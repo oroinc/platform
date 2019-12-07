@@ -550,6 +550,8 @@ services:
                 - image
                 - enum
                 - multiEnum
+                - multiFile
+                - multiImage
             -
                 #BAP-5875
                 #- oneToOne

@@ -146,9 +146,7 @@ services:
 
     oro_attachment.entity_config_dumper.extension.file:
         class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-        arguments:
-            - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.relation_builder'
+        parent: oro_entity_extend.entity_config_dumper.extension.relation
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 

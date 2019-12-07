@@ -7,6 +7,8 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFileItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Entity for Multiple Files and Multiple Images relations
+ *
  * @ORM\Table(name="oro_attachment_file_item")
  * @ORM\Entity()
  * @Config
@@ -40,6 +42,14 @@ class FileItem extends ExtendFileItem
      * @ORM\Column(name="sort_order", type="integer", options={"default"=0})
      */
     protected $sortOrder = 0;
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string)$this->getId();
+    }
 
     /**
      * @return int|null

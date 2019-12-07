@@ -45,6 +45,8 @@ oro:
                 manyToMany:         Many to many
                 enum:               Select
                 multiEnum:          Multi-Select
+                multiFile:          Multiple Files
+                multiImage:         Multiple Images
 
                 ref-one:            System relation
                 ref-many:           System relation
