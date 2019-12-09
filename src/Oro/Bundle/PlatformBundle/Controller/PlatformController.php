@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Controller;
 
+use Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -33,6 +34,7 @@ class PlatformController extends AbstractController
         return [
             'thirdPartyPackages' => $packageProvider->getThirdPartyPackages(),
             'oroPackages' => $packageProvider->getOroPackages(),
+            'deploymentVariables' => $this->get(DeploymentVariableProvider::class)->getVariables(),
         ];
     }
 
@@ -43,6 +45,7 @@ class PlatformController extends AbstractController
     {
         return array_merge(parent::getSubscribedServices(), [
             PackageProvider::class,
+            DeploymentVariableProvider::class
         ]);
     }
 }

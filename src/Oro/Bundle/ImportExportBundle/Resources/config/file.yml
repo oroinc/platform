@@ -1,3 +1,0 @@
-services:
-    oro_importexport.file.mime_type_guesser:
-        class: Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser

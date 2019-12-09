@@ -165,7 +165,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
 
             $subBlock->setUseSpan(true);
             $this->assertTrue($subBlock->getUseSpan());
-            
+
             $subBlock->setTooltip($tooltip);
             $this->assertEquals($tooltip, $subBlock->getTooltip());
 
@@ -195,6 +195,8 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
 
     public function testException()
     {
+        // NOTE: do not change default Error Handler or restore it
+
         /** test getSubBlock Exception */
         $this->expectException(\PHPUnit\Framework\Error\Notice::class);
         $this->expectExceptionMessage('Undefined index: testSubBlock');

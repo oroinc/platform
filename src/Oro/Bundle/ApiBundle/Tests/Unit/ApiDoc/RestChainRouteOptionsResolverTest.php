@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -13,14 +14,23 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
     private $docViewDetector;
 
-    /** @var RestChainRouteOptionsResolver */
-    private $chainRouteOptionsResolver;
-
     protected function setUp()
     {
         $this->docViewDetector = $this->createMock(RestDocViewDetector::class);
+    }
 
-        $this->chainRouteOptionsResolver = new RestChainRouteOptionsResolver($this->docViewDetector);
+    /**
+     * @param array $resolvers [[resolver, view name], ...]
+     *
+     * @return RestChainRouteOptionsResolver
+     */
+    private function getChainRouteOptionsResolver(
+        array $resolvers = []
+    ): RestChainRouteOptionsResolver {
+        return new RestChainRouteOptionsResolver(
+            $resolvers,
+            $this->docViewDetector
+        );
     }
 
     public function testEmptyChainResolver()
@@ -31,7 +41,8 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->docViewDetector->expects(self::never())
             ->method('getView');
 
-        $this->chainRouteOptionsResolver->resolve($route, $routes);
+        $chainRouteOptionsResolver = $this->getChainRouteOptionsResolver();
+        $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
     public function testEmptyView()
@@ -40,7 +51,6 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $routes = $this->createMock(RouteCollectionAccessor::class);
 
         $resolver1 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver1);
 
         $this->docViewDetector->expects(self::once())
             ->method('getView')
@@ -49,7 +59,10 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $resolver1->expects(self::never())
             ->method('resolve');
 
-        $this->chainRouteOptionsResolver->resolve($route, $routes);
+        $chainRouteOptionsResolver = $this->getChainRouteOptionsResolver(
+            [[$resolver1, null]]
+        );
+        $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
     public function testResolve()
@@ -58,17 +71,11 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $routes = $this->createMock(RouteCollectionAccessor::class);
 
         $resolver1 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver1);
         $resolver2 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver2, 'testView');
         $resolver3 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver3, 'anotherView');
         $resolver4 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver4);
         $resolver5 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver5, 'testView');
         $resolver6 = $this->createMock(RouteOptionsResolverInterface::class);
-        $this->chainRouteOptionsResolver->addResolver($resolver6, 'anotherView');
 
         $this->docViewDetector->expects(self::once())
             ->method('getView')
@@ -91,6 +98,30 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $resolver6->expects(self::never())
             ->method('resolve');
 
-        $this->chainRouteOptionsResolver->resolve($route, $routes);
+        $chainRouteOptionsResolver = $this->getChainRouteOptionsResolver(
+            [
+                [$resolver1, null],
+                [$resolver2, 'testView'],
+                [$resolver3, 'anotherView'],
+                [$resolver4, null],
+                [$resolver5, 'testView'],
+                [$resolver6, 'anotherView']
+            ]
+        );
+        $chainRouteOptionsResolver->resolve($route, $routes);
+    }
+
+    public function testReset()
+    {
+        $resolver1 = $this->createMock(RouteOptionsResolverInterface::class);
+        $resolver2 = $this->createMock(RestRouteOptionsResolver::class);
+
+        $resolver2->expects(self::once())
+            ->method('reset');
+
+        $chainRouteOptionsResolver = $this->getChainRouteOptionsResolver(
+            [[$resolver1, null], [$resolver2, null]]
+        );
+        $chainRouteOptionsResolver->reset();
     }
 }

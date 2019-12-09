@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 class CacheManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -311,11 +312,15 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsNotSpecified()
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
+        $resettableService = $this->createMock(ResetInterface::class);
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
+        $cacheManager->addResettableService($resettableService);
 
         $apiDocExtractor->expects(self::exactly(2))
             ->method('warmUp')
             ->withConsecutive(['view1'], ['view2']);
+        $resettableService->expects(self::exactly(2))
+            ->method('reset');
 
         $cacheManager->warmUpApiDocCache();
     }
@@ -323,11 +328,15 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsSpecified()
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
+        $resettableService = $this->createMock(ResetInterface::class);
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
+        $cacheManager->addResettableService($resettableService);
 
         $apiDocExtractor->expects(self::once())
             ->method('warmUp')
             ->with('view1');
+        $resettableService->expects(self::once())
+            ->method('reset');
 
         $cacheManager->warmUpApiDocCache('view1');
     }

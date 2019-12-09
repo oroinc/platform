@@ -5,22 +5,32 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Contracts\Service\ResetInterface;
 
-class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
+/**
+ * Delegates the route modifications based on its options to all applicable child resolvers.
+ */
+class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, ResetInterface
 {
+    /** @var array [[RouteOptionsResolverInterface, view name], ...] */
+    private $resolvers = [];
+
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /**
+     * @param array               $resolvers       [[RouteOptionsResolverInterface, view name], ...]
+     *                                             The view name can be NULL if the route option resolver
+     *                                             is applicable to all views
      * @param RestDocViewDetector $docViewDetector
      */
-    public function __construct(RestDocViewDetector $docViewDetector)
-    {
+    public function __construct(
+        array $resolvers,
+        RestDocViewDetector $docViewDetector
+    ) {
+        $this->resolvers = $resolvers;
         $this->docViewDetector = $docViewDetector;
     }
-
-    /** @var array [[RouteOptionsResolverInterface, view], ...] */
-    protected $resolvers = [];
 
     /**
      * {@inheritdoc}
@@ -45,15 +55,14 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * Adds a route option resolver to the chain.
-     * The resolvers are executed in the order they are added.
-     *
-     * @param RouteOptionsResolverInterface $resolver The route option resolver
-     * @param string|null                   $view     The name of a view the route option resolver is applicable to
-     *                                                If NULL the route option resolver will work for all views
+     * {@inheritdoc}
      */
-    public function addResolver(RouteOptionsResolverInterface $resolver, $view = null)
+    public function reset()
     {
-        $this->resolvers[] = [$resolver, $view];
+        foreach ($this->resolvers as list($resolver, $resolverView)) {
+            if ($resolver instanceof ResetInterface) {
+                $resolver->reset();
+            }
+        }
     }
 }

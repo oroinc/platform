@@ -86,18 +86,7 @@ class CachingApiDocExtractor extends BaseExtractor implements
      */
     public function all($view = ApiDoc::DEFAULT_VIEW)
     {
-        /**
-         * disabling the garbage collector gives a significant performance gain (about 2 times)
-         * because a lot of config and metadata objects with short lifetime are used
-         * this happens because we work with clones of these objects
-         * @see \Oro\Bundle\ApiBundle\Provider\ConfigProvider::getConfig
-         * @see \Oro\Bundle\ApiBundle\Provider\MetadataProvider::getMetadata
-         */
-        gc_disable();
-        $result = parent::all($this->resolveView($view));
-        gc_enable();
-
-        return $result;
+        return parent::all($this->resolveView($view));
     }
 
     /**
