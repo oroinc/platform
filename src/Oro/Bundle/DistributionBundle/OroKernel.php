@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
+use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use OroRequirements;
@@ -480,6 +481,20 @@ abstract class OroKernel extends Kernel
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
         ) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
+        }
+
+        return $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildContainer()
+    {
+        $container = parent::buildContainer();
+
+        if (null !== ($deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir()))) {
+            $this->getContainerLoader($container)->load($deploymentConfig);
         }
 
         return $container;
