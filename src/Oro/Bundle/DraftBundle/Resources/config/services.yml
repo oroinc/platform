@@ -74,3 +74,18 @@ services:
         class: Oro\Bundle\DraftBundle\EventListener\SearchListener
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
+
+    oro_draft.event_listener.draftable_filter_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\DraftableFilterListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    oro_draft.consumption.draftable_filter_extension:
+        class: Oro\Bundle\DraftBundle\Consumption\Extension\DraftableFilterExtension
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: 249, persistent: false }
