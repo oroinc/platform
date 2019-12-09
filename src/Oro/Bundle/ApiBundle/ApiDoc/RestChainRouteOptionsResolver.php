@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Delegates the route modifications based on its options to all applicable child resolvers.
  */
-class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
+class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, ResetInterface
 {
     /** @var array [[RouteOptionsResolverInterface, view name], ...] */
     private $resolvers = [];
@@ -49,6 +50,18 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
         foreach ($this->resolvers as list($resolver, $resolverView)) {
             if (null === $resolverView || $resolverView === $view) {
                 $resolver->resolve($route, $routes);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        foreach ($this->resolvers as list($resolver, $resolverView)) {
+            if ($resolver instanceof ResetInterface) {
+                $resolver->reset();
             }
         }
     }

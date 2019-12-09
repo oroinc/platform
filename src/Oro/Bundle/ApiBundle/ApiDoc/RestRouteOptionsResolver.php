@@ -14,13 +14,14 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Adds all REST API routes to API sandbox based on the current API view and API configuration.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class RestRouteOptionsResolver implements RouteOptionsResolverInterface
+class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetInterface
 {
     public const ENTITY_ATTRIBUTE        = 'entity';
     public const ENTITY_PLACEHOLDER      = '{entity}';
@@ -111,6 +112,16 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $route->setOption(self::HIDDEN_OPTION, true);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->resources = [];
+        $this->resourcesWithoutIdentifier = [];
+        $this->overrides = [];
     }
 
     /**
