@@ -64,6 +64,8 @@ class DraftableFilterListener
                 }
             }
         }
+
+        return null;
     }
 
     /**
