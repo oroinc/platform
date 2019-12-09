@@ -339,6 +339,12 @@ services:
             - '@oro_api.entity_alias.cache_warmer'
             - '@oro_api.resources.cache_warmer'
             - '@nelmio_api_doc.extractor.api_doc_extractor'
+        calls:
+            - [addResettableService, ['@oro_api.rest.chain_routing_options_resolver']]
+            - [addResettableService, ['@oro_api.resources_provider']]
+            - [addResettableService, ['@oro_api.config_provider']]
+            - [addResettableService, ['@oro_api.metadata_provider']]
+            - [addResettableService, ['@oro_api.value_normalizer']]
 
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry

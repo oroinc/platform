@@ -6,6 +6,9 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Delegates the route modifications based on its options to all applicable child resolvers.
+ */
 class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     /** @var RestDocViewDetector */
@@ -55,5 +58,17 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
     public function addResolver(RouteOptionsResolverInterface $resolver, $view = null)
     {
         $this->resolvers[] = [$resolver, $view];
+    }
+
+    /**
+     * Resets an object to its initial state.
+     */
+    public function reset()
+    {
+        foreach ($this->resolvers as list($resolver, $resolverView)) {
+            if (method_exists($resolver, 'reset')) {
+                $resolver->reset();
+            }
+        }
     }
 }
