@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Gaufrette\Filesystem;
 use Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
@@ -19,7 +20,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -227,11 +227,11 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected function createDoctrineMock()
     {
-        return $this->createMock(RegistryInterface::class);
+        return $this->createMock(ManagerRegistry::class);
     }
 
     /**

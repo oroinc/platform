@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -14,7 +15,6 @@ use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
@@ -34,7 +34,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $urlGenerator;
 
-    /** @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /** @var AttachmentManager */
@@ -50,7 +50,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $this->mimeTypeChecker = $this->createMock(MimeTypeChecker::class);
         $this->associationManager = $this->createMock(AssociationManager::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $this->registry = $this->createMock(RegistryInterface::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->file = new TestFile();
         $this->file->setFilename('testFile.txt');
@@ -114,7 +114,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->registry
             ->expects(self::once())
-            ->method('getEntityManagerForClass')
+            ->method('getManagerForClass')
             ->with(File::class)
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
@@ -146,7 +146,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->registry
             ->expects(self::once())
-            ->method('getEntityManagerForClass')
+            ->method('getManagerForClass')
             ->with(File::class)
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 

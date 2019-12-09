@@ -15,9 +15,9 @@ class AutocompletePasswordTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return PasswordType::class;
+        return [PasswordType::class];
     }
 
     /**

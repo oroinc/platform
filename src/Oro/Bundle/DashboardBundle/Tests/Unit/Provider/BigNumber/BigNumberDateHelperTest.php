@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\BigNumber;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper;
 use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BigNumberDateHelperTest extends TestCase
 {
@@ -34,7 +34,7 @@ class BigNumberDateHelperTest extends TestCase
             ->willReturn($calendar);
 
         $helper = new BigNumberDateHelper(
-            $this->createMock(RegistryInterface::class),
+            $this->createMock(ManagerRegistry::class),
             $this->createMock(AclHelper::class),
             $localeSettings
         );

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer;
 use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
@@ -10,7 +11,6 @@ use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityBundle\DataCollector\ProfilingManagerRegistry;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 use Oro\Bundle\EntityBundle\ORM\Registry;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -32,7 +32,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->setParameter('oro_entity.orm.hydrators', []);
         $containerBuilder->register('oro_entity.profiler.duplicate_queries_data_collector');
         $containerBuilder->register('oro_entity.profiler.orm_data_collector');
-        $doctrine = $this->createMock(RegistryInterface::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $containerBuilder->set('doctrine', $doctrine);
         $containerBuilder->register('doctrine');
 
@@ -47,7 +47,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->register('profiler');
         $containerBuilder->setParameter('oro_entity.orm.hydrators', []);
         $containerBuilder->register('oro_entity.profiler.orm_data_collector');
-        $doctrine = $this->createMock(RegistryInterface::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $containerBuilder->set('doctrine', $doctrine);
         $containerBuilder->register('doctrine');
 
@@ -87,7 +87,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->register('profiler');
         $containerBuilder->register('oro_entity.profiler.duplicate_queries_data_collector');
-        $doctrine = $this->createMock(RegistryInterface::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::once())
             ->method('getConnectionNames')
             ->willReturn([]);

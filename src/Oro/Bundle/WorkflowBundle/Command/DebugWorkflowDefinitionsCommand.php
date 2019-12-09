@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DebugWorkflowDefinitionsCommand extends Command
 {
+    /** @var string */
     protected static $defaultName = 'oro:debug:workflow:definitions';
 
     private const INLINE_DEPTH = 20;
@@ -36,13 +37,17 @@ class DebugWorkflowDefinitionsCommand extends Command
         'Exclusive Record Groups'
     ];
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(RegistryInterface $doctrine, TranslatorInterface $translator)
+    /**
+     * @param ManagerRegistry $doctrine
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator)
     {
         $this->doctrine = $doctrine;
         $this->translator = $translator;

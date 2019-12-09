@@ -30,8 +30,8 @@ class FeatureToggleConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $root = $builder->root(self::ROOT_NODE);
+        $builder = new TreeBuilder(self::ROOT_NODE);
+        $root = $builder->getRootNode();
 
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 

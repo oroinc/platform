@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -16,7 +17,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
@@ -42,8 +42,8 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->repository = $this->createMock(EmailTemplateRepository::class);
 
-        /** @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject $doctrine */
-        $doctrine = $this->createMock(RegistryInterface::class);
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getRepository')
             ->with(EmailTemplate::class)

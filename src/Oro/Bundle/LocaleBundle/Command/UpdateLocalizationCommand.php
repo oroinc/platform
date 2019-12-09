@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\LocaleBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 /**
  * Replaces "en" language and "en" formatting code in the default localization.
@@ -29,13 +29,13 @@ class UpdateLocalizationCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:localization:update';
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(RegistryInterface $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
         parent::__construct();
@@ -134,7 +134,7 @@ EOD;
      */
     private function updateLocalization(Localization $localization, Language $language, string $formattingCode): void
     {
-        $title = Intl::getLocaleBundle()->getLocaleName($formattingCode, $language->getCode());
+        $title = Locales::getName($formattingCode, $language->getCode());
 
         $localization->setFormattingCode($formattingCode)
             ->setLanguage($language)

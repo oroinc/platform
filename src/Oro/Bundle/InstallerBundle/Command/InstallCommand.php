@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\Process\Process;
 
 /**
@@ -745,7 +745,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     private function validateFormattingCode(string $locale): void
     {
-        $locales = array_keys(Intl::getLocaleBundle()->getLocaleNames());
+        $locales = array_keys(Locales::getNames());
         if (!in_array($locale, $locales, true)) {
             throw new \InvalidArgumentException($this->getExceptionMessage('formatting', $locale, $locales));
         }
@@ -757,7 +757,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     private function validateLanguage(string $language)
     {
-        $locales = Intl::getLocaleBundle()->getLocales();
+        $locales = Locales::getLocales();
         if (!in_array($language, $locales, true)) {
             throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $locales));
         }

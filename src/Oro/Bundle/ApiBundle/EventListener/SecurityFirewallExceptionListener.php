@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Prevents usage of Session in case if the request does not have session identifier in cookies.
- * This is required because API can work in two modes, stateless and statefull.
+ * It is required because API can work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
 class SecurityFirewallExceptionListener extends ExceptionListener

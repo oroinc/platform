@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Event\BeforeImportChunksEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
@@ -28,7 +31,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class PreparingHttpImportMessageProcessorTest
@@ -75,7 +78,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private $notificationSettings;
 
     /**
-     * @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     private $registry;
 
@@ -83,6 +86,11 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $logger;
+
+    /**
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $eventDispatcher;
 
     /**
      * @var PreImportMessageProcessor
@@ -107,9 +115,10 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn(From::emailAddress('sender_email@example.com', 'sender_name'));
-        $this->registry = $this->createMock(RegistryInterface::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->writer = $this->createMock(FileStreamWriter::class);
         $writerChain = new WriterChain();
@@ -124,6 +133,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $writerChain,
             $this->notificationSettings,
             $this->registry,
+            $this->eventDispatcher,
             100
         );
 
@@ -152,6 +162,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message')
         ;
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -185,6 +198,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('splitImportFile')
             ->willReturn(['test']);
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message->expects($this->once())
@@ -251,6 +267,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['import_1.csv'])
         ;
 
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
+
         $message = $this->createMessageMock();
         $message
             ->expects($this->once())
@@ -316,6 +335,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('test', 'import', $this->writer)
             ->willReturn(['import_1.csv'])
         ;
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $message = $this->createMessageMock();
         $message
@@ -411,6 +433,9 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($em);
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
 
@@ -519,6 +544,10 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('splitImportFile')
             ->willReturn(['chunk_1_12345.csv', 'chunk_2_12345.csv'])
         ;
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS, new BeforeImportChunksEvent($messageData));
 
         $message = $this->createMessageMock();
         $message

@@ -28,8 +28,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NAME);
+        $treeBuilder = new TreeBuilder(self::ROOT_NAME);
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode->children()
             ->scalarNode('formatting_code')->defaultValue(self::DEFAULT_LOCALE)->end()

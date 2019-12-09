@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,11 +33,6 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      * @var LocaleSettings
      */
     protected $localeSettings;
-
-    /**
-     * @var string
-     */
-    protected $currencySelectorConfigKey;
 
     /**
      * @var CurrencyNameHelper
@@ -174,9 +169,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         $invalidCurrencies = [];
 
         foreach ($currencies as $currency) {
-            $name = Intl::getCurrencyBundle()->getCurrencyName($currency, $this->localeSettings->getLocale());
-
-            if (!$name) {
+            if (!Currencies::exists($currency)) {
                 $invalidCurrencies[] = $currency;
             }
         }

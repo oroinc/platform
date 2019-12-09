@@ -94,7 +94,9 @@ oro_form:
                 article: ~
                 audio: ~
                 bdo: ~
-                blockquote: ~
+                blockquote:
+                    attributes:
+                        - cite
                 caption: ~
                 cite: ~
                 code: ~

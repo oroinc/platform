@@ -37,5 +37,3 @@ services:
         public: true
         arguments:
             - '@symfony2_extension.kernel'
-            - '%kernel.root_dir%/Resources'
-            - ['%kernel.root_dir%']

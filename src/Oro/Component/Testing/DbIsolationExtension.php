@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Testing;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Component\Testing\Doctrine\Events;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 /**
@@ -33,7 +33,7 @@ trait DbIsolationExtension
             throw new \LogicException('The client missing a container. Make sure the kernel was booted');
         }
 
-        /** @var RegistryInterface $registry */
+        /** @var ManagerRegistry $registry */
         $registry = $this->getClientInstance()->getContainer()->get('doctrine');
         foreach ($registry->getManagers() as $name => $em) {
             if ($em instanceof EntityManagerInterface) {

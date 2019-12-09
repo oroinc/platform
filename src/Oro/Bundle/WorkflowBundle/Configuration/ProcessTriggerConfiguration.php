@@ -115,8 +115,8 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('configuration');
+        $treeBuilder = new TreeBuilder('configuration');
+        $rootNode = $treeBuilder->getRootNode();
         $this->addTriggerNodes($rootNode);
 
         return $treeBuilder;

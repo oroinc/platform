@@ -28,8 +28,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $rootNode = $builder->root('oro_message_queue');
+        $builder = new TreeBuilder('oro_message_queue');
+        $rootNode = $builder->getRootNode();
         
         $transportNode = $rootNode->children()
             ->arrayNode('transport')

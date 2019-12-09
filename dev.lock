@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d82e4bb9029eaef194b86fffcd049178",
+    "content-hash": "d8c41afb0a078cc6ef2a77481ffe2d51",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -381,26 +381,6 @@
                 "reference": "df0ddedcab1a8fdb3a7abafc5fe97819931e7bd5"
             },
             "type": "bower-asset"
-        },
-        {
-            "name": "bower-asset/font-awesome",
-            "version": "v4.7.0",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:FortAwesome/Font-Awesome.git",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/a8386aae19e200ddb0f6845b5feeee5eb7013687",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
-            },
-            "type": "bower-asset",
-            "license": [
-                "OFL-1.1",
-                "MIT",
-                "CC-BY-3.0"
-            ]
         },
         {
             "name": "bower-asset/fuse",
@@ -4961,6 +4941,18 @@
             ]
         },
         {
+            "name": "npm-asset/font-awesome",
+            "version": "4.7.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/font-awesome/-/font-awesome-4.7.0.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "(OFL-1.1 AND MIT)"
+            ]
+        },
+        {
             "name": "npm-asset/jquery",
             "version": "3.4.1",
             "dist": {
@@ -8427,16 +8419,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v4.4.0",
+            "version": "v4.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "625a4dbfdafcb8cea8ff90a62b9c24b28694938d"
+                "reference": "04863e4457b0a9b2a34b34fe53e7fd4f1203e1c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/625a4dbfdafcb8cea8ff90a62b9c24b28694938d",
-                "reference": "625a4dbfdafcb8cea8ff90a62b9c24b28694938d",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/04863e4457b0a9b2a34b34fe53e7fd4f1203e1c0",
+                "reference": "04863e4457b0a9b2a34b34fe53e7fd4f1203e1c0",
                 "shasum": ""
             },
             "require": {
@@ -8598,7 +8590,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2019-11-21T07:08:41+00:00"
+            "time": "2019-12-01T14:06:54+00:00"
         },
         {
             "name": "tinymce/tinymce",

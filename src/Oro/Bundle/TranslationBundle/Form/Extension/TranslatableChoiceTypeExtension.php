@@ -17,9 +17,9 @@ class TranslatableChoiceTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ChoiceType::class;
+        return [ChoiceType::class];
     }
 
     /**

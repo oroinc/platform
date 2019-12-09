@@ -1,10 +1,24 @@
 /* @theme: blank; */
 
-// In blank theme has not use custom fonts.
+// In blank theme has not use custom fonts except icon font.
 // This variable update in child's themes.
-$theme-fonts: () !default;
+$theme-fonts: (
+    'font-awesome': (
+        'family': 'FontAwesome',
+        'variants': (
+            (
+                // This font based on 'Lato regular' font.
+                'path': '#{$global-url}/npmassets/font-awesome/fonts/fontawesome-webfont',
+                'weight': normal,
+                'style': normal
+            )
+        ),
+        'formats': ('woff2', 'woff')
+    )
+) !default;
 
 $base-font: Arial, sans-serif !default;
+
 // include in assets
 $icon-font: 'FontAwesome' !default;
 

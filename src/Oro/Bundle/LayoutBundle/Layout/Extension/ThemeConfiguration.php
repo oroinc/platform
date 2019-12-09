@@ -54,11 +54,11 @@ class ThemeConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $treeBuilder->getRootNode();
 
-        $configTreeBuilder = new TreeBuilder();
-        $configNode = $configTreeBuilder->root('config');
+        $configTreeBuilder = new TreeBuilder('config');
+        $configNode = $configTreeBuilder->getRootNode();
         $configNode->info('Layout theme additional config')->end();
         // Allow extra configuration keys to be present in this configuration node.
         // This is needed to give other bundles ability to declare and add custom configuration.
