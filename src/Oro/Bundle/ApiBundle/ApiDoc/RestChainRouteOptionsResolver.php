@@ -18,18 +18,24 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
     /** @var RestDocViewDetector */
     private $docViewDetector;
 
+    /** @var array [view name => underlying view name, ...] */
+    private $underlyingViews;
+
     /**
      * @param array               $resolvers       [[RouteOptionsResolverInterface, view name], ...]
      *                                             The view name can be NULL if the route option resolver
      *                                             is applicable to all views
      * @param RestDocViewDetector $docViewDetector
+     * @param array               $underlyingViews [view name => underlying view name, ...]
      */
     public function __construct(
         array $resolvers,
-        RestDocViewDetector $docViewDetector
+        RestDocViewDetector $docViewDetector,
+        array $underlyingViews
     ) {
         $this->resolvers = $resolvers;
         $this->docViewDetector = $docViewDetector;
+        $this->underlyingViews = $underlyingViews;
     }
 
     /**
@@ -46,9 +52,10 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
             return;
         }
 
+        $underlyingView = $this->underlyingViews[$view] ?? null;
         /** @var RouteOptionsResolverInterface $resolver */
         foreach ($this->resolvers as list($resolver, $resolverView)) {
-            if (null === $resolverView || $resolverView === $view) {
+            if (null === $resolverView || $resolverView === $view || $resolverView === $underlyingView) {
                 $resolver->resolve($route, $routes);
             }
         }
