@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
  * Give an additional chance to authorise user from session context if
  * the current request is AJAX request (has valid "X-CSRF-Header" header)
  * and it has session identifier in cookies.
- * This is required because API can work in two modes, stateless and statefull.
+ * It is required because API can work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
 class SecurityFirewallContextListener implements ListenerInterface

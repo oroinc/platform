@@ -16,3 +16,4 @@ oro:
                 contains_primary: 'One of the emails must be set as primary.'
             phones:
                 contains_primary: 'One of the phones must be set as primary.'
+            existing_address_used: 'An existing address cannot be used.'

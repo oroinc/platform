@@ -6,6 +6,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class PlatformControllerTest extends WebTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient(
@@ -22,6 +25,7 @@ class PlatformControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $content = $result->getContent();
+        $this->assertContains('Deployment Type', $content);
         $this->assertContains('Oro Packages', $content);
         $this->assertContains('3rd Party Packages', $content);
         $this->assertContains('symfony/symfony', $content);
