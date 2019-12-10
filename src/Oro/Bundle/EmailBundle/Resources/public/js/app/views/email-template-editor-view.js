@@ -165,7 +165,7 @@ define(function(require) {
                 const view = component.view;
 
                 if (!_.isUndefined(view) && !_.isUndefined(view.tinymceConnected)) {
-                    view.setEnabled(enabled);
+                    view.setIsHtml(enabled);
                     this.listenToOnce(view, 'TinyMCE:initialized', this._onEditorBlur.bind(this));
                 }
             });
