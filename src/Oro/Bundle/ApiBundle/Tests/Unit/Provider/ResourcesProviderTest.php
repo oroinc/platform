@@ -879,4 +879,64 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
         );
     }
+
+    public function testReset()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([new ApiResource('Test\Entity1')]);
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => true]);
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getExcludedActions')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity1' => ['update']]);
+        $this->resourcesCache->expects(self::exactly(2))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(['Test\Entity2']);
+        $this->resourcesCache->expects(self::never())
+            ->method('clear');
+
+        // warmup the memory cache
+        self::assertEquals(
+            [new ApiResource('Test\Entity1')],
+            $this->resourcesProvider->getResources($version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
+        );
+        self::assertEquals(
+            ['update'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+
+        // clear the memory cache
+        $this->resourcesProvider->reset();
+
+        // test that the memory cache was cleared
+        self::assertEquals(
+            [new ApiResource('Test\Entity1')],
+            $this->resourcesProvider->getResources($version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceAccessible('Test\Entity1', $version, $requestType)
+        );
+        self::assertEquals(
+            ['update'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+    }
 }
