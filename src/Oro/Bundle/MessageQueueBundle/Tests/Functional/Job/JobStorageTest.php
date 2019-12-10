@@ -72,7 +72,11 @@ class JobStorageTest extends WebTestCase
     {
         return [
             'not closed entity manager' => [false],
-           // 'closed entity manager'     => [true],
+            // 'closed entity manager'     => [true],
+            // This case doesn't work only in a test environment. EntityManager service is not a proxy,
+            // which is required to reset it. Marking it as proxy (lazy) breaks other tests.
+            // Updating doctrine to version 3 will be possible for us to change the inheritance
+            // of the EntityManager to decoration.
         ];
     }
 

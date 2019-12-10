@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Nelmio\ApiDocBundle\Extractor as NelmioExtractor;
 use Nelmio\ApiDocBundle\Formatter as NelmioFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
@@ -43,6 +44,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             return;
         }
 
+        $this->configureUnderlyingViews($container);
         $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
         $this->configureSimpleFormatter($container);
@@ -96,6 +98,55 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureUnderlyingViews(ContainerBuilder $container)
+    {
+        $underlyingViews = $this->getUnderlyingViews($container);
+        foreach ($underlyingViews as $view => $underlyingView) {
+            $this->registerUnderlyingViewHandler($container, $view, $underlyingView);
+        }
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(2, $underlyingViews);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array [view name => underlying view name, ...]
+     */
+    private function getUnderlyingViews(ContainerBuilder $container)
+    {
+        $underlyingViews = [];
+        $views = $this->getApiDocViews($container);
+        foreach ($views as $name => $view) {
+            if (\array_key_exists('underlying_view', $view) && $view['underlying_view']) {
+                $underlyingViews[$name] = $view['underlying_view'];
+            }
+        }
+
+        return $underlyingViews;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $view
+     * @param string           $underlyingView
+     */
+    private function registerUnderlyingViewHandler(ContainerBuilder $container, string $view, string $underlyingView)
+    {
+        $container
+            ->register(
+                self::API_DOC_ANNOTATION_HANDLER_SERVICE . '.' . $view,
+                AddApiDocViewAnnotationHandler::class
+            )
+            ->setArguments([$view, $underlyingView])
+            ->setPublic(false)
+            ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
     }
 
     /**

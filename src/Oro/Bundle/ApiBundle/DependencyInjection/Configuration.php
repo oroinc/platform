@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -133,6 +136,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * @param NodeBuilder $node
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function appendApiDocViewsNode(NodeBuilder $node)
     {
@@ -148,6 +152,9 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('default')
                             ->info('Whether this view is default one.')
                             ->defaultFalse()
+                        ->end()
+                        ->scalarNode('underlying_view')
+                            ->info('The name of the underlying view.')
                         ->end()
                         ->arrayNode('request_type')
                             ->info('The request type supported by this view.')
@@ -214,15 +221,80 @@ class Configuration implements ConfigurationInterface
                 ->always(function (array $value) {
                     $documentationPath = $value['documentation_path'];
                     unset($value['documentation_path']);
-                    foreach ($value['api_doc_views'] as $key => $view) {
-                        if (!\array_key_exists('documentation_path', $view)) {
-                            $value['api_doc_views'][$key]['documentation_path'] = $documentationPath;
+                    $views = $value['api_doc_views'];
+                    foreach (array_keys($views) as $viewName) {
+                        if (!empty($views[$viewName]['underlying_view'])) {
+                            $underlyingViewName = $views[$viewName]['underlying_view'];
+                            self::assertUnderlyingView($views, $underlyingViewName, $viewName);
+                            $value['api_doc_views'][$viewName] = self::mergeViews(
+                                $views[$viewName],
+                                $views[$underlyingViewName]
+                            );
+                        }
+                        if (!\array_key_exists('documentation_path', $views[$viewName])) {
+                            $value['api_doc_views'][$viewName]['documentation_path'] = $documentationPath;
                         }
                     }
 
                     return $value;
                 })
             ->end();
+    }
+
+    /**
+     * @param array  $views
+     * @param string $underlyingViewName
+     * @param string $viewName
+     */
+    private static function assertUnderlyingView(array $views, string $underlyingViewName, string $viewName)
+    {
+        if (empty($views[$underlyingViewName])) {
+            throw new \LogicException(sprintf(
+                'The API view "%s" cannot be used as a underlying view for "%s" API view'
+                . ' because it is not defined.',
+                $underlyingViewName,
+                $viewName
+            ));
+        }
+        if (!empty($views[$underlyingViewName]['underlying_view'])) {
+            throw new \LogicException(sprintf(
+                'The API view "%s" cannot be used as a underlying view for "%s" API view'
+                . ' because only one nesting level of a underlying views is supported.',
+                $underlyingViewName,
+                $viewName
+            ));
+        }
+    }
+
+    /**
+     * @param array $view
+     * @param array $underlyingView
+     *
+     * @return array
+     */
+    private static function mergeViews(array $view, array $underlyingView): array
+    {
+        foreach ($underlyingView as $key => $val) {
+            if (!\array_key_exists($key, $view)) {
+                $view[$key] = $val;
+            } elseif ('headers' === $key) {
+                foreach ($underlyingView[$key] as $headerName => $headerValues) {
+                    $existingHeaderValues = [];
+                    if (!empty($view[$key][$headerName])) {
+                        foreach ($view[$key][$headerName] as $headerValue) {
+                            $existingHeaderValues[$headerValue['value']] = true;
+                        }
+                    }
+                    foreach ($headerValues as $headerValue) {
+                        if (!isset($existingHeaderValues[$headerValue['value']])) {
+                            $view[$key][$headerName][] = $headerValue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $view;
     }
 
     /**

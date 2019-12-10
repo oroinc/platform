@@ -167,7 +167,7 @@ define(function(require) {
         },
 
         onTypeChange: function(e) {
-            this.getBodyEditorView().setEnabled($(e.target).val() === 'html');
+            this.getBodyEditorView().setIsHtml($(e.target).val() === 'html');
         },
 
         /**
