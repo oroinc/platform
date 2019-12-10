@@ -4,3 +4,6 @@ app-modules:
     - oronavigation/js/app/modules/navigation-module
 configs:
     oronavigation/js/routes-loader: {}
+dynamic-imports:
+    oronavigation:
+        - routing
