@@ -159,6 +159,8 @@ services:
             - ['setAttribute', ['span', 'aria-hidden', 'Bool']]
             - ['setAttribute', ['span', 'data-toggle', 'Text']]
             - ['setAttribute', ['span', 'data-content', 'Text']]
+            - ['setAttribute', ['span', 'data-title', 'Text']]
+            - ['setAttribute', ['span', 'data-type', 'Text']]
             - ['setAttribute', ['span', 'tabindex', 'Text']]
             # button attributes
             - ['setAttribute', ['button', 'id', 'ID']]
