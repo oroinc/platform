@@ -60,7 +60,7 @@ class OroAttachmentBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_attachment_file_item');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('file_id', 'integer', []);
+        $table->addColumn('file_id', 'integer', ['notnull' => false]);
         $table->addColumn('sort_order', 'integer', ['default' => '0']);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['file_id']);

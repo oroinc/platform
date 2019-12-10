@@ -32,7 +32,7 @@ class FileItem extends ExtendFileItem
      *     cascade={"persist", "remove"},
      *     orphanRemoval=true
      *  )
-     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $file;
 

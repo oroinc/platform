@@ -112,9 +112,13 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $imageFieldConfig = $this->createExtendFieldConfig(TestEntity2::class, 'imageFieldName', 'image');
         $imageImportFieldConfig = $this->createImportExportFieldConfig(TestEntity2::class, 'imageFieldName');
 
+        $imageFieldConfig->set('cascade', ['persist', 'refresh']);
+
         $fileEntityConfig = $this->createExtendEntityConfig(TestEntity3::class);
         $fileFieldConfig = $this->createExtendFieldConfig(TestEntity3::class, 'fileFieldName', 'file');
         $fileImportFieldConfig = $this->createImportExportFieldConfig(TestEntity3::class, 'fileFieldName');
+
+        $imageFieldConfig->set('cascade', ['refresh']);
 
         $this->configManager->expects(self::exactly(4))
             ->method('getConfigs')
@@ -175,6 +179,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                         'target_entity' => File::class,
                         'target_field_id' => false,
                         'cascade' => [
+                            'refresh',
                             'persist',
                         ],
                     ],
@@ -189,6 +194,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 'target_entity' => File::class,
                 'target_field' => 'id',
                 'cascade' => [
+                    'refresh',
                     'persist',
                 ],
                 'relation_key' => $imageRelationKey,
@@ -245,8 +251,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $imagesEntityConfig = $this->createExtendEntityConfig(TestEntity2::class);
         $imagesFieldConfig = $this->createExtendFieldConfig(TestEntity2::class, 'imagesFieldName', 'multiImage');
 
+        $imagesFieldConfig->set('cascade', ['persist', 'remove', 'refresh']);
+
         $filesEntityConfig = $this->createExtendEntityConfig(TestEntity3::class);
         $filesFieldConfig = $this->createExtendFieldConfig(TestEntity3::class, 'filesFieldName', 'multiFile');
+
+        $filesFieldConfig->set('cascade', ['persist', 'remove', 'refresh']);
 
         $fileItemEntityConfig = $this->createExtendEntityConfig(FileItem::class);
 
@@ -300,6 +310,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                         'owner' => false,
                         'target_entity' => FileItem::class,
                         'target_field_id' => $imagesTagretFieldId,
+                        'cascade' => [
+                            'persist',
+                            'remove',
+                            'refresh',
+                        ],
+                        'orphanRemoval' => true,
                     ],
                 ],
             ],
@@ -315,6 +331,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 'target_title' => ['id'],
                 'target_detailed' => ['id'],
                 'relation_key' => $imagesRelationKey,
+                'cascade' => [
+                    'persist',
+                    'remove',
+                    'refresh',
+                ],
+                'orphanRemoval' => true,
             ],
             $imagesFieldConfig->all()
         );
@@ -340,6 +362,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                         'owner' => false,
                         'target_entity' => FileItem::class,
                         'target_field_id' => $filesTagretFieldId,
+                        'cascade' => [
+                            'persist',
+                            'remove',
+                            'refresh',
+                        ],
+                        'orphanRemoval' => true,
                     ],
                 ],
             ],
@@ -355,6 +383,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 'target_title' => ['id'],
                 'target_detailed' => ['id'],
                 'relation_key' => $filesRelationKey,
+                'cascade' => [
+                    'persist',
+                    'remove',
+                    'refresh',
+                ],
+                'orphanRemoval' => true,
             ],
             $filesFieldConfig->all()
         );

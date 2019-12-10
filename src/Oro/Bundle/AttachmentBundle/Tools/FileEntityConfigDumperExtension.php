@@ -81,9 +81,16 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
 
         $extendFieldConfig->set('target_entity', FileItem::class);
         $extendFieldConfig->set('bidirectional', true);
+        $extendFieldConfig->set('orphanRemoval', true);
         $extendFieldConfig->set('target_grid', ['id']);
         $extendFieldConfig->set('target_title', ['id']);
         $extendFieldConfig->set('target_detailed', ['id']);
+
+        $cascade = array_merge(
+            $extendFieldConfig->get('cascade', false, []),
+            ['persist', 'remove']
+        );
+        $extendFieldConfig->set('cascade', array_unique($cascade));
 
         $this->createRelation($extendFieldConfig);
     }

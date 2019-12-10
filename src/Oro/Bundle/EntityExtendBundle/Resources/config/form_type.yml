@@ -233,6 +233,8 @@ services:
 
             - [addExtendTypeMapping, ["file", Oro\Bundle\AttachmentBundle\Form\Type\FileType]]
             - [addExtendTypeMapping, ["image", Oro\Bundle\AttachmentBundle\Form\Type\ImageType]]
+            - [addExtendTypeMapping, ["multiFile", Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType]]
+            - [addExtendTypeMapping, ["multiImage", Oro\Bundle\AttachmentBundle\Form\Type\MultiImageType]]
             - [addExtendTypeMapping, ["manyToOne", Oro\Bundle\EntityBundle\Form\Type\EntitySelectType]]
             - [addExtendTypeMapping, ["oneToMany", Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType]]
             - [addExtendTypeMapping, ["manyToMany", Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType]]
