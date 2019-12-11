@@ -18,10 +18,13 @@
         "ext-zip": "*",
         "ext-openssl": "*",
         "psr/container": "^1.0",
-        "symfony/symfony": "4.2.*",
+        "psr/simple-cache": "1.0.*",
+        "nyholm/psr7": "1.2.*",
+        "symfony/symfony": "4.4.1",
+        "symfony/property-info": "4.4.1",
         "symfony/security-acl": "~3.0.0",
         "symfony/acl-bundle": "1.0.*",
-        "twig/twig": "2.9.*",
+        "twig/twig": "2.10.*",
         "doctrine/orm": "2.6.3",
         "doctrine/doctrine-bundle": "1.9.*",
         "doctrine/dbal": "2.7.*",
@@ -30,7 +33,7 @@
         "doctrine/doctrine-fixtures-bundle": "2.4.*",
         "doctrine/collections": "1.5.*",
         "twig/extensions": "1.5.*",
-        "symfony/swiftmailer-bundle": "3.1.1",
+        "symfony/swiftmailer-bundle": "3.1.2",
         "symfony/monolog-bundle": "3.3.*",
         "sensio/framework-extra-bundle": "5.2.*",
         "incenteev/composer-parameter-handler": "2.1.*",
@@ -56,7 +59,7 @@
         "nesbot/Carbon": "1.29.*",
         "monolog/monolog": "1.23.*",
         "ocramius/proxy-manager": "2.1.1",
-        "knplabs/knp-gaufrette-bundle": "0.5.0",
+        "knplabs/knp-gaufrette-bundle": "0.5.2",
         "oro/doctrine-extensions": "1.2.*",
         "tinymce/tinymce": "4.6.*",
         "ezyang/htmlpurifier": "4.10.*",
@@ -89,7 +92,7 @@
         "bower-asset/lightgallery": "1.4.0",
         "bower-asset/jquery-ui-multiselect-widget": "2.0.1",
         "bower-asset/autolinker.js": "1.6.*",
-        "bower-asset/font-awesome": "4.7.*",
+        "npm-asset/font-awesome": "4.7.*",
         "npm-asset/bootstrap": "4.3.1",
         "npm-asset/popper.js": "1.14.7",
         "npm-asset/asap": "2.0.6",
@@ -150,7 +153,7 @@
     "prefer-stable": true,
     "extra": {
         "symfony": {
-            "require": "4.2.*"
+            "require": "4.4.*"
         },
         "branch-alias": {
             "dev-master": "4.0-dev"

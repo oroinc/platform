@@ -24,6 +24,7 @@ define(function(require) {
 
         defaults: {
             enabled: true,
+            isHtml: true,
             plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
             pluginsMap: {
                 bdesk_photo: 'bundles/oroform/lib/bdeskphoto/plugin.min.js'
@@ -67,6 +68,7 @@ define(function(require) {
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
+            this.isHtml = options.isHtml;
             if (this.firstRender && !this.autoRender) {
                 this.enabled = false;
             }
@@ -89,13 +91,16 @@ define(function(require) {
                 this.tinymceInstance = null;
 
                 // strip tags when disable HTML editing mode
-                this.htmlValue = this.$el.val();
-                this.strippedValue = txtHtmlTransformer.html2text(this.htmlValue);
-                this.$el.val(this.strippedValue);
+                if (!this.isHtml) {
+                    this.htmlValue = this.$el.val();
+                    this.strippedValue = txtHtmlTransformer.html2text(this.htmlValue);
+                    this.$el.val(this.strippedValue);
+                }
 
                 this.$el.show();
                 this.tinymceConnected = false;
             }
+
             if (this.enabled) {
                 this.connectTinyMCE();
                 this.$el.attr('data-focusable', true);
@@ -103,6 +108,7 @@ define(function(require) {
             } else {
                 this.$el.removeAttr('data-focusable');
             }
+
             this.firstRender = false;
             this.trigger('resize');
         },
@@ -221,6 +227,17 @@ define(function(require) {
             }
             this.enabled = enabled;
             this.render();
+        },
+
+        /**
+         * @param {boolean} isHtml
+         */
+        setIsHtml: function(isHtml) {
+            if (this.isHtml === isHtml) {
+                return;
+            }
+            this.isHtml = isHtml;
+            this.setEnabled(isHtml);
         },
 
         setFocus: function(e) {

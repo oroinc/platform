@@ -5,6 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 use Oro\Bundle\DistributionBundle\OroKernel;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
+use PHPUnit\Util\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroKernelTest extends \PHPUnit\Framework\TestCase
@@ -27,14 +28,24 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
      */
     protected function tearDown()
     {
-        $cacheDir = $this->kernel->getCacheDir();
+        $this->removeDir($this->kernel->getCacheDir());
+        $this->removeDir($this->kernel->getLogDir());
 
-        if (!is_dir($cacheDir)) {
+        // restore error handler
+        set_error_handler([ErrorHandler::class, 'handleError']);
+    }
+
+    /**
+     * @param string $dir
+     */
+    private function removeDir(string $dir)
+    {
+        if (!is_dir($dir)) {
             return;
         }
 
         $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($cacheDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
@@ -46,7 +57,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        rmdir($cacheDir);
+        rmdir($dir);
     }
 
     /**

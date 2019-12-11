@@ -5,6 +5,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass;
 use Oro\Bundle\FeatureToggleBundle\OroFeatureToggleBundle;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
@@ -36,9 +37,15 @@ class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
         $bundle->build($container);
 
         $passes = $container->getCompiler()->getPassConfig()->getAfterRemovingPasses();
+        $passes = array_filter(
+            $passes,
+            static function (CompilerPassInterface $pass) {
+                return strpos(get_class($pass), 'Symfony\\') !== 0;
+            }
+        );
 
         $this->assertInternalType('array', $passes);
         $this->assertCount(1, $passes);
-        $this->assertInstanceOf(ConfigurationPass::class, $passes[0]);
+        $this->assertInstanceOf(ConfigurationPass::class, reset($passes));
     }
 }

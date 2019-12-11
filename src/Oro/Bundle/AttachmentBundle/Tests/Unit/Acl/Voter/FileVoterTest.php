@@ -366,6 +366,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass(self::PARENT_ENTITY_CLASS);
         $file->setParentEntityId(self::PARENT_ENTITY_ID);
         $file->setParentEntityFieldName(self::PARENT_ENTITY_FIELD_NAME);
+        $file->setUuid('test-uuid');
 
         return $file;
     }

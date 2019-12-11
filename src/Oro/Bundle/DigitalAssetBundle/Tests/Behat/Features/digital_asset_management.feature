@@ -16,7 +16,7 @@ Feature:  Digital asset management
       | Title | Not supported mime type |
     When I save form
     Then I should see validation errors:
-      | File | The mime type of the file is invalid ("text/plain"). Allowed mime types are "application/msword", "application/vnd.ms-excel", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
+      | File | The mime type of the file is invalid ("text/csv"). Allowed mime types are "application/msword", "application/vnd.ms-excel", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
 
   Scenario: Create digital assets with jpg mime types
     Given I fill "Digital Asset Form" with:

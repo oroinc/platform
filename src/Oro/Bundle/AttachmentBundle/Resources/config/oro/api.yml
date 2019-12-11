@@ -16,6 +16,9 @@ api:
         Oro\Bundle\AttachmentBundle\Entity\File:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/file.md'
             fields:
+                uuid:
+                    form_options:
+                        mapped: false
                 filename:
                     exclude: true
                 extension:

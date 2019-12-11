@@ -20,8 +20,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $treeBuilder->getRootNode();
 
         $node = $rootNode->children();
         $this->appendActionGroups($node);
@@ -168,8 +168,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getAttributesNode()
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('attributes');
+        $builder = new TreeBuilder('attributes');
+        $node = $builder->getRootNode();
         $node
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -209,8 +209,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getButtonOptionsNode()
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('button_options');
+        $builder = new TreeBuilder('button_options');
+        $node = $builder->getRootNode();
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -235,8 +235,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getFrontendOptionsNode()
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('frontend_options');
+        $builder = new TreeBuilder('frontend_options');
+        $node = $builder->getRootNode();
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -269,8 +269,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getDatagridOptionsNode()
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('datagrid_options');
+        $builder = new TreeBuilder('datagrid_options');
+        $node = $builder->getRootNode();
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -302,8 +302,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function getFormOptionsNode()
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('form_options');
+        $builder = new TreeBuilder('form_options');
+        $node = $builder->getRootNode();
         $node
             ->children()
                 ->arrayNode('validation_groups')

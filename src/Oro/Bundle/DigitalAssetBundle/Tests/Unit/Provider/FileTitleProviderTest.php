@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
@@ -10,7 +11,6 @@ use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Provider\FileTitleProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +20,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationHelper;
 
-    /** @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     /** @var FileTitleProvider */
@@ -33,7 +33,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->innerFileTitleProvider = $this->createMock(FileTitleProviderInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
-        $this->doctrine = $this->createMock(RegistryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->provider = new FileTitleProvider(
             $this->innerFileTitleProvider,

@@ -127,7 +127,7 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
             [
                 sprintf('The last processor executed before interrupt of consuming was "%s"', $messageProcessorClass)
             ],
-            $logger->getLogs('info')
+            $logger->getMessages()
         );
     }
 }

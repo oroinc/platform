@@ -45,7 +45,6 @@ services:
     # actually this service is replaced with an alias to the most priority scoped config manager
     oro_config.manager:
         class: Oro\Bundle\ConfigBundle\Config\ConfigManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
@@ -78,7 +77,6 @@ services:
 
     oro_config.provider.system_configuration.form_provider:
         class: Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
@@ -121,7 +119,6 @@ services:
 
     oro_config.form.handler.config:
         class: Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_config.global'
@@ -131,7 +128,6 @@ services:
 
     oro_config.manager.api:
         class: Oro\Bundle\ConfigBundle\Config\ConfigApiManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'

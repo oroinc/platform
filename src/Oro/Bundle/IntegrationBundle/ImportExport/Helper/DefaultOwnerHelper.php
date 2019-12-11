@@ -2,28 +2,28 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DefaultOwnerHelper
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /**
-     * @param RegistryInterface                  $registry
+     * @param ManagerRegistry                    $registry
      * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider
     ) {
         $this->registry = $registry;

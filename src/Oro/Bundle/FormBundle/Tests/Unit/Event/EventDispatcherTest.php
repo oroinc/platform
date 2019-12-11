@@ -33,7 +33,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $eventName = 'test_event_name';
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($eventName, $event);
+            ->with($event, $eventName);
 
         $this->immutableDispatcher->dispatch($eventName, $event);
     }
@@ -53,10 +53,10 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch');
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
-            ->with($eventName, $event);
+            ->with($event, $eventName);
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with($eventName . '.form_name', $event);
+            ->with($event, $eventName . '.form_name');
 
         $this->immutableDispatcher->dispatch($eventName, $event);
     }

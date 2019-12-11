@@ -10,7 +10,7 @@ class UrlGeneratorStub implements UrlGeneratorInterface
     /**
      * @var array
      */
-    private static $declaredRoutes = [
+    private static $compiledRoutes = [
         'route_name' => [
             ['view'],
             ['_controller' => 'controller::action'],

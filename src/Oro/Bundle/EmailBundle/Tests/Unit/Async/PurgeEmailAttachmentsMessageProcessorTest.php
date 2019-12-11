@@ -1,20 +1,21 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new PurgeEmailAttachmentsMessageProcessor(
-            $this->createRegistryInterfaceMock(),
+            $this->createRegistryMock(),
             $this->createMessageProducerMock(),
             $this->createJobRunnerMock(),
             $this->createConfigManagerMock()
@@ -31,6 +32,9 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
 
     /**
      * @dataProvider getSizeDataProvider
+     * @param $payload
+     * @param $parameterSize
+     * @param $expectedResult
      */
     public function testShouldReturnCorrectAttachmentSizeByPayload($payload, $parameterSize, $expectedResult)
     {
@@ -42,7 +46,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
         ;
 
         $processor = new PurgeEmailAttachmentsMessageProcessor(
-            $this->createRegistryInterfaceMock(),
+            $this->createRegistryMock(),
             $this->createMessageProducerMock(),
             $this->createJobRunnerMock(),
             $configManager
@@ -53,6 +57,9 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
         $this->assertEquals($expectedResult, $actualResult);
     }
 
+    /**
+     * @return array
+     */
     public function getSizeDataProvider()
     {
         return [
@@ -83,11 +90,11 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
-    private function createRegistryInterfaceMock()
+    private function createRegistryMock()
     {
-        return $this->createMock(RegistryInterface::class);
+        return $this->createMock(ManagerRegistry::class);
     }
 
 

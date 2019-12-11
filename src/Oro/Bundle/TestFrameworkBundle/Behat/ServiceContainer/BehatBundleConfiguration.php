@@ -38,8 +38,8 @@ class BehatBundleConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_behat_extension');
+        $treeBuilder = new TreeBuilder('oro_behat_extension');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()

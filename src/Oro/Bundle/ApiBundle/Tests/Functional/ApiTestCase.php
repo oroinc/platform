@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\Debug\BufferingLogger;
@@ -604,11 +605,33 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param string $entityClass
+     *
      * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getEntityManager(string $entityClass = null)
     {
-        return self::getContainer()->get('doctrine')->getManager();
+        $doctrine = self::getContainer()->get('doctrine');
+        if ($entityClass) {
+            return $doctrine->getManagerForClass($entityClass);
+        }
+
+        return $doctrine->getManager();
+    }
+
+    /**
+     * @param string|null $scope The configuration scope (e.g.: global, organization, user, etc.)
+     *                           or NULL to get the configuration manager for the current scope
+     *
+     * @return ConfigManager
+     */
+    protected function getConfigManager(?string $scope = 'global'): ConfigManager
+    {
+        if (!$scope) {
+            return self::getContainer()->get('oro_config.manager');
+        }
+
+        return self::getContainer()->get('oro_config.' . $scope);
     }
 
     /**

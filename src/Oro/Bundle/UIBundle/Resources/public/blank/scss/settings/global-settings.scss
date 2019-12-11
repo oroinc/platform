@@ -4,5 +4,5 @@ $global-url: 'bundles' !default;
 
 @import './partials/functions';
 @import './partials/variables';
-@import './partials/font-awesome-vars';
+@import './partials/font-awesome/font-awesome';
 @import './partials/mixins';

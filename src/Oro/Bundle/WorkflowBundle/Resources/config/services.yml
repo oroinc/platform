@@ -33,7 +33,6 @@ services:
 
     oro_workflow.manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_workflow.registry'
@@ -159,7 +158,6 @@ services:
 
     oro_workflow.registry.workflow_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_action.provider.current_application'
@@ -225,7 +223,7 @@ services:
         parent: oro_notification.email_handler
         public: false
         tags:
-            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+            - { name: notification.handler, alias: workflow_notification_handler, priority: 100 }
 
     oro_workflow.database_checker:
         public: false
@@ -257,7 +255,6 @@ services:
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
@@ -417,7 +414,6 @@ services:
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_workflow.helper.translation'

@@ -5,6 +5,9 @@ namespace Oro\Bundle\PlatformBundle\Provider;
 use Oro\Bundle\PlatformBundle\Model\DeploymentVariable;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
+/**
+ * Deployment vars provider
+ */
 class DeploymentVariableProvider
 {
     /** @var ParameterBag */
@@ -19,7 +22,7 @@ class DeploymentVariableProvider
     }
 
     /**
-     * @return EnvironmentVariable[]
+     * @return DeploymentVariable[]
      */
     public function getVariables()
     {

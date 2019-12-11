@@ -19,8 +19,8 @@ class NavigationConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE, 'array', new MenuTreeBuilder());
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE, 'array', new MenuTreeBuilder());
+        $rootNode = $treeBuilder->getRootNode();
 
         $node = $rootNode->children();
         $this->appendMenuConfig($node);

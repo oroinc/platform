@@ -17,7 +17,6 @@ parameters:
 
 services:
     oro_attachment.manager:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
         arguments:
@@ -32,7 +31,6 @@ services:
         alias: oro_attachment.manager
 
     oro_attachment.file_manager:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         parent: oro_gaufrette.file_manager
@@ -90,7 +88,6 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_attachment.manager.api:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
@@ -103,7 +100,6 @@ services:
 
     oro_attachment.manager.file.api:
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -223,7 +219,6 @@ services:
 
     oro_attachment.provider.attachment:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -309,7 +304,7 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker'
         public: false
         arguments:
-            - '@oro_entity_config.config_manager'
+            - '@oro_attachment.provider.attachment_entity_config'
 
     oro_attachment.url_generator:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator
@@ -323,6 +318,25 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
+        alias: 'oro_attachment.provider.file_url'
+
+    oro_attachment.provider.file_url_by_uuid.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_attachment_file_url_by_uuid' ] ]
+
+    oro_attachment.provider.file_url_by_uuid:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider'
+        arguments:
+            - '@oro_attachment.provider.file_url'
+            - '@oro_attachment.provider.file_url_by_uuid.cache'
+            - '@doctrine'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider:
+        alias: 'oro_attachment.provider.file_url_by_uuid'
 
     oro_attachment.provider.resized_image_path:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'
@@ -347,7 +361,6 @@ services:
 
     oro_attachment.provider.resized_image:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_attachment.file_manager'
@@ -359,7 +372,6 @@ services:
 
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_attachment.provider.resized_image'
@@ -382,7 +394,7 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider'
         public: false
         arguments:
-            - '@oro_entity_config.config_manager'
+            - '@oro_attachment.provider.attachment_entity_config'
 
     oro_attachment.filtered_attachment_migration:
         class: 'Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationService'
@@ -405,9 +417,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider
         arguments:
             - '@oro_config.manager'
-            - '@oro_entity_config.config_manager'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@oro_attachment.provider.attachment_entity_config'
 
     Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider:
         alias: oro_attachment.provider.file_constraints
@@ -434,3 +444,13 @@ services:
 
     Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface:
         alias: oro_attachment.provider.file_title
+
+    oro_attachment.provider.attachment_entity_config:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        calls:
+            - [setLogger, ['@logger']]
+
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface:
+        alias: oro_attachment.provider.attachment_entity_config

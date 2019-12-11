@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
@@ -15,7 +16,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Responsible for sending different types of notifications related to import process such as import result and
@@ -49,7 +49,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $notificationSettings;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -64,7 +64,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      * @param JobStorage $jobStorage
      * @param ImportExportResultSummarizer $importJobSummaryResultService
      * @param NotificationSettings $notificationSettings
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
     public function __construct(
         MessageProducerInterface $producer,
@@ -72,7 +72,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         JobStorage $jobStorage,
         ImportExportResultSummarizer $importJobSummaryResultService,
         NotificationSettings $notificationSettings,
-        RegistryInterface $doctrine
+        ManagerRegistry $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;

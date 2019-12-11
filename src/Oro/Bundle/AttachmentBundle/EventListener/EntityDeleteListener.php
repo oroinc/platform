@@ -36,7 +36,7 @@ class EntityDeleteListener
             $files = $repository->findBy(
                 [
                     'parentEntityClass' => $this->doctrineHelper->getEntityClass($entity),
-                    'parentEntityId' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
+                    'parentEntityId' => $id,
                 ]
             );
 

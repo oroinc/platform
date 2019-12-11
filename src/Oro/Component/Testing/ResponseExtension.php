@@ -1,10 +1,14 @@
 <?php
+
 namespace Oro\Component\Testing;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Provides assertion for the Response object.
+ */
 trait ResponseExtension
 {
     /**
@@ -21,7 +25,7 @@ trait ResponseExtension
      */
     public function assertLastResponseStatus($expectedStatus)
     {
-        $this->assertResponseStatus($this->getClient()->getResponse(), $expectedStatus);
+        $this->assertResponseStatus($this->getClientInstance()->getResponse(), $expectedStatus);
     }
 
     /**
@@ -41,7 +45,7 @@ trait ResponseExtension
 
     public function assertLastResponseContentTypeHtml()
     {
-        $this->assertResponseContentTypeHtml($this->getClient()->getResponse());
+        $this->assertResponseContentTypeHtml($this->getClientInstance()->getResponse());
     }
 
     /**
@@ -57,7 +61,7 @@ trait ResponseExtension
 
     public function assertLastResponseContentTypeJson()
     {
-        $this->assertResponseContentTypeJson($this->getClient()->getResponse());
+        $this->assertResponseContentTypeJson($this->getClientInstance()->getResponse());
     }
 
     /**
@@ -84,7 +88,7 @@ trait ResponseExtension
      */
     public function getLastResponseJsonContent()
     {
-        return $this->getResponseJsonContent($this->getClient()->getResponse());
+        return $this->getResponseJsonContent($this->getClientInstance()->getResponse());
     }
 
     /**
@@ -120,5 +124,5 @@ trait ResponseExtension
     /**
      * @return Client
      */
-    abstract protected function getClient();
+    abstract protected function getClientInstance();
 }

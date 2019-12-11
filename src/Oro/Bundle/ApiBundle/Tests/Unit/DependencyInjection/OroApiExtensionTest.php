@@ -1340,6 +1340,9 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testConfigurationForApiDocViews()
     {
         $container = $this->getContainer();
@@ -1364,7 +1367,19 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                     'html_formatter'     => 'another_html_formatter',
                     'sandbox'            => false
                 ],
-                'view3' => []
+                'view3' => [],
+                'view4' => [
+                    'label'           => 'View 4',
+                    'default'         => false,
+                    'request_type'    => ['rest', 'json_api', 'api4'],
+                    'underlying_view' => 'view1',
+                    'headers'         => [
+                        'X-Include'    => [
+                            ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
+                            ['value' => 'another']
+                        ]
+                    ]
+                ]
             ]
         ];
 
@@ -1406,6 +1421,25 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                     'html_formatter'     => 'oro_api.api_doc.formatter.html_formatter',
                     'sandbox'            => true,
                     'headers'            => []
+                ],
+                'view4' => [
+                    'label'              => 'View 4',
+                    'default'            => false,
+                    'request_type'       => ['rest', 'json_api', 'api4'],
+                    'underlying_view'    => 'view1',
+                    'documentation_path' => 'http://test.com/default_api_docs',
+                    'html_formatter'     => 'oro_api.api_doc.formatter.html_formatter',
+                    'sandbox'            => true,
+                    'headers'            => [
+                        'Content-Type' => [
+                            ['value' => 'application/vnd.api+json', 'actions' => []]
+                        ],
+                        'X-Include'    => [
+                            ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
+                            ['value' => 'another', 'actions' => []],
+                            ['value' => 'forAllActions', 'actions' => []]
+                        ]
+                    ]
                 ]
             ],
             $apiConfig['api_doc_views']

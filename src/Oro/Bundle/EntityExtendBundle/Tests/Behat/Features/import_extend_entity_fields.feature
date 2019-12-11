@@ -210,12 +210,3 @@ Feature: Import extend entity fields
     And I should see "FieldText Label updated" in grid
     And I should not see "correctFieldName"
     And I should not see "Update schema"
-
-  Scenario: It should be impossible to import columns with invalid field name
-    Given I fill template with data:
-      | fieldName                 | type   | entity.label       | datagrid.show_filter | datagrid.is_visible |
-      | <script>alert(1)</script> | string | string field Label | no                   | 0                   |
-    When I try import file
-    Then I should not see "Import File Field Validation" element with text "The mime type of the file is invalid" inside "Import File Form" element
-    When I reload the page
-    Then I should not see "Update schema"

@@ -43,7 +43,6 @@ services:
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_email_emailtemplate", Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType, null]
@@ -83,7 +82,6 @@ services:
 
     oro_email.form.handler.emailtemplate:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_email.form.emailtemplate'
@@ -125,7 +123,6 @@ services:
 
     oro_email.form.handler.email.api:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_email.form.email.api'
@@ -139,7 +136,6 @@ services:
 
     oro_email.form.email.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -200,7 +196,6 @@ services:
 
     oro_email.form.handler.mailbox:
         class: Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@form.factory'

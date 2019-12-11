@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Guesser;
 
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\FileBag;
+use Oro\Bundle\ImportExportBundle\MimeType\UploadedFileExtensionHelper;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
+/**
+ * MIME Type guesser for ms outlook msg files.
+ */
 class MsMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
@@ -17,15 +19,12 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         ],
     ];
 
-    /** @var array */
-    protected $files;
-
     /**
      * {@inheritdoc}
      */
-    public function guess($path)
+    public function guessMimeType(string $path): ?string
     {
-        $extension = $this->getExtensionByPath($path);
+        $extension = UploadedFileExtensionHelper::getExtensionByPath($path);
         if (!$extension) {
             return null;
         }
@@ -46,46 +45,10 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * @param string $path
-     * @return string|null
+     * {@inheritdoc}
      */
-    private function getExtensionByPath($path)
+    public function isGuesserSupported(): bool
     {
-        $extension = null;
-
-        $uploadedFiles = $this->fetchUploadedFiles();
-        if (isset($uploadedFiles[$path])) {
-            $path = $uploadedFiles[$path];
-        }
-
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        if ($extension) {
-            $extension = strtolower($extension);
-        }
-
-        return $extension;
-    }
-
-    /**
-     * @return array
-     */
-    private function fetchUploadedFiles()
-    {
-        if (null === $this->files) {
-            $this->files = [];
-
-            $fileBagArray = (new FileBag($_FILES))->getIterator()->getArrayCopy();
-            array_walk_recursive(
-                $fileBagArray,
-                function ($item) {
-                    /** $item UploadedFile */
-                    if ($item instanceof UploadedFile) {
-                        $this->files[$item->getRealPath()] = $item->getClientOriginalName();
-                    }
-                }
-            );
-        }
-
-        return $this->files;
+        return true;
     }
 }

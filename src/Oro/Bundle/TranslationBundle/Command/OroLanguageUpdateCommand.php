@@ -12,7 +12,8 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Locales;
 
 /**
  * Installs/Updates language's external translations
@@ -164,12 +165,12 @@ class OroLanguageUpdateCommand extends Command
     private function getLanguageName(Language $language)
     {
         $code = $language->getCode();
-        $name = Intl::getLanguageBundle()->getLanguageName($code, null, 'en');
+        $name = Languages::getName($code, 'en');
         if ($name) {
             return $name;
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName($code, 'en');
+        $name = Locales::getName($code, 'en');
 
         return $name ?: $code;
     }

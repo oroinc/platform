@@ -508,9 +508,9 @@ class CustomImportTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ImportType::NAME;
+        return [ImportType::NAME];
     }
 
     /**
@@ -542,9 +542,9 @@ class CustomExportTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ExportType::NAME;
+        return [ExportType::NAME];
     }
 
     /**

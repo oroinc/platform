@@ -15,8 +15,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_cache');
+        $treeBuilder = new TreeBuilder('oro_cache');
+        $treeBuilder->getRootNode();
 
         return $treeBuilder;
     }

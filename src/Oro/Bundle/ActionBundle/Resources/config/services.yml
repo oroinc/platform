@@ -1,7 +1,6 @@
 services:
     oro_action.handler.delete:
         class: 'Oro\Bundle\ActionBundle\Handler\DeleteHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.delete_handler_registry'
@@ -146,7 +145,6 @@ services:
 
     oro_action.form.handler.operation_button:
         class: 'Oro\Bundle\ActionBundle\Handler\OperationFormHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@form.factory'
@@ -203,14 +201,12 @@ services:
 
     oro_action.provider.button_search_context:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_action.helper.context'
 
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         lazy: true
         calls:

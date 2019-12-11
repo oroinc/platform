@@ -24,8 +24,6 @@ services:
         parent: oro_importexport.handler.abstract
         arguments:
             index_6: '@oro_importexport.file.batch_file_manager.export'
-        calls:
-            - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
         lazy: true
 
     Oro\Bundle\ImportExportBundle\Handler\ExportHandler:

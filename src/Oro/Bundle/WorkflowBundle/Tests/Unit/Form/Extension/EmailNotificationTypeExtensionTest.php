@@ -28,9 +28,9 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        $this->assertEquals(EmailNotificationType::class, $this->extension->getExtendedType());
+        $this->assertEquals([EmailNotificationType::class], EmailNotificationTypeExtension::getExtendedTypes());
     }
 
     public function testBuildForm()

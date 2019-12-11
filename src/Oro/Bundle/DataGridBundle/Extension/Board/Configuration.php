@@ -48,9 +48,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('board');
 
-        $builder->root('board')
+        $builder->getRootNode()
                 ->children()
                     ->scalarNode(static::LABEL_KEY)->defaultValue('oro.datagrid.appearance.board')->end()
                     ->scalarNode(static::ICON_KEY)->defaultValue('fa-th')->end()

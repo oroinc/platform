@@ -15,10 +15,12 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
+ * Abstract class for the email synchronizer.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, LoggerAwareInterface
@@ -39,7 +41,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /** @var KnownEmailAddressCheckerFactory */
     protected $knownEmailAddressCheckerFactory;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var KnownEmailAddressCheckerInterface */
@@ -78,9 +80,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     }
 
     /**
-     * @param TokenStorage $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function setTokenStorage(TokenStorage $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
         $this->currentToken = $tokenStorage->getToken();
@@ -318,7 +320,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Switches the security context to the given organization
-     * @todo: Should be deleted after email sync process will be refactored
+     * Should be deleted after email sync process will be refactored
      */
     protected function impersonateOrganization(Organization $organization = null)
     {

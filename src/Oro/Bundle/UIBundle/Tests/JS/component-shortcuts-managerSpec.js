@@ -1,16 +1,8 @@
-/* global requirejs */
-// require({
-//     config: {
-//         'oroui/js/component-shortcuts-manager': {
-//             reservedKeys: ['options', 'testOption']
-//         }
-//     }
-// });
-
-define(['underscore'], function(_) {
+define(function(require) {
     'use strict';
 
-    let componentShortcutsManager;
+    const _ = require('underscore');
+    const componentShortcutsManagerModuleInjector = require('inject-loader!oroui/js/component-shortcuts-manager');
 
     const testWidgetConfiguration = {
         moduleName: 'test-path-to-module',
@@ -19,17 +11,31 @@ define(['underscore'], function(_) {
         }
     };
 
-    xdescribe('Component Shortcuts Manager', function() {
-        beforeEach(function(done) {
-            requirejs.undef('oroui/js/component-shortcuts-manager');
-            require(['oroui/js/component-shortcuts-manager'], function(m) {
-                componentShortcutsManager = m;
-                done();
+    describe('Component Shortcuts Manager', function() {
+        let componentShortcutsManager;
+
+        beforeEach(function() {
+            componentShortcutsManager = componentShortcutsManagerModuleInjector({
+                'module-config': {
+                    'default': () => ({reservedKeys: ['options', 'someReservedName']})
+                }
             });
         });
 
         it('Initialize manager with custom module config', function() {
-            expect(componentShortcutsManager.reservedKeys).toEqual(['options', 'testOption']);
+            expect(() => {
+                componentShortcutsManager.add('someComponent', {
+                    moduleName: 'some/module/name'
+                });
+            }).not.toThrowError();
+
+            expect(() => {
+                componentShortcutsManager.add('someReservedName', {
+                    moduleName: 'some/module/name'
+                });
+            }).toThrow(
+                new Error('Component shortcut `someReservedName` is reserved!')
+            );
         });
 
         it('Add shortcut', function() {

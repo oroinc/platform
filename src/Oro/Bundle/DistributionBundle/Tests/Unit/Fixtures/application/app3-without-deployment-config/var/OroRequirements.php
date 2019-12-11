@@ -1,5 +1,5 @@
 <?php
-
+//@codingStandardsIgnoreStart
 if (!class_exists(OroRequirements::class)) {
     class OroRequirements
     {
@@ -9,3 +9,4 @@ if (!class_exists(OroRequirements::class)) {
         const REQUIRED_NODEJS_VERSION  = '>=12.0';
     }
 }
+// @codingStandardsIgnoreEnd
