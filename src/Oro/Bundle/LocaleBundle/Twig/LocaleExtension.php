@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -79,7 +79,7 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function getCurrencyName($currency, $displayLocale = null)
     {
-        return Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale);
+        return Currencies::getName($currency, $displayLocale);
     }
 
     /**

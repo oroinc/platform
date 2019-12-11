@@ -33,6 +33,9 @@ oro:
             entity_plural_label:     Files
             entity_description:      Files attached to emails, comments, notes or other entity records.
             id.label:                Id
+            uuid:
+                label:               UUID
+                description:         Universally Unique Identifier of the file.
             filename.label:          File name
             original_filename:
                 label:               Original file name
@@ -64,7 +67,7 @@ oro:
 
         config:
             file_size_settings.label: File Size Settings
-            file_size.label:     File size
+            file_size.label:     File Size (MB)
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings

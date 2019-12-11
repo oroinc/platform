@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,15 +15,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CronDefinitionsLoadCommand extends Command
 {
+    /** @var string */
     protected static $defaultName = 'oro:cron:definitions:load';
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(RegistryInterface $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
 

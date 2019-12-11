@@ -10,6 +10,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Adds fields configuration to the search entity map based on ownership metadata.
+ */
 class SearchListener
 {
     const EMPTY_ORGANIZATION_ID = 0;
@@ -44,8 +47,14 @@ class SearchListener
                 'target_type'   => 'integer',
                 'target_fields' => ['organization']
             ];
+
+            $fieldName = $metadata->getOwnerFieldName();
+            if (!$fieldName) {
+                continue;
+            }
+
             $mapConfig[$className]['fields'][] = [
-                'name'          => $metadata->getOwnerFieldName(),
+                'name'          => $fieldName,
                 'target_type'   => 'integer',
                 'target_fields' => [$this->getOwnerKey($metadata, $mapping['alias'])]
             ];

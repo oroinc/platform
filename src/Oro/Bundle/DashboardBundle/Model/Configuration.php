@@ -19,8 +19,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root(self::ROOT_NODE_NAME)
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE_NAME);
+
+        $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('widgets_configuration')
                     ->info('Form fields used for widget configuration that will be added to each widget')

@@ -15,8 +15,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_sso');
+        $treeBuilder = new TreeBuilder('oro_sso');
+        $rootNode    = $treeBuilder->getRootNode();
 
         SettingsBuilder::append($rootNode, [
             'enable_google_sso' => [

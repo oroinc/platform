@@ -7,7 +7,6 @@ use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
@@ -22,19 +21,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ExportHandler extends AbstractHandler
 {
-    /**
-     * @var MimeTypeGuesser
-     */
-    protected $mimeTypeGuesser;
-
-    /**
-     * @param MimeTypeGuesser $mimeTypeGuesser
-     */
-    public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
-    {
-        $this->mimeTypeGuesser = $mimeTypeGuesser;
-    }
-
     /**
      * Get export result
      *
@@ -263,18 +249,5 @@ class ExportHandler extends AbstractHandler
         }
 
         return $response;
-    }
-
-    /**
-     * Tries to guess MIME type of the given file
-     *
-     * @param string $fileName
-     * @return string|null
-     */
-    protected function getFileContentType($fileName)
-    {
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-
-        return $this->mimeTypeGuesser->guessByFileExtension($extension);
     }
 }

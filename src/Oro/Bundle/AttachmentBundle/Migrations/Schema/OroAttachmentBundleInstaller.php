@@ -7,6 +7,7 @@ use Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_0\OroAttachmentBundle;
 use Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_1\OroAttachmentBundle as OroAttachmentBundle1;
 use Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_2\OroAttachmentBundle as OroAttachmentOrganization;
 use Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_4\AddOriginalFilenameIndex;
+use Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_7\AddFileUuidColumn;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -17,7 +18,7 @@ class OroAttachmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -27,6 +28,7 @@ class OroAttachmentBundleInstaller implements Installation
     {
         OroAttachmentBundle::createFileTable($schema);
         $this->addParentEntityClassEntityIdColumns($schema);
+        AddFileUuidColumn::addUuidColumn($schema);
         OroAttachmentBundle1::createAttachmentTable($schema);
         OroAttachmentOrganization::addOrganizationFields($schema);
         AddOriginalFilenameIndex::addOriginalFilenameIndex($schema);

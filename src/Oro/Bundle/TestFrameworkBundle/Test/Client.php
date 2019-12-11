@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Simulates a browser and makes requests to a Kernel object.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Client extends BaseClient
 {
     const LOCAL_URL = 'http://localhost';
@@ -40,8 +44,8 @@ class Client extends BaseClient
         }
 
         if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
-            //generate new WSSE header
-            parent::setServerParameters(WebTestCase::generateWsseAuthHeader());
+            // generate new WSSE header
+            $this->mergeServerParameters(WebTestCase::generateWsseAuthHeader());
         }
 
         $hashNavigationHeader = $this->getHashNavigationHeader();
@@ -49,9 +53,7 @@ class Client extends BaseClient
             $server[$hashNavigationHeader] = 1;
         }
 
-        // set the session cookie
-        $sessionOptions = $this->kernel->getContainer()->getParameter('session.storage.options');
-        $this->getCookieJar()->set(new Cookie($sessionOptions['name'], 'test'));
+        $this->setSessionCookie($server);
 
         parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 
@@ -297,5 +299,37 @@ class Client extends BaseClient
     public function mergeServerParameters(array $server)
     {
         $this->server = array_replace($this->server, $server);
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getSessionName()
+    {
+        $session = $this->getContainer()->get('session');
+
+        return null !== $session
+            ? $session->getName()
+            : null;
+    }
+
+    /**
+     * @param array $server
+     */
+    private function setSessionCookie(array &$server)
+    {
+        if (array_key_exists('HTTP_X-WSSE', $server)) {
+            return;
+        }
+
+        if (array_key_exists('HTTP_SESSION', $server)) {
+            if ($server['HTTP_SESSION']) {
+                $sessionName = $this->getSessionName();
+                if ($sessionName && null === $this->getCookieJar()->get($sessionName)) {
+                    $this->getCookieJar()->set(new Cookie($sessionName, $server['HTTP_SESSION']));
+                }
+            }
+            unset($server['HTTP_SESSION']);
+        }
     }
 }

@@ -3,12 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
@@ -111,8 +115,12 @@ class CollectFormErrors implements ProcessorInterface
                 $this->processForm($includedForm, $context);
                 if ($context->hasErrors()) {
                     foreach ($context->getErrors() as $error) {
-                        $errorCompleter->complete($error, $requestType, $includedData->getMetadata());
-                        $this->fixIncludedEntityErrorPath($error, $includedData->getPath());
+                        $errorCompleter->fixIncludedEntityPath(
+                            $includedData->getPath(),
+                            $error,
+                            $requestType,
+                            $includedData->getMetadata()
+                        );
                         $errors[] = $error;
                     }
                     $context->resetErrors();
@@ -126,21 +134,13 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param Error  $error
-     * @param string $entityPath
-     */
-    protected function fixIncludedEntityErrorPath(Error $error, string $entityPath): void
-    {
-        // no default implementation, the path to an included entity depends on the request type
-    }
-
-    /**
      * @param FormInterface $form
      * @param FormContext   $context
      */
     protected function processForm(FormInterface $form, FormContext $context): void
     {
-        // collect errors of the root form
+        /** @var Error[] $foundErrors */
+        $foundErrors = [];
         $errors = $form->getErrors();
         foreach ($errors as $error) {
             $errorObject = $this->createErrorObject(
@@ -148,17 +148,18 @@ class CollectFormErrors implements ProcessorInterface
                 $this->getFormErrorPropertyPath($error)
             );
             $context->addError($errorObject);
+            $foundErrors[] = [$form, $errorObject];
         }
-
-        // collect errors of child forms
-        $this->processChildren($form, $context);
+        $this->processChildren($form, $context, $foundErrors);
+        $this->fixErrorPaths($foundErrors, $context);
     }
 
     /**
      * @param FormInterface $form
      * @param FormContext   $context
+     * @param array         $foundErrors [[parent form, error], ...]
      */
-    protected function processChildren(FormInterface $form, FormContext $context): void
+    protected function processChildren(FormInterface $form, FormContext $context, array &$foundErrors): void
     {
         /** @var FormInterface $child */
         foreach ($form as $child) {
@@ -169,12 +170,83 @@ class CollectFormErrors implements ProcessorInterface
                         $this->getFieldErrorPropertyPath($error, $child)
                     );
                     $context->addError($errorObject);
+                    $foundErrors[] = [$form, $errorObject];
                 }
                 if ($this->isCompoundForm($child)) {
-                    $this->processChildren($child, $context);
+                    $this->processChildren($child, $context, $foundErrors);
                 }
             }
         }
+    }
+
+    /**
+     * @param array       $foundErrors [[parent form, error], ...]
+     * @param FormContext $context
+     */
+    protected function fixErrorPaths(array $foundErrors, FormContext $context): void
+    {
+        $includedEntities = $context->getIncludedEntities();
+        if (null === $includedEntities) {
+            return;
+        }
+
+        $requestType = $context->getRequestType();
+        /**
+         * @var FormInterface $parentForm
+         * @var Error         $error
+         */
+        foreach ($foundErrors as list($parentForm, $error)) {
+            $errorSource = $error->getSource();
+            if (null === $errorSource
+                || false === strpos($errorSource->getPropertyPath(), ConfigUtil::PATH_DELIMITER)
+            ) {
+                continue;
+            }
+            $path = ConfigUtil::explodePropertyPath($errorSource->getPropertyPath());
+            $fieldForm = FormUtil::findFormFieldByPropertyPath($parentForm, $path[0]);
+            if (null === $fieldForm) {
+                continue;
+            }
+            $fieldData = $fieldForm->getData();
+            if (!\is_object($fieldData)) {
+                continue;
+            }
+            if (!$fieldData instanceof Collection) {
+                $this->fixErrorPath($path[1], $error, $requestType, $includedEntities->getData($fieldData));
+            } elseif (\count($path) > 2) {
+                foreach ($fieldData as $key => $item) {
+                    if ($path[1] === (string)$key && \is_object($item)) {
+                        $this->fixErrorPath($path[2], $error, $requestType, $includedEntities->getData($item));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string                  $propertyPath
+     * @param Error                   $error
+     * @param RequestType             $requestType
+     * @param IncludedEntityData|null $includedData
+     */
+    protected function fixErrorPath(
+        string $propertyPath,
+        Error $error,
+        RequestType $requestType,
+        ?IncludedEntityData $includedData
+    ): void {
+        if (null === $includedData) {
+            return;
+        }
+
+        $error->getSource()->setPropertyPath($propertyPath);
+        $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
+        $errorCompleter->fixIncludedEntityPath(
+            $includedData->getPath(),
+            $error,
+            $requestType,
+            $includedData->getMetadata()
+        );
     }
 
     /**
@@ -223,7 +295,7 @@ class CollectFormErrors implements ProcessorInterface
             $path = \array_reverse($path);
         }
 
-        return \implode('.', $path);
+        return \implode(ConfigUtil::PATH_DELIMITER, $path);
     }
 
     /**
@@ -318,7 +390,7 @@ class CollectFormErrors implements ProcessorInterface
         $path = $this->getConstraintViolationPath($constraintViolation);
 
         return !empty($path)
-            ? \implode('.', $path)
+            ? \implode(ConfigUtil::PATH_DELIMITER, $path)
             : null;
     }
 

@@ -97,6 +97,8 @@ api:
                     form_options:
                         constraints:
                             - NotBlank: ~
+                targetEntity:
+                    property_path: target
                 items:
                     property_path: lineItems
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:

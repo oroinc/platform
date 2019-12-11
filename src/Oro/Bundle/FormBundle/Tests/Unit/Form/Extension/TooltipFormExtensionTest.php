@@ -30,7 +30,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->translator = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->setMethods(['trans', 'hasTrans', 'transChoice', 'setLocale', 'getLocale'])
+            ->setMethods(['trans', 'hasTrans', 'setLocale', 'getLocale'])
             ->disableOriginalConstructor()
             ->getMock();
     }

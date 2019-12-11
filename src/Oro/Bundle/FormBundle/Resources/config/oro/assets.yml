@@ -1,3 +1,18 @@
 css:
     inputs:
         - 'bundles/oroform/css/scss/main.scss'
+
+css_tinymce_skin:
+    inputs:
+        - 'bundles/oroform/css/scss/tinymce/skin.scss'
+    output: css/tinymce/skin.min.css
+
+css_tinymce_content:
+    inputs:
+        - 'bundles/oroform/css/scss/tinymce/content.scss'
+    output: css/tinymce/content.min.css
+
+css_tinymce_wysiwyg_editor:
+    inputs:
+        - 'bundles/oroform/css/scss/tinymce/wysiwyg-editor.scss'
+    output: css/tinymce/wysiwyg-editor.css

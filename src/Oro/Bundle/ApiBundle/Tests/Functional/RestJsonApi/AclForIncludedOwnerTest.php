@@ -37,15 +37,11 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
      */
     protected function clearAclCache()
     {
-        $container = self::getContainer();
-        $cache = $container->get('doctrine')
-            ->getManagerForClass(TestEntityWithUserOwnership::class)
-            ->getConfiguration()
-            ->getQueryCacheImpl();
+        $cache = $this->getEntityManager()->getConfiguration()->getQueryCacheImpl();
         if ($cache && !($cache instanceof ApcCache && $cache instanceof XcacheCache)) {
             $cache->deleteAll();
         }
-        $container->get('tests.security.acl.cache.doctrine')->clearCache();
+        self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
     }
 
     public function testTryToGetTestEntityForUserWitoutPermissionsToUserEntity()
@@ -58,7 +54,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
                 'CREATE' => AccessLevel::NONE_LEVEL,
                 'DELETE' => AccessLevel::NONE_LEVEL,
                 'ASSIGN' => AccessLevel::NONE_LEVEL,
-                'EDIT'   => AccessLevel::NONE_LEVEL,
+                'EDIT'   => AccessLevel::NONE_LEVEL
             ]
         );
 
@@ -89,7 +85,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
                 'CREATE' => AccessLevel::NONE_LEVEL,
                 'DELETE' => AccessLevel::NONE_LEVEL,
                 'ASSIGN' => AccessLevel::NONE_LEVEL,
-                'EDIT'   => AccessLevel::NONE_LEVEL,
+                'EDIT'   => AccessLevel::NONE_LEVEL
             ]
         );
 
@@ -113,7 +109,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
                 'CREATE' => AccessLevel::SYSTEM_LEVEL,
                 'DELETE' => AccessLevel::SYSTEM_LEVEL,
                 'ASSIGN' => AccessLevel::SYSTEM_LEVEL,
-                'EDIT'   => AccessLevel::SYSTEM_LEVEL,
+                'EDIT'   => AccessLevel::SYSTEM_LEVEL
             ]
         );
         $this->updateRolePermissions(
@@ -124,7 +120,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
                 'CREATE' => AccessLevel::SYSTEM_LEVEL,
                 'DELETE' => AccessLevel::SYSTEM_LEVEL,
                 'ASSIGN' => AccessLevel::SYSTEM_LEVEL,
-                'EDIT'   => AccessLevel::SYSTEM_LEVEL,
+                'EDIT'   => AccessLevel::SYSTEM_LEVEL
             ]
         );
 

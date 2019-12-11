@@ -46,17 +46,17 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
         $currency = null;
 
         $isValueSubmitted = false;
-        $valueForm = $context->findFormField('value');
-        if (null !== $valueForm && array_key_exists($valueForm->getName(), $data)) {
+        $valueFieldName = $context->findFormFieldName('value');
+        if (null !== $valueFieldName && array_key_exists($valueFieldName, $data)) {
             $isValueSubmitted = true;
-            $value = $data[$valueForm->getName()];
+            $value = $data[$valueFieldName];
         }
 
         $isCurrencySubmitted = false;
-        $currencyForm = $context->findFormField('currency');
-        if (null !== $currencyForm && array_key_exists($currencyForm->getName(), $data)) {
+        $currencyFieldName = $context->findFormFieldName('currency');
+        if (null !== $currencyFieldName && array_key_exists($currencyFieldName, $data)) {
             $isCurrencySubmitted = true;
-            $currency = $data[$currencyForm->getName()];
+            $currency = $data[$currencyFieldName];
         }
 
         if ($isValueSubmitted || $isCurrencySubmitted) {

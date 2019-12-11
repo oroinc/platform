@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
@@ -770,15 +771,16 @@ abstract class WebTestCase extends BaseWebTestCase
         $changeHistory = true
     ) {
         $csrfToken = 'nochecks';
-        $csrfTokenCookie = $this->client->getCookieJar()->get('_csrf', '/', 'localhost');
+        $cookieJar = $this->client->getCookieJar();
+        $csrfTokenCookie = $cookieJar->get(CsrfRequestManager::CSRF_TOKEN_ID, '/', 'localhost');
         if ($csrfTokenCookie) {
             $csrfToken = $csrfTokenCookie->getValue();
         } else {
-            $this->client->getCookieJar()->set(new Cookie('_csrf', $csrfToken, null, '/', 'localhost'));
+            $cookieJar->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken, null, '/', 'localhost'));
         }
         $server['HTTP_X-Requested-With'] = 'XMLHttpRequest';
         $server['HTTP_Content-type'] = 'application/json';
-        $server['HTTP_X-CSRF-Header'] = $csrfToken;
+        $server['HTTP_' . CsrfRequestManager::CSRF_HEADER] = $csrfToken;
 
         return $this->client->request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
@@ -1123,16 +1125,6 @@ abstract class WebTestCase extends BaseWebTestCase
                 self::sortArrayByKeyRecursively($value);
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return Client
-     */
-    protected function getClient()
-    {
-        return self::getClientInstance();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
@@ -20,7 +21,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -261,11 +261,11 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected function createDoctrineMock()
     {
-        return $this->createMock(RegistryInterface::class);
+        return $this->createMock(ManagerRegistry::class);
     }
 
     /**

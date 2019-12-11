@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Event\BeforeImportChunksEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
@@ -24,6 +26,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Responsible for splitting import process into a set of independent jobs each processing its own
@@ -79,6 +82,11 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     private $managerRegistry;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
      * @param DependentJobService $dependentJob
@@ -87,7 +95,9 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      * @param WriterChain $writerChain
      * @param NotificationSettings $notificationSettings
      * @param ManagerRegistry $managerRegistry
+     * @param EventDispatcherInterface $eventDispatcher
      * @param integer $batchSize
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         JobRunner $jobRunner,
@@ -98,6 +108,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         WriterChain $writerChain,
         NotificationSettings $notificationSettings,
         ManagerRegistry $managerRegistry,
+        EventDispatcherInterface $eventDispatcher,
         $batchSize
     ) {
         $this->jobRunner = $jobRunner;
@@ -108,6 +119,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->writerChain = $writerChain;
         $this->notificationSettings = $notificationSettings;
         $this->managerRegistry = $managerRegistry;
+        $this->eventDispatcher = $eventDispatcher;
         $this->batchSize = $batchSize;
     }
 
@@ -176,6 +188,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             $parentMessageId,
             $jobName,
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
+                $this->dispatchBeforeChunksEvent($body);
+
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
                         sprintf('%s:chunk.%s', $jobName, ++$key),
@@ -326,5 +340,18 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $result = $this->processJob($parentMessageId, $body, $files);
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    /**
+     * @param array $body
+     */
+    protected function dispatchBeforeChunksEvent(array $body)
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
+                new BeforeImportChunksEvent($body)
+            );
+        }
     }
 }

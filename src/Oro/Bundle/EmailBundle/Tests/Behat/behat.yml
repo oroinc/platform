@@ -77,12 +77,12 @@ oro_behat_extension:
     Red dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Red dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mP8z8AARBDAiJMDAIzoBf5Dp2P2AAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="red-dot"]'
 
     Blue dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Blue dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mNkYPj/nwEKGHFyAIbuBf4sIeHsAAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="blue-dot"]'
 
     Upload Email Attachment Link:
       selector: 'a.upload-new'

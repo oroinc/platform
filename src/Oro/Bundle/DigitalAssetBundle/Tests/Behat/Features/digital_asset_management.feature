@@ -16,7 +16,7 @@ Feature:  Digital asset management
       | Title | Not supported mime type |
     When I save form
     Then I should see validation errors:
-      | File | The mime type of the file is invalid ("text/plain"). Allowed mime types are "application/msword", "application/vnd.ms-excel", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
+      | File | The mime type of the file is invalid ("text/csv"). Allowed mime types are "application/msword", "application/vnd.ms-excel", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
 
   Scenario: Create digital assets with jpg mime types
     Given I fill "Digital Asset Form" with:
@@ -54,11 +54,15 @@ Feature:  Digital asset management
       | Type         | Image        |
     And click "Continue"
     And I fill form with:
-      | File size          | 5                       |
-      | Thumbnail Width    | 190                     |
-      | Thumbnail Height   | 120                     |
-      | Allowed MIME types | [image/jpeg, image/png] |
-      | Use DAM            | Yes                     |
+      | File Size (MB)        | 5000                    |
+      | Thumbnail Width       | 190                     |
+      | Thumbnail Height      | 120                     |
+      | Allowed MIME types    | [image/jpeg, image/png] |
+      | Use DAM               | Yes                     |
+    When I save and create new form
+    Then I should see "This value should be 2,047 or less."
+    And I fill form with:
+      | File Size (MB) | 5 |
     When I save and create new form
     Then I should see "Field saved" flash message
     And I fill form with:
@@ -67,9 +71,9 @@ Feature:  Digital asset management
       | Type         | File         |
     And click "Continue"
     And I fill form with:
-      | File size          | 5                 |
-      | Allowed MIME types | [application/pdf] |
-      | Use DAM            | Yes               |
+      | File Size (MB)        | 5                 |
+      | Allowed MIME types    | [application/pdf] |
+      | Use DAM               | Yes               |
     When I save and close form
     Then I should see "Field saved" flash message
     And I click update schema

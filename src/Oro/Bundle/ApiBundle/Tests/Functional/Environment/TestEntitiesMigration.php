@@ -632,7 +632,15 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $orderTable = $schema->createTable('test_api_order');
         $orderTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $orderTable->addColumn('po_number', 'string', ['notnull' => false, 'length' => 255]);
+        $orderTable->addColumn('target_id', 'integer', ['notnull' => false]);
+        $orderTable->addIndex(['target_id']);
         $orderTable->setPrimaryKey(['id']);
+        $orderTable->addForeignKeyConstraint(
+            $schema->getTable('test_api_target'),
+            ['target_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
 
         $orderLineItemTable = $schema->createTable('test_api_order_line_item');
         $orderLineItemTable->addColumn('id', 'integer', ['autoincrement' => true]);

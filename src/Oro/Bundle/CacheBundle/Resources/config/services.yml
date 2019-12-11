@@ -1,7 +1,6 @@
 services:
     oro_cache.oro_data_cache_manager:
         class: Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
 
     oro_cache.validator:
@@ -37,7 +36,6 @@ services:
 
     oro_cache.action.handler.invalidate_scheduled:
         class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_cron.deferred_scheduler'
@@ -50,7 +48,6 @@ services:
 
     oro_cache.action.provider.invalidate_cache_time:
         class: 'Oro\Bundle\CacheBundle\Action\Provider\InvalidateCacheTimeProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_cache.action.handler.schedule_arguments_builder'

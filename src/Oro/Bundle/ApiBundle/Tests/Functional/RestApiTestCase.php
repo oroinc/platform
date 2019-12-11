@@ -8,6 +8,8 @@ use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -93,6 +95,26 @@ abstract class RestApiTestCase extends ApiTestCase
             $server = array_replace($server, $this->getWsseAuthHeader());
         } elseif (!$server['HTTP_X-WSSE']) {
             unset($server['HTTP_X-WSSE']);
+        }
+    }
+
+    /**
+     * @param array $server
+     */
+    protected function checkCsrfHeader(array &$server)
+    {
+        $csrfHeader = 'HTTP_' . CsrfRequestManager::CSRF_HEADER;
+        $cookieJar = $this->client->getCookieJar();
+        $csrfCookie = $cookieJar->get(CsrfRequestManager::CSRF_TOKEN_ID);
+        if (array_key_exists($csrfHeader, $server)) {
+            if (null === $csrfCookie) {
+                $cookieJar->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $server[$csrfHeader]));
+            }
+        } elseif (null !== $csrfCookie) {
+            $server[$csrfHeader] = $csrfCookie->getValue();
+        }
+        if (array_key_exists($csrfHeader, $server) && !array_key_exists('HTTP_SESSION', $server)) {
+            $server['HTTP_SESSION'] = 'test_session';
         }
     }
 
@@ -711,7 +733,7 @@ abstract class RestApiTestCase extends ApiTestCase
         if ($assertValid) {
             self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
             self::assertSame('', $response->getContent());
-            self::assertSame(0, $response->headers->get('Content-Length'));
+            self::assertSame('0', $response->headers->get('Content-Length'));
             $this->assertOptionsResponseCacheHeader($response);
         }
 
@@ -817,9 +839,15 @@ abstract class RestApiTestCase extends ApiTestCase
     /**
      * @param string $method
      * @param string $uri
+     * @param array  $server
      */
-    protected static function assertSessionNotStarted($method, $uri)
+    protected static function assertSessionNotStarted($method, $uri, array $server)
     {
+        // do not check session if request was made as a session aware AJAX request
+        if (array_key_exists('HTTP_' . CsrfRequestManager::CSRF_HEADER, $server)) {
+            return;
+        }
+
         self::assertFalse(
             self::getContainer()->get('oro_api.tests.test_session_listener')->isSessionStarted(),
             sprintf(

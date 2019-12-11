@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\Debug\BufferingLogger;
@@ -284,25 +285,9 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Loads the response content.
-     *
-     * @param array|string $expectedContent The file name or full file path to YAML template file or array
-     *
-     * @return array
-     */
-    protected function loadResponseData($expectedContent)
-    {
-        if (is_string($expectedContent)) {
-            $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
-        }
-
-        return self::processTemplateData($expectedContent);
-    }
-
-    /**
      * Converts the given request to an array that can be sent to the server.
      *
-     * @param array|string $request
+     * @param array|string $request The file name or full file path to YAML template file or array
      *
      * @return array
      */
@@ -313,6 +298,23 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return self::processTemplateData($request);
+    }
+
+    /**
+     * Converts the given response to an array that can be used to compare it
+     * with a response received from the server.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function getResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
+        }
+
+        return self::processTemplateData($expectedContent);
     }
 
     /**
@@ -334,7 +336,7 @@ abstract class ApiTestCase extends WebTestCase
         string $key = 'id',
         string $placeholder = 'new'
     ): array {
-        $expectedContent = $this->loadResponseData($expectedContent);
+        $expectedContent = $this->getResponseData($expectedContent);
         $content = self::jsonToArray($response->getContent());
         $this->walkResponseContent($expectedContent, $content, $key, $placeholder);
 
@@ -603,11 +605,33 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param string $entityClass
+     *
      * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getEntityManager(string $entityClass = null)
     {
-        return self::getContainer()->get('doctrine')->getManager();
+        $doctrine = self::getContainer()->get('doctrine');
+        if ($entityClass) {
+            return $doctrine->getManagerForClass($entityClass);
+        }
+
+        return $doctrine->getManager();
+    }
+
+    /**
+     * @param string|null $scope The configuration scope (e.g.: global, organization, user, etc.)
+     *                           or NULL to get the configuration manager for the current scope
+     *
+     * @return ConfigManager
+     */
+    protected function getConfigManager(?string $scope = 'global'): ConfigManager
+    {
+        if (!$scope) {
+            return self::getContainer()->get('oro_config.manager');
+        }
+
+        return self::getContainer()->get('oro_config.' . $scope);
     }
 
     /**

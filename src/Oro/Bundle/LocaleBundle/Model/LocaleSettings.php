@@ -7,7 +7,8 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfi
 use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
+use Symfony\Component\Intl\Locales;
 
 /**
  * Provides locale related information such as locale's language and currency and also holds some helper methods.
@@ -407,7 +408,7 @@ class LocaleSettings
     {
         if (null === self::$locales) {
             self::$locales = [];
-            foreach (Intl::getLocaleBundle()->getLocales() as $locale) {
+            foreach (Locales::getLocales() as $locale) {
                 self::$locales[$locale] = $locale;
             }
         }
@@ -423,7 +424,7 @@ class LocaleSettings
     public static function getCountryByLocale($locale)
     {
         $region = \Locale::getRegion($locale);
-        $countries = Intl::getRegionBundle()->getCountryNames();
+        $countries = Countries::getNames();
         if (array_key_exists($region, $countries)) {
             return $region;
         }
@@ -485,7 +486,7 @@ class LocaleSettings
      */
     public function getLocalesByCodes(array $codes, $locale = 'en')
     {
-        $localeLabels = Intl::getLocaleBundle()->getLocaleNames($locale);
+        $localeLabels = Locales::getNames($locale);
 
         return array_intersect_key($localeLabels, array_combine($codes, $codes));
     }

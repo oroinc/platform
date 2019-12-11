@@ -26,9 +26,9 @@ class EmailNotificationTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return EmailNotificationType::class;
+        return [EmailNotificationType::class];
     }
 
     /**

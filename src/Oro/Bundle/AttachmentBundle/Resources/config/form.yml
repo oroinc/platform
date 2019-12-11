@@ -48,7 +48,6 @@ services:
             - '@oro_attachment.provider.file_constraints'
 
     oro_attachment.form.handler.attachment:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         class: Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler
         arguments:

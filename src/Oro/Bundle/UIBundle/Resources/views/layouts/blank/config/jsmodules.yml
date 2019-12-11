@@ -42,6 +42,7 @@ app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
     - oroui/js/app/modules/css-variable-module
+    - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/layout-module
@@ -87,6 +88,7 @@ dynamic-imports:
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
         - oroui/js/app/views/element-value-copy-to-clipboard-view
+        - oroui/js/app/views/input-widget/number
         - oroui/js/app/views/input-widget/select2
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select

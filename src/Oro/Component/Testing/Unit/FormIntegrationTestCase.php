@@ -186,12 +186,6 @@ class FormIntegrationTestCase extends BaseTestCase
                 return $id;
             }))
         ;
-        $translator->expects($this->any())
-            ->method('transChoice')
-            ->will($this->returnCallback(function ($id) {
-                return $id;
-            }))
-        ;
 
         return $translator;
     }

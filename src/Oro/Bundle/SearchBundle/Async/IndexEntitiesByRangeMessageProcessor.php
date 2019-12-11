@@ -1,6 +1,8 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -10,12 +12,11 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -35,13 +36,13 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
     private $logger;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param IndexerInterface $indexer
      * @param JobRunner $jobRunner
      * @param LoggerInterface $logger
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         IndexerInterface $indexer,
         JobRunner $jobRunner,
         LoggerInterface $logger

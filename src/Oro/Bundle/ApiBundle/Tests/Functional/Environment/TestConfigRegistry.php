@@ -81,8 +81,8 @@ class TestConfigRegistry
 
     private function clearCaches()
     {
-        $this->configProvider->clearCache();
-        $this->metadataProvider->clearCache();
+        $this->configProvider->reset();
+        $this->metadataProvider->reset();
         if ($this->isResourcesCacheAffected) {
             $this->resourcesProvider->clearCache();
         }

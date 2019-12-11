@@ -5,17 +5,15 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
@@ -31,13 +29,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    use LoggerAwareTraitTestTrait;
-
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
+    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentEntityConfigProvider;
 
     /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassNameHelper;
@@ -59,14 +55,14 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->entityConfigManager = $this->createMock(ConfigManager::class);
+        $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
         $this->previewMetadataProvider = $this->createMock(PreviewMetadataProvider::class);
         $this->digitalAssetToIdTransformer = $this->createMock(EntityToIdTransformer::class);
         $this->fileReflector = $this->createMock(FileReflector::class);
 
         $this->extension = new DigitalAssetManagerExtension(
-            $this->entityConfigManager,
+            $this->attachmentEntityConfigProvider,
             $this->entityClassNameHelper,
             $this->previewMetadataProvider,
             $this->digitalAssetToIdTransformer,
@@ -74,8 +70,6 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->form = $this->createMock(FormInterface::class);
-
-        $this->setUpLoggerMock($this->extension);
     }
 
     public function testGetExtendedTypes(): void
@@ -387,13 +381,11 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('__toString')
             ->willReturn($fieldName = 'sampleField');
 
-        $this->entityConfigManager
+        $this->attachmentEntityConfigProvider
             ->expects($this->once())
             ->method('getFieldConfig')
-            ->with('attachment', $entityClass, $fieldName)
-            ->willThrowException(new RuntimeException());
-
-        $this->assertLoggerWarningMethodCalled();
+            ->with($entityClass, $fieldName)
+            ->willReturn(null);
 
         $this->extension->buildView(
             $formView = new FormView(),
@@ -459,10 +451,10 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('__toString')
             ->willReturn(self::SAMPLE_FIELD);
 
-        $this->entityConfigManager
+        $this->attachmentEntityConfigProvider
             ->expects($this->once())
             ->method('getFieldConfig')
-            ->with('attachment', self::SAMPLE_CLASS, self::SAMPLE_FIELD)
+            ->with(self::SAMPLE_CLASS, self::SAMPLE_FIELD)
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
         return $entityFieldConfig;

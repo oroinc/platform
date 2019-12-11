@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Provides a set of reusable utility methods for "big numbers" dashboard widgets
@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class BigNumberDateHelper
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var AclHelper */
@@ -25,11 +25,11 @@ class BigNumberDateHelper
     protected $localeSettings;
 
     /**
-     * @param RegistryInterface $doctrine
-     * @param AclHelper         $aclHelper
-     * @param LocaleSettings    $localeSettings
+     * @param ManagerRegistry $doctrine
+     * @param AclHelper $aclHelper
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(RegistryInterface $doctrine, AclHelper $aclHelper, LocaleSettings $localeSettings)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper, LocaleSettings $localeSettings)
     {
         $this->doctrine       = $doctrine;
         $this->aclHelper      = $aclHelper;

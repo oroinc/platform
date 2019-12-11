@@ -6,6 +6,9 @@ use Doctrine\Common\EventArgs;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 
+/**
+ * Provides possibility to disable some event listeners.
+ */
 class OroEventManager extends ContainerAwareEventManager
 {
     /**
@@ -98,15 +101,13 @@ class OroEventManager extends ContainerAwareEventManager
     protected function preDispatch($event)
     {
         $listeners = $this->getListeners($event);
-        foreach ($listeners as $listener) {
-            $unmodifiedListener = $listener;
-            if (is_string($listener)) {
-                $listener = $this->serviceContainer->get($listener);
-            }
-
+        foreach ($listeners as $hash => $listener) {
             if (!$this->isListenerEnabled($listener)) {
                 $this->disabledListeners[$event][] = $listener;
-                $this->removeEventListener($event, $unmodifiedListener);
+                $this->removeEventListener(
+                    $event,
+                    strpos($hash, '_service_') === 0 ? substr($hash, strlen('_service_')) : $listener
+                );
             }
         }
     }

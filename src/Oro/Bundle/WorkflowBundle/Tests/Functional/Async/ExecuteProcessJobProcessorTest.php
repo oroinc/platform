@@ -44,7 +44,6 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
             new LoggerExtension($logger)
         ]));
 
-        $logs = $logger->getLogs('error');
-        self::assertEmpty($logs);
+        $this->assertFalse($logger->hasErrorRecords());
     }
 }

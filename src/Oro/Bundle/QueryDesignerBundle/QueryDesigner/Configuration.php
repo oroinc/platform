@@ -29,9 +29,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::ROOT_NODE_NAME);
 
-        $builder->root(self::ROOT_NODE_NAME)
+        $builder->getRootNode()
             ->children()
                 ->append($this->getFiltersConfigTree())
                 ->append($this->getGroupingConfigTree())
@@ -49,8 +49,8 @@ class Configuration implements ConfigurationInterface
      */
     private function getFiltersConfigTree()
     {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('filters');
+        $builder = new TreeBuilder('filters');
+        $node    = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')
@@ -126,8 +126,8 @@ class Configuration implements ConfigurationInterface
      */
     private function getGroupingConfigTree()
     {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('grouping');
+        $builder = new TreeBuilder('grouping');
+        $node    = $builder->getRootNode();
 
         $node->ignoreExtraKeys()
             ->children()
@@ -158,8 +158,8 @@ class Configuration implements ConfigurationInterface
      */
     private function getConvertersConfigTree()
     {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('converters');
+        $builder = new TreeBuilder('converters');
+        $node    = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')
@@ -233,8 +233,8 @@ class Configuration implements ConfigurationInterface
      */
     private function getAggregatorsConfigTree()
     {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('aggregates');
+        $builder = new TreeBuilder('aggregates');
+        $node    = $builder->getRootNode();
 
         $node->useAttributeAsKey('name')
             ->prototype('array')

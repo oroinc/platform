@@ -4,22 +4,22 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Acl;
 
 use Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentEntityConfigProvider;
 
     /** @var FileAccessControlChecker */
     private $checker;
 
     protected function setUp()
     {
-        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
 
-        $this->checker = new FileAccessControlChecker($this->configManager);
+        $this->checker = new FileAccessControlChecker($this->attachmentEntityConfigProvider);
     }
 
     /**
@@ -29,7 +29,7 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsCoveredByAclWhenNotEnoughData(File $file): void
     {
-        $this->configManager
+        $this->attachmentEntityConfigProvider
             ->expects(self::never())
             ->method('getFieldConfig');
 
@@ -56,10 +56,10 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
             ->setParentEntityId(1)
             ->setParentEntityFieldName($parentEntityFieldName = 'sample-field');
 
-        $this->configManager
+        $this->attachmentEntityConfigProvider
             ->expects(self::once())
             ->method('getFieldConfig')
-            ->with('attachment', $parentEntityClass, $parentEntityFieldName)
+            ->with($parentEntityClass, $parentEntityFieldName)
         ->willReturn($config  = $this->createMock(Config::class));
 
         $config
@@ -69,5 +69,21 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($result = true);
 
         self::assertSame($result, $this->checker->isCoveredByAcl($file));
+    }
+
+    public function testIsCoveredByAclWhenNoEntityFieldConfig(): void
+    {
+        $file = (new File())
+            ->setParentEntityClass($parentEntityClass = \stdClass::class)
+            ->setParentEntityId(1)
+            ->setParentEntityFieldName($parentEntityFieldName = 'sample-field');
+
+        $this->attachmentEntityConfigProvider
+            ->expects(self::once())
+            ->method('getFieldConfig')
+            ->with($parentEntityClass, $parentEntityFieldName)
+            ->willReturn(null);
+
+        self::assertFalse($this->checker->isCoveredByAcl($file));
     }
 }

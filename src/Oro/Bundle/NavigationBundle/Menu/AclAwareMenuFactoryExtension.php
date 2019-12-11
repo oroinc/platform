@@ -190,7 +190,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             $generator = $this->router->getGenerator();
 
             $reflectionClass = new \ReflectionClass($generator);
-            $property = $reflectionClass->getProperty('declaredRoutes');
+            $property = $reflectionClass->getProperty('compiledRoutes');
             $property->setAccessible(true);
 
             $this->declaredRoutes = $property->getValue($generator);

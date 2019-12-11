@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\ConfigCache as SymfonyConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {

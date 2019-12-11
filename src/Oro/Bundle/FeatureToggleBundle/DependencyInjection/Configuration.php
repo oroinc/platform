@@ -13,8 +13,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(OroFeatureToggleExtension::ALIAS);
+        $treeBuilder = new TreeBuilder(OroFeatureToggleExtension::ALIAS);
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()

@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Config\Tests\Unit\Cache;
 
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
 use Oro\Component\Config\Cache\ConfigCache;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {

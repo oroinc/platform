@@ -8,14 +8,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Extends the choice form type with "translatable_options" and "translatable_groups" options
+ * used to manage the translation of rendered choice items and groups.
+ */
 class TranslatableChoiceTypeExtension extends AbstractTypeExtension
 {
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ChoiceType::class;
+        return [ChoiceType::class];
     }
 
     /**
@@ -23,14 +27,9 @@ class TranslatableChoiceTypeExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'is_translated_group'  => false, // @deprecated since 1.5. Will be removed in 2.0
-                'is_translated_option' => false, // @deprecated since 1.5. Will be removed in 2.0
-                'translatable_groups'  => true,
-                'translatable_options' => true
-            )
-        );
+        $resolver
+            ->setDefault('translatable_groups', true)
+            ->setDefault('translatable_options', true);
     }
 
     /**
@@ -38,10 +37,10 @@ class TranslatableChoiceTypeExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (!$options['translatable_groups'] || $options['is_translated_group']) {
+        if (!$options['translatable_groups']) {
             $view->vars['translatable_groups'] = false;
         }
-        if (!$options['translatable_options'] || $options['is_translated_option']) {
+        if (!$options['translatable_options']) {
             $view->vars['translatable_options'] = false;
         }
     }

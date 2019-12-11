@@ -4,10 +4,12 @@ namespace Oro\Bundle\AttachmentBundle;
 
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
 use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Mime\MimeTypes;
 
+/**
+ * Attachment Bundle. Adds MIME Type and MIME Type Extension guesser
+ */
 class OroAttachmentBundle extends Bundle
 {
     /**
@@ -15,7 +17,8 @@ class OroAttachmentBundle extends Bundle
      */
     public function boot()
     {
-        MimeTypeGuesser::getInstance()->register(new MsMimeTypeGuesser());
-        ExtensionGuesser::getInstance()->register(new MimeTypeExtensionGuesser());
+        $mimeTypes = MimeTypes::getDefault();
+        $mimeTypes->registerGuesser(new MsMimeTypeGuesser());
+        $mimeTypes->registerGuesser(new MimeTypeExtensionGuesser());
     }
 }

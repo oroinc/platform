@@ -97,6 +97,12 @@ Delete a set of file records.
 
 **The required field.**
 
+### uuid
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
 ### mimeType
 
 #### create

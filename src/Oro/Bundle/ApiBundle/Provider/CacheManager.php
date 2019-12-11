@@ -6,6 +6,7 @@ use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The class that can be used to manage API caches.
@@ -35,6 +36,9 @@ class CacheManager
 
     /** @var ApiDocExtractor */
     private $apiDocExtractor;
+
+    /** @var ResetInterface[] */
+    private $resettableServices = [];
 
     /**
      * @param array                       $configKeys
@@ -159,11 +163,34 @@ class CacheManager
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
             if ($view) {
                 $this->apiDocExtractor->warmUp($view);
+                $this->resetServices();
             } else {
                 foreach ($this->apiDocViews as $currentView => $expr) {
                     $this->apiDocExtractor->warmUp($currentView);
+                    $this->resetServices();
                 }
             }
+        }
+    }
+
+    /**
+     * Registers a service that should be reset to its initial state
+     * after API documentation cache for a specific view is warmed up.
+     *
+     * @param ResetInterface $service
+     */
+    public function addResettableService(ResetInterface $service)
+    {
+        $this->resettableServices[] = $service;
+    }
+
+    /**
+     * Resets all registered resettable services to theirs initial state.
+     */
+    private function resetServices()
+    {
+        foreach ($this->resettableServices as $service) {
+            $service->reset();
         }
     }
 

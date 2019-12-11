@@ -199,9 +199,6 @@ services:
             - default
             - default
 
-    oro_test.router.default.alias:
-        alias: router.default
-
     oro_test.layout.data_provider.test:
         class: 'Oro\Bundle\TestFrameworkBundle\Layout\TestProvider'
         tags:

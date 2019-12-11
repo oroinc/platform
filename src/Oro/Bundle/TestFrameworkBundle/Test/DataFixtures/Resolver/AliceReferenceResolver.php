@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
@@ -18,7 +18,7 @@ class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterf
     private static $regex = '/^@(?P<ref>[^<*]*)$/';
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     protected $registry;
 
@@ -28,9 +28,9 @@ class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterf
     protected $references;
 
     /**
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }

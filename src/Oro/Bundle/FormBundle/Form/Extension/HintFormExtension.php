@@ -50,8 +50,8 @@ class HintFormExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        return ['Symfony\Component\Form\Extension\Core\Type\FormType'];
     }
 }

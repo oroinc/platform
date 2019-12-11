@@ -282,6 +282,12 @@ services:
             - '@oro_api.entity_alias_resolver_registry'
             - '@oro_api.resources.cache_warmer'
             - '@nelmio_api_doc.extractor.api_doc_extractor'
+        calls:
+            - [addResettableService, ['@oro_api.rest.chain_routing_options_resolver']]
+            - [addResettableService, ['@oro_api.resources_provider']]
+            - [addResettableService, ['@oro_api.config_provider']]
+            - [addResettableService, ['@oro_api.metadata_provider']]
+            - [addResettableService, ['@oro_api.value_normalizer']]
 
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
@@ -545,13 +551,29 @@ services:
         arguments:
             - '@oro_api.rest.routes'
 
+    oro_api.rest.body_listener_adapter:
+        class: Oro\Bundle\ApiBundle\EventListener\FosRestBodyListenerAdapter
+        decorates: 'fos_rest.body_listener'
+        decoration_priority: 250
+        arguments:
+            - '@oro_api.rest.body_listener_adapter.inner'
+
+    oro_api.rest.error_handling_body_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\ErrorHandlingBodyListenerDecorator
+        decorates: 'fos_rest.body_listener'
+        decoration_priority: -250
+        arguments:
+            - '@oro_api.rest.error_handling_body_listener.inner'
+
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
 
     oro_api.rest.chain_routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
         arguments:
+            - [] # resolvers. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
             - '@oro_api.rest.doc_view_detector'
+            - [] # underlying views. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
 
     oro_api.rest.routing_options_resolver.prefix:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver
@@ -785,3 +807,9 @@ services:
         class: Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor
         arguments:
             - '@oro_api.request_expression_matcher'
+
+    oro_api.action_group_executor:
+        class: Oro\Bundle\ApiBundle\Util\ActionGroupExecutor
+        arguments:
+            - '@oro_action.action_group_registry'
+            - '@translator'
