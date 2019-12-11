@@ -113,6 +113,7 @@ define(function(require) {
             // Creates copy of route options which can be extended by event and used to create an url
             // original option remains same
             var routeOptions = $.extend(true, {}, this.routeOptions);
+            routeOptions.options = $.extend(true, {}, routeOptions.options);
             mediator.trigger('import-export:handleExport', routeOptions.options);
 
             if (this.options.isExportPopupRequired) {
