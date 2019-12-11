@@ -33,7 +33,7 @@ class DraftPermissionHelperTest extends \PHPUnit\Framework\TestCase
 
         $source = new DraftableEntityStub();
         $permission = $this->helper->generatePermissions($source, BasicPermissionMap::PERMISSION_VIEW);
-        $this->assertEquals('VIEW_ALL_DRAFT', $permission);
+        $this->assertEquals('VIEW_ALL_DRAFTS', $permission);
 
         $source
             ->setDraftOwner($user)
@@ -51,6 +51,6 @@ class DraftPermissionHelperTest extends \PHPUnit\Framework\TestCase
     public function testGenerateGlobalPermission(): void
     {
         $permission = $this->helper->generateGlobalPermission(BasicPermissionMap::PERMISSION_VIEW);
-        $this->assertEquals('VIEW_ALL_DRAFT', $permission);
+        $this->assertEquals('VIEW_ALL_DRAFTS', $permission);
     }
 }

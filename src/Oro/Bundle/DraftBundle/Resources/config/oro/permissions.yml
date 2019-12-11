@@ -1,11 +1,10 @@
 oro_permissions:
-    CREATE_DRAFTS:
+    CREATE_DRAFT:
         label: oro.draft.permission.create.label
         apply_to_all: false
         group_names: ""
         apply_to_interfaces:
             - Oro\Bundle\DraftBundle\Entity\DraftableInterface
-            - Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface
 
     VIEW_ALL_DRAFTS:
         label: oro.draft.permission.view_all.label
@@ -21,7 +20,7 @@ oro_permissions:
         apply_to_interfaces:
             - Oro\Bundle\DraftBundle\Entity\DraftableInterface
 
-    DELETE_OWN_DRAFTS:
+    DELETE_DRAFT:
         label: oro.draft.permission.delete_own.label
         apply_to_all: false
         group_names: ""
@@ -35,7 +34,7 @@ oro_permissions:
         apply_to_interfaces:
             - Oro\Bundle\DraftBundle\Entity\DraftableInterface
 
-    PUBLISH_DRAFTS:
+    PUBLISH_DRAFT:
         label: oro.draft.permission.publish.label
         apply_to_all: false
         group_names: ""

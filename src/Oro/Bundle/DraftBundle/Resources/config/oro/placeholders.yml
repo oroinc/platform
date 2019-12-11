@@ -8,16 +8,16 @@ placeholders:
     items:
         oro_save_as_draft:
             template: OroDraftBundle:Draft:saveAsDraft.html.twig
-            acl: CREATE_DRAFT
             applicable:
                 - '@oro_ui.placeholder.filter->isInstanceOf($entity$, Oro\Bundle\DraftBundle\Entity\DraftableInterface)'
                 - '@oro_ui.placeholder.filter->isTrue($entity.id$)'
                 - '@oro_ui.placeholder.filter->isSame($entity.draftUuid$, $null$)'
+                - '@oro_draft.placeholder.filter->isApplicable($entity$)'
 
         oro_save_as_new_draft:
             template: OroDraftBundle:Draft:saveAsNewDraft.html.twig
-            acl: CREATE_DRAFT
             applicable:
                 - '@oro_ui.placeholder.filter->isInstanceOf($entity$, Oro\Bundle\DraftBundle\Entity\DraftableInterface)'
                 - '@oro_ui.placeholder.filter->isTrue($entity.id$)'
                 - '@oro_ui.placeholder.filter->isTrue($entity.draftUuid$)'
+                - '@oro_draft.placeholder.filter->isApplicable($entity$)'

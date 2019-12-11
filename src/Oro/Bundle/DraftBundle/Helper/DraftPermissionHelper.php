@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 class DraftPermissionHelper
 {
     private const PERMISSION_OWNER_SUFFIX = 'DRAFT';
-    private const PERMISSION_SUFFIX = 'ALL_DRAFT';
+    private const PERMISSION_SUFFIX = 'ALL_DRAFTS';
 
     /**
      * @var TokenAccessorInterface

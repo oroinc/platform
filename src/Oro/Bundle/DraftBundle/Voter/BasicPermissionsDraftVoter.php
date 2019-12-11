@@ -134,8 +134,9 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
     private function checkSourcePermission(DraftableInterface $object, string $attribute): int
     {
         $source = $object->getDraftSource();
+        $permissions = $this->draftPermissionHelper->generatePermissions($object, BasicPermissionMap::PERMISSION_VIEW);
 
-        return $this->isGranted($source, $attribute);
+        return $this->isGranted($source, $attribute) | $this->isGranted($object, $permissions);
     }
 
     /**
