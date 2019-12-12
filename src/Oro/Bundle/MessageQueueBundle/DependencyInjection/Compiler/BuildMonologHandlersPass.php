@@ -3,6 +3,8 @@
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
 use Monolog\Logger;
+use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -11,34 +13,58 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class BuildMonologHandlersPass implements CompilerPassInterface
 {
-    const CONSOLE_ERROR_HANDLER_ID = 'oro_message_queue.log.handler.console_error';
+    private const CONSOLE_ERROR_HANDLER_ID = 'oro_message_queue.log.handler.console_error';
+    private const VERBOSITY_FILTER_HANDLER_ID = 'oro_message_queue.log.handler.verbosity_filter';
 
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        $configs = $container->getExtensionConfig('monolog');
-        foreach ($configs as $config) {
-            if (array_key_exists('handlers', $config)) {
-                foreach ($config['handlers'] as $name => $handler) {
-                    if (!array_key_exists('id', $handler) || self::CONSOLE_ERROR_HANDLER_ID !== $handler['id']) {
+        $extension = $container->getExtension('monolog');
+        if ($extension instanceof MonologExtension) {
+            $configs = $container->getExtensionConfig('monolog');
+            $configuration = $extension->getConfiguration($configs, $container);
+            $config = (new Processor())->processConfiguration($configuration, $configs);
+
+            if (isset($config['handlers'])) {
+                foreach ($config['handlers'] as $handler) {
+                    if ('service' !== $handler['type']) {
                         continue;
                     }
 
-                    $nestedHandlerId = sprintf('monolog.handler.%s', $handler['handler']);
-                    $nestedHandlerDefinition = $container->getDefinition($nestedHandlerId);
-
-                    $consoleErrorHandler = $container->getDefinition(self::CONSOLE_ERROR_HANDLER_ID);
-                    $consoleErrorHandler->setArguments([
-                        $nestedHandlerDefinition,
-                        $this->getArgument($handler, 'buffer_size', 0),
-                        $this->getArgument($handler, 'level', Logger::DEBUG),
-                        $this->getArgument($handler, 'bubble', true),
-                        $this->getArgument($handler, 'flush_on_overflow', false),
-                    ]);
+                    $this->buildHandler($container, $handler);
                 }
             }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array $handler
+     *
+     * @return void
+     */
+    private function buildHandler(ContainerBuilder $container, array $handler): void
+    {
+        if (!in_array($handler['id'], [self::CONSOLE_ERROR_HANDLER_ID, self::VERBOSITY_FILTER_HANDLER_ID], true)) {
+            return;
+        }
+
+        $handlerDefinition = $container->getDefinition($handler['id']);
+
+        $nestedHandlerId = sprintf('monolog.handler.%s', $handler['handler']);
+        $nestedHandlerDefinition = $container->getDefinition($nestedHandlerId);
+        $handlerDefinition->setArgument(1, $nestedHandlerDefinition);
+
+        switch ($handler['id']) {
+            case self::CONSOLE_ERROR_HANDLER_ID:
+                $handlerDefinition->setArgument(2, $this->getArgument($handler, 'level', Logger::DEBUG));
+                break;
+            case self::VERBOSITY_FILTER_HANDLER_ID:
+                $handlerDefinition->setArgument(2, $this->getArgument($handler, 'verbosity_levels', []));
+                $handlerDefinition->addTag('kernel.event_subscriber');
+                break;
         }
     }
 
@@ -49,7 +75,7 @@ class BuildMonologHandlersPass implements CompilerPassInterface
      *
      * @return mixed
      */
-    private function getArgument(array $handler, $key, $default)
+    private function getArgument(array $handler, string $key, $default)
     {
         return array_key_exists($key, $handler) ? $handler[$key] : $default;
     }
