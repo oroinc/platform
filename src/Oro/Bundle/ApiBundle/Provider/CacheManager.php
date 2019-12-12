@@ -36,6 +36,9 @@ class CacheManager
     /** @var ApiDocExtractor */
     private $apiDocExtractor;
 
+    /** @var object[] */
+    private $resettableServices = [];
+
     /**
      * @param array                    $configKeys
      * @param array                    $apiDocViews
@@ -159,11 +162,34 @@ class CacheManager
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
             if ($view) {
                 $this->apiDocExtractor->warmUp($view);
+                $this->resetServices();
             } else {
                 foreach ($this->apiDocViews as $currentView => $expr) {
                     $this->apiDocExtractor->warmUp($currentView);
+                    $this->resetServices();
                 }
             }
+        }
+    }
+
+    /**
+     * Registers a service that should be reset to its initial state
+     * after API documentation cache for a specific view is warmed up.
+     *
+     * @param object $service
+     */
+    public function addResettableService($service)
+    {
+        $this->resettableServices[] = $service;
+    }
+
+    /**
+     * Resets all registered resettable services to theirs initial state.
+     */
+    private function resetServices()
+    {
+        foreach ($this->resettableServices as $service) {
+            $service->reset();
         }
     }
 

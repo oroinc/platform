@@ -2,10 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityReaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -411,5 +419,134 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($iterator, $this->reader->getSourceIterator());
         $this->reader->setSourceIterator();
         $this->assertNull($this->reader->getSourceIterator());
+    }
+
+    public function testGetIds()
+    {
+        $entityName = 'entityName';
+        $options = [];
+        $result = [1, 2, 3];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $emConfiguration = $this->createMock(Configuration::class);
+
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->exactly(2))
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($classMetadata);
+        $entityManager->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($emConfiguration);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn([
+                1 => 'a',
+                2 => 'b',
+                3 => 'c',
+            ]);
+
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->exactly(2))
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('o ', 'o.id')
+            ->willReturn($queryBuilder);
+
+        $entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with($entityName)
+            ->willReturn($repository);
+
+        $this->managerRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityName)
+            ->willReturn($entityManager);
+
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::BEFORE_EXPORT_GET_IDS, new ExportPreGetIds($queryBuilder, $options));
+
+        $this->reader->setDispatcher($dispatcher);
+
+        $this->assertEquals($result, $this->reader->getIds($entityName, $options));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Not supported entity (entityName) with composite primary key.
+     */
+    public function testGetIdsCompositeKey()
+    {
+        $entityName = 'entityName';
+        $options = [];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id', 'name']);
+        $classMetadata->expects($this->never())
+            ->method('getSingleIdentifierFieldName');
+
+        $emConfiguration = $this->createMock(Configuration::class);
+
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($classMetadata);
+        $entityManager->expects($this->never())
+            ->method('getConfiguration');
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->never())
+            ->method('getResult');
+
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->never())
+            ->method('getQuery');
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->never())
+            ->method('createQueryBuilder');
+
+        $entityManager->expects($this->never())
+            ->method('getRepository');
+
+        $this->managerRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityName)
+            ->willReturn($entityManager);
+
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->reader->setDispatcher($dispatcher);
+
+        $this->reader->getIds($entityName, $options);
     }
 }

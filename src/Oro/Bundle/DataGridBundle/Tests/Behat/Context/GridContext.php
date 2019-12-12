@@ -1821,6 +1821,7 @@ TEXT;
 
         // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
         // which one is the actual filter manager dropdown.
+        /** @var GridFilterManager[]|null $filterDropdowns */
         $filterDropdowns = $this->spin(function () use ($grid) {
             $elements = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
 
@@ -1829,8 +1830,8 @@ TEXT;
             });
         }, 3);
 
+        self::assertNotNull($filterDropdowns, 'Filter manager dropdown was not found');
         $filterManager = array_shift($filterDropdowns);
-        self::assertNotNull($filterManager, 'Filter manager dropdown was not found');
 
         /** @var GridFilterManager $filterManager */
         $filterManager->checkColumnFilter($filter);

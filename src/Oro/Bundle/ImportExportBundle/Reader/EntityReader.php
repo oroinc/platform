@@ -13,6 +13,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -104,7 +105,6 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         $this->setSourceQuery($this->applyAcl($qb));
     }
 
-
     /**
      * @param $entityName
      * @param Organization|null $organization
@@ -183,6 +183,10 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
             $entityName,
             $options
         );
+
+        $event = new ExportPreGetIds($queryBuilder, $options);
+        $this->dispatcher->dispatch(Events::BEFORE_EXPORT_GET_IDS, $event);
+
         $organization = isset($options['organization']) ? $options['organization'] : null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
         $this->applyAcl($queryBuilder);

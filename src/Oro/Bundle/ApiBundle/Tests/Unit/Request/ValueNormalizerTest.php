@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
+use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -14,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
 /**
@@ -1696,5 +1698,85 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         } else {
             self::assertSame($expected, $actual, $message);
         }
+    }
+
+    public function testGetRequirementCache()
+    {
+        $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])
+            ->setMethods(['process'])
+            ->getMock();
+        $processor->expects(self::exactly(4))
+            ->method('process')
+            ->willReturnCallback(function (NormalizeValueContext $context) {
+                $context->setRequirement((string)$context->getRequestType());
+            });
+
+        $requestType1 = new RequestType([RequestType::REST]);
+        $requestType2 = new RequestType([RequestType::JSON_API]);
+        $valueNormalizer = new ValueNormalizer($processor);
+
+        self::assertEquals((string)$requestType1, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType1));
+        self::assertEquals((string)$requestType2, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType2));
+
+        // test cached values
+        self::assertEquals((string)$requestType1, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType1));
+        self::assertEquals((string)$requestType2, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType2));
+
+        // clear the memory cache
+        $valueNormalizer->reset();
+
+        // test that the memory cache was cleared
+        self::assertEquals((string)$requestType1, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType1));
+        self::assertEquals((string)$requestType2, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType2));
+    }
+
+    public function testNormalizeValueCache()
+    {
+        $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])
+            ->setMethods(['process'])
+            ->getMock();
+        $processor->expects(self::exactly(4))
+            ->method('process')
+            ->willReturnCallback(function (NormalizeValueContext $context) {
+                $context->setResult($context->getRequestType() . '_' . $context->getResult());
+            });
+
+        $requestType1 = new RequestType([RequestType::REST]);
+        $requestType2 = new RequestType([RequestType::JSON_API]);
+        $valueNormalizer = new ValueNormalizer($processor);
+
+        self::assertEquals(
+            $requestType1 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType1)
+        );
+        self::assertEquals(
+            $requestType2 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType2)
+        );
+
+        // test cached values
+        self::assertEquals(
+            $requestType1 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType1)
+        );
+        self::assertEquals(
+            $requestType2 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType2)
+        );
+
+        // clear the memory cache
+        $valueNormalizer->reset();
+
+        // test that the memory cache was cleared
+        self::assertEquals(
+            $requestType1 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType1)
+        );
+        self::assertEquals(
+            $requestType2 . '_val',
+            $valueNormalizer->normalizeValue('val', DataType::ENTITY_TYPE, $requestType2)
+        );
     }
 }

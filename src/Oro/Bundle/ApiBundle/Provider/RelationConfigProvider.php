@@ -43,13 +43,8 @@ class RelationConfigProvider extends AbstractConfigProvider
         RequestType $requestType,
         array $extras = []
     ): Config {
-        if (empty($className)) {
+        if (!$className) {
             throw new \InvalidArgumentException('$className must not be empty.');
-        }
-
-        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
-        if (array_key_exists($cacheKey, $this->cache)) {
-            return clone $this->cache[$cacheKey];
         }
 
         /** @var RelationConfigContext $context */
@@ -58,11 +53,7 @@ class RelationConfigProvider extends AbstractConfigProvider
 
         $this->processor->process($context);
 
-        $config = $this->buildResult($context);
-
-        $this->cache[$cacheKey] = $config;
-
-        return clone $config;
+        return $this->buildResult($context);
     }
 
     /**

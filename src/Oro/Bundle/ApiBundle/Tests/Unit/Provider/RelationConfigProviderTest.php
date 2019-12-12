@@ -92,41 +92,10 @@ class RelationConfigProviderTest extends \PHPUnit\Framework\TestCase
             $requestType,
             [$extra, $sectionExtra]
         );
-        self::assertEquals('relation|Test\Class|test_extra_key', $result->getDefinition()->getKey());
+        self::assertNull($result->getDefinition()->getKey());
         self::assertTrue($definition->hasField('test_field'));
         self::assertEquals(['test_section_key' => 'value'], $result->get('test_section_extra'));
         // a clone of definition should be returned
-        self::assertNotSame($definition, $result->getDefinition());
-        self::assertEquals($definition, $result->getDefinition());
-
-        // test that the config is cached, but its clone should be returned
-        $anotherResult = $this->configProvider->getRelationConfig(
-            $className,
-            $version,
-            $requestType,
-            [$extra, $sectionExtra]
-        );
-        self::assertNotSame($result, $anotherResult);
-        self::assertEquals($result, $anotherResult);
-    }
-
-    public function testShouldBePossibleToClearInternalCache()
-    {
-        $className = 'Test\Class';
-        $version = '1.2';
-        $requestType = new RequestType(['test_request']);
-        $context = new ConfigContext();
-
-        $this->processor->expects(self::exactly(2))
-            ->method('createContext')
-            ->willReturn($context);
-        $this->processor->expects(self::exactly(2))
-            ->method('process')
-            ->with(self::identicalTo($context));
-
-        $this->configProvider->getRelationConfig($className, $version, $requestType);
-
-        $this->configProvider->clearCache();
-        $this->configProvider->getRelationConfig($className, $version, $requestType);
+        self::assertSame($definition, $result->getDefinition());
     }
 }

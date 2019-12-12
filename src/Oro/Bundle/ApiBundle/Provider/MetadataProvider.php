@@ -14,6 +14,8 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class MetadataProvider
 {
+    const KEY_DELIMITER = '|';
+
     /** @var ActionProcessorInterface */
     private $processor;
 
@@ -49,7 +51,7 @@ class MetadataProvider
         array $extras = [],
         bool $withExcludedProperties = false
     ): ?EntityMetadata {
-        if (empty($className)) {
+        if (!$className) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
@@ -98,6 +100,14 @@ class MetadataProvider
      * Removes all already built metadatas from the internal cache.
      */
     public function clearCache(): void
+    {
+        $this->cache = [];
+    }
+
+    /**
+     * Resets an object to its initial state.
+     */
+    public function reset()
     {
         $this->cache = [];
     }
@@ -160,16 +170,16 @@ class MetadataProvider
         string $configKey
     ): string {
         $cacheKey = (string)$requestType
-            . '|' . $version
-            . '|' . $className
-            . '|' . ($withExcludedProperties ? '1' : '0');
+            . self::KEY_DELIMITER . $version
+            . self::KEY_DELIMITER . $className
+            . self::KEY_DELIMITER . ($withExcludedProperties ? '1' : '0');
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $cacheKey .= '|' . $part;
+            if ($part) {
+                $cacheKey .= self::KEY_DELIMITER . $part;
             }
         }
-        $cacheKey .= '|' . $configKey;
+        $cacheKey .= self::KEY_DELIMITER . $configKey;
 
         return $cacheKey;
     }
