@@ -90,6 +90,18 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 249, persistent: false }
 
+    oro_draft.datagrid.extension.draftable_filter:
+        class: Oro\Bundle\DraftBundle\Datagrid\DraftableFilterExtension
+        arguments:
+            - '@oro_draft.manager.draftable_filter'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_draft.manager.draftable_filter:
+        class: Oro\Bundle\DraftBundle\Manager\DraftableFilterManager
+        arguments:
+            - '@doctrine'
+
     oro_draft.placeholder.filter:
         class: Oro\Bundle\DraftBundle\Placeholder\PlaceholderFilter
         public: true

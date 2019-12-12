@@ -14,13 +14,16 @@ oro:
                 label: Create draft
                 success: Draft has been saved
             update:
+                label: Edit draft
                 save_as_draft.label: Save as draft
                 save_as_new_draft.label: Save as new draft
             publish:
                 label: Publish draft
-                success: Draft has been created
+                success: Draft has been published
             duplicate:
                 label: Duplicate
+            delete:
+                label: Delete draft
         permission:
             create.label: Create Drafts
             view_all.label: View All Drafts

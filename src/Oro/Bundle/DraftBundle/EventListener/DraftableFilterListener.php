@@ -4,6 +4,7 @@ namespace Oro\Bundle\DraftBundle\EventListener;
 
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
+use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -34,8 +35,8 @@ class DraftableFilterListener
         $entityId = $request->get('entityId');
         $className = null;
 
-        if (is_array($entityId) && isset($entityId['id'])) {
-            $id = $entityId['id'];
+        if ($entityId) {
+            $id = is_array($entityId) && isset($entityId['id']) ? $entityId['id'] : $entityId;
             $className = $request->get('entityClass');
         } else {
             $id = $event->getRequest()->get('id');
@@ -104,7 +105,7 @@ class DraftableFilterListener
         $filters->disable(DraftableFilter::FILTER_ID);
         /** @var DraftableInterface $entity */
         $entity = $em->getRepository($className)->find($id);
-        if ($entity && !$entity->getDraftUuid()) {
+        if ($entity && !DraftHelper::isDraft($entity)) {
             $filters->enable(DraftableFilter::FILTER_ID);
         }
     }
