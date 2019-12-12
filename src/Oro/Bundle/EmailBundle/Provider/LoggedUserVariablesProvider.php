@@ -10,6 +10,7 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -36,22 +37,28 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var ConfigManager */
     private $configManager;
 
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
+
     /**
-     * @param TranslatorInterface    $translator
+     * @param TranslatorInterface $translator
      * @param TokenAccessorInterface $tokenAccessor
-     * @param EntityNameResolver     $entityNameResolver
-     * @param ConfigManager          $configManager
+     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager $configManager
+     * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         TranslatorInterface $translator,
         TokenAccessorInterface $tokenAccessor,
         EntityNameResolver $entityNameResolver,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->translator = $translator;
         $this->tokenAccessor = $tokenAccessor;
         $this->entityNameResolver = $entityNameResolver;
         $this->configManager = $configManager;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -211,7 +218,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         if (is_object($user)) {
             if ($addValue) {
-                $val = $this->configManager->get('oro_email.signature');
+                $val = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
             } else {
                 $val = [
                     'type'  => 'string',
