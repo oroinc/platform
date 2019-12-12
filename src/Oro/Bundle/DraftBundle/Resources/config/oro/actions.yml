@@ -47,11 +47,24 @@ operations:
         button_options:
             icon: fa-files-o
             class: btn
+        frontend_options:
+            confirmation:
+                content: '$.confirmationContent'
+                component: oroui/js/standart-confirmation
         preconditions:
             '@and':
                 - '@not_blank': $.data
                 - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
                 - '@equal': [$.data.draftUuid, null]
+        preactions:
+            - '@assign_draftable_fields':
+                object: $.data
+                attribute: $.draftableFields
+            - '@render_template':
+                attribute: $.confirmationContent
+                template: OroDraftBundle:Draft:draftConfirmation.html.twig
+                params:
+                    draftableFields: $.draftableFields
         actions:
             - '@run_action_group':
                   action_group: oro_draft_create

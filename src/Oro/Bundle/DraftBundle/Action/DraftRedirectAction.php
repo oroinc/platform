@@ -59,8 +59,7 @@ class DraftRedirectAction extends AbstractAction
      */
     public function initialize(array $options): DraftRedirectAction
     {
-        $this->getOptionResolver()->resolve($options);
-        $this->options = $options;
+        $this->options = $this->getOptionResolver()->resolve($options);
 
         return $this;
     }

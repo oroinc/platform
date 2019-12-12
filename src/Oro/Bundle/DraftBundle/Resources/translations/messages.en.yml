@@ -1,7 +1,6 @@
 oro:
     draft:
-        draft:
-            label: Draft
+        label: Draft
         draftproject:
             entity_label: Project
             entity_plural_label: Projects
@@ -13,6 +12,8 @@ oro:
             create:
                 label: Create draft
                 success: Draft has been saved
+                confirmation:
+                    body_title: "Only the changes from the following fields will be transferred to a draft:"
             update:
                 label: Edit draft
                 save_as_draft.label: Save as draft

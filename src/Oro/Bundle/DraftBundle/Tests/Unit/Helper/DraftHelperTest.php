@@ -4,6 +4,9 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,16 +14,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DraftHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DraftHelper */
-    private $helper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
+    /**
+     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $requestStack;
+
+    /**
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $draftProvider;
+
+    /**
+     * @var DraftHelper
+     */
+    private $helper;
 
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
-        $this->helper = new DraftHelper($this->requestStack);
+        $this->draftProvider = $this->createMock(ConfigProvider::class);
+
+        $this->helper = new DraftHelper($this->requestStack, $this->draftProvider);
     }
 
     public function testIsSaveAsDraftAction(): void
@@ -54,5 +68,22 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
         $source->setDraftUuid(UUIDGenerator::v4());
         $source->setDraftSource($draftSource);
         $this->assertTrue(DraftHelper::isDraft($source));
+    }
+
+    public function testGetDraftableProperties(): void
+    {
+        $source = new DraftableEntityStub();
+        $className = 'Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub';
+
+        $this->draftProvider
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->with($className)
+            ->willReturn([
+                new Config(new FieldConfigId('draftable', $className, 'content'), ['draftable' => true]),
+                new Config(new FieldConfigId('draftable', $className, 'titles'), ['draftable' => false]),
+            ]);
+
+        $this->assertEquals(['content'], $this->helper->getDraftableProperties($source));
     }
 }

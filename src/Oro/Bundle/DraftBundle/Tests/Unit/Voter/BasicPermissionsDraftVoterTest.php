@@ -8,6 +8,7 @@ use Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\DraftBundle\Voter\BasicPermissionsDraftVoter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -62,7 +63,10 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack $requestStack */
         $requestStack = $this->createMock(RequestStack::class);
-        $this->draftHelper = new DraftHelper($requestStack);
+        /** @var ConfigProvider $configProvider */
+        $configProvider = $this->createMock(ConfigProvider::class);
+
+        $this->draftHelper = new DraftHelper($requestStack, $configProvider);
 
         $this->voter = new BasicPermissionsDraftVoter(
             $this->doctrineHelper,

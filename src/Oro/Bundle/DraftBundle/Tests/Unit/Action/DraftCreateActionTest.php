@@ -42,6 +42,9 @@ class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
 
     public function testInitialize(): void
     {
+        $this->expectExceptionMessage('The required options "source", "target" are missing.');
+        $this->action->initialize([]);
+
         $options = [
             'source' => new PropertyPath('source'),
             'target' => new PropertyPath('target')

@@ -25,12 +25,9 @@ abstract class AbstractDraftAction extends AbstractAction
      *
      * @return $this|ActionInterface
      */
-    public function initialize(array $options)
+    public function initialize(array $options): ActionInterface
     {
-        $this->getOptionResolver()->resolve($options);
-        $this->options = $options;
-
-        $this->getOption($options, self::OPTION_KEY_SOURCE);
+        $this->options = $this->getOptionResolver()->resolve($options);
 
         return $this;
     }

@@ -3,8 +3,10 @@
 namespace Oro\Bundle\DraftBundle\Helper;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Responsible for functionality that can indicate draft state and ways to interact with the draft.
@@ -20,11 +22,18 @@ class DraftHelper
     private $requestStack;
 
     /**
-     * @param RequestStack $requestStack
+     * @var ConfigProvider
      */
-    public function __construct(RequestStack $requestStack)
+    private $draftProvider;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param ConfigProvider $draftProvider
+     */
+    public function __construct(RequestStack $requestStack, ConfigProvider $draftProvider)
     {
         $this->requestStack = $requestStack;
+        $this->draftProvider = $draftProvider;
     }
 
     /**
@@ -49,5 +58,24 @@ class DraftHelper
     public static function isDraft(DraftableInterface $object): bool
     {
         return null != $object->getDraftUuid();
+    }
+
+    /**
+     * @param DraftableInterface $source
+     *
+     * @return array
+     */
+    public function getDraftableProperties(DraftableInterface $source): array
+    {
+        $className = ClassUtils::getRealClass($source);
+        $draftConfigs = $this->draftProvider->getConfigs($className);
+        $fields = [];
+        foreach ($draftConfigs as $config) {
+            if ($config->is('draftable')) {
+                $fields[] = $config->getId()->getFieldName();
+            }
+        }
+
+        return $fields;
     }
 }
