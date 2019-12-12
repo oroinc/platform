@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -73,6 +74,11 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $factory;
 
+    /**
+     * @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $htmlTagHelper;
+
     protected function setUp()
     {
         $this->request = new Request();
@@ -118,6 +124,8 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getActivityTargets')
             ->willReturn([]);
 
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+
         $this->factory = new Factory();
 
         $requestStack = new RequestStack();
@@ -131,6 +139,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             $this->factory,
             $requestStack
         );
+        $this->emailModelBuilder->setHtmlTagHelper($this->htmlTagHelper);
     }
 
     /**
@@ -197,6 +206,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             $this->factory,
             $requestStack
         );
+        $this->emailModelBuilder->setHtmlTagHelper($this->htmlTagHelper);
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
             ->method('decodeClassName')
@@ -222,7 +232,12 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with('oro_email.signature');
+            ->with('oro_email.signature')
+            ->willReturn('Signature');
+        $this->htmlTagHelper->expects($this->once())
+            ->method('sanitize')
+            ->with('Signature')
+            ->willReturn('Sanitized Signature');
 
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
         $this->assertEquals($emailModel, $result);
@@ -236,6 +251,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result->getTo());
         $this->assertEquals($expected, $result->getCc());
         $this->assertEquals($expected, $result->getBcc());
+        $this->assertEquals('Sanitized Signature', $result->getSignature());
     }
 
     /**
