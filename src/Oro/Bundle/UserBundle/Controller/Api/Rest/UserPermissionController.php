@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -35,8 +34,6 @@ class UserPermissionController extends RestGetController
      *      description="The entity class name. One or several classes names separated by comma.
      * Defaults to all classes."
      *)
-     *
-     * @Rest\Get(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get user permissions",

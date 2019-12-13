@@ -165,9 +165,6 @@ class UserController extends RestController implements ClassResourceInterface
      * Get user roles
      *
      * @param int $id User id
-     *
-     * @Rest\Get(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get user roles",
      *      resource=true,
@@ -195,7 +192,7 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @Rest\Get(requirements={"id"="\d+"})
+     *
      *
      * @ApiDoc(
      *      description="Get user groups",
