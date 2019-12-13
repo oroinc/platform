@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
+use Monolog\Handler\HandlerWrapper;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as BaseConsoleHandler;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Writes message queue consumer related logs to the console output depending on its verbosity setting.
  * It is disabled by default and gets activated as soon as ConsumerState::startConsumption is called.
  * @see \Oro\Component\MessageQueue\Log\ConsumerState::startConsumption
+ *
+ * @property BaseConsoleHandler $handler
  */
-class ConsoleHandler extends BaseConsoleHandler
+class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
 {
     /** @var ConsumerState */
     private $consumerState;
@@ -22,15 +26,14 @@ class ConsoleHandler extends BaseConsoleHandler
     private $commandNestedLevel = 0;
 
     /**
-     * @param ConsumerState $consumerState     The object that stores the current state of message queue consumer
-     * @param bool          $bubble            Whether the messages that are handled can bubble up the stack or not
-     * @param array         $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
-     *                                         level (leave empty to use the default mapping)
+     * @param ConsumerState $consumerState
      */
-    public function __construct(ConsumerState $consumerState, $bubble = true, array $verbosityLevelMap = [])
+    public function __construct(ConsumerState $consumerState)
     {
-        parent::__construct(null, $bubble, $verbosityLevelMap);
+        parent::__construct(new BaseConsoleHandler());
+
         $this->consumerState = $consumerState;
+        $this->setFormatter(new ConsoleFormatter());
     }
 
     /**
@@ -48,15 +51,16 @@ class ConsoleHandler extends BaseConsoleHandler
      */
     public function handle(array $record)
     {
-        if (!$this->consumerState->isConsumptionStarted()) {
-            return false;
-        }
-
-        return parent::handle($record);
+        return
+            $this->consumerState->isConsumptionStarted()
+            && parent::handle($record);
     }
 
     /**
-     * {@inheritdoc}
+     * Before a command is executed, the handler gets activated and the console output
+     * is set in order to know where to write the logs.
+     *
+     * @param ConsoleCommandEvent $event
      */
     public function onCommand(ConsoleCommandEvent $event)
     {
@@ -64,26 +68,29 @@ class ConsoleHandler extends BaseConsoleHandler
         if (1 === $this->commandNestedLevel) {
             // use stdout, not stderr as in Symfony, because this handler
             // is the main channel to write console messages for the consumer command
-            $this->setOutput($event->getOutput());
+            $this->handler->setOutput($event->getOutput());
         }
     }
 
     /**
-     * {@inheritdoc}
+     *
+     * After a command has been executed, it disables the output.
+     *
+     * @param ConsoleTerminateEvent $event
      */
     public function onTerminate(ConsoleTerminateEvent $event)
     {
         $this->commandNestedLevel--;
         if (0 === $this->commandNestedLevel) {
-            parent::onTerminate($event);
+            $this->handler->onTerminate($event);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultFormatter()
+    public static function getSubscribedEvents()
     {
-        return new ConsoleFormatter();
+        return BaseConsoleHandler::getSubscribedEvents();
     }
 }

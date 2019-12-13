@@ -7,7 +7,7 @@ define(function(require) {
 
     const WidgetTabsView = BaseView.extend({
         events: {
-            'shown.bs.tab .tab-button': 'onTabClick'
+            'shown.bs.tab .tab-button': 'onTabShown'
         },
 
         loadingMask: null,
@@ -34,7 +34,7 @@ define(function(require) {
             return this.$el.closest('.widget-content').find('.tab-content');
         },
 
-        onTabClick: function(e) {
+        onTabShown: function(e) {
             const $currentTarget = $(e.currentTarget);
             const previusActiveTab = $(e.relatedTarget);
             const loadingView = this.subview('loading');
