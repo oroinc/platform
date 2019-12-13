@@ -12,9 +12,9 @@ class DeleteMassActionConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('delete');
 
-        $builder->root('delete')
+        $builder->getRootNode()
             ->canBeDisabled()
             ->end();
 

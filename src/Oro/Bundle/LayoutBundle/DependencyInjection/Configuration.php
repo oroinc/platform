@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_layout');
+        $treeBuilder = new TreeBuilder('oro_layout');
+        $rootNode    = $treeBuilder->getRootNode();
 
         SettingsBuilder::append($rootNode, [
             'development_settings_feature_enabled' => [
@@ -57,8 +57,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendTemplatingNodes(ArrayNodeDefinition $parentNode)
     {
-        $treeBuilder = new TreeBuilder();
-        $node        = $treeBuilder->root('templating');
+        $treeBuilder = new TreeBuilder('templating');
+        $node        = $treeBuilder->getRootNode();
 
         $node
             ->addDefaultsIfNotSet()

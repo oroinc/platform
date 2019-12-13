@@ -74,7 +74,10 @@ oro_form:
                 i: ~
                 br:
                     hasClosingTag: false
-                span: ~
+                span:
+                    attributes:
+                        - data-title
+                        - data-type
                 img:
                     attributes:
                         - src

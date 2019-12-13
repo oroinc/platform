@@ -86,6 +86,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         array $viewData,
         array $customOptions = array()
     ) {
+        // NOTE: must be executed after EntityBundle, because it will be fail result
+
         $this->localeSettings
             ->expects($this->once())
             ->method('getLocale')
@@ -284,6 +286,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         array $viewData,
         array $customOptions
     ) {
+        // NOTE: must be executed after EntityBundle, because it will be fail result
+
         $this->localeSettings
             ->expects($this->once())
             ->method('getLocale')

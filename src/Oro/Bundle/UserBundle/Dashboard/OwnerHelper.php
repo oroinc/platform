@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class OwnerHelper
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var TokenStorageInterface */
@@ -27,12 +27,12 @@ class OwnerHelper
     protected $ownerIds;
 
     /**
-     * @param RegistryInterface          $registry
+     * @param ManagerRegistry            $registry
      * @param TokenStorageInterface      $tokenStorage
      * @param OwnerTreeProviderInterface $ownerTreeProvider
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         TokenStorageInterface $tokenStorage,
         OwnerTreeProviderInterface $ownerTreeProvider
     ) {

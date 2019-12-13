@@ -7,7 +7,8 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -74,7 +75,7 @@ class AddLanguageType extends AbstractType
         // Remove already enabled languages
         $crowdinLangs = array_diff_key($crowdinLangs, $oroLangs);
         // Remove crowdin langs from intl list
-        $intlLangs = array_diff_key(Intl::getLocaleBundle()->getLocaleNames($systemLocale), $oroLangs, $crowdinLangs);
+        $intlLangs = array_diff_key(Locales::getNames($systemLocale), $oroLangs, $crowdinLangs);
 
         asort($crowdinLangs);
         array_walk($crowdinLangs, [$this, 'formatLanguageLabel']);
@@ -122,19 +123,13 @@ class AddLanguageType extends AbstractType
     private function resolveLanguageTitle($systemLocale, $langCode, $realCode = null)
     {
         // Check if 'Intl' has title for $langCode
-        $langTitle = Intl::getLocaleBundle()->getLocaleName($langCode, $systemLocale);
-
-        if ($langTitle) {
-            return $langTitle;
+        if (Locales::exists($langCode)) {
+            return Locales::getName($langCode, $systemLocale);
         }
 
-        if (null !== $realCode) {
-            // Check if 'Intl' has title for $realCode
-            $langTitle = Intl::getLanguageBundle()->getLanguageName($realCode, null, $systemLocale);
-
-            if ($langTitle) {
-                return $langTitle;
-            }
+        // Check if 'Intl' has title for $realCode
+        if (null !== $realCode && Languages::exists($realCode)) {
+            return Languages::getName($realCode, $systemLocale);
         }
 
         return $langCode;

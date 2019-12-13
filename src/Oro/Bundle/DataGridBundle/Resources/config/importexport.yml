@@ -26,6 +26,7 @@ services:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_security.acl_helper'
             - '@oro_importexport.reader.entity'
+            - '@event_dispatcher'
 
     oro_datagrid.importexport.export_connector:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector

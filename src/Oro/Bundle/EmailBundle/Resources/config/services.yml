@@ -117,6 +117,7 @@ services:
             - '@oro_email.provider.email_attachment_provider'
             - '@oro_email.form.factory'
             - '@request_stack'
+            - '@oro_ui.html_tag_helper'
 
     Oro\Bundle\EmailBundle\Builder\EmailModelBuilder:
         alias: 'oro_email.email.model.builder'
@@ -436,6 +437,7 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_entity.entity_name_resolver'
             - '@oro_config.user'
+            - '@oro_ui.html_tag_helper'
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 

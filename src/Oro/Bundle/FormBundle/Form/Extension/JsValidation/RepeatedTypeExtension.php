@@ -50,8 +50,11 @@ class RepeatedTypeExtension extends AbstractTypeExtension
         $second->vars['attr']['data-validation'] = json_encode($secondValue);
     }
 
-    public function getExtendedType()
+    /**
+     * {@inheritdoc}
+     */
+    public static function getExtendedTypes(): iterable
     {
-        return RepeatedType::class;
+        return [RepeatedType::class];
     }
 }

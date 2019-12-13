@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 /**
  * Provides lists of languages and formatting codes translated on current system language.
@@ -65,7 +65,7 @@ class LocalizationChoicesProvider
      */
     public function getFormattingChoices()
     {
-        return array_flip(Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage()));
+        return array_flip(Locales::getNames($this->getSystemLanguage()));
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
@@ -12,14 +14,13 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const LIMIT = 100;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -34,11 +35,11 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     private $logger;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param JobRunner $jobRunner
      * @param LoggerInterface $logger
      */
-    public function __construct(RegistryInterface $doctrine, JobRunner $jobRunner, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $doctrine, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;
         $this->jobRunner = $jobRunner;

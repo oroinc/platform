@@ -175,7 +175,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
 
         $age = $dateDiff->y;
 
-        return $this->getTranslator()->transChoice('oro.age', $age, ['%count%' => $age], 'messages');
+        return $this->getTranslator()->trans('oro.age', ['%count%' => $age], 'messages');
     }
 
     /**

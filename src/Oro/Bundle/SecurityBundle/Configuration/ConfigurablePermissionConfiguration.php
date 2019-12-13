@@ -19,8 +19,8 @@ class ConfigurablePermissionConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $rootNode = $builder->root(self::ROOT_NODE);
+        $builder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $builder->getRootNode();
 
         $rootNode->useAttributeAsKey('name')
             ->isRequired()
@@ -59,8 +59,8 @@ class ConfigurablePermissionConfiguration implements ConfigurationInterface
      */
     protected function getPermissionArrayNode($nodeName)
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root($nodeName);
+        $treeBuilder = new TreeBuilder($nodeName);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->prototype('variable')
                 ->beforeNormalization()

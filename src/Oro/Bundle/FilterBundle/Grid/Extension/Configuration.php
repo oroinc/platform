@@ -28,9 +28,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('filters');
 
-        $builder->root('filters')
+        $builder->getRootNode()
             ->children()
                 ->arrayNode('columns')
                     ->useAttributeAsKey('name')

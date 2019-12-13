@@ -6,11 +6,12 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides an information about all registered API resources.
  */
-class ResourcesProvider
+class ResourcesProvider implements ResetInterface
 {
     /** @var ActionProcessorInterface */
     private $processor;
@@ -80,7 +81,7 @@ class ResourcesProvider
         $accessibleResources = $this->loadAccessibleResources($version, $requestType, $cacheKey);
         $resourcesWithoutIdentifier = $this->loadResourcesWithoutIdentifier($version, $requestType, $cacheKey);
         foreach ($accessibleResources as $entityClass => $isAccessible) {
-            if ($isAccessible || in_array($entityClass, $resourcesWithoutIdentifier, true)) {
+            if ($isAccessible || \in_array($entityClass, $resourcesWithoutIdentifier, true)) {
                 $result[] = $entityClass;
             }
         }
@@ -105,7 +106,7 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        if (!array_key_exists($entityClass, $accessibleResources)) {
+        if (!\array_key_exists($entityClass, $accessibleResources)) {
             return false;
         }
 
@@ -133,7 +134,7 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return array_key_exists($entityClass, $accessibleResources);
+        return \array_key_exists($entityClass, $accessibleResources);
     }
 
     /**
@@ -153,7 +154,7 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return array_key_exists($entityClass, $excludedActions)
+        return \array_key_exists($entityClass, $excludedActions)
             ? $excludedActions[$entityClass]
             : [];
     }
@@ -192,7 +193,7 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return in_array($entityClass, $resourcesWithoutIdentifier, true);
+        return \in_array($entityClass, $resourcesWithoutIdentifier, true);
     }
 
     /**
@@ -200,11 +201,19 @@ class ResourcesProvider
      */
     public function clearCache(): void
     {
+        $this->reset();
+        $this->resourcesCache->clear();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
         $this->resources = [];
         $this->accessibleResources = [];
         $this->excludedActions = [];
         $this->resourcesWithoutIdentifier = [];
-        $this->resourcesCache->clear();
     }
 
     /**
@@ -214,7 +223,7 @@ class ResourcesProvider
      */
     private function hasResourcesInMemoryCache(string $cacheKey): bool
     {
-        return array_key_exists($cacheKey, $this->resources);
+        return \array_key_exists($cacheKey, $this->resources);
     }
 
     /**
@@ -351,7 +360,7 @@ class ResourcesProvider
      */
     private function loadResourcesWithoutIdentifier(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if (array_key_exists($cacheKey, $this->resourcesWithoutIdentifier)) {
+        if (\array_key_exists($cacheKey, $this->resourcesWithoutIdentifier)) {
             $resourcesWithoutId = $this->resourcesWithoutIdentifier[$cacheKey];
         } else {
             $resourcesWithoutId = $this->resourcesCache->getResourcesWithoutIdentifier($version, $requestType);

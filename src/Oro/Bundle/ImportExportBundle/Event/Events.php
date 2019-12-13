@@ -92,6 +92,13 @@ final class Events
     const AFTER_JOB_EXECUTION = 'oro.import_export.after_job_execution';
 
     /**
+     * This event occurs before qetting ids for the products export
+     *
+     * It can be used to modify the query builder to make additional filtering
+     */
+    const BEFORE_EXPORT_GET_IDS = 'oro.import_export.before_get_ids';
+
+    /**
      * This event occurs before chunk jobs are created in import processor.
      *
      * Can be used to send extra messages before processing chunks.

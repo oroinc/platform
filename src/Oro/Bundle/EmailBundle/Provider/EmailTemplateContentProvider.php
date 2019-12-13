@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -12,7 +13,6 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class EmailTemplateContentProvider
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $doctrine;
 
     /** @var EmailRenderer */
@@ -33,13 +33,13 @@ class EmailTemplateContentProvider
     private $logger;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param EmailRenderer $emailRenderer
      * @param PropertyAccessor $propertyAccessor
      * @param LoggerInterface $logger
      */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         EmailRenderer $emailRenderer,
         PropertyAccessor $propertyAccessor,
         LoggerInterface $logger

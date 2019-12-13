@@ -12,9 +12,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('features');
 
-        $builder->root('features')
+        $builder->getRootNode()
             ->children()
                 ->scalarNode('entity_class_name_path')->end()
             ->end();

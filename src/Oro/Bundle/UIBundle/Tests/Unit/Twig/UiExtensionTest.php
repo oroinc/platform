@@ -594,6 +594,20 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testRenderContent(): void
+    {
+        $this->assertSame(
+            'render_content data',
+            self::callTwigFilter(
+                $this->extension,
+                'render_content',
+                [
+                    'render_content data'
+                ]
+            )
+        );
+    }
+
     /**
      * @dataProvider skypeButtonProvider
      */

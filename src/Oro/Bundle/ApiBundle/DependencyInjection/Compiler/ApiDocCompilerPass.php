@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Nelmio\ApiDocBundle\Extractor as NelmioExtractor;
 use Nelmio\ApiDocBundle\Formatter as NelmioFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
@@ -43,6 +44,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             return;
         }
 
+        $this->configureUnderlyingViews($container);
         $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
         $this->configureSimpleFormatter($container);
@@ -96,6 +98,55 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureUnderlyingViews(ContainerBuilder $container)
+    {
+        $underlyingViews = $this->getUnderlyingViews($container);
+        foreach ($underlyingViews as $view => $underlyingView) {
+            $this->registerUnderlyingViewHandler($container, $view, $underlyingView);
+        }
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(2, $underlyingViews);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array [view name => underlying view name, ...]
+     */
+    private function getUnderlyingViews(ContainerBuilder $container)
+    {
+        $underlyingViews = [];
+        $views = $this->getApiDocViews($container);
+        foreach ($views as $name => $view) {
+            if (\array_key_exists('underlying_view', $view) && $view['underlying_view']) {
+                $underlyingViews[$name] = $view['underlying_view'];
+            }
+        }
+
+        return $underlyingViews;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $view
+     * @param string           $underlyingView
+     */
+    private function registerUnderlyingViewHandler(ContainerBuilder $container, string $view, string $underlyingView)
+    {
+        $container
+            ->register(
+                self::API_DOC_ANNOTATION_HANDLER_SERVICE . '.' . $view,
+                AddApiDocViewAnnotationHandler::class
+            )
+            ->setArguments([$view, $underlyingView])
+            ->setPublic(false)
+            ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
     }
 
     /**
@@ -210,44 +261,38 @@ class ApiDocCompilerPass implements CompilerPassInterface
      */
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)
     {
-        $chainServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE
-        );
-        if (null !== $chainServiceDef) {
-            $services = [];
-            $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
-            $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
-            foreach ($taggedServices as $id => $attributes) {
-                foreach ($attributes as $attribute) {
-                    $view = DependencyInjectionUtil::getRequiredAttribute(
-                        $attribute,
-                        'view',
+        $services = [];
+        $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
+        $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
+        foreach ($taggedServices as $id => $attributes) {
+            foreach ($attributes as $attribute) {
+                $view = DependencyInjectionUtil::getRequiredAttribute(
+                    $attribute,
+                    'view',
+                    $id,
+                    self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
+                );
+                if (!in_array($view, $views, true)) {
+                    throw new LogicException(sprintf(
+                        'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
+                        . ' Possible values: %s.',
+                        $view,
+                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
                         $id,
-                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
-                    );
-                    if (!in_array($view, $views, true)) {
-                        throw new LogicException(sprintf(
-                            'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
-                            . ' Possible values: %s.',
-                            $view,
-                            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
-                            $id,
-                            implode(', ', $views)
-                        ));
-                    }
-                    $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
+                        implode(', ', $views)
+                    ));
                 }
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-            foreach ($services as $service) {
-                $chainServiceDef->addMethodCall('addResolver', $service);
+                $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
             }
         }
+        if (empty($services)) {
+            return;
+        }
+
+        $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(0, $services);
     }
 
     /**

@@ -13,7 +13,8 @@ use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Locales;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -109,7 +110,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         }
 
         $localization = new Localization();
-        $title = Intl::getLocaleBundle()->getLocaleName($locale, $locale);
+        $title = Locales::getName($locale, $locale);
         $localization->setLanguage($language)
             ->setFormattingCode($locale)
             ->setName($title)
@@ -137,9 +138,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function isSupportedLocale($locale)
     {
-        $locales = Intl::getLocaleBundle()->getLocaleNames();
-
-        return array_key_exists($locale, $locales);
+        return Locales::exists($locale);
     }
 
     /**
@@ -149,9 +148,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function isSupportedLanguage($language)
     {
-        $languages = Intl::getLanguageBundle()->getLanguageNames();
-
-        return array_key_exists($language, $languages);
+        return Languages::exists($language);
     }
 
     /**

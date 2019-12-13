@@ -19,8 +19,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root(self::ROOT_NODE_NAME)
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE_NAME);
+        $treeBuilder->getRootNode()
             ->info('Configuration of charts')
             ->useAttributeAsKey('name')
             ->prototype('array')

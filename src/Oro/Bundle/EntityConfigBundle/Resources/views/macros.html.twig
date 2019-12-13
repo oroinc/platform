@@ -105,7 +105,7 @@
                 {{ 'oro.entity_config.entity.information_message'|trans }}
             </div>
         {% endif %}
-        {{ UI.renderCollapsibleHtml(value|oro_html_sanitize|default('N/A'|trans)|raw, entity, item.label, 'More', 'Less') }}
+        {{ UI.renderCollapsibleHtml(value|render_content|oro_html_sanitize|default('N/A'|trans)|raw, entity, item.label, 'More', 'Less') }}
     {% elseif type != 'html' %}
         {{ value|default('N/A'|trans) }}
     {% endif %}

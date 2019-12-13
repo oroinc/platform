@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessor;
@@ -30,7 +31,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -78,7 +78,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private $notificationSettings;
 
     /**
-     * @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     private $registry;
 
@@ -115,7 +115,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn(From::emailAddress('sender_email@example.com', 'sender_name'));
-        $this->registry = $this->createMock(RegistryInterface::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

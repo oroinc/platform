@@ -39,7 +39,7 @@ class HtmlTagProviderTest extends WebTestCase
         'font[color]',
         'i',
         'br',
-        'span',
+        'span[data-title|data-type]',
         'img[src|width|height|alt]',
         'h1',
         'h2',

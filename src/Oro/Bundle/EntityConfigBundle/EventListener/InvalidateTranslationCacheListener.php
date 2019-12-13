@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\Common\Cache\ClearableCache;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Event listener that processed InvalidateTranslationCacheEvent event and clears the doctrine queries cache.
@@ -14,14 +14,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class InvalidateTranslationCacheListener
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
