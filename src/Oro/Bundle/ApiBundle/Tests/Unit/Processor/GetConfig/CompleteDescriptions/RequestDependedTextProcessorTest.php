@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDescriptio
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\RequestDependedTextProcessor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,7 +12,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->processor = new RequestDependedTextProcessor(new RequestExpressionMatcher());
+        $this->processor = new RequestDependedTextProcessor();
     }
 
     /**

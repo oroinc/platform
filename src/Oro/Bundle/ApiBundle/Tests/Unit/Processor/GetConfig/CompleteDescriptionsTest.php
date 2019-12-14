@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\DescriptionProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\EntityDescriptionHelper;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FeatureDependedTextProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FiltersDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\IdentifierDescriptionHelper;
@@ -20,9 +21,9 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\ProductPrice as TestEntity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue as EnumEntity;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -87,8 +88,10 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ->willReturn($this->resourceDocParser);
 
         $resourceDocParserProvider = new ResourceDocParserProvider($this->resourceDocParserRegistry);
-        $requestDependedTextProcessor = new RequestDependedTextProcessor(new RequestExpressionMatcher());
-        $descriptionProcessor = new DescriptionProcessor($requestDependedTextProcessor);
+        $descriptionProcessor = new DescriptionProcessor(
+            new RequestDependedTextProcessor(),
+            new FeatureDependedTextProcessor($this->createMock(FeatureChecker::class))
+        );
         $identifierDescriptionHelper = new IdentifierDescriptionHelper();
 
         $this->processor = new CompleteDescriptions(

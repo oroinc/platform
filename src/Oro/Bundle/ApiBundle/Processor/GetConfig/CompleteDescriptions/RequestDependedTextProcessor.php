@@ -3,26 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 /**
  * The class that helps to process "{@request:...}" placeholders in a text.
  */
-class RequestDependedTextProcessor
+class RequestDependedTextProcessor extends AbstractTextProcessor
 {
     private const START_REQUEST_TAG = '{@request:';
     private const END_REQUEST_TAG   = '{@/request}';
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
-    /**
-     * @param RequestExpressionMatcher $matcher
-     */
-    public function __construct(RequestExpressionMatcher $matcher)
-    {
-        $this->matcher = $matcher;
-    }
 
     /**
      * Checks whether the given text contains "{@request:...}" placeholders and, if so, do the following:
@@ -36,35 +24,13 @@ class RequestDependedTextProcessor
      */
     public function process(string $text, RequestType $requestType): string
     {
-        $offset = 0;
-        $startLength = \strlen(self::START_REQUEST_TAG);
-        $endLength = \strlen(self::END_REQUEST_TAG);
-        while (false !== ($startOpenPos = \strpos($text, self::START_REQUEST_TAG, $offset))) {
-            $startClosePos = \strpos($text, '}', $startOpenPos + $startLength);
-            if (false === $startClosePos) {
-                break;
+        return $this->processText(
+            $text,
+            self::START_REQUEST_TAG,
+            self::END_REQUEST_TAG,
+            function ($value) use ($requestType) {
+                return $requestType->contains($value);
             }
-            $expression = \substr(
-                $text,
-                $startOpenPos + $startLength,
-                $startClosePos - $startOpenPos - $startLength
-            );
-            if (!$expression) {
-                break;
-            }
-            $endClosePos = \strpos($text, self::END_REQUEST_TAG, $startClosePos + 1);
-            if (false === $endClosePos) {
-                break;
-            }
-
-            $body = '';
-            if ($this->matcher->matchValue($expression, $requestType)) {
-                $body = \substr($text, $startClosePos + 1, $endClosePos - $startClosePos - 1);
-            }
-
-            $text = \substr_replace($text, $body, $startOpenPos, ($endClosePos + $endLength) - $startOpenPos);
-        }
-
-        return $text;
+        );
     }
 }

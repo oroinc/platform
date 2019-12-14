@@ -12,12 +12,19 @@ class DescriptionProcessor
     /** @var RequestDependedTextProcessor */
     private $requestDependedTextProcessor;
 
+    /** @var FeatureDependedTextProcessor */
+    private $featureDependedTextProcessor;
+
     /**
      * @param RequestDependedTextProcessor $requestDependedTextProcessor
+     * @param FeatureDependedTextProcessor $featureDependedTextProcessor
      */
-    public function __construct(RequestDependedTextProcessor $requestDependedTextProcessor)
-    {
+    public function __construct(
+        RequestDependedTextProcessor $requestDependedTextProcessor,
+        FeatureDependedTextProcessor $featureDependedTextProcessor
+    ) {
         $this->requestDependedTextProcessor = $requestDependedTextProcessor;
+        $this->featureDependedTextProcessor = $featureDependedTextProcessor;
     }
 
     /**
@@ -28,6 +35,9 @@ class DescriptionProcessor
      */
     public function process(string $description, RequestType $requestType): string
     {
-        return $this->requestDependedTextProcessor->process($description, $requestType);
+        return $this->requestDependedTextProcessor->process(
+            $this->featureDependedTextProcessor->process($description),
+            $requestType
+        );
     }
 }
