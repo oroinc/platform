@@ -154,14 +154,10 @@ services:
     oro_api.object_normalizer_registry:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
         calls:
-            - [addNormalizer,  ['@oro_api.search_item_normalizer', 50]]
             - [addNormalizer,  ['@oro_api.datetime_normalizer']]
 
     oro_api.datetime_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer
-
-    oro_api.search_item_normalizer:
-        class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
 
     oro_api.entity_alias.cache_warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
