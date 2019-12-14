@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
@@ -33,7 +34,11 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->willReturn('meta');
 
         $this->processor = new HandleMetaPropertyFilter(
-            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher()),
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            ),
             $this->valueNormalizer
         );
     }

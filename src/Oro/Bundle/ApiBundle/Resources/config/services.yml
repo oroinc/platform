@@ -153,11 +153,17 @@ services:
 
     oro_api.object_normalizer_registry:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
-        calls:
-            - [addNormalizer,  ['@oro_api.datetime_normalizer']]
+        arguments:
+            - [] # normalizers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ObjectNormalizerCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ObjectNormalizerCompilerPass
+            - '@oro_api.request_expression_matcher'
 
     oro_api.datetime_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer
+        arguments:
+            - '@oro_api.data_transformer_registry'
+        tags:
+            - { name: oro.api.object_normalizer, class: DateTimeInterface }
 
     oro_api.entity_alias.cache_warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
@@ -530,6 +536,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry
         arguments:
             - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestRoutesCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestRoutesCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.routes:

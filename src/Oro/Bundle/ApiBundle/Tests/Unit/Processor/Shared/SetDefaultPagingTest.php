@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class SetDefaultPagingTest extends GetListProcessorTestCase
 {
@@ -31,7 +32,11 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
             ->willReturn('page[size]');
 
         $this->processor = new SetDefaultPaging(
-            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            )
         );
     }
 

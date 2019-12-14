@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -185,6 +186,36 @@ class DependencyInjectionUtil
                 $chainServiceDef->addMethodCall($addMethodName, [$service]);
             }
         }
+    }
+
+    /**
+     * Registers tagged services that depend on the request type.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $chainServiceId
+     * @param string           $tagName
+     */
+    public static function registerRequestTypeDependedTaggedServices(
+        ContainerBuilder $container,
+        $chainServiceId,
+        $tagName
+    ) {
+        $services = [];
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        foreach ($taggedServices as $id => $attributes) {
+            $services[$id] = new Reference($id);
+            foreach ($attributes as $tagAttributes) {
+                $items[self::getPriority($tagAttributes)][] = [$id, self::getRequestType($tagAttributes)];
+            }
+        }
+        if ($items) {
+            $items = self::sortByPriorityAndFlatten($items);
+        }
+
+        $container->getDefinition($chainServiceId)
+            ->replaceArgument(0, $items)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 
     /**

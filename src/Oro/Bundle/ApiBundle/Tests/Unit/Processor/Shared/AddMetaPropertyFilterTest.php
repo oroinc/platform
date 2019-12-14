@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddMetaPropertyFilterTest extends GetProcessorTestCase
 {
@@ -26,7 +27,11 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
             ->willReturn('meta');
 
         $this->processor = new AddMetaPropertyFilter(
-            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            )
         );
     }
 

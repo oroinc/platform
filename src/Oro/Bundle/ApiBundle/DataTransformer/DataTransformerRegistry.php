@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains all data transformers
@@ -12,19 +13,24 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
  */
 class DataTransformerRegistry
 {
-    /** @var array [data type => [[transformer, request type expression], ...], ...] */
+    /** @var array [data type => [[transformer service id, request type expression], ...], ...] */
     private $transformers;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /** @var RequestExpressionMatcher */
     private $matcher;
 
     /**
-     * @param array                    $transformers [data type => [[transformer, request type expression], ...], ...]
+     * @param array                    $transformers [data type => [[service id, request type expression], ...], ...]
+     * @param ContainerInterface       $container
      * @param RequestExpressionMatcher $matcher
      */
-    public function __construct(array $transformers, RequestExpressionMatcher $matcher)
+    public function __construct(array $transformers, ContainerInterface $container, RequestExpressionMatcher $matcher)
     {
         $this->transformers = $transformers;
+        $this->container = $container;
         $this->matcher = $matcher;
     }
 
@@ -42,9 +48,9 @@ class DataTransformerRegistry
     {
         $result = null;
         if (isset($this->transformers[$dataType])) {
-            foreach ($this->transformers[$dataType] as list($transformer, $expression)) {
+            foreach ($this->transformers[$dataType] as list($serviceId, $expression)) {
                 if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
-                    $result = $transformer;
+                    $result = $this->container->get($serviceId);
                     break;
                 }
             }

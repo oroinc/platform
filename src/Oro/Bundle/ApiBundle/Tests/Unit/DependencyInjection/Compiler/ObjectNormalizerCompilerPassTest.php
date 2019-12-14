@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FilterNamesCompilerPass;
-use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ObjectNormalizerCompilerPass;
+use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class FilterNamesCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ObjectNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FilterNamesCompilerPass */
+    /** @var ObjectNormalizerCompilerPass */
     private $compiler;
 
     /** @var ContainerBuilder */
@@ -24,15 +24,15 @@ class FilterNamesCompilerPassTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->container = new ContainerBuilder();
-        $this->compiler = new FilterNamesCompilerPass();
+        $this->compiler = new ObjectNormalizerCompilerPass();
 
         $this->registry = $this->container->setDefinition(
-            'oro_api.filter_names_registry',
-            new Definition(FilterNamesRegistry::class, [[], null])
+            'oro_api.object_normalizer_registry',
+            new Definition(ObjectNormalizerRegistry::class, [[], null])
         );
     }
 
-    public function testProcessWhenNoRoutesProviders()
+    public function testProcessWhenNoObjectNormalizers()
     {
         $this->compiler->process($this->container);
 
@@ -47,28 +47,33 @@ class FilterNamesCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        $errorCompleter1 = $this->container->setDefinition('provider1', new Definition());
-        $errorCompleter1->addTag(
-            'oro.api.filter_names',
-            ['requestType' => 'first&rest']
+        $normalizer1 = $this->container->setDefinition('normalizer1', new Definition());
+        $normalizer1->addTag(
+            'oro.api.object_normalizer',
+            ['class' => 'Class1', 'requestType' => 'rest']
         );
-        $errorCompleter1->addTag(
-            'oro.api.filter_names',
-            ['requestType' => 'rest', 'priority' => -10]
+        $normalizer2 = $this->container->setDefinition('normalizer2', new Definition());
+        $normalizer2->addTag(
+            'oro.api.object_normalizer',
+            ['class' => 'Class2', 'priority' => -10]
         );
-        $errorCompleter2 = $this->container->setDefinition('provider2', new Definition());
-        $errorCompleter2->addTag(
-            'oro.api.filter_names',
-            ['requestType' => 'second&rest']
+        $normalizer2->addTag(
+            'oro.api.object_normalizer',
+            ['class' => 'Class2', 'requestType' => 'rest', 'priority' => 10]
+        );
+        $normalizer2->addTag(
+            'oro.api.object_normalizer',
+            ['class' => 'Class2', 'requestType' => 'json_api']
         );
 
         $this->compiler->process($this->container);
 
         self::assertEquals(
             [
-                ['provider1', 'first&rest'],
-                ['provider2', 'second&rest'],
-                ['provider1', 'rest']
+                ['normalizer2', 'Class2', 'rest'],
+                ['normalizer1', 'Class1', 'rest'],
+                ['normalizer2', 'Class2', 'json_api'],
+                ['normalizer2', 'Class2', null]
             ],
             $this->registry->getArgument(0)
         );
@@ -79,8 +84,8 @@ class FilterNamesCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                'provider1' => new ServiceClosureArgument(new Reference('provider1')),
-                'provider2' => new ServiceClosureArgument(new Reference('provider2'))
+                'normalizer1' => new ServiceClosureArgument(new Reference('normalizer1')),
+                'normalizer2' => new ServiceClosureArgument(new Reference('normalizer2'))
             ],
             $serviceLocatorDef->getArgument(0)
         );

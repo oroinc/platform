@@ -11,16 +11,19 @@ use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
-use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -38,18 +41,17 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->willReturn(null);
 
-        $normalizers = new ObjectNormalizerRegistry();
         $this->objectNormalizer = new ObjectNormalizer(
-            $normalizers,
+            new ObjectNormalizerRegistry(
+                [],
+                TestContainerBuilder::create()->getContainer($this),
+                new RequestExpressionMatcher()
+            ),
             new DoctrineHelper($doctrine),
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
             new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
-        );
-
-        $normalizers->addNormalizer(
-            new DateTimeNormalizer()
         );
     }
 
@@ -62,6 +64,9 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     private function normalizeObject($object, EntityDefinitionConfig $config = null, array $context = [])
     {
+        if (!isset($context[ApiContext::REQUEST_TYPE])) {
+            $context[ApiContext::REQUEST_TYPE] = new RequestType([RequestType::REST]);
+        }
         $normalizedObjects = $this->objectNormalizer->normalizeObjects([$object], $config, $context);
 
         return reset($normalizedObjects);
@@ -956,7 +961,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $normalizedObjects = $this->objectNormalizer->normalizeObjects(
             [$this->createProductObject()],
             $this->createConfigObject($config),
-            [],
+            [ApiContext::REQUEST_TYPE => new RequestType([RequestType::REST])],
             true
         );
         $result = reset($normalizedObjects);
