@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\QueryModifierInterface;
 use Oro\Bundle\ApiBundle\Util\QueryModifierRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
 {
