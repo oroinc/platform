@@ -803,11 +803,6 @@ services:
     oro_api.request_expression_matcher:
         class: Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher
 
-    oro_api.request_depended_text_processor:
-        class: Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor
-        arguments:
-            - '@oro_api.request_expression_matcher'
-
     oro_api.action_group_executor:
         class: Oro\Bundle\ApiBundle\Util\ActionGroupExecutor
         arguments:

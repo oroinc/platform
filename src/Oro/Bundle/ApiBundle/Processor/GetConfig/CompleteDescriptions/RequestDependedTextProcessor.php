@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Util;
+namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 /**
  * The class that helps to process "{@request:...}" placeholders in a text.
