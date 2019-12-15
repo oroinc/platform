@@ -27,7 +27,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - '@doctrine'
+            - '@oro_entity.entity_class_provider.orm'
         tags:
             - { name: console.command }
 
