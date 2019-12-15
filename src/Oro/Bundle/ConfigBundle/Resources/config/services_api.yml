@@ -35,7 +35,7 @@ services:
     oro_config.get_list.rest.fix_configuration_sections_result_document:
         class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\Rest\FixConfigurationSectionsResultDocument
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, requestType: rest&!json_api, priority: -240 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -240 }
 
     #
     # get
@@ -44,7 +44,7 @@ services:
     oro_config.get.rest.expand_configuration_options:
         class: Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\ExpandConfigurationOptions
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, requestType: rest&!json_api }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
 
     oro_config.api.get.load_configuration_section:
         class: Oro\Bundle\ConfigBundle\Api\Processor\Get\LoadConfigurationSection
@@ -56,7 +56,7 @@ services:
     oro_config.get.rest.fix_configuration_section_result_document:
         class: Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\FixConfigurationSectionResultDocument
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, requestType: rest&!json_api, priority: -240 }
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -240 }
 
     #
     # get_list & get

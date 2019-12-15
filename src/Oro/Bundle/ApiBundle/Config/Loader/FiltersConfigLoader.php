@@ -12,10 +12,16 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class FiltersConfigLoader extends AbstractConfigLoader
 {
     private const FIELD_METHOD_MAP = [
-        ConfigUtil::EXCLUDE     => 'setExcluded',
-        ConfigUtil::COLLECTION  => 'setIsCollection',
-        ConfigUtil::ALLOW_ARRAY => 'setArrayAllowed',
-        ConfigUtil::ALLOW_RANGE => 'setRangeAllowed'
+        ConfigUtil::FILTER_TYPE      => 'setType',
+        ConfigUtil::FILTER_OPERATORS => 'setOperators',
+        ConfigUtil::FILTER_OPTIONS   => 'setOptions',
+        ConfigUtil::PROPERTY_PATH    => 'setPropertyPath',
+        ConfigUtil::DATA_TYPE        => 'setDataType',
+        ConfigUtil::DESCRIPTION      => 'setDescription',
+        ConfigUtil::EXCLUDE          => 'setExcluded',
+        ConfigUtil::COLLECTION       => 'setIsCollection',
+        ConfigUtil::ALLOW_ARRAY      => 'setArrayAllowed',
+        ConfigUtil::ALLOW_RANGE      => 'setRangeAllowed'
     ];
 
     /**

@@ -225,25 +225,26 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             'fields'                    => [
                 'id'   => null,
                 'name' => null
-            ],
-            'post_serialize'            => function (array $item, array $context) {
-                $item['name'] .= sprintf('_additional[%s]', $context['key']);
-                $item['another'] = 'value';
-
-                return $item;
-            },
-            'post_serialize_collection' => function (array $items, array $context) {
-                foreach ($items as $key => $item) {
-                    $items[$key]['name'] .= ' + collection';
-                }
-
-                return $items;
-            }
+            ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->setPostSerializeHandler(function (array $item, array $context) {
+            $item['name'] .= sprintf('_additional[%s]', $context['key']);
+            $item['another'] = 'value';
+
+            return $item;
+        });
+        $configObject->setPostSerializeCollectionHandler(function (array $items, array $context) {
+            foreach ($items as $key => $item) {
+                $items[$key]['name'] .= ' + collection';
+            }
+
+            return $items;
+        });
 
         $result = $this->normalizeObject(
             $object,
-            $this->createConfigObject($config),
+            $configObject,
             ['key' => 'context value']
         );
 
@@ -278,19 +279,20 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                             'property_path'    => 'category',
                             'fields'           => 'name'
                         ]
-                    ],
-                    'post_serialize'   => function (array $item) {
-                        $item['name'] .= '_additional';
-
-                        return $item;
-                    }
+                    ]
                 ]
             ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('owner')->getTargetEntity()->setPostSerializeHandler(function (array $item) {
+            $item['name'] .= '_additional';
+
+            return $item;
+        });
 
         $result = $this->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config)
+            $configObject
         );
 
         self::assertEquals(
@@ -510,19 +512,22 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                             'property_path'    => 'groups',
                             'fields'           => 'id'
                         ]
-                    ],
-                    'post_serialize'   => function (array $item, array $context) {
-                        $item['name'] .= sprintf('_additional[%s]', $context['key']);
-
-                        return $item;
-                    }
+                    ]
                 ]
             ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('owner')->getTargetEntity()->setPostSerializeHandler(
+            function (array $item, array $context) {
+                $item['name'] .= sprintf('_additional[%s]', $context['key']);
+
+                return $item;
+            }
+        );
 
         $result = $this->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config),
+            $configObject,
             ['key' => 'context value']
         );
 
@@ -915,17 +920,18 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'name'         => [
                     'exclude' => true
                 ]
-            ],
-            'post_serialize'   => function (array $item) {
-                $item['computedName'] = $item['name'] . ' (computed)';
-
-                return $item;
-            }
+            ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->setPostSerializeHandler(function (array $item) {
+            $item['computedName'] = $item['name'] . ' (computed)';
+
+            return $item;
+        });
 
         $result = $this->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config)
+            $configObject
         );
 
         self::assertEquals(
@@ -950,17 +956,18 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 'name'         => [
                     'exclude' => true
                 ]
-            ],
-            'post_serialize'   => function (array $item) {
-                $item['computedName'] = $item['name'] . ' (computed)';
-
-                return $item;
-            }
+            ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->setPostSerializeHandler(function (array $item) {
+            $item['computedName'] = $item['name'] . ' (computed)';
+
+            return $item;
+        });
 
         $normalizedObjects = $this->objectNormalizer->normalizeObjects(
             [$this->createProductObject()],
-            $this->createConfigObject($config),
+            $configObject,
             [ApiContext::REQUEST_TYPE => new RequestType([RequestType::REST])],
             true
         );
@@ -993,19 +1000,20 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                                 'value' => null
                             ]
                         ]
-                    ],
-                    'post_serialize'   => function (array $item) {
-                        $item['computedName'] = ['value' => $item['name'] . ' (computed)'];
-
-                        return $item;
-                    }
+                    ]
                 ]
             ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('owner')->getTargetEntity()->setPostSerializeHandler(function (array $item) {
+            $item['computedName'] = ['value' => $item['name'] . ' (computed)'];
+
+            return $item;
+        });
 
         $result = $this->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config)
+            $configObject
         );
 
         self::assertEquals(
@@ -1040,19 +1048,20 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                                 ]
                             ]
                         ]
-                    ],
-                    'post_serialize'   => function (array $item) {
-                        $item['renamedComputedName'] = ['renamedValue' => $item['name'] . ' (computed)'];
-
-                        return $item;
-                    }
+                    ]
                 ]
             ]
         ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('renamedOwner')->getTargetEntity()->setPostSerializeHandler(function (array $item) {
+            $item['renamedComputedName'] = ['renamedValue' => $item['name'] . ' (computed)'];
+
+            return $item;
+        });
 
         $result = $this->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config)
+            $configObject
         );
 
         self::assertEquals(

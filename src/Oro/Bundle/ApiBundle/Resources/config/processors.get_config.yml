@@ -200,14 +200,14 @@ services:
             - ['string', 'boolean', 'datetime', 'date', 'time']
             - ['string', 'boolean', 'guid', 'currency']
         tags:
-            - { name: oro.api.processor, action: get_config, extra: filters, priority: -80 }
+            - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -80 }
 
     oro_api.get_config.complete_sorters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteSorters
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters, priority: -80 }
+            - { name: oro.api.processor, action: get_config, extra: 'sorters&!identifier_fields_only', priority: -80 }
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\FixFieldNaming
@@ -232,19 +232,19 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: filters, priority: -130 }
+            - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -130 }
 
     oro_api.get_config.normalize_sorters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeSorters
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters, priority: -130 }
+            - { name: oro.api.processor, action: get_config, extra: 'sorters&!identifier_fields_only', priority: -130 }
 
     oro_api.get_config.complete_composite_identifier_filter:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteCompositeIdentifierFilter
         tags:
-            - { name: oro.api.processor, action: get_config, extra: filters, priority: -140 }
+            - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -140 }
 
     oro_api.get_config.set_has_more:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\SetHasMore

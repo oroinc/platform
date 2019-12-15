@@ -13,6 +13,14 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ActionsConfigLoader extends AbstractConfigLoader
 {
     private const METHOD_MAP = [
+        ConfigUtil::FORM_TYPE               => 'setFormType',
+        ConfigUtil::FORM_OPTIONS            => 'setFormOptions',
+        ConfigUtil::PAGE_SIZE               => 'setPageSize',
+        ConfigUtil::MAX_RESULTS             => 'setMaxResults',
+        ConfigUtil::ORDER_BY                => 'setOrderBy',
+        ConfigUtil::ACL_RESOURCE            => 'setAclResource',
+        ConfigUtil::DESCRIPTION             => 'setDescription',
+        ConfigUtil::DOCUMENTATION           => 'setDocumentation',
         ConfigUtil::EXCLUDE                 => 'setExcluded',
         ConfigUtil::DISABLE_SORTING         => ['disableSorting', 'enableSorting'],
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
@@ -22,7 +30,10 @@ class ActionsConfigLoader extends AbstractConfigLoader
     ];
 
     private const FIELD_METHOD_MAP = [
-        ConfigUtil::EXCLUDE => 'setExcluded'
+        ConfigUtil::DIRECTION    => 'setDirection',
+        ConfigUtil::FORM_TYPE    => 'setFormType',
+        ConfigUtil::FORM_OPTIONS => 'setFormOptions',
+        ConfigUtil::EXCLUDE      => 'setExcluded'
     ];
 
     /** @var StatusCodesConfigLoader */

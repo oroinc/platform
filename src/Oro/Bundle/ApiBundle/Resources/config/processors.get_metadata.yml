@@ -117,7 +117,7 @@ services:
             - '@oro_api.rest.routes_registry'
             - '@router'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -200 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -200 }
 
     oro_api.get_metadata.rest.add_hateoas_links_for_associations:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddHateoasLinksForAssociations
@@ -126,7 +126,7 @@ services:
             - '@router'
             - '@oro_api.subresources_provider'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -205 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -205 }
 
     oro_api.get_metadata.rest.add_pagination_links_for_associations:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddPaginationLinksForAssociations
@@ -136,4 +136,4 @@ services:
             - '@router'
             - '@oro_api.subresources_provider'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -210 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -210 }

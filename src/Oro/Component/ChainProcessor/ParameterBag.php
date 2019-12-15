@@ -10,12 +10,6 @@ class ParameterBag extends AbstractParameterBag
     /** @var array [key => value, ...] */
     private $items = [];
 
-    /** @var ParameterValueResolverInterface[] [key => ParameterValueResolverInterface, ...] */
-    private $resolvers = [];
-
-    /** @var array [key => value, ...] */
-    private $resolvedItems = [];
-
     /**
      * {@inheritdoc}
      */
@@ -29,24 +23,7 @@ class ParameterBag extends AbstractParameterBag
      */
     public function get($key)
     {
-        if (!\array_key_exists($key, $this->items)) {
-            return null;
-        }
-
-        if (\array_key_exists($key, $this->resolvedItems)) {
-            return $this->resolvedItems[$key];
-        }
-
-        $value = $this->items[$key];
-        if (isset($this->resolvers[$key])) {
-            $resolver = $this->resolvers[$key];
-            if ($resolver->supports($value)) {
-                $value = $resolver->resolve($value);
-            }
-            $this->resolvedItems[$key] = $value;
-        }
-
-        return $value;
+        return $this->items[$key] ?? null;
     }
 
     /**
@@ -55,19 +32,6 @@ class ParameterBag extends AbstractParameterBag
     public function set($key, $value)
     {
         $this->items[$key] = $value;
-        unset($this->resolvedItems[$key]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setResolver($key, ?ParameterValueResolverInterface $resolver)
-    {
-        if (null === $resolver) {
-            unset($this->resolvers[$key]);
-        } else {
-            $this->resolvers[$key] = $resolver;
-        }
     }
 
     /**
@@ -75,7 +39,7 @@ class ParameterBag extends AbstractParameterBag
      */
     public function remove($key)
     {
-        unset($this->items[$key], $this->resolvedItems[$key]);
+        unset($this->items[$key]);
     }
 
     /**
@@ -83,22 +47,7 @@ class ParameterBag extends AbstractParameterBag
      */
     public function toArray()
     {
-        $result = [];
-        foreach ($this->items as $key => $value) {
-            if (\array_key_exists($key, $this->resolvedItems)) {
-                $value = $this->resolvedItems[$key];
-            } elseif (isset($this->resolvers[$key])) {
-                $resolver = $this->resolvers[$key];
-                if ($resolver->supports($value)) {
-                    $value = $resolver->resolve($value);
-                }
-                $this->resolvedItems[$key] = $value;
-            }
-
-            $result[$key] = $value;
-        }
-
-        return $result;
+        return $this->items;
     }
 
     /**
@@ -107,7 +56,6 @@ class ParameterBag extends AbstractParameterBag
     public function clear()
     {
         $this->items = [];
-        $this->resolvedItems = [];
     }
 
     /**

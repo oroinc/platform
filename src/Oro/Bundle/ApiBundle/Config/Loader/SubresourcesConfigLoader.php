@@ -12,7 +12,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class SubresourcesConfigLoader extends AbstractConfigLoader
 {
     private const METHOD_MAP = [
-        ConfigUtil::EXCLUDE => 'setExcluded'
+        ConfigUtil::TARGET_CLASS => 'setTargetClass',
+        ConfigUtil::TARGET_TYPE  => 'setTargetType',
+        ConfigUtil::EXCLUDE      => 'setExcluded'
     ];
 
     /** @var ActionsConfigLoader */

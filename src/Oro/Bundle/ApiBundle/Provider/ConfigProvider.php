@@ -148,7 +148,7 @@ class ConfigProvider implements ResetInterface
         if ($identifierFieldsOnly) {
             $definition = $config->getDefinition();
             if (null !== $definition) {
-                $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
+                $definition->setKey($this->buildConfigKey($className, $extras));
             }
         }
 
@@ -190,9 +190,11 @@ class ConfigProvider implements ResetInterface
         }
         $extras = $context->getExtras();
         foreach ($extras as $extra) {
-            $sectionName = $extra->getName();
-            if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
-                $config->set($sectionName, $context->get($sectionName));
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                $sectionName = $extra->getName();
+                if ($context->has($sectionName)) {
+                    $config->set($sectionName, $context->get($sectionName));
+                }
             }
         }
 
