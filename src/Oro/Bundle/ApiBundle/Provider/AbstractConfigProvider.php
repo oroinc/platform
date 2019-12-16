@@ -13,6 +13,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 abstract class AbstractConfigProvider
 {
+    const KEY_DELIMITER = '|';
+
     /**
      * @param ConfigContext          $context
      * @param string                 $className
@@ -49,11 +51,11 @@ abstract class AbstractConfigProvider
         RequestType $requestType,
         array $extras
     ): string {
-        $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
+        $cacheKey = (string)$requestType . self::KEY_DELIMITER . $version . self::KEY_DELIMITER . $className;
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $cacheKey .= '|' . $part;
+            if ($part) {
+                $cacheKey .= self::KEY_DELIMITER . $part;
             }
         }
 
@@ -74,8 +76,8 @@ abstract class AbstractConfigProvider
                 continue;
             }
             $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $configKey .= '|' . $part;
+            if ($part) {
+                $configKey .= self::KEY_DELIMITER . $part;
             }
         }
 
@@ -99,10 +101,6 @@ abstract class AbstractConfigProvider
             if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
                 $config->set($sectionName, $context->get($sectionName));
             }
-        }
-        $definition = $config->getDefinition();
-        if ($definition) {
-            $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
         }
 
         return $config;

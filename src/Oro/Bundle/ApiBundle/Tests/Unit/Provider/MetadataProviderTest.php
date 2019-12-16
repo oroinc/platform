@@ -171,7 +171,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->metadataProvider->getMetadata($className, $version, $requestType, $config);
 
-        $this->metadataProvider->clearCache();
+        $this->metadataProvider->reset();
         $this->metadataProvider->getMetadata($className, $version, $requestType, $config);
     }
 }

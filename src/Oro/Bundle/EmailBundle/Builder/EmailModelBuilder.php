@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -68,13 +69,18 @@ class EmailModelBuilder
     protected $factory;
 
     /**
-     * @param EmailModelBuilderHelper   $emailModelBuilderHelper
-     * @param EntityManager             $entityManager
-     * @param ConfigManager             $configManager
+     * @var HtmlTagHelper
+     */
+    private $htmlTagHelper;
+
+    /**
+     * @param EmailModelBuilderHelper $emailModelBuilderHelper
+     * @param EntityManager $entityManager
+     * @param ConfigManager $configManager
      * @param EmailActivityListProvider $activityListProvider
-     * @param EmailAttachmentProvider   $emailAttachmentProvider
-     * @param Factory                   $factory
-     * @param RequestStack              $requestStack
+     * @param EmailAttachmentProvider $emailAttachmentProvider
+     * @param Factory $factory
+     * @param RequestStack $requestStack
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
@@ -92,6 +98,14 @@ class EmailModelBuilder
         $this->emailAttachmentProvider = $emailAttachmentProvider;
         $this->factory = $factory;
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -431,7 +445,7 @@ class EmailModelBuilder
      */
     protected function applySignature(EmailModel $emailModel)
     {
-        $signature = $this->configManager->get('oro_email.signature');
+        $signature = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
         if ($signature) {
             $emailModel->setSignature($signature);
         }

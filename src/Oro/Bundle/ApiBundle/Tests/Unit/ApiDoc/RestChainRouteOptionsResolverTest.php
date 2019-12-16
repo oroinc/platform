@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -92,5 +93,18 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
             ->method('resolve');
 
         $this->chainRouteOptionsResolver->resolve($route, $routes);
+    }
+
+    public function testReset()
+    {
+        $resolver1 = $this->createMock(RouteOptionsResolverInterface::class);
+        $this->chainRouteOptionsResolver->addResolver($resolver1);
+        $resolver2 = $this->createMock(RestRouteOptionsResolver::class);
+        $this->chainRouteOptionsResolver->addResolver($resolver2);
+
+        $resolver2->expects(self::once())
+            ->method('reset');
+
+        $this->chainRouteOptionsResolver->reset();
     }
 }

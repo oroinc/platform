@@ -139,7 +139,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithQueryBuilder()
@@ -159,7 +159,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithQuery()
@@ -177,7 +177,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithSqlQueryBuilder()
@@ -223,7 +223,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithSqlQuery()
@@ -264,7 +264,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     public function testHandleWithJustManagerAwareController()
@@ -303,7 +303,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
 
         $response = $context->getResponse();
-        $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
+        $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
     /**

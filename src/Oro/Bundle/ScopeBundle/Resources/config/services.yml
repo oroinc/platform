@@ -16,6 +16,9 @@ services:
             - '@oro_scope.entity_storage'
             - '@oro_entity.entity_field_provider.link'
 
+    Oro\Bundle\ScopeBundle\Manager\ScopeManager:
+        alias: oro_scope.scope_manager
+
     oro_scope.scope_repository.cache:
         parent: oro.cache.abstract
         calls:

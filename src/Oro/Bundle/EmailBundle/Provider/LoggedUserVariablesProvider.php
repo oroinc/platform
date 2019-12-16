@@ -9,6 +9,7 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -31,11 +32,14 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
+
     /**
-     * @param TranslatorInterface    $translator
+     * @param TranslatorInterface $translator
      * @param TokenAccessorInterface $tokenAccessor
-     * @param EntityNameResolver     $entityNameResolver
-     * @param ConfigManager          $configManager
+     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager $configManager
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -47,6 +51,14 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
         $this->tokenAccessor = $tokenAccessor;
         $this->entityNameResolver = $entityNameResolver;
         $this->configManager = $configManager;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -206,7 +218,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         if (is_object($user)) {
             if ($addValue) {
-                $val = $this->configManager->get('oro_email.signature');
+                $val = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
             } else {
                 $val = [
                     'type'  => 'string',

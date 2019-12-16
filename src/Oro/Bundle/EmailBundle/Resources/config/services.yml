@@ -245,6 +245,8 @@ services:
             - '@oro_email.provider.email_attachment_provider'
             - '@oro_email.form.factory'
             - '@request_stack'
+        calls:
+            - ['setHtmlTagHelper', ['@oro_ui.html_tag_helper']]
 
     oro_email.email_websocket.processor:
         class: '%oro_email.email_websocket.processor.class%'
@@ -549,6 +551,8 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@oro_config.user'
         public: false
+        calls:
+            - ['setHtmlTagHelper', ['@oro_ui.html_tag_helper']]
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 

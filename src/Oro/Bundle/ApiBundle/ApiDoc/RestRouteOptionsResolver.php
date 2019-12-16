@@ -116,6 +116,16 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
+     * Resets an object to its initial state.
+     */
+    public function reset()
+    {
+        $this->resources = [];
+        $this->resourcesWithoutIdentifier = [];
+        $this->overrides = [];
+    }
+
+    /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
      */
