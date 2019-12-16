@@ -750,7 +750,7 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
         tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
 
     oro_api.entity_description_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider
