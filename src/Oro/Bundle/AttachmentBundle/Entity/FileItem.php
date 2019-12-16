@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFileItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
 /**
  * Entity for Multiple Files and Multiple Images relations
@@ -13,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity()
  * @Config
  */
-class FileItem extends ExtendFileItem
+class FileItem extends ExtendFileItem implements EmptyItem
 {
     /**
      * @var int|null
@@ -37,7 +38,7 @@ class FileItem extends ExtendFileItem
     protected $file;
 
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(name="sort_order", type="integer", options={"default"=0})
      */
@@ -52,6 +53,14 @@ class FileItem extends ExtendFileItem
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return null === $this->getFile();
+    }
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
@@ -60,10 +69,10 @@ class FileItem extends ExtendFileItem
     }
 
     /**
-     * @param File $file
+     * @param File|null $file
      * @return $this
      */
-    public function setFile(File $file)
+    public function setFile(?File $file)
     {
         $this->file = $file;
 
@@ -79,18 +88,18 @@ class FileItem extends ExtendFileItem
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getSortOrder(): int
+    public function getSortOrder(): ?int
     {
         return $this->sortOrder;
     }
 
     /**
-     * @param int $order
+     * @param int|null $order
      * @return $this
      */
-    public function setSortOrder(int $order)
+    public function setSortOrder(?int $order)
     {
         $this->sortOrder = $order;
 

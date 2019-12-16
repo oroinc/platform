@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * Form type for File collection
@@ -20,6 +21,9 @@ class MultiFileType extends AbstractType
     {
         $resolver->setDefaults([
             'entry_type' => FileItemType::class,
+            'constraints' => [
+                new Valid(),
+            ],
         ]);
     }
 

@@ -20,10 +20,12 @@ class FileItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('sortOrder', NumberType::class, [])
-            ->add('file', $options['file_type'], [
-                'allowDelete' => false,
-            ]);
+        $builder->add('sortOrder', NumberType::class, [
+            'block_prefix' => $this->getBlockPrefix() . '_sortOrder',
+        ])->add('file', $options['file_type'], [
+            'block_prefix' => $this->getBlockPrefix() . '_file',
+            'allowDelete' => false,
+        ]);
     }
 
     /**

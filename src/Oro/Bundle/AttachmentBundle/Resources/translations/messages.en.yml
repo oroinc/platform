@@ -70,7 +70,13 @@ oro:
             entity_plural_label: File Items
             id.label: Id
             file.label: File
+            image.label: Image
             sort_order.label: Sort Order
+
+            file:
+                add.label: Add File
+            image:
+                add.label: Add Image
 
         config:
             file_size_settings.label: File Size Settings

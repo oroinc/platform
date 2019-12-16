@@ -28,12 +28,15 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::at(0))
             ->method('add')
-            ->with('sortOrder', NumberType::class, [])
+            ->with('sortOrder', NumberType::class, ['block_prefix' => 'oro_attachment_file_item_sortOrder'])
             ->willReturnSelf();
 
         $builder->expects(self::at(1))
             ->method('add')
-            ->with('file', FileType::class, ['allowDelete' => false])
+            ->with('file', FileType::class, [
+                'allowDelete' => false,
+                'block_prefix' => 'oro_attachment_file_item_file'
+            ])
             ->willReturnSelf();
 
         $this->type->buildForm($builder, ['file_type' => FileType::class]);

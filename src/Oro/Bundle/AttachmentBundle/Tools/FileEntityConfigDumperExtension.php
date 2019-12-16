@@ -50,6 +50,7 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
 
         $extendFieldConfig->set('target_entity', File::class);
         $extendFieldConfig->set('target_field', 'id');
+        $extendFieldConfig->set('on_delete', 'SET NULL');
 
         $cascade = $extendFieldConfig->get('cascade', false, []);
         if (!in_array('persist', $cascade, true)) {

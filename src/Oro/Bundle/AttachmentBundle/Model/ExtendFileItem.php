@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Model;
 
+/**
+ * Extend class for FileItem
+ */
 class ExtendFileItem
 {
     /**

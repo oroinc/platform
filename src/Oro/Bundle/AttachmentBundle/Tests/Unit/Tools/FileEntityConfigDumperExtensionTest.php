@@ -182,6 +182,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                             'refresh',
                             'persist',
                         ],
+                        'on_delete' => 'SET NULL',
                     ],
                 ],
             ],
@@ -197,6 +198,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                     'refresh',
                     'persist',
                 ],
+                'on_delete' => 'SET NULL',
                 'relation_key' => $imageRelationKey,
             ],
             $imageFieldConfig->all()
@@ -220,6 +222,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                         'cascade' => [
                             'persist',
                         ],
+                        'on_delete' => 'SET NULL',
                     ],
                 ],
             ],
@@ -234,6 +237,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 'cascade' => [
                     'persist',
                 ],
+                'on_delete' => 'SET NULL',
                 'relation_key' => $fileRelationKey,
             ],
             $fileFieldConfig->all()

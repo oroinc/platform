@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileItemType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,6 +29,9 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
             ->method('setDefaults')
             ->with([
                 'entry_type' => FileItemType::class,
+                'constraints' => [
+                    new Valid(),
+                ],
             ]);
 
         $this->type->configureOptions($resolver);

@@ -144,6 +144,14 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_attachment.listener.multi_file_block_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\MultiFileBlockListener
+        arguments:
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: onBeforeFormRender, priority: -260 }
+
     oro_attachment.entity_config_dumper.extension.file:
         class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
         parent: oro_entity_extend.entity_config_dumper.extension.relation

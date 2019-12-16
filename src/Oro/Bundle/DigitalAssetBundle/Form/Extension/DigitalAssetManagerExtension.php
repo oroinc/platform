@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Form\Extension;
 
+use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -133,6 +134,11 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
             $entityClass = $this->getParentEntityClass($form);
             $fieldName = $this->getParentEntityFieldName($form);
 
+            if ($entityClass === FileItem::class) {
+                $entityClass = $this->getParentEntityClass($form->getParent()->getParent());
+                $fieldName = $this->getParentEntityFieldName($form->getParent()->getParent());
+            }
+
             $attachmentConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
 
             if ($attachmentConfig && $attachmentConfig->is('use_dam')) {
@@ -141,13 +147,11 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
 
                 $file = $form->getData();
 
-                /** @var FieldConfigId $fieldConfigId */
-                $fieldConfigId = $attachmentConfig->getId();
                 $view->vars['dam_widget'] = [
                     'is_valid_digital_asset' => $form->isSubmitted() ? $form->get('digitalAsset')->isValid() : true,
                     'preview_metadata' => $file && $file->getId()
                         ? $this->previewMetadataProvider->getMetadata($file) : [],
-                    'is_image_type' => $fieldConfigId->getFieldType() === 'image',
+                    'is_image_type' => FieldConfigHelper::isImageField($attachmentConfig->getId()),
                     'route' => $options['dam_widget_route'],
                     'parameters' => $options['dam_widget_parameters'] ?? [
                             'parentEntityClass' => $this->entityClassNameHelper->getUrlSafeClassName($entityClass),
