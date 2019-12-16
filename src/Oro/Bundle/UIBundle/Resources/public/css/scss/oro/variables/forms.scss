@@ -6,7 +6,7 @@ $form-horizontal-control-label-line-height: 20px !default;
 $form-horizontal-widget-control-label-width: auto !default;
 
 $form-horizontal-control-margin-start: 24px !default;
-$form-container-control-row-space: 16px !default;
+$form-container-control-row-space: $content-padding-medium !default;
 
 $form-container-column-max-width: 480px !default;
 $form-container-column-offset-right: 20px !default;

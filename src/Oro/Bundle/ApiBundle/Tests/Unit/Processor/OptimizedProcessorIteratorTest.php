@@ -78,18 +78,19 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
+     * @param array                      $expectedProcessors [processor id => group, ...]
+     * @param OptimizedProcessorIterator $processors
      */
-    private function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private function assertProcessors(array $expectedProcessors, OptimizedProcessorIterator $processors)
     {
-        $processorIds = [];
+        $actualProcessors = [];
         /** @var ProcessorMock $processor */
         foreach ($processors as $processor) {
-            $processorIds[] = $processor->getProcessorId();
+            $actualProcessors[$processor->getProcessorId()] = $processors->getGroup();
+            self::assertEquals($processor->getProcessorId(), $processors->getProcessorId());
         }
 
-        self::assertEquals($expectedProcessorIds, $processorIds);
+        self::assertEquals($expectedProcessors, $actualProcessors);
     }
 
     public function testNoApplicableRules()
@@ -106,9 +107,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor3'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor3' => null
             ],
             $iterator
         );
@@ -134,9 +135,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor4'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor4' => null
             ],
             $iterator
         );
@@ -163,10 +164,10 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor4',
-                'processor5',
-                'processor8'
+                'processor1' => null,
+                'processor4' => 'group2',
+                'processor5' => 'group2',
+                'processor8' => null
             ],
             $iterator
         );
@@ -191,8 +192,8 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor3',
-                'processor4'
+                'processor3' => 'group2',
+                'processor4' => 'group2'
             ],
             $iterator
         );
@@ -218,12 +219,12 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor3',
-                'processor4',
-                'processor5',
-                'processor8'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor3' => 'group1',
+                'processor4' => 'group2',
+                'processor5' => 'group2',
+                'processor8' => null
             ],
             $iterator
         );
@@ -244,9 +245,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor3'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor3' => null
             ],
             $iterator
         );
@@ -270,10 +271,10 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor3',
-                'processor4'
+                'processor1' => 'group1',
+                'processor2' => 'group1',
+                'processor3' => 'group2',
+                'processor4' => 'group2'
             ],
             $iterator
         );
@@ -300,10 +301,10 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor4',
-                'processor5',
-                'processor8'
+                'processor1' => null,
+                'processor4' => 'group2',
+                'processor5' => 'group2',
+                'processor8' => null
             ],
             $iterator
         );
@@ -331,8 +332,8 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor8'
+                'processor1' => null,
+                'processor8' => null
             ],
             $iterator
         );
@@ -358,12 +359,12 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor4',
-                'processor5',
-                'processor6',
-                'processor7',
-                'processor8'
+                'processor1' => null,
+                'processor4' => 'group2',
+                'processor5' => 'group2',
+                'processor6' => 'group3',
+                'processor7' => 'group3',
+                'processor8' => null
             ],
             $iterator
         );
@@ -384,9 +385,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor3'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor3' => null
             ],
             $iterator
         );
@@ -410,10 +411,10 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor3',
-                'processor4',
-                'processor5',
-                'processor6'
+                'processor3' => 'group2',
+                'processor4' => 'group2',
+                'processor5' => 'group3',
+                'processor6' => 'group3'
             ],
             $iterator
         );
@@ -440,10 +441,10 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor4',
-                'processor5',
-                'processor8'
+                'processor1' => null,
+                'processor4' => 'group2',
+                'processor5' => 'group2',
+                'processor8' => null
             ],
             $iterator
         );
@@ -471,8 +472,8 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor5'
+                'processor1' => null,
+                'processor5' => null
             ],
             $iterator
         );
@@ -500,9 +501,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor3',
-                'processor5'
+                'processor1' => null,
+                'processor3' => 'group1',
+                'processor5' => null
             ],
             $iterator
         );
@@ -530,9 +531,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor2',
-                'processor5'
+                'processor1' => null,
+                'processor2' => 'group1',
+                'processor5' => null
             ],
             $iterator
         );
@@ -562,8 +563,8 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor7'
+                'processor1' => null,
+                'processor7' => null
             ],
             $iterator
         );
@@ -613,9 +614,9 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProcessors(
             [
-                'processor1',
-                'processor3',
-                'processor5'
+                'processor1' => null,
+                'processor3' => 'group2',
+                'processor5' => null
             ],
             $iterator
         );
@@ -636,7 +637,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
         $this->assertProcessors(
-            ['processor2'],
+            ['processor2' => 'group2'],
             $iterator
         );
     }
@@ -674,7 +675,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
         $this->assertProcessors(
-            ['processor3'],
+            ['processor3' => 'group3'],
             $iterator
         );
     }
@@ -693,7 +694,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
 
         $this->assertProcessors(
-            ['processor1'],
+            ['processor1' => 'group1'],
             $iterator
         );
     }

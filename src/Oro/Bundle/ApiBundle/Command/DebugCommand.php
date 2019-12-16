@@ -30,6 +30,8 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
 {
     use ContainerAwareTrait;
 
+    private const MAX_ELEMENTS_PER_LINE = 2;
+
     /** @var string */
     protected static $defaultName = 'oro:api:debug';
 
@@ -409,6 +411,8 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 $rows[] = $this->formatProcessorAttribute('collection', 'collection' === $group, true);
             } elseif ('customize_form_data' === $action) {
                 $rows[] = $this->formatProcessorAttribute('event', $group, true);
+            } elseif ('normalize_value' === $action) {
+                $rows[] = $this->formatProcessorAttribute('dataType', $group, true);
             } else {
                 $rows[] = $this->formatProcessorAttribute('group', $group, true);
             }
@@ -433,7 +437,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
             } else {
                 $extra = [Matcher::OPERATOR_NOT => FilterIdentifierFieldsConfigExtra::NAME];
             }
-            $attributes['extra'] = $extra;
+            $attributes = ['extra' => $extra] + $attributes;
             unset($attributes[FilterIdentifierFieldsConfigExtra::NAME]);
         }
 
@@ -499,12 +503,12 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
             $items
         );
 
-        if ($items <= 3) {
+        if ($items <= self::MAX_ELEMENTS_PER_LINE) {
             return implode($delimiter, $items);
         }
 
         $result = '';
-        $chunks = array_chunk($items, 3);
+        $chunks = array_chunk($items, self::MAX_ELEMENTS_PER_LINE);
         foreach ($chunks as $chunk) {
             if ($result) {
                 $result .= "\n" . $delimiter;

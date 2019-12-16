@@ -11,20 +11,26 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
     private const METHOD_MAP = [
+        ConfigUtil::DATA_TYPE        => 'setDataType',
+        ConfigUtil::PROPERTY_PATH    => 'setPropertyPath',
+        ConfigUtil::FORM_TYPE        => 'setFormType',
+        ConfigUtil::FORM_OPTIONS     => 'setFormOptions',
+        ConfigUtil::TARGET_CLASS     => 'setTargetClass',
+        ConfigUtil::TARGET_TYPE      => 'setTargetType',
+        ConfigUtil::DEPENDS_ON       => 'setDependsOn',
+        ConfigUtil::DESCRIPTION      => 'setDescription',
         ConfigUtil::EXCLUDE          => 'setExcluded',
         ConfigUtil::COLLAPSE         => 'setCollapsed',
         ConfigUtil::DATA_TRANSFORMER => 'setDataTransformers'
     ];
 
     private const TARGET_ENTITY_METHOD_MAP = [
-        ConfigUtil::EXCLUSION_POLICY          => 'setExclusionPolicy',
-        ConfigUtil::IDENTIFIER_FIELD_NAMES    => 'setIdentifierFieldNames',
-        ConfigUtil::ORDER_BY                  => 'setOrderBy',
-        ConfigUtil::MAX_RESULTS               => 'setMaxResults',
-        ConfigUtil::HINTS                     => 'setHints',
-        ConfigUtil::POST_SERIALIZE            => 'setPostSerializeHandler',
-        ConfigUtil::POST_SERIALIZE_COLLECTION => 'setPostSerializeCollectionHandler',
-        ConfigUtil::FORM_EVENT_SUBSCRIBER     => 'setFormEventSubscribers'
+        ConfigUtil::EXCLUSION_POLICY       => 'setExclusionPolicy',
+        ConfigUtil::IDENTIFIER_FIELD_NAMES => 'setIdentifierFieldNames',
+        ConfigUtil::ORDER_BY               => 'setOrderBy',
+        ConfigUtil::MAX_RESULTS            => 'setMaxResults',
+        ConfigUtil::HINTS                  => 'setHints',
+        ConfigUtil::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers'
     ];
 
     /** @var ConfigLoaderFactory */

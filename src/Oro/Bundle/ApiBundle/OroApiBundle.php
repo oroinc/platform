@@ -43,6 +43,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\SimpleFilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
+        $container->addCompilerPass(new Compiler\ObjectNormalizerCompilerPass());
         $container->addCompilerPass(new Compiler\EntityIdTransformerCompilerPass());
         $container->addCompilerPass(new Compiler\EntityIdResolverCompilerPass());
         $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());

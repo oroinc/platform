@@ -8,9 +8,6 @@ use Psr\Container\ContainerInterface;
 
 /**
  * The registry returns the documentation parser for a specific request type.
- * The implementation of this registry assumes that all parsers
- * are declared in DIC as public services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
  */
 class ResourceDocParserRegistry
 {

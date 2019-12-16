@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\MetadataProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
@@ -31,7 +32,11 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->subresourcesProvider = $this->createMock(SubresourcesProvider::class);
         $this->processor = new AddHateoasLinksForAssociations(
-            new RestRoutesRegistry([[$routes, 'rest']], new RequestExpressionMatcher()),
+            new RestRoutesRegistry(
+                [['routes', 'rest']],
+                TestContainerBuilder::create()->add('routes', $routes)->getContainer($this),
+                new RequestExpressionMatcher()
+            ),
             $urlGenerator,
             $this->subresourcesProvider
         );

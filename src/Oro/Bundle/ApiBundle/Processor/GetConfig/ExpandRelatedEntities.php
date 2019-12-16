@@ -245,9 +245,11 @@ class ExpandRelatedEntities implements ProcessorInterface
         if ($config->hasDefinition()) {
             $targetEntity = $config->getDefinition();
             foreach ($extras as $extra) {
-                $sectionName = $extra->getName();
-                if ($extra instanceof ConfigExtraSectionInterface && $config->has($sectionName)) {
-                    $targetEntity->set($sectionName, $config->get($sectionName));
+                if ($extra instanceof ConfigExtraSectionInterface) {
+                    $sectionName = $extra->getName();
+                    if ($config->has($sectionName)) {
+                        $targetEntity->set($sectionName, $config->get($sectionName));
+                    }
                 }
             }
             $field = $definition->getOrAddField($fieldName);

@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
 {

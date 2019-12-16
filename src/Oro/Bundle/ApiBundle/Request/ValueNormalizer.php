@@ -139,6 +139,8 @@ class ValueNormalizer implements ResetInterface
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
         $context->getRequestType()->set($requestType);
+        $context->setFirstGroup($dataType);
+        $context->setLastGroup($dataType);
         $context->setDataType($dataType);
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);
