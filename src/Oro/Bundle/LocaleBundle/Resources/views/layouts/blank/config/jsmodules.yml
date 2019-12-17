@@ -1,7 +1,7 @@
 aliases:
-    moment$: bowerassets/moment/moment
-    moment-timezone$: bowerassets/moment-timezone/builds/moment-timezone-with-data
-    numeral$: bowerassets/numeral/numeral
+    moment$: npmassets/moment/moment
+    moment-timezone$: npmassets/moment-timezone/builds/moment-timezone-with-data
+    numeral$: npmassets/numeral/numeral
 app-modules:
     - orolocale/js/app/modules/locale-module
 configs:
