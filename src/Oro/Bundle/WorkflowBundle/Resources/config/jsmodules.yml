@@ -28,9 +28,9 @@ map:
     "*":
         jsplumb: oroworkflow/js/extend/jsplumb
     oroworkflow/js/extend/jsplumb:
-        jsplumb: bowerassets/jsplumb/dist/js/jsPlumb-1.7.10
+        jsplumb: npmassets/@oroinc/jsplumb/dist/js/jsPlumb-1.7.10
 shim:
-    bowerassets/jsplumb/dist/js/jsPlumb-1.7.10:
+    npmassets/@oroinc/jsplumb/dist/js/jsPlumb-1.7.10:
         imports:
             - define=>false
             - this=>window
