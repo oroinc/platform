@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -41,7 +42,11 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new CorrectSortValue(
             $this->doctrineHelper,
             $this->valueNormalizer,
-            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            )
         );
     }
 

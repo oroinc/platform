@@ -187,13 +187,6 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
-    oro_message_queue.event_listener.console_error:
-        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsoleErrorListener
-        arguments:
-            - '@monolog.logger.consumer'
-        tags:
-            - { name: kernel.event_listener, event: console.error, method: onConsoleError, priority: 255 }
-
     oro_message_queue.processor_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator
         public: false

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains all filter names providers
@@ -11,19 +12,24 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
  */
 class FilterNamesRegistry
 {
-    /** @var array [data type => [[provider, request type expression], ...], ...] */
+    /** @var array [data type => [[provider service id, request type expression], ...], ...] */
     private $providers;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /** @var RequestExpressionMatcher */
     private $matcher;
 
     /**
-     * @param array                    $providers [[provider, request type expression], ...]
+     * @param array                    $providers [[provider service id, request type expression], ...]
+     * @param ContainerInterface       $container
      * @param RequestExpressionMatcher $matcher
      */
-    public function __construct(array $providers, RequestExpressionMatcher $matcher)
+    public function __construct(array $providers, ContainerInterface $container, RequestExpressionMatcher $matcher)
     {
         $this->providers = $providers;
+        $this->container = $container;
         $this->matcher = $matcher;
     }
 
@@ -36,9 +42,9 @@ class FilterNamesRegistry
      */
     public function getFilterNames(RequestType $requestType): FilterNames
     {
-        foreach ($this->providers as list($provider, $expression)) {
+        foreach ($this->providers as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
-                return $provider;
+                return $this->container->get($serviceId);
             }
         }
 

@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -38,8 +39,16 @@ class AddPaginationLinksTest extends GetListProcessorTestCase
         $requestExpressionMatcher = new RequestExpressionMatcher();
 
         $this->processor = new AddPaginationLinks(
-            new RestRoutesRegistry([[$routes, null]], $requestExpressionMatcher),
-            new FilterNamesRegistry([[$filterNames, null]], $requestExpressionMatcher),
+            new RestRoutesRegistry(
+                [['routes', null]],
+                TestContainerBuilder::create()->add('routes', $routes)->getContainer($this),
+                $requestExpressionMatcher
+            ),
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                $requestExpressionMatcher
+            ),
             $this->urlGenerator
         );
     }

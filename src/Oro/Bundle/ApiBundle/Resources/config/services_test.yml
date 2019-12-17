@@ -127,14 +127,14 @@ services:
             - false
             - true
         tags:
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, class: Extend\Entity\TestApiE2, collection: false, requestType: json_api, priority: 91 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: json_api, collection: false, class: Extend\Entity\TestApiE2, priority: 91 }
 
     oro_api.tests.change_subresource.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\BuildFormBuilder
         arguments:
             - '@oro_api.form_helper'
         tags:
-            - { name: oro.api.processor, action: update_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, association: biM2O, collection: false, priority: 101 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, collection: false, association: biM2O, parentClass: Extend\Entity\TestApiE1, priority: 101 }
 
     oro_api.tests.change_subresource.build_form_builder.throw_exception:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BuildFormBuilderThrowException

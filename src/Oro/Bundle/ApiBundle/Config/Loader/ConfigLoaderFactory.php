@@ -92,7 +92,7 @@ class ConfigLoaderFactory
             }
         }
 
-        if (array_key_exists($configType, $this->loaders)) {
+        if (\array_key_exists($configType, $this->loaders)) {
             return $this->loaders[$configType];
         }
 

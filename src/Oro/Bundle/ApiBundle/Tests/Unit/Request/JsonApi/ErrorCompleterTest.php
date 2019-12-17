@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
@@ -52,7 +53,8 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
             $this->exceptionTextExtractor,
             $this->valueNormalizer,
             new FilterNamesRegistry(
-                [[$filterNames, RequestType::JSON_API]],
+                [['filter_names', RequestType::JSON_API]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );

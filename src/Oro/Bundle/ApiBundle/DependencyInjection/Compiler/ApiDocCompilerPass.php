@@ -28,6 +28,8 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
     private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
+    private const API_DOC_MARKDOWN_FORMATTER_SERVICE        = 'nelmio_api_doc.formatter.markdown_formatter';
+    private const API_DOC_SWAGGER_FORMATTER_SERVICE         = 'nelmio_api_doc.formatter.swagger_formatter';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
@@ -47,8 +49,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $this->configureUnderlyingViews($container);
         $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
-        $this->configureSimpleFormatter($container);
-        $this->configureHtmlFormatter($container);
+        $this->configureApiDocFormatters($container);
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
         $this->configureRequestTypeProvider($container);
@@ -203,16 +204,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    private function configureSimpleFormatter(ContainerBuilder $container)
-    {
-        $formatterDef = $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE);
-        $formatterDef->setPublic(true);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function configureHtmlFormatter(ContainerBuilder $container)
+    private function configureApiDocFormatters(ContainerBuilder $container)
     {
         // rename default HTML formatter service
         $defaultHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
@@ -254,6 +246,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
         foreach ($htmlFormatters as $htmlFormatter) {
             $container->getDefinition($htmlFormatter)->addMethodCall('setViews', [$views]);
         }
+
+        // make other formatter services public as it is required for "api:doc:dump" and "api:swagger:dump" commands
+        $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE)->setPublic(true);
+        $container->getDefinition(self::API_DOC_MARKDOWN_FORMATTER_SERVICE)->setPublic(true);
+        $container->getDefinition(self::API_DOC_SWAGGER_FORMATTER_SERVICE)->setPublic(true);
     }
 
     /**

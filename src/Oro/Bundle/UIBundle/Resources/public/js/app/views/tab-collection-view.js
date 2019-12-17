@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
     'use strict';
 
-    const $ = require('jquery');
     const _ = require('underscore');
     const mediator = require('oroui/js/mediator');
     const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
@@ -17,9 +16,6 @@ define(function(require, exports, module) {
         className: 'tab-collection oro-tabs clearfix',
         itemView: TabItemView,
         useDropdown: false,
-        events: {
-            'click a': 'onTabClick'
-        },
         listen: {
             'change collection': 'onChange'
         },
@@ -37,16 +33,6 @@ define(function(require, exports, module) {
             _.extend(this, _.defaults(_.pick(options, ['useDropdown']), this));
 
             TabCollectionView.__super__.initialize.call(this, options);
-        },
-
-        onTabClick: function(e) {
-            const $el = $(e.target);
-
-            e.preventDefault();
-
-            if ($el.closest('.dropdown').find('[data-dropdown-label]').html() !== $el.html()) {
-                $el.trigger('shown.bs.tab');
-            }
         },
 
         onChange: function(changedModel) {

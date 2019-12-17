@@ -32,7 +32,6 @@ define(function(require) {
         wrapperClassName: undefined,
 
         events: {
-            'click .dropdown-menu': 'onDropdownMenuClick',
             'show.bs.dropdown': 'onBeforeOpen',
             'shown.bs.dropdown': 'onOpen',
             'hide.bs.dropdown': 'onHide'
@@ -108,17 +107,6 @@ define(function(require) {
         },
 
         /**
-         * Prevents dropdown menu from closing on click
-         *
-         * @param {jQuery.Event} e
-         */
-        onDropdownMenuClick: function(e) {
-            if (!this.$(e.target).is('.close')) {
-                e.stopPropagation();
-            }
-        },
-
-        /**
          * Handles bootstrap dropdown show event
          *
          * @param {jQuery.Event} showEvent
@@ -152,7 +140,16 @@ define(function(require) {
         /**
          * Handles dropdown menu hide
          */
-        onHide: function() {
+        onHide: function(e) {
+            if (e.clickEvent && !this.$(e.clickEvent.target).is('.close')) {
+                const $clickTarget = this.$(e.clickEvent.target);
+                if ($clickTarget.get(0) && !$clickTarget.is('.close')) {
+                    // prevent closing dropdown on click within menu, except it's 'close' button
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             mediator.trigger('dropdown-launcher:hide');
         },
 

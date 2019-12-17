@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -38,23 +38,28 @@ class AutoResponseTemplateType extends AbstractType
     /** @var LocalizationManager */
     protected $localizationManager;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param ConfigManager $cm
      * @param ConfigManager $userConfig
-     * @param LocaleSettings $localeSettings
      * @param Registry $registry
      * @param LocalizationManager $localizationManager
+     * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         ConfigManager $cm,
         ConfigManager $userConfig,
         Registry $registry,
-        LocalizationManager $localizationManager
+        LocalizationManager $localizationManager,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->cm = $cm;
         $this->userConfig = $userConfig;
         $this->registry = $registry;
         $this->localizationManager = $localizationManager;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -107,7 +112,8 @@ class AutoResponseTemplateType extends AbstractType
 
             if (!$event->getData()) {
                 $emailTemplate = new EmailTemplate();
-                $emailTemplate->setContent($this->cm->get('oro_email.signature', ''));
+                $signature = $this->htmlTagHelper->sanitize($this->cm->get('oro_email.signature', ''));
+                $emailTemplate->setContent($signature);
                 $emailTemplate->setEntityName(Email::ENTITY_CLASS);
                 $event->setData($emailTemplate);
             }

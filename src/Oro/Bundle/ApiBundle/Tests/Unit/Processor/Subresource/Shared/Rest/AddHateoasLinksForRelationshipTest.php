@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -36,7 +37,11 @@ class AddHateoasLinksForRelationshipTest extends GetSubresourceProcessorTestCase
         $routes = new RestRoutes('item', 'list', 'subresource', 'relationship');
 
         $this->processor = new AddHateoasLinksForRelationship(
-            new RestRoutesRegistry([[$routes, null]], new RequestExpressionMatcher()),
+            new RestRoutesRegistry(
+                [['routes', null]],
+                TestContainerBuilder::create()->add('routes', $routes)->getContainer($this),
+                new RequestExpressionMatcher()
+            ),
             $this->urlGenerator,
             $this->subresourcesProvider
         );
