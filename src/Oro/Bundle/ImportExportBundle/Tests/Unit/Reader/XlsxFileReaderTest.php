@@ -6,6 +6,8 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,6 +42,9 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 
     /** @var int */
     protected $readCount;
+
+    /** @var ImportStrategyHelper|MockObject */
+    protected $importHelper;
 
     /** {@inheritdoc} */
     protected function setUp()
@@ -80,7 +85,10 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
              ->method('createPHPExcelObject')
              ->willReturn($this->phpExcel);
 
+        $this->importHelper = $this->createMock(ImportStrategyHelper::class);
+
         $this->reader = new XlsxFileReader($this->contextRegistry, $this->phpExcelFactory);
+        $this->reader->setImportHelper($this->importHelper);
     }
 
     /** {@inheritdoc} */
