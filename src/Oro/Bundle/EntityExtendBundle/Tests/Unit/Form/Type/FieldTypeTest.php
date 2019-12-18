@@ -205,8 +205,7 @@ class FieldTypeTest extends TypeTestCase
 
         /** @var $form FormInterface|\PHPUnit\Framework\MockObject\MockObject */
         $form = $this->createMock(FormInterface::class);
-
-        $this->type->finishView($view, $form, []);
+        $this->type->finishView($view, $form, ['excludeTypes' => []]);
 
         $this->assertEquals(
             [
