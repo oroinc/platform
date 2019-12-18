@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\EventListener;
+namespace Oro\Bundle\ApiBundle\Security\Http\Firewall;
 
-use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
+use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener as BaseExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
  * It is required because API can work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
-class SecurityFirewallExceptionListener extends ExceptionListener
+class ExceptionListener extends BaseExceptionListener
 {
     /**
      * {@inheritdoc}

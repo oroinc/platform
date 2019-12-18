@@ -1374,7 +1374,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                     'request_type'    => ['rest', 'json_api', 'api4'],
                     'underlying_view' => 'view1',
                     'headers'         => [
-                        'X-Include'    => [
+                        'X-Include' => [
                             ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
                             ['value' => 'another']
                         ]
@@ -1443,6 +1443,131 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             $apiConfig['api_doc_views']
+        );
+    }
+
+    public function testConfigurationForDefaultApiDocCache()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load([], $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'excluded_features' => ['web_api']
+            ],
+            $apiConfig['api_doc_cache']
+        );
+    }
+
+    public function testConfigurationForApiDocCache()
+    {
+        $container = $this->getContainer();
+
+        $configs = [
+            [
+                'api_doc_cache' => [
+                    'excluded_features' => ['feature1']
+                ]
+            ],
+            [
+                'api_doc_cache' => [
+                    'excluded_features' => ['feature2']
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load($configs, $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'excluded_features' => ['feature1', 'feature2']
+            ],
+            $apiConfig['api_doc_cache']
+        );
+    }
+
+    public function testConfigurationForDefaultFeatureDependedFirewalls()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load([], $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals([], $apiConfig['api_firewalls']);
+    }
+
+    public function testConfigurationForFeatureDependedFirewalls()
+    {
+        $container = $this->getContainer();
+
+        $configs = [
+            [
+                'api_firewalls' => [
+                    'firewall1' => [
+                        'feature_name' => 'feature1'
+                    ],
+                    'firewall2' => [
+                        'feature_name'               => 'feature2',
+                        'feature_firewall_listeners' => ['firewall2_listener1']
+                    ],
+                    'firewall3' => [
+                        'feature_name'               => 'feature3',
+                        'feature_firewall_listeners' => ['firewall3_listener1']
+                    ],
+                    'firewall4' => [
+                        'feature_name' => 'feature4'
+                    ]
+                ]
+            ],
+            [
+                'api_firewalls' => [
+                    'firewall2' => [
+                        'feature_firewall_listeners' => ['firewall2_listener2']
+                    ],
+                    'firewall4' => [
+                        'feature_firewall_listeners' => ['firewall4_listener1']
+                    ],
+                    'firewall5' => [
+                        'feature_name' => 'feature5'
+                    ]
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load($configs, $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'firewall1' => [
+                    'feature_name'               => 'feature1',
+                    'feature_firewall_listeners' => []
+                ],
+                'firewall2' => [
+                    'feature_name'               => 'feature2',
+                    'feature_firewall_listeners' => ['firewall2_listener1', 'firewall2_listener2']
+                ],
+                'firewall3' => [
+                    'feature_name'               => 'feature3',
+                    'feature_firewall_listeners' => ['firewall3_listener1']
+                ],
+                'firewall4' => [
+                    'feature_name'               => 'feature4',
+                    'feature_firewall_listeners' => ['firewall4_listener1']
+                ],
+                'firewall5' => [
+                    'feature_name'               => 'feature5',
+                    'feature_firewall_listeners' => []
+                ]
+            ],
+            $apiConfig['api_firewalls']
         );
     }
 }
