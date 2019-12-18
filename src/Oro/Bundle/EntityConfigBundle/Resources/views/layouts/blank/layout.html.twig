@@ -101,6 +101,22 @@
     {{ oro_file_view(value) }}
 {% endblock %}
 
+{% block attribute_multiimage_widget %}
+    {% set collection = value %}
+    {%- for item in collection -%}
+        {% set value = item.file %}
+        {{ block('attribute_image_widget') }}
+    {%- endfor -%}
+{% endblock %}
+
+{% block attribute_multifile_widget %}
+    {% set collection = value %}
+    {%- for item in collection -%}
+        {% set value = item.file %}
+        {{ block('attribute_file_widget') }}
+    {%- endfor -%}
+{% endblock %}
+
 {% block attribute_localized_fallback_widget %}
     {{ translated_value|oro_html_sanitize }}
 {% endblock %}
