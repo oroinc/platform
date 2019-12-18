@@ -41,13 +41,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: load_data, priority: -20 }
 
-    oro_api.get_list.load_data_by_search_query:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesBySearchQuery
-        arguments:
-            - '@oro_search.index'
-        tags:
-            - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }
-
     #
     # data_security_check
     #

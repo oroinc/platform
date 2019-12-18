@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Monolog\Handler\BufferHandler;
-use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
-use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
@@ -77,12 +74,9 @@ class ClearLoggerExtension extends AbstractExtension
      */
     private function clearHandler(HandlerInterface $handler)
     {
-        if ($handler instanceof FingersCrossedHandler || $handler instanceof BufferHandler) {
+        if (method_exists($handler, 'clear')) {
             // do clear because each processor is a separate "request" for the consumer
             // and the logging should starts from the scratch for each processor
-            $handler->clear();
-        } elseif ($handler instanceof TestHandler) {
-            // it is safe to clear this handler because it is not used in "prod" mode
             $handler->clear();
         }
     }

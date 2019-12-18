@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {

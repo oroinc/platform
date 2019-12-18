@@ -12,7 +12,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class SortersConfigLoader extends AbstractConfigLoader
 {
     private const FIELD_METHOD_MAP = [
-        ConfigUtil::EXCLUDE => 'setExcluded'
+        ConfigUtil::PROPERTY_PATH => 'setPropertyPath',
+        ConfigUtil::EXCLUDE       => 'setExcluded'
     ];
 
     /**

@@ -28,7 +28,7 @@ class DocumentationProviderCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->chainDocumentationProvider = $this->container->setDefinition(
             'oro_api.api_doc.documentation_provider',
-            new Definition(ChainDocumentationProvider::class, [[]])
+            new Definition(ChainDocumentationProvider::class, [[], null])
         );
     }
 

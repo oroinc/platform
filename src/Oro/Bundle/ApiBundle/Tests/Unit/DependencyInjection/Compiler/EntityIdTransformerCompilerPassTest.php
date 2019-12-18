@@ -28,7 +28,7 @@ class EntityIdTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->registry = $this->container->setDefinition(
             'oro_api.entity_id_transformer_registry',
-            new Definition(EntityIdTransformerRegistry::class, [[]])
+            new Definition(EntityIdTransformerRegistry::class, [[], null])
         );
     }
 

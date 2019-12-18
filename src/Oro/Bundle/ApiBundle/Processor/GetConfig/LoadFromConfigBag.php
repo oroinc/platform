@@ -198,16 +198,19 @@ class LoadFromConfigBag implements ProcessorInterface
     /**
      * @param ConfigContext $context
      * @param array         $config
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function saveConfig(ConfigContext $context, array $config)
     {
+        $hasDescriptionsConfigExtra = $context->hasExtra(DescriptionsConfigExtra::NAME);
         $action = $context->getTargetAction();
         if ($action) {
             if (!empty($config[ConfigUtil::ACTIONS][$action])) {
                 $config = $this->mergeActionConfigHelper->mergeActionConfig(
                     $config,
                     $config[ConfigUtil::ACTIONS][$action],
-                    $context->hasExtra(DescriptionsConfigExtra::NAME)
+                    $hasDescriptionsConfigExtra
                 );
             }
             $association = $context->getAssociationName();
@@ -222,7 +225,7 @@ class LoadFromConfigBag implements ProcessorInterface
                         $config,
                         $parentConfig[ConfigUtil::SUBRESOURCES][$association],
                         $action,
-                        $context->hasExtra(DescriptionsConfigExtra::NAME),
+                        $hasDescriptionsConfigExtra,
                         $context->hasExtra(FiltersConfigExtra::NAME),
                         $context->hasExtra(SortersConfigExtra::NAME)
                     );
@@ -232,21 +235,24 @@ class LoadFromConfigBag implements ProcessorInterface
 
         $extras = $context->getExtras();
         foreach ($extras as $extra) {
-            $sectionName = $extra->getName();
-            if ($extra instanceof ConfigExtraSectionInterface
-                && !empty($config[$sectionName])
-                && !$context->has($sectionName)
-            ) {
-                $context->set(
-                    $sectionName,
-                    $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
-                );
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                $sectionName = $extra->getName();
+                if (!empty($config[$sectionName]) && !$context->has($sectionName)) {
+                    $context->set(
+                        $sectionName,
+                        $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
+                    );
+                }
             }
         }
 
         $sectionNames = $this->configExtensionRegistry->getConfigSectionNames();
         foreach ($sectionNames as $sectionName) {
             unset($config[$sectionName]);
+        }
+
+        if (!$hasDescriptionsConfigExtra) {
+            unset($config[ConfigUtil::DOCUMENTATION_RESOURCE]);
         }
 
         if (!empty($config)) {

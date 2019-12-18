@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    require('bowerassets/base64/base64');
+    require('npmassets/Base64/base64');
 
     return {
         encode: function(stringToEncode) {

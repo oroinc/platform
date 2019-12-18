@@ -22,15 +22,6 @@ class ConfigExtensionRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame(1, $configExtensionRegistry->getMaxNestingLevel());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $maxNestingLevel must be an integer. Got: string.
-     */
-    public function testConstructorWithInvalidMaxNestingLevel()
-    {
-        new ConfigExtensionRegistry('1');
-    }
-
     public function testExtensions()
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();

@@ -114,17 +114,20 @@ class DumpApiDocConsoleCommandListener
      */
     protected function ensureViewOptionDefined(Command $command)
     {
+        $viewOption = new InputOption(
+            self::VIEW_OPTION,
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'A view for which API definitions should be dumped.',
+            ApiDoc::DEFAULT_VIEW
+        );
         $inputDefinition = $command->getApplication()->getDefinition();
         if (!$inputDefinition->hasOption(self::VIEW_OPTION)) {
-            $inputDefinition->addOption(
-                new InputOption(
-                    self::VIEW_OPTION,
-                    null,
-                    InputOption::VALUE_OPTIONAL,
-                    'A view for which API definitions should be dumped.',
-                    ApiDoc::DEFAULT_VIEW
-                )
-            );
+            $inputDefinition->addOption($viewOption);
+        }
+        $commandDefinition = $command->getDefinition();
+        if (!$commandDefinition->hasOption(self::VIEW_OPTION)) {
+            $commandDefinition->addOption($viewOption);
         }
     }
 }

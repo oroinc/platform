@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
@@ -296,9 +297,9 @@ class ObjectNormalizer
             }
             $value = $this->postSerializeCollection($value, $config, $context);
         } elseif (is_object($value)) {
-            $objectNormalizer = $this->normalizerRegistry->getObjectNormalizer($value);
+            $objectNormalizer = $this->getObjectNormalizer($value, $context);
             if (null !== $objectNormalizer) {
-                $value = $objectNormalizer->normalize($value);
+                $value = $objectNormalizer->normalize($value, $context[ApiContext::REQUEST_TYPE]);
             } elseif ($value instanceof \Traversable) {
                 $normalizedValues = [];
                 $nextLevel = $level + 1;
@@ -458,5 +459,23 @@ class ObjectNormalizer
         }
 
         return $this->serializationHelper->postSerializeCollection($items, $config, $context);
+    }
+
+    /**
+     * @param object $object
+     * @param array  $context
+     *
+     * @return ObjectNormalizerInterface|null
+     */
+    private function getObjectNormalizer($object, array $context): ?ObjectNormalizerInterface
+    {
+        if (!isset($context[ApiContext::REQUEST_TYPE])) {
+            throw new \InvalidArgumentException(sprintf(
+                'The object normalization context must have "%s" attribute.',
+                ApiContext::REQUEST_TYPE
+            ));
+        }
+
+        return $this->normalizerRegistry->getObjectNormalizer($object, $context[ApiContext::REQUEST_TYPE]);
     }
 }

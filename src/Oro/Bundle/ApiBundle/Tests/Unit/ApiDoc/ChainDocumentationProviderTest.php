@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {

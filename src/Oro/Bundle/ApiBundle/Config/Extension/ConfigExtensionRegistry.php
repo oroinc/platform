@@ -16,20 +16,17 @@ class ConfigExtensionRegistry
     /** @var ConfigExtensionInterface[] */
     private $extensions = [];
 
+    /** @var ConfigurationSettingsInterface|null */
+    private $configurationSettings;
+
+    /** @var string[]|null */
+    private $configSectionNames;
+
     /**
      * @param int $maxNestingLevel The maximum number of nesting target entities
      */
-    public function __construct($maxNestingLevel = 0)
+    public function __construct(int $maxNestingLevel = 0)
     {
-        if (!is_int($maxNestingLevel)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The $maxNestingLevel must be an integer. Got: %s.',
-                    gettype($maxNestingLevel)
-                )
-            );
-        }
-
         $this->maxNestingLevel = $maxNestingLevel;
     }
 
@@ -38,7 +35,7 @@ class ConfigExtensionRegistry
      *
      * @return int
      */
-    public function getMaxNestingLevel()
+    public function getMaxNestingLevel(): int
     {
         return $this->maxNestingLevel;
     }
@@ -48,9 +45,11 @@ class ConfigExtensionRegistry
      *
      * @param ConfigExtensionInterface $extension
      */
-    public function addExtension(ConfigExtensionInterface $extension)
+    public function addExtension(ConfigExtensionInterface $extension): void
     {
         $this->extensions[] = $extension;
+        $this->configurationSettings = null;
+        $this->configSectionNames = null;
     }
 
     /**
@@ -58,7 +57,7 @@ class ConfigExtensionRegistry
      *
      * @return ConfigExtensionInterface[]
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }
@@ -68,32 +67,34 @@ class ConfigExtensionRegistry
      *
      * @return ConfigurationSettingsInterface
      */
-    public function getConfigurationSettings()
+    public function getConfigurationSettings(): ConfigurationSettingsInterface
     {
-        $settings = new ConfigurationSettings();
-
-        $extensions = $this->getExtensions();
-        foreach ($extensions as $extension) {
-            $sections = $extension->getEntityConfigurationSections();
-            foreach ($sections as $sectionName => $sectionConfiguration) {
-                $sectionConfiguration->setSettings($settings);
-                $settings->addExtraSection($sectionName, $sectionConfiguration);
+        if (null === $this->configurationSettings) {
+            $settings = new ConfigurationSettings();
+            $extensions = $this->getExtensions();
+            foreach ($extensions as $extension) {
+                $sections = $extension->getEntityConfigurationSections();
+                foreach ($sections as $sectionName => $sectionConfiguration) {
+                    $sectionConfiguration->setSettings($settings);
+                    $settings->addExtraSection($sectionName, $sectionConfiguration);
+                }
+                $callbacks = $extension->getConfigureCallbacks();
+                foreach ($callbacks as $section => $callback) {
+                    $settings->addConfigureCallback($section, $callback);
+                }
+                $callbacks = $extension->getPreProcessCallbacks();
+                foreach ($callbacks as $section => $callback) {
+                    $settings->addPreProcessCallback($section, $callback);
+                }
+                $callbacks = $extension->getPostProcessCallbacks();
+                foreach ($callbacks as $section => $callback) {
+                    $settings->addPostProcessCallback($section, $callback);
+                }
             }
-            $callbacks = $extension->getConfigureCallbacks();
-            foreach ($callbacks as $section => $callback) {
-                $settings->addConfigureCallback($section, $callback);
-            }
-            $callbacks = $extension->getPreProcessCallbacks();
-            foreach ($callbacks as $section => $callback) {
-                $settings->addPreProcessCallback($section, $callback);
-            }
-            $callbacks = $extension->getPostProcessCallbacks();
-            foreach ($callbacks as $section => $callback) {
-                $settings->addPostProcessCallback($section, $callback);
-            }
+            $this->configurationSettings = $settings;
         }
 
-        return $settings;
+        return $this->configurationSettings;
     }
 
     /**
@@ -101,19 +102,22 @@ class ConfigExtensionRegistry
      *
      * @return string[]
      */
-    public function getConfigSectionNames()
+    public function getConfigSectionNames(): array
     {
-        $sectionNameMap = [];
-        $extensions = $this->getExtensions();
-        foreach ($extensions as $extension) {
-            $sections = $extension->getEntityConfigurationSections();
-            foreach ($sections as $name => $configuration) {
-                if (!isset($sectionNameMap[$name])) {
-                    $sectionNameMap[$name] = true;
+        if (null === $this->configSectionNames) {
+            $sectionNameMap = [];
+            $extensions = $this->getExtensions();
+            foreach ($extensions as $extension) {
+                $sections = $extension->getEntityConfigurationSections();
+                foreach ($sections as $name => $configuration) {
+                    if (!isset($sectionNameMap[$name])) {
+                        $sectionNameMap[$name] = true;
+                    }
                 }
             }
+            $this->configSectionNames = array_keys($sectionNameMap);
         }
 
-        return array_keys($sectionNameMap);
+        return $this->configSectionNames;
     }
 }

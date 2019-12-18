@@ -1,15 +1,20 @@
 services:
-    oro_importexport.reader.csv:
-        class: 'Oro\Bundle\ImportExportBundle\Reader\CsvFileReader'
+    oro_importexport.reader.file.abstract:
+        class: Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader
         arguments:
             - '@oro_importexport.context_registry'
+        calls:
+            - ['setImportHelper', ['@oro_importexport.strategy.import.helper']]
+
+    oro_importexport.reader.csv:
+        class: 'Oro\Bundle\ImportExportBundle\Reader\CsvFileReader'
+        parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: csv }
 
     oro_importexport.reader.xlsx:
         class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
-        arguments:
-            - '@oro_importexport.context_registry'
+        parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
 

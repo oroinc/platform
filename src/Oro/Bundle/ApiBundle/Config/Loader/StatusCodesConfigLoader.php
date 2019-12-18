@@ -12,7 +12,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class StatusCodesConfigLoader extends AbstractConfigLoader
 {
     private const METHOD_MAP = [
-        ConfigUtil::EXCLUDE => 'setExcluded'
+        ConfigUtil::DESCRIPTION => 'setDescription',
+        ConfigUtil::EXCLUDE     => 'setExcluded'
     ];
 
     /**

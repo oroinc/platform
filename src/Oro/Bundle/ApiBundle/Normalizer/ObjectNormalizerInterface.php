@@ -2,22 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
+
 /**
  * Provides an interface for normalizers of different kind of objects.
  */
 interface ObjectNormalizerInterface
 {
     /**
-     * @param object $object
-     *
-     * @return bool
-     */
-    public function supports($object);
-
-    /**
-     * @param object $object
+     * @param object      $object
+     * @param RequestType $requestType
      *
      * @return mixed
      */
-    public function normalize($object);
+    public function normalize($object, RequestType $requestType);
 }

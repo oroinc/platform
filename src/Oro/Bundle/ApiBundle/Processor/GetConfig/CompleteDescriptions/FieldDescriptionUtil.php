@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Util;
+namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -11,6 +11,25 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 class FieldDescriptionUtil
 {
     public const MODIFY_READ_ONLY_FIELD_DESCRIPTION = '**The read-only field. A passed value will be ignored.**';
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $fieldName
+     * @param string                 $description
+     */
+    public static function updateFieldDescription(
+        EntityDefinitionConfig $definition,
+        string $fieldName,
+        string $description
+    ): void {
+        $field = $definition->getField($fieldName);
+        if (null !== $field) {
+            $existingDescription = $field->getDescription();
+            if (!$existingDescription) {
+                $field->setDescription($description);
+            }
+        }
+    }
 
     /**
      * @param EntityDefinitionConfig $definition

@@ -27,7 +27,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - '@doctrine'
+            - '@oro_entity.entity_class_provider.orm'
         tags:
             - { name: console.command }
 
@@ -56,35 +56,14 @@ services:
         tags:
             - { name: console.command }
 
-    oro_cms.command.api_doc_dump_service_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        arguments:
-            -
-                - '@router'
-                - '@nelmio_api_doc.formatter.simple_formatter'
-                - '@nelmio_api_doc.formatter.markdown_formatter'
-                - '@nelmio_api_doc.formatter.html_formatter'
-                - '@nelmio_api_doc.extractor.api_doc_extractor'
-        tags:
-            - { name: container.service_locator }
-
-    Oro\Bundle\ApiBundle\Command\ApiDocDumpCommand:
-        arguments:
-            - '@oro_cms.command.api_doc_dump_service_locator'
+    Nelmio\ApiDocBundle\Command\DumpCommand:
+        calls:
+            - [setContainer, ['@service_container']]
         tags:
             - { name: console.command, command: 'api:doc:dump' }
 
-    oro_cms.command.api_swagger_dump_service_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        arguments:
-            -
-                - '@nelmio_api_doc.extractor.api_doc_extractor'
-                - '@nelmio_api_doc.formatter.swagger_formatter'
-        tags:
-            - { name: container.service_locator }
-
-    Oro\Bundle\ApiBundle\Command\ApiSwaggerDumpCommand:
-        arguments:
-            - '@oro_cms.command.api_swagger_dump_service_locator'
+    Nelmio\ApiDocBundle\Command\SwaggerDumpCommand:
+        calls:
+            - [setContainer, ['@service_container']]
         tags:
             - { name: console.command, command: 'api:swagger:dump' }

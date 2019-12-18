@@ -28,7 +28,7 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->registry = $this->container->setDefinition(
             'oro_api.error_completer_registry',
-            new Definition(ErrorCompleterRegistry::class, [[]])
+            new Definition(ErrorCompleterRegistry::class, [[], null])
         );
     }
 
