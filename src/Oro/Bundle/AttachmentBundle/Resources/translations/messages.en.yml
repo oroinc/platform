@@ -90,6 +90,10 @@ oro:
             upload_image_mime_types.label: Image MIME types
             upload_image_mime_types.tooltip: List of MIME image types that are permitted for upload.
 
+            max_number_of_files:
+                label: 'Maximum Number Of Files'
+                tooltip: '0 equals unlimited'
+
         action:
             add:                 Add attachment
             update:              Update attachment

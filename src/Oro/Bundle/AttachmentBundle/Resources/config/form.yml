@@ -53,3 +53,19 @@ services:
         arguments:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
+
+    oro_attachment.form.multiple_file_subscriber:
+        class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\MultipleFileSubscriber
+        arguments: ['@oro_attachment.validator.multiple_file_config_validator']
+
+    oro_attachment.validator.multiple_file_config_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator
+        arguments:
+            - '@validator'
+
+    oro_attachment.form.type.multiple_file:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType
+        calls:
+            - [setEventSubscriber,  ['@oro_attachment.form.multiple_file_subscriber']]
+        tags:
+            - { name: form.type, alias: oro_attachment_multi_file }

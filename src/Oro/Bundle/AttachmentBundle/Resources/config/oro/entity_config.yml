@@ -145,3 +145,25 @@ entity_config:
                             required:       false
                             label:          oro.attachment.mimetypes
                             tooltip:        oro.attachment.mimetypes.tooltip
+
+                # the max number of files
+                max_number_of_files: # integer
+                    options:
+                        value_type:         integer
+                        default_value:      0 # unlimited number of files
+                        allowed_type:       [multiFile, multiImage]
+                    constraints:
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:          0
+                              max:          100
+                    form:
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        options:
+                            required:       false
+                            label:          oro.attachment.config.max_number_of_files.label
+                            block:          general
+                            subblock:       properties
+                            empty_data:     0
+                            tooltip:        oro.attachment.config.max_number_of_files.tooltip
