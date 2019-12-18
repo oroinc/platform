@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -11,13 +12,18 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $urlGenerator;
 
+    /** @var FileNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $filenameProvider;
+
     /** @var FileUrlProvider */
     private $provider;
 
     protected function setUp()
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->filenameProvider = $this->createMock(FileNameProviderInterface::class);
         $this->provider = new FileUrlProvider($this->urlGenerator);
+        $this->provider->setFilenameProvider($this->filenameProvider);
     }
 
     public function testGetFileUrl(): void
@@ -43,13 +49,22 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetResizedImageUrl(): void
     {
+        $fileId = 1;
+        $filename = 'sample-filename';
+        $file = $this->getFile($fileId, $filename);
+
+        $this->filenameProvider->expects($this->once())
+            ->method('getFileName')
+            ->with($file)
+            ->willReturn($filename);
+
         $this->urlGenerator
             ->method('generate')
             ->with(
                 'oro_resize_attachment',
                 [
-                    'id' => $fileId = 1,
-                    'filename' => $filename = 'sample-filename',
+                    'id' => $fileId,
+                    'filename' => $filename,
                     'width' => $width = 10,
                     'height' => $height = 20,
                 ],
@@ -59,20 +74,30 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $url,
-            $this->provider->getResizedImageUrl($this->getFile($fileId, $filename), $width, $height, $referenceType)
+            $this->provider->getResizedImageUrl($file, $width, $height, $referenceType)
         );
     }
 
     public function testGetFilteredImageUrl(): void
     {
+        $fileId = 1;
+        $filename = 'sample-filename';
+        $filter = 'sample-filter';
+        $file = $this->getFile($fileId, $filename);
+
+        $this->filenameProvider->expects($this->once())
+            ->method('getFileName')
+            ->with($file)
+            ->willReturn($filename);
+
         $this->urlGenerator
             ->method('generate')
             ->with(
                 'oro_filtered_attachment',
                 [
-                    'id' => $fileId = 1,
-                    'filename' => $filename = 'sample-filename',
-                    'filter' => $filter = 'sample-filter',
+                    'id' => $fileId,
+                    'filename' => $filename,
+                    'filter' => $filter
                 ],
                 $referenceType = 1
             )
@@ -80,7 +105,7 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $url,
-            $this->provider->getFilteredImageUrl($this->getFile($fileId, $filename), $filter, $referenceType)
+            $this->provider->getFilteredImageUrl($file, $filter, $referenceType)
         );
     }
 
