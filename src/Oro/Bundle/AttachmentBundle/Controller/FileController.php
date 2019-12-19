@@ -152,8 +152,14 @@ class FileController extends Controller
      */
     protected function getFileByIdAndFileName($id, $fileName)
     {
-        $file = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->find($id);
-        if (!$file || ($file->getFilename() !== $fileName && $file->getOriginalFilename() !== $fileName)) {
+        /** @var File $file */
+        $file = $this->get('doctrine')->getRepository(File::class)->find($id);
+        $filenameProvider = $this->get('oro_attachment.provider.attachment_file_name_provider');
+        if (!$file || (
+            $filenameProvider->getFileName($file) !== $fileName
+            && $fileName !== $file->getFilename()
+            && $fileName !== $file->getOriginalFilename()
+        )) {
             throw $this->createNotFoundException('File not found');
         }
 

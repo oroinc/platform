@@ -322,10 +322,16 @@ services:
             - '@router'
             - '@liip_imagine.filter.configuration'
 
+    oro_attachment.provider.attachment_file_name_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
+        public: true
+
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
+        calls:
+            - ['setFilenameProvider', ['@oro_attachment.provider.attachment_file_name_provider']]
 
     oro_attachment.provider.resized_image_path:
         class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'

@@ -4,9 +4,13 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
+class CsvFileReaderTest extends TestCase
 {
     /**
      * @var CsvFileReader
@@ -14,18 +18,20 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
     protected $reader;
 
     /**
-     * @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject
+     * @var ContextRegistry|MockObject
      */
     protected $contextRegistry;
 
+    /** @var ImportStrategyHelper|MockObject */
+    protected $importHelper;
+
     protected function setUp()
     {
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getByStepExecution'])
-            ->getMock();
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->importHelper = $this->createMock(ImportStrategyHelper::class);
 
         $this->reader = new CsvFileReader($this->contextRegistry);
+        $this->reader->setImportHelper($this->importHelper);
     }
 
     /**
@@ -249,7 +255,42 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
         $stepExecution = $this->getMockStepExecution($context);
         $this->reader->setStepExecution($stepExecution);
-        $this->reader->read($stepExecution);
+        $this->reader->initializeByContext($context);
+
+        $context
+            ->expects($this->once())
+            ->method('incrementErrorEntriesCount');
+
+        $this->importHelper
+            ->expects($this->once())
+            ->method('addValidationErrors')
+            ->willReturnCallback(function (array $messages, $context) {
+                $message = reset($messages);
+                $this->assertContains('Expecting to get 3 columns, actually got 2.', $message);
+            });
+
+        $this->reader->read($context);
+    }
+
+    /**
+     * @expectedException \Akeneo\Bundle\BatchBundle\Item\InvalidItemException
+     * @expectedExceptionMessage Expecting to get 3 columns, actually got 2.
+     * Message also contains additional rows info but it is not possible to add it in annotation
+     */
+    public function testReadErrorWithinSplitProcess()
+    {
+        $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
+        $this->reader->initializeByContext($context);
+
+        $context
+            ->expects($this->never())
+            ->method('incrementErrorEntriesCount');
+
+        $this->importHelper
+            ->expects($this->never())
+            ->method('addValidationErrors');
+
+        $this->reader->read($context);
     }
 
     /**
@@ -273,9 +314,8 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
 
     protected function getContextWithOptionsMock($options)
     {
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(StepExecutionProxyContext::class);
+
         $context->expects($this->any())
             ->method('hasOption')
             ->will(

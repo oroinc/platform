@@ -12,13 +12,26 @@ class FileUrlProvider implements FileUrlProviderInterface
 {
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
+    /**
+     * @var FilenameProviderInterface
+     */
+    private $filenameProvider;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator
+    ) {
         $this->urlGenerator = $urlGenerator;
+    }
+
+    /**
+     * @param FileNameProviderInterface $filenameProvider
+     */
+    public function setFilenameProvider($filenameProvider): void
+    {
+        $this->filenameProvider = $filenameProvider;
     }
 
     /**
@@ -49,7 +62,7 @@ class FileUrlProvider implements FileUrlProviderInterface
             'oro_resize_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $file->getFilename(),
+                'filename' => $this->filenameProvider->getFileName($file),
                 'width' => $width,
                 'height' => $height,
             ],
@@ -69,7 +82,7 @@ class FileUrlProvider implements FileUrlProviderInterface
             'oro_filtered_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $file->getFilename(),
+                'filename' => $this->filenameProvider->getFileName($file),
                 'filter' => $filterName,
             ],
             $referenceType

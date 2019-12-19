@@ -65,20 +65,8 @@ class CsvFileReader extends AbstractFileReader
             $context->incrementReadCount();
 
             if ($this->firstLineIsHeader) {
-                if (count($this->header) !== count($data)) {
-                    throw new InvalidItemException(
-                        sprintf(
-                            'Expecting to get %d columns, actually got %d.
-                            Header contains: %s 
-                            Row contains: %s',
-                            count($this->header),
-                            count($data),
-                            print_r($this->header, true),
-                            print_r($data, true)
-                        ),
-                        $data
-                    );
-                }
+                $this->validateHeader();
+                $this->validateColumnCount($data);
 
                 $data = array_combine($this->header, $data);
             }
