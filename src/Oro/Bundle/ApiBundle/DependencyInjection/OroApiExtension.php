@@ -106,6 +106,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**

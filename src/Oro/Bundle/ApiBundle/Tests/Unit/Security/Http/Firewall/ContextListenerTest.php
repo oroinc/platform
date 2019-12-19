@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -13,28 +13,28 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\Security\Http\Firewall\ContextListener as BaseContextListener;
 
-class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
+class ContextListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID   = 'o595fqdg5214u4e4nfcs3uc923';
 
     /**
-     * @param ContextListener         $innerListener
+     * @param BaseContextListener     $innerListener
      * @param TokenStorageInterface   $tokenStorage
      * @param SessionInterface|null   $session
      * @param CsrfRequestManager|null $csrfRequestManager
      *
-     * @return SecurityFirewallContextListener
+     * @return ContextListener
      */
     private function getListener(
-        ContextListener $innerListener,
+        BaseContextListener $innerListener,
         TokenStorageInterface $tokenStorage,
         ?SessionInterface $session,
         ?CsrfRequestManager $csrfRequestManager
     ) {
-        $listener =  new SecurityFirewallContextListener(
+        $listener = new ContextListener(
             $innerListener,
             $tokenStorage,
             $session
@@ -79,7 +79,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 
@@ -109,7 +109,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 
@@ -135,7 +135,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 
@@ -160,7 +160,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->setSession($session);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 
@@ -186,7 +186,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = new TokenStorage();
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
         $csrfRequestManager->expects($this->once())
@@ -223,7 +223,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = new TokenStorage();
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
         $csrfRequestManager->expects($this->once())
@@ -259,7 +259,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
         $csrfRequestManager->expects($this->once())
@@ -288,7 +288,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->setSession($session);
         $event->getRequest()->setMethod('POST');
 
-        $innerListener = $this->createMock(ContextListener::class);
+        $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 
