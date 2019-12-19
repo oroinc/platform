@@ -114,6 +114,13 @@ oro:
             image_link:
                 default: N/A
 
+        frontend:
+            file:
+                file.label: File
+                mime_type.label: Type
+                file_size.label: Size
+                created_at.label: Created At
+
     entity_extend:
         form:
             data_type:

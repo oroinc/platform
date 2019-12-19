@@ -118,10 +118,28 @@
 
 {% block attribute_multifiles_widget %}
     {% set collection = value %}
-    {%- for item in collection -%}
-        {% set value = item.file %}
-        {{ block('attribute_file_widget') }}
-    {%- endfor -%}
+    <div class="table-responsive">
+        <table class="grid table">
+            <thead class="grid-header">
+            <tr class="grid-header-row">
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.file.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.mime_type.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.file_size.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.created_at.label'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody class="grid-body">
+            {%- for item in collection -%}
+                <tr class="grid-row">
+                    <td class="grid-cell">{{ oro_file_view(item.file) }}</td>
+                    <td class="grid-cell">{{ item.file.extension|upper }}</td>
+                    <td class="grid-cell">{{ file_size(item.file.fileSize) }}</td>
+                    <td class="grid-cell">{{ item.file.createdAt|oro_format_datetime() }}</td>
+                </tr>
+            {%- endfor -%}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block attribute_localized_fallback_widget %}
