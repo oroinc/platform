@@ -7,7 +7,9 @@ use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\Entity\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
@@ -35,6 +37,251 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new MultiFileBlockListener($this->configProvider, $this->translator);
     }
 
+    public function testOnBeforeValueRender()
+    {
+        $entity = new TestEntity1();
+        $fieldValue = 'value1';
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fieldName', 'fieldType');
+
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
+
+        $this->listener->onBeforeValueRender($event);
+
+        $this->assertTrue($event->isFieldVisible());
+        $this->assertEquals('value1', $event->getFieldViewValue());
+    }
+
+    public function testOnBeforeValueRenderWithMultiFile()
+    {
+        $entity = new TestEntity1();
+        $fieldValue = 'value1';
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiFileField', 'multiFile');
+
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
+
+        $this->listener->onBeforeValueRender($event);
+
+        $this->assertFalse($event->isFieldVisible());
+        $this->assertEquals('value1', $event->getFieldViewValue());
+    }
+
+    public function testOnBeforeValueRenderWithMultiImage()
+    {
+        $entity = new TestEntity1();
+        $fieldValue = 'value1';
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiImageField', 'multiImage');
+
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
+
+        $this->listener->onBeforeValueRender($event);
+
+        $this->assertFalse($event->isFieldVisible());
+        $this->assertEquals('value1', $event->getFieldViewValue());
+    }
+
+    public function testOnBeforeValueRenderWithFile()
+    {
+        $entity = new TestEntity1();
+        $fieldValue = 'value1';
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fileField', 'file');
+
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
+
+        $this->listener->onBeforeValueRender($event);
+
+        $this->assertTrue($event->isFieldVisible());
+        $this->assertEquals(
+            [
+                'template' => 'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                'fieldConfigId' => $fieldConfigId,
+                'entity' => $entity,
+                'value' => $fieldValue,
+            ],
+            $event->getFieldViewValue()
+        );
+    }
+
+    public function testOnBeforeValueRenderWithImage()
+    {
+        $entity = new TestEntity1();
+        $fieldValue = 'value1';
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'imageField', 'image');
+
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
+
+        $this->listener->onBeforeValueRender($event);
+
+        $this->assertTrue($event->isFieldVisible());
+        $this->assertEquals(
+            [
+                'template' => 'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                'fieldConfigId' => $fieldConfigId,
+                'entity' => $entity,
+                'value' => $fieldValue,
+            ],
+            $event->getFieldViewValue()
+        );
+    }
+
+    public function testOnBeforeViewRenderWithotEntity()
+    {
+        $event = new BeforeViewRenderEvent(
+            $this->createMock(\Twig\Environment::class),
+            [],
+            null
+        );
+
+        $this->configProvider->expects(self::never())
+            ->method('getIds');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        $this->listener->onBeforeViewRender($event);
+
+        $this->assertEquals([], $event->getData());
+    }
+
+    public function testOnBeforeViewRenderWithoutConfigs()
+    {
+        $event = new BeforeViewRenderEvent(
+            $this->createMock(\Twig\Environment::class),
+            [],
+            new TestEntity1()
+        );
+
+        $this->configProvider->expects(self::once())
+            ->method('getIds')
+            ->with(TestEntity1::class);
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        $this->listener->onBeforeViewRender($event);
+
+        $this->assertEquals([], $event->getData());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testOnBeforeViewRender()
+    {
+        /** @var $twig \Twig\Environment|\PHPUnit\Framework\MockObject\MockObject */
+        $twig = $this->createMock(\Twig\Environment::class);
+
+        $entity = new TestEntity1();
+
+        $event = new BeforeViewRenderEvent(
+            $twig,
+            [
+                ScrollData::DATA_BLOCKS => [
+                    'general' => [
+                        ScrollData::SUB_BLOCKS => [
+                            'block1' => [],
+                        ],
+                    ],
+                ],
+
+            ],
+            $entity
+        );
+
+        $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fieldName', 'fieldType');
+        $multiFileConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiFileField', 'multiFile');
+        $multiImageConfigId = new FieldConfigId('extend', TestEntity1::class, 'multiImageField', 'multiImage');
+
+        $multiFileConfig = new Config($multiFileConfigId, [
+            'label' => 'multiFileLabel',
+        ]);
+        $multiImageConfig = new Config($multiImageConfigId, [
+            'label' => 'multiImageLabel',
+        ]);
+
+        $this->configProvider->expects(self::once())
+            ->method('getIds')
+            ->with(TestEntity1::class)
+            ->willReturn([
+                $fieldConfigId,
+                $multiFileConfigId,
+                $multiImageConfigId,
+            ]);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->will($this->returnValueMap([
+                [TestEntity1::class, 'multiFileField', $multiFileConfig],
+                [TestEntity1::class, 'multiImageField', $multiImageConfig],
+            ]));
+
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->will($this->returnValueMap([
+                ['multiFileLabel', [], null, null, 'translated multiFileLabel'],
+                ['multiImageLabel', [], null, null, 'translated multiImageLabel'],
+            ]));
+
+        $twig->expects(self::exactly(2))
+            ->method('render')
+            ->will($this->returnValueMap([
+                [
+                    'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                    ['data' => ['entity' => $entity, 'fieldConfigId' => $multiFileConfigId]],
+                    'multiFile html'
+                ],
+                [
+                    'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                    ['data' => ['entity' => $entity, 'fieldConfigId' => $multiImageConfigId]],
+                    'multiImage html'
+                ],
+            ]));
+
+        $this->listener->onBeforeViewRender($event);
+
+        $this->assertEquals(
+            [
+                ScrollData::DATA_BLOCKS => [
+                    'general' => [
+                        ScrollData::SUB_BLOCKS => [
+                            'block1' => [],
+                        ],
+                    ],
+                    'multiFileField_block_section' => [
+                        'title' => 'translated multiFileLabel',
+                        'useSubBlockDivider' => true,
+                        'priority' => MultiFileBlockListener::ADDITIONAL_SECTION_PRIORITY - 1,
+                        ScrollData::SUB_BLOCKS => [
+                            [
+                                ScrollData::DATA => [
+                                    'multiFileField' => 'multiFile html',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'multiImageField_block_section' => [
+                        'title' => 'translated multiImageLabel',
+                        'useSubBlockDivider' => true,
+                        'priority' => MultiFileBlockListener::ADDITIONAL_SECTION_PRIORITY - 1,
+                        ScrollData::SUB_BLOCKS => [
+                            [
+                                ScrollData::DATA => [
+                                    'multiImageField' => 'multiImage html',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $event->getData()
+        );
+    }
+
     public function testOnBeforeFormRenderWithoutEntity()
     {
         $event = new BeforeFormRenderEvent(
@@ -54,6 +301,8 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
             ->method('trans');
 
         $this->listener->onBeforeFormRender($event);
+
+        $this->assertEquals([], $event->getFormData());
     }
 
     public function testOnBeforeFormRenderWithoutConfigs()
@@ -76,6 +325,8 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
             ->method('trans');
 
         $this->listener->onBeforeFormRender($event);
+
+        $this->assertEquals([], $event->getFormData());
     }
 
     /**
@@ -159,7 +410,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
                                 ],
                             ],
                         ],
-                    ]
+                    ],
                 ],
                 'expected' => [
                     ScrollData::DATA_BLOCKS => [

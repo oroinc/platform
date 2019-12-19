@@ -65,6 +65,12 @@ oro:
                 label:               Parent entity field name
                 description:         The field name where this file is stored of the entity to which this file belongs.
 
+            uploaded_by.label: Uploaded By
+            name.label: Name
+            image.label: Image
+            image_width.label: Width
+            image_height.label: Height
+
         fileitem:
             entity_label: File Item
             entity_plural_label: File Items
@@ -75,8 +81,10 @@ oro:
 
             file:
                 add.label: Add File
+                plural_label: Files
             image:
                 add.label: Add Image
+                plural_label: Images
 
         config:
             file_size_settings.label: File Size Settings
@@ -92,7 +100,7 @@ oro:
 
             max_number_of_files:
                 label: 'Maximum Number Of Files'
-                tooltip: '0 equals unlimited'
+                tooltip: 'Maximum Number Of Files'
 
         action:
             add:                 Add attachment

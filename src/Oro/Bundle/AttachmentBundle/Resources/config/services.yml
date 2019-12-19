@@ -151,6 +151,8 @@ services:
             - '@translator'
         tags:
             - { name: kernel.event_listener, event: entity_form.render.before, method: onBeforeFormRender, priority: -260 }
+            - { name: kernel.event_listener, event: entity_view.render.before, method: onBeforeViewRender, priority: -260 }
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: onBeforeValueRender, priority: -260 }
 
     oro_attachment.entity_config_dumper.extension.file:
         class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
@@ -199,6 +201,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-files-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-files-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-images-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-images-grid, method: onBuildBefore }
 
     oro_attachment.listener.merge_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\MergeListener
