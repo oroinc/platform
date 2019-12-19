@@ -383,8 +383,8 @@ services:
             - [addBlockType, ['image', 'attribute_image']]
             - [addBlockType, ['boolean', 'attribute_boolean']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
-            - [addBlockType, ['multiFile', 'attribute_multifile']]
-            - [addBlockType, ['multiImage', 'attribute_multiimage']]
+            - [addBlockType, ['multiFile', 'attribute_multifiles']]
+            - [addBlockType, ['multiImage', 'attribute_multiimages']]
             - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
 
     oro_entity_config.layout.data_provider.attribute_config_provider:

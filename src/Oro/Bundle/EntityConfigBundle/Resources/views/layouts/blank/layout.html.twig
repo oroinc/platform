@@ -94,22 +94,29 @@
 {% endblock %}
 
 {% block attribute_image_widget %}
-    <img src="{{ resized_image_url(value, width, height) }}" alt="{{ label }}" width="{{ width }}" height="{{ height }}">
+    {% set attr = layout_attr_defaults(attr, {
+        'src': resized_image_url(value, width, height),
+        'alt': label,
+        'width': width,
+        'height': height
+    }) %}
+    <img {{ block('block_attributes') }}>
 {% endblock %}
 
 {% block attribute_file_widget %}
     {{ oro_file_view(value) }}
 {% endblock %}
 
-{% block attribute_multiimage_widget %}
+{% block attribute_multiimages_widget %}
     {% set collection = value %}
     {%- for item in collection -%}
         {% set value = item.file %}
+        {% set label = '' %}
         {{ block('attribute_image_widget') }}
     {%- endfor -%}
 {% endblock %}
 
-{% block attribute_multifile_widget %}
+{% block attribute_multifiles_widget %}
     {% set collection = value %}
     {%- for item in collection -%}
         {% set value = item.file %}
