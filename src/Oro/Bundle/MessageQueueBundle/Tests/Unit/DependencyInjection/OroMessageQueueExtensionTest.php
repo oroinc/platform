@@ -483,7 +483,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.consumption.consumer_state_driver.dbal',
             'oro_message_queue.listener.authentication',
             'oro_message_queue.topic.message_queue_heartbeat',
-            'oro_message_queue.event_listener.console_error',
             // log.yml
             'oro_message_queue.log.consumer_state',
             'oro_message_queue.log.consumption_extension',
@@ -496,6 +495,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.log.processor.add_consumer_state',
             'oro_message_queue.log.handler.console',
             'oro_message_queue.log.handler.console_error',
+            'oro_message_queue.log.handler.verbosity_filter',
             'oro_message_queue.log.handler.resend_job',
             // job.yml
             'oro_message_queue.job.configuration_provider',

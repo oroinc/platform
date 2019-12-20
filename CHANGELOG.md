@@ -249,12 +249,6 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
-#### ChainProcessor component
-* The method `setResolver($key, ?ParameterValueResolverInterface $resolver)` was added to
-  `Oro\Component\ChainProcessor\ParameterBagInterface`. It allows to resolve a parameter value
-  when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
-  value resolving.
-
 #### ApiBundle
 * The class `Oro\Bundle\ApiBundle\Request\ValueTransformer` (service ID is `oro_api.value_transformer`) was added
   to help transformation of complex computed values to concrete data-type for API responses.

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
+class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
 
@@ -39,7 +39,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
             ->with('_security.key.target_path', 'http://localhost/');
         $event->getRequest()->setSession($session);
 
-        $listener = $this->createSecurityFirewallExceptionListener(true);
+        $listener = $this->createExceptionListener(true);
         $listener->onKernelException($event);
     }
 
@@ -59,7 +59,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $session->expects(self::never())->method('set');
         $event->getRequest()->setSession($session);
 
-        $listener = $this->createSecurityFirewallExceptionListener(true);
+        $listener = $this->createExceptionListener(true);
         $listener->onKernelException($event);
     }
 
@@ -75,9 +75,9 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param bool $fullSetup
      *
-     * @return SecurityFirewallExceptionListener
+     * @return ExceptionListener
      */
-    protected function createSecurityFirewallExceptionListener($fullSetup = false)
+    protected function createExceptionListener($fullSetup = false)
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
@@ -96,7 +96,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(new Response('OK'));
         }
 
-        return new SecurityFirewallExceptionListener(
+        return new ExceptionListener(
             $tokenStorage,
             $trustResolver,
             $this->createMock(HttpUtils::class),

@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const Backgrid = require('bowerassets/backgrid/lib/backgrid');
+    const Backgrid = require('npmassets/backgrid/lib/backgrid');
 
     /**
      * Cells should be removed durung dispose cycle

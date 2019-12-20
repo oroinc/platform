@@ -7,6 +7,8 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,11 +20,17 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     /** @var XlsxFileReader */
     private $reader;
 
+    /** @var ImportStrategyHelper|MockObject */
+    protected $importHelper;
+
     /** {@inheritdoc} */
     protected function setUp()
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->importHelper = $this->createMock(ImportStrategyHelper::class);
+
         $this->reader = new XlsxFileReader($this->contextRegistry);
+        $this->reader->setImportHelper($this->importHelper);
     }
 
     public function testSetStepExecution()

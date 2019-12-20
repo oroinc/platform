@@ -76,7 +76,7 @@ class MetadataProvider implements ResetInterface
             $withExcludedProperties,
             $configKey
         );
-        if (array_key_exists($cacheKey, $this->cache)) {
+        if (\array_key_exists($cacheKey, $this->cache)) {
             $metadata = $this->cache[$cacheKey];
         } else {
             $metadata = $this->loadMetadata(

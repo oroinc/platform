@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -16,7 +18,7 @@ class DependencyInjectionUtil
     public const PROCESSOR_TAG = 'oro.api.processor';
 
     /** the attribute to specify the request type for "oro.api.processor" DIC tag */
-    public const REQUEST_TYPE = 'requestType';
+    public const REQUEST_TYPE = ApiContext::REQUEST_TYPE;
 
     /**
      * @internal never use this constant outside of ApiBundle,
@@ -188,6 +190,36 @@ class DependencyInjectionUtil
     }
 
     /**
+     * Registers tagged services that depend on the request type.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $chainServiceId
+     * @param string           $tagName
+     */
+    public static function registerRequestTypeDependedTaggedServices(
+        ContainerBuilder $container,
+        $chainServiceId,
+        $tagName
+    ) {
+        $services = [];
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        foreach ($taggedServices as $id => $attributes) {
+            $services[$id] = new Reference($id);
+            foreach ($attributes as $tagAttributes) {
+                $items[self::getPriority($tagAttributes)][] = [$id, self::getRequestType($tagAttributes)];
+            }
+        }
+        if ($items) {
+            $items = self::sortByPriorityAndFlatten($items);
+        }
+
+        $container->getDefinition($chainServiceId)
+            ->replaceArgument(0, $items)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $services));
+    }
+
+    /**
      * Disables the specific API processor for the given request type.
      *
      * @param ContainerBuilder $container
@@ -205,11 +237,36 @@ class DependencyInjectionUtil
 
         foreach ($tags as $tag) {
             if (empty($tag[self::REQUEST_TYPE])) {
-                $tag[self::REQUEST_TYPE] = '!' . $requestType;
+                $tag = self::addRequestTypeToTag($tag, '!' . $requestType);
             } else {
                 $tag[self::REQUEST_TYPE] = sprintf('!%s&%s', $requestType, $tag[self::REQUEST_TYPE]);
             }
             $processorDef->addTag(self::PROCESSOR_TAG, $tag);
         }
+    }
+
+    /**
+     * @param array  $tag
+     * @param string $value
+     *
+     * @return array
+     */
+    private static function addRequestTypeToTag(array $tag, string $value): array
+    {
+        $extraAttrName = 'extra';
+        if (array_key_exists('extra', $tag)) {
+            $attributes = [];
+            foreach ($tag as $attrName => $attrVal) {
+                $attributes[$attrName] = $attrVal;
+                if ($attrName === $extraAttrName) {
+                    $attributes[self::REQUEST_TYPE] = $value;
+                }
+            }
+            $tag = $attributes;
+        } else {
+            $tag = [self::REQUEST_TYPE => $value] + $tag;
+        }
+
+        return $tag;
     }
 }

@@ -15,6 +15,7 @@ services:
         class: Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry
         arguments:
             - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FilterNamesCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FilterNamesCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.filter_names.rest_plain:

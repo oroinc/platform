@@ -24,7 +24,7 @@ define(function(require, exports, module) {
         },
 
         events: {
-            'click [data-tab-link]': 'onSelect'
+            'shown.bs.tab': 'onTabShown'
         },
 
         /**
@@ -41,16 +41,18 @@ define(function(require, exports, module) {
         },
 
         updateStates: function() {
-            this.$('a').toggleClass('active', !!this.model.get('active'));
             this.$el.toggleClass('changed', !!this.model.get('changed'));
-
+            const $tab = this.$('[role="tab"]');
+            if ($tab.attr('aria-selected') !== String(this.model.get('active'))) {
+                $tab.attr('aria-selected', this.model.get('active'));
+            }
             if (this.model.get('active')) {
                 const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }
         },
 
-        onSelect: function() {
+        onTabShown: function(e) {
             this.model.set('active', true);
             this.model.trigger('select', this.model);
         }

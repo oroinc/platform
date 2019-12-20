@@ -41,16 +41,6 @@ interface ParameterBagInterface extends \IteratorAggregate, \Countable, \ArrayAc
     public function remove($key);
 
     /**
-     * Sets a resolver for a parameter value.
-     * The resolver will be executed only once when the parameter is requested at the first time.
-     * This can be helpful for rare used parameters with time consuming value resolving.
-     *
-     * @param string                               $key      The name of a parameter
-     * @param ParameterValueResolverInterface|null $resolver The value resolver
-     */
-    public function setResolver($key, ?ParameterValueResolverInterface $resolver);
-
-    /**
      * Gets a native PHP array representation of the bag.
      *
      * @return array [key => value, ...]

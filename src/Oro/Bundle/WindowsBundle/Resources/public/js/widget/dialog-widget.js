@@ -107,12 +107,22 @@ define(function(require, exports, module) {
                 this._initModel();
             }
 
-            dialogOptions.beforeClose = _.bind(this.closeHandler, this, dialogOptions.close);
-            dialogOptions.close = undefined;
+            dialogOptions.dragStop = this.onDragStop.bind(this);
+            dialogOptions.beforeClose = this.closeHandler.bind(this, dialogOptions.close);
+            delete dialogOptions.close;
 
             dialogManager.add(this);
 
             this.initializeWidget(options);
+        },
+
+        onDragStop: function(event, ui) {
+            const {left, top} = $(this.getLimitToContainer()).offset();
+
+            this.dndPosition = {
+                left: ui.position.left - left,
+                top: ui.position.top - top
+            };
         },
 
         onWidgetRender: function(content) {
@@ -346,15 +356,15 @@ define(function(require, exports, module) {
         },
 
         getLimitToContainer: function() {
-            const limitTo = this.options.dialogOptions.limitTo;
+            let limitTo = this.options.dialogOptions.limitTo;
 
             if (limitTo === 'viewport') {
                 return document.documentElement;
             } else if (limitTo) {
-                return $(this.options.dialogOptions.limitTo)[0];
-            } else {
-                return document.body;
+                limitTo = $(limitTo)[0];
             }
+
+            return limitTo || document.body;
         },
 
         _clearActionsContainer: function() {
@@ -419,6 +429,7 @@ define(function(require, exports, module) {
             const keepAliveOnClose = this.keepAliveOnClose;
             this.keepAliveOnClose = true;
             this.widget.dialog('close');
+            delete this.dndPosition;
             this.keepAliveOnClose = keepAliveOnClose;
         },
 
@@ -494,15 +505,25 @@ define(function(require, exports, module) {
                     collision: 'fit'
                 }));
             }
-            if (!this.options.incrementalPosition) {
+
+            if (this.dndPosition && this.getState() !== 'maximized') {
+                const {left, top} = this.dndPosition;
+
+                this.setPosition({
+                    my: 'left top',
+                    at: `left+${left} top+${top}`,
+                    of: this.getLimitToContainer(),
+                    collision: 'fit'
+                });
+            } else if (this.options.incrementalPosition) {
+                dialogManager.updateIncrementalPosition(this);
+            } else {
                 this.setPosition({
                     my: 'center center',
                     at: this.defaultPos,
                     of: this.getLimitToContainer(),
                     collision: 'fit'
                 });
-            } else {
-                dialogManager.updateIncrementalPosition(this);
             }
 
             mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
@@ -536,7 +557,7 @@ define(function(require, exports, module) {
             const initialDialogPosition = dialog.css('position');
             const initialScrollTop = $(window).scrollTop();
             if (tools.isIOS() && initialDialogPosition === 'fixed') {
-                // Manipulating with position to fix stupid iOS bug,
+                // Manipulating with position to fix iOS bug,
                 // when orientation is changed
                 $('html, body').scrollTop(0);
                 dialog.css({
@@ -553,7 +574,7 @@ define(function(require, exports, module) {
             this.widget.trigger('dialogreposition');
 
             if (tools.isIOS() && initialDialogPosition === 'fixed') {
-                // Manipulating with position to fix stupid iOS bug,
+                // Manipulating with position to fix iOS bug,
                 // when orientation is changed
                 dialog.css({
                     position: initialDialogPosition

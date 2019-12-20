@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,6 +35,11 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         return new RestRoutesRegistry(
             $providers,
+            TestContainerBuilder::create()
+                ->add('default_provider', $this->defaultProvider)
+                ->add('first_provider', $this->firstProvider)
+                ->add('second_provider', $this->secondProvider)
+                ->getContainer($this),
             new RequestExpressionMatcher()
         );
     }
@@ -53,9 +59,9 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $registry = $this->getRegistry(
             [
-                [$this->firstProvider, 'first&rest'],
-                [$this->secondProvider, 'second&rest'],
-                [$this->defaultProvider, 'rest']
+                ['first_provider', 'first&rest'],
+                ['second_provider', 'second&rest'],
+                ['default_provider', 'rest']
             ]
         );
 
@@ -67,9 +73,9 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $registry = $this->getRegistry(
             [
-                [$this->firstProvider, 'first&rest'],
-                [$this->secondProvider, 'second&rest'],
-                [$this->defaultProvider, 'rest']
+                ['first_provider', 'first&rest'],
+                ['second_provider', 'second&rest'],
+                ['default_provider', 'rest']
             ]
         );
 
@@ -81,9 +87,9 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $registry = $this->getRegistry(
             [
-                [$this->firstProvider, 'first&rest'],
-                [$this->secondProvider, 'second&rest'],
-                [$this->defaultProvider, 'rest']
+                ['first_provider', 'first&rest'],
+                ['second_provider', 'second&rest'],
+                ['default_provider', 'rest']
             ]
         );
 
@@ -95,8 +101,8 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $registry = $this->getRegistry(
             [
-                [$this->firstProvider, 'first'],
-                [$this->defaultProvider, '']
+                ['first_provider', 'first'],
+                ['default_provider', '']
             ]
         );
 

@@ -35,7 +35,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->registry = $this->container->setDefinition(
             'oro_api.resource_doc_parser_registry',
-            new Definition(ResourceDocParserRegistry::class, [[]])
+            new Definition(ResourceDocParserRegistry::class, [[], null])
         );
     }
 

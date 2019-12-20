@@ -24,15 +24,15 @@ class AccessRulesPass implements CompilerPassInterface
         $rules = [];
         $services = [];
         $taggedServices = $container->findTaggedServiceIds(self::RULE_TAG_NAME, true);
-        foreach ($taggedServices as $serviceId => $attributes) {
+        foreach ($taggedServices as $id => $attributes) {
+            $services[$id] = new Reference($id);
             foreach ($attributes as $tagAttributes) {
                 $priority = 0;
                 if (array_key_exists(self::PRIORITY_ATTRIBUTE, $tagAttributes)) {
                     $priority = $tagAttributes[self::PRIORITY_ATTRIBUTE];
                     unset($tagAttributes[self::PRIORITY_ATTRIBUTE]);
                 }
-                $rules[$priority][] = [$serviceId, $tagAttributes];
-                $services[$serviceId] = new Reference($serviceId);
+                $rules[$priority][] = [$id, $tagAttributes];
             }
         }
         if ($rules) {

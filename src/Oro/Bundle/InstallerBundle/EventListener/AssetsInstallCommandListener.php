@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * The listener that moves 'bowerassets', 'npmassets' and 'components' directories
+ * The listener that moves 'npmassets' and 'components' directories
  * from "public/bundles" directory to a temporary directory before "assets:install" command
  * and restore these directories after this command finished.
  * This is required because this command removes all assets that are not related to bundles.
@@ -97,7 +97,7 @@ class AssetsInstallCommandListener
      */
     private function getAssets()
     {
-        return ['bowerassets', 'npmassets', 'components'];
+        return ['npmassets', 'components'];
     }
 
     /**
