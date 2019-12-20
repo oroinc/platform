@@ -9,3 +9,4 @@ phpunit.xml
 *~
 node_modules
 /components
+/package.json

@@ -215,13 +215,14 @@ services:
         arguments:
             - '@oro_api.config_provider'
 
-    oro_api.listener.update_schema:
+    oro_api.listener.api_source:
         class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener
         arguments:
             - '@oro_api.cache_manager'
+            - [] # excluded features. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: clearCache }
-            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: clearCache }
+            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry
@@ -811,3 +812,8 @@ services:
         arguments:
             - '@oro_action.action_group_registry'
             - '@translator'
+
+    oro_api.security.firewall.feature_access_listener:
+        class: Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener
+        arguments:
+            - '@security.token_storage'

@@ -36,8 +36,18 @@ security:
             context: main
             logout_on_user_change: true
 
-
 oro_api:
+    api_firewalls:
+        api_wsse_secured:
+            feature_name: web_api
+            feature_firewall_listeners:
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+        wsse_secured:
+            feature_name: web_api
+            feature_firewall_listeners:
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+        api_options:
+            feature_name: web_api
     config_files:
         plain:
             file_name: [api_plain.yml, api.yml]
@@ -68,6 +78,9 @@ oro_api:
             documentation_path: ~ # no documentation for this view
     # default documentation for all views
     documentation_path: https://oroinc.com/orocrm/doc/current/dev-guide/web-api
+
+    api_doc_cache:
+        excluded_features: [ web_api ]
 
     config_extensions:
         - oro_api.config_extension.filters

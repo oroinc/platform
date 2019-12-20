@@ -314,10 +314,17 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider:
+        alias: oro_attachment.provider.attachment_file_name_provider
+
+    oro_attachment.provider.attachment_file_name_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
+
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
+            - '@oro_attachment.provider.attachment_file_name_provider'
 
     Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
         alias: 'oro_attachment.provider.file_url'
@@ -369,6 +376,9 @@ services:
             - '@liip_imagine.filter.configuration'
         calls:
             - [setLogger, ['@logger']]
+
+    Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager:
+        alias: oro_attachment.manager.image_resize
 
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'

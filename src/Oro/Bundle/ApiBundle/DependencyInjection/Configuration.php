@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -21,10 +22,18 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('oro_api');
         $rootNode = $treeBuilder->getRootNode();
 
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'web_api' => ['type' => 'boolean', 'value' => false]
+            ]
+        );
+
         $node = $rootNode->children();
         $this->appendOptions($node);
         $this->appendConfigFilesNode($node);
         $this->appendApiDocViewsNode($node);
+        $this->appendApiDocCacheNode($node);
         $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
         $this->appendFilterOperatorsNode($node);
@@ -34,6 +43,7 @@ class Configuration implements ConfigurationInterface
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
         $this->appendCorsNode($node);
+        $this->appendFeatureDependedFirewalls($node);
 
         return $treeBuilder;
     }
@@ -57,7 +67,7 @@ class Configuration implements ConfigurationInterface
             ->integerNode('config_max_nesting_level')
                 ->info(
                     'The maximum number of nesting target entities'
-                    . ' that can be specified in "Resources/config/oro/api.yml"'
+                    . ' that can be specified in "Resources/config/oro/api.yml".'
                 )
                 ->min(0)
                 ->defaultValue(3)
@@ -71,7 +81,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('config_files')
-                ->info('All supported API configuration files')
+                ->info('All supported API configuration files.')
                 ->validate()
                     ->always(function (array $value) {
                         if (!array_key_exists('default', $value)) {
@@ -299,6 +309,27 @@ class Configuration implements ConfigurationInterface
 
     /**
      * @param NodeBuilder $node
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function appendApiDocCacheNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('api_doc_cache')
+                ->info('The configuration of API documentation cache.')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->arrayNode('excluded_features')
+                        ->info('The list of features that do not affect API documentation cache.')
+                        ->example(['web_api'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                        ->defaultValue(['web_api'])
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
      */
     private function appendConfigExtensionsNode(NodeBuilder $node)
     {
@@ -318,7 +349,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('actions')
-                ->info('A definition of API actions')
+                ->info('The definition of API actions.')
                 ->example(
                     [
                         'get' => [
@@ -357,7 +388,7 @@ class Configuration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                         ->arrayNode('processing_groups')
-                            ->info('A list of groups by which child processors can be split')
+                            ->info('A list of groups by which child processors can be split.')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->children()
@@ -402,7 +433,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('filters')
-                ->info('A definition of filters')
+                ->info('The definition of filters.')
                 ->example(
                     [
                         'integer' => [
@@ -466,7 +497,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_types')
-                ->info('The form types that can be reused in API')
+                ->info('The form types that can be reused in API.')
                 ->example([
                     'Symfony\Component\Form\Extension\Core\Type\FormType',
                     'oro_api.form.type.entity'
@@ -483,7 +514,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_extensions')
-                ->info('The form type extensions that can be reused in API')
+                ->info('The form type extensions that can be reused in API.')
                 ->example(['form.type_extension.form.http_foundation'])
                 ->prototype('scalar')
                 ->end()
@@ -497,7 +528,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_guessers')
-                ->info('The form type guessers that can be reused in API')
+                ->info('The form type guessers that can be reused in API.')
                 ->example(['form.type_guesser.validator'])
                 ->prototype('scalar')
                 ->end()
@@ -511,7 +542,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('form_type_guesses')
-                ->info('A definition of data type to form type guesses')
+                ->info('The definition of data type to form type guesses.')
                 ->example(
                     [
                         'integer' => [
@@ -546,32 +577,60 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->arrayNode('cors')
-                ->info('The configuration of CORS requests')
+                ->info('The configuration of CORS requests.')
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->integerNode('preflight_max_age')
-                        ->info('The amount of seconds the user agent is allowed to cache CORS preflight requests')
+                        ->info('The amount of seconds the user agent is allowed to cache CORS preflight requests.')
                         ->defaultValue(600)
                         ->min(0)
                     ->end()
                     ->arrayNode('allow_origins')
-                        ->info('The list of origins that are allowed to send CORS requests')
+                        ->info('The list of origins that are allowed to send CORS requests.')
                         ->example(['https://foo.com', 'https://bar.com'])
                         ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                     ->booleanNode('allow_credentials')
-                        ->info('Indicates whether CORS request can include user credentials')
+                        ->info('Indicates whether CORS request can include user credentials.')
                         ->defaultValue(false)
                     ->end()
                     ->arrayNode('allow_headers')
-                        ->info('The list of headers that are allowed to send by CORS requests')
+                        ->info('The list of headers that are allowed to send by CORS requests.')
                         ->example(['X-Foo', 'X-Bar'])
                         ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                     ->arrayNode('expose_headers')
-                        ->info('The list of headers that can be exposed by CORS responses')
+                        ->info('The list of headers that can be exposed by CORS responses.')
                         ->example(['X-Foo', 'X-Bar'])
                         ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendFeatureDependedFirewalls(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('api_firewalls')
+                ->info('The configuration of feature depended API firewalls.')
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('feature_name')
+                            ->info('The name of the feature.')
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->arrayNode('feature_firewall_listeners')
+                            ->info(
+                                'The list of security firewall listeners that should be removed'
+                                . ' if the feature is disabled.'
+                            )
+                            ->prototype('scalar')->cannotBeEmpty()->end()
+                            ->defaultValue([])
+                        ->end()
                     ->end()
                 ->end()
             ->end();

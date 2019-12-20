@@ -4,7 +4,7 @@ aliases:
     bootstrap$: oroviewswitcher/js/bootstrap
     bootstrap-alert$: npmassets/bootstrap/js/dist/alert
     chaplin$: oroui/lib/chaplin
-    cryptojs/sha256$: bowerassets/crypto-js/sha256
+    cryptojs/sha256$: npmassets/crypto-js/sha256
     jquery$: npmassets/jquery/dist/jquery
     module-config$: oroui/js/app/services/module-config
     oroui/js/app$: oroviewswitcher/js/app/views/demo/demo

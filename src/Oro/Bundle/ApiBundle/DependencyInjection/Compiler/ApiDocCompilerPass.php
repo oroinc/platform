@@ -36,6 +36,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
+    private const API_SOURCE_LISTENER_SERVICE               = 'oro_api.listener.api_source';
 
     /**
      * {@inheritdoc}
@@ -53,6 +54,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
         $this->configureRequestTypeProvider($container);
+        $this->configureApiSourceListener($container);
     }
 
     /**
@@ -204,6 +206,13 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
+    private function configureApiSourceListener(ContainerBuilder $container)
+    {
+        $config = DependencyInjectionUtil::getConfig($container);
+        $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
+            ->setArgument(1, $config['api_doc_cache']['excluded_features']);
+    }
+
     private function configureApiDocFormatters(ContainerBuilder $container)
     {
         // rename default HTML formatter service
