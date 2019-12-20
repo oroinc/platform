@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * The validator that can be used to check that a file collection is allowed to be uploaded.
+ */
 class ConfigMultipleFileValidator
 {
     /** @var ValidatorInterface */

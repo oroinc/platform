@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -46,6 +47,8 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
 
     public function testReflectFromDigitalAsset(): void
     {
+        $user = new User();
+
         $digitalAsset = $this->createMock(DigitalAsset::class);
 
         $digitalAsset
@@ -58,7 +61,8 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
             ->setOriginalFilename('sample/original/filename')
             ->setMimeType('sample/type1')
             ->setFileSize(1024)
-            ->setExtension('sampleext');
+            ->setExtension('sampleext')
+            ->setOwner($user);
 
         $fileReflector = new FileReflector(new PropertyAccessor());
         $fileReflector->reflectFromDigitalAsset($this->file, $digitalAsset);
@@ -68,10 +72,13 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->file->getMimeType(), $sourceFile->getMimeType());
         $this->assertEquals($this->file->getFileSize(), $sourceFile->getFileSize());
         $this->assertEquals($this->file->getExtension(), $sourceFile->getExtension());
+        $this->assertEquals($this->file->getOwner(), $sourceFile->getOwner());
     }
 
     public function testReflectFromFile(): void
     {
+        $user = new User();
+
         $sourceFile = new File();
 
         $sourceFile
@@ -79,7 +86,8 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
             ->setOriginalFilename('sample/original/filename')
             ->setMimeType('sample/type1')
             ->setFileSize(1024)
-            ->setExtension('sampleext');
+            ->setExtension('sampleext')
+            ->setOwner($user);
 
         $fileReflector = new FileReflector(new PropertyAccessor());
         $fileReflector->reflectFromFile($this->file, $sourceFile);
@@ -89,5 +97,6 @@ class FileReflectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->file->getMimeType(), $sourceFile->getMimeType());
         $this->assertEquals($this->file->getFileSize(), $sourceFile->getFileSize());
         $this->assertEquals($this->file->getExtension(), $sourceFile->getExtension());
+        $this->assertEquals($this->file->getOwner(), $sourceFile->getOwner());
     }
 }

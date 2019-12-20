@@ -7,6 +7,9 @@ use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * - fetches max number of files for multiFile from entity field config
+ */
 class MultipleFileConstraintFromEntityFieldConfigValidator extends ConstraintValidator
 {
     /** @var MultipleFileConstraintsProvider */

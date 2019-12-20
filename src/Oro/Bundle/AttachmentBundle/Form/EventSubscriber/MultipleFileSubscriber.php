@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Validates uploaded file collection via ConfigMultipleFileValidator
+ */
 class MultipleFileSubscriber implements EventSubscriberInterface
 {
     /** @var ConfigMultipleFileValidator */

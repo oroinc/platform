@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
@@ -91,8 +92,11 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $fileType = new FileType();
         $fileType->setEventSubscriber(new EventSubscriberStub());
 
+        $multiFileType = new MultiFileType();
+        $multiFileType->setEventSubscriber(new EventSubscriberStub());
+
         return [
-            new PreloadedExtension([$fileType], [])
+            new PreloadedExtension([$fileType, $multiFileType], [])
         ];
     }
 

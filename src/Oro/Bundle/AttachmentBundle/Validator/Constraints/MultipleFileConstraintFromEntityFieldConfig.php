@@ -4,6 +4,9 @@ namespace Oro\Bundle\AttachmentBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Constraint for checking max number of the uploaded file according to entity field config.
+ */
 class MultipleFileConstraintFromEntityFieldConfig extends Constraint
 {
     /** @var string */
