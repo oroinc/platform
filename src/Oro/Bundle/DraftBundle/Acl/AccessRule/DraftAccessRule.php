@@ -55,6 +55,14 @@ class DraftAccessRule implements AccessRuleInterface
     }
 
     /**
+     * @param boolean $enabled
+     */
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * @param Criteria $criteria
      *
      * @return bool
@@ -138,13 +146,5 @@ class DraftAccessRule implements AccessRuleInterface
             Comparison::EQ,
             $this->tokenAccessor->getOrganizationId()
         );
-    }
-
-    /**
-     * @param boolean $enabled
-     */
-    public function setEnabled(bool $enabled): void
-    {
-        $this->enabled = $enabled;
     }
 }
