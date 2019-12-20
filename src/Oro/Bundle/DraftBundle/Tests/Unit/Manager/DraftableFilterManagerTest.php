@@ -60,6 +60,20 @@ class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->disable($className);
     }
 
+    public function testEnableFilter(): void
+    {
+        $className = 'className';
+        /** @var FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters */
+        $filters = $this->createMock(FilterCollection::class);
+        $filters->expects($this->once())
+            ->method('enable')
+            ->with(DraftableFilter::FILTER_ID);
+
+        $this->mockManagerRegistry($filters, $className);
+
+        $this->manager->enable($className);
+    }
+
     /**
      * @param FilterCollection $filters
      * @param string $className

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DraftBundle\Duplicator\Filter;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Component\Duplicator\Filter\Filter;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Responsible for updating  draft owner field.
@@ -12,16 +12,16 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 class OwnerFilter implements Filter
 {
     /**
-     * @var TokenStorage
+     * @var TokenStorageInterface
      */
     private $tokenStorage;
 
     /**
      * OwnerFilter constructor.
      *
-     * @param TokenStorage $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(TokenStorage $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }

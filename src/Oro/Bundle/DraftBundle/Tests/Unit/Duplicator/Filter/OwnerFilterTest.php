@@ -5,7 +5,7 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
 use Oro\Bundle\DraftBundle\Duplicator\Filter\OwnerFilter;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class OwnerFilterTest extends \PHPUnit\Framework\TestCase
@@ -19,8 +19,8 @@ class OwnerFilterTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn(new User());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorage $tokenStorage */
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface $tokenStorage */
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')

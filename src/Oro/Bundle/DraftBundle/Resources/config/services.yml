@@ -94,6 +94,7 @@ services:
         class: Oro\Bundle\DraftBundle\Datagrid\DraftableFilterExtension
         arguments:
             - '@oro_draft.manager.draftable_filter'
+            - '@oro_draft.access_rule.draft_access_rule'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -114,3 +115,12 @@ services:
             - ['oneToMany']
         tags:
             - { name: form.type_extension }
+
+    oro_draft.access_rule.draft_access_rule:
+        class: Oro\Bundle\DraftBundle\Acl\AccessRule\DraftAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_draft.helper.draft_permission_helper'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro_security.access_rule }
