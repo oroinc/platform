@@ -132,3 +132,6 @@ services:
             - [] # services. Will be set in Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass
         tags:
             - { name: container.service_locator }
+
+    Doctrine\Persistence\ManagerRegistry:
+        alias: 'doctrine'
