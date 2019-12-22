@@ -2,20 +2,24 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Helper;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
+/**
+ * The utility class that can be used to:
+ * * get entity routes
+ * * safe get entity config values in YAML files like action definition files
+ */
 class EntityConfigHelper
 {
     /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    private $configProvider;
 
     /** @var AclGroupProviderInterface */
-    protected $groupProvider;
+    private $groupProvider;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider            $configProvider
      * @param AclGroupProviderInterface $groupProvider
      */
     public function __construct(ConfigProvider $configProvider, AclGroupProviderInterface $groupProvider)
@@ -25,33 +29,24 @@ class EntityConfigHelper
     }
 
     /**
-     * @param string $class
-     * @return array
-     */
-    public function getAvailableRoutes($class)
-    {
-        $metadata = $this->getConfigManager()->getEntityMetadata($this->configProvider->getClassName($class));
-
-        return $metadata ? $metadata->getRoutes() : [];
-    }
-
-    /**
      * @param string|object $class
-     * @param array $routes
-     * @param string $groupName
+     * @param array         $routes
+     * @param string        $groupName
+     *
      * @return array
      */
     public function getRoutes($class, array $routes, $groupName = '')
     {
-        $metadata = $this->getConfigManager()->getEntityMetadata($this->configProvider->getClassName($class));
-
         $result = [];
-
-        if ($metadata) {
+        $metadata = $this->configProvider
+            ->getConfigManager()
+            ->getEntityMetadata($this->getClassName($class));
+        if (null !== $metadata) {
             foreach ($routes as $route) {
                 $routeName = $this->getRouteByGroup($route, $groupName);
-
-                $result[$route] = $metadata->hasRoute($routeName, true) ? $metadata->getRoute($routeName, true) : null;
+                $result[$route] = $metadata->hasRoute($routeName, true)
+                    ? $metadata->getRoute($routeName, true)
+                    : null;
             }
         }
 
@@ -60,8 +55,9 @@ class EntityConfigHelper
 
     /**
      * @param string|object $class
-     * @param string $name
-     * @param bool $strict
+     * @param string        $name
+     * @param bool          $strict
+     *
      * @return mixed
      */
     public function getConfigValue($class, $name, $strict = false)
@@ -69,8 +65,7 @@ class EntityConfigHelper
         $data = null;
 
         try {
-            $config = $this->configProvider->getConfig($class);
-
+            $config = $this->configProvider->getConfig($this->getClassName($class));
             $data = $config->get($name);
         } catch (\RuntimeException $e) {
             if ($strict) {
@@ -82,11 +77,26 @@ class EntityConfigHelper
     }
 
     /**
-     * @param string $route
-     * @param string $groupName
+     * @param string|object $class
+     *
      * @return string
      */
-    protected function getRouteByGroup($route, $groupName = '')
+    private function getClassName($class)
+    {
+        if (\is_object($class)) {
+            return \get_class($class);
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param string $route
+     * @param string $groupName
+     *
+     * @return string
+     */
+    private function getRouteByGroup($route, $groupName = '')
     {
         $group = $groupName ?: $this->groupProvider->getGroup();
 
@@ -95,13 +105,5 @@ class EntityConfigHelper
         }
 
         return $group . ucfirst($route);
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->configProvider->getConfigManager();
     }
 }
