@@ -17,12 +17,17 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         Country::class => [
             'germany' => ['iso2Code' => 'DE'],
             'austria' => ['iso2Code' => 'AT'],
+            'samoa' => ['iso2Code' => 'AS'],
             'united_states' => ['iso2Code' => 'US'],
+            'monaco' => ['iso2Code' => 'MC'],
         ],
         Region::class => [
             'berlin' => ['combinedCode' => 'DE-BE'],
             'vienna' => ['combinedCode' => 'AT-9'],
             'florida' => ['combinedCode' => 'US-FL'],
+            'new_york' => ['combinedCode' => 'US-NY'],
+            'indiana' => ['combinedCode' => 'US-IN'],
+            'california' => ['combinedCode' => 'US-CA'],
         ],
         AddressType::class => [
             'billingType' => ['name' => 'billing'],

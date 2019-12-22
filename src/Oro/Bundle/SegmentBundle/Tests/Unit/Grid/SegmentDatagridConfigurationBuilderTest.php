@@ -125,7 +125,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => SqlWalker::class,
-                    ]
+                    ],
                 ],
                 'acl_resource' => 'oro_segment_view',
             ],
@@ -158,6 +158,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 ]
             );
             $definition['source']['query']['select'] = ['t1.userName as c1', 't1.' . self::TEST_IDENTIFIER_NAME];
+            $definition['source']['hints'][] = 'HINT_TRANSLATABLE';
         }
 
         return $definition;
