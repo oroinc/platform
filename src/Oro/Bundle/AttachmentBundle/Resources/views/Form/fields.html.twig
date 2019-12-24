@@ -140,6 +140,7 @@
 {% endmacro %}
 
 {% block oro_attachment_multi_file_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% import _self as fields %}
     {% spaceless %}
         {% if prototype is defined %}
@@ -148,7 +149,12 @@
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ ' file-collection' }) %}
         {% set prototype_name = form.vars.prototype_name %}
 
-        <div class="row-oro attachment-fileitems" data-page-component-module="oroattachment/js/app/components/multi-file-control-component">
+        <div class="row-oro attachment-fileitems" {{ UI.renderPageComponentAttributes({
+            module: 'oroattachment/js/app/components/multi-file-control-component',
+            options: {
+                maxNumber: form.vars.maxNumber
+            }
+        }) }}>
             <div {{ block('widget_container_attributes') }}>
                 <table class="grid table-hover table table-bordered table-condensed">
                     <thead>

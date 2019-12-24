@@ -149,7 +149,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
 
                 $view->vars['dam_widget'] = [
                     'is_valid_digital_asset' => $form->isSubmitted() ? $form->get('digitalAsset')->isValid() : true,
-                    'preview_metadata' => $file && $file->getId()
+                    'preview_metadata' => $file
                         ? $this->previewMetadataProvider->getMetadata($file) : [],
                     'is_image_type' => FieldConfigHelper::isImageField($attachmentConfig->getId()),
                     'route' => $options['dam_widget_route'],

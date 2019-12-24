@@ -149,16 +149,6 @@ datagrids:
                 type: twig
                 frontend_type: html
                 template: OroAttachmentBundle:Attachment:Datagrid/Property/fileLink.html.twig
-            imageWidth:
-                label: oro.attachment.file.image_width.label
-                type: twig
-                frontend_type: html
-                template: OroAttachmentBundle:Attachment:Datagrid/Property/imageWidth.html.twig
-            imageHeight:
-                label: oro.attachment.file.image_height.label
-                type: twig
-                frontend_type: html
-                template: OroAttachmentBundle:Attachment:Datagrid/Property/imageHeight.html.twig
             uploadedBy:
                 label: oro.attachment.file.uploaded_by.label
             createdAt:

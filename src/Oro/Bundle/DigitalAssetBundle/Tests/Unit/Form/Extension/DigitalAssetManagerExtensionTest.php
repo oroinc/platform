@@ -8,6 +8,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
@@ -92,8 +93,8 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $fileType = new FileType();
         $fileType->setEventSubscriber(new EventSubscriberStub());
 
-        $multiFileType = new MultiFileType();
-        $multiFileType->setEventSubscriber(new EventSubscriberStub());
+        $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
+        $multiFileType = new MultiFileType(new EventSubscriberStub(), $multipleFileConstraintsProvider);
 
         return [
             new PreloadedExtension([$fileType, $multiFileType], [])
@@ -652,7 +653,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->willReturn($file = $this->createMock(File::class));
 
         $file
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getId')
             ->willReturn(1);
 

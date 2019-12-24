@@ -65,7 +65,8 @@ services:
 
     oro_attachment.form.type.multiple_file:
         class: Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType
-        calls:
-            - [setEventSubscriber,  ['@oro_attachment.form.multiple_file_subscriber']]
+        arguments:
+            - '@oro_attachment.form.multiple_file_subscriber'
+            - '@oro_attachment.provider.multiple_files_constraints'
         tags:
             - { name: form.type, alias: oro_attachment_multi_file }

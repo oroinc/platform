@@ -9,7 +9,26 @@ define(function(require) {
         /**
          * @property {Object}
          */
-        options: {},
+        options: {
+            lineItemSortOrderSelector: 'tr td.sort-order input',
+            addItemButton: '.add-list-item',
+            maxNumber: 0
+        },
+
+        /**
+         * @property {jQuery}
+         */
+        $el: null,
+
+        /**
+         * @property {Object}
+         */
+        $lineItemSortOrder: null,
+
+        /**
+         * @property {Object}
+         */
+        $addItemButton: null,
 
         /**
          * @inheritDoc
@@ -23,24 +42,52 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
+            this.$el = this.options._sourceElement;
 
-            const $el = this.options._sourceElement;
-            const lineItemSortOrderSelector = 'tr td.sort-order input';
+            this.$addItemButton = this.$el.find(this.options.addItemButton);
+            this.$lineItemSortOrder = this.$el.find(this.options.lineItemSortOrderSelector);
 
-            const $lineItemSortOrder = $el.find(lineItemSortOrderSelector);
-            if ($lineItemSortOrder.length === 1 && !$lineItemSortOrder.val()) {
-                $lineItemSortOrder.val(1);
+            if (this.$lineItemSortOrder.length === 1 && !this.$lineItemSortOrder.val()) {
+                this.$lineItemSortOrder.val(1);
             }
 
-            // process adding new item to collection
-            $el.on('content:changed', function() {
-                let max = 0;
-                $(this).find(lineItemSortOrderSelector).each(function() {
-                    max = Math.max(max, $(this).val() || 0);
-                });
+            this.$el.on('content:changed', _.bind(this._onChangeContent, this));
+            this.$el.on('content:remove', _.bind(this._onRemoveContent, this));
 
-                $(this).find(lineItemSortOrderSelector).last().val(max + 1);
+            this._hideAddItemButton();
+        },
+
+        _onChangeContent: function() {
+            let max = 0;
+            this.$el.find(this.options.lineItemSortOrderSelector).each(function() {
+                max = Math.max(max, $(this).val() || 0);
             });
+
+            this.$el.find(this.options.lineItemSortOrderSelector).last().val(max + 1);
+
+            this._hideAddItemButton();
+        },
+
+        _onRemoveContent: function() {
+            this._showAddItemButton();
+        },
+
+        _hideAddItemButton: function() {
+            if (this.options.maxNumber > 0) {
+                const count = this.$el.find(this.options.lineItemSortOrderSelector).length;
+                if (this.options.maxNumber <= count) {
+                    this.$addItemButton.hide();
+                }
+            }
+        },
+
+        _showAddItemButton: function() {
+            if (this.options.maxNumber > 0) {
+                const count = this.$el.find(this.options.lineItemSortOrderSelector).length - 1;
+                if (this.options.maxNumber > count) {
+                    this.$addItemButton.show();
+                }
+            }
         }
     });
 

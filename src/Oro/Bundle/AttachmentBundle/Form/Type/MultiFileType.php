@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Entity\FileItem;
+use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -19,12 +23,19 @@ class MultiFileType extends AbstractType
     /** @var EventSubscriberInterface */
     private $eventSubscriber;
 
+    /** @var MultipleFileConstraintsProvider */
+    private $constraintsProvider;
+
     /**
      * @param EventSubscriberInterface $eventSubscriber
+     * @param MultipleFileConstraintsProvider $constraintsProvider
      */
-    public function setEventSubscriber(EventSubscriberInterface $eventSubscriber): void
-    {
+    public function __construct(
+        EventSubscriberInterface $eventSubscriber,
+        MultipleFileConstraintsProvider $constraintsProvider
+    ) {
         $this->eventSubscriber = $eventSubscriber;
+        $this->constraintsProvider = $constraintsProvider;
     }
 
     /**
@@ -33,6 +44,27 @@ class MultiFileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->eventSubscriber);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $rootClass = $form->getRoot()->getConfig()->getDataClass();
+        $fieldName = $form->getConfig()->getName();
+        $maxNumber = $this->constraintsProvider->getMaxNumberOfFilesForEntityField($rootClass, $fieldName);
+
+        $view->vars['maxNumber'] = $maxNumber;
+
+        usort($view->children, function (FormView $leftFileItemView, FormView $rightFileItemView) {
+            /** @var FileItem $leftFileItem */
+            $leftFileItem = $leftFileItemView->vars['data'];
+            /** @var FileItem $rightFileItem */
+            $rightFileItem = $rightFileItemView->vars['data'];
+
+            return $leftFileItem->getSortOrder() - $rightFileItem->getSortOrder();
+        });
     }
 
     /**

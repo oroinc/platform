@@ -4,23 +4,29 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\FileItemType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
+use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EventSubscriberInterface */
+    private $eventSubscriber;
+
     /** @var MultiFileType */
-    protected $type;
+    private $type;
 
     /**
      * {@inheritdoc}
      */
     public function setUp()
     {
-        $this->type = new MultiFileType();
+        $this->eventSubscriber = $this->createMock(EventSubscriberInterface::class);
+        $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
+        $this->type = new MultiFileType($this->eventSubscriber, $multipleFileConstraintsProvider);
     }
 
     public function testConfigureOptions()
@@ -57,12 +63,10 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm(): void
     {
-        $event = new TestSubscriber();
-        $this->type->setEventSubscriber($event);
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with($event);
+            ->with($this->eventSubscriber);
 
         $this->type->buildForm($builder, []);
     }
