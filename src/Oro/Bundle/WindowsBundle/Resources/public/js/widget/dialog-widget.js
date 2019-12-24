@@ -90,7 +90,8 @@ define(function(require, exports, module) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: this.options.limitTo,
-                minWidth: 320,
+                // minimal width is adjusted to dialog shows typical form without horizontal scroll
+                minWidth: tools.isMobile() ? 320 : 604,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -475,17 +476,30 @@ define(function(require, exports, module) {
             }
         },
 
-        _fixScrollableHeight: function() {
-            const widget = this.widget;
+        _clearScrollableHeight: function() {
             if (!tools.isMobile()) {
                 // on mobile devices without setting these properties modal dialogs cannot be scrolled
-                widget.find('.scrollable-container').each(_.bind(function(i, el) {
-                    const $el = $(el);
-                    const height = widget.height() - $el.position().top;
+                this.widget.find('.scrollable-container').each(function() {
+                    $(this).css('max-height', '');
+                });
+            }
+        },
+
+        _fixScrollableHeight: function() {
+            if (!tools.isMobile()) {
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
+                const widget = this.widget;
+                const content = widget.find('.widget-content:first');
+                const contentHeight = Math.ceil(widget.height() - content.outerHeight(true) + content.height());
+
+                widget.find('.scrollable-container').each(function() {
+                    const $el = $(this);
+                    const height = contentHeight - $el.position().top;
+
                     if (height) {
-                        $el.outerHeight(height);
+                        $el.css('max-height', height);
                     }
-                }, this));
+                });
             }
 
             mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
@@ -499,6 +513,8 @@ define(function(require, exports, module) {
                 // widget is not initialized -- where's nothing to position yet
                 return;
             }
+            this._clearScrollableHeight();
+
             if (this.options.position) {
                 this.setPosition(_.extend(this.options.position, {
                     of: this.getLimitToContainer(),
@@ -526,7 +542,7 @@ define(function(require, exports, module) {
                 });
             }
 
-            mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
+            this._fixScrollableHeight();
         },
 
         internalSetDialogPosition: function(position, leftShift, topShift) {

@@ -23,4 +23,4 @@ services:
         arguments:
             - '@oro_workflow.entity_field_provider'
             - '@oro_workflow.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'

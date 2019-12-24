@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
@@ -18,6 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Handles a form represents an embed entity.
+ */
 class EmbedFormController extends Controller
 {
     use RequestHandlerTrait;
@@ -76,10 +78,9 @@ class EmbedFormController extends Controller
             /**
              * Set owner ID (current organization) to concrete form entity
              */
-            $entityClass      = ClassUtils::getClass($entity);
-            $config           = $this->get('oro_entity_config.provider.ownership');
-            $entityConfig     = $config->getConfig($entityClass);
-            $formEntityConfig = $config->getConfig($formEntity);
+            $configProvider = $this->get('oro_entity_config.provider.ownership');
+            $entityConfig = $configProvider->getConfig(get_class($entity));
+            $formEntityConfig = $configProvider->getConfig(get_class($formEntity));
 
             if ($entityConfig->get('owner_type') === OwnershipType::OWNER_TYPE_ORGANIZATION) {
                 $accessor = PropertyAccess::createPropertyAccessor();

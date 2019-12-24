@@ -5,21 +5,22 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityWithFieldsProvider */
-    private $provider;
-
     /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityProvider;
 
     /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelper;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
+    /** @var EntityWithFieldsProvider */
+    private $provider;
 
     /**
      * {@inheritdoc}
@@ -28,12 +29,12 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
         $this->entityProvider = $this->createMock(EntityProvider::class);
-        $this->configHelper = $this->createMock(EntityConfigHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->provider = new EntityWithFieldsProvider(
             $this->fieldProvider,
             $this->entityProvider,
-            $this->configHelper
+            $this->configManager
         );
     }
 
@@ -107,25 +108,31 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldsWithRoutes()
     {
+        $className = 'Test\Entity';
+
         $this->entityProvider->expects($this->once())
             ->method('getEntities')
             ->with(true, true, true)
-            ->willReturn([['name' => 'entity1']]);
+            ->willReturn([['name' => $className]]);
 
         $this->fieldProvider->expects($this->once())
             ->method('getFields')
-            ->with('entity1', true, false, false, false, true, true)
+            ->with($className, true, false, false, false, true, true)
             ->willReturn(['field1' => []]);
 
-        $this->configHelper->expects($this->once())
-            ->method('getAvailableRoutes')
-            ->with('entity1')
+        $entityMetadata = $this->createMock(EntityMetadata::class);
+        $entityMetadata->expects($this->once())
+            ->method('getRoutes')
             ->willReturn(['routeName' => 'routeValue']);
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn($entityMetadata);
 
         $this->assertEquals(
             [
-                'entity1' => [
-                    'name' => 'entity1',
+                $className => [
+                    'name' => $className,
                     'fields' => [
                         'field1' => [],
                     ],
@@ -217,10 +224,14 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->with($className, true, false, false, false, true, true)
             ->willReturn(['field1' => []]);
 
-        $this->configHelper->expects($this->once())
-            ->method('getAvailableRoutes')
-            ->with($className)
+        $entityMetadata = $this->createMock(EntityMetadata::class);
+        $entityMetadata->expects($this->once())
+            ->method('getRoutes')
             ->willReturn(['routeName' => 'routeValue']);
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn($entityMetadata);
 
         $this->assertEquals(
             [
@@ -231,6 +242,37 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
                 'routes' => [
                     'routeName' => 'routeValue'
                 ]
+            ],
+            $this->provider->getFieldsForEntity($className, false, false, true, true, true, true)
+        );
+    }
+
+    public function testGetFieldsForEntityWithRoutesWhenEntityMetadataDoesNotExist()
+    {
+        $className = 'Test\Entity';
+
+        $this->entityProvider->expects($this->once())
+            ->method('getEnabledEntity')
+            ->with($className, true, true)
+            ->willReturn(['name' => $className]);
+
+        $this->fieldProvider->expects($this->once())
+            ->method('getFields')
+            ->with($className, true, false, false, false, true, true)
+            ->willReturn(['field1' => []]);
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn(null);
+
+        $this->assertEquals(
+            [
+                'name'   => $className,
+                'fields' => [
+                    'field1' => []
+                ],
+                'routes' => []
             ],
             $this->provider->getFieldsForEntity($className, false, false, true, true, true, true)
         );
