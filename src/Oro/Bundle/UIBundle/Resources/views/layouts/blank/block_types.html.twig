@@ -40,7 +40,9 @@
                 {{ breadcrumbs }}
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
-                    {{ not loop.first ? ' / ' }}
+                    {% if not loop.first %}
+                        <span aria-hidden="true">/</span>
+                    {% endif %}
                     {% if breadcrumb.label is defined %}
                         {% if breadcrumb.uri is defined %}
                             {% set url = breadcrumb.uri %}
