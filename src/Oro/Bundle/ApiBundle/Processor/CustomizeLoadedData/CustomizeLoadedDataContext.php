@@ -87,7 +87,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
         $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
         if (!$fieldName) {
             $field = $config->getField($propertyPath);
-            if (null !== $field && ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
+            if (null === $field || ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
                 $fieldName = $propertyPath;
             }
         }
