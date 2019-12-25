@@ -48,8 +48,6 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityIdResolverCompilerPass());
         $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());
         $container->addCompilerPass(new Compiler\ExclusionProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\ExceptionTextExtractorCompilerPass());
-        $container->addCompilerPass(new Compiler\ConstraintTextExtractorCompilerPass());
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());

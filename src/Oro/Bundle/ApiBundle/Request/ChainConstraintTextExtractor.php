@@ -9,17 +9,15 @@ use Symfony\Component\Validator;
  */
 class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
-    /** @var ConstraintTextExtractorInterface[] */
-    private $extractors = [];
+    /** @var iterable|ConstraintTextExtractorInterface[] */
+    private $extractors;
 
     /**
-     * Registers a given extractor in the chain.
-     *
-     * @param ConstraintTextExtractorInterface $extractor
+     * @param iterable|ConstraintTextExtractorInterface[] $extractors
      */
-    public function addExtractor(ConstraintTextExtractorInterface $extractor)
+    public function __construct(iterable $extractors)
     {
-        $this->extractors[] = $extractor;
+        $this->extractors = $extractors;
     }
 
     /**

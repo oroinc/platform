@@ -460,6 +460,8 @@ services:
 
     oro_api.exception_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
+        arguments:
+            - !tagged oro.api.exception_text_extractor
 
     oro_api.exception_text_extractor.default:
         class: Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor
@@ -571,6 +573,8 @@ services:
 
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
+        arguments:
+            - !tagged oro.api.api_doc_annotation_handler
 
     oro_api.rest.chain_routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
@@ -731,6 +735,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
         arguments:
             - '@request_stack'
+            - !tagged oro.api.request_type_provider
 
     oro_api.rest.request_type_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
@@ -789,6 +794,8 @@ services:
 
     oro_api.constraint_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
+        arguments:
+            - !tagged oro.api.constraint_text_extractor
 
     oro_api.constraint_text_extractor.default:
         class: Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor
