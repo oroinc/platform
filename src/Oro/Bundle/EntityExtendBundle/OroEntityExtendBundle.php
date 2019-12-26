@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappi
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -68,7 +69,11 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityExtendValidationLoaderPass());
         $container->addCompilerPass(new Compiler\ConfigLoaderPass());
         $container->addCompilerPass(new Compiler\EntityManagerPass());
-        $container->addCompilerPass(new Compiler\EntityMetadataBuilderPass());
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_entity_extend.entity_metadata_builder',
+            'addBuilder',
+            'oro_entity_extend.entity_metadata_builder'
+        ));
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(

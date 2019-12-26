@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\NotificationBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -11,7 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class NotificationHandlerPass implements CompilerPassInterface
 {
-    private const LOCATOR_SERVICE_KEY = 'oro_notification.handler_locator';
+    use TaggedServiceTrait;
+
     private const MANAGER_SERVICE_KEY = 'oro_notification.manager';
     private const HANDLER_TAG         = 'notification.handler';
 
@@ -23,22 +26,18 @@ class NotificationHandlerPass implements CompilerPassInterface
         $handlers = [];
         $handlerMap = [];
         $taggedServices = $container->findTaggedServiceIds(self::HANDLER_TAG, true);
-        foreach ($taggedServices as $id => $attributes) {
-            foreach ($attributes as $tagAttributes) {
-                $handlerMap[$id] = new Reference($id);
-                $handlers[$tagAttributes['priority'] ?? 0][] = $id;
+        foreach ($taggedServices as $id => $tags) {
+            $handlerMap[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $handlers[$this->getPriorityAttribute($attributes)][] = $id;
             }
         }
-        if (empty($handlerMap)) {
-            return;
+        if ($handlers) {
+            $handlers = $this->sortByPriorityAndFlatten($handlers);
         }
 
-        krsort($handlers);
-        $handlers = array_merge(...$handlers);
-
-        $container->getDefinition(self::LOCATOR_SERVICE_KEY)
-            ->replaceArgument(0, $handlerMap);
         $container->getDefinition(self::MANAGER_SERVICE_KEY)
-            ->replaceArgument(0, $handlers);
+            ->replaceArgument(0, $handlers)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $handlerMap));
     }
 }

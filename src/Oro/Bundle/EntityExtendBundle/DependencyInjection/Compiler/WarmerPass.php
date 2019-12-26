@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -14,32 +15,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class WarmerPass implements CompilerPassInterface
 {
-    const CACHE_WARMER_AGGREGATE_SERVICE = 'oro_entity_extend.cache_warmer_aggregate';
-    const CACHE_WARMER_SERVICE           = 'cache_warmer';
-    const EXTEND_CACHE_WARMER_SERVICE    = 'oro_entity_extend.cache_warmer';
-    const EXTEND_CACHE_WARMER_TAG_NAME   = 'oro_entity_extend.warmer';
+    use PriorityTaggedServiceTrait;
+
+    private const CACHE_WARMER_AGGREGATE_SERVICE = 'oro_entity_extend.cache_warmer_aggregate';
+    private const CACHE_WARMER_SERVICE           = 'cache_warmer';
+    private const EXTEND_CACHE_WARMER_SERVICE    = 'oro_entity_extend.cache_warmer';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        // load
-        $warmers = [];
-        $taggedServices = $container->findTaggedServiceIds(self::EXTEND_CACHE_WARMER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $warmers[$priority][] = new Reference($id);
-        }
-
-        // sort by priority and flatten
-        krsort($warmers);
-        $warmers = call_user_func_array('array_merge', $warmers);
-
-        // register
-        $container->getDefinition(self::EXTEND_CACHE_WARMER_SERVICE)
-            ->replaceArgument(0, $warmers);
-
         // replace "cache_warmer" service with "oro_entity_extend.cache_warmer_aggregate"
         $cacheWarmerAggregateDefinition = $container->getDefinition(self::CACHE_WARMER_AGGREGATE_SERVICE);
         $cacheWarmerDefinition = $container->getDefinition(self::CACHE_WARMER_SERVICE);

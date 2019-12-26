@@ -26,7 +26,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
     private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
     private const API_DOC_MARKDOWN_FORMATTER_SERVICE        = 'nelmio_api_doc.formatter.markdown_formatter';
     private const API_DOC_SWAGGER_FORMATTER_SERVICE         = 'nelmio_api_doc.formatter.swagger_formatter';
@@ -48,11 +47,9 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         $this->configureUnderlyingViews($container);
-        $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
         $this->configureApiDocFormatters($container);
         $this->registerRoutingOptionsResolvers($container);
-        $this->registerRequestTypeProviders($container);
         $this->configureRequestTypeProvider($container);
         $this->configureApiSourceListener($container);
     }
@@ -150,19 +147,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->setArguments([$view, $underlyingView])
             ->setPublic(false)
             ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function configureApiDocAnnotationHandler(ContainerBuilder $container)
-    {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::API_DOC_ANNOTATION_HANDLER_SERVICE,
-            self::API_DOC_ANNOTATION_HANDLER_TAG_NAME,
-            'addHandler'
-        );
     }
 
     /**
@@ -299,19 +283,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container
             ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
             ->replaceArgument(0, $services);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function registerRequestTypeProviders(ContainerBuilder $container)
-    {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::REST_DOC_VIEW_DETECTOR_SERVICE,
-            self::REQUEST_TYPE_PROVIDER_TAG,
-            'addRequestTypeProvider'
-        );
     }
 
     /**

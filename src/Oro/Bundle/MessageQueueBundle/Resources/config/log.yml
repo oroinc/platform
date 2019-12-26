@@ -26,9 +26,8 @@ services:
 
     oro_message_queue.log.message_to_array_converter:
         class: Oro\Component\MessageQueue\Log\Converter\ChainMessageToArrayConverter
-        lazy: true
         arguments:
-            - []
+            - !tagged oro_message_queue.log.message_to_array_converter
 
     oro_message_queue.log.message_to_array_converter.base:
         class: Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverter

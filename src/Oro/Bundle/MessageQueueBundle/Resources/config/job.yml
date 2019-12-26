@@ -38,7 +38,7 @@ services:
         class: 'Oro\Component\MessageQueue\Job\Extension\ChainExtension'
         public: false
         arguments:
-            - []
+            - !tagged oro_message_queue.job.extension
 
     oro_message_queue.job.root_job_status_calculator:
         class: 'Oro\Component\MessageQueue\Job\RootJobStatusCalculator'

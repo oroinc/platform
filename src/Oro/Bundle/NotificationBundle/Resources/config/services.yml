@@ -76,16 +76,9 @@ services:
         class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
         arguments:
             - [] # handler service ids sorted by priority. They are set by Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass
-            - '@oro_notification.handler_locator'
+            - [] # service locator for handlers. It is set by Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass
             - '@oro_notification.cache'
             - '@doctrine'
-
-    oro_notification.handler_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        arguments:
-            - [] # handlers. They are set by Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass
-        tags:
-            - { name: container.service_locator }
 
     oro_notification.cache:
         parent: oro.cache.abstract

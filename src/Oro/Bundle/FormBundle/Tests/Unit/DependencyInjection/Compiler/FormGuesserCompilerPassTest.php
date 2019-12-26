@@ -9,21 +9,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class FormGuesserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessNoDefinition()
-    {
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('form.extension')
-            ->will($this->returnValue(false));
-        $container->expects($this->never())
-            ->method('getDefinition');
-
-        $compiler = new FormGuesserCompilerPass();
-        $compiler->process($container);
-    }
-
     public function testProcess()
     {
         $guesserTags = [
@@ -47,10 +32,6 @@ class FormGuesserCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('form.extension')
-            ->will($this->returnValue(true));
         $container->expects($this->once())
             ->method('getDefinition')
             ->with('form.extension')

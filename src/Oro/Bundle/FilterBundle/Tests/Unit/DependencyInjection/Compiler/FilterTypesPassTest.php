@@ -55,10 +55,12 @@ class FilterTypesPassTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($filter2Def->isPublic());
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The tag attribute "type" is required for service "filter1_service".
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The attribute "type" is required for "test_filter" tag and its value should not be blank. Service: "filter1_service".
      */
+    // @codingStandardsIgnoreEnd
     public function testProcessFilterWithoutTypeAttribute()
     {
         $container = new ContainerBuilder();
