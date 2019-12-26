@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\HiddenRoutesPass;
-use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\RoutingOptionsResolverPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,7 +21,11 @@ class OroDistributionBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new CacheConfigurationPass());
-        $container->addCompilerPass(new RoutingOptionsResolverPass());
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_distribution.routing_options_resolver',
+            'addResolver',
+            'routing.options_resolver'
+        ));
         $container->addCompilerPass(new HiddenRoutesPass());
     }
 }

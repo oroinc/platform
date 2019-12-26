@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
@@ -46,9 +47,26 @@ class OroEntityBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
-        $container->addCompilerPass(new Compiler\EntityAliasProviderPass());
-        $container->addCompilerPass(new Compiler\EntityClassNameProviderPass());
-        $container->addCompilerPass(new Compiler\ExclusionProviderPass());
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_entity.entity_alias_loader',
+            'addEntityClassProvider',
+            'oro_entity.class_provider'
+        ));
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_entity.entity_alias_loader',
+            'addEntityAliasProvider',
+            'oro_entity.alias_provider'
+        ));
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_entity.entity_class_name_provider',
+            'addProvider',
+            'oro_entity.class_name_provider'
+        ));
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_entity.exclusion_provider',
+            'addProvider',
+            'oro_entity.exclusion_provider.default'
+        ));
         $container->addCompilerPass(new Compiler\VirtualFieldProvidersCompilerPass());
         $container->addCompilerPass(new Compiler\VirtualRelationProvidersCompilerPass());
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FilterTypesPass implements CompilerPassInterface
 {
+    use TaggedServiceTrait;
+
     /** @var string */
     private $filterBagServiceId;
 
@@ -37,14 +40,13 @@ class FilterTypesPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($this->filterTag);
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                if (empty($attributes['type'])) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'The tag attribute "type" is required for service "%s".',
-                        $serviceId
-                    ));
-                }
-
-                $filters[$attributes['type']] = new Reference($serviceId);
+                $type = $this->getRequiredNotBlankAttribute(
+                    $attributes,
+                    'type',
+                    $serviceId,
+                    $this->filterTag
+                );
+                $filters[$type] = new Reference($serviceId);
             }
         }
 

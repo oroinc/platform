@@ -9,13 +9,13 @@ use Oro\Component\MessageQueue\Job\Job;
  */
 class ChainExtension implements ExtensionInterface
 {
-    /** @var ExtensionInterface[] */
+    /** @var iterable|ExtensionInterface[] */
     private $extensions;
 
     /**
-     * @param ExtensionInterface[] $extensions
+     * @param iterable|ExtensionInterface[] $extensions
      */
-    public function __construct(array $extensions)
+    public function __construct(iterable $extensions)
     {
         $this->extensions = $extensions;
     }

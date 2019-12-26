@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AccessRulesPass implements CompilerPassInterface
 {
+    use TaggedServiceTrait;
+
     private const EXECUTOR_SERVICE_ID = 'oro_security.access_rule_executor';
     private const RULE_TAG_NAME       = 'oro_security.access_rule';
     private const PRIORITY_ATTRIBUTE  = 'priority';
@@ -36,8 +39,7 @@ class AccessRulesPass implements CompilerPassInterface
             }
         }
         if ($rules) {
-            krsort($rules);
-            $rules = array_merge(...$rules);
+            $rules = $this->sortByPriorityAndFlatten($rules);
         }
 
         $container->findDefinition(self::EXECUTOR_SERVICE_ID)

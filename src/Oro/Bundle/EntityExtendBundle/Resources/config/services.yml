@@ -588,7 +588,7 @@ services:
         class: Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate
         public: true
         arguments:
-            - [] # warmers; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
+            - !tagged oro_entity_extend.warmer
 
     oro_entity_extend.console_command_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\ConsoleCommandListener

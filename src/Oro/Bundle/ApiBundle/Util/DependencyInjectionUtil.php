@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -107,7 +107,7 @@ class DependencyInjectionUtil
      *
      * @return mixed
      *
-     * @throws LogicException is the requested attribute does not exist in $attributes array
+     * @throws InvalidArgumentException is the requested attribute does not exist
      */
     public static function getRequiredAttribute(
         array $attributes,
@@ -116,7 +116,7 @@ class DependencyInjectionUtil
         string $tagName
     ) {
         if (!array_key_exists($attributeName, $attributes)) {
-            throw new LogicException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'The attribute "%s" is mandatory for "%s" tag. Service: "%s".',
                 $attributeName,
                 $tagName,

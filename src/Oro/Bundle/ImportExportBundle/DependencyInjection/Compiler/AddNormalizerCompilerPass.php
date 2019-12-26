@@ -2,61 +2,63 @@
 
 namespace Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all normalizers and encoders for the import export Serializer service.
+ */
 class AddNormalizerCompilerPass implements CompilerPassInterface
 {
-    const SERIALIZER_SERVICE = 'oro_importexport.serializer';
-    const ATTRIBUTE_NORMALIZER_TAG = 'oro_importexport.normalizer';
+    use TaggedServiceTrait;
 
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        $definition = $container->getDefinition(self::SERIALIZER_SERVICE);
-
-        $normalizers = $this->findAndSortTaggedServices(self::ATTRIBUTE_NORMALIZER_TAG, $container);
-        $definition->replaceArgument(0, $normalizers);
-
-        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
-        $definition->replaceArgument(1, array_merge($definition->getArgument(1), $encoders));
+        $serializerDef = $container->getDefinition('oro_importexport.serializer');
+        $serializerDef->replaceArgument(
+            0,
+            $this->findAndSortTaggedServices('oro_importexport.normalizer', $container)
+        );
+        $serializerDef->replaceArgument(
+            1,
+            array_merge(
+                $serializerDef->getArgument(1),
+                $this->findAndSortTaggedServices('serializer.encoder', $container)
+            )
+        );
     }
 
     /**
-     * @param string $tagName
+     * @param string           $tagName
      * @param ContainerBuilder $container
-     * @return array
+     *
+     * @return Reference[]
      */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
+    private function findAndSortTaggedServices(string $tagName, ContainerBuilder $container): array
     {
-        $services = $container->findTaggedServiceIds($tagName);
-
-        if (empty($services)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'You must tag at least one service as "%s" to use the import export Serializer service',
-                    $tagName
-                )
-            );
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        if (!$taggedServices) {
+            throw new \RuntimeException(sprintf(
+                'You must tag at least one service as "%s" to use the import export Serializer service',
+                $tagName
+            ));
         }
 
-        $sortedServices = array();
-        foreach ($services as $serviceId => $tags) {
+        $services = [];
+        foreach ($taggedServices as $serviceId => $tags) {
             if ($container->hasDefinition($serviceId)) {
                 $container->getDefinition($serviceId)->setPublic(false);
             }
             foreach ($tags as $tag) {
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
+                $services[$this->getPriorityAttribute($tag)][] = new Reference($serviceId);
             }
         }
 
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
+        return $this->sortByPriorityAndFlatten($services);
     }
 }
