@@ -143,7 +143,8 @@ oro:
         page_loading: 'Page loading...'
         button:
             copy_to_clipboard.label: 'Copy to Clipboard'
-            skip_to_content: 'Skip to main content'
+            skip_to_content: 'Skip to Main Content'
+            
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'

@@ -34,7 +34,11 @@
         }) }}></div>
         <div id="container" data-layout="separate"
              {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
-            <a class="skip-to-content" href="#page-main">{{ 'oro.ui.button.skip_to_content'|trans }}</a>
+            <button class="skip-to-content"
+                    id="skip-to-content"
+                    onclick="document.getElementById('page-main').focus();">
+                <span class="btn btn--info">{{ 'oro.ui.button.skip_to_content'|trans }}</span>
+            </button>
             {{ block_widget(block) }}
         </div>
     </body>
@@ -63,7 +67,8 @@
 {% block _page_main_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' page-main',
-        '~id': 'page-main'
+        '~id': 'page-main',
+        '~tabindex': '-1'
     }) %}
     <main{{ block('block_attributes') }}>
         {{ block_widget(block) }}
