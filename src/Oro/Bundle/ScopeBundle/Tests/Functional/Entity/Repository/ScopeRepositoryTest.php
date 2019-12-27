@@ -5,7 +5,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Functional\Entity\Repository;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
-use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
+use Oro\Bundle\ScopeBundle\Tests\Functional\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ScopeRepositoryTest extends WebTestCase
