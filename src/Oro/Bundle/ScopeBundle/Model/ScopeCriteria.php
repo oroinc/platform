@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ScopeBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
@@ -17,22 +20,41 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class ScopeCriteria implements \IteratorAggregate
 {
+    use NormalizeParameterValueTrait;
+
     public const IS_NOT_NULL = 'IS_NOT_NULL';
 
-    /** @var array the parameter list */
+    /** @var array [parameter name => parameter value, ...] */
     private $parameters;
 
-    /** @var ClassMetadata */
-    private $scopeClassMetadata;
+    /** @var ClassMetadataFactory */
+    private $classMetadataFactory;
+
+    /** @var string|null */
+    private $identifier;
 
     /**
-     * @param array         $parameters         [parameter name => parameter value, ...]
-     * @param ClassMetadata $scopeClassMetadata The metadata of Scope entity
+     * @param array                $parameters           [parameter name => parameter value, ...]
+     * @param ClassMetadataFactory $classMetadataFactory The ORM metadata factory
      */
-    public function __construct(array $parameters, ClassMetadata $scopeClassMetadata)
+    public function __construct(array $parameters, ClassMetadataFactory $classMetadataFactory)
     {
         $this->parameters = $parameters;
-        $this->scopeClassMetadata = $scopeClassMetadata;
+        $this->classMetadataFactory = $classMetadataFactory;
+    }
+
+    /**
+     * Gets unique identifier of a set of parameters represented by this criteria object.
+     *
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        if (null === $this->identifier) {
+            $this->identifier = $this->buildIdentifier();
+        }
+
+        return $this->identifier;
     }
 
     /**
@@ -114,14 +136,15 @@ class ScopeCriteria implements \IteratorAggregate
         array $ignoreFields,
         bool $withPriority
     ): void {
+        $scopeClassMetadata = $this->getClassMetadata(Scope::class);
         QueryBuilderUtil::checkIdentifier($alias);
         foreach ($this->parameters as $field => $value) {
             QueryBuilderUtil::checkIdentifier($field);
-            if (in_array($field, $ignoreFields, true)) {
+            if (\in_array($field, $ignoreFields, true)) {
                 continue;
             }
             $condition = null;
-            if ($this->isCollectionValuedAssociation($field)) {
+            if ($this->isCollectionValuedAssociation($scopeClassMetadata, $field)) {
                 $localAlias = $alias . '_' . $field;
                 $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, $withPriority);
                 $qb->leftJoin($alias . '.' . $field, $localAlias, Join::WITH, $condition);
@@ -148,9 +171,10 @@ class ScopeCriteria implements \IteratorAggregate
         array $ignoreFields,
         bool $withPriority
     ): void {
+        $scopeClassMetadata = $this->getClassMetadata(Scope::class);
         QueryBuilderUtil::checkIdentifier($alias);
         foreach ($joins as $join) {
-            if (is_array($join)) {
+            if (\is_array($join)) {
                 $this->reapplyJoins($qb, $join, $alias, $ignoreFields, $withPriority);
                 continue;
             }
@@ -167,10 +191,10 @@ class ScopeCriteria implements \IteratorAggregate
                     $usedFields = $this->getUsedFields($joinCondition, $alias);
                 }
                 foreach ($this->parameters as $field => $value) {
-                    if (in_array($field, $ignoreFields, true) || in_array($field, $usedFields, true)) {
+                    if (\in_array($field, $ignoreFields, true) || \in_array($field, $usedFields, true)) {
                         continue;
                     }
-                    if ($this->isCollectionValuedAssociation($field)) {
+                    if ($this->isCollectionValuedAssociation($scopeClassMetadata, $field)) {
                         $additionalJoins[$field] = $this->resolveBasicCondition(
                             $qb,
                             $alias . '_' . $field,
@@ -225,7 +249,7 @@ class ScopeCriteria implements \IteratorAggregate
             $part = $qb->expr()->isNotNull($aliasedField);
         } else {
             $paramName = $alias . '_param_' . $field;
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $comparisonCondition = $qb->expr()->in($aliasedField, ':' . $paramName);
             } else {
                 $comparisonCondition = $qb->expr()->eq($aliasedField, ':' . $paramName);
@@ -316,16 +340,56 @@ class ScopeCriteria implements \IteratorAggregate
     }
 
     /**
-     * @param string $field
+     * @param string $entityClass
+     *
+     * @return ClassMetadata
+     */
+    private function getClassMetadata(string $entityClass): ClassMetadata
+    {
+        return $this->classMetadataFactory->getMetadataFor($entityClass);
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param string        $field
      *
      * @return bool
      */
-    private function isCollectionValuedAssociation(string $field): bool
+    private function isCollectionValuedAssociation(ClassMetadata $classMetadata, string $field): bool
     {
-        if (!$this->scopeClassMetadata->hasAssociation($field)) {
+        if (!$classMetadata->hasAssociation($field)) {
             return false;
         }
 
-        return $this->scopeClassMetadata->isCollectionValuedAssociation($field);
+        return $classMetadata->isCollectionValuedAssociation($field);
+    }
+
+    /**
+     * @return string
+     */
+    private function buildIdentifier(): string
+    {
+        $result = '';
+        foreach ($this->parameters as $field => $value) {
+            $result .= sprintf('%s=%s;', $field, $this->normalizeParameterValue($value));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return mixed
+     */
+    private function getEntityId($entity)
+    {
+        $classMetadata = $this->getClassMetadata(ClassUtils::getClass($entity));
+        $id = $classMetadata->getFieldValue($entity, $classMetadata->getSingleIdentifierFieldName());
+        if (null === $id) {
+            $id = spl_object_hash($entity);
+        }
+
+        return $id;
     }
 }

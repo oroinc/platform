@@ -48,7 +48,7 @@ class ScopeProviderPass implements CompilerPassInterface
         }
 
         $container->findDefinition(self::MANAGER_SERVICE)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $services))
-            ->setArgument(1, $providers);
+            ->replaceArgument(0, $providers)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

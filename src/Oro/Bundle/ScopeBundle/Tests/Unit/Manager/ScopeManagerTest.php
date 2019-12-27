@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Manager;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
+use Oro\Bundle\ScopeBundle\Manager\ScopeDataAccessor;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubContext;
@@ -23,27 +26,44 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ScopeEntityStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityStorage;
+    /** @var ScopeDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $scopeDataAccessor;
+
+    /** @var ScopeCollection|\PHPUnit\Framework\MockObject\MockObject */
+    private $scheduledForInsertScopes;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $classMetadataFactory;
 
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeClassMetadata;
 
-    /** @var ScopeRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeRepository;
-
     protected function setUp()
     {
-        $this->entityStorage = $this->createMock(ScopeEntityStorage::class);
+        $this->scopeDataAccessor = $this->createMock(ScopeDataAccessor::class);
+        $this->scheduledForInsertScopes = $this->createMock(ScopeCollection::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->classMetadataFactory = $this->createMock(ClassMetadataFactory::class);
         $this->scopeClassMetadata = $this->createMock(ClassMetadata::class);
-        $this->scopeRepository = $this->createMock(ScopeRepository::class);
 
-        $this->entityStorage->expects($this->any())
-            ->method('getClassMetadata')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Scope::class)
+            ->willReturn($this->em);
+        $this->em->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($this->classMetadataFactory);
+        $this->classMetadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with(Scope::class)
             ->willReturn($this->scopeClassMetadata);
-        $this->entityStorage->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->scopeRepository);
     }
 
     /**
@@ -77,23 +97,25 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
             });
 
         return new ScopeManager(
-            $container,
             $providerIds,
-            $this->entityStorage,
+            $container,
+            $this->doctrine,
+            $this->scopeDataAccessor,
+            $this->scheduledForInsertScopes,
             new PropertyAccessor()
         );
     }
 
     public function testFindDefaultScope()
     {
-        $expectedCriteria = new ScopeCriteria(['relation' => null], $this->scopeClassMetadata);
+        $expectedCriteria = new ScopeCriteria(['relation' => null], $this->classMetadataFactory);
         $scope = new Scope();
 
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
             ->willReturn(['relation']);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($expectedCriteria)
             ->willReturn($scope);
@@ -149,7 +171,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => $fieldValue, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -158,7 +180,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', $fieldValue, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
@@ -173,7 +195,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['field' => $fieldValue, 'field2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
         $context = ['field' => $fieldValue];
 
@@ -183,7 +205,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
@@ -198,7 +220,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['field' => $fieldValue, 'field2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
         $context = new StubContext();
         $context->setField($fieldValue);
@@ -209,7 +231,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
@@ -224,7 +246,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = ScopeCriteria::IS_NOT_NULL;
         $scopeCriteria = new ScopeCriteria(
             ['field' => $fieldValue, 'field2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
         $context = ['field' => $fieldValue];
 
@@ -234,7 +256,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
@@ -249,7 +271,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = [1, 2, 3];
         $scopeCriteria = new ScopeCriteria(
             ['field' => $fieldValue, 'field2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
         $context = ['field' => $fieldValue];
 
@@ -259,7 +281,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
@@ -280,7 +302,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->never())
+        $this->scopeDataAccessor->expects($this->never())
             ->method('findOneByCriteria');
 
         $manager = $this->getScopeManager(['testScope' => [$provider]]);
@@ -299,7 +321,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->never())
+        $this->scopeDataAccessor->expects($this->never())
             ->method('findOneByCriteria');
 
         $manager = $this->getScopeManager(['testScope' => [$provider]]);
@@ -312,7 +334,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => $fieldValue, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -321,12 +343,12 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', $fieldValue, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->with($scopeCriteria);
 
-        $this->entityStorage->expects($this->once())
-            ->method('getScheduledForInsertByCriteria')
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
             ->with($scopeCriteria)
             ->willReturn($scope);
 
@@ -334,18 +356,57 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope'));
     }
 
+    public function testFindId()
+    {
+        $scopeId = 123;
+        $fieldValue = new \stdClass();
+        $scopeCriteria = new ScopeCriteria(
+            ['field' => $fieldValue, 'field2' => null],
+            $this->classMetadataFactory
+        );
+
+        $this->scopeClassMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(['field', 'field2']);
+
+        $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
+
+        $this->scopeDataAccessor->expects($this->once())
+            ->method('findIdentifierByCriteria')
+            ->with($scopeCriteria)
+            ->willReturn($scopeId);
+
+        $manager = $this->getScopeManager(['testScope' => [$provider]]);
+        $this->assertSame($scopeId, $manager->findId('testScope', ['field' => $fieldValue]));
+    }
+
+    public function testFindIdWhenScopeIdWasNotFound()
+    {
+        $this->scopeClassMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(['field']);
+
+        $this->scopeDataAccessor->expects($this->once())
+            ->method('findIdentifierByCriteria')
+            ->with(new ScopeCriteria(['field' => null], $this->classMetadataFactory))
+            ->willReturn(null);
+
+        $manager = $this->getScopeManager(['testScope' => []]);
+        $this->assertNull($manager->findId('testScope'));
+    }
+
     public function testCreateScopeByCriteriaWithFlush()
     {
-        $scopeCriteria = new ScopeCriteria([], $this->scopeClassMetadata);
+        $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
 
-        $this->entityStorage->expects($this->once())
-            ->method('getScheduledForInsertByCriteria')
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
             ->with($scopeCriteria)
             ->willReturn(null);
-        $this->entityStorage->expects($this->once())
-            ->method('scheduleForInsert')
-            ->with($this->isInstanceOf(Scope::class), $scopeCriteria);
-        $this->entityStorage->expects($this->once())
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf(Scope::class), $this->identicalTo($scopeCriteria));
+        $this->em->expects($this->once())
             ->method('flush');
 
         $manager = $this->getScopeManager();
@@ -354,16 +415,16 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateScopeByCriteriaWithoutFlush()
     {
-        $scopeCriteria = new ScopeCriteria([], $this->scopeClassMetadata);
+        $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
 
-        $this->entityStorage->expects($this->once())
-            ->method('getScheduledForInsertByCriteria')
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
             ->with($scopeCriteria)
             ->willReturn(null);
-        $this->entityStorage->expects($this->once())
-            ->method('scheduleForInsert')
-            ->with($this->isInstanceOf(Scope::class), $scopeCriteria);
-        $this->entityStorage->expects($this->never())
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf(Scope::class), $this->identicalTo($scopeCriteria));
+        $this->em->expects($this->never())
             ->method('flush');
 
         $manager = $this->getScopeManager();
@@ -373,15 +434,15 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     public function testCreateScopeByCriteriaScheduled()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria([], $this->scopeClassMetadata);
+        $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
 
-        $this->entityStorage->expects($this->once())
-            ->method('getScheduledForInsertByCriteria')
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
             ->with($scopeCriteria)
             ->willReturn($scope);
-        $this->entityStorage->expects($this->never())
-            ->method('scheduleForInsert');
-        $this->entityStorage->expects($this->never())
+        $this->scheduledForInsertScopes->expects($this->never())
+            ->method('add');
+        $this->em->expects($this->never())
             ->method('flush');
 
         $manager = $this->getScopeManager();
@@ -393,7 +454,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $scope = new Scope();
         $criteriaField = 'scopeField';
         $criteriaValue = new \stdClass();
-        $scopeCriteria = new ScopeCriteria([$criteriaField => $criteriaValue], $this->scopeClassMetadata);
+        $scopeCriteria = new ScopeCriteria([$criteriaField => $criteriaValue], $this->classMetadataFactory);
 
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
@@ -401,7 +462,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider($criteriaField, $criteriaValue, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findByCriteria')
             ->with($scopeCriteria)
             ->willReturn([$scope]);
@@ -415,7 +476,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $scopes = [new Scope()];
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -424,7 +485,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scopes);
@@ -438,7 +499,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $scopeIds = [1, 4];
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -447,7 +508,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findIdentifiersByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scopeIds);
@@ -462,7 +523,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => $fieldValue, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -471,7 +532,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', $fieldValue, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findIdentifiersByCriteriaWithPriority')
             ->with($scopeCriteria)
             ->willReturn($scopes);
@@ -482,55 +543,58 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testFindOrCreate()
     {
-        $scope = new Scope();
-
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
             ->willReturn([]);
 
         $provider = new StubScopeCriteriaProvider('fieldName', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->willReturn(null);
 
-        $this->entityStorage->expects($this->once())
-            ->method('scheduleForInsert')
-            ->with($scope, $this->isInstanceOf(ScopeCriteria::class));
-        $this->entityStorage->expects($this->once())
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
+            ->with($this->isInstanceOf(ScopeCriteria::class))
+            ->willReturn(null);
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf(Scope::class), $this->isInstanceOf(ScopeCriteria::class));
+        $this->em->expects($this->once())
             ->method('flush');
 
         $manager = $this->getScopeManager(['testScope' => [$provider]]);
-        $this->assertEquals($scope, $manager->findOrCreate('testScope'));
+        $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope'));
     }
 
     public function testFindOrCreateWithoutFlush()
     {
-        $scope = new Scope();
-
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
             ->willReturn([]);
 
         $provider = new StubScopeCriteriaProvider('fieldName', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->willReturn(null);
 
-        $this->entityStorage->expects($this->once())
-            ->method('scheduleForInsert')
-            ->with($scope, $this->isInstanceOf(ScopeCriteria::class));
-        $this->entityStorage->expects($this->never())
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
+            ->with($this->isInstanceOf(ScopeCriteria::class))
+            ->willReturn(null);
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf(Scope::class), $this->isInstanceOf(ScopeCriteria::class));
+        $this->em->expects($this->never())
             ->method('flush');
 
         $manager = $this->getScopeManager(['testScope' => [$provider]]);
-        $this->assertEquals($scope, $manager->findOrCreate('testScope', null, false));
+        $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope', null, false));
     }
 
     public function testFindOrCreateUsingContext()
     {
-        $scope = new Scope();
         $context = ['scopeAttribute' => new \stdClass()];
 
         $this->scopeClassMetadata->expects($this->once())
@@ -539,18 +603,22 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', null, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
+        $this->scopeDataAccessor->expects($this->once())
             ->method('findOneByCriteria')
             ->willReturn(null);
 
-        $this->entityStorage->expects($this->once())
-            ->method('scheduleForInsert')
-            ->with($scope, $this->isInstanceOf(ScopeCriteria::class));
-        $this->entityStorage->expects($this->once())
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('get')
+            ->with($this->isInstanceOf(ScopeCriteria::class))
+            ->willReturn(null);
+        $this->scheduledForInsertScopes->expects($this->once())
+            ->method('add')
+            ->with($this->isInstanceOf(Scope::class), $this->isInstanceOf(ScopeCriteria::class));
+        $this->em->expects($this->once())
             ->method('flush');
 
         $manager = $this->getScopeManager(['testScope' => [$provider]]);
-        $this->assertEquals($scope, $manager->findOrCreate('testScope', $context));
+        $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope', $context));
     }
 
     public function testGetScopeEntities()
@@ -572,7 +640,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $fieldValue = new \stdClass();
         $scopeCriteria = new ScopeCriteria(
             ['fieldName' => $fieldValue, 'fieldName2' => null],
-            $this->scopeClassMetadata
+            $this->classMetadataFactory
         );
 
         $this->scopeClassMetadata->expects($this->once())
@@ -581,8 +649,8 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
         $provider = new StubScopeCriteriaProvider('fieldName', $fieldValue, \stdClass::class);
 
-        $this->scopeRepository->expects($this->once())
-            ->method('findMostSuitable')
+        $this->scopeDataAccessor->expects($this->once())
+            ->method('findMostSuitableByCriteria')
             ->with($scopeCriteria)
             ->willReturn($scope);
 
@@ -601,7 +669,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $scope = new StubScope();
         $scope->setScopeField($scopeFieldValue);
-        $scopeCriteria = new ScopeCriteria($criteriaContext, $this->scopeClassMetadata);
+        $scopeCriteria = new ScopeCriteria($criteriaContext, $this->classMetadataFactory);
 
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
