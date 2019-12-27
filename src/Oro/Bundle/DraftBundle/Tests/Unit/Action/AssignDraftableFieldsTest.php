@@ -5,6 +5,7 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\DraftBundle\Action\AssignDraftableFields;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
+use Oro\Bundle\DraftBundle\Provider\ChainDraftableFieldsExclusionProvider;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\Action\Action\ActionInterface;
@@ -30,6 +31,11 @@ class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
     private $eventDispatcher;
 
     /**
+     * @var ChainDraftableFieldsExclusionProvider|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $chainDraftableFieldsExclusionProvider;
+
+    /**
      * @var AssignDraftableFields
      */
     private $action;
@@ -39,8 +45,13 @@ class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
         $this->contextAccessor = new ContextAccessor();
         $this->draftHelper = $this->createMock(DraftHelper::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->chainDraftableFieldsExclusionProvider = $this->createMock(ChainDraftableFieldsExclusionProvider::class);
 
-        $this->action = new AssignDraftableFields($this->contextAccessor, $this->draftHelper);
+        $this->action = new AssignDraftableFields(
+            $this->contextAccessor,
+            $this->draftHelper,
+            $this->chainDraftableFieldsExclusionProvider
+        );
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
@@ -65,7 +76,11 @@ class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
 
         $this->draftHelper->expects($this->once())
             ->method('getDraftableProperties')
-            ->willReturn(['content']);
+            ->willReturn(['content', 'content_2']);
+        $this->chainDraftableFieldsExclusionProvider->expects($this->once())
+            ->method('getExcludedFields')
+            ->with(DraftableEntityStub::class)
+            ->willReturn(['content_2']);
 
         $this->action->initialize([
             'object' => new PropertyPath('object'),

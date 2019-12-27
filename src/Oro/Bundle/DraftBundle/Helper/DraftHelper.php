@@ -68,7 +68,7 @@ class DraftHelper
     public function getDraftableProperties(DraftableInterface $source): array
     {
         $className = ClassUtils::getRealClass($source);
-        $draftConfigs = $this->draftProvider->getConfigs($className);
+        $draftConfigs = $this->draftProvider->getConfigs($className, true);
         $fields = [];
         foreach ($draftConfigs as $config) {
             if ($config->is('draftable')) {

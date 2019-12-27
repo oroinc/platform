@@ -29,5 +29,6 @@ services:
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_draft.helper.draft_helper'
+            - '@oro_draft.provider.chain_draftable_fields_exclusion'
         tags:
             - { name: oro_action.action, alias: assign_draftable_fields }

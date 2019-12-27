@@ -4,11 +4,13 @@ namespace Oro\Bundle\DraftBundle\Action;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
+use Oro\Bundle\DraftBundle\Provider\ChainDraftableFieldsExclusionProvider;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Assign not draftable entity fields to confirmation message
@@ -29,13 +31,23 @@ class AssignDraftableFields extends AbstractAction
     private $options;
 
     /**
+     * @var ChainDraftableFieldsExclusionProvider
+     */
+    private $chainDraftableFieldsExclusionProvider;
+
+    /**
      * @param ContextAccessor $contextAccessor
      * @param DraftHelper $draftHelper
+     * @param ChainDraftableFieldsExclusionProvider $chainDraftableFieldsExclusionProvider
      */
-    public function __construct(ContextAccessor $contextAccessor, DraftHelper $draftHelper)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        DraftHelper $draftHelper,
+        ChainDraftableFieldsExclusionProvider $chainDraftableFieldsExclusionProvider
+    ) {
         parent::__construct($contextAccessor);
         $this->draftHelper = $draftHelper;
+        $this->chainDraftableFieldsExclusionProvider = $chainDraftableFieldsExclusionProvider;
     }
 
     /**
@@ -56,10 +68,14 @@ class AssignDraftableFields extends AbstractAction
         $entity = $this->contextAccessor->getValue($context, $this->options[self::OBJECT]);
 
         if ($entity instanceof DraftableInterface) {
+            $draftableProperties = $this->draftHelper->getDraftableProperties($entity);
+            $className = ClassUtils::getRealClass($entity);
+            $excludedFields = $this->chainDraftableFieldsExclusionProvider->getExcludedFields($className);
+
             $this->contextAccessor->setValue(
                 $context,
                 $this->options[self::ATTRIBUTE],
-                $this->draftHelper->getDraftableProperties($entity)
+                \array_diff($draftableProperties, $excludedFields)
             );
         }
     }

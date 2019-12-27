@@ -124,3 +124,9 @@ services:
             - '@oro_security.token_accessor'
         tags:
             - { name: oro_security.access_rule }
+
+    oro_draft.provider.chain_draftable_fields_exclusion:
+        class: Oro\Bundle\DraftBundle\Provider\ChainDraftableFieldsExclusionProvider
+        public: false
+        arguments:
+            - !tagged oro_draft.provider.draftable_fields_exclusion

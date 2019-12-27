@@ -73,12 +73,12 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetDraftableProperties(): void
     {
         $source = new DraftableEntityStub();
-        $className = 'Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub';
+        $className = DraftableEntityStub::class;
 
         $this->draftProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn([
                 new Config(new FieldConfigId('draftable', $className, 'content'), ['draftable' => true]),
                 new Config(new FieldConfigId('draftable', $className, 'titles'), ['draftable' => false]),
