@@ -99,7 +99,7 @@ entity_config:
                 width: # integer
                     options:
                         value_type:         integer
-                        allowed_type:       [image, multiImage]
+                        allowed_type:       [image]
                     constraints:
                         - Type:
                             type:           int
@@ -117,7 +117,7 @@ entity_config:
                 height: # integer
                     options:
                         value_type:         integer
-                        allowed_type:       [image, multiImage]
+                        allowed_type:       [image]
                     constraints:
                         - Type:
                             type:           int
