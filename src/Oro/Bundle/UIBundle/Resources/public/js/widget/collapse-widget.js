@@ -121,6 +121,11 @@ define(function(require) {
         _applyStateOnEl: function(isOpen) {
             this.$el.toggleClass(this.options.openClass, isOpen);
             this.$el.toggleClass(this.options.closeClass, !isOpen);
+            if (isOpen) {
+                this.$el.attr("aria-expanded", "true");
+            } else {
+                this.$el.attr("aria-expanded", "false");
+            }
         },
 
         _applyStateOnContainer: function(isOpen) {
