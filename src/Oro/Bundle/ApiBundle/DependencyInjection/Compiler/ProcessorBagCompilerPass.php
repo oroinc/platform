@@ -34,6 +34,8 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  */
 class ProcessorBagCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID = 'oro_api.processor_bag_config_provider';
     private const CUSTOMIZE_LOADED_DATA_ACTION             = 'customize_loaded_data';
     private const CUSTOMIZE_FORM_DATA_ACTION               = 'customize_form_data';
@@ -59,7 +61,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         foreach ($config['actions'] as $action => $actionConfig) {
             if (isset($actionConfig['processing_groups'])) {
                 foreach ($actionConfig['processing_groups'] as $group => $groupConfig) {
-                    $groups[$action][$group] = DependencyInjectionUtil::getPriority($groupConfig);
+                    $groups[$action][$group] = $this->getPriorityAttribute($groupConfig);
                 }
             }
         }

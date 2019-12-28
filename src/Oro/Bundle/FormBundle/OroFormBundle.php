@@ -21,8 +21,6 @@ class OroFormBundle extends Bundle
 
         $container->addCompilerPass(new Compiler\AutocompleteCompilerPass());
         $container->addCompilerPass(new Compiler\FormGuesserCompilerPass());
-        $container->addCompilerPass(new Compiler\FormTemplateDataProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\FormHandlerCompilerPass());
     }
 
     /**

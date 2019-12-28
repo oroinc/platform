@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
@@ -20,6 +19,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationH
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceWithServiceLocatorCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
@@ -50,7 +50,15 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
-        $container->addCompilerPass(new AccessRulesPass());
+        $container->addCompilerPass(new PriorityTaggedServiceWithServiceLocatorCompilerPass(
+            'oro_security.access_rule_executor',
+            'oro_security.access_rule',
+            function (array $attributes, string $serviceId): array {
+                unset($attributes['priority']);
+
+                return [$serviceId, $attributes];
+            }
+        ));
         $container->addCompilerPass(new SessionPass());
         $container->addCompilerPass(new SetFirewallExceptionListenerPass());
 

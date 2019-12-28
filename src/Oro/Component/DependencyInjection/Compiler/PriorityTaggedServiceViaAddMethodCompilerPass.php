@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Finds all services with the given tag name, orders them by their priority
  * and adds them to the definition of the given service via the given method name.
- * NOTE: prefer injecting tagged services in the constructor via "!tagged tag_name" in services.yml.
+ * NOTE: prefer injecting tagged services in the constructor via "!tagged_iterator tag_name" in services.yml.
  */
 class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInterface
 {

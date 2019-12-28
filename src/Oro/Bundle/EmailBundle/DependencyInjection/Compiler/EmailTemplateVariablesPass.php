@@ -35,12 +35,7 @@ class EmailTemplateVariablesPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $serviceId => $tags) {
             $attributes = $tags[0];
-            $scope = $this->getRequiredNotBlankAttribute(
-                $attributes,
-                self::SCOPE_ATTR,
-                $serviceId,
-                self::PROVIDER_TAG
-            );
+            $scope = $this->getRequiredAttribute($attributes, self::SCOPE_ATTR, $serviceId, self::PROVIDER_TAG);
             $priority = $this->getPriorityAttribute($attributes);
             if (self::SCOPE_SYSTEM === $scope) {
                 $systemProviders[$priority][] = $serviceId;

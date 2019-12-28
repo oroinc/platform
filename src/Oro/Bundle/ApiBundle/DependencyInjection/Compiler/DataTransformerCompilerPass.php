@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,6 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DataTransformerCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const DATA_TRANSFORMER_REGISTRY_SERVICE_ID = 'oro_api.data_transformer_registry';
     private const DATA_TRANSFORMER_TAG                 = 'oro.api.data_transformer';
 
@@ -24,21 +25,21 @@ class DataTransformerCompilerPass implements CompilerPassInterface
         $services = [];
         $transformers = [];
         $taggedServices = $container->findTaggedServiceIds(self::DATA_TRANSFORMER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
+        foreach ($taggedServices as $id => $tags) {
             $services[$id] = new Reference($id);
-            foreach ($attributes as $tagAttributes) {
-                $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
+            foreach ($tags as $attributes) {
+                $transformers[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    $tagAttributes['dataType'],
-                    DependencyInjectionUtil::getRequestType($tagAttributes)
+                    $attributes['dataType'],
+                    $this->getRequestTypeAttribute($attributes)
                 ];
             }
         }
 
         $groupedTransformers = [];
         if ($transformers) {
-            $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
-            foreach ($transformers as list($id, $dataType, $requestType)) {
+            $transformers = $this->sortByPriorityAndFlatten($transformers);
+            foreach ($transformers as [$id, $dataType, $requestType]) {
                 $groupedTransformers[$dataType][] = [$id, $requestType];
             }
         }

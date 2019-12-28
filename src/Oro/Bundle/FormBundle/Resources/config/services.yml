@@ -70,7 +70,7 @@ services:
         class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
         public: false
         arguments:
-            - ~ # providers. Set by Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormTemplateDataProviderCompilerPass
+            - !tagged_locator { tag: oro_form.form_template_data_provider, index_by: alias }
 
     oro_form.provider.from_template_data.default:
         class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider
@@ -82,7 +82,7 @@ services:
         class: Oro\Bundle\FormBundle\Model\FormHandlerRegistry
         public: false
         arguments:
-            - ~ # handlers. Set by Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormHandlerCompilerPass
+            - !tagged_locator { tag: oro_form.form.handler, index_by: alias }
 
     oro_form.form.handler.default:
         class: Oro\Bundle\FormBundle\Form\Handler\FormHandler

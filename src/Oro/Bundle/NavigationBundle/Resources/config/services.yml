@@ -241,7 +241,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
         public: false
         arguments:
-          - !tagged oro_navigation.title_reader
+          - !tagged_iterator oro_navigation.title_reader
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader

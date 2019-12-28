@@ -40,12 +40,7 @@ class FilterTypesPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($this->filterTag);
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                $type = $this->getRequiredNotBlankAttribute(
-                    $attributes,
-                    'type',
-                    $serviceId,
-                    $this->filterTag
-                );
+                $type = $this->getRequiredAttribute($attributes, 'type', $serviceId, $this->filterTag);
                 $filters[$type] = new Reference($serviceId);
             }
         }

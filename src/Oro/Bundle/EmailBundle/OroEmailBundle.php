@@ -51,7 +51,6 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new Compiler\EmailRecipientsProviderPass());
         $container->addCompilerPass(new Compiler\MailboxProcessPass());
         $container->addCompilerPass(new Compiler\OverrideServiceSwiftMailer());
-        $container->addCompilerPass(new Compiler\VariableProcessorPass());
         $container->addCompilerPass(new Compiler\SwiftMailerTransportPass(), PassConfig::TYPE_OPTIMIZE);
 
         $addTopicPass = AddTopicMetaPass::create()

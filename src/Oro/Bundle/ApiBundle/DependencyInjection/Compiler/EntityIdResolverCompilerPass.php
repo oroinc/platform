@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,6 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EntityIdResolverCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const RESOLVER_REGISTRY_SERVICE_ID = 'oro_api.entity_id_resolver_registry';
     private const RESOLVER_TAG                 = 'oro.api.entity_id_resolver';
 
@@ -24,26 +25,14 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
         $services = [];
         $resolvers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOLVER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
+        foreach ($taggedServices as $id => $tags) {
             $services[$id] = new Reference($id);
-            foreach ($attributes as $tagAttributes) {
-                $entityId = DependencyInjectionUtil::getRequiredAttribute(
-                    $tagAttributes,
-                    'id',
+            foreach ($tags as $attributes) {
+                $resolvers[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    self::RESOLVER_TAG
-                );
-                $entityClass = DependencyInjectionUtil::getRequiredAttribute(
-                    $tagAttributes,
-                    'class',
-                    $id,
-                    self::RESOLVER_TAG
-                );
-                $resolvers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
-                    $id,
-                    DependencyInjectionUtil::getRequestType($tagAttributes),
-                    $entityId,
-                    $entityClass
+                    $this->getRequestTypeAttribute($attributes),
+                    $this->getRequiredAttribute($attributes, 'id', $id, self::RESOLVER_TAG),
+                    $this->getRequiredAttribute($attributes, 'class', $id, self::RESOLVER_TAG)
                 ];
             }
         }
@@ -51,7 +40,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
         if ($resolvers) {
             // sort by priority and convert to the following array:
             // [entity id => [entity class => [resolver service id, request type expression], ...], ...]
-            $resolvers = DependencyInjectionUtil::sortByPriorityAndFlatten($resolvers);
+            $resolvers = $this->sortByPriorityAndFlatten($resolvers);
             $restructured = [];
             foreach ($resolvers as list($serviceId, $requestTypeExpr, $entityId, $entityClass)) {
                 $restructured[$entityId][$entityClass][] = [$serviceId, $requestTypeExpr];

@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Provides a set of methods to simplify processing the tagged services.
+ * Provides a set of methods to simplify processing tagged services.
  */
 trait TaggedServiceTrait
 {
@@ -57,36 +57,6 @@ trait TaggedServiceTrait
     }
 
     /**
-     * Gets a value of the specific mandatory tag attribute that value should be not empty string and not NULL.
-     *
-     * @param array  $attributes
-     * @param string $attributeName
-     * @param string $serviceId
-     * @param string $tagName
-     *
-     * @return mixed
-     *
-     * @throws InvalidArgumentException is the requested attribute does not exist or its value is blank
-     */
-    private function getRequiredNotBlankAttribute(
-        array $attributes,
-        string $attributeName,
-        string $serviceId,
-        string $tagName
-    ) {
-        if (empty($attributes[$attributeName])) {
-            throw new InvalidArgumentException(sprintf(
-                'The attribute "%s" is required for "%s" tag and its value should not be blank. Service: "%s".',
-                $attributeName,
-                $tagName,
-                $serviceId
-            ));
-        }
-
-        return $attributes[$attributeName];
-    }
-
-    /**
      * Gets a value of the "priority" attribute.
      * If a tag does not have this attribute, 0 is returned.
      *
@@ -100,7 +70,7 @@ trait TaggedServiceTrait
     }
 
     /**
-     * Sorts the tagged services by the priority
+     * Sorts tagged services by the priority
      * (the higher the priority number, the earlier the service is added to the result list)
      * and returns flatten array of sorted services.
      *

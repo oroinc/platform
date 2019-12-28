@@ -394,7 +394,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameResolver
         public: true
         arguments:
-            - !tagged oro_entity.name_provider
+            - !tagged_iterator oro_entity.name_provider
             - '%oro_entity.entity_name_format.default%'
             - '@oro_entity.entity_configuration.provider'
 
@@ -461,7 +461,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
         public: false
         arguments:
-            - !tagged oro_entity.dictionary_value_list_provider
+            - !tagged_iterator oro_entity.dictionary_value_list_provider
 
     oro_entity.routing.options_resolver.dictionary_entity:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver

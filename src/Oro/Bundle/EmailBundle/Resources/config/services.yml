@@ -1218,7 +1218,7 @@ services:
     oro_email.emailtemplate.variable_processor:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry
         arguments:
-            - ~ # processors. Set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\VariableProcessorPass
+            - !tagged_locator { tag: oro_email.emailtemplate.variable_processor, index_by: alias }
 
     oro_email.emailtemplate.variable_processor.entity_routes:
         class: Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor

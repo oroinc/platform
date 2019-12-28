@@ -58,7 +58,7 @@ class FilterTypesPassTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "type" is required for "test_filter" tag and its value should not be blank. Service: "filter1_service".
+     * @expectedExceptionMessage The attribute "type" is required for "test_filter" tag. Service: "filter1_service".
      */
     // @codingStandardsIgnoreEnd
     public function testProcessFilterWithoutTypeAttribute()
