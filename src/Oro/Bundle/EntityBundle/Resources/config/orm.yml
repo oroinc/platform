@@ -47,6 +47,14 @@ services:
 
     oro_entity.orm.insert_from_select_query_executor:
         class: '%oro_entity.orm.insert_from_select_query_executor.class%'
+        public: true
+        arguments:
+            - '@oro_entity.orm.native_query_executor_helper'
+
+    oro_entity.orm.multi_insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor
+        public: true
+        shared: false
         arguments:
             - '@oro_entity.orm.native_query_executor_helper'
 
