@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Form\DataTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transform data for FallbackValueType
+ */
 class FallbackValueTransformer implements DataTransformerInterface
 {
     /**
@@ -37,10 +40,10 @@ class FallbackValueTransformer implements DataTransformerInterface
             return null;
         }
 
-        if (!empty($value['fallback'])) {
-            return new FallbackType($value['fallback']);
-        } elseif (isset($value['value'])) {
+        if (!empty($value['value'])) {
             return $value['value'];
+        } elseif (!empty($value['use_fallback']) && !empty($value['fallback'])) {
+            return new FallbackType($value['fallback']);
         }
 
         return null;

@@ -18,7 +18,8 @@ define(function(require) {
         options: {
             selectors: {
                 useParentScopeSelector: '.parent-scope-use',
-                scopesSelector: '.scopes'
+                scopesSelector: '.scopes',
+                containerSelector: null
             }
         },
 
@@ -48,19 +49,14 @@ define(function(require) {
         },
 
         handleLayoutInit: function() {
-            this.$useParentScope = this.$el.find(this.options.selectors.useParentScopeSelector);
-            this.$scopeFields = this.$el.find(this.options.selectors.scopesSelector);
+            var $el = this.options.selectors.containerSelector !== null
+                ? this.$el.closest(this.options.selectors.containerSelector)
+                : this.$el;
+            this.$useParentScope = $el.find(this.options.selectors.useParentScopeSelector);
+            this.$scopeFields = $el.find(this.options.selectors.scopesSelector);
 
-            this._initScopes();
-            this.$el.on('change', this.$useParentScope, _.bind(this._toggleScopes, this));
-        },
-
-        _initScopes: function() {
-            if (this.$useParentScope.is(':checked')) {
-                this.$scopeFields.hide();
-            } else {
-                this.$scopeFields.show();
-            }
+            this._toggleScopes();
+            $el.on('change', this.$useParentScope, _.bind(this._toggleScopes, this));
         },
 
         _toggleScopes: function() {
