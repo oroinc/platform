@@ -71,7 +71,7 @@
         "box/spout": "2.7.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
-        "oro/redis-config": "4.0.*",
+        "oro/redis-config": "4.1.*",
         "brick/math": "0.8.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
@@ -154,7 +154,7 @@
             "require": "4.4.*"
         },
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     },
     "autoload": {
