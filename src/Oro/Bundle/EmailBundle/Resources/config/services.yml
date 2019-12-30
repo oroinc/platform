@@ -873,10 +873,10 @@ services:
     oro_email.acl.voter.email_voter:
         class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@security.authorization_checker'
+            - '@oro_email.mailbox.manager'
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber }
 
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
