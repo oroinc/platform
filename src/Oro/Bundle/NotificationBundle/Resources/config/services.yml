@@ -149,6 +149,7 @@ services:
     oro_notification.email_notification_entity_provider:
         class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
         parent: oro_entity.entity_provider.abstract
+        lazy: true
         arguments:
             - '@doctrine'
 
