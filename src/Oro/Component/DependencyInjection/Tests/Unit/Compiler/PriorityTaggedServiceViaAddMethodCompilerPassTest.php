@@ -69,12 +69,12 @@ class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framewo
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
-        $taggedService1 = $this->container->setDefinition('tagged_service_1', new Definition());
-        $taggedService1->addTag(self::TAG_NAME);
-        $taggedService2 = $this->container->setDefinition('tagged_service_2', new Definition());
-        $taggedService2->addTag(self::TAG_NAME, ['priority' => -10]);
-        $taggedService3 = $this->container->setDefinition('tagged_service_3', new Definition());
-        $taggedService3->addTag(self::TAG_NAME, ['priority' => 10]);
+        $this->container->setDefinition('tagged_service_1', new Definition())
+            ->addTag(self::TAG_NAME);
+        $this->container->setDefinition('tagged_service_2', new Definition())
+            ->addTag(self::TAG_NAME, ['priority' => -10]);
+        $this->container->setDefinition('tagged_service_3', new Definition())
+            ->addTag(self::TAG_NAME, ['priority' => 10]);
 
         $compiler = new PriorityTaggedServiceViaAddMethodCompilerPass(
             self::SERVICE_ID,

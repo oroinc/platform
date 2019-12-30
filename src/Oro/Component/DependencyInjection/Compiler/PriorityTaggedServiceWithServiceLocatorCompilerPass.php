@@ -58,13 +58,13 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPass implements CompilerPas
         $services = [];
         $items = [];
         $taggedServices = $container->findTaggedServiceIds($this->tagName);
-        foreach ($taggedServices as $serviceId => $tags) {
-            $services[$serviceId] = new Reference($serviceId);
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
             foreach ($tags as $attributes) {
                 $items[$this->getPriorityAttribute($attributes)][] = \call_user_func(
                     $this->attributesHandler,
                     $attributes,
-                    $serviceId,
+                    $id,
                     $this->tagName
                 );
             }

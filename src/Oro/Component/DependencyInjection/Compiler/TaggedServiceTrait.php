@@ -74,14 +74,19 @@ trait TaggedServiceTrait
      * (the higher the priority number, the earlier the service is added to the result list)
      * and returns flatten array of sorted services.
      *
-     * @param array $services [priority => item, ...]
+     * @param array $services        [priority => item, ...]
+     * @param bool  $inversePriority if TRUE, ksort() will be used instead of krsort() to sort be priority
      *
      * @return array [item, ...]
      */
-    private function sortByPriorityAndFlatten(array $services): array
+    private function sortByPriorityAndFlatten(array $services, bool $inversePriority = false): array
     {
         if ($services) {
-            krsort($services);
+            if ($inversePriority) {
+                ksort($services);
+            } else {
+                krsort($services);
+            }
             $services = array_merge(...$services);
         }
 

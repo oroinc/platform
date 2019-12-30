@@ -9,10 +9,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
     oro_filter.extension.orm_filter_bag:
         class: Oro\Bundle\FilterBundle\Filter\FilterBag
         public: true
+        arguments:
+            - [] # filter names
+            - ~ # service locator
 
     oro_filter.datagrid.column_options_guesser:
         class: Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser

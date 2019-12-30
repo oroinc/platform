@@ -67,10 +67,10 @@ services:
     oro_featuretoggle.voter.dependency_voter:
         class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\DependencyVoter'
         arguments:
-        - '@oro_featuretoggle.checker.feature_checker'
-        - '@oro_featuretoggle.configuration.manager'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_featuretoggle.configuration.manager'
         tags:
-        - { name: oro_featuretogle.voter }
+            - { name: oro_featuretogle.voter }
 
     oro_featuretoggle.event_listener.request:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
