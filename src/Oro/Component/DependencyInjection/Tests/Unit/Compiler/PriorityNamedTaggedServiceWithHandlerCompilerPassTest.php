@@ -2,14 +2,14 @@
 
 namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceWithServiceLocatorCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class PriorityTaggedServiceWithServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
+class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private const SERVICE_ID = 'test_service';
     private const TAG_NAME   = 'test_tag';
@@ -30,7 +30,7 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPassTest extends \PHPUnit\F
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
 
-        $compiler = new PriorityTaggedServiceWithServiceLocatorCompilerPass(
+        $compiler = new PriorityNamedTaggedServiceWithHandlerCompilerPass(
             self::SERVICE_ID,
             self::TAG_NAME,
             function (array $attributes, string $serviceId, string $tagName): array {
@@ -45,7 +45,7 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPassTest extends \PHPUnit\F
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
 
-        $compiler = new PriorityTaggedServiceWithServiceLocatorCompilerPass(
+        $compiler = new PriorityNamedTaggedServiceWithHandlerCompilerPass(
             self::SERVICE_ID,
             self::TAG_NAME,
             function (array $attributes, string $serviceId, string $tagName): array {
@@ -60,7 +60,7 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPassTest extends \PHPUnit\F
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class, [[], null]));
 
-        $compiler = new PriorityTaggedServiceWithServiceLocatorCompilerPass(
+        $compiler = new PriorityNamedTaggedServiceWithHandlerCompilerPass(
             self::SERVICE_ID,
             self::TAG_NAME,
             function (array $attributes, string $serviceId, string $tagName): array {
@@ -91,7 +91,7 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPassTest extends \PHPUnit\F
             ->addTag(self::TAG_NAME, ['attr1' => 'val2'])
             ->addTag(self::TAG_NAME, ['attr1' => 'val1', 'priority' => 5]);
 
-        $compiler = new PriorityTaggedServiceWithServiceLocatorCompilerPass(
+        $compiler = new PriorityNamedTaggedServiceWithHandlerCompilerPass(
             self::SERVICE_ID,
             self::TAG_NAME,
             function (array $attributes, string $serviceId, string $tagName): array {

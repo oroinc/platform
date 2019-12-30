@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * and adds an array of items returned by the attributes handler and a service locator contains them
  * to the definition of the given service.
  */
-class PriorityTaggedServiceWithServiceLocatorCompilerPass implements CompilerPassInterface
+class PriorityNamedTaggedServiceWithHandlerCompilerPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
@@ -69,9 +69,7 @@ class PriorityTaggedServiceWithServiceLocatorCompilerPass implements CompilerPas
                 );
             }
         }
-        if ($items) {
-            $items = $this->sortByPriorityAndFlatten($items);
-        }
+        $items = $this->sortByPriorityAndFlatten($items);
 
         $container->getDefinition($this->serviceId)
             ->setArgument(0, $items)

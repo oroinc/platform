@@ -21,24 +21,24 @@ class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInter
     private $serviceId;
 
     /** @var string */
-    private $addMethodName;
+    private $tagName;
 
     /** @var string */
-    private $tagName;
+    private $addMethodName;
 
     /** @var bool */
     private $isServiceOptional;
 
     /**
      * @param string $serviceId
-     * @param string $addMethodName
      * @param string $tagName
+     * @param string $addMethodName
      * @param bool   $isServiceOptional
      */
     public function __construct(
         string $serviceId,
-        string $addMethodName,
         string $tagName,
+        string $addMethodName,
         bool $isServiceOptional = false
     ) {
         $this->serviceId = $serviceId;

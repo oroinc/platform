@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceWithServiceLocatorCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 
 /**
  * Registers tagged services that depend on the request type.
  */
-class RequestTypeDependedTaggedServiceCompilerPass extends PriorityTaggedServiceWithServiceLocatorCompilerPass
+class RequestTypeDependedTaggedServiceCompilerPass extends PriorityNamedTaggedServiceWithHandlerCompilerPass
 {
     use ApiTaggedServiceTrait;
 

@@ -66,8 +66,8 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_api.entity_exclusion_provider.shared',
-            'addProvider',
-            'oro_entity.exclusion_provider.api'
+            'oro_entity.exclusion_provider.api',
+            'addProvider'
         ));
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());

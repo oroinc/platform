@@ -10,8 +10,8 @@ use Symfony\Component\DependencyInjection\Reference;
 class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private const SERVICE_ID      = 'test_service';
-    private const ADD_METHOD_NAME = 'addTaggedService';
     private const TAG_NAME        = 'test_tag';
+    private const ADD_METHOD_NAME = 'addTaggedService';
 
     /** @var ContainerBuilder */
     private $container;
@@ -31,8 +31,8 @@ class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framewo
 
         $compiler = new PriorityTaggedServiceViaAddMethodCompilerPass(
             self::SERVICE_ID,
-            self::ADD_METHOD_NAME,
-            self::TAG_NAME
+            self::TAG_NAME,
+            self::ADD_METHOD_NAME
         );
         $compiler->process($this->container);
     }
@@ -44,8 +44,8 @@ class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framewo
 
         $compiler = new PriorityTaggedServiceViaAddMethodCompilerPass(
             self::SERVICE_ID,
-            self::ADD_METHOD_NAME,
             self::TAG_NAME,
+            self::ADD_METHOD_NAME,
             true
         );
         $compiler->process($this->container);
@@ -57,8 +57,8 @@ class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framewo
 
         $compiler = new PriorityTaggedServiceViaAddMethodCompilerPass(
             self::SERVICE_ID,
-            self::ADD_METHOD_NAME,
-            self::TAG_NAME
+            self::TAG_NAME,
+            self::ADD_METHOD_NAME
         );
         $compiler->process($this->container);
 
@@ -78,8 +78,8 @@ class PriorityTaggedServiceViaAddMethodCompilerPassTest extends \PHPUnit\Framewo
 
         $compiler = new PriorityTaggedServiceViaAddMethodCompilerPass(
             self::SERVICE_ID,
-            self::ADD_METHOD_NAME,
-            self::TAG_NAME
+            self::TAG_NAME,
+            self::ADD_METHOD_NAME
         );
         $compiler->process($this->container);
 

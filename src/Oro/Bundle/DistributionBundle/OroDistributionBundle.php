@@ -23,8 +23,8 @@ class OroDistributionBundle extends Bundle
         $container->addCompilerPass(new CacheConfigurationPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_distribution.routing_options_resolver',
-            'addResolver',
-            'routing.options_resolver'
+            'routing.options_resolver',
+            'addResolver'
         ));
         $container->addCompilerPass(new HiddenRoutesPass());
     }
