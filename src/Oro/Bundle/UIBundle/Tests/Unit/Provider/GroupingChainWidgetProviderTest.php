@@ -5,27 +5,25 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 use Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider;
 use Oro\Bundle\UIBundle\Provider\LabelProviderInterface;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
-    protected $highPriorityProvider;
+    private $highPriorityProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
-    protected $lowPriorityProvider;
+    private $lowPriorityProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
-    protected $unsupportedProvider;
+    private $unsupportedProvider;
 
     protected function setUp()
     {
-        $this->highPriorityProvider =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
-        $this->lowPriorityProvider  =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
-        $this->unsupportedProvider  =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+        $this->highPriorityProvider = $this->createMock(WidgetProviderInterface::class);
+        $this->lowPriorityProvider = $this->createMock(WidgetProviderInterface::class);
+        $this->unsupportedProvider = $this->createMock(WidgetProviderInterface::class);
     }
 
     public function testSupports()
@@ -182,12 +180,11 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
      * @param bool $setEventDispatcher
      * @return GroupingChainWidgetProvider
      */
-    protected function getChainProvider($withGroupNameProvider = false, $setEventDispatcher = true)
+    private function getChainProvider($withGroupNameProvider = false, $setEventDispatcher = true)
     {
         $groupNameProvider = null;
         if ($withGroupNameProvider) {
-            /** @var \PHPUnit\Framework\MockObject\MockObject|LabelProviderInterface $groupNameProvider */
-            $groupNameProvider = $this->createMock('Oro\Bundle\UIBundle\Provider\LabelProviderInterface');
+            $groupNameProvider = $this->createMock(LabelProviderInterface::class);
             $groupNameProvider->expects($this->any())
                 ->method('getLabel')
                 ->will(
@@ -199,22 +196,27 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
                 );
         }
 
+        $pageType = null;
+        $eventDispatcher = null;
         if ($setEventDispatcher) {
-            /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface $eventDispatcher */
-            $eventDispatcher = $this->createMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+            $pageType = 1;
+            $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
             $eventDispatcher->expects($this->once())
                 ->method('dispatch');
         }
 
-        $chainProvider = new GroupingChainWidgetProvider(
+        $providerContainer = TestContainerBuilder::create()
+            ->add('low_priority_provider', $this->lowPriorityProvider)
+            ->add('high_priority_provider', $this->highPriorityProvider)
+            ->add('unsupported_provider', $this->unsupportedProvider)
+            ->getContainer($this);
+
+        return new GroupingChainWidgetProvider(
+            [['low_priority_provider', null], ['high_priority_provider', null], ['unsupported_provider', null]],
+            $providerContainer,
             $groupNameProvider,
-            isset($eventDispatcher) ? $eventDispatcher : null
+            $eventDispatcher,
+            $pageType
         );
-
-        $chainProvider->addProvider($this->lowPriorityProvider);
-        $chainProvider->addProvider($this->highPriorityProvider);
-        $chainProvider->addProvider($this->unsupportedProvider);
-
-        return $chainProvider;
     }
 }

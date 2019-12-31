@@ -41,7 +41,7 @@ trait PriorityTaggedLocatorTrait
         $services = [];
         if ($items) {
             $items = $this->sortByPriorityAndFlatten($items, $inversePriority);
-            foreach ($items as [$key, $id]) {
+            foreach ($items as list($key, $id)) {
                 if (!isset($services[$key])) {
                     $services[$key] = new Reference($id);
                 }
@@ -49,5 +49,35 @@ trait PriorityTaggedLocatorTrait
         }
 
         return $services;
+    }
+
+    /**
+     * @param string           $tagName
+     * @param \Closure         $handler         function (array $attributes, string $serviceId, string $tagName): array
+     * @param ContainerBuilder $container
+     * @param bool             $inversePriority if TRUE, ksort() will be used instead of krsort() to sort be priority
+     *
+     * @return array [services, items]
+     *               services - [service name => service reference, ...]
+     *               items - [[value, ...], ...]
+     */
+    private function findAndSortTaggedServicesWithHandler(
+        string $tagName,
+        \Closure $handler,
+        ContainerBuilder $container,
+        bool $inversePriority = false
+    ): array {
+        $services = [];
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $items[$this->getPriorityAttribute($attributes)][] = $handler($attributes, $id, $tagName);
+            }
+        }
+        $items = $this->sortByPriorityAndFlatten($items, $inversePriority);
+
+        return [$services, $items];
     }
 }

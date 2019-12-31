@@ -4,12 +4,13 @@ namespace Oro\Bundle\UIBundle\ContentProvider;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CurrentRouteContentProvider extends AbstractContentProvider
+/**
+ * Returns the master request route name.
+ */
+class CurrentRouteContentProvider implements ContentProviderInterface
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var RequestStack */
+    private $requestStack;
 
     /**
      * @param RequestStack $requestStack
@@ -25,18 +26,10 @@ class CurrentRouteContentProvider extends AbstractContentProvider
     public function getContent()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request) {
-            return $request->attributes->get('_master_request_route');
+        if (null === $request) {
+            return null;
         }
 
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'currentRoute';
+        return $request->attributes->get('_master_request_route');
     }
 }

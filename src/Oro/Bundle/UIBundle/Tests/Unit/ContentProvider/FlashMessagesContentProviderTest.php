@@ -36,9 +36,4 @@ class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($flashBag));
         $this->assertEquals($messages, $this->provider->getContent());
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('flashMessages', $this->provider->getName());
-    }
 }

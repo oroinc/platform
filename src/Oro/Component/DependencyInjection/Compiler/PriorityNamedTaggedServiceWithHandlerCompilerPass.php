@@ -5,7 +5,6 @@ namespace Oro\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Finds all services with the given tag name, orders them by their priority
@@ -14,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class PriorityNamedTaggedServiceWithHandlerCompilerPass implements CompilerPassInterface
 {
-    use TaggedServiceTrait;
+    use PriorityTaggedLocatorTrait;
 
     /** @var string */
     private $serviceId;
@@ -55,21 +54,11 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPass implements CompilerPassI
             return;
         }
 
-        $services = [];
-        $items = [];
-        $taggedServices = $container->findTaggedServiceIds($this->tagName);
-        foreach ($taggedServices as $id => $tags) {
-            $services[$id] = new Reference($id);
-            foreach ($tags as $attributes) {
-                $items[$this->getPriorityAttribute($attributes)][] = \call_user_func(
-                    $this->attributesHandler,
-                    $attributes,
-                    $id,
-                    $this->tagName
-                );
-            }
-        }
-        $items = $this->sortByPriorityAndFlatten($items);
+        [$services, $items] = $this->findAndSortTaggedServicesWithHandler(
+            $this->tagName,
+            $this->attributesHandler,
+            $container
+        );
 
         $container->getDefinition($this->serviceId)
             ->setArgument(0, $items)

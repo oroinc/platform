@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
+use Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\Events;
@@ -46,19 +46,15 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->environment = $this->createMock(Environment::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contentProviderManager = $this->getMockBuilder(ContentProviderManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->contentProviderManager = $this->createMock(TwigContentProviderManager::class);
         $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
 
         $container = self::getContainerBuilder()
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
-            ->add(ContentProviderManager::class, $this->contentProviderManager)
-            ->add(UserAgentProviderInterface::class, $this->userAgentProvider)
+            ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
+            ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
             ->getContainer($this);
 
         $this->extension = new UiExtension($container);

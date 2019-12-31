@@ -5,47 +5,49 @@ namespace Oro\Bundle\UIBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 use Oro\Bundle\UIBundle\Event\Events;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * This provider calls all registered leaf providers in a chain, merges and does grouping of widgets returned
- * by each leaf provider and orders result widgets by priority.
+ * This provider calls all registered child providers to get widgets
+ * and returns merged, grouped and ordered by priority widgets.
  */
 class GroupingChainWidgetProvider implements WidgetProviderInterface
 {
-    /** @var array [WidgetProviderInterface, group] */
-    protected $providers = [];
+    /** @var array [[provider id, group], ...] */
+    private $providers;
 
-    /** @var LabelProviderInterface */
-    protected $groupNameProvider;
+    /** @var ContainerInterface */
+    private $providerContainer;
 
-    /** @var  EventDispatcherInterface */
-    protected $eventDispatcher;
+    /** @var int */
+    private $pageType;
+
+    /** @var LabelProviderInterface|null */
+    private $groupNameProvider;
+
+    /** @var EventDispatcherInterface|null */
+    private $eventDispatcher;
 
     /**
-     * @param LabelProviderInterface   $groupNameProvider
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param int|null                 $pageType
+     * @param array                         $providers
+     * @param ContainerInterface            $providerContainer
+     * @param LabelProviderInterface|null   $groupNameProvider
+     * @param EventDispatcherInterface|null $eventDispatcher
+     * @param int                           $pageType
      */
     public function __construct(
+        array $providers,
+        ContainerInterface $providerContainer,
         LabelProviderInterface $groupNameProvider = null,
         EventDispatcherInterface $eventDispatcher = null,
-        $pageType = null
+        int $pageType = null
     ) {
+        $this->providers = $providers;
+        $this->providerContainer = $providerContainer;
         $this->groupNameProvider = $groupNameProvider;
-        $this->eventDispatcher   = $eventDispatcher;
-        $this->pageType          = $pageType;
-    }
-
-    /**
-     * Registers the given provider in the chain
-     *
-     * @param WidgetProviderInterface $provider
-     * @param string|null             $group
-     */
-    public function addProvider(WidgetProviderInterface $provider, $group = null)
-    {
-        $this->providers[] = [$provider, $group];
+        $this->eventDispatcher = $eventDispatcher;
+        $this->pageType = $pageType;
     }
 
     /**
@@ -85,16 +87,13 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
                 $result[$groupName] = [
                     'widgets' => []
                 ];
-                if ($this->groupNameProvider && !empty($groupName)) {
-                    $result[$groupName]['label'] = $this->groupNameProvider->getLabel(
-                        [
-                            'groupName'   => $groupName,
-                            'entityClass' => ClassUtils::getClass($object)
-                        ]
-                    );
+                if (null !== $this->groupNameProvider && $groupName) {
+                    $result[$groupName]['label'] = $this->groupNameProvider->getLabel([
+                        'groupName'   => $groupName,
+                        'entityClass' => ClassUtils::getClass($object)
+                    ]);
                 }
             }
-
             $result[$groupName]['widgets'][] = $widget;
         }
 
@@ -113,31 +112,26 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
         $result = [];
 
         // collect widgets
-        foreach ($this->providers as $item) {
+        foreach ($this->providers as list($providerId, $group)) {
             /** @var WidgetProviderInterface $provider */
-            $provider = $item[0];
-            /** @var string|null $group */
-            $group = $item[1];
-
+            $provider = $this->providerContainer->get($providerId);
             if ($provider->supports($object)) {
                 $widgets = $provider->getWidgets($object);
-                if (!empty($widgets)) {
-                    foreach ($widgets as $widget) {
-                        if (!empty($group) && !isset($widget['group'])) {
-                            $widget['group'] = $group;
-                        }
-                        $priority = isset($widget['priority']) ? $widget['priority'] : 0;
-                        unset($widget['priority']);
-                        $result[$priority][] = $widget;
+                foreach ($widgets as $widget) {
+                    if ($group && !isset($widget['group'])) {
+                        $widget['group'] = $group;
                     }
+                    $priority = $widget['priority'] ?? 0;
+                    unset($widget['priority']);
+                    $result[$priority][] = $widget;
                 }
             }
         }
 
         // sort by priority and flatten
-        if (!empty($result)) {
+        if ($result) {
             ksort($result);
-            $result = call_user_func_array('array_merge', $result);
+            $result = array_merge(...$result);
         }
 
         return $result;
