@@ -63,7 +63,7 @@ class NestedTreeComparisonExpression implements ComparisonExpressionInterface
         }
 
         $visitor->addParameter($parameterName, $value);
-        $subquery = $visitor->createSubquery();
+        $subquery = $visitor->createSubquery($field ?: null);
         $this->buildSubquery($subquery, $visitor->buildPlaceholder($parameterName));
 
         return $visitor->getExpressionBuilder()->exists($subquery->getDQL());
