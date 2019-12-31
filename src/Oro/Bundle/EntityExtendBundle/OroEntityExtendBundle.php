@@ -83,7 +83,6 @@ class OroEntityExtendBundle extends Bundle
                 ]
             )
         );
-        $container->addCompilerPass(new Compiler\ExtensionPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
