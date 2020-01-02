@@ -1,6 +1,6 @@
 # OroAttachmentBundle
 
-OroAttachmentBundle introduces two entity field types: an image and a file, and enables their usage with the Oro extended entities.
+OroAttachmentBundle introduces few entity field types: image, file, multiImage and multiFile. Enables their usage with the Oro extended entities.
 
 ## System Configuration
 
@@ -36,6 +36,14 @@ When creating a new file field type, a user should specify the maximum size of t
 
 On the entity record's details page, this field is displayed as a link to download this file.
 
+## MultiFile Type
+
+**MultiFile** field provides ability to upload collection of files to any entity.
+
+Supports the following options: maximum file size, maximum number of files that allowed to add.
+
+On the entity record's details page, this field is displayed as a grid with links to download files.
+
 ## Image Type
 
 Image file type enables to upload images to any entity.
@@ -43,6 +51,18 @@ Image file type enables to upload images to any entity.
 When creating a new image field type, a user should specify maximum size of the file supported for this field as well as its width and height to enable the thumbnail image preview.
 
 On the entity record's details page, this field is displayed as a thumbnail image with a link to download the original image file.
+
+Can be used with Digital Asset Management (DAM) functionality.
+
+## MultiImage Type
+
+**MultiImage** field provides ability to upload collection of images to any entity.
+
+Supports the following options: maximum file size, thumbnail width and height, maximum number of files that allowed to add.
+
+On the entity record's details page, this field is displayed as a grid with thumbnail image and links to download the original image file.
+
+Can be used with Digital Asset Management (DAM) functionality.
 
 ## Storage Configuration
 
