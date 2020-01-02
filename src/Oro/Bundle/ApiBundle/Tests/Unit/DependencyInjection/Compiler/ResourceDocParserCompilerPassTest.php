@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -42,7 +41,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenNoResourceDocParsers()
     {
         $config = ['api_doc_views' => []];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $this->compiler->process($this->container);
 
@@ -58,7 +57,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWithoutApiDocViews()
     {
         $config = ['api_doc_views' => []];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -112,7 +111,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 'view5' => []
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -163,7 +162,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -209,7 +208,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -255,7 +254,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);

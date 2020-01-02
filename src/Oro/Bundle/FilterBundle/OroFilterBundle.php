@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle;
 
-use Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -18,9 +18,10 @@ class OroFilterBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new FilterTypesPass(
+        $container->addCompilerPass(new PriorityNamedTaggedServiceCompilerPass(
             'oro_filter.extension.orm_filter_bag',
-            'oro_filter.extension.orm_filter.filter'
+            'oro_filter.extension.orm_filter.filter',
+            'type'
         ));
     }
 }

@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
+use Oro\Bundle\ScopeBundle\Tests\Functional\DataFixtures\LoadScopeData;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\FormScopeCriteriaResolver;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
@@ -44,7 +44,7 @@ class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
                         'field1' => 'parent_scope_value',
                         'field2' => 'parent_scope_value',
                     ],
-                    new ClassMetadata(Scope::class)
+                    $this->createMock(ClassMetadataFactory::class)
                 )
             );
         $parentFormConfig->method('hasOption')

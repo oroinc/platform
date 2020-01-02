@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\MigrationBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all migration extensions.
+ */
 class MigrationExtensionPass implements CompilerPassInterface
 {
-    const MANAGER_SERVICE_KEY = 'oro_migration.migrations.extension_manager';
-    const TAG                 = 'oro_migration.extension';
+    use TaggedServiceTrait;
+
+    private const MANAGER_SERVICE_KEY = 'oro_migration.migrations.extension_manager';
+    private const TAG                 = 'oro_migration.extension';
 
     /**
      * {@inheritdoc}
@@ -20,8 +25,8 @@ class MigrationExtensionPass implements CompilerPassInterface
         if (!$container->hasDefinition(self::MANAGER_SERVICE_KEY)) {
             return;
         }
-        $storageDefinition = $container->getDefinition(self::MANAGER_SERVICE_KEY);
 
+        $storageDefinition = $container->getDefinition(self::MANAGER_SERVICE_KEY);
         $extensions = $this->loadExtensions($container);
         foreach ($extensions as $extensionName => $extensionServiceId) {
             $storageDefinition->addMethodCall(
@@ -32,33 +37,19 @@ class MigrationExtensionPass implements CompilerPassInterface
     }
 
     /**
-     * Load migration extensions services
-     *
      * @param ContainerBuilder $container
+     *
      * @return array
-     * @throws InvalidConfigurationException
      */
-    protected function loadExtensions(ContainerBuilder $container)
+    private function loadExtensions(ContainerBuilder $container): array
     {
+        $extensions = [];
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
-        $extensions     = [];
-        foreach ($taggedServices as $id => $tagAttributes) {
-            if ($container->hasDefinition($id)) {
-                $container->getDefinition($id)->setPublic(false);
-            }
-            $priority = 0;
-            $extensionName = null;
-            foreach ($tagAttributes as $attributes) {
-                if (!empty($attributes['priority'])) {
-                    $priority = (int)$attributes['priority'];
-                }
-                if (!isset($attributes['extension_name']) || empty($attributes['extension_name'])) {
-                    throw new InvalidConfigurationException(
-                        sprintf('Tag attribute "extension_name" is required for "%s" service', $id)
-                    );
-                }
-                $extensionName = $attributes['extension_name'];
-            }
+        foreach ($taggedServices as $id => $tags) {
+            $container->getDefinition($id)->setPublic(false);
+            $attributes = $tags[0];
+            $priority = $this->getPriorityAttribute($attributes);
+            $extensionName = $this->getRequiredAttribute($attributes, 'extension_name', $id, self::TAG);
             if (!isset($extensions[$extensionName])) {
                 $extensions[$extensionName] = [];
             }

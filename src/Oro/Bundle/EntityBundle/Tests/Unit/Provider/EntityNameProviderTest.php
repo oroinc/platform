@@ -66,6 +66,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $entity->setName('test');
 
         $this->metadata->expects($this->any())
+            ->method('getName')
+            ->willReturn(TestEntity::class);
+        $this->metadata->expects($this->any())
             ->method('hasField')
             ->willReturnMap(
                 [
@@ -173,6 +176,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNameDQLShortNoIdentifier()
     {
+        $this->metadata->expects($this->any())
+            ->method('getName')
+            ->willReturn(TestEntity::class);
         $this->metadata->expects($this->any())
             ->method('hasField')
             ->willReturnMap(

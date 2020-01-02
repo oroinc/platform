@@ -1,5 +1,5 @@
 services:
-    oro_workflow.entity_manager_clearer_stub:
+    oro_workflow.tests.entity_manager_clearer_stub:
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\EntityManagerClearerStub
         public: true
         arguments:
@@ -11,12 +11,12 @@ services:
         tags:
             - { name: oro_scope.provider, scopeType: workflow_definition, priority: -255 }
 
-    oro_workflow.notification_manager:
+    oro_workflow.tests.notification_manager:
         decorates: oro_notification.manager
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\NotificationManager
         parent: oro_notification.manager
 
-    oro_workflow.notification_email_handler:
+    oro_workflow.tests.notification_email_handler:
         decorates: oro_notification.email_handler
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\EmailNotificationHandler
         parent: oro_notification.email_handler

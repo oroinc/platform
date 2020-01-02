@@ -5,7 +5,6 @@ namespace Oro\Bundle\CommentBundle\Entity\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -255,7 +254,7 @@ class CommentApiManager extends ApiEntityManager
      *
      * @param User $user
      *
-     * @return string
+     * @return array
      */
     protected function getCommentAvatarImageUrl($user)
     {
@@ -264,10 +263,9 @@ class CommentApiManager extends ApiEntityManager
             $attachment->getFilename() &&
             ($this->attachmentManager instanceof AttachmentManager)
         ) {
-            $entityClass = ClassUtils::getRealClass($user);
             $config = $this->configManager
                 ->getProvider('attachment')
-                ->getConfig($entityClass, self::AVATAR_FIELD_NAME);
+                ->getConfig(get_class($user), self::AVATAR_FIELD_NAME);
             return [
                 'avatarUrl' => $this->attachmentManager
                     ->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'))

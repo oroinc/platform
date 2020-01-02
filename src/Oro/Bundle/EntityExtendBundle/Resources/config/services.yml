@@ -71,6 +71,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
         arguments:
             - '%kernel.cache_dir%'
+            - !tagged_iterator oro_entity_extend.entity_generator_extension
 
     oro_entity_extend.entity_generator.extension:
         class: Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
@@ -79,7 +80,6 @@ services:
 
     oro_entity_extend.tools.dumper:
         class: Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
-        public: true
         arguments:
             - "@oro_entity_config.entity_manager_bag"
             - "@oro_entity_config.config_manager"
@@ -88,6 +88,7 @@ services:
             - "@oro_entity_extend.entity_generator"
             - "@oro_entity_config.provider.extend_entity_config_provider"
             - '%kernel.cache_dir%'
+            - !tagged_iterator oro_entity_extend.entity_config_dumper_extension
 
     oro_entity_extend.entity_config_dumper.extension.association:
         abstract: true
@@ -588,7 +589,7 @@ services:
         class: Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate
         public: true
         arguments:
-            - [] # warmers; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
+            - !tagged_iterator oro_entity_extend.warmer
 
     oro_entity_extend.console_command_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\ConsoleCommandListener

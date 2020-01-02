@@ -28,13 +28,8 @@ class TitleShortContentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->titleService->expects($this->once())
             ->method('render')
-            ->with(array(), null, null, null, true, true)
+            ->with([], null, null, null, true, true)
             ->will($this->returnValue('title_content'));
         $this->assertEquals('title_content', $this->provider->getContent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('titleShort', $this->provider->getName());
     }
 }

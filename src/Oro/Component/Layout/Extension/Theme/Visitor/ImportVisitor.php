@@ -15,6 +15,9 @@ use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
+/**
+ * Provides possibility to include layout updates from folder `imports`.
+ */
 class ImportVisitor implements VisitorInterface
 {
     const IMPORT_FOLDER = 'imports';
@@ -34,6 +37,9 @@ class ImportVisitor implements VisitorInterface
     /** @var array */
     private $updates = [];
 
+    /** @var string */
+    private $rootName = 'root';
+
     /**
      * @param LayoutUpdateLoaderInterface $loader
      * @param DependencyInitializer $dependencyInitializer
@@ -50,6 +56,14 @@ class ImportVisitor implements VisitorInterface
         $this->dependencyInitializer = $dependencyInitializer;
         $this->resourceProvider = $resourceProvider;
         $this->themeManager = $themeManager;
+    }
+
+    /**
+     * @param string $rootName
+     */
+    public function setRootName(string $rootName): void
+    {
+        $this->rootName = $rootName;
     }
 
     /**
@@ -123,7 +137,7 @@ class ImportVisitor implements VisitorInterface
     {
         $el = $update instanceof ElementDependentLayoutUpdateInterface
             ? $update->getElement()
-            : 'root';
+            : $this->rootName;
 
         $parentUpdateIndex = array_search($parentUpdate, $this->updates[$el]);
 

@@ -334,7 +334,7 @@ services:
     oro_locale.provider.current_localization:
         class: Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider
         arguments:
-            - !tagged oro_locale.extension.current_localization
+            - !tagged_iterator oro_locale.extension.current_localization
 
     oro_locale.provider.config_default_localization:
         class: Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider
@@ -370,7 +370,7 @@ services:
     oro_locale.provider.preferred_localization_provider:
         class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLocalizationProvider
         arguments:
-            - !tagged oro_locale.preferred_localization_provider
+            - !tagged_iterator oro_locale.preferred_localization_provider
 
     Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface:
         alias: 'oro_locale.provider.preferred_localization_provider'

@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to select an entity from a list.
+ */
 class EntitySelectType extends AbstractType
 {
     const NAME = 'oro_entity_select';
@@ -33,9 +36,8 @@ class EntitySelectType extends AbstractType
     {
         $vars = ['configs' => $options['configs']];
         if ($form->getData()) {
-            $data = $form->getParent()->getData();
-
-            $fieldConfig = $this->cm->getProvider('extend')->getConfig($data, $form->getName());
+            $parentData = $form->getParent()->getData();
+            $fieldConfig = $this->cm->getProvider('extend')->getConfig(get_class($parentData), $form->getName());
             if ($form->getData()) {
                 /** @var ConverterInterface|EntitySelectHandler $converter */
                 $converter = $options['converter'];
