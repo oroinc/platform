@@ -229,6 +229,44 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testWalkComparisonWithEmptyFieldName()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['IN' => new InComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+
+        $comparison = new Comparison('', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+        self::assertEquals(
+            new QueryExpr\Func(' IN', [':e']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+
+        $comparison = new Comparison('', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+        self::assertEquals(
+            new QueryExpr\Func(' IN', [':e_1']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e', [1, 2, 3]),
+                new Parameter('e_1', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
+
     /**
      * @expectedException \Doctrine\ORM\Query\QueryException
      * @expectedExceptionMessage Unknown comparison operator "NOT SUPPORTED".

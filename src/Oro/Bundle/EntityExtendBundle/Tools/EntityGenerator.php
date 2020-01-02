@@ -13,23 +13,22 @@ use Symfony\Component\Yaml\Yaml;
 class EntityGenerator
 {
     /** @var string */
-    protected $cacheDir;
+    private $cacheDir;
 
     /** @var string */
-    protected $entityCacheDir;
+    private $entityCacheDir;
 
-    /** @var array */
-    protected $extensions = [];
-
-    /** @var AbstractEntityGeneratorExtension[]|null */
-    protected $sortedExtensions;
+    /** @var iterable|AbstractEntityGeneratorExtension[] */
+    private $extensions;
 
     /**
      * @param string $cacheDir
+     * @param iterable|AbstractEntityGeneratorExtension[] $extensions
      */
-    public function __construct($cacheDir)
+    public function __construct(string $cacheDir, iterable $extensions)
     {
         $this->setCacheDir($cacheDir);
+        $this->extensions = $extensions;
     }
 
     /**
@@ -49,20 +48,8 @@ class EntityGenerator
      */
     public function setCacheDir($cacheDir)
     {
-        $this->cacheDir       = $cacheDir;
+        $this->cacheDir = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
-    }
-
-    /**
-     * @param AbstractEntityGeneratorExtension $extension
-     * @param int                              $priority
-     */
-    public function addExtension(AbstractEntityGeneratorExtension $extension, $priority = 0)
-    {
-        if (!isset($this->extensions[$priority])) {
-            $this->extensions[$priority] = [];
-        }
-        $this->extensions[$priority][] = $extension;
     }
 
     /**
@@ -102,8 +89,7 @@ class EntityGenerator
             $class->setAbstract(true);
         }
 
-        $extensions = $this->getExtensions();
-        foreach ($extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             if ($extension->supports($schema)) {
                 $extension->generate($schema, $class);
             }
@@ -121,20 +107,5 @@ class EntityGenerator
             $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
             Yaml::dump($schema['doctrine'], 5)
         );
-    }
-
-    /**
-     * Return sorted extensions
-     *
-     * @return AbstractEntityGeneratorExtension[]
-     */
-    protected function getExtensions()
-    {
-        if (null === $this->sortedExtensions) {
-            krsort($this->extensions);
-            $this->sortedExtensions = array_merge(...$this->extensions);
-        }
-
-        return $this->sortedExtensions;
     }
 }

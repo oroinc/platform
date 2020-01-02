@@ -2,25 +2,83 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
+use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubEntity;
 
 class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $classMetadataFactory;
+
+    protected function setUp()
+    {
+        $this->classMetadataFactory = $this->createMock(ClassMetadataFactory::class);
+    }
+
+    public function testGetIdentifier()
+    {
+        $entityIdReflProperty = new \ReflectionProperty(StubEntity::class, 'id');
+        $entityIdReflProperty->setAccessible(true);
+        $entityClassMetadata = new ClassMetadata(StubEntity::class);
+        $entityClassMetadata->fieldMappings = ['id' => []];
+        $entityClassMetadata->reflFields = ['id' => $entityIdReflProperty];
+        $entityClassMetadata->setIdentifier(['id']);
+        $this->classMetadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with(StubEntity::class)
+            ->willReturn($entityClassMetadata);
+        $newEntity1 = new StubEntity(null);
+        $newEntity2 = new StubEntity(null);
+        $newEntity3 = new StubEntity(null);
+        $criteria = new ScopeCriteria(
+            [
+                'nullField' => null,
+                'notNullField' => ScopeCriteria::IS_NOT_NULL,
+                'fieldWithValue' => 1,
+                'multiField' => [1, 2],
+                'newEntity' => $newEntity1,
+                'newEntities' => [$newEntity2, $newEntity3],
+                'entity' => new StubEntity(10),
+                'entities' => [new StubEntity(20), new StubEntity(30)]
+            ],
+            $this->classMetadataFactory
+        );
+        $this->assertEquals(
+            sprintf(
+                'nullField=;notNullField=IS_NOT_NULL;fieldWithValue=1;multiField=1,2;'
+                . 'newEntity=%s;newEntities=%s,%s;entity=10;entities=20,30;',
+                spl_object_hash($newEntity1),
+                spl_object_hash($newEntity2),
+                spl_object_hash($newEntity3)
+            ),
+            $criteria->getIdentifier()
+        );
+    }
+
     public function testToArray()
     {
         $criteriaData = [
             'field1' => 1,
-            'field2' => 2,
+            'field2' => 2
         ];
-        $criteria = new ScopeCriteria($criteriaData, new ClassMetadata(Scope::class));
+        $criteria = new ScopeCriteria($criteriaData, $this->createMock(ClassMetadataFactory::class));
         $this->assertSame($criteriaData, $criteria->toArray());
+    }
+
+    public function testGetIterator()
+    {
+        $criteriaData = [
+            'field1' => 1,
+            'field2' => 2
+        ];
+        $criteria = new ScopeCriteria($criteriaData, $this->createMock(ClassMetadataFactory::class));
+        $this->assertSame($criteriaData, iterator_to_array($criteria));
     }
 
     public function testApplyWhere()
@@ -35,6 +93,10 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             'ignoredField' => ['type' => ClassMetadata::MANY_TO_ONE],
             'multiField' => ['type' => ClassMetadata::MANY_TO_MANY]
         ];
+        $this->classMetadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(Scope::class)
+            ->willReturn($scopeClassMetadata);
         $criteria = new ScopeCriteria(
             [
                 'nullField' => null,
@@ -43,7 +105,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'ignoredField' => 2,
                 'multiField' => [1, 2],
             ],
-            $scopeClassMetadata
+            $this->classMetadataFactory
         );
         $qb->method('expr')->willReturn(new Expr());
         $qb->expects($this->exactly(4))
@@ -70,6 +132,10 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
 
+        $this->classMetadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(Scope::class)
+            ->willReturn(new ClassMetadata(Scope::class));
         $criteria = new ScopeCriteria(
             [
                 'nullField' => null,
@@ -77,7 +143,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
             ],
-            new ClassMetadata(Scope::class)
+            $this->classMetadataFactory
         );
         $qb->method('expr')->willReturn(new Expr());
         $qb->expects($this->exactly(3))
@@ -99,6 +165,10 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyToJoin()
     {
+        $this->classMetadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with(Scope::class)
+            ->willReturn(new ClassMetadata(Scope::class));
         $criteria = new ScopeCriteria(
             [
                 'joinField' => 5,
@@ -107,7 +177,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
             ],
-            new ClassMetadata(Scope::class)
+            $this->classMetadataFactory
         );
 
         $qb = $this->getBaseQbMock();
@@ -150,6 +220,10 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             'ignoredField' => ['type' => ClassMetadata::MANY_TO_ONE],
             'multiField' => ['type' => ClassMetadata::MANY_TO_MANY]
         ];
+        $this->classMetadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with(Scope::class)
+            ->willReturn($scopeClassMetadata);
         $criteria = new ScopeCriteria(
             [
                 'joinField' => 5,
@@ -159,7 +233,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 'ignoredField' => 2,
                 'multiField' => [1, 2],
             ],
-            $scopeClassMetadata
+            $this->classMetadataFactory
         );
         $qb = $this->getBaseQbMock();
 
@@ -217,7 +291,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
     /**
      * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getBaseQbMock()
+    private function getBaseQbMock()
     {
         /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
@@ -253,26 +327,5 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                 ]
             );
         return $qb;
-    }
-
-    /**
-     * @param $platform
-     * @param $qb
-     */
-    protected function platformIsCalled($platform, $qb)
-    {
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->expects($this->any())
-            ->method('getDatabasePlatform')
-            ->willReturn($platform);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($connection);
-        $qb->expects($this->any())
-            ->method('getEntityManager')
-            ->willReturn($em);
     }
 }

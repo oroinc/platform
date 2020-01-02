@@ -40,9 +40,4 @@ class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->provider->getContent());
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('currentRoute', $this->provider->getName());
-    }
 }

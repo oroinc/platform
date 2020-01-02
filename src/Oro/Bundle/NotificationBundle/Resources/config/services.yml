@@ -42,7 +42,7 @@ services:
     oro_notification.additional_email_association_provider:
         class: Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider
         arguments:
-            - !tagged oro_notification.additional_email_association_provider
+            - !tagged_iterator oro_notification.additional_email_association_provider
 
     oro_notification.additional_email_association_provider.default:
         class: Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProvider
@@ -75,17 +75,9 @@ services:
     oro_notification.manager:
         class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
         arguments:
-            - [] # handler service ids sorted by priority. They are set by Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass
-            - '@oro_notification.handler_locator'
+            - !tagged_iterator notification.handler
             - '@oro_notification.cache'
             - '@doctrine'
-
-    oro_notification.handler_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        arguments:
-            - [] # handlers. They are set by Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass
-        tags:
-            - { name: container.service_locator }
 
     oro_notification.cache:
         parent: oro.cache.abstract
@@ -157,6 +149,7 @@ services:
     oro_notification.email_notification_entity_provider:
         class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
         parent: oro_entity.entity_provider.abstract
+        lazy: true
         arguments:
             - '@doctrine'
 

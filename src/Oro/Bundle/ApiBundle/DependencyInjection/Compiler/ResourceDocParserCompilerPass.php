@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResourceDocParserCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID = 'oro_api.resource_doc_parser_registry';
     private const DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID  = 'oro_api.resource_doc_parser.template';
     private const RESOURCE_DOC_PARSER_TAG                 = 'oro.api.resource_doc_parser';
@@ -29,23 +31,23 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
         $services = [];
         $resourceDocParsers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOURCE_DOC_PARSER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
+        foreach ($taggedServices as $id => $tags) {
             $services[$id] = new Reference($id);
-            foreach ($attributes as $tagAttributes) {
-                $resourceDocParsers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
+            foreach ($tags as $attributes) {
+                $resourceDocParsers[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getRequestType($tagAttributes)
+                    $this->getRequestTypeAttribute($attributes)
                 ];
             }
         }
 
         if ($resourceDocParsers) {
-            $resourceDocParsers = DependencyInjectionUtil::sortByPriorityAndFlatten($resourceDocParsers);
+            $resourceDocParsers = $this->sortByPriorityAndFlatten($resourceDocParsers);
         }
 
         // add non defined explicitly parsers
         $existingRequestType = [];
-        foreach ($resourceDocParsers as list($id, $expr)) {
+        foreach ($resourceDocParsers as [$id, $expr]) {
             if ($expr) {
                 $existingRequestType[$this->normalizeRequestType($expr)] = true;
             }

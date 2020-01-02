@@ -41,6 +41,8 @@ services:
     oro_activity.widget_provider.activities:
         class: Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
         public: true
+        arguments:
+            - [] # providers
 
     oro_activity.widget_provider.activities.main:
         class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider

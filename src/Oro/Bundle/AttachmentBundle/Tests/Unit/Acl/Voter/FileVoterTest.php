@@ -75,9 +75,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     public function testVoteWhenNoSubject(): void
     {
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityClass');
-
         self::assertSame(
             VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, null, ['VIEW'])
@@ -93,10 +90,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testVoteWhenUnsupported(array $attributes, $subject, int $expectedResult): void
     {
-        $this->doctrineHelper
-            ->method('getEntityClass')
-            ->willReturn(get_class($subject));
-
         self::assertSame(
             $expectedResult,
             $this->voter->vote($this->token, $subject, $attributes)
@@ -178,10 +171,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     private function mockDoctrineHelper(): void
     {
-        $this->doctrineHelper
-            ->method('getEntityClass')
-            ->willReturn(File::class);
-
         $this->doctrineHelper
             ->method('getSingleEntityIdentifier')
             ->willReturn(self::FILE_ID);

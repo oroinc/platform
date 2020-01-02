@@ -48,7 +48,6 @@ class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
             new Compiler\BuildMessageProcessorRegistryPass(),
             new Compiler\BuildTopicMetaSubscribersPass(),
             new Compiler\BuildDestinationMetaRegistryPass(),
-            new Compiler\BuildMessageToArrayConverterPass(),
             new Compiler\BuildMonologHandlersPass(),
             new Compiler\ConfigureClearersPass(),
             new Compiler\MakeLoggerServicesPersistentPass(),

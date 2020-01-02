@@ -160,9 +160,11 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
     private function setConfigProvider($object, $hasConfig, $isEnabled)
     {
+        $class = is_object($object) ? get_class($object) : $object;
+
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->with($object)
+            ->with($class)
             ->willReturn($hasConfig);
 
         if ($hasConfig) {
@@ -173,7 +175,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
             $this->configProvider->expects($this->once())
                 ->method('getConfig')
-                ->with($object)
+                ->with($class)
                 ->willReturn($config);
         }
     }

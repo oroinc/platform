@@ -19,25 +19,6 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
         $this->featureToggleVotersPass = new FeatureToggleVotersPass();
     }
 
-    public function testSkipProcess()
-    {
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
-        $container = $this->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_featuretoggle.checker.feature_checker')
-            ->willReturn(false);
-
-        $container->expects($this->never())
-            ->method('findTaggedServiceIds')
-            ->with('oro_featuretogle.voter');
-
-        $this->featureToggleVotersPass->process($container);
-    }
-    
     public function testProcess()
     {
         $voters = [
@@ -63,11 +44,6 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_featuretoggle.checker.feature_checker')
-            ->willReturn(true);
 
         $container->expects($this->once())
             ->method('getDefinition')

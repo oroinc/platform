@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,8 +22,16 @@ class OroFormBundle extends Bundle
 
         $container->addCompilerPass(new Compiler\AutocompleteCompilerPass());
         $container->addCompilerPass(new Compiler\FormGuesserCompilerPass());
-        $container->addCompilerPass(new Compiler\FormTemplateDataProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\FormHandlerCompilerPass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_form.registry.form_template_data_provider',
+            'oro_form.form_template_data_provider',
+            'alias'
+        ));
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_form.registry.form_handler',
+            'oro_form.form.handler',
+            'alias'
+        ));
     }
 
     /**

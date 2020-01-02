@@ -10,6 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class OroApiBundle extends Bundle
 {
+    use Compiler\ApiTaggedServiceTrait;
+
     /** @var KernelInterface */
     private $kernel;
 
@@ -39,32 +42,67 @@ class OroApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
-        $container->addCompilerPass(new Compiler\FilterNamesCompilerPass());
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.filter_names_registry',
+            'oro.api.filter_names'
+        ));
         $container->addCompilerPass(new Compiler\SimpleFilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
-        $container->addCompilerPass(new Compiler\ObjectNormalizerCompilerPass());
-        $container->addCompilerPass(new Compiler\EntityIdTransformerCompilerPass());
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.object_normalizer_registry',
+            'oro.api.object_normalizer',
+            function (array $attributes, string $serviceId, string $tagName): array {
+                return [
+                    $this->getRequiredAttribute($attributes, 'class', $serviceId, $tagName)
+                ];
+            }
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.entity_id_transformer_registry',
+            'oro.api.entity_id_transformer'
+        ));
         $container->addCompilerPass(new Compiler\EntityIdResolverCompilerPass());
         $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());
-        $container->addCompilerPass(new Compiler\ExclusionProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\ExceptionTextExtractorCompilerPass());
-        $container->addCompilerPass(new Compiler\ConstraintTextExtractorCompilerPass());
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_api.entity_exclusion_provider.shared',
+            'oro_entity.exclusion_provider.api',
+            'addProvider'
+        ));
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentBuilderCompilerPass());
-        $container->addCompilerPass(new Compiler\ErrorCompleterCompilerPass());
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.error_completer_registry',
+            'oro.api.error_completer'
+        ));
         $container->addCompilerPass(new Compiler\ResourceDocParserCompilerPass());
         $container->addCompilerPass(new Compiler\ResourcesCacheWarmerCompilerPass());
-        $container->addCompilerPass(new Compiler\QueryModifierCompilerPass());
-        $container->addCompilerPass(new Compiler\MandatoryFieldProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\DocumentationProviderCompilerPass());
-        $container->addCompilerPass(new Compiler\RestRoutesCompilerPass());
-        $container->addCompilerPass(new Compiler\CustomDataTypeCompleterCompilerPass());
-        $container->addCompilerPass(
-            new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
-        );
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.entity_serializer.query_modifier_registry',
+            'oro.api.query_modifier'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.entity_serializer.mandatory_field_provider_registry',
+            'oro.api.mandatory_field_provider'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.api_doc.documentation_provider',
+            'oro.api.documentation_provider'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.rest.routes_registry',
+            'oro.api.rest_routes'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.complete_definition_helper.custom_data_type',
+            'oro.api.custom_data_type_completer'
+        ));
+        $container->addCompilerPass(new LoadApplicableCheckersCompilerPass(
+            'oro_api.processor_bag',
+            'oro.api.processor.applicable_checker'
+        ));
         $container->addCompilerPass(
             new CleanUpProcessorsCompilerPass(
                 'oro_api.simple_processor_registry',

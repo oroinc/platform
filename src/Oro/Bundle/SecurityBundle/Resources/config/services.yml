@@ -738,13 +738,12 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -10 }
 
-    # this service is initialized by Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass
     oro_security.access_rule_executor:
         class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
         public: false
         arguments:
-            - []
-            - ~
+            - [] # rules
+            - ~ # service locator
             - '@oro_security.access_rule_option_matcher'
 
     oro_security.access_rule_option_matcher:

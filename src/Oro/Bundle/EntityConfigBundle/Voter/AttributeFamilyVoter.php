@@ -3,13 +3,18 @@
 namespace Oro\Bundle\EntityConfigBundle\Voter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 
+/**
+ * Prevents removal of non deletable attribute families.
+ */
 class AttributeFamilyVoter extends AbstractEntityVoter
 {
     const ATTRIBUTE_DELETE = 'delete';
+
+    /** @var array */
+    protected $supportedAttributes = [self::ATTRIBUTE_DELETE];
 
     /** @var AttributeFamilyManager */
     private $familyManager;
@@ -21,8 +26,6 @@ class AttributeFamilyVoter extends AbstractEntityVoter
     public function __construct(DoctrineHelper $doctrineHelper, AttributeFamilyManager $familyManager)
     {
         parent::__construct($doctrineHelper);
-        $this->supportedAttributes = [self::ATTRIBUTE_DELETE];
-        $this->className = AttributeFamily::class;
         $this->familyManager = $familyManager;
     }
 

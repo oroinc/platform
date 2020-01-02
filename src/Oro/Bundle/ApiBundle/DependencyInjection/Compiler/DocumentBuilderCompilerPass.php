@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -14,6 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DocumentBuilderCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const DOCUMENT_BUILDER_FACTORY_SERVICE_ID = 'oro_api.document_builder_factory';
     private const DOCUMENT_BUILDER_TAG                = 'oro.api.document_builder';
 
@@ -25,21 +26,20 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
         $services = [];
         $documentBuilders = [];
         $taggedServices = $container->findTaggedServiceIds(self::DOCUMENT_BUILDER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
+        foreach ($taggedServices as $id => $tags) {
             if ($container->getDefinition($id)->isShared()) {
                 throw new LogicException(sprintf('The document builder service "%s" should be non shared.', $id));
             }
             $services[$id] = new Reference($id);
-            foreach ($attributes as $tagAttributes) {
-                $documentBuilders[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
+            foreach ($tags as $attributes) {
+                $documentBuilders[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getRequestType($tagAttributes)
+                    $this->getRequestTypeAttribute($attributes)
                 ];
             }
         }
-
         if ($documentBuilders) {
-            $documentBuilders = DependencyInjectionUtil::sortByPriorityAndFlatten($documentBuilders);
+            $documentBuilders = $this->sortByPriorityAndFlatten($documentBuilders);
         }
 
         $container->getDefinition(self::DOCUMENT_BUILDER_FACTORY_SERVICE_ID)

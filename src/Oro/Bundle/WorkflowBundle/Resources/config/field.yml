@@ -7,12 +7,14 @@ services:
     oro_workflow.entity_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityProvider
         parent: oro_entity.entity_provider.abstract
+        lazy: true
         calls:
             - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
 
     oro_workflow.entity_field_provider:
         class: 'Oro\Bundle\WorkflowBundle\Field\FieldProvider'
         parent: oro_entity.entity_field_provider.abstract
+        lazy: true
         calls:
             - [setEntityProvider, ['@oro_workflow.entity_provider']]
             - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
@@ -23,4 +25,4 @@ services:
         arguments:
             - '@oro_workflow.entity_field_provider'
             - '@oro_workflow.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'

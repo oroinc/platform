@@ -87,7 +87,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
         $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
         if (!$fieldName) {
             $field = $config->getField($propertyPath);
-            if (null !== $field && ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
+            if (null === $field || ConfigUtil::IGNORE_PROPERTY_PATH === $field->getPropertyPath()) {
                 $fieldName = $propertyPath;
             }
         }
@@ -133,18 +133,18 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
             return false;
         }
 
+        if (null !== $data && \array_key_exists($fieldName, $data)) {
+            return false;
+        }
+
         $config = $this->getConfig();
         if (null === $config) {
             return false;
         }
 
         $field = $config->getField($fieldName);
-        $isRequested = null !== $field && !$field->isExcluded();
-        if ($isRequested && null !== $data && \array_key_exists($fieldName, $data)) {
-            $isRequested = false;
-        }
 
-        return $isRequested;
+        return null !== $field && !$field->isExcluded();
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -40,25 +41,19 @@ class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
         $authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturnCallback(function ($attributes, $object) {
-                $result = isset($this->permissions[$attributes][$object])
-                    ? $this->permissions[$attributes][$object]
-                    : true;
-
-                return $result;
+                return $this->permissions[$attributes][$object] ?? true;
             });
 
-        $gridConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getConfig', 'has', 'get'])
-            ->getMock();
+        $gridConfig = $this->createMock(ConfigInterface::class);
+        $gridConfigProvider = $this->createMock(ConfigProvider::class);
         $gridConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($gridConfigProvider));
-        $gridConfigProvider->expects($this->any())
+            ->willReturn($gridConfig);
+        $gridConfig->expects($this->any())
             ->method('has')
             ->with('context')
             ->willReturn(true);
-        $gridConfigProvider->expects($this->any())
+        $gridConfig->expects($this->any())
             ->method('get')
             ->with('context')
             ->will($this->returnValue($this->expectedGridName));

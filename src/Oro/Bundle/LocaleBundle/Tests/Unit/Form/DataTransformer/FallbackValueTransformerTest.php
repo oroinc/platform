@@ -81,8 +81,8 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
                 'expected' => 'string',
             ],
             'fallback' => [
-                'expected' => ['value' => null, 'fallback' => FallbackType::SYSTEM],
-                'input'    => new FallbackType(FallbackType::SYSTEM),
+                'input' => ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
+                'expected' => new FallbackType(FallbackType::SYSTEM),
             ],
         ];
     }

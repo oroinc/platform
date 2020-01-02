@@ -272,7 +272,22 @@ class EmailTemplateRepositoryTest extends WebTestCase
         ];
     }
 
-    public function testGetDistinctByEntityNameQueryBuilder(): void
+    public function testGetDistinctByEntityNameQueryBuilderWithoutFilters(): void
+    {
+        $this->loadFixtures([LoadEmailTemplateData::class]);
+
+        $actualResult = $this->getRepository()->getDistinctByEntityNameQueryBuilder()
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($actualResult as $row) {
+            if (empty($row['entityName'])) {
+                $this->fail('Failed asserting that there are no records with empty value in "entityName" column.');
+            }
+        }
+    }
+
+    public function testGetDistinctByEntityNameQueryBuilderWithFilterByName(): void
     {
         $this->loadFixtures([LoadEmailTemplateData::class]);
 

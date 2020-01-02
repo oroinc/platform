@@ -8,6 +8,9 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensio
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * The EntityConfigBundle bundle class.
+ */
 class OroEntityConfigBundle extends Bundle
 {
     /**
@@ -17,7 +20,6 @@ class OroEntityConfigBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\ServiceMethodPass);
         $container->addCompilerPass(new Compiler\EntityConfigPass);
         $container->addCompilerPass(new Compiler\AttributeBlockTypeMapperPass());
         $container->addCompilerPass(new Compiler\AttributeTypePass());

@@ -20,6 +20,19 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
  */
 class NestedTreeFilter extends StandaloneFilter
 {
+    /** @var string|null */
+    private $field;
+
+    /**
+     * Sets an association name by which the data is filtered.
+     *
+     * @param string $field The association name
+     */
+    public function setField(string $field): void
+    {
+        $this->field = $field;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +61,7 @@ class NestedTreeFilter extends StandaloneFilter
         }
 
         return new Comparison(
-            $path,
+            $this->field ?? '',
             $this->getComparisonExpressionOperator($value->getOperator()),
             new Value($value->getValue())
         );
