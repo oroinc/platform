@@ -34,5 +34,6 @@ oro_behat_extension:
           - OroConfigBundle::FeatureContext
           - OroOrderBundle::FeatureContext
           - OroQueryDesignerBundle::QueryDesignerContext
+          - OroReportBundle::FeatureContext
         paths:
           - '@OroLocaleBundle/Tests/Behat/Features'
