@@ -1,4 +1,3 @@
-{% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
 {% set linkLabel = params.label|trans %}
 {% set isAjax = false %}
 
@@ -10,7 +9,6 @@
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
                 href="#"
                 class="icons-holder-text operation-button {{ params.buttonOptions.class|default('') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
-                title="{{ linkTitle }}"
                 {% for name,value in options.data %}
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
