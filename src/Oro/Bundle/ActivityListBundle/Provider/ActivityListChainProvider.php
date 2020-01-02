@@ -455,6 +455,10 @@ class ActivityListChainProvider
                 $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
                 $list->setOrganization($provider->getOrganization($entity));
             }
+            
+            foreach ($provider->getActivityOwners() as $activityOwner) {
+                $list->addActivityOwner($activityOwner);
+            }
 
             $targets = $provider->getTargetEntities($entity);
             foreach ($targets as $target) {
