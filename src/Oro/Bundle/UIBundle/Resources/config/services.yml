@@ -65,7 +65,7 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.config_settings.listener:
@@ -102,23 +102,35 @@ services:
         class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
         public: true
         arguments:
+            - [] # providers
+            - ~ # service locator
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - '%oro_ui.widget_provider.view_actions.page_type%'
+            - ~ # page type
 
     oro_ui.widget_provider.update_actions:
         class: Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
         public: true
         arguments:
+            - [] # providers
+            - ~ # service locator
             - '@oro_ui.label_provider.action_button_group'
             - '@event_dispatcher'
-            - '%oro_ui.widget_provider.update_actions.page_type%'
+            - ~ # page type
 
     oro_ui.content_provider.manager:
         class: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
+        arguments:
+            - [] # provider names
+            - ~ # service locator
+            - [] # enabled provider names
 
-    Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager:
-        alias: oro_ui.content_provider.manager
+    oro_ui.content_provider.manager.twig:
+        class: Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
 
     oro_ui.provider.widget_context:
         class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider
@@ -247,9 +259,6 @@ services:
         class: Oro\Bundle\UIBundle\Provider\UserAgentProvider
         arguments:
             - '@request_stack'
-
-    Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface:
-        alias: oro_ui.user_agent_provider
 
     oro_ui.formatter:
         class: Oro\Bundle\UIBundle\Formatter\FormatterManager

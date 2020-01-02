@@ -873,10 +873,10 @@ services:
     oro_email.acl.voter.email_voter:
         class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
         arguments:
-            - '@Psr\Container\ContainerInterface'
+            - '@security.authorization_checker'
+            - '@oro_email.mailbox.manager'
         tags:
             - { name: security.voter }
-            - { name: container.service_subscriber }
 
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
@@ -1218,7 +1218,7 @@ services:
     oro_email.emailtemplate.variable_processor:
         class: Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry
         arguments:
-            - ~ # processors. Set by Oro\Bundle\EmailBundle\DependencyInjection\Compiler\VariableProcessorPass
+            - ~ # service locator
 
     oro_email.emailtemplate.variable_processor.entity_routes:
         class: Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor

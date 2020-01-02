@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -13,6 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class QueryExpressionCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID = 'oro_api.query.expression_visitor_factory';
 
     private const COMPOSITE_EXPRESSION_TAG       = 'oro.api.query.composite_expression';
@@ -52,9 +53,9 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
         $services = [];
         $taggedServices = $container->findTaggedServiceIds($tagName);
         foreach ($taggedServices as $id => $tags) {
-            foreach ($tags as $tag) {
-                $services[DependencyInjectionUtil::getPriority($tag)][] = [
-                    DependencyInjectionUtil::getRequiredAttribute($tag, $operatorPlaceholder, $id, $tagName),
+            foreach ($tags as $attributes) {
+                $services[$this->getPriorityAttribute($attributes)][] = [
+                    $this->getRequiredAttribute($attributes, $operatorPlaceholder, $id, $tagName),
                     new Reference($id)
                 ];
             }
@@ -64,8 +65,8 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
         }
 
         $expressions = [];
-        $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-        foreach ($services as list($expressionType, $serviceRef)) {
+        $services = $this->sortByPriorityAndFlatten($services);
+        foreach ($services as [$expressionType, $serviceRef]) {
             $expressions[$expressionType] = $serviceRef;
         }
 

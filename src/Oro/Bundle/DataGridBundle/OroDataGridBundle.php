@@ -28,8 +28,8 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new CompilerPass\BoardProcessorsPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_datagrid.provider.selected_fields',
-            'addSelectedFieldsProvider',
-            'oro_datagrid.selected_fields_provider'
+            'oro_datagrid.selected_fields_provider',
+            'addSelectedFieldsProvider'
         ));
     }
 }

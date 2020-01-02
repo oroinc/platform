@@ -71,8 +71,8 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityManagerPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_entity_extend.entity_metadata_builder',
-            'addBuilder',
-            'oro_entity_extend.entity_metadata_builder'
+            'oro_entity_extend.entity_metadata_builder',
+            'addBuilder'
         ));
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(
@@ -83,7 +83,6 @@ class OroEntityExtendBundle extends Bundle
                 ]
             )
         );
-        $container->addCompilerPass(new Compiler\ExtensionPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
@@ -19,6 +18,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationF
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -42,15 +42,23 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new AclConfigurationPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_security.acl.annotation_provider',
-            'addLoader',
-            'oro_security.acl.config_loader'
+            'oro_security.acl.config_loader',
+            'addLoader'
         ));
         $container->addCompilerPass(new OwnershipDecisionMakerPass());
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
         $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
-        $container->addCompilerPass(new AccessRulesPass());
+        $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(
+            'oro_security.access_rule_executor',
+            'oro_security.access_rule',
+            function (array $attributes, string $serviceId): array {
+                unset($attributes['priority']);
+
+                return [$serviceId, $attributes];
+            }
+        ));
         $container->addCompilerPass(new SessionPass());
         $container->addCompilerPass(new SetFirewallExceptionListenerPass());
 

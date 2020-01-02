@@ -17,6 +17,8 @@ use Symfony\Component\Form\FormRegistry;
  */
 class FormCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const FORM_REGISTRY_SERVICE_ID                 = 'form.registry';
     private const FORM_EXTENSION_SERVICE_ID                = 'form.extension';
     private const FORM_TYPE_TAG                            = 'form.type';
@@ -218,9 +220,9 @@ class FormCompilerPass implements CompilerPassInterface
     private function getApiFormTypes(ContainerBuilder $container, array $formTypeClassNames)
     {
         $types = array_fill_keys($formTypeClassNames, null);
-        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $serviceId => $tag) {
-            $alias = DependencyInjectionUtil::getAttribute($tag[0], 'alias', $serviceId);
-            $types[$alias] = $serviceId;
+        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $id => $tags) {
+            $alias = $this->getAttribute($tags[0], 'alias', $id);
+            $types[$alias] = $id;
         }
 
         return $types;
@@ -234,9 +236,9 @@ class FormCompilerPass implements CompilerPassInterface
     private function getApiFormTypeExtensions(ContainerBuilder $container)
     {
         $typeExtensions = [];
-        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $serviceId => $tag) {
-            $alias = DependencyInjectionUtil::getAttribute($tag[0], $this->getTagKeyForExtension(), $serviceId);
-            $typeExtensions[$alias][] = $serviceId;
+        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $id => $tags) {
+            $alias = $this->getAttribute($tags[0], $this->getTagKeyForExtension(), $id);
+            $typeExtensions[$alias][] = $id;
         }
 
         return $typeExtensions;
@@ -250,9 +252,9 @@ class FormCompilerPass implements CompilerPassInterface
     private function getApiFormTypeGuessers(ContainerBuilder $container)
     {
         $guessers = [];
-        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $guessers[$serviceId] = DependencyInjectionUtil::getPriority($tag);
+        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $guessers[$id] = $this->getPriorityAttribute($attributes);
             }
         }
         arsort($guessers, SORT_NUMERIC);

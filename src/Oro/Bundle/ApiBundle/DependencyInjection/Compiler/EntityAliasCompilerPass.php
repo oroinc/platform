@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -12,6 +11,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EntityAliasCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID = 'oro_api.entity_alias_resolver_registry';
 
     private const ALIAS_PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
@@ -22,10 +23,6 @@ class EntityAliasCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)) {
-            return;
-        }
-
         // find providers
         $classProviders = $this->getClassProviders($container);
         $aliasProviders = $this->getAliasProviders($container);
@@ -49,11 +46,11 @@ class EntityAliasCompilerPass implements CompilerPassInterface
      *
      * @return string[]
      */
-    private function getClassProviders(ContainerBuilder $container)
+    private function getClassProviders(ContainerBuilder $container): array
     {
         $classProviders = [];
         $taggedServices = $container->findTaggedServiceIds(self::CLASS_PROVIDER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
+        foreach ($taggedServices as $id => $tags) {
             $classProviders[] = new Reference($id);
         }
 
@@ -65,15 +62,15 @@ class EntityAliasCompilerPass implements CompilerPassInterface
      *
      * @return string[]
      */
-    private function getAliasProviders(ContainerBuilder $container)
+    private function getAliasProviders(ContainerBuilder $container): array
     {
         $aliasProviders = [];
         $taggedServices = $container->findTaggedServiceIds(self::ALIAS_PROVIDER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $aliasProviders[DependencyInjectionUtil::getPriority($attributes[0])][] = new Reference($id);
+        foreach ($taggedServices as $id => $tags) {
+            $aliasProviders[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
         }
         if (!empty($aliasProviders)) {
-            $aliasProviders = DependencyInjectionUtil::sortByPriorityAndFlatten($aliasProviders);
+            $aliasProviders = $this->sortByPriorityAndFlatten($aliasProviders);
         }
 
         return $aliasProviders;

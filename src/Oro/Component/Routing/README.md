@@ -56,8 +56,8 @@ class AcmeAppBundle extends Bundle
 
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'acme.routing_options_resolver',
-            'addResolver',
-            'routing.options_resolver'
+            'routing.options_resolver',
+            'addResolver'
         ));
     }
 }

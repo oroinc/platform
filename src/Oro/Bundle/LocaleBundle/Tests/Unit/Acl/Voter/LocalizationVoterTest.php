@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -13,7 +14,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
-    const ENTITY_CLASS = 'Oro\Bundle\LocaleBundle\Entity\Localization';
 
     /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
@@ -31,20 +31,9 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->repository = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(LocalizationRepository::class);
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->willReturnCallback(
-                function ($object) {
-                    return get_class($object);
-                }
-            );
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->willReturnCallback(
@@ -53,10 +42,10 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->voter = new LocalizationVoter($this->doctrineHelper, $this->configManager);
-        $this->voter->setClassName(self::ENTITY_CLASS);
+        $this->voter->setClassName(Localization::class);
     }
 
     /**
@@ -72,7 +61,7 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrineHelper
             ->method('getEntityRepository')
-            ->with(self::ENTITY_CLASS)
+            ->with(Localization::class)
             ->willReturn($this->repository);
 
         $this->repository
@@ -80,7 +69,10 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($count);
         $this->configManager->method('get')->willReturn($defaultLocalization);
 
-        $this->assertEquals($expected, $this->voter->vote($this->getToken(), $object, [$attribute]));
+        $this->assertEquals(
+            $expected,
+            $this->voter->vote($this->createMock(TokenInterface::class), $object, [$attribute])
+        );
     }
 
     /**
@@ -141,15 +133,5 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
                 'expected' => VoterInterface::ACCESS_DENIED,
             ],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
-     */
-    protected function getToken()
-    {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

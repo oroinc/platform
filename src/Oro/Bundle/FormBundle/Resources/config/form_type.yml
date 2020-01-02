@@ -346,3 +346,8 @@ services:
             - '@oro_locale.formatter.number'
         tags:
             - { name: form.type, alias: oro_hidden_number }
+
+    oro_form.type.checkbox:
+        class: Oro\Bundle\FormBundle\Form\Type\CheckboxType
+        tags:
+            - { name: form.type, alias: oro_checkbox }

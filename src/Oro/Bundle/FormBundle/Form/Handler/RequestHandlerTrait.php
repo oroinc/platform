@@ -20,7 +20,7 @@ trait RequestHandlerTrait
      * @param Request $request
      * @param bool $clearMissing
      */
-    private function submitPostPutRequest(FormInterface $form, Request $request, bool $clearMissing = true)
+    protected function submitPostPutRequest(FormInterface $form, Request $request, bool $clearMissing = true)
     {
         $requestData = $form->getName()
             ? $request->request->get($form->getName(), [])

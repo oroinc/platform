@@ -4,12 +4,13 @@ namespace Oro\Bundle\UIBundle\ContentProvider;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FlashMessagesContentProvider extends AbstractContentProvider
+/**
+ * Returns all flash messages.
+ */
+class FlashMessagesContentProvider implements ContentProviderInterface
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    /** @var Session */
+    private $session;
 
     /**
      * @param Session $session
@@ -25,13 +26,5 @@ class FlashMessagesContentProvider extends AbstractContentProvider
     public function getContent()
     {
         return $this->session->getFlashBag()->all();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'flashMessages';
     }
 }

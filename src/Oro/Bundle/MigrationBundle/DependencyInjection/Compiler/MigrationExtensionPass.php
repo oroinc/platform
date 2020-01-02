@@ -49,12 +49,7 @@ class MigrationExtensionPass implements CompilerPassInterface
             $container->getDefinition($id)->setPublic(false);
             $attributes = $tags[0];
             $priority = $this->getPriorityAttribute($attributes);
-            $extensionName = $this->getRequiredNotBlankAttribute(
-                $attributes,
-                'extension_name',
-                $id,
-                self::TAG
-            );
+            $extensionName = $this->getRequiredAttribute($attributes, 'extension_name', $id, self::TAG);
             if (!isset($extensions[$extensionName])) {
                 $extensions[$extensionName] = [];
             }

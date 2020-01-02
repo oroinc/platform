@@ -29,7 +29,7 @@ class ScopeProviderPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG_NAME);
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                $scopeType = $this->getRequiredNotBlankAttribute(
+                $scopeType = $this->getRequiredAttribute(
                     $attributes,
                     self::SCOPE_TYPE_ATTRIBUTE,
                     $serviceId,

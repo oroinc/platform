@@ -61,7 +61,7 @@ class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "scope" is required for "oro_email.emailtemplate.variable_provider" tag and its value should not be blank. Service: "system_provider1".
+     * @expectedExceptionMessage The attribute "scope" is required for "oro_email.emailtemplate.variable_provider" tag. Service: "system_provider1".
      */
     // @codingStandardsIgnoreEnd
     public function testProcessForProviderWithoutScope()
