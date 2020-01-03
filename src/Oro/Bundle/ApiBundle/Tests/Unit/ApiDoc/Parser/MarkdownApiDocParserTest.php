@@ -12,7 +12,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @return MarkdownApiDocParser
      */
-    private function loadDocument()
+    private function loadDocument(): MarkdownApiDocParser
     {
         $fixturesDir = __DIR__ . '/Fixtures';
 
@@ -35,6 +35,36 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         return $apiDocParser;
     }
 
+    /**
+     * Assert loaded data in markdown parser
+     *
+     * In the PHP >= 7.3 updated DOM component.
+     * Now DOMDocument::saveHTML return html in different formatting than PHP < 7.3.
+     * We removing new lines in actual parsed data so that check to work on all supported PHP versions.
+     *
+     * @param array $expected
+     * @param MarkdownApiDocParser $apiDocParser
+     * @throws \ReflectionException
+     */
+    private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void
+    {
+        $reflectionClass = new \ReflectionClass($apiDocParser);
+        $property = $reflectionClass->getProperty('loadedData');
+        $property->setAccessible(true);
+        $actualValue = $property->getValue($apiDocParser);
+
+        $normalizer = static function (&$val): void {
+            if (\is_string($val)) {
+                $val = str_replace("\n", '', $val);
+            }
+        };
+
+        array_walk_recursive($expected, $normalizer);
+        array_walk_recursive($actualValue, $normalizer);
+
+        $this->assertEquals($expected, $actualValue);
+    }
+
     public function testRegisterDocumentationResourceForUnsupportedFile()
     {
         $fileLocator = $this->createMock(FileLocator::class);
@@ -53,7 +83,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/apidoc.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     public function testInheritDoc()
@@ -63,7 +93,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/inheritdoc.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     public function testReplaceDescriptions()
@@ -73,7 +103,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     /**

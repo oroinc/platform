@@ -169,7 +169,7 @@ class GridController extends AbstractController
      * @Route(
      *      "/{gridName}/massAction/{actionName}",
      *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:\-]+", "actionName"="[\w\-]+"}
      * )
      * @CsrfProtection()
      *

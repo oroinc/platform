@@ -397,7 +397,7 @@ class Parser
                     // an exception shall be thrown.
                     (
                         $token->type !== Token::OPERATOR_TYPE
-                        || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value)
+                        || !preg_match('/[a-zA-Z\_\x7f-\xff][a-zA-Z0-9\_\x7f-\xff]*/A', $token->value)
                     )
                 ) {
                     throw new SyntaxError('Expected name', $token->cursor);
