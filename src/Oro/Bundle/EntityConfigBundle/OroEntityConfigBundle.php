@@ -38,18 +38,13 @@ class OroEntityConfigBundle extends Bundle
             )
         );
 
-        $container
-            ->addCompilerPass(
-                new DefaultFallbackExtensionPass(
-                    [
-                        'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily' => [
-                            'label' => 'labels',
-                        ],
-                        'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup' => [
-                            'label' => 'labels',
-                        ],
-                    ]
-                )
-            );
+        $container->addCompilerPass(new DefaultFallbackExtensionPass([
+            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily' => [
+                'label' => 'labels'
+            ],
+            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup' => [
+                'label' => 'labels'
+            ],
+        ]));
     }
 }

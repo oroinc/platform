@@ -110,6 +110,9 @@ services:
     # Converters
     oro_locale.format_converter.date_time.registry:
         class: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry
+        arguments:
+            - [] # converter names
+            - ~ # service locator for converters
 
     oro_locale.format_converter.date_time.intl:
         class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
@@ -343,6 +346,8 @@ services:
 
     oro_locale.entity_generator.extension:
         class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+        arguments:
+            - [] # a map of default fallback fields
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
