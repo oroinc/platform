@@ -560,6 +560,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+            - '@doctrine.orm.entity_manager'
 
     oro_security.layout.data_provider.acl:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider

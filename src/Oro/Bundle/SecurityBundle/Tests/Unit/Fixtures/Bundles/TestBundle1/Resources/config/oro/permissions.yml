@@ -8,5 +8,6 @@ oro_permissions:
         description: Permission 2 description
         apply_to_entities: ['OroTestFrameworkBundle:TestActivity', 'OroTestFrameworkBundle:Product']
         exclude_entities: ['OroTestFrameworkBundle:Item', 'OroTestFrameworkBundle:ItemValue']
+        apply_to_interfaces: ['OroTestFrameworkBundle:TestActivityInterface']
         group_names: ['', 'frontend']
         apply_to_all: false
