@@ -2,33 +2,35 @@
 
 namespace Oro\Bundle\NavigationBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all extensions for menu factory.
+ */
 class MenuExtensionPass implements CompilerPassInterface
 {
-    const MENU_FACTORY_TAG = 'oro_menu.factory';
-    const MENU_EXTENSION_TAG = 'oro_navigation.menu_extension';
+    use TaggedServiceTrait;
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::MENU_FACTORY_TAG)) {
-            return;
-        }
-
-        $extensions = $container->findTaggedServiceIds(self::MENU_EXTENSION_TAG);
+        $extensions = $container->findTaggedServiceIds('oro_navigation.menu_extension');
         if (!$extensions) {
             return;
         }
 
-        $serviceDefinition = $container->getDefinition(self::MENU_FACTORY_TAG);
+        $factoryDef = $container->getDefinition('oro_menu.factory');
         foreach ($extensions as $id => $tags) {
             foreach ($tags as $attributes) {
-                $serviceDefinition->addMethodCall('addExtension', [new Reference($id), $attributes['priority']]);
+                $factoryDef->addMethodCall(
+                    'addExtension',
+                    [new Reference($id), $this->getPriorityAttribute($attributes)]
+                );
             }
         }
     }

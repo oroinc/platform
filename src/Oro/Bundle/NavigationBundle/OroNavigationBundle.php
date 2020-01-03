@@ -3,8 +3,7 @@
 namespace Oro\Bundle\NavigationBundle;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
-use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\ChainBreadcrumbManagerPass;
-use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
+use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuExtensionPass;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\DynamicAssetVersionPass;
@@ -23,8 +22,7 @@ class OroNavigationBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new MenuBuilderChainPass());
-        $container->addCompilerPass(new ChainBreadcrumbManagerPass());
+        $container->addCompilerPass(new MenuBuilderPass());
         $container->addCompilerPass(new DynamicAssetVersionPass('routing'));
         $container->addCompilerPass(new MenuExtensionPass());
 
