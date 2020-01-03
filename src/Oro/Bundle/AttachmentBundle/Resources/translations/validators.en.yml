@@ -1,4 +1,7 @@
 oro:
     attachment:
+        max_number_of_files:
+            files: 'Not more than {{max}} file is allowed in this field.|Not more than {{max}} files are allowed in this field.'
+            images: 'Not more than {{max}} image is allowed in this field.|Not more than {{max}} images are allowed in this field.'
         mimetypes:
             not_allowed: 'MIME type {{ notAllowedMimeTypes }} is not allowed, please contact your system administrator.|MIME types {{ notAllowedMimeTypes }} are not allowed, please contact your system administrator.'

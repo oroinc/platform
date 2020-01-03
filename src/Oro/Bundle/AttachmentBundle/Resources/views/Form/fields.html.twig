@@ -108,3 +108,95 @@
         {% endif %}
     {% endspaceless %}
 {% endblock %}
+
+{% macro oro_attachment_multi_file_item_prototype(widget, attributes) %}
+    {% if 'collection' in widget.vars.block_prefixes %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.full_name ~ '[' ~ widget.vars.prototype.vars.name ~ ']' %}
+        {% set disabled = widget.vars.disabled %}
+        {% set allow_delete = widget.vars.allow_delete %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+        {% set disabled = widget.parent.vars.disabled %}
+        {% set allow_delete = widget.parent.vars.allow_delete %}
+    {% endif %}
+
+    <tr data-content="{{ name }}" data-validation-optional-group {{ attributes }}>
+        <td class="sort-order">
+            {{ form_widget(form.sortOrder) }}
+        </td>
+        <td class="file">
+            {{ form_widget(form.file) }}
+        </td>
+        {% if allow_delete %}
+            <td>
+                <button type="button" class="removeRow btn btn-icon btn-square-lighter" aria-label="{{ 'Remove row'|trans }}">
+                    <span class="fa-trash-o" aria-hidden="true"></span>
+                </button>
+            </td>
+        {% endif %}
+    </tr>
+{% endmacro %}
+
+{% block oro_attachment_multi_file_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import _self as fields %}
+    {% spaceless %}
+        {% if prototype is defined %}
+            {% set prototype_html = fields.oro_attachment_multi_file_item_prototype(form) %}
+        {% endif %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ ' file-collection' }) %}
+        {% set prototype_name = form.vars.prototype_name %}
+
+        <div class="row-oro attachment-fileitems" {{ UI.renderPageComponentAttributes({
+            module: 'oroattachment/js/app/components/multi-file-control-component',
+            options: {
+                maxNumber: form.vars.maxNumber
+            }
+        }) }}>
+            <div {{ block('widget_container_attributes') }}>
+                <table class="grid table-hover table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="sort-order"><span>{{ 'oro.attachment.fileitem.sort_order.label'|trans }}</span></th>
+                            <th class="file"><span>{{ fileLabel|default('oro.attachment.fileitem.file.label')|trans }}</span></th>
+                            {% if form.vars.allow_delete %}
+                                <th class="remove"></th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody data-last-index="{{ form.children|length}}"
+                           data-row-count-add="{{ form.vars.row_count_add }}"
+                           data-prototype-name="{{ prototype_name }}"
+                           {% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}
+                    >
+                        {% if form.children|length %}
+                            {% for child in form.children %}
+                                {{ fields.oro_attachment_multi_file_item_prototype(child) }}
+                            {% endfor %}
+                        {% elseif show_form_when_empty and prototype_html is defined %}
+                            {% for i in 0..(form.vars.row_count_initial - 1) %}
+                                {{ prototype_html|replace({(prototype_name): i})|raw }}
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% if allow_add %}
+                    <a class="btn add-list-item" data-container=".file-collection tbody" href="javascript: void(0);">
+                        {{ addLabel|default('oro.attachment.fileitem.file.add.label')|trans }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block oro_attachment_multi_file_row %}
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+{% endblock %}
+
+{% block oro_attachment_multi_image_widget %}
+    {{ form_widget(form, {addLabel: 'oro.attachment.fileitem.image.add.label', fileLabel: 'oro.attachment.fileitem.image.label'}) }}
+{% endblock %}

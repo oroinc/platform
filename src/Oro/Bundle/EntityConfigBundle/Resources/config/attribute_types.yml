@@ -76,6 +76,22 @@ services:
         tags:
              - { name: oro_entity_config.attribute_type }
 
+    oro_entity_config.attribute_type.multifile:
+        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType'
+        public: false
+        arguments:
+            - 'multiFile'
+        tags:
+             - { name: oro_entity_config.attribute_type }
+
+    oro_entity_config.attribute_type.multiimage:
+        class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\FileAttributeType'
+        public: false
+        arguments:
+            - 'multiImage'
+        tags:
+             - { name: oro_entity_config.attribute_type }
+
     oro_entity_config.attribute_type.integer:
         class: 'Oro\Bundle\EntityConfigBundle\Attribute\Type\IntegerAttributeType'
         public: false

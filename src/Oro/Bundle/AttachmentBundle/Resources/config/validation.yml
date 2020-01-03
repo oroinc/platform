@@ -3,6 +3,15 @@ Oro\Bundle\AttachmentBundle\Entity\Attachment:
         file:
             - Valid: ~
 
+Oro\Bundle\AttachmentBundle\Entity\FileItem:
+    properties:
+        sortOrder:
+            - NotBlank: ~
+            - Range:
+                min: 0
+        file:
+            - Valid: ~
+
 Oro\Bundle\AttachmentBundle\Entity\File:
     properties:
         fileSize:

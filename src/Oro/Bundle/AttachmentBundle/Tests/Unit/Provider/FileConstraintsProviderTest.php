@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
+use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as SystemConfigManager;
@@ -254,8 +255,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypes(): void
-    {
+    /**
+     * @dataProvider getAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypesProvider
+     *
+     * @param string $inputType
+     * @param array $expectedResult
+     * @return void
+     */
+    public function testGetAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypes(
+        string $inputType,
+        array $expectedResult
+    ): void {
         $this->attachmentEntityConfigProvider
             ->expects($this->once())
             ->method('getFieldConfig')
@@ -276,18 +286,41 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $fieldConfigId
             ->expects($this->once())
             ->method('getFieldType')
-            ->willReturn('image');
+            ->willReturn($inputType);
 
         $this->systemConfigManager
             ->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_image_mime_types', '', false, null)
-            ->willReturn('sample/type1,sample/type2');
+            ->will($this->returnValueMap([
+                ['oro_attachment.upload_image_mime_types', '', false, null, 'image/type1,image/type2'],
+                ['oro_attachment.upload_file_mime_types', '', false, null, 'file/type1,file/type2'],
+            ]));
 
         $this->assertEquals(
-            ['sample/type1', 'sample/type2'],
+            $expectedResult,
             $this->provider->getAllowedMimeTypesForEntityField($entityClass, $fieldName)
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypesProvider(): array
+    {
+        return [
+            'image' => [
+                'input' => FieldConfigHelper::IMAGE_TYPE,
+                'expected' => ['image/type1', 'image/type2'],
+            ],
+            'multiImage' => [
+                'input' => FieldConfigHelper::MULTI_IMAGE_TYPE,
+                'expected' => ['image/type1', 'image/type2'],
+            ],
+            'other' => [
+                'input' => 'other',
+                'expected' => ['file/type1', 'file/type2'],
+            ],
+        ];
     }
 
     public function testGetAllowedMimeTypesForEntityFieldWhenNotImageAndNoMimeTypes(): void

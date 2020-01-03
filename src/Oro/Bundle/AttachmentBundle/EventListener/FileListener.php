@@ -48,7 +48,7 @@ class FileListener
 
         $this->fileManager->preUpload($entity);
         $file = $entity->getFile();
-        if (null !== $file && $file->isFile()) {
+        if (null !== $file && $file->isFile() && !$entity->getOwner()) {
             $entity->setOwner($this->tokenAccessor->getUser());
         }
     }
