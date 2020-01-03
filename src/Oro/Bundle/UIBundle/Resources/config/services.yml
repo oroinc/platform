@@ -141,7 +141,7 @@ services:
         class: Oro\Bundle\UIBundle\Tools\HtmlTagHelper
         arguments:
             - '@oro_form.provider.html_tag_provider'
-            - '%kernel.cache_dir%'
+            - '%kernel.cache_dir%/oro_data'
         calls:
             # Additional div attributes
             - ['setAttribute', ['div', 'role', 'Text']]
