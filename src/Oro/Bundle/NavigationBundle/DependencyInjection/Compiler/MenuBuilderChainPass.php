@@ -32,7 +32,7 @@ class MenuBuilderChainPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition(self::MENU_PROVIDER_KEY);
-        $taggedServices = $this->findAndSortTaggedServices(self::MENU_BUILDER_TAG, $container);
+        $taggedServices = $this->findAndInverseSortTaggedServices(self::MENU_BUILDER_TAG, $container);
 
         foreach ($taggedServices as $reference) {
             $builderDefinition = $container->getDefinition((string)$reference);
@@ -56,7 +56,7 @@ class MenuBuilderChainPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition(self::ITEMS_PROVIDER_KEY);
-        $taggedServices = $this->findAndSortTaggedServices(self::ITEMS_BUILDER_TAG, $container);
+        $taggedServices = $this->findAndInverseSortTaggedServices(self::ITEMS_BUILDER_TAG, $container);
 
         foreach ($taggedServices as $reference) {
             $factoryDefinition = $container->getDefinition((string) $reference);

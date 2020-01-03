@@ -74,19 +74,35 @@ trait TaggedServiceTrait
      * (the higher the priority number, the earlier the service is added to the result list)
      * and returns flatten array of sorted services.
      *
-     * @param array $services        [priority => item, ...]
-     * @param bool  $inversePriority if TRUE, ksort() will be used instead of krsort() to sort be priority
+     * @param array $services [priority => item, ...]
      *
      * @return array [item, ...]
      */
-    private function sortByPriorityAndFlatten(array $services, bool $inversePriority = false): array
+    private function sortByPriorityAndFlatten(array $services): array
     {
         if ($services) {
-            if ($inversePriority) {
-                ksort($services);
-            } else {
-                krsort($services);
-            }
+            krsort($services);
+            $services = array_merge(...$services);
+        }
+
+        return $services;
+    }
+
+    /**
+     * Sorts tagged services by the priority using ksort() function
+     * (the higher the priority number, the later the service is added to the result list)
+     * and returns flatten array of sorted services.
+     *
+     * @param array $services [priority => item, ...]
+     *
+     * @return array [item, ...]
+     *
+     * @deprecated use {@see sortByPriorityAndFlatten} for new tags
+     */
+    private function inverseSortByPriorityAndFlatten(array $services): array
+    {
+        if ($services) {
+            ksort($services);
             $services = array_merge(...$services);
         }
 
@@ -101,6 +117,8 @@ trait TaggedServiceTrait
      * @param string           $serviceId
      * @param string           $addMethodName
      * @param array            $taggedServices
+     *
+     * @deprecated use "!tagged_iterator tag_name" for new tags
      */
     private function registerTaggedServicesViaAddMethod(
         ContainerBuilder $container,
