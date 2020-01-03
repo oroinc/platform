@@ -28,39 +28,16 @@ services:
             - [setResolver, [@routing.resolver]]
         tags:
             - { name: routing.loader }
-
-    acme.routing_options_resolver:
-        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
-        public: false
 ```
 
 Here we also have registered the chain route options resolver service which allows to add resolvers from any bundle. There are several ways how to allow a bundle to register own route options resolver in the chain resolver, but most common way is to use DI container tags. The following example shows how to register tagged resolvers:
 
-``` php
-<?php
-
-namespace Acme\Bundle\AppBundle;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
-
-class AcmeAppBundle extends Bundle
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'acme.routing_options_resolver',
-            'routing.options_resolver',
-            'addResolver'
-        ));
-    }
-}
+``` yaml
+services:
+    acme.routing_options_resolver:
+        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
+        arguments:
+            - !tagged_iterator routing.options_resolver
 ```
 
 The last thing you need to do is to register a root routing resource for your application in `config/routing.yml`:

@@ -43,7 +43,7 @@ class WidgetProviderPass implements CompilerPassInterface
             $providers[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
         }
 
-        $providers = $this->sortByPriorityAndFlatten($providers, true);
+        $providers = $this->inverseSortByPriorityAndFlatten($providers);
 
         $container->getDefinition($this->serviceId)
             ->setArgument(0, new IteratorArgument($providers));

@@ -11,7 +11,6 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 /**
  * Provides a core functionality to convert a query definition created by the query designer to another format.
  *
- * @todo: need to think how to reduce the complexity of this class
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -1740,7 +1739,7 @@ abstract class AbstractQueryConverter
         ];
 
         return preg_replace_callback(
-            '/\$([\w_]+)/',
+            '/\$([\w\_]+)/',
             function ($matches) use (&$variables) {
                 return $variables[$matches[1]];
             },

@@ -6,32 +6,25 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
+/**
+ * The builder for extendable entities ORM metadata.
+ */
 class ExtendMetadataBuilder
 {
     /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
+
+    /** @var iterable|MetadataBuilderInterface[] */
+    private $builders;
 
     /**
-     * @var MetadataBuilderInterface[]
+     * @param ConfigProvider                      $extendConfigProvider
+     * @param iterable|MetadataBuilderInterface[] $builders
      */
-    protected $builders = [];
-
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
-    public function __construct(ConfigProvider $extendConfigProvider)
+    public function __construct(ConfigProvider $extendConfigProvider, iterable $builders)
     {
         $this->extendConfigProvider = $extendConfigProvider;
-    }
-
-    /**
-     * Registers the metadata builder in the chain
-     *
-     * @param MetadataBuilderInterface $builder
-     */
-    public function addBuilder(MetadataBuilderInterface $builder)
-    {
-        $this->builders[] = $builder;
+        $this->builders = $builders;
     }
 
     /**

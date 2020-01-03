@@ -3,6 +3,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder
         arguments:
             - '@oro_entity_config.provider.extend'
+            - !tagged_iterator oro_entity_extend.entity_metadata_builder
 
     oro_entity_extend.link.entity_metadata_builder:
         tags:

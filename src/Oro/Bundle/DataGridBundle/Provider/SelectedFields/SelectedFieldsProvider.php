@@ -6,19 +6,19 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
 /**
- * Composite provider which returns selected fields from all inner providers.
+ * Returns selected fields from all child providers.
  */
 class SelectedFieldsProvider implements SelectedFieldsProviderInterface
 {
-    /** @var SelectedFieldsProviderInterface[] */
-    private $selectedFieldsProviders = [];
+    /** @var iterable|SelectedFieldsProviderInterface[] */
+    private $selectedFieldsProviders;
 
     /**
-     * @param SelectedFieldsProviderInterface $selectedFieldsProvider
+     * @param iterable|SelectedFieldsProviderInterface[] $selectedFieldsProviders
      */
-    public function addSelectedFieldsProvider(SelectedFieldsProviderInterface $selectedFieldsProvider)
+    public function __construct(iterable $selectedFieldsProviders)
     {
-        $this->selectedFieldsProviders[] = $selectedFieldsProvider;
+        $this->selectedFieldsProviders = $selectedFieldsProviders;
     }
 
     /**
@@ -28,12 +28,14 @@ class SelectedFieldsProvider implements SelectedFieldsProviderInterface
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
     ): array {
-        $selectedFields = [[]];
+        $result = [];
         foreach ($this->selectedFieldsProviders as $selectedFieldsProvider) {
-            $selectedFields[] = $selectedFieldsProvider
-                ->getSelectedFields($datagridConfiguration, $datagridParameters);
+            $result[] = $selectedFieldsProvider->getSelectedFields($datagridConfiguration, $datagridParameters);
+        }
+        if ($result) {
+            $result = array_unique(array_merge(...$result));
         }
 
-        return array_unique(array_merge(...$selectedFields));
+        return $result;
     }
 }

@@ -7,7 +7,7 @@ entity_config:
                     options:
                         value_type: boolean
                         default_value: false
-                        allowed_type: [file, image]
+                        allowed_type: [file, image, multiFile, multiImage]
                         create_only: true
                     form:
                         type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType

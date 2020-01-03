@@ -2,59 +2,60 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
+use Psr\Container\ContainerInterface;
+
+/**
+ * The navigation item factory.
+ */
 class ItemFactory
 {
-    /**
-     * Collection of builders grouped by alias
-     *
-     * @var array
-     */
-    protected $builders = [];
+    /** @var ContainerInterface */
+    private $builders;
 
     /**
-     * Add builder
-     *
-     * @param AbstractBuilder $builder
+     * @param ContainerInterface $builders
      */
-    public function addBuilder(AbstractBuilder $builder)
+    public function __construct(ContainerInterface $builders)
     {
-        $this->builders[$builder->getType()] = $builder;
+        $this->builders = $builders;
     }
 
     /**
-     * Create navigation item
+     * Creates a navigation item.
      *
-     * @param  string      $type
-     * @param  array       $params
-     * @return null|object
+     * @param string $type
+     * @param array  $params
+     *
+     * @return object|null
      */
     public function createItem($type, $params)
     {
-        if (!array_key_exists($type, $this->builders)) {
+        if (!$this->builders->has($type)) {
             return null;
         }
 
-        /** @var $builder AbstractBuilder */
-        $builder = $this->builders[$type];
+        /** @var AbstractBuilder $builder */
+        $builder = $this->builders->get($type);
 
         return $builder->buildItem($params);
     }
 
     /**
-     * Get navigation item
+     * Gets a navigation item.
      *
-     * @param  string      $type
-     * @param  int         $itemId
-     * @return null|object
+     * @param string $type
+     * @param int    $itemId
+     *
+     * @return object|null
      */
     public function findItem($type, $itemId)
     {
-        if (!array_key_exists($type, $this->builders)) {
+        if (!$this->builders->has($type)) {
             return null;
         }
 
-        /** @var $builder AbstractBuilder */
-        $builder = $this->builders[$type];
+        /** @var AbstractBuilder $builder */
+        $builder = $this->builders->get($type);
 
         return $builder->findItem($itemId);
     }

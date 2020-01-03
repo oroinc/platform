@@ -6,6 +6,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Resolve datagrid configs with system configs
+ */
 class SystemAwareResolver implements ContainerAwareInterface
 {
     const KEY_EXTENDS       = 'extends';
@@ -128,7 +131,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveClassName($val)
     {
-        if (preg_match('#%([^\'":\s]+)%#', $val, $match)) {
+        if (preg_match('#%([^\'\"\:\s]+)%#', $val, $match)) {
             $matchedString = $match[0];
             $class = $match[1];
 
@@ -152,7 +155,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveStatic($datagridName, $key, $val)
     {
-        if (preg_match('#([^\'"%:\s]+)::([\w\._]+)#', $val, $match)) {
+        if (preg_match('#([^\'\"\%\:\s]+)::([\w\.\_]+)#', $val, $match)) {
             $matchedString = $match[0];
             $class = $match[1];
             $method = $match[2];

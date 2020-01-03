@@ -1985,7 +1985,7 @@ JS;
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s-]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s\-]+)"$/
      *
      * @param string $pageTitle
      */

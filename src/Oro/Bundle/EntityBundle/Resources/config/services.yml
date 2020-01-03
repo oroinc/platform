@@ -175,9 +175,8 @@ services:
 
     oro_entity.virtual_field_provider.chain:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
-        lazy: true
         arguments:
-            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass
+            - [] # providers
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_field_provider:
@@ -217,9 +216,8 @@ services:
 
     oro_entity.virtual_relation_provider.chain:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
-        lazy: true
         arguments:
-            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass
+            - [] # providers
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_relation_provider.config:

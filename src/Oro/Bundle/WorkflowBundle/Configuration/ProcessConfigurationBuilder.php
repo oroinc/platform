@@ -5,9 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Cron\CronExpression;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 
-class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
+/**
+ * The builder for process definitions.
+ */
+class ProcessConfigurationBuilder
 {
     /**
      * @param array $configuration
@@ -30,13 +34,18 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessDefinition($name, array $configuration)
     {
-        $this->assertConfigurationOptions($configuration, ['label', 'entity']);
+        if (!isset($configuration['entity'])) {
+            throw new MissedRequiredOptionException('The "entity" configuration option is required.');
+        }
+        if (!isset($configuration['label'])) {
+            throw new MissedRequiredOptionException('The "label" configuration option is required.');
+        }
 
-        $enabled = $this->getConfigurationOption($configuration, 'enabled', true);
-        $order = $this->getConfigurationOption($configuration, 'order', 0);
-        $excludeDefinitions = $this->getConfigurationOption($configuration, 'exclude_definitions', []);
-        $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', []);
-        $preConditionsConfiguration = $this->getConfigurationOption($configuration, 'preconditions', []);
+        $enabled = $configuration['enabled'] ?? true;
+        $order = $configuration['order'] ?? 0;
+        $excludeDefinitions = $configuration['exclude_definitions'] ?? [];
+        $actionsConfiguration = $configuration['actions_configuration'] ?? [];
+        $preConditionsConfiguration = $configuration['preconditions'] ?? [];
 
         $definition = new ProcessDefinition();
         $definition
@@ -82,15 +91,15 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessTrigger(array $configuration, ProcessDefinition $definition)
     {
-        $event = $this->getConfigurationOption($configuration, 'event', null);
+        $event = $configuration['event'] ?? null;
         $cron = $this->getCronExpression($configuration);
 
         $this->validateEventAndCronParameters($event, $cron);
 
-        $field     = $this->getConfigurationOption($configuration, 'field', null);
-        $priority  = $this->getConfigurationOption($configuration, 'priority', ProcessPriority::PRIORITY_DEFAULT);
-        $queued    = $this->getConfigurationOption($configuration, 'queued', false);
-        $timeShift = $this->getConfigurationOption($configuration, 'time_shift', null);
+        $field = $configuration['field'] ?? null;
+        $priority = $configuration['priority'] ?? ProcessPriority::PRIORITY_DEFAULT;
+        $queued = $configuration['queued'] ?? false;
+        $timeShift = $configuration['time_shift'] ?? null;
 
         if ($timeShift && !is_int($timeShift) && !$timeShift instanceof \DateInterval) {
             throw new InvalidParameterException('Time shift parameter must be either integer or DateInterval');
@@ -122,9 +131,9 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      * @param array $configuration
      * @return string|null
      */
-    protected function getCronExpression(array $configuration)
+    private function getCronExpression(array $configuration)
     {
-        $cron = $this->getConfigurationOption($configuration, 'cron', null);
+        $cron = $configuration['cron'] ?? null;
         if ($cron !== null) {
             // validate cron expression
             CronExpression::factory($cron);
@@ -138,7 +147,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      * @param string $cron
      * @throws InvalidParameterException
      */
-    protected function validateEventAndCronParameters($event, $cron)
+    private function validateEventAndCronParameters($event, $cron)
     {
         if ($cron && $event) {
             throw new InvalidParameterException('Only one parameter "event" or "cron" must be configured.');

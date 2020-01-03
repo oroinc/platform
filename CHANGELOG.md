@@ -2,6 +2,22 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.1.0
+
+### Changed
+
+#### WorkflowBundle
+* The handling of `priority` attribute for `oro.workflow.configuration.handler` and
+  `oro.workflow.definition_builder.extension` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro.workflow.configuration.handler, priority: 100 }` should be changed to
+  `{ name: oro.workflow.configuration.handler, priority: -100 }`
+
+### Added
+
+#### AttachmentBundle
+* Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](./src/Oro/Bundle/AttachmentBundle/README.md).
+
 ## 4.1.0-rc (2019-12-10)
 [Show detailed list of changes](incompatibilities-4-1-rc.md)
 

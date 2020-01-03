@@ -5,9 +5,11 @@ namespace Oro\Bundle\ReminderBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Repository for Reminder entity.
+ */
 class ReminderRepository extends EntityRepository
 {
     /**
@@ -30,8 +32,7 @@ class ReminderRepository extends EntityRepository
         return $this->createRemindersToSendQuery()
             ->select('COUNT(reminder.id)')
             ->getQuery()
-            ->getSingleScalarResult()
-        ;
+            ->getSingleScalarResult();
     }
 
     /**
@@ -44,8 +45,7 @@ class ReminderRepository extends EntityRepository
             ->andWhere('reminder.startAt <= :now')
             ->andWhere('reminder.expireAt >= :now')
             ->setParameter('now', new \DateTime())
-            ->setParameter('state', Reminder::STATE_NOT_SENT)
-        ;
+            ->setParameter('state', Reminder::STATE_NOT_SENT);
     }
 
     /**
@@ -79,7 +79,7 @@ class ReminderRepository extends EntityRepository
             ->andWhere('reminder.recipient = :userId')
             ->andWhere('reminder.method = :method')
             ->setParameter('userId', $user->getId())
-            ->setParameter('method', WebSocketSendProcessor::NAME)
+            ->setParameter('method', 'web_socket')
             ->setParameter('sent_state', Reminder::STATE_REQUESTED)
             ->getQuery()
             ->execute();

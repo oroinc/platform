@@ -297,6 +297,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         if ($fieldConfig->has('nullable')) {
             $relation['nullable'] = $fieldConfig->get('nullable');
         }
+        if ($fieldConfig->has('orphanRemoval')) {
+            $relation['orphanRemoval'] = $fieldConfig->get('orphanRemoval');
+        }
     }
 
     /**

@@ -22,13 +22,6 @@ interface SendProcessorInterface
     public function process();
 
     /**
-     * Gets unique name of processor
-     *
-     * @param string
-     */
-    public function getName();
-
-    /**
      * Gets label of processor
      *
      * @param string

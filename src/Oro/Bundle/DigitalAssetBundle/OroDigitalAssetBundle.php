@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\DigitalAssetBundle;
 
-use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Bundle class for OroDigitalAssetBundle.
+ * The DigitalAssetBundle bundle class.
  */
 class OroDigitalAssetBundle extends Bundle
 {
@@ -17,6 +16,12 @@ class OroDigitalAssetBundle extends Bundle
      */
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new DefaultFallbackExtensionPass([DigitalAsset::class => ['title' => 'titles']]));
+        parent::build($container);
+
+        $container->addCompilerPass(new DefaultFallbackExtensionPass([
+            'Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset' => [
+                'title' => 'titles'
+            ]
+        ]));
     }
 }

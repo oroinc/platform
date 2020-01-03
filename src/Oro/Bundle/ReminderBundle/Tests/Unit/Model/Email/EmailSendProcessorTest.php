@@ -141,14 +141,6 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            EmailSendProcessor::NAME,
-            $this->processor->getName()
-        );
-    }
-
     public function testGetLabel()
     {
         $this->assertEquals(

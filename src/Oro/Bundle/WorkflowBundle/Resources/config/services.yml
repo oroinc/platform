@@ -418,7 +418,7 @@ services:
         arguments:
             - '@oro_workflow.helper.translation'
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 150 }
+            - { name: oro.workflow.configuration.handler, priority: -150 }
             - { name: oro.workflow.definition_builder.extension }
 
     Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor:

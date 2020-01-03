@@ -71,7 +71,7 @@ class ContentType extends BaseContentType
     public function setType($type)
     {
         $matches = [];
-        if (preg_match('/^[a-z-]+\/[a-z0-9.+-]+/i', $type, $matches)) {
+        if (preg_match('/^[a-z\-]+\/[a-z0-9\.\+\-]+/i', $type, $matches)) {
             $type = $matches[0];
         }
         $this->type = $type;
