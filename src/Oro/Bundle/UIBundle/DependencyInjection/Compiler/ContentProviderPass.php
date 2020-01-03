@@ -2,50 +2,62 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all content providers and adds the content provider manager to TWIG.
+ */
 class ContentProviderPass implements CompilerPassInterface
 {
-    const TWIG_SERVICE_KEY                 = 'twig';
-    const CONTENT_PROVIDER_TAG             = 'oro_ui.content_provider';
-    const CONTENT_PROVIDER_MANAGER_SERVICE = 'oro_ui.content_provider.manager';
+    use TaggedServiceTrait;
 
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::CONTENT_PROVIDER_MANAGER_SERVICE)) {
-            return;
+        $items = [];
+        $tagName = 'oro_ui.content_provider';
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $items[$this->getPriorityAttribute($attributes)][] = [
+                    $id,
+                    $this->getRequiredAttribute($attributes, 'alias', $id, $tagName),
+                    $this->getAttribute($attributes, 'enabled', true)
+                ];
+            }
         }
 
-        $contentProviderManagerDefinition = $container->getDefinition(self::CONTENT_PROVIDER_MANAGER_SERVICE);
-        $taggedServices                   = $container->findTaggedServiceIds(self::CONTENT_PROVIDER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
-            if ($container->hasDefinition($id)) {
-                $container->getDefinition($id)->setPublic(false);
-            }
-            $isEnabled = true;
-            foreach ($attributes as $attribute) {
-                if (array_key_exists('enabled', $attribute)) {
-                    $isEnabled = !empty($attribute['enabled']);
-                    break;
+        $services = [];
+        $providers = [];
+        $enabledProviders = [];
+        if ($items) {
+            $items = $this->sortByPriorityAndFlatten($items);
+            foreach ($items as [$id, $alias, $enabled]) {
+                if (!isset($services[$alias])) {
+                    $services[$alias] = new Reference($id);
+                    $providers[] = $alias;
+                    if ($enabled) {
+                        $enabledProviders[] = $alias;
+                    }
                 }
             }
-            $contentProviderManagerDefinition->addMethodCall(
-                'addContentProvider',
-                array(new Reference($id), $isEnabled)
-            );
         }
 
-        if ($container->hasDefinition(self::TWIG_SERVICE_KEY)) {
-            $twig = $container->getDefinition(self::TWIG_SERVICE_KEY);
-            $twig->addMethodCall(
+        $container->getDefinition('oro_ui.content_provider.manager')
+            ->setArgument(0, $providers)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services))
+            ->setArgument(2, $enabledProviders);
+
+        $container->getDefinition('twig')
+            ->addMethodCall(
                 'addGlobal',
-                ['oro_ui_content_provider_manager', new Reference(self::CONTENT_PROVIDER_MANAGER_SERVICE)]
+                ['oro_ui_content_provider_manager', new Reference('oro_ui.content_provider.manager.twig')]
             );
-        }
     }
 }

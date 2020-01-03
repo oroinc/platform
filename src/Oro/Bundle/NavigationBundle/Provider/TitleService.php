@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Navigation title helper.
@@ -61,9 +60,9 @@ class TitleService implements TitleServiceInterface
     private $titleTranslator;
 
     /**
-     * @var ServiceLink
+     * @var BreadcrumbManagerInterface
      */
-    protected $breadcrumbManagerLink;
+    protected $breadcrumbManager;
 
     /**
      * @var ConfigManager
@@ -71,21 +70,21 @@ class TitleService implements TitleServiceInterface
     protected $userConfigManager;
 
     /**
-     * @param TitleReaderRegistry $titleReaderRegistry
-     * @param TitleTranslator     $titleTranslator
-     * @param ConfigManager       $userConfigManager
-     * @param ServiceLink         $breadcrumbManagerLink
+     * @param TitleReaderRegistry        $titleReaderRegistry
+     * @param TitleTranslator            $titleTranslator
+     * @param ConfigManager              $userConfigManager
+     * @param BreadcrumbManagerInterface $breadcrumbManager
      */
     public function __construct(
         TitleReaderRegistry $titleReaderRegistry,
         TitleTranslator $titleTranslator,
         ConfigManager $userConfigManager,
-        ServiceLink $breadcrumbManagerLink
+        BreadcrumbManagerInterface $breadcrumbManager
     ) {
         $this->titleReaderRegistry = $titleReaderRegistry;
         $this->titleTranslator = $titleTranslator;
         $this->userConfigManager = $userConfigManager;
-        $this->breadcrumbManagerLink = $breadcrumbManagerLink;
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -347,9 +346,7 @@ class TitleService implements TitleServiceInterface
             $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
         }
 
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-        return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
+        return $this->breadcrumbManager->getBreadcrumbLabels($menuName, $route);
     }
 
     /**
@@ -365,9 +362,7 @@ class TitleService implements TitleServiceInterface
             $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
         }
 
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-        return $breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
+        return $this->breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
     }
 
     /**

@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
 .drag-n-drop-sorting-view {
-    min-width: $drag-n-drop-sorting-view-width;
-
     &__wrapper {
         &.disabled {
             .removeRow {

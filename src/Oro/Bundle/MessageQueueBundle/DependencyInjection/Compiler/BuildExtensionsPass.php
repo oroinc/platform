@@ -4,43 +4,38 @@ namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Collects consumption and job extensions.
+ * Collects consumption extensions.
  */
 class BuildExtensionsPass implements CompilerPassInterface
 {
+    use TaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
         $this->processConsumptionExtensions($container);
-        $this->processJobExtensions($container);
     }
 
     /**
      * @param ContainerBuilder $container
      */
-    protected function processConsumptionExtensions(ContainerBuilder $container)
+    private function processConsumptionExtensions(ContainerBuilder $container): void
     {
         $extensions = [];
         $taggedServices = $container->findTaggedServiceIds('oro_message_queue.consumption.extension');
         foreach ($taggedServices as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                $priority = 0;
-                if (isset($attributes['priority'])) {
-                    $priority = (int)$attributes['priority'];
-                }
-                $persistent = false;
-                if (isset($attributes['persistent'])) {
-                    $persistent = (bool)$attributes['persistent'];
-                }
-
+                $priority = $this->getPriorityAttribute($attributes);
+                $persistent = $this->getAttribute($attributes, 'persistent', false);
                 $extensions[$priority][] = [$serviceId, $persistent];
             }
         }
@@ -48,12 +43,10 @@ class BuildExtensionsPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
-        krsort($extensions);
-        $extensions = call_user_func_array('array_merge', $extensions);
+        $extensions = $this->sortByPriorityAndFlatten($extensions);
 
         $extensionReferences = [];
-        foreach ($extensions as list($serviceId, $persistent)) {
+        foreach ($extensions as [$serviceId, $persistent]) {
             if (!$persistent) {
                 $service = $container->getDefinition($serviceId);
                 $serviceClass = $service->getClass();
@@ -78,34 +71,5 @@ class BuildExtensionsPass implements CompilerPassInterface
 
         $container->getDefinition('oro_message_queue.consumption.extensions')
             ->replaceArgument(0, $extensionReferences);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function processJobExtensions(ContainerBuilder $container)
-    {
-        $extensions = [];
-        $taggedServices = $container->findTaggedServiceIds('oro_message_queue.job.extension');
-        foreach ($taggedServices as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = 0;
-                if (isset($attributes['priority'])) {
-                    $priority = (int)$attributes['priority'];
-                }
-
-                $extensions[$priority][] = new Reference($serviceId);
-            }
-        }
-        if (empty($extensions)) {
-            return;
-        }
-
-        // sort by priority and flatten
-        krsort($extensions);
-        $extensions = call_user_func_array('array_merge', $extensions);
-
-        $container->getDefinition('oro_message_queue.job.extensions')
-            ->replaceArgument(0, $extensions);
     }
 }

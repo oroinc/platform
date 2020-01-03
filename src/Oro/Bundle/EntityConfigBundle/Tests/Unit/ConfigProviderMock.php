@@ -17,16 +17,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 class ConfigProviderMock extends ConfigProvider
 {
     /** @var Config[] */
-    protected $entityConfigs = [];
+    private $entityConfigs = [];
 
     /** @var array of Config[] */
-    protected $fieldConfigs = [];
+    private $fieldConfigs = [];
 
     /** @var bool[] */
-    protected $hiddenEntities = [];
+    private $hiddenEntities = [];
 
     /** @var array of bool[] */
-    protected $hiddenFields = [];
+    private $hiddenFields = [];
 
     /**
      * @param ConfigManager $configManager
@@ -100,10 +100,6 @@ class ConfigProviderMock extends ConfigProvider
      */
     public function getId($className = null, $fieldName = null, $fieldType = null)
     {
-        if ($className) {
-            $className = $this->getClassName($className);
-        }
-
         return $fieldName
             ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
             : new EntityConfigId($this->getScope(), $className);
@@ -136,23 +132,18 @@ class ConfigProviderMock extends ConfigProvider
     {
         if (!$this->hasConfig($className, $fieldName)) {
             if ($fieldName) {
-                throw new RuntimeException(
-                    sprintf(
-                        'A config for the field "%s::%s" does not exist. Scope: %s.',
-                        $className,
-                        $fieldName,
-                        $this->getScope()
-                    )
-                );
-            } else {
-                throw new RuntimeException(
-                    sprintf(
-                        'A config for the entity "%s" does not exist. Scope: %s.',
-                        $className,
-                        $this->getScope()
-                    )
-                );
+                throw new RuntimeException(sprintf(
+                    'A config for the field "%s::%s" does not exist. Scope: %s.',
+                    $className,
+                    $fieldName,
+                    $this->getScope()
+                ));
             }
+            throw new RuntimeException(sprintf(
+                'A config for the entity "%s" does not exist. Scope: %s.',
+                $className,
+                $this->getScope()
+            ));
         }
 
         return $fieldName
@@ -175,14 +166,10 @@ class ConfigProviderMock extends ConfigProvider
      */
     public function getIds($className = null, $withHidden = false)
     {
-        if ($className) {
-            $className = $this->getClassName($className);
-        }
-
         $result = [];
         if ($className) {
             /** @var Config $config */
-            $fieldConfigs = isset($this->fieldConfigs[$className]) ? $this->fieldConfigs[$className] : [];
+            $fieldConfigs = $this->fieldConfigs[$className] ?? [];
             foreach ($fieldConfigs as $config) {
                 if (!$withHidden) {
                     /** @var FieldConfigId $fieldId */
@@ -214,14 +201,10 @@ class ConfigProviderMock extends ConfigProvider
      */
     public function getConfigs($className = null, $withHidden = false)
     {
-        if ($className) {
-            $className = $this->getClassName($className);
-        }
-
         $result = [];
         if ($className) {
             /** @var Config $config */
-            $fieldConfigs = isset($this->fieldConfigs[$className]) ? $this->fieldConfigs[$className] : [];
+            $fieldConfigs = $this->fieldConfigs[$className] ?? [];
             foreach ($fieldConfigs as $config) {
                 if (!$withHidden) {
                     /** @var FieldConfigId $fieldId */

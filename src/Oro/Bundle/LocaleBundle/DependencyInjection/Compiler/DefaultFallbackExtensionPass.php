@@ -5,39 +5,39 @@ namespace Oro\Bundle\LocaleBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Registers default fallback fields mapping.
+ */
 class DefaultFallbackExtensionPass implements CompilerPassInterface
 {
-    const GENERATOR_EXTENSION_NAME = 'oro_locale.entity_generator.extension';
+    /** @var array */
+    private $classes;
 
     /**
-     * @var array Array of classes and fields
+     * @param array $classes [class name => [singular field name => field name, ...], ...]
      */
-    protected $classes;
-
-    public function __construct(array $classes = [])
+    public function __construct(array $classes)
     {
         $this->classes = $classes;
     }
 
     /**
-     * You can modify the container here before it is dumped to PHP code.
-     *
-     * @param ContainerBuilder $container
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$this->classes) {
-            return;
-        }
-
-        if (!$container->hasDefinition(self::GENERATOR_EXTENSION_NAME)) {
-            return;
-        }
-
-        $generator = $container->getDefinition(self::GENERATOR_EXTENSION_NAME);
-
+        $generatorExtensionDef = $container->getDefinition('oro_locale.entity_generator.extension');
+        $fieldMap = $generatorExtensionDef->getArgument(0);
         foreach ($this->classes as $class => $fields) {
-            $generator->addMethodCall('addDefaultMethodFields', [$class, $fields]);
+            if (!$fields) {
+                continue;
+            }
+            if (empty($fieldMap[$class])) {
+                $fieldMap[$class] = $fields;
+            } else {
+                $fieldMap[$class] = array_merge($fieldMap[$class], $fields);
+            }
         }
+        $generatorExtensionDef->setArgument(0, $fieldMap);
     }
 }

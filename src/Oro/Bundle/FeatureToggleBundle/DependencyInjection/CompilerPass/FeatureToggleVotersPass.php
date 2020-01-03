@@ -2,30 +2,31 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all feature voters.
+ */
 class FeatureToggleVotersPass implements CompilerPassInterface
 {
+    use TaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('oro_featuretoggle.checker.feature_checker')) {
-            return;
+        $voters = [];
+        $taggedServices = $container->findTaggedServiceIds('oro_featuretogle.voter');
+        foreach ($taggedServices as $id => $tags) {
+            $voters[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
         }
 
-        $voters = new \SplPriorityQueue();
-        foreach ($container->findTaggedServiceIds('oro_featuretogle.voter') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $voters->insert(new Reference($id), $priority);
-        }
+        $voters = $this->inverseSortByPriorityAndFlatten($voters);
 
-        $voters = iterator_to_array($voters);
-        ksort($voters);
-        
         $container->getDefinition('oro_featuretoggle.checker.feature_checker')
             ->addMethodCall('setVoters', [array_values($voters)]);
     }

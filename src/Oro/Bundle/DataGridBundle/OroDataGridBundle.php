@@ -3,11 +3,12 @@
 namespace Oro\Bundle\DataGridBundle;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Adds compiler passes required by OroDataGridBundle.
+ * The DataGridBundle bundle class.
  */
 class OroDataGridBundle extends Bundle
 {
@@ -25,6 +26,10 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new CompilerPass\InlineEditColumnOptionsGuesserPass());
         $container->addCompilerPass(new CompilerPass\SetDatagridEventListenersLazyPass());
         $container->addCompilerPass(new CompilerPass\BoardProcessorsPass());
-        $container->addCompilerPass(new CompilerPass\SelectedFieldsProvidersPass());
+        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
+            'oro_datagrid.provider.selected_fields',
+            'oro_datagrid.selected_fields_provider',
+            'addSelectedFieldsProvider'
+        ));
     }
 }

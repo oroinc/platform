@@ -275,10 +275,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
     oro_search.extension.search_filter_bag:
         class: Oro\Bundle\FilterBundle\Filter\FilterBag
         public: true
+        arguments:
+            - [] # filter names
+            - ~ # service locator
 
     oro_search.extension.search_sorter:
         class: Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension

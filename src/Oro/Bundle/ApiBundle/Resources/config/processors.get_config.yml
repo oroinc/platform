@@ -51,8 +51,8 @@ services:
     oro_api.complete_definition_helper.custom_data_type:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper
         arguments:
-            - [] # completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CustomDataTypeCompleterCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CustomDataTypeCompleterCompilerPass
+            - [] # completers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.custom_data_type_completer.unidirectional_association:

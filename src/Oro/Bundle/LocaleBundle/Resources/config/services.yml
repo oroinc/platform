@@ -110,6 +110,9 @@ services:
     # Converters
     oro_locale.format_converter.date_time.registry:
         class: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry
+        arguments:
+            - [] # converter names
+            - ~ # service locator for converters
 
     oro_locale.format_converter.date_time.intl:
         class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
@@ -334,7 +337,7 @@ services:
     oro_locale.provider.current_localization:
         class: Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider
         arguments:
-            - !tagged oro_locale.extension.current_localization
+            - !tagged_iterator oro_locale.extension.current_localization
 
     oro_locale.provider.config_default_localization:
         class: Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider
@@ -343,6 +346,8 @@ services:
 
     oro_locale.entity_generator.extension:
         class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+        arguments:
+            - [] # a map of default fallback fields
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
@@ -370,7 +375,7 @@ services:
     oro_locale.provider.preferred_localization_provider:
         class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLocalizationProvider
         arguments:
-            - !tagged oro_locale.preferred_localization_provider
+            - !tagged_iterator oro_locale.preferred_localization_provider
 
     Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface:
         alias: 'oro_locale.provider.preferred_localization_provider'

@@ -154,8 +154,8 @@ services:
     oro_api.object_normalizer_registry:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
         arguments:
-            - [] # normalizers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ObjectNormalizerCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ObjectNormalizerCompilerPass
+            - [] # normalizers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.datetime_normalizer:
@@ -388,8 +388,8 @@ services:
     oro_api.entity_serializer.query_modifier_registry:
         class: Oro\Bundle\ApiBundle\Util\QueryModifierRegistry
         arguments:
-            - [] # query modifiers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
+            - [] # query modifiers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.field_accessor:
@@ -403,8 +403,8 @@ services:
     oro_api.entity_serializer.mandatory_field_provider_registry:
         class: Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry
         arguments:
-            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
+            - [] # providers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.config_normalizer:
@@ -439,8 +439,8 @@ services:
     oro_api.entity_id_transformer_registry:
         class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
         arguments:
-            - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass
+            - [] # transformers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
             - '@oro_api.entity_id_resolver_registry'
 
@@ -460,6 +460,8 @@ services:
 
     oro_api.exception_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
+        arguments:
+            - !tagged_iterator oro.api.exception_text_extractor
 
     oro_api.exception_text_extractor.default:
         class: Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor
@@ -479,8 +481,8 @@ services:
     oro_api.error_completer_registry:
         class: Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry
         arguments:
-            - [] # error completers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
+            - [] # error completers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.error_completer.default:
@@ -536,8 +538,8 @@ services:
     oro_api.rest.routes_registry:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry
         arguments:
-            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestRoutesCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestRoutesCompilerPass
+            - [] # providers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.routes:
@@ -571,6 +573,8 @@ services:
 
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
+        arguments:
+            - !tagged_iterator oro.api.api_doc_annotation_handler
 
     oro_api.rest.chain_routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
@@ -703,8 +707,8 @@ services:
     oro_api.api_doc.documentation_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider
         arguments:
-            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+            - [] # providers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.api_doc.documentation_provider.predefined_ids:
@@ -731,6 +735,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
         arguments:
             - '@request_stack'
+            - !tagged_iterator oro.api.request_type_provider
 
     oro_api.rest.request_type_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
@@ -789,6 +794,8 @@ services:
 
     oro_api.constraint_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
+        arguments:
+            - !tagged_iterator oro.api.constraint_text_extractor
 
     oro_api.constraint_text_extractor.default:
         class: Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor

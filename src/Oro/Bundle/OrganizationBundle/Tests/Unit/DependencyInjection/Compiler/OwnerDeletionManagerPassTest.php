@@ -47,10 +47,12 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The tag attribute "entity" is required for service "checker2".
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The attribute "entity" is required for "oro_organization.owner_assignment_checker" tag. Service: "checker2".
      */
+    // @codingStandardsIgnoreEnd
     public function testProcessWhenCheckerDoesNotHaveEntityTagAttribute()
     {
         $container = new ContainerBuilder();
@@ -69,7 +71,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The service "checker2" must not have the tag "oro_organization.owner_assignment_checker" and the entity "Test\Entity1" because there is another service ("checker1") with this tag and entity. Use a decoration of "checker1" service to extend it or create a compiler pass for the dependency injection container to override "checker1" service completely.
      */
     // @codingStandardsIgnoreEnd
