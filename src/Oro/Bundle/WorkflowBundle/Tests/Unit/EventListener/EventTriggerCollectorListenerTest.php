@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnClearEventArgs;
@@ -11,26 +10,29 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\EventTriggerExtensionInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY = 'stdClass';
-    const FIELD  = 'field';
+    private const ENTITY = 'stdClass';
+    private const FIELD  = 'field';
+
+    /** @var EventTriggerExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $extension;
 
     /** @var EventTriggerCollectorListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp()
     {
-        $this->listener = new EventTriggerCollectorListener();
-    }
+        $this->extension = $this->createMock(EventTriggerExtensionInterface::class);
 
-    protected function tearDown()
-    {
-        unset($this->listener);
+        $this->listener = new EventTriggerCollectorListener(new RewindableGenerator(
+            function () {
+                yield $this->extension;
+            },
+            1
+        ));
     }
 
     public function testSetEnabled()
@@ -46,33 +48,17 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertAttributeEquals(false, 'forceQueued', $this->listener);
 
-        $extension = $this->getExtensionMock();
-        $extension->expects($this->at(0))->method('setForceQueued')->with(false);
-        $extension->expects($this->at(1))->method('setForceQueued')->with(true);
+        $this->extension->expects($this->once())
+            ->method('setForceQueued')
+            ->with(true);
 
-        $this->listener->addExtension($extension);
         $this->listener->setForceQueued(true);
+        // force initializing of extensions
+        $this->listener->preRemove(
+            new LifecycleEventArgs(new \stdClass(), $this->createMock(EntityManagerInterface::class))
+        );
 
         $this->assertAttributeEquals(true, 'forceQueued', $this->listener);
-    }
-
-    public function testAddExtension()
-    {
-        $this->assertAttributeEquals(new ArrayCollection(), 'extensions', $this->listener);
-
-        $extension1 = $this->getExtensionMock(true);
-        $extension2 = $this->getExtensionMock(true);
-
-        $this->listener->setForceQueued(true);
-
-        $this->listener->addExtension($extension1);
-        $this->assertAttributeEquals(new ArrayCollection([$extension1]), 'extensions', $this->listener);
-
-        $this->listener->addExtension($extension1);
-        $this->assertAttributeEquals(new ArrayCollection([$extension1]), 'extensions', $this->listener);
-
-        $this->listener->addExtension($extension2);
-        $this->assertAttributeEquals(new ArrayCollection([$extension1, $extension2]), 'extensions', $this->listener);
     }
 
     /**
@@ -84,14 +70,14 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $extension = $this->getExtensionMock();
-        $extension->expects($this->never())->method('hasTriggers');
-        $extension->expects($this->never())->method('schedule');
+        $this->extension->expects($this->never())
+            ->method('hasTriggers');
+        $this->extension->expects($this->never())
+            ->method('schedule');
 
-        $this->listener->addExtension($extension);
         $this->listener->setEnabled(false);
 
-        $this->callPreFunctionByEventName($event, $entity, $this->getEntityManagerMock());
+        $this->callPreFunctionByEventName($event, $entity, $this->createMock(EntityManagerInterface::class));
     }
 
     /**
@@ -117,18 +103,20 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $extension1 = $this->getExtensionMock();
-        $extension1->expects($this->atLeastOnce())->method('hasTriggers')->with($entity, $event)->willReturn(true);
-        $extension1->expects($this->atLeastOnce())->method('schedule')->with($entity, $event, $expectedChangeSet);
+        $this->extension->expects($this->atLeastOnce())
+            ->method('hasTriggers')
+            ->with($entity, $event)
+            ->willReturn(true);
+        $this->extension->expects($this->atLeastOnce())
+            ->method('schedule')
+            ->with($entity, $event, $expectedChangeSet);
 
-        $extension2 = $this->getExtensionMock();
-        $extension2->expects($this->atLeastOnce())->method('hasTriggers')->with($entity, $event)->willReturn(false);
-        $extension2->expects($this->never())->method('schedule');
-
-        $this->listener->addExtension($extension1);
-        $this->listener->addExtension($extension2);
-
-        $this->callPreFunctionByEventName($event, $entity, $this->getEntityManagerMock(), $changeSet);
+        $this->callPreFunctionByEventName(
+            $event,
+            $entity,
+            $this->createMock(EntityManagerInterface::class),
+            $changeSet
+        );
     }
 
     /**
@@ -158,10 +146,10 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnClear(OnClearEventArgs $args, $entityClass)
     {
-        $extension = $this->getExtensionMock();
-        $extension->expects($this->atLeastOnce())->method('clear')->with($entityClass);
+        $this->extension->expects($this->atLeastOnce())
+            ->method('clear')
+            ->with($entityClass);
 
-        $this->listener->addExtension($extension);
         $this->listener->onClear($args);
     }
 
@@ -172,11 +160,11 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'clear all' => [
-                'args' => new OnClearEventArgs($this->getEntityManagerMock()),
+                'args' => new OnClearEventArgs($this->createMock(EntityManagerInterface::class)),
                 'entityClass' => null
             ],
             'clear entity class' => [
-                'args' => new OnClearEventArgs($this->getEntityManagerMock(), self::ENTITY),
+                'args' => new OnClearEventArgs($this->createMock(EntityManagerInterface::class), self::ENTITY),
                 'entityClass' => self::ENTITY
             ]
         ];
@@ -184,23 +172,22 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostFlush()
     {
-        $em = $this->getEntityManagerMock();
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $extension = $this->getExtensionMock();
-        $extension->expects($this->atLeastOnce())->method('process')->with($em);
+        $this->extension->expects($this->atLeastOnce())
+            ->method('process')
+            ->with($em);
 
-        $this->listener->addExtension($extension);
         $this->listener->postFlush(new PostFlushEventArgs($em));
     }
 
     public function testPostFlushNotEnabled()
     {
-        $extension = $this->getExtensionMock();
-        $extension->expects($this->never())->method('process');
+        $this->extension->expects($this->never())
+            ->method('process');
 
-        $this->listener->addExtension($extension);
         $this->listener->setEnabled(false);
-        $this->listener->postFlush(new PostFlushEventArgs($this->getEntityManagerMock()));
+        $this->listener->postFlush(new PostFlushEventArgs($this->createMock(EntityManagerInterface::class)));
     }
 
     /**
@@ -209,7 +196,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
      * @param EntityManagerInterface $em
      * @param array $changeSet
      */
-    protected function callPreFunctionByEventName($event, $entity, EntityManagerInterface $em, $changeSet = [])
+    private function callPreFunctionByEventName($event, $entity, EntityManagerInterface $em, $changeSet = [])
     {
         switch ($event) {
             case EventTriggerInterface::EVENT_CREATE:
@@ -225,28 +212,5 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
                 $this->listener->preRemove($args);
                 break;
         }
-    }
-
-    /**
-     * @param null|bool $forceQueued
-     * @return EventTriggerExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getExtensionMock($forceQueued = null)
-    {
-        $mock = $this->createMock(EventTriggerExtensionInterface::class);
-
-        if (null !== $forceQueued) {
-            $mock->expects($this->once())->method('setForceQueued')->with($forceQueued);
-        }
-
-        return $mock;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
-     */
-    protected function getEntityManagerMock()
-    {
-        return $this->createMock(EntityManagerInterface::class);
     }
 }
