@@ -280,6 +280,7 @@ services:
             - '%kernel.cache_dir%/oro/acl_annotations.php'
             - '%kernel.debug%'
             - '@oro_entity.orm.entity_class_resolver'
+            - !tagged_iterator oro_security.acl.config_loader
 
     oro_security.acl.config_loader:
         class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader

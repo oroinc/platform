@@ -15,31 +15,27 @@ use Oro\Component\Config\ResourcesContainerInterface;
  */
 class AclAnnotationProvider extends PhpConfigProvider
 {
-    /** @var AclAnnotationLoaderInterface[] */
-    private $loaders = [];
+    /** @var iterable|AclAnnotationLoaderInterface[] */
+    private $loaders;
 
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
     /**
-     * @param string              $cacheFile
-     * @param bool                $debug
-     * @param EntityClassResolver $entityClassResolver
+     * @param string                                  $cacheFile
+     * @param bool                                    $debug
+     * @param EntityClassResolver                     $entityClassResolver
+     * @param iterable|AclAnnotationLoaderInterface[] $loaders
      */
-    public function __construct(string $cacheFile, bool $debug, EntityClassResolver $entityClassResolver)
-    {
+    public function __construct(
+        string $cacheFile,
+        bool $debug,
+        EntityClassResolver $entityClassResolver,
+        iterable $loaders
+    ) {
         parent::__construct($cacheFile, $debug);
         $this->entityClassResolver = $entityClassResolver;
-    }
-
-    /**
-     * Adds ACL annotation loader.
-     *
-     * @param AclAnnotationLoaderInterface $loader
-     */
-    public function addLoader(AclAnnotationLoaderInterface $loader): void
-    {
-        $this->loaders[] = $loader;
+        $this->loaders = $loaders;
     }
 
     /**
