@@ -6,6 +6,13 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### TranslationBundle
+* The handling of `priority` attribute for `oro_translation.extension.translation_context_resolver` and
+  `oro_translation.extension.translation_strategy` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_translation.extension.translation_context_resolver, priority: 100 }` should be changed to
+  `{ name: oro_translation.extension.translation_context_resolver, priority: -100 }`
+
 #### WorkflowBundle
 * The handling of `priority` attribute for `oro.workflow.configuration.handler` and
   `oro.workflow.definition_builder.extension` DIC tags was changed to correspond Symfony recommendations.
