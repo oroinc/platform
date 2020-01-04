@@ -24,6 +24,10 @@ The current file describes significant changes in the code that may affect the u
 * The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
   Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
 
+#### EntityConfigBundle
+* The `getType()` method was removed from `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface`.
+  Use the `type` attribute of the `oro_entity_config.attribute_type` DIC tag instead.
+
 #### ReminderBundle
 * The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
   Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.

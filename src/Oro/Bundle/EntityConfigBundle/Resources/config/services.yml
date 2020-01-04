@@ -372,6 +372,7 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper
         arguments:
             - '@doctrine'
+            - !tagged_iterator oro_entity_config.layout.attribute_block_type_mapper
         calls:
             - [setDefaultBlockType, ['attribute_text']]
             - [addBlockType, ['percent', 'attribute_percent']]
