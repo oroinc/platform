@@ -733,7 +733,7 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - { name: oro_activity_list.provider, priority: 30 }
+           - { name: oro_activity_list.provider, class: Oro\Bundle\EmailBundle\Entity\Email, priority: 30 }
            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.related_emails.provider:

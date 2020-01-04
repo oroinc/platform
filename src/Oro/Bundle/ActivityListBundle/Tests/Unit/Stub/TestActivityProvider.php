@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
+namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -12,12 +12,13 @@ class TestActivityProvider implements
     CommentProviderInterface,
     ActivityListUpdatedByProviderInterface
 {
-    const ACTIVITY_CLASS_NAME = 'Test\Entity';
-    const ACL_CLASS = 'Test\Entity';
-
     const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
 
-    protected $targets;
+    /** @var string|null */
+    private $aclClass;
+
+    /** @var object[] */
+    private $targets;
 
     /**
      * {@inheritdoc}
@@ -66,17 +67,17 @@ class TestActivityProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getActivityClass()
+    public function getAclClass()
     {
-        return self::ACTIVITY_CLASS_NAME;
+        return $this->aclClass;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|null $aclClass
      */
-    public function getAclClass()
+    public function setAclClass($aclClass)
     {
-        return self::ACL_CLASS;
+        $this->aclClass = $aclClass;
     }
 
     /**
@@ -102,6 +103,9 @@ class TestActivityProvider implements
         return $this->targets;
     }
 
+    /**
+     * @param object[] $targets
+     */
     public function setTargets($targets)
     {
         $this->targets = $targets;

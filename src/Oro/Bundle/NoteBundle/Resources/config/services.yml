@@ -29,7 +29,7 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - {name: oro_activity_list.provider, priority: 40}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\NoteBundle\Entity\Note, priority: 40 }
 
     oro_note.activity_entity_delete_handler_extension:
         class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension

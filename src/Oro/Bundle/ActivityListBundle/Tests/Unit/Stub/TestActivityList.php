@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture;
+namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 

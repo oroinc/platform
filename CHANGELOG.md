@@ -18,6 +18,21 @@ The current file describes significant changes in the code that may affect the u
 #### AttachmentBundle
 * Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](./src/Oro/Bundle/AttachmentBundle/README.md).
 
+### Removed
+
+#### ActivityListBundle
+* The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+
+#### ReminderBundle
+* The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
+  Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
+
+#### UIBundle
+* The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+  Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
+* Unneeded `isEnabled()` and `setEnabled()` methods were removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+
 ## 4.1.0-rc (2019-12-10)
 [Show detailed list of changes](incompatibilities-4-1-rc.md)
 

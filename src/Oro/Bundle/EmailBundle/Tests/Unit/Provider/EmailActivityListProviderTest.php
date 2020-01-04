@@ -319,4 +319,12 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
     }
+
+    public function testIsApplicable()
+    {
+        self::assertTrue($this->emailActivityListProvider->isApplicable(new Email()));
+        self::assertTrue($this->emailActivityListProvider->isApplicable(Email::class));
+        self::assertFalse($this->emailActivityListProvider->isApplicable(new \stdClass()));
+        self::assertFalse($this->emailActivityListProvider->isApplicable(\stdClass::class));
+    }
 }

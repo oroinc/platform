@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture;
+namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Stub;
 
 class TestNonActiveTarget
 {
