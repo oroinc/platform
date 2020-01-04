@@ -74,7 +74,7 @@ class PriorityTaggedLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The attribute "alias" is required for "test_tag" tag. Service: "tagged_service_1".
      */
-    public function testProcessFilterWithoutNameAttribute()
+    public function testProcessWithoutNameAttribute()
     {
         $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 

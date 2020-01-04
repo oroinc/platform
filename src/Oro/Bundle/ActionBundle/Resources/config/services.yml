@@ -74,6 +74,7 @@ services:
     oro_action.operation_registry:
         class: 'Oro\Bundle\ActionBundle\Model\OperationRegistry'
         arguments:
+            - [] # filters
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
             - '@oro_action.provider.current_application'
@@ -139,9 +140,10 @@ services:
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
-
     oro_action.provider.doctrine_type_mapping:
         class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
+        arguments:
+            - [] # extensions
 
     oro_action.form.handler.operation_button:
         class: 'Oro\Bundle\ActionBundle\Handler\OperationFormHandler'
@@ -189,6 +191,8 @@ services:
 
     oro_action.datagrid.mass_action_provider.registry:
         class: 'Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry'
+        arguments:
+            - ~ # service locator for mass action providers
 
     oro_action.layout.data_provider.button_provider:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider'
@@ -208,10 +212,10 @@ services:
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
         public: true
-        lazy: true
-        calls:
-            - [setLogger, ['@logger']]
-            - [setEventDispatcher, ['@event_dispatcher']]
+        arguments:
+            - [] # extensions
+            - '@event_dispatcher'
+            - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_action }
 

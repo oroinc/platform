@@ -7,33 +7,16 @@ use Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface;
 
 class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineTypeMappingProvider */
-    private $provider;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->provider = new DoctrineTypeMappingProvider();
-    }
-
     /**
      * @dataProvider doctrineTypesProvider
      *
      * @param DoctrineTypeMappingExtensionInterface[] $extensions
-     * @param array $expected
+     * @param array                                   $expected
      */
     public function testGetDoctrineTypeMappings($extensions, array $expected)
     {
-        foreach ($extensions as $extension) {
-            $this->provider->addExtension($extension);
-        }
-
-        $this->assertEquals(
-            $expected,
-            $this->provider->getDoctrineTypeMappings()
-        );
+        $provider = new DoctrineTypeMappingProvider($extensions);
+        $this->assertEquals($expected, $provider->getDoctrineTypeMappings());
     }
 
     /**
@@ -49,31 +32,29 @@ class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
             ['test_type2' => ['type' => 'test_type2', 'options' => []]]
         );
 
-
-        yield 'no extension' => [
-            'extensions' => [],
-            'expected' => []
-        ];
-
-        yield 'one extension' => [
-            'extensions' => [$extension2],
-            'expected' => [
-                'test_type' => ['type' => 'test_type', 'options' => []]
-            ]
-        ];
-
-        yield 'two extensions' => [
-            'extensions' => [$extension1, $extension2],
-            'expected' => [
-                'test_type' => ['type' => 'test_type', 'options' => []]
-            ]
-        ];
-
-        yield 'test two extensions merge' => [
-            'extensions' => [$extension1, $extension2, $extension3],
-            'expected' => [
-                'test_type' => ['type' => 'test_type', 'options' => []],
-                'test_type2' => ['type' => 'test_type2', 'options' => []]
+        return [
+            'no extension'              => [
+                'extensions' => [],
+                'expected'   => []
+            ],
+            'one extension'             => [
+                'extensions' => [$extension2],
+                'expected'   => [
+                    'test_type' => ['type' => 'test_type', 'options' => []]
+                ]
+            ],
+            'two extensions'            => [
+                'extensions' => [$extension1, $extension2],
+                'expected'   => [
+                    'test_type' => ['type' => 'test_type', 'options' => []]
+                ]
+            ],
+            'test two extensions merge' => [
+                'extensions' => [$extension1, $extension2, $extension3],
+                'expected'   => [
+                    'test_type'  => ['type' => 'test_type', 'options' => []],
+                    'test_type2' => ['type' => 'test_type2', 'options' => []]
+                ]
             ]
         ];
     }
