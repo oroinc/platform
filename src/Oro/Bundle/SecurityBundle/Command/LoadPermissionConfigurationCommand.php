@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Symfony\Component\Console\Command\Command;
@@ -22,18 +24,32 @@ class LoadPermissionConfigurationCommand extends Command
     /** @var PermissionManager */
     private $permissionManager;
 
+    /** @var PermissionConfigurationProvider */
+    private $permissionConfigurationProvider;
+
+    /** @var PermissionConfigurationBuilder */
+    private $permissionConfigurationBuilder;
+
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
     /**
      * @param PermissionManager $permissionManager
+     * @param PermissionConfigurationProvider $permissionConfigurationProvider
+     * @param PermissionConfigurationBuilder $permissionConfigurationBuilder
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(PermissionManager $permissionManager, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        PermissionManager $permissionManager,
+        PermissionConfigurationProvider $permissionConfigurationProvider,
+        PermissionConfigurationBuilder $permissionConfigurationBuilder,
+        DoctrineHelper $doctrineHelper
+    ) {
         parent::__construct();
 
         $this->permissionManager = $permissionManager;
+        $this->permissionConfigurationProvider = $permissionConfigurationProvider;
+        $this->permissionConfigurationBuilder = $permissionConfigurationBuilder;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -58,7 +74,9 @@ class LoadPermissionConfigurationCommand extends Command
     {
         $acceptedPermissions = $input->getOption('permissions') ?: null;
 
-        $permissions = $this->permissionManager->getPermissionsFromConfig($acceptedPermissions);
+        $permissions = $this->permissionConfigurationBuilder->buildPermissions(
+            $this->permissionConfigurationProvider->getPermissionConfiguration($acceptedPermissions)
+        );
         if ($permissions) {
             $output->writeln('Loading permissions...');
 

@@ -117,7 +117,7 @@ class PermissionConfigurationBuilder
      */
     protected function buildPermissionEntities(array $configuration)
     {
-        $repository = $this->doctrineHelper->getEntityRepositoryForClass('OroSecurityBundle:PermissionEntity');
+        $repository = $this->doctrineHelper->getEntityRepositoryForClass(PermissionEntity::class);
 
         $entities = new ArrayCollection();
         $configuration = array_unique($configuration);

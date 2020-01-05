@@ -45,7 +45,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
-            ->with('OroSecurityBundle:PermissionEntity')
+            ->with(PermissionEntity::class)
             ->willReturn($repository);
         $doctrineHelper->expects($this->any())
             ->method('isManageableEntityClass')

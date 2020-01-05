@@ -9,8 +9,6 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
@@ -18,8 +16,6 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,12 +32,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
-
-    /** @var PermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
-
-    /** @var PermissionConfigurationBuilder */
-    protected $configurationBuilder;
 
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
@@ -60,12 +50,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->configurationProvider = new PermissionConfigurationProvider(
-            $this->getTempFile('PermissionManager'),
-            false,
-            CumulativeResourceManager::getInstance()->getBundles()
-        );
-
         $this->entityRepository = $this
             ->getMockBuilder(PermissionRepository::class)
             ->disableOriginalConstructor()
@@ -76,13 +60,8 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
-            ->with('OroSecurityBundle:Permission')
-            ->willReturn($this->entityRepository);
-
-        $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
-            ->with('OroSecurityBundle:PermissionEntity')
+            ->with(Permission::class)
             ->willReturn($this->entityRepository);
 
         $this->entityManager = $this->getMockBuilder(EntityManager::class)
@@ -91,21 +70,8 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManagerForClass')
-            ->with('OroSecurityBundle:Permission')
+            ->with(Permission::class)
             ->willReturn($this->entityManager);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface $validator */
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->any())
-            ->method('validate')
-            ->with($this->isInstanceOf(Permission::class))
-            ->willReturn(new ConstraintViolationList());
-
-        $this->configurationBuilder = new PermissionConfigurationBuilder(
-            $this->doctrineHelper,
-            $validator,
-            $this->entityManager
-        );
 
         $this->cacheProvider = $this->getMockBuilder(CacheProvider::class)
             ->setMethods(['fetch', 'save', 'deleteAll'])
@@ -113,21 +79,8 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->manager = new PermissionManager(
             $this->doctrineHelper,
-            $this->configurationProvider,
-            $this->configurationBuilder,
             $this->cacheProvider
         );
-    }
-
-    public function testGetPermissionsFromConfig(): void
-    {
-        $this->mockEntityManagerConfiguration();
-        $permissionNames = [];
-        foreach ($this->manager->getPermissionsFromConfig() as $permission) {
-            $permissionNames[] = $permission->getName();
-        }
-
-        $this->assertEquals(['PERMISSION1', 'PERMISSION2', 'PERMISSION3'], $permissionNames);
     }
 
     public function testProcessPermissions(): void
@@ -264,7 +217,7 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($inputData['permission'] ? $this->once() : $this->never())
             ->method('getReference')
-            ->with('OroSecurityBundle:Permission', $inputData['id'])
+            ->with(Permission::class, $inputData['id'])
             ->willReturn($inputData['permission']);
 
         $this->assertEquals($expectedData, $this->manager->getPermissionByName($inputData['name']));
