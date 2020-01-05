@@ -239,9 +239,11 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
         arguments:
-            - '@oro_workflow.permission_registry'
-            - '@oro_workflow.restriction.manager'
-            - '@oro_workflow.database_checker'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber, id: oro_workflow.database_checker }
+            - { name: container.service_subscriber, id: oro_workflow.permission_registry }
+            - { name: container.service_subscriber, id: oro_workflow.restriction.manager }
 
     oro_workflow.restriction.manager:
         class: 'Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager'
