@@ -9,6 +9,7 @@ Feature: Date cells in datagrids are formatted with timezone
 
   Scenario: Prepare order and set time zone
     Given I login as administrator
+    And I have a complete calendar date table from "2018" to "2019"
     And I go to System / Configuration
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And uncheck "Use default" for "Timezone" field
@@ -34,6 +35,7 @@ Feature: Date cells in datagrids are formatted with timezone
     And I select "Created At" from date grouping field
     And I save and close form
     Then I should see "Report saved" flash message
+    And I filter Time Period as between "Jan 1, 2019 11:30 AM" and "Jan 3, 2020 11:30 AM"
     And there is 1 record in grid
     And I should see following grid:
       | Time period | Id |

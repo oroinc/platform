@@ -554,6 +554,14 @@ services:
         arguments:
             - "@security.token_storage"
 
+    oro_user.user_scope_cache_key_builder:
+        class: Oro\Bundle\UserBundle\Provider\UserScopeCacheKeyBuilder
+        decorates: oro_scope.scope_cache_key_builder
+        decoration_priority: 100
+        arguments:
+            - '@oro_user.user_scope_cache_key_builder.inner'
+            - '@security.token_storage'
+
     oro_user.datagrid.action_checker:
         class: Oro\Bundle\UserBundle\Datagrid\ActionChecker
         arguments:

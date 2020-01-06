@@ -1,5 +1,9 @@
 # Configuration for https://github.com/oroinc/phpstan-rules/
 trusted_data:
+    variables:
+        Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor:
+            execute:
+                columnNamesWithNonNamedParameters: true
     properties:
         Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
             searchEntities:

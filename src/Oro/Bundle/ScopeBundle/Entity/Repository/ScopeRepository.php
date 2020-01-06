@@ -8,8 +8,12 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCacheKeyBuilderInterface;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
+/**
+ * The repository for Scope entity.
+ */
 class ScopeRepository extends EntityRepository
 {
     const SCOPE_RESULT_CACHE_KEY_ID = 'oro_scope_result_cache_key_id';
@@ -20,11 +24,24 @@ class ScopeRepository extends EntityRepository
     private $scopeRepositoryCache;
 
     /**
+     * @var ScopeCacheKeyBuilderInterface
+     */
+    private $scopeCacheKeyBuilder;
+
+    /**
      * @param CacheProvider $scopeRepositoryCache
      */
     public function setScopeRepositoryCache(CacheProvider $scopeRepositoryCache)
     {
         $this->scopeRepositoryCache = $scopeRepositoryCache;
+    }
+
+    /**
+     * @param ScopeCacheKeyBuilderInterface $scopeCacheKeyBuilder
+     */
+    public function setScopeCacheKeyBuilder(ScopeCacheKeyBuilderInterface $scopeCacheKeyBuilder)
+    {
+        $this->scopeCacheKeyBuilder = $scopeCacheKeyBuilder;
     }
 
     /**
@@ -48,7 +65,7 @@ class ScopeRepository extends EntityRepository
         $qb = $this->createQueryBuilder('scope');
         $criteria->applyWhere($qb, 'scope');
 
-        return $this->findIdentifiers($qb);
+        return $this->findIdentifiers($qb, $criteria);
     }
 
     /**
@@ -76,7 +93,7 @@ class ScopeRepository extends EntityRepository
         $qb = $this->createQueryBuilder('scope');
         $criteria->applyWhereWithPriority($qb, 'scope');
 
-        return $this->findIdentifiers($qb);
+        return $this->findIdentifiers($qb, $criteria);
     }
 
     /**
@@ -88,11 +105,13 @@ class ScopeRepository extends EntityRepository
         $qb = $this->createQueryBuilder('scope');
         $criteria->applyWhere($qb, 'scope');
         $query = $qb->setMaxResults(1)->getQuery();
-        if ($this->scopeRepositoryCache) {
-            $query
-                ->useResultCache(true)
-                ->setResultCacheId(self::SCOPE_RESULT_CACHE_KEY_ID)
-                ->setResultCacheDriver($this->scopeRepositoryCache);
+        if ($this->scopeRepositoryCache && $this->scopeCacheKeyBuilder) {
+            $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
+            if (null !== $cacheKey) {
+                $query
+                    ->useResultCache(true, null, $cacheKey)
+                    ->setResultCacheDriver($this->scopeRepositoryCache);
+            }
         }
 
         return $query->getOneOrNullResult();
@@ -100,17 +119,20 @@ class ScopeRepository extends EntityRepository
 
     /**
      * @param QueryBuilder $qb
+     * @param ScopeCriteria $criteria
      *
      * @return array
      */
-    private function findIdentifiers(QueryBuilder $qb)
+    private function findIdentifiers(QueryBuilder $qb, ScopeCriteria $criteria)
     {
         $query = $qb->select('scope.id')->getQuery();
-        if ($this->scopeRepositoryCache) {
-            $query
-                ->useResultCache(true)
-                ->setResultCacheId(self::SCOPE_RESULT_CACHE_KEY_ID)
-                ->setResultCacheDriver($this->scopeRepositoryCache);
+        if ($this->scopeRepositoryCache && $this->scopeCacheKeyBuilder) {
+            $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
+            if (null !== $cacheKey) {
+                $query
+                    ->useResultCache(true, null, $cacheKey)
+                    ->setResultCacheDriver($this->scopeRepositoryCache);
+            }
         }
         $scopes = $query->getScalarResult();
 

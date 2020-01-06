@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Functional;
+namespace Oro\Bundle\NavigationBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository;

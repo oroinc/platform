@@ -116,9 +116,9 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 'submittedData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => '10',
                     LocalizedPropertyType::FIELD_LOCALIZATIONS => [
-                        1 => ['value' => '', 'fallback' => FallbackType::SYSTEM],
+                        1 => ['value' => '', 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
                         2 => ['value' => '5', 'fallback' => ''],
-                        3 => ['value' => '', 'fallback' => FallbackType::PARENT_LOCALIZATION],
+                        3 => ['value' => '', 'fallback' => FallbackType::PARENT_LOCALIZATION, 'use_fallback' => true],
                     ]
                 ],
                 'expectedData' => [

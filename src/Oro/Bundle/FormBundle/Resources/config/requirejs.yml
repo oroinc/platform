@@ -61,6 +61,7 @@ config:
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
+        'oroform/js/app/views/checkbox-view': 'bundles/oroform/js/app/views/checkbox-view.js'
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
         'oroform/js/app/views/fields-groups-collection-view': 'bundles/oroform/js/app/views/fields-groups-collection-view.js'
         'oroform/js/app/views/default-field-value-view': 'bundles/oroform/js/app/views/default-field-value-view.js'

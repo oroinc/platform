@@ -4,7 +4,10 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\QueryBuilder;
 
-class InsertFromSelectQueryExecutor
+/**
+ * Compiles and executes "insert from select" query
+ */
+class InsertFromSelectQueryExecutor implements InsertQueryExecutorInterface
 {
     /**
      * @var array

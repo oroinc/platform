@@ -105,6 +105,14 @@ define(function(require) {
             return this.$elements[name];
         },
 
+        /**
+         * @param {String} name
+         * @returns {Boolean}
+         */
+        hasElement: function(name) {
+            return this.$elements && name in this.$elements;
+        },
+
         dropdownInit: function() {
             this.getElement('dropdownToggleLabel').data(
                 'dropdownDefaultLabel',
@@ -135,7 +143,7 @@ define(function(require) {
 
         updateStateOfHiddenTabs: function() {
             // Once update width of tabs if they were hide
-            if (this.getElement('tabs').data('dropdownOuterWidth') <= 0) {
+            if (this.hasElement('tabs') && this.getElement('tabs').data('dropdownOuterWidth') <= 0) {
                 this.saveDropdownOuterWidth();
                 this.dropdownUpdate();
             }
