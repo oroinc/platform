@@ -106,7 +106,7 @@
     "prefer-stable": true,
     "extra": {
         "npm": {
-            "moment": "2.18.*",
+            "moment": "2.24.*",
             "moment-timezone": "0.5.*",
             "jstree": "3.3.*",
             "jquery.cookie": "1.4.1",
@@ -124,7 +124,6 @@
             "bean": "1.0.6",
             "jquery-validation": "1.16.0",
             "backgrid": "0.3.7",
-            "backgrid-paginator": "0.3.8",
             "numeral": "2.0.6",
             "jquery-form": "4.2.1",
             "fuse.js": "3.2.*",
