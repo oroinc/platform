@@ -19,7 +19,7 @@ define(function(require) {
         className: 'action-column renderable',
 
         /** @property */
-        tagName: 'th',
+        tagName: 'td',
 
         /** @property */
         template: template,
