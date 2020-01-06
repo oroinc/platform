@@ -69,7 +69,7 @@
         "bower-asset/underscore": "1.8.3",
         "piwik/device-detector": "3.10.*",
         "bower-asset/jsplumb": "1.7.*",
-        "bower-asset/moment": "2.18.*",
+        "bower-asset/moment": "2.24.*",
         "bower-asset/moment-timezone": "0.5.*",
         "vakata/jstree": "3.3.*",
         "symfony/polyfill-php70":"1.*",

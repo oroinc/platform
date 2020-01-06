@@ -11,7 +11,7 @@
     "test-codestyle": "./node_modules/.bin/eslint ../../** -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
-    "autoprefixer": "^9.1.5",
+    "autoprefixer": "^9.7.3",
     "css-loader": "^1.0.0",
     "deepmerge": "^2.1.1",
     "eslint": "^4.19.1",
@@ -25,7 +25,6 @@
     "js-yaml": "^3.12.0",
     "karma": "3.1.4",
     "karma-chrome-launcher": "2.2.0",
-    "karma-coverage": "1.1.1",
     "karma-firefox-launcher": "1.1.0",
     "karma-jasmine": "1.1.1",
     "karma-junit-reporter": "1.2.0",
@@ -40,11 +39,11 @@
     "resolve-url-loader": "^2.3.1",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.0",
+    "terser": "3.14.1",
     "text-loader": "0.0.1",
     "url-loader": "^1.1.1",
-    "webpack": "^4.17.2",
-    "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.2",
-    "terser": "3.14.1"
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.1.2"
   }
 }
