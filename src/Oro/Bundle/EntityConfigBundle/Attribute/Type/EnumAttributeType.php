@@ -7,18 +7,10 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
- * Entity attribute type for enum field type
+ * Provides metadata about enum attribute type.
  */
 class EnumAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'enum';
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -6,7 +6,6 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -235,7 +234,6 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
 
         $strategy = $this->createMock(TranslationStrategyInterface::class);
 
-        $strategyProviderLink = new ServiceLink($strategyProvider);
         $strategyProvider->expects($this->any())
             ->method('getStrategy')
             ->willReturn($strategy);
@@ -243,7 +241,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
             ->method('getFallbackLocales')
             ->willReturn([]);
 
-        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setStrategyProvider($strategyProvider);
 
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);

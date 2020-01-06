@@ -26,13 +26,49 @@ trait PriorityTaggedLocatorTrait
         ContainerBuilder $container
     ): array {
         $items = [];
-        $taggedServices = $container->findTaggedServiceIds($tagName);
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
                 $items[$this->getPriorityAttribute($attributes)][] = [
                     $this->getRequiredAttribute($attributes, $nameAttribute, $id, $tagName),
                     $id
                 ];
+            }
+        }
+
+        $services = [];
+        if ($items) {
+            $items = $this->sortByPriorityAndFlatten($items);
+            foreach ($items as list($key, $id)) {
+                if (!isset($services[$key])) {
+                    $services[$key] = new Reference($id);
+                }
+            }
+        }
+
+        return $services;
+    }
+
+    /**
+     * @param string           $tagName
+     * @param ContainerBuilder $container
+     * @param string|null      $nameAttribute
+     *
+     * @return Reference[] [service name => service reference, ...]
+     */
+    private function findAndSortTaggedServicesWithOptionalNameAttribute(
+        string $tagName,
+        ContainerBuilder $container,
+        string $nameAttribute = null
+    ): array {
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $key = $nameAttribute
+                    ? $this->getAttribute($attributes, $nameAttribute, $id)
+                    : $id;
+                $items[$this->getPriorityAttribute($attributes)][] = [$key, $id];
             }
         }
 
@@ -65,7 +101,7 @@ trait PriorityTaggedLocatorTrait
     ): array {
         $services = [];
         $items = [];
-        $taggedServices = $container->findTaggedServiceIds($tagName);
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
         foreach ($taggedServices as $id => $tags) {
             $services[$id] = new Reference($id);
             foreach ($tags as $attributes) {
@@ -92,7 +128,7 @@ trait PriorityTaggedLocatorTrait
         ContainerBuilder $container
     ): array {
         $items = [];
-        $taggedServices = $container->findTaggedServiceIds($tagName);
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
                 $items[$this->getPriorityAttribute($attributes)][] = [
@@ -133,7 +169,7 @@ trait PriorityTaggedLocatorTrait
     ): array {
         $services = [];
         $items = [];
-        $taggedServices = $container->findTaggedServiceIds($tagName);
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
         foreach ($taggedServices as $id => $tags) {
             $services[$id] = new Reference($id);
             foreach ($tags as $attributes) {

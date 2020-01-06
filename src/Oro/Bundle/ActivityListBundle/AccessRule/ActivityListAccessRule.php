@@ -68,10 +68,9 @@ class ActivityListAccessRule implements AccessRuleInterface
 
         $providers = $this->activityListProvider->getProviders();
         /** @var ActivityListProviderInterface $provider */
-        foreach ($providers as $provider) {
+        foreach ($providers as $activityClass => $provider) {
             $providerExpressions = [];
-            $activityClass = $provider->getActivityClass();
-            $aclClass = $provider->getAclClass();
+            $aclClass = $provider->getAclClass() ?? $activityClass;
             $conditionData = $this->builder->getAclConditionData($aclClass, $criteria->getPermission());
 
             if (!empty($conditionData)) {

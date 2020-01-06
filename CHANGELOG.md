@@ -6,6 +6,20 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### DataGridBundle
+* The handling of `priority` attribute for `oro_datagrid.extension.action.provider` and
+  `oro_datagrid.extension.mass_action.iterable_result_factory` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_datagrid.extension.action.provider, priority: 100 }` should be changed to
+  `{ name: oro_datagrid.extension.action.provider, priority: -100 }`
+
+#### TranslationBundle
+* The handling of `priority` attribute for `oro_translation.extension.translation_context_resolver` and
+  `oro_translation.extension.translation_strategy` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_translation.extension.translation_context_resolver, priority: 100 }` should be changed to
+  `{ name: oro_translation.extension.translation_context_resolver, priority: -100 }`
+
 #### WorkflowBundle
 * The handling of `priority` attribute for `oro.workflow.configuration.handler` and
   `oro.workflow.definition_builder.extension` DIC tags was changed to correspond Symfony recommendations.
@@ -17,6 +31,29 @@ The current file describes significant changes in the code that may affect the u
 
 #### AttachmentBundle
 * Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](./src/Oro/Bundle/AttachmentBundle/README.md).
+
+### Removed
+
+#### ActivityListBundle
+* The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+
+#### DataGridBundle
+* The `getName()` method was removed from `Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface`.
+  Use the `alias` attribute of the `oro_datagrid.board_processor` DIC tag instead.
+
+#### EntityConfigBundle
+* The `getType()` method was removed from `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface`.
+  Use the `type` attribute of the `oro_entity_config.attribute_type` DIC tag instead.
+
+#### ReminderBundle
+* The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
+  Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
+
+#### UIBundle
+* The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+  Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
+* Unneeded `isEnabled()` and `setEnabled()` methods were removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
 
 ## 4.1.0-rc (2019-12-10)
 [Show detailed list of changes](incompatibilities-4-1-rc.md)

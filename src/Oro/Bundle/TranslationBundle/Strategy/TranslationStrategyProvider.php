@@ -5,13 +5,24 @@ namespace Oro\Bundle\TranslationBundle\Strategy;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * Provides a way to manage the current translation strategy.
+ */
 class TranslationStrategyProvider
 {
-    /** @var TranslationStrategyInterface */
-    protected $strategy;
+    /** @var iterable|TranslationStrategyInterface[] */
+    private $strategies;
 
-    /** @var TranslationStrategyInterface[] */
-    protected $strategies = [];
+    /** @var TranslationStrategyInterface|null */
+    private $strategy;
+
+    /**
+     * @param iterable|TranslationStrategyInterface[] $strategies
+     */
+    public function __construct(iterable $strategies)
+    {
+        $this->strategies = $strategies;
+    }
 
     /**
      * @param TranslationStrategyInterface $strategy
@@ -26,7 +37,7 @@ class TranslationStrategyProvider
      */
     public function getStrategy()
     {
-        if (!$this->strategy) {
+        if (null === $this->strategy) {
             foreach ($this->strategies as $strategy) {
                 if ($strategy->isApplicable()) {
                     $this->strategy = $strategy;
@@ -39,19 +50,16 @@ class TranslationStrategyProvider
     }
 
     /**
-     * @param TranslationStrategyInterface $strategy
-     */
-    public function addStrategy(TranslationStrategyInterface $strategy)
-    {
-        $this->strategies[$strategy->getName()] = $strategy;
-    }
-
-    /**
      * @return TranslationStrategyInterface[]
      */
     public function getStrategies()
     {
-        return $this->strategies;
+        $result = [];
+        foreach ($this->strategies as $strategy) {
+            $result[$strategy->getName()] = $strategy;
+        }
+
+        return $result;
     }
 
     /**

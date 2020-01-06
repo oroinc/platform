@@ -84,7 +84,7 @@ services:
     oro_locale.datagird.formatter.localized_value_property:
         class: Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: localized_value }
+            - { name: oro_datagrid.extension.formatter.property, type: localized_value }
 
     oro_locale.translation.strategy.localization_fallback_strategy:
         class: Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy

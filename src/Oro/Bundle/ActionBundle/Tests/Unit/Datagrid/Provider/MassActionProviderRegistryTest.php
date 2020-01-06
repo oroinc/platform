@@ -4,39 +4,20 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Provider;
 
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class MassActionProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MassActionProviderRegistry */
-    protected $registry;
-
-    protected function setUp()
+    public function testGetProvider()
     {
-        $this->registry = new MassActionProviderRegistry();
-    }
+        $provider = $this->createMock(MassActionProviderInterface::class);
 
-    protected function tearDown()
-    {
-        unset($this->registry);
-    }
+        $container = TestContainerBuilder::create()
+            ->add('test_provider', $provider)
+            ->getContainer($this);
+        $registry = new MassActionProviderRegistry($container);
 
-    public function testAddAndGetProvider()
-    {
-        $this->assertAttributeEmpty('providers', $this->registry);
-
-        $provider = $this->getProvider();
-
-        $this->registry->addProvider('test_provider', $provider);
-
-        $this->assertAttributeCount(1, 'providers', $this->registry);
-        $this->assertSame($provider, $this->registry->getProvider('test_provider'));
-    }
-
-    /**
-     * @return MassActionProviderInterface
-     */
-    protected function getProvider()
-    {
-        return $this->createMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
+        $this->assertSame($provider, $registry->getProvider('test_provider'));
+        $this->assertNull($registry->getProvider('another'));
     }
 }

@@ -8,7 +8,6 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
@@ -293,7 +292,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $strategyProvider = $this->getStrategyProvider($locale);
-        $strategyProviderLink = new ServiceLink($strategyProvider);
 
         /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
@@ -308,7 +306,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
-        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setStrategyProvider($strategyProvider);
         $translator->setInstalled(true);
         $translator->setEventDispatcher($this->getEventDispatcher());
 
@@ -334,7 +332,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->method('getAvailableDomainsForLocales')
             ->willReturn($domains);
         $strategyProvider = $this->getStrategyProvider($locale);
-        $strategyProviderLink = new ServiceLink($strategyProvider);
 
         /** @var DynamicTranslationMetadataCache|\PHPUnit\Framework\MockObject\MockObject $databaseCache */
         $databaseCache = $this->createMock(DynamicTranslationMetadataCache::class);
@@ -352,7 +349,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
-        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setStrategyProvider($strategyProvider);
         $translator->setEventDispatcher($this->getEventDispatcher());
         $translator->setInstalled(true);
 
@@ -412,19 +409,19 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $firstStrategy */
         $firstStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $firstStrategy->expects($this->exactly(3))
+        $firstStrategy->expects($this->exactly(2))
             ->method('getName')
             ->willReturn($firstStrategyName);
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $secondStrategy */
         $secondStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $secondStrategy->expects($this->exactly(3))
+        $secondStrategy->expects($this->exactly(2))
             ->method('getName')
             ->willReturn($secondStrategyName);
 
         /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([[$firstStrategy, $secondStrategy]])
             ->setMethods(['getAllFallbackLocales', 'getFallbackLocales'])
             ->getMock();
         $strategyProvider->expects($this->exactly(2))
@@ -433,9 +430,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $strategyProvider->expects($this->exactly(2))
             ->method('getFallbackLocales')
             ->willReturn([]);
-
-        $strategyProvider->addStrategy($firstStrategy);
-        $strategyProvider->addStrategy($secondStrategy);
 
         /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -468,8 +462,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         EventDispatcherInterface $eventDispatcher,
         array $options = []
     ) {
-        $strategyProviderServiceLink = new ServiceLink($strategyProvider);
-
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
 
@@ -482,7 +474,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         );
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
-        $translator->setStrategyProviderLink($strategyProviderServiceLink);
+        $translator->setStrategyProvider($strategyProvider);
         $translator->setInstalled(true);
         $translator->setEventDispatcher($eventDispatcher);
 

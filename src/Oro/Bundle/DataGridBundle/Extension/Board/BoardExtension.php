@@ -5,18 +5,21 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardException;
-use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds "board" mode to a datagrid.
+ */
 class BoardExtension extends AbstractExtension
 {
     const CONFIG_PATH = 'board';
@@ -32,17 +35,11 @@ class BoardExtension extends AbstractExtension
      */
     const BOARD_COLUMNS_ID_PARAM_ID = 'boardColumnIds';
 
-    /** @var array */
-    protected $boards;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var RequestStack */
     protected $requestStack;
-
-    /** @var BoardProcessorInterface[] */
-    protected $processors;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -64,8 +61,16 @@ class BoardExtension extends AbstractExtension
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
 
+    /** @var ContainerInterface */
+    private $processorContainer;
+
+    /** @var array */
+    private $boards = [];
+
     /**
+     * @param ContainerInterface            $processorContainer
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param RequestStack                  $requestStack
      * @param TranslatorInterface           $translator
      * @param RestrictionManager            $restrictionManager
      * @param Configuration                 $configuration
@@ -73,38 +78,23 @@ class BoardExtension extends AbstractExtension
      * @param EntityClassResolver           $entityClassResolver
      */
     public function __construct(
+        ContainerInterface $processorContainer,
         AuthorizationCheckerInterface $authorizationChecker,
+        RequestStack $requestStack,
         TranslatorInterface $translator,
         RestrictionManager $restrictionManager,
         Configuration $configuration,
         EntityClassNameHelper $entityClassNameHelper,
         EntityClassResolver $entityClassResolver
     ) {
+        $this->processorContainer = $processorContainer;
         $this->authorizationChecker = $authorizationChecker;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
         $this->restrictionManager = $restrictionManager;
         $this->configuration = $configuration;
         $this->entityClassNameHelper = $entityClassNameHelper;
         $this->entityClassResolver = $entityClassResolver;
-        $this->processors = [];
-        $this->boards = [];
-    }
-
-    /**
-     * @param RequestStack $requestStack
-     *
-     */
-    public function setRequestStack($requestStack)
-    {
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * @param BoardProcessorInterface $processor
-     */
-    public function addProcessor(BoardProcessorInterface $processor)
-    {
-        $this->processors[] = $processor;
     }
 
     /**
@@ -145,8 +135,9 @@ class BoardExtension extends AbstractExtension
                 'plugin' => $boardConfig[Configuration::PLUGIN_KEY],
                 'icon' => $boardConfig[Configuration::ICON_KEY],
                 'id' => $boardId,
-                'label' => $boardConfig[Configuration::LABEL_KEY] ?
-                    $this->translator->trans($boardConfig[Configuration::LABEL_KEY]) : '',
+                'label' => $boardConfig[Configuration::LABEL_KEY]
+                    ? $this->translator->trans($boardConfig[Configuration::LABEL_KEY])
+                    : '',
                 'group_by' => $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_KEY],
                 'columns' => $processor->getBoardOptions($boardConfig, $config),
                 'default_transition' => $boardConfig[Configuration::TRANSITION_KEY],
@@ -174,11 +165,9 @@ class BoardExtension extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($this->isBoardEnabled()) {
-            $appearanceData = $this->getOr(AppearanceExtension::APPEARANCE_DATA_PARAM);
+            $appearanceData = $this->getAppearanceOption(AppearanceExtension::APPEARANCE_DATA_PARAM);
             if (!isset($this->boards[$appearanceData['id']])) {
-                throw new NotFoundBoardException(
-                    sprintf('Not defined board %s', $appearanceData['id'])
-                );
+                throw new RuntimeException(sprintf('Not defined board %s', $appearanceData['id']));
             }
             $boardConfig = $this->boards[$appearanceData['id']];
             $processor = $this->getProcessor($boardConfig[Configuration::PROCESSOR_KEY]);
@@ -211,7 +200,7 @@ class BoardExtension extends AbstractExtension
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
     protected function getBoardColumnIds()
     {
@@ -226,21 +215,16 @@ class BoardExtension extends AbstractExtension
 
     /**
      * @param string $name
-     * @return BoardProcessorInterface
      *
-     * @throws NotFoundBoardProcessorException
+     * @return BoardProcessorInterface
      */
-    protected function getProcessor($name)
+    protected function getProcessor(string $name): BoardProcessorInterface
     {
-        foreach ($this->processors as $processor) {
-            if ($processor->getName() === $name) {
-                return $processor;
-            }
+        if (!$this->processorContainer->has($name)) {
+            throw new RuntimeException(sprintf('Not found board processor %s', $name));
         }
 
-        throw new NotFoundBoardProcessorException(
-            sprintf('Not found board processor %s', $name)
-        );
+        return $this->processorContainer->get($name);
     }
 
     /**
@@ -251,38 +235,46 @@ class BoardExtension extends AbstractExtension
     protected function initBoards(DatagridConfiguration $config)
     {
         $appearanceConfig = $config->offsetGetOr(AppearanceExtension::APPEARANCE_CONFIG_PATH, []);
-        if (!empty($appearanceConfig[static::APPEARANCE_TYPE])) {
-            $boardConfig = $appearanceConfig[static::APPEARANCE_TYPE];
-            foreach ($boardConfig as $boardId => $boardOptions) {
-                $resultOptions = $this->validateConfiguration(
-                    $this->configuration,
-                    ['board' => $boardOptions]
-                );
+        if (empty($appearanceConfig[static::APPEARANCE_TYPE])) {
+            return;
+        }
 
-                if (is_null($resultOptions[Configuration::TRANSITION_KEY][Configuration::TRANSITION_API_ACCESSOR_KEY]
-                ['default_route_parameters']['className'])) {
-                    $entityName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
-                    $resultOptions[Configuration::TRANSITION_KEY][Configuration::TRANSITION_API_ACCESSOR_KEY]
-                    ['default_route_parameters']['className'] =
-                        $this->entityClassNameHelper->getUrlSafeClassName($entityName);
-                }
-                $this->boards[$boardId] = $resultOptions;
-            }
+        $boardConfig = $appearanceConfig[static::APPEARANCE_TYPE];
+        foreach ($boardConfig as $boardId => $boardOptions) {
+            $this->boards[$boardId] = $this->loadBoardOptions($config, $boardOptions);
         }
     }
 
     /**
+     * @param DatagridConfiguration $config
+     * @param array                 $boardConfig
+     *
+     * @return array
+     */
+    protected function loadBoardOptions(DatagridConfiguration $config, array $boardConfig): array
+    {
+        $result = $this->validateConfiguration($this->configuration, ['board' => $boardConfig]);
+        if (!isset($result['default_transition']['save_api_accessor']['default_route_parameters']['className'])) {
+            $entityName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
+            $result['default_transition']['save_api_accessor']['default_route_parameters']['className'] =
+                $this->entityClassNameHelper->getUrlSafeClassName($entityName);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param array $boardConfig
+     *
      * @return bool
      */
     protected function isReadOnly($boardConfig)
     {
-        if (isset($boardConfig[Configuration::ACL_RESOURCE_KEY])) {
-            $aclResource = $boardConfig[Configuration::ACL_RESOURCE_KEY];
-            return !$this->authorizationChecker->isGranted($aclResource);
+        if (!isset($boardConfig[Configuration::ACL_RESOURCE_KEY])) {
+            return false;
         }
 
-        return false;
+        return !$this->authorizationChecker->isGranted($boardConfig[Configuration::ACL_RESOURCE_KEY]);
     }
 
     /**
@@ -292,8 +284,7 @@ class BoardExtension extends AbstractExtension
      */
     protected function isBoardEnabled()
     {
-        $appearanceType = $this->getOr(AppearanceExtension::APPEARANCE_TYPE_PARAM, '');
-        return static::APPEARANCE_TYPE === $appearanceType;
+        return static::APPEARANCE_TYPE === $this->getAppearanceOption(AppearanceExtension::APPEARANCE_TYPE_PARAM, '');
     }
 
     /**
@@ -319,9 +310,10 @@ class BoardExtension extends AbstractExtension
      *
      * @return mixed
      */
-    protected function getOr($paramName, $default = null)
+    protected function getAppearanceOption($paramName, $default = null)
     {
-        $boardParameters = $this->getParameters()->get(AppearanceExtension::APPEARANCE_ROOT_PARAM, []);
-        return isset($boardParameters[$paramName]) ? $boardParameters[$paramName] : $default;
+        $appearanceParameters = $this->getParameters()->get(AppearanceExtension::APPEARANCE_ROOT_PARAM, []);
+
+        return $appearanceParameters[$paramName] ?? $default;
     }
 }

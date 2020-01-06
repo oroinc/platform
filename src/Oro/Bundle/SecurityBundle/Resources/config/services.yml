@@ -162,8 +162,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.configuration.provider.permission_configuration'
-            - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
 
     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager:

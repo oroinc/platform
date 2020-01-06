@@ -11,12 +11,7 @@ class IntegerAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        return new IntegerAttributeType('integer');
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('integer', $this->getAttributeType()->getType());
+        return new IntegerAttributeType();
     }
 
     /**

@@ -14,15 +14,15 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provides a way to use Note entity in an activity list.
+ */
 class NoteActivityListProvider implements
     ActivityListProviderInterface,
     CommentProviderInterface,
     ActivityListDateProviderInterface,
     ActivityListUpdatedByProviderInterface
 {
-    const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
-    const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -60,7 +60,7 @@ class NoteActivityListProvider implements
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
             $entityClass,
-            self::ACTIVITY_CLASS,
+            Note::class,
             $accessible
         );
     }
@@ -80,17 +80,9 @@ class NoteActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getActivityClass()
-    {
-        return self::ACTIVITY_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAclClass()
     {
-        return self::ACL_CLASS;
+        return null;
     }
 
     /**
@@ -185,11 +177,11 @@ class NoteActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        if (is_object($entity)) {
-            $entity = $this->doctrineHelper->getEntityClass($entity);
+        if (\is_object($entity)) {
+            return $entity instanceof Note;
         }
 
-        return $entity == self::ACTIVITY_CLASS;
+        return $entity === Note::class;
     }
 
     /**

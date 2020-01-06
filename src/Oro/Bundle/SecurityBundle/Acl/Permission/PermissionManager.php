@@ -8,8 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 
@@ -23,12 +21,6 @@ class PermissionManager
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
-
-    /** @var PermissionConfigurationProvider */
-    protected $configurationProvider;
-
-    /** @var PermissionConfigurationBuilder */
-    protected $configurationBuilder;
 
     /** @var CacheProvider */
     protected $cache;
@@ -44,31 +36,12 @@ class PermissionManager
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param PermissionConfigurationProvider $configurationProvider
-     * @param PermissionConfigurationBuilder $configurationBuilder
      * @param CacheProvider $cache
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        PermissionConfigurationProvider $configurationProvider,
-        PermissionConfigurationBuilder $configurationBuilder,
-        CacheProvider $cache
-    ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configurationProvider = $configurationProvider;
-        $this->configurationBuilder = $configurationBuilder;
-        $this->cache = $cache;
-    }
-
-    /**
-     * @param array|null $acceptedPermissions
-     * @return Permission[]|Collection
-     */
-    public function getPermissionsFromConfig(array $acceptedPermissions = null)
+    public function __construct(DoctrineHelper $doctrineHelper, CacheProvider $cache)
     {
-        $permissionConfiguration = $this->configurationProvider->getPermissionConfiguration($acceptedPermissions);
-
-        return $this->configurationBuilder->buildPermissions($permissionConfiguration);
+        $this->doctrineHelper = $doctrineHelper;
+        $this->cache = $cache;
     }
 
     /**
@@ -150,7 +123,7 @@ class PermissionManager
             $map = $this->getPermissionsMap();
             if (isset($map[$name])) {
                 $this->loadedPermissions[$name] = $this->getEntityManager()
-                    ->getReference('OroSecurityBundle:Permission', $map[$name]);
+                    ->getReference(Permission::class, $map[$name]);
             } else {
                 $this->loadedPermissions[$name] = null;
             }
@@ -243,7 +216,7 @@ class PermissionManager
      */
     protected function getEntityManager()
     {
-        return $this->doctrineHelper->getEntityManagerForClass('OroSecurityBundle:Permission');
+        return $this->doctrineHelper->getEntityManagerForClass(Permission::class);
     }
 
     /**
@@ -251,6 +224,6 @@ class PermissionManager
      */
     protected function getRepository()
     {
-        return $this->doctrineHelper->getEntityRepository('OroSecurityBundle:Permission');
+        return $this->doctrineHelper->getEntityRepositoryForClass(Permission::class);
     }
 }

@@ -34,6 +34,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
+ * Provides a way to use Email entity in an activity list.
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
  * we are trying to extract Organization from the current logged user.
  *
@@ -50,9 +51,6 @@ class EmailActivityListProvider implements
     FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
-
-    const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
-    const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -141,7 +139,7 @@ class EmailActivityListProvider implements
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
             $entityClass,
-            self::ACTIVITY_CLASS,
+            Email::class,
             $accessible
         );
     }
@@ -160,17 +158,9 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getActivityClass()
-    {
-        return self::ACTIVITY_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAclClass()
     {
-        return self::ACL_CLASS;
+        return EmailUser::class;
     }
 
     /**
@@ -313,9 +303,10 @@ class EmailActivityListProvider implements
      */
     public function getActivityId($entity)
     {
-        if ($this->doctrineHelper->getEntityClass($entity) === self::ACL_CLASS) {
+        if ($this->doctrineHelper->getEntityClass($entity) === EmailUser::class) {
             $entity = $entity->getEmail();
         }
+
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
@@ -324,7 +315,11 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS;
+        if (\is_object($entity)) {
+            return $entity instanceof Email;
+        }
+
+        return $entity === Email::class;
     }
 
     /**
@@ -376,7 +371,7 @@ class EmailActivityListProvider implements
                 'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
             )
             ->andWhere('e.thread = :thread')
-            ->setParameter('class', self::ACTIVITY_CLASS)
+            ->setParameter('class', Email::class)
             ->setParameter('thread', $entity->getThread());
 
         if ($associatedEntityClass && $associatedEntityId) {
@@ -512,7 +507,7 @@ class EmailActivityListProvider implements
      */
     protected function getEmailEntity($entity)
     {
-        if (ClassUtils::getClass($entity) === self::ACL_CLASS) {
+        if ($entity instanceof EmailUser) {
             $entity = $entity->getEmail();
         }
 

@@ -7,6 +7,9 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a way to use different kind of entities in an activity list.
+ */
 interface ActivityListProviderInterface
 {
     /**
@@ -88,16 +91,10 @@ interface ActivityListProviderInterface
     public function getRoutes($activityEntity);
 
     /**
-     * returns a class name of entity for which we monitor changes
+     * Gets a class name of entity for which ACL should be checked
+     * to determine whether an activity entity is accessible in the activity list.
      *
-     * @return string
-     */
-    public function getActivityClass();
-
-    /**
-     * returns a class name of entity for which we verify ACL
-     *
-     * @return string
+     * @return string|null The class name or NULL if ACL class is equal to activity entity class of this provider
      */
     public function getAclClass();
 

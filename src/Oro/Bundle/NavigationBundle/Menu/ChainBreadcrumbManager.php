@@ -15,7 +15,7 @@ class ChainBreadcrumbManager implements BreadcrumbManagerInterface
     /**
      * @param iterable|BreadcrumbManagerInterface[] $managers
      */
-    public function __construct($managers)
+    public function __construct(iterable $managers)
     {
         $this->managers = $managers;
     }

@@ -15,11 +15,6 @@ class OneToManyAttributeTypeTest extends AttributeTypeTestCase
         return new OneToManyAttributeType($this->entityNameResolver);
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('oneToMany', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

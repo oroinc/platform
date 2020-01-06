@@ -14,33 +14,26 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class InlineEditColumnOptionsGuesser
 {
+    /** @var iterable|GuesserInterface[] */
+    private $guessers;
+
     /** @var ValidatorInterface */
-    protected $validator;
-
-    /** @var GuesserInterface[] */
-    protected $guessers;
+    private $validator;
 
     /**
-     * @param ValidatorInterface $validator
+     * @param iterable|GuesserInterface[] $guessers
+     * @param ValidatorInterface          $validator
      */
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(iterable $guessers, ValidatorInterface $validator)
     {
-        $this->guessers = [];
+        $this->guessers = $guessers;
         $this->validator = $validator;
-    }
-
-    /**
-     * @param GuesserInterface $guesser
-     */
-    public function addGuesser(GuesserInterface $guesser)
-    {
-        $this->guessers[] = $guesser;
     }
 
     /**
      * @param string $columnName
      * @param string $entityName
-     * @param array $column
+     * @param array  $column
      * @param string $behaviour
      *
      * @return array
@@ -77,11 +70,11 @@ class InlineEditColumnOptionsGuesser
 
     /**
      * @param ClassMetadataInterface $validatorMetadata
-     * @param string $columnName
+     * @param string                 $columnName
      *
      * @return array
      */
-    protected function getValidationRules($validatorMetadata, $columnName)
+    private function getValidationRules($validatorMetadata, $columnName)
     {
         /** @var PropertyMetadataInterface $metadata */
         $metadata = $validatorMetadata->getPropertyMetadata($columnName);
@@ -111,6 +104,7 @@ class InlineEditColumnOptionsGuesser
     private function isDefaultConstraint($constraint)
     {
         $groups = is_array($constraint) ? $constraint['groups'] : $constraint->groups;
+
         return in_array(Constraint::DEFAULT_GROUP, $groups, true);
     }
 }

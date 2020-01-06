@@ -43,7 +43,7 @@ services:
            - '@oro_entity.doctrine_helper'
            - '@oro_activity.association_helper'
         tags:
-           - {name: oro_activity_list.provider}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\TestFrameworkBundle\Entity\TestActivity }
 
     oro_test.entity_alias_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\EntityAliasProvider
