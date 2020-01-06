@@ -2,49 +2,47 @@
 
 namespace Oro\Bundle\WindowsBundle\Manager;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Entity\Repository\AbstractWindowsStateRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Provides a way to manage windows state.
+ */
 class WindowsStateManager
 {
     /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var WindowsStateRequestManager */
-    protected $requestStateManager;
+    private $requestStateManager;
 
     /** @var string */
-    protected $className;
-
-    /** @var string */
-    protected $userClassName;
+    private $className;
 
     /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param DoctrineHelper $doctrineHelper
+     * @param TokenStorageInterface      $tokenStorage
+     * @param ManagerRegistry            $doctrine
      * @param WindowsStateRequestManager $requestStateManager
-     * @param string $className
-     * @param string $userClassName
+     * @param string                     $className
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $doctrine,
         WindowsStateRequestManager $requestStateManager,
-        $className,
-        $userClassName
+        string $className
     ) {
         $this->tokenStorage = $tokenStorage;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->requestStateManager = $requestStateManager;
         $this->className = $className;
-        $this->userClassName = $userClassName;
     }
 
     /**
@@ -52,12 +50,13 @@ class WindowsStateManager
      */
     public function createWindowsState()
     {
+        $em = $this->getEntityManager();
+
         /** @var AbstractWindowsState $state */
-        $state = $this->doctrineHelper->createEntityInstance($this->className);
+        $state = $em->getClassMetadata($this->className)->newInstance();
         $state->setData($this->requestStateManager->getData());
         $state->setUser($this->getUser());
 
-        $em = $this->doctrineHelper->getEntityManagerForClass($this->className);
         $em->persist($state);
         $em->flush($state);
 
@@ -66,6 +65,7 @@ class WindowsStateManager
 
     /**
      * @param int $windowId
+     *
      * @return bool
      */
     public function updateWindowsState($windowId)
@@ -79,6 +79,7 @@ class WindowsStateManager
 
     /**
      * @param int $windowId
+     *
      * @return bool
      */
     public function deleteWindowsState($windowId)
@@ -96,26 +97,36 @@ class WindowsStateManager
 
     /**
      * @param int $windowId
+     *
      * @return AbstractWindowsState
      */
     public function getWindowsState($windowId)
     {
-        return $this->getRepository()->findBy(['user' => $this->getUser(), 'id' => $this->filterId($windowId)]);
+        return $this->getRepository()->findOneBy(['user' => $this->getUser(), 'id' => $this->filterId($windowId)]);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager()
+    {
+        return $this->doctrine->getManagerForClass($this->className);
     }
 
     /**
      * @return AbstractWindowsStateRepository
      */
-    protected function getRepository()
+    private function getRepository()
     {
-        return $this->doctrineHelper->getEntityRepository($this->className);
+        return $this->getEntityManager()->getRepository($this->className);
     }
 
     /**
      * @param mixed $windowId
+     *
      * @return int
      */
-    protected function filterId($windowId)
+    private function filterId($windowId)
     {
         $windowId = filter_var($windowId, FILTER_VALIDATE_INT);
         if (false === $windowId) {
@@ -127,31 +138,19 @@ class WindowsStateManager
 
     /**
      * @return UserInterface
-     *
-     * @see TokenInterface::getUser()
      */
-    protected function getUser()
+    private function getUser()
     {
-        if (null === $token = $this->tokenStorage->getToken()) {
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
             throw new AccessDeniedException();
         }
 
-        if (!is_object($user = $token->getUser())) {
+        $user = $token->getUser();
+        if (!is_object($user) || !$user instanceof UserInterface) {
             throw new AccessDeniedException();
         }
 
         return $user;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isApplicable()
-    {
-        try {
-            return is_a($this->getUser(), $this->userClassName);
-        } catch (AccessDeniedException $e) {
-            return false;
-        }
     }
 }
