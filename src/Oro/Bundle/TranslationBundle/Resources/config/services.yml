@@ -348,7 +348,6 @@ services:
     oro_translation.mass_action.reset_translation:
         class: Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
 

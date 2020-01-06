@@ -93,7 +93,7 @@ services:
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: search-result }
+            - { name: oro_datagrid.extension.formatter.property, type: search-result }
 
     oro_search.extension.search_results:
         class: Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultsExtension

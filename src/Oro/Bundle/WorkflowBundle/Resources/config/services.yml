@@ -11,14 +11,12 @@ services:
     oro_workflow.datagrid.action.workflow_activate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
     oro_workflow.datagrid.action.workflow_deactivate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 

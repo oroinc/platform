@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
-use Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * The configuration of {@see BoardExtension}.
+ */
 class Configuration implements ConfigurationInterface
 {
     const GROUP_KEY = 'group_by';
@@ -54,7 +56,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->scalarNode(static::LABEL_KEY)->defaultValue('oro.datagrid.appearance.board')->end()
                     ->scalarNode(static::ICON_KEY)->defaultValue('fa-th')->end()
-                    ->scalarNode(static::PROCESSOR_KEY)->defaultValue(DefaultProcessor::NAME)->end()
+                    ->scalarNode(static::PROCESSOR_KEY)->defaultValue('default')->end()
                     ->scalarNode(static::ACL_RESOURCE_KEY)->end()
                     ->arrayNode(static::GROUP_KEY)
                         ->children()

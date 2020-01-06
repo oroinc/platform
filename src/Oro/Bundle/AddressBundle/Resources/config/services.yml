@@ -24,7 +24,6 @@ services:
     oro_address.extension.action.type.map:
         class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
 

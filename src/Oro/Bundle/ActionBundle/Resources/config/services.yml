@@ -166,7 +166,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: oro_datagrid.extension.action.provider, priority: 250 }
+            - { name: oro_datagrid.extension.action.provider, priority: -250 }
 
     oro_action.datagrid.extension.delete_mass_action:
         class: 'Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension'
@@ -185,7 +185,6 @@ services:
         arguments:
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: button-widget }
 

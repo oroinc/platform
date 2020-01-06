@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\DataGridBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\DataGridBundle\Event as DatagridEvent;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

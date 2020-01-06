@@ -18,6 +18,9 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a way to add actions to datagrid rows.
+ */
 class ActionExtension extends AbstractExtension
 {
     const METADATA_ACTION_KEY               = 'rowActions';
@@ -38,9 +41,6 @@ class ActionExtension extends AbstractExtension
     /** @var OwnershipQueryHelper */
     protected $ownershipQueryHelper;
 
-    /** @var DatagridActionProviderInterface[] */
-    protected $actionsProviders = [];
-
     /** @var bool */
     protected $isMetadataVisited = false;
 
@@ -48,6 +48,9 @@ class ActionExtension extends AbstractExtension
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
+
+    /** @var iterable|DatagridActionProviderInterface[] */
+    private $actionProviders;
 
     /**
      * @var array [entity alias => [
@@ -62,17 +65,20 @@ class ActionExtension extends AbstractExtension
     private $ownershipFields = [];
 
     /**
-     * @param ActionFactory                 $actionFactory
-     * @param ActionMetadataFactory         $actionMetadataFactory
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param OwnershipQueryHelper          $ownershipQueryHelper
+     * @param iterable|DatagridActionProviderInterface[] $actionProviders
+     * @param ActionFactory                              $actionFactory
+     * @param ActionMetadataFactory                      $actionMetadataFactory
+     * @param AuthorizationCheckerInterface              $authorizationChecker
+     * @param OwnershipQueryHelper                       $ownershipQueryHelper
      */
     public function __construct(
+        iterable $actionProviders,
         ActionFactory $actionFactory,
         ActionMetadataFactory $actionMetadataFactory,
         AuthorizationCheckerInterface $authorizationChecker,
         OwnershipQueryHelper $ownershipQueryHelper
     ) {
+        $this->actionProviders = $actionProviders;
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
         $this->authorizationChecker = $authorizationChecker;
@@ -80,21 +86,11 @@ class ActionExtension extends AbstractExtension
     }
 
     /**
-     * Registers a provider of actions.
-     *
-     * @param DatagridActionProviderInterface $actionsProvider
-     */
-    public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
-    {
-        $this->actionsProviders[] = $actionsProvider;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        foreach ($this->actionsProviders as $provider) {
+        foreach ($this->actionProviders as $provider) {
             if ($provider->hasActions($config)) {
                 $provider->applyActions($config);
             }
@@ -149,12 +145,12 @@ class ActionExtension extends AbstractExtension
             if (!empty($aclResources)) {
                 $aliases = array_keys($this->ownershipFields);
                 $entityAlias = reset($aliases);
-                list(
+                [
                     $entityClass,
                     $entityIdFieldAlias,
                     $organizationIdFieldAlias,
                     $ownerIdFieldAlias
-                    ) = $this->ownershipFields[$entityAlias];
+                    ] = $this->ownershipFields[$entityAlias];
 
                 $disabledActions = [];
                 /** @var ResultRecord[] $records */

@@ -5,4 +5,4 @@ services:
             - '@oro_currency.formatter.money_value_type'
             - '@logger'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: money_value }
+            - { name: oro_datagrid.extension.formatter.property, type: money_value }

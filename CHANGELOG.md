@@ -6,6 +6,13 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### DataGridBundle
+* The handling of `priority` attribute for `oro_datagrid.extension.action.provider` and
+  `oro_datagrid.extension.mass_action.iterable_result_factory` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_datagrid.extension.action.provider, priority: 100 }` should be changed to
+  `{ name: oro_datagrid.extension.action.provider, priority: -100 }`
+
 #### TranslationBundle
 * The handling of `priority` attribute for `oro_translation.extension.translation_context_resolver` and
   `oro_translation.extension.translation_strategy` DIC tags was changed to correspond Symfony recommendations.
@@ -30,6 +37,10 @@ The current file describes significant changes in the code that may affect the u
 #### ActivityListBundle
 * The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
   Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+
+#### DataGridBundle
+* The `getName()` method was removed from `Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface`.
+  Use the `alias` attribute of the `oro_datagrid.board_processor` DIC tag instead.
 
 #### EntityConfigBundle
 * The `getType()` method was removed from `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface`.
