@@ -6,6 +6,13 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ConfigBundle
+* The handling of `priority` attribute for `oro_config.configuration_search_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_config.configuration_search_provider, priority: 100 }` should be changed to
+  `{ name: oro_config.configuration_search_provider, priority: -100 }`
+
 #### DataGridBundle
 * The handling of `priority` attribute for `oro_datagrid.extension.action.provider` and
   `oro_datagrid.extension.mass_action.iterable_result_factory` DIC tags was changed to correspond Symfony recommendations.
