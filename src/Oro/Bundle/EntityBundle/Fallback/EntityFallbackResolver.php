@@ -17,6 +17,7 @@ use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -43,44 +44,29 @@ class EntityFallbackResolver
         self::TYPE_ARRAY,
     ];
 
-    /**
-     * @var EntityFallbackProviderInterface[]
-     */
-    protected $fallbackProviders = [];
+    /** @var ContainerInterface */
+    protected $fallbackProviders;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var SystemConfigurationFormProvider
-     */
+    /** @var SystemConfigurationFormProvider */
     protected $sysConfigFormProvider;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var ConfigBag
-     */
+    /** @var ConfigBag */
     protected $configBag;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $accessor;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
     /**
-     * EntityFallbackResolver constructor.
-     *
+     * @param ContainerInterface $fallbackProviders
      * @param ConfigProvider $entityConfigProvider
      * @param SystemConfigurationFormProvider $formProvider
      * @param ConfigManager $configManager
@@ -88,12 +74,14 @@ class EntityFallbackResolver
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
+        ContainerInterface $fallbackProviders,
         ConfigProvider $entityConfigProvider,
         SystemConfigurationFormProvider $formProvider,
         ConfigManager $configManager,
         ConfigBag $configBag,
         DoctrineHelper $doctrineHelper
     ) {
+        $this->fallbackProviders = $fallbackProviders;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->sysConfigFormProvider = $formProvider;
         $this->accessor = PropertyAccess::createPropertyAccessor();
@@ -335,18 +323,6 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param EntityFallbackProviderInterface $provider
-     * @param string $providerId
-     * @return $this
-     */
-    public function addFallbackProvider(EntityFallbackProviderInterface $provider, $providerId)
-    {
-        $this->fallbackProviders[$providerId] = $provider;
-
-        return $this;
-    }
-
-    /**
      * @param string $key
      *
      * @return EntityFallbackProviderInterface
@@ -354,11 +330,11 @@ class EntityFallbackResolver
      */
     public function getFallbackProvider($key)
     {
-        if (!array_key_exists($key, $this->fallbackProviders)) {
+        if (!$this->fallbackProviders->has($key)) {
             throw new FallbackProviderNotFoundException($key);
         }
 
-        return $this->fallbackProviders[$key];
+        return $this->fallbackProviders->get($key);
     }
 
     /**
