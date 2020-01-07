@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CacheBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\NullCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -40,7 +40,7 @@ class OroCacheExtension extends Extension
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_cache_attributes',
-            new YamlCumulativeFileLoader('Resources/config/oro/cache_metadata.yml')
+            new NullCumulativeFileLoader('Resources/config/oro/cache_metadata.yml')
         );
         $resources = $configLoader->load();
         $serializerFileLoaders = [];

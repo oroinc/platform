@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The aim of this class is to help getting an email address from an object.
@@ -14,22 +15,18 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * 1. check if an object has own email address
  * 2. loop through registered target entities ordered by priority and check if they have an email address
  */
-class EmailHolderHelper
+class EmailHolderHelper implements ResetInterface
 {
-    const GET_EMAIL_METHOD = 'getEmail';
+    private const GET_EMAIL_METHOD = 'getEmail';
 
     /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
 
-    /**
-     * @var string[]
-     */
-    protected $targetEntities = [];
+    /** @var array */
+    private $targetEntities = [];
 
-    /**
-     * @var string[]
-     */
-    protected $sortedTargetEntities;
+    /** @var string[] */
+    private $sortedTargetEntities;
 
     /**
      * @param ConfigProvider $extendConfigProvider
@@ -40,6 +37,14 @@ class EmailHolderHelper
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->sortedTargetEntities = null;
+    }
+
+    /**
      * Registers the entity in supported target entities list
      *
      * @param string  $className
@@ -47,11 +52,8 @@ class EmailHolderHelper
      */
     public function addTargetEntity($className, $priority = 0)
     {
-        if (!isset($this->targetEntities[$priority])) {
-            $this->targetEntities[$priority] = [];
-        }
         $this->targetEntities[$priority][] = $className;
-        $this->sortedTargetEntities        = null;
+        $this->sortedTargetEntities = null;
     }
 
     /**
@@ -70,7 +72,8 @@ class EmailHolderHelper
         // check if an object has own email address
         if ($object instanceof EmailHolderInterface) {
             return $object->getEmail();
-        } elseif (method_exists($object, self::GET_EMAIL_METHOD)) {
+        }
+        if (method_exists($object, self::GET_EMAIL_METHOD)) {
             $email = $object->getEmail();
             if (!is_object($email)) {
                 return $email;
@@ -86,14 +89,14 @@ class EmailHolderHelper
      *
      * @return string|null
      */
-    protected function getEmailFromRelatedObject($object)
+    private function getEmailFromRelatedObject($object)
     {
         $applicableRelations = $this->getApplicableRelations($object);
         if (empty($applicableRelations)) {
             return null;
         }
 
-        $targetEntities   = $this->getTargetEntities();
+        $targetEntities = $this->getTargetEntities();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($targetEntities as $className) {
             if (!isset($applicableRelations[$className])) {
@@ -112,7 +115,7 @@ class EmailHolderHelper
      *
      * @return array
      */
-    protected function getApplicableRelations($object)
+    private function getApplicableRelations($object)
     {
         $result = [];
 
@@ -121,7 +124,7 @@ class EmailHolderHelper
             return $result;
         }
         $extendConfig = $this->extendConfigProvider->getConfig($className);
-        $relations    = $extendConfig->get('relation');
+        $relations = $extendConfig->get('relation');
         if (empty($relations)) {
             return $result;
         }
@@ -154,12 +157,12 @@ class EmailHolderHelper
      *
      * @return string[]
      */
-    protected function getTargetEntities()
+    private function getTargetEntities()
     {
         if (null === $this->sortedTargetEntities) {
             ksort($this->targetEntities);
-            $this->sortedTargetEntities = !empty($this->targetEntities)
-                ? call_user_func_array('array_merge', $this->targetEntities)
+            $this->sortedTargetEntities = $this->targetEntities
+                ? array_merge(...$this->targetEntities)
                 : [];
         }
 

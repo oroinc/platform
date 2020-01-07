@@ -48,9 +48,13 @@ services:
 
     oro_email.email_body_loader_selector:
         class: Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
+        arguments:
+            - !tagged_iterator oro_email.email_body_loader
 
     oro_email.email_flag_manager_loader_selector:
         class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
+        arguments:
+            - !tagged_iterator oro_email.email_flag_manager_loader
 
     oro_email.email_address.entity_manager:
         parent: oro_entity.abstract_entity_manager
