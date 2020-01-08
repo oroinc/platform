@@ -7,10 +7,13 @@ Feature: Create email template
     And go to System/ Emails/ Templates
     And click "Create Email Template"
     And fill form with:
-      |Owner         | John Doe       |
-      |Template Name | Test Template  |
-      |Type          | Html           |
-      |Entity Name   | Email          |
-      |Subject       | <!DOCTYPE html><html><head></head><body>{% set option = 1 %}{% if option > 1 %}test{% endif %}</body></html> |
-    When I save and close form
+      | Owner         | John Doe      |
+      | Template Name | Test Template |
+      | Type          | Html          |
+      | Entity Name   | Email         |
+      | Subject       | SampleSubject |
+      | Content       | SampleContent |
+    When I save form
     Then I should see "Template saved" flash message
+    When I click "Preview"
+    Then I should see "SampleContent" inside "Preview Email" iframe

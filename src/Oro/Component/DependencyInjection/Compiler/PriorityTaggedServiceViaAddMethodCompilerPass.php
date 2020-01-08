@@ -58,11 +58,11 @@ class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInter
             return;
         }
 
-        $this->registerTaggedServicesViaAddMethod(
-            $container,
-            $this->serviceId,
-            $this->addMethodName,
-            $this->findAndSortTaggedServices($this->tagName, $container)
-        );
+        $taggedServices = $this->findAndSortTaggedServices($this->tagName, $container);
+
+        $serviceDef = $container->getDefinition($this->serviceId);
+        foreach ($taggedServices as $taggedService) {
+            $serviceDef->addMethodCall($this->addMethodName, [$taggedService]);
+        }
     }
 }

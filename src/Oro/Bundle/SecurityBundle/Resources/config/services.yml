@@ -85,6 +85,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
         arguments:
+            - [] # extensions
             - '@oro_security.acl.object_id_accessor'
 
     oro_security.acl.extension.entity:
@@ -208,6 +209,8 @@ services:
 
     oro_security.acl.group_provider.chain:
         class: Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
+        arguments:
+            - [] # providers
 
     oro_security.owner.decision_maker:
         public: false
@@ -376,8 +379,8 @@ services:
 
     oro_security.ownership_tree_provider.chain:
         class: Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
-        calls:
-            - [setDefaultProvider, ['@oro_security.ownership_tree_provider']]
+        arguments:
+            - !tagged_iterator oro_security.ownership.tree_provider
 
     oro_security.ownership_tree_provider:
         public: false

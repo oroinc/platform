@@ -9,7 +9,6 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPas
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\DecorateAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SessionPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetFirewallExceptionListenerPass;
@@ -41,7 +40,6 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new AclConfigurationPass());
         $container->addCompilerPass(new OwnershipDecisionMakerPass());
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
-        $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
         $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(
