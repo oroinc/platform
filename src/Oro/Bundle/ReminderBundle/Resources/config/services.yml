@@ -9,18 +9,16 @@ services:
 
     oro_reminder.reminder_entity_listener:
         class: Oro\Bundle\ReminderBundle\EventListener\ReminderListener
-        public: false
         arguments:
-            - '@oro_reminder.entity.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: doctrine.event_listener, event: postLoad, lazy: false }
-            - { name: doctrine.event_listener, event: postPersist, lazy: false }
+            - { name: doctrine.event_subscriber }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     oro_reminder.sender:
         class: Oro\Bundle\ReminderBundle\Model\ReminderSender
         arguments:
             - '@oro_reminder.send_processor_registry'
-        lazy: true
 
     oro_reminder.send_processor_registry:
         class: Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
