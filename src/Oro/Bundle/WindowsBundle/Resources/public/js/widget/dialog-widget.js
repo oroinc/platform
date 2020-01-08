@@ -694,22 +694,24 @@ define(function(require, exports, module) {
          * @protected
          */
         _bindDialogEvents: function() {
-            const self = this;
-            this.widget.on('dialogbeforeclose', function() {
-                mediator.trigger('widget_dialog:close', self);
+            this.widget.on('dialogbeforeclose', () => {
+                mediator.trigger('widget_dialog:close', this);
+                this.trigger('close');
             });
-            this.widget.on('dialogopen', function() {
-                mediator.trigger('widget_dialog:open', self);
+            this.widget.on('dialogopen', () => {
+                mediator.trigger('widget_dialog:open', this);
+                this.trigger('open');
             });
-            this.widget.on('dialogstatechange', function(event, data) {
+            this.widget.on('dialogstatechange', (event, data) => {
                 if (data.state !== data.oldState) {
-                    mediator.trigger('widget_dialog:stateChange', self, data);
+                    mediator.trigger('widget_dialog:stateChange', this, data);
+                    this.trigger('stateChange', data);
                 }
             });
             this.widget.on({
-                'dialogresizestart': _.bind(this.onResizeStart, this),
-                'dialogresize dialogmaximize dialogrestore': _.bind(this.onResize, this),
-                'dialogresizestop': _.bind(this.onResizeStop, this)
+                'dialogresizestart': this.onResizeStart.bind(this),
+                'dialogresize dialogmaximize dialogrestore': this.onResize.bind(this),
+                'dialogresizestop': this.onResizeStop.bind(this)
             });
         },
 
