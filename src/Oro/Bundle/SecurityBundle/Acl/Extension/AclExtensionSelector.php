@@ -9,37 +9,41 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Provides a functionality to find ACL extension.
+ * Provides a way to find ACL extension.
  */
-class AclExtensionSelector
+class AclExtensionSelector implements ResetInterface
 {
+    /** @var AclExtensionInterface[] [extension key => extension, ...] */
+    private $extensions;
+
     /** @var ObjectIdAccessor */
-    protected $objectIdAccessor;
+    private $objectIdAccessor;
 
-    /** @var AclExtensionInterface[] */
-    protected $extensions = [];
-
-    /** @var array [cache key => ACL extension, ...] */
-    protected $localCache = [];
+    /** @var array [cache key => ACL extension or NULL, ...] */
+    private $localCache = [];
 
     /**
-     * @param ObjectIdAccessor $objectIdAccessor
+     * @param AclExtensionInterface[] $extensions
+     * @param ObjectIdAccessor        $objectIdAccessor
      */
-    public function __construct(ObjectIdAccessor $objectIdAccessor)
+    public function __construct(array $extensions, ObjectIdAccessor $objectIdAccessor)
     {
+        $this->extensions = [];
+        foreach ($extensions as $extension) {
+            $this->extensions[$extension->getExtensionKey()] = $extension;
+        }
         $this->objectIdAccessor = $objectIdAccessor;
     }
 
     /**
-     * Adds ACL extension
-     *
-     * @param AclExtensionInterface $extension
+     * {@inheritDoc}
      */
-    public function addAclExtension(AclExtensionInterface $extension)
+    public function reset()
     {
-        $this->extensions[] = $extension;
+        $this->localCache = [];
     }
 
     /**
@@ -51,13 +55,11 @@ class AclExtensionSelector
      */
     public function selectByExtensionKey($extensionKey)
     {
-        foreach ($this->extensions as $extension) {
-            if ($extension->getExtensionKey() === $extensionKey) {
-                return $extension;
-            }
+        if (!isset($this->extensions[$extensionKey])) {
+            return null;
         }
 
-        return null;
+        return $this->extensions[$extensionKey];
     }
 
     /**
@@ -79,16 +81,16 @@ class AclExtensionSelector
         }
 
         $type = $id = $fieldName = null;
-        if (is_string($val)) {
-            list($id, $type, $fieldName) = ObjectIdentityHelper::parseIdentityString($val);
-        } elseif (is_object($val)) {
-            list($id, $type, $fieldName) = $this->parseObject($val);
+        if (\is_string($val)) {
+            [$id, $type, $fieldName] = ObjectIdentityHelper::parseIdentityString($val);
+        } elseif (\is_object($val)) {
+            [$id, $type, $fieldName] = $this->parseObject($val);
         }
 
         $result = null;
         if ($type !== null) {
             $cacheKey = ((string)$id) . '!' . $type;
-            if (array_key_exists($cacheKey, $this->localCache)) {
+            if (\array_key_exists($cacheKey, $this->localCache)) {
                 $result = $this->localCache[$cacheKey];
             } else {
                 $result = $this->findExtension($type, $id);
@@ -124,7 +126,7 @@ class AclExtensionSelector
      *
      * @return array [id, type, field name]
      */
-    protected function parseObject($object)
+    private function parseObject($object)
     {
         $fieldName = null;
         if ($object instanceof FieldVote) {
@@ -162,7 +164,7 @@ class AclExtensionSelector
      *
      * @return AclExtensionInterface|null
      */
-    protected function findExtension($type, $id)
+    private function findExtension($type, $id)
     {
         foreach ($this->extensions as $extension) {
             if ($extension->supports($type, $id)) {
@@ -183,7 +185,7 @@ class AclExtensionSelector
      *
      * @return InvalidDomainObjectException
      */
-    protected function createAclExtensionNotFoundException($val, $type, $id, $fieldName = null)
+    private function createAclExtensionNotFoundException($val, $type, $id, $fieldName = null)
     {
         $objInfo = is_object($val) && !($val instanceof ObjectIdentityInterface)
             ? get_class($val)
