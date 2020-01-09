@@ -148,27 +148,20 @@ services:
             - '@oro_email.email.owner.provider'
             - '@event_dispatcher'
 
-    oro_email.link.email.activity.manager:
-        tags:
-            - { name: oro_service_link,  service: oro_email.email.activity.manager }
-
-    oro_email.link.email.thread.manager:
-        tags:
-            - { name: oro_service_link,  service: oro_email.email.thread.manager }
-
     oro_email.listener.entity_listener:
         class: Oro\Bundle\EmailBundle\EventListener\EntityListener
         arguments:
-            - '@oro_email.email.owner.manager'
-            - '@oro_email.link.email.activity.manager'
-            - '@oro_email.link.email.thread.manager'
-            - '@oro_email.model.email_activity_updates'
             - '@oro_message_queue.client.message_producer'
-            - '@oro_email.email.address.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
             - { name: doctrine.event_listener, event: postRemove, connection: default }
+            - { name: container.service_subscriber, id: oro_email.email.owner.manager }
+            - { name: container.service_subscriber, id: oro_email.email.thread.manager }
+            - { name: container.service_subscriber, id: oro_email.email.activity.manager }
+            - { name: container.service_subscriber, id: oro_email.model.email_activity_updates }
+            - { name: container.service_subscriber, id: oro_email.email.address.manager }
 
     oro_email.acl.manager.link:
         tags:
