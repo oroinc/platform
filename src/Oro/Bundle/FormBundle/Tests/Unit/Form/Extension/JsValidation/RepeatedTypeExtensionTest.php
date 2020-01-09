@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension;
 use Symfony\Component\Form\FormView;
