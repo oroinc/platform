@@ -158,14 +158,6 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getAclClass()
-    {
-        return EmailUser::class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getSubject($entity)
     {
         /** @var $entity Email */

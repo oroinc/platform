@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle;
 
-use Oro\Component\DependencyInjection\Compiler\InverseNamedTaggedServiceCompilerPass;
+use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -18,10 +18,6 @@ class OroActivityListBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new InverseNamedTaggedServiceCompilerPass(
-            'oro_activity_list.provider.chain',
-            'oro_activity_list.provider',
-            'class'
-        ));
+        $container->addCompilerPass(new ActivityListProviderPass());
     }
 }

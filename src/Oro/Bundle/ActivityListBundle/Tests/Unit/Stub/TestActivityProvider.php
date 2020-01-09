@@ -14,9 +14,6 @@ class TestActivityProvider implements
 {
     const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
 
-    /** @var string|null */
-    private $aclClass;
-
     /** @var object[] */
     private $targets;
 
@@ -62,22 +59,6 @@ class TestActivityProvider implements
     public function getRoutes($activityEntity)
     {
         return ['delete' => 'test_delete_route'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAclClass()
-    {
-        return $this->aclClass;
-    }
-
-    /**
-     * @param string|null $aclClass
-     */
-    public function setAclClass($aclClass)
-    {
-        $this->aclClass = $aclClass;
     }
 
     /**
