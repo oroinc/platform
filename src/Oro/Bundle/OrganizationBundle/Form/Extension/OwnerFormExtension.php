@@ -54,6 +54,9 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -76,18 +79,35 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     protected $oldOwner;
 
     /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ContainerInterface     $container
+     * @param DoctrineHelper                $doctrineHelper
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ContainerInterface            $container
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenAccessorInterface $tokenAccessor,
+        AuthorizationCheckerInterface $authorizationChecker,
         ContainerInterface $container
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->tokenAccessor = $tokenAccessor;
+        $this->authorizationChecker = $authorizationChecker;
         $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'security.acl.voter.basic_permissions' => AclVoterInterface::class,
+            'oro_security.owner.ownership_metadata_provider' => OwnershipMetadataProviderInterface::class,
+            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
+            'oro_security.ownership_tree_provider' => OwnerTreeProvider::class,
+            'oro_organization.business_unit_manager' => BusinessUnitManager::class
+        ];
     }
 
     /**
@@ -369,7 +389,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
              * If assign permission is granted, and user able to see business units, showing all available.
              * If not able to see, render default in hidden field.
              */
-            if ($this->getAuthorizationChecker()->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
+            if ($this->authorizationChecker->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
                 $builder->add(
                     $this->fieldName,
                     BusinessUnitSelectAutocomplete::class,
@@ -486,7 +506,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     {
         $observer = new OneShotIsGrantedObserver();
         $this->getAclVoter()->addOneShotIsGrantedObserver($observer);
-        $this->isAssignGranted = $this->getAuthorizationChecker()->isGranted($permission, $object);
+        $this->isAssignGranted = $this->authorizationChecker->isGranted($permission, $object);
         $this->accessLevel = $observer->getAccessLevel();
     }
 
@@ -569,14 +589,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     }
 
     /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
-    {
-        return $this->container->get('security.authorization_checker');
-    }
-
-    /**
      * @return AclVoterInterface
      */
     protected function getAclVoter(): AclVoterInterface
@@ -614,20 +626,5 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     protected function getBusinessUnitManager(): BusinessUnitManager
     {
         return $this->container->get('oro_organization.business_unit_manager');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return [
-            'security.authorization_checker' => AuthorizationCheckerInterface::class,
-            'security.acl.voter.basic_permissions' => AclVoterInterface::class,
-            'oro_security.owner.ownership_metadata_provider' => OwnershipMetadataProviderInterface::class,
-            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
-            'oro_security.ownership_tree_provider' => OwnerTreeProvider::class,
-            'oro_organization.business_unit_manager' => BusinessUnitManager::class
-        ];
     }
 }

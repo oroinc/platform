@@ -32,6 +32,9 @@ class ActivityListChainProvider implements ResetInterface
     /** @var string[] */
     private $activityClasses;
 
+    /** @var string[] [activity class => activity ACL class, ...] */
+    private $activityAclClasses;
+
     /** @var ContainerInterface */
     private $providerContainer;
 
@@ -61,6 +64,7 @@ class ActivityListChainProvider implements ResetInterface
 
     /**
      * @param string[]               $activityClasses
+     * @param string[]               $activityAclClasses
      * @param ContainerInterface     $providerContainer
      * @param DoctrineHelper         $doctrineHelper
      * @param ConfigManager          $configManager
@@ -70,6 +74,7 @@ class ActivityListChainProvider implements ResetInterface
      */
     public function __construct(
         array $activityClasses,
+        array $activityAclClasses,
         ContainerInterface $providerContainer,
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
@@ -78,6 +83,7 @@ class ActivityListChainProvider implements ResetInterface
         TokenAccessorInterface $tokenAccessor
     ) {
         $this->activityClasses = $activityClasses;
+        $this->activityAclClasses = $activityAclClasses;
         $this->providerContainer = $providerContainer;
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
@@ -177,13 +183,24 @@ class ActivityListChainProvider implements ResetInterface
     {
         if (null === $this->ownerActivityClasses) {
             $this->ownerActivityClasses = [];
-            $providers = $this->getProviders();
-            foreach ($providers as $activityClass => $provider) {
-                $this->ownerActivityClasses[] = $provider->getAclClass() ?? $activityClass;
+            foreach ($this->activityClasses as $activityClass) {
+                $this->ownerActivityClasses[] = $this->activityAclClasses[$activityClass] ?? $activityClass;
             }
         }
 
         return $this->ownerActivityClasses;
+    }
+
+    /**
+     * Gets a supported activity owner class for the given activity class.
+     *
+     * @param string $activityClass
+     *
+     * @return string
+     */
+    public function getSupportedOwnerActivity(string $activityClass): string
+    {
+        return $this->activityAclClasses[$activityClass] ?? $activityClass;
     }
 
     /**
@@ -259,12 +276,11 @@ class ActivityListChainProvider implements ResetInterface
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        $providers = $this->getProviders();
-        foreach ($providers as $activityClass => $provider) {
-            $aclClass = $provider->getAclClass() ?? $activityClass;
+        foreach ($this->activityClasses as $activityClass) {
+            $aclClass = $this->activityAclClasses[$activityClass] ?? $activityClass;
             if ($entityClass === $aclClass) {
                 $entityClass = $activityClass;
-                $entityId = $provider->getActivityId($entity);
+                $entityId = $this->getProviderByClass($activityClass)->getActivityId($entity);
             }
         }
 
@@ -421,11 +437,10 @@ class ActivityListChainProvider implements ResetInterface
      */
     public function getProviderByOwnerClass(string $activityOwnerClass): ActivityListProviderInterface
     {
-        $providers = $this->getProviders();
-        foreach ($providers as $activityClass => $provider) {
-            $aclClass = $provider->getAclClass() ?? $activityClass;
+        foreach ($this->activityClasses as $activityClass) {
+            $aclClass = $this->activityAclClasses[$activityClass] ?? $activityClass;
             if ($aclClass === $activityOwnerClass) {
-                return $provider;
+                return $this->getProviderByClass($activityClass);
             }
         }
 
@@ -464,7 +479,7 @@ class ActivityListChainProvider implements ResetInterface
             return null;
         }
 
-        if (!$list) {
+        if (null === $list) {
             $list = new ActivityList();
         }
 

@@ -44,6 +44,8 @@ The current file describes significant changes in the code that may affect the u
 #### ActivityListBundle
 * The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
   Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+* The `getAclClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `acl_class` attribute of the `oro_activity_list.provider` DIC tag instead.
 
 #### DataGridBundle
 * The `getName()` method was removed from `Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface`.

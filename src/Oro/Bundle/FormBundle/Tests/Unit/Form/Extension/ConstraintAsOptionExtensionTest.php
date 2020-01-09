@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;

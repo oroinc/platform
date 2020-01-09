@@ -78,14 +78,6 @@ class NoteActivityListProvider implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAclClass()
-    {
-        return null;
-    }
-
-    /**
      * @param Note $entity
      *
      * {@inheritdoc}

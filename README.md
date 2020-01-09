@@ -23,6 +23,8 @@ OroPlatform is a composer package that requires an application to initialize and
 A [platform-application](https://github.com/orocrm/platform-application) is an example of such application which
 simplifies initial project setup and configuration.
 
-## Documentation
-  
-The documentation for OroPlatform can be found [here](http://www.oroinc.com/doc/orocrm/).
+Resources
+---------
+
+  * [OroCommerce, OroCRM and OroPlatform Documentation](https://doc.oroinc.com)
+  * [Contributing](https://doc.oroinc.com/community/contribute/)

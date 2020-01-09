@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\AccessRule;
 use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityProvider;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
@@ -68,8 +67,10 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');
 
         $this->activityListProvider->expects($this->once())
-            ->method('getProviders')
+            ->method('getSupportedActivities')
             ->willReturn([]);
+        $this->activityListProvider->expects($this->never())
+            ->method('getSupportedOwnerActivity');
 
         $this->rule->process($criteria);
         $this->assertEquals(
@@ -94,11 +95,13 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');
 
-        $activityProvider = new TestActivityProvider();
-
         $this->activityListProvider->expects($this->once())
-            ->method('getProviders')
-            ->willReturn([self::TEST_ACTIVITY_CLASS => $activityProvider]);
+            ->method('getSupportedActivities')
+            ->willReturn([self::TEST_ACTIVITY_CLASS]);
+        $this->activityListProvider->expects($this->once())
+            ->method('getSupportedOwnerActivity')
+            ->with(self::TEST_ACTIVITY_CLASS)
+            ->willReturn(self::TEST_ACTIVITY_CLASS);
 
         $this->builder->expects($this->once())
             ->method('getAclConditionData')
@@ -140,13 +143,15 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');
 
-        $activityProvider = new TestActivityProvider();
         $activityAclClass = 'Test\AnotherEntity';
-        $activityProvider->setAclClass($activityAclClass);
 
         $this->activityListProvider->expects($this->once())
-            ->method('getProviders')
-            ->willReturn([self::TEST_ACTIVITY_CLASS => $activityProvider]);
+            ->method('getSupportedActivities')
+            ->willReturn([self::TEST_ACTIVITY_CLASS]);
+        $this->activityListProvider->expects($this->once())
+            ->method('getSupportedOwnerActivity')
+            ->with(self::TEST_ACTIVITY_CLASS)
+            ->willReturn($activityAclClass);
 
         $this->builder->expects($this->once())
             ->method('getAclConditionData')
