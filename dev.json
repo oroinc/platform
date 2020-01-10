@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.1.26",
+        "php": "~7.3.13",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
