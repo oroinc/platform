@@ -34,8 +34,8 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' breadcrumbs'
     }) %}
-    <div {{ block('block_attributes') }}>
-        <span class="breadcrumbs__item">
+    <ul {{ block('block_attributes') }} role="navigation" aria-label="breadcrumb">
+        <li class="breadcrumbs__item">
             {% if breadcrumbs is not iterable %}
                 {{ breadcrumbs }}
             {% else %}
@@ -53,16 +53,16 @@
                         {% if url and not loop.last %}
                             <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
                         {% else %}
-                            {{ breadcrumb.label|trans }}
+                            <span aria-current="page">{{ breadcrumb.label|trans }}</span>
                         {% endif %}
                     {%  else %}
                         {{ breadcrumb }}
                     {%  endif %}
                 {% endfor %}
             {% endif %}
-        </span>
+        </li>
         {{ block('container_widget') }}
-    </div>
+    </ul>
 {% endblock %}
 
 {% block logo_widget %}
