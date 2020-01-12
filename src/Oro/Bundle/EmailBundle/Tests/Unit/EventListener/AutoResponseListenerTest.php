@@ -29,7 +29,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
         $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add(AutoResponseManager::class, $this->autoResponseManager)
+            ->add('oro_email.autoresponserule_manager', $this->autoResponseManager)
             ->add(MessageProducerInterface::class, $this->producer)
             ->getContainer($this);
 

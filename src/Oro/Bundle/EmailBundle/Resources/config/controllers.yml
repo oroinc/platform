@@ -6,10 +6,11 @@ services:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
-            - { name: 'container.service_subscriber' }
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_email.autoresponserule_manager }
 
     Oro\Bundle\EmailBundle\Controller\Dashboard\DashboardController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
-            - { name: 'container.service_subscriber' }
+            - { name: container.service_subscriber }
