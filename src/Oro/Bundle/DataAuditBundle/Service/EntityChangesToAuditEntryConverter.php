@@ -326,7 +326,7 @@ class EntityChangesToAuditEntryConverter
             $auditEntry->setAction($action);
 
             $auditEntityManager->persist($auditEntry);
-            $auditEntityManager->flush();
+            $auditEntityManager->flush($auditEntry);
 
             $this->setNewAuditVersionService->setVersion($auditEntry);
         }
