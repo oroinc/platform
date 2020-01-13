@@ -4,34 +4,9 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Yaml\Parser;
 
 class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoad()
-    {
-        $configuration = new ContainerBuilder();
-
-        $loader = new OroPlatformExtension();
-        $config = $this->getEmptyConfig();
-
-        $loader->load(array($config), $configuration);
-
-        $this->assertTrue($configuration instanceof ContainerBuilder);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getEmptyConfig()
-    {
-        $yaml   = '';
-        $parser = new Parser();
-
-        return $parser->parse($yaml);
-    }
-
     public function testSecurityShouldBeMergedCorrectly()
     {
         $originalConfig = [
@@ -103,7 +78,7 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 
         $platformExtension = new OroPlatformExtension();
         $mergeConfigurationIntoOne = new \ReflectionMethod(
-            'Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension',
+            OroPlatformExtension::class,
             'mergeConfigIntoOne'
         );
         $mergeConfigurationIntoOne->setAccessible(true);
