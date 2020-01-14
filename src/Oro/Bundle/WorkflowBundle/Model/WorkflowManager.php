@@ -173,14 +173,21 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array $data
      * @param bool $throwGroupException
+     * @param Collection|null $errors
      *
      * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
-    public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
-    {
+    public function startWorkflow(
+        $workflow,
+        $entity,
+        $transition = null,
+        array $data = [],
+        $throwGroupException = true,
+        Collection $errors = null
+    ) {
         try {
-            $workflowItem = $this->doStartWorkflow($workflow, $entity, $transition, $data);
+            $workflowItem = $this->doStartWorkflow($workflow, $entity, $transition, $data, [], $errors);
         } catch (WorkflowRecordGroupException $exception) {
             if ($throwGroupException) {
                 throw $exception;
@@ -210,6 +217,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array $data
      * @param array $workflowItems
+     * @param Collection|null $errors
      *
      * @return WorkflowItem|null
      *
@@ -220,7 +228,8 @@ class WorkflowManager implements LoggerAwareInterface
         $entity,
         $transition = null,
         array $data = [],
-        array $workflowItems = []
+        array $workflowItems = [],
+        Collection $errors = null
     ) {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $this->getWorkflow($workflow);
@@ -229,7 +238,7 @@ class WorkflowManager implements LoggerAwareInterface
         if (!$transition) {
             $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
 
-            if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
+            if (!$workflow->isStartTransitionAvailable($transition, $entity, $data, $errors)) {
                 return null;
             }
         }
@@ -262,7 +271,7 @@ class WorkflowManager implements LoggerAwareInterface
 
         $this->unsetStartedWorkflowForEntity($workflow, $entity);
 
-        return $workflow->start($entity, $data, $transition);
+        return $workflow->start($entity, $data, $transition, $errors);
     }
 
     /**
@@ -336,14 +345,15 @@ class WorkflowManager implements LoggerAwareInterface
     /**
      * Perform workflow item transition.
      *
-     * @param WorkflowItem      $workflowItem
+     * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
+     * @param Collection|null $errors
      */
-    public function transit(WorkflowItem $workflowItem, $transition)
+    public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
-        $this->transitWorkflow($workflow, $workflowItem, $transition);
+        $this->transitWorkflow($workflow, $workflowItem, $transition, $errors);
     }
 
     /**
@@ -351,11 +361,15 @@ class WorkflowManager implements LoggerAwareInterface
      * @param WorkflowItem $workflowItem
      * @param string       $transition
      */
-    private function transitWorkflow(Workflow $workflow, WorkflowItem $workflowItem, $transition)
-    {
+    private function transitWorkflow(
+        Workflow $workflow,
+        WorkflowItem $workflowItem,
+        $transition,
+        Collection $errors = null
+    ): void {
         $this->inTransaction(
-            function (EntityManager $em) use ($workflow, $workflowItem, $transition) {
-                $workflow->transit($workflowItem, $transition);
+            function (EntityManager $em) use ($workflow, $workflowItem, $transition, $errors) {
+                $workflow->transit($workflowItem, $transition, $errors);
                 $workflowItem->setUpdated(); // transition might not change workflow item
                 $em->flush();
 
