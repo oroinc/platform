@@ -8,12 +8,11 @@ define(function(require) {
      * @param {Boolean}  options.readonly - specifies if cards should be draggable
      * @augments BaseView
      */
-    var ColumnView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    ColumnView = BaseView.extend({
+    const ColumnView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -22,13 +21,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/column-view.html'),
+        template: require('tpl-loader!../../../../templates/board/column-view.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function ColumnView() {
-            ColumnView.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnView(options) {
+            ColumnView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -46,7 +45,7 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            var column = this;
+            const column = this;
             if (this.subview('columns') && !this.readonly) {
                 this.destroySortable();
             }
@@ -70,7 +69,7 @@ define(function(require) {
          * Connects sortable behaviour
          */
         initSortable: function() {
-            var column = this;
+            const column = this;
             this.subview('columns').$el.sortable({
                 connectWith: '.board-column',
                 placeholder: 'board-card-placeholder',
@@ -85,8 +84,8 @@ define(function(require) {
                     column.trigger('dragEnd');
                 },
                 update: function(event, data) {
-                    var domEl = data.item[0];
-                    var dropIndex = Array.prototype.indexOf.call(domEl.parentNode.children, domEl);
+                    const domEl = data.item[0];
+                    const dropIndex = Array.prototype.indexOf.call(domEl.parentNode.children, domEl);
                     if (domEl.parentNode === column.el) {
                         if (!data.item.data('model')) {
                             throw new Error('Trying to receive non card element');
@@ -133,7 +132,7 @@ define(function(require) {
         },
 
         cleanupViews: function() {
-            var columns = this.subview('columns');
+            const columns = this.subview('columns');
             if (columns) {
                 columns.cleanup();
             }

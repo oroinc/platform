@@ -10,17 +10,15 @@ use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
  */
 class ChainConfigurationProvider implements ConfigurationProviderInterface
 {
-    /** @var ConfigurationProviderInterface[] */
-    private $providers = [];
+    /** @var iterable|ConfigurationProviderInterface[] */
+    private $providers;
 
     /**
-     * Registers the given provider in the chain
-     *
-     * @param ConfigurationProviderInterface $provider
+     * @param iterable|ConfigurationProviderInterface[] $providers
      */
-    public function addProvider(ConfigurationProviderInterface $provider)
+    public function __construct(iterable $providers)
     {
-        $this->providers[] = $provider;
+        $this->providers = $providers;
     }
 
     /**
@@ -36,23 +34,17 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
      */
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
-        $foundProvider = null;
         foreach ($this->providers as $provider) {
             if ($provider->isApplicable($gridName)) {
-                $foundProvider = $provider;
-                break;
+                return $provider->getConfiguration($gridName);
             }
         }
 
-        if ($foundProvider === null) {
-            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
-        }
-
-        return $foundProvider->getConfiguration($gridName);
+        throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
     }
 
     /**
-     * @return ConfigurationProviderInterface[]
+     * @return iterable|ConfigurationProviderInterface[]
      */
     public function getProviders()
     {

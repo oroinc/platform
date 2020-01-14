@@ -14,7 +14,7 @@ services:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
         public: false
         arguments:
-            - '@service_container'
+            - [] # clearers. They are set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 250, persistent: true }
 
@@ -145,7 +145,6 @@ services:
 
     oro_message_queue.consumption.cache_state:
         class: Oro\Bundle\MessageQueueBundle\Consumption\CacheState
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_message_queue.consumption.cache_state_driver.dbal'
@@ -187,13 +186,6 @@ services:
             - 'oro_message_queue.message_queue_heartbeat'
         tags:
             - { name: gos_web_socket.topic }
-
-    oro_message_queue.event_listener.console_error:
-        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsoleErrorListener
-        arguments:
-            - '@monolog.logger.consumer'
-        tags:
-            - { name: kernel.event_listener, event: console.error, method: onConsoleError, priority: 255 }
 
     oro_message_queue.processor_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator

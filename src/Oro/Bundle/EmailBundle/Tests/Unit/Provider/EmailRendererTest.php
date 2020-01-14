@@ -96,9 +96,9 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         return strtr(
             self::ENTITY_VARIABLE_TEMPLATE,
             [
-                '%name%'   => $propertyName,
-                '%val%'    => $path,
-                '%parent%' => $parentPath
+                '%name%' => $propertyName,
+                '%val%' => $path,
+                '%parent%' => $parentPath,
             ]
         );
     }
@@ -128,10 +128,10 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
-                'properties'         => [],
-                'methods'            => [get_class($entity) => ['getField1']],
-                'accessors'          => [get_class($entity) => ['field1' => 'getField1']],
-                'default_formatters' => []
+                'properties' => [],
+                'methods' => [get_class($entity) => ['getField1']],
+                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => [],
             ]);
 
         $template = 'test <a href="http://example.com">test</a> {{ system.testVar }}';
@@ -164,10 +164,10 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
-                'properties'         => [],
-                'methods'            => [$entityClass => ['getField1']],
-                'accessors'          => [$entityClass => ['field1' => 'getField1']],
-                'default_formatters' => $defaultFormatters
+                'properties' => [],
+                'methods' => [$entityClass => ['getField1']],
+                'accessors' => [$entityClass => ['field1' => 'getField1']],
+                'default_formatters' => $defaultFormatters,
             ]);
         $this->expectVariables($entityVariableProcessors, $systemVars);
 
@@ -180,7 +180,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $emailTemplate = $this->getEmailTemplate($content, $subject);
         $templateParams = [
             'entity' => $entity,
-            'system' => $systemVars
+            'system' => $systemVars,
         ];
 
         $result = $this->renderer->compileMessage($emailTemplate, $templateParams);
@@ -204,13 +204,13 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([
-                'properties'         => [],
-                'methods'            => [get_class($entity) => ['getField1']],
-                'accessors'          => [get_class($entity) => ['field1' => 'getField1']],
-                'default_formatters' => []
+                'properties' => [],
+                'methods' => [get_class($entity) => ['getField1']],
+                'accessors' => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => [],
             ]);
         $this->expectVariables([
-            get_class($entity) => []
+            get_class($entity) => [],
         ], ['currentDate' => '10-12-2019']);
 
         $htmlTagHelper = $this->createMock(HtmlTagHelper::class);

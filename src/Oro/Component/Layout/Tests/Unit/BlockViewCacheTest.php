@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\CacheBundle\Provider\ArrayCache;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
@@ -114,5 +115,61 @@ class BlockViewCacheTest extends LayoutTestCase
             ->method('deleteAll');
 
         $this->blockViewCache->reset();
+    }
+
+    public function testCacheWhenContextWithFilledData()
+    {
+        $normalizer = $this->createMock(ObjectNormalizer::class);
+        $normalizer->expects($this->any())
+            ->method('supportsNormalization')
+            ->willReturn(true);
+        $normalizer->expects($this->any())
+            ->method('supportsDenormalization')
+            ->willReturn(true);
+        $normalizer->expects($this->any())
+            ->method('normalize')
+            ->willReturnCallback(function ($data, $format, $context) {
+                return $data->vars;
+            });
+        $normalizer->expects($this->any())
+            ->method('denormalize')
+            ->willReturnCallback(function ($data) {
+                if (!$data) {
+                    return null;
+                }
+
+                $object = new BlockView();
+                $object->vars = $data;
+
+                return $object;
+            });
+        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
+
+        $cache = new BlockViewCache(new ArrayCache(), $serializer);
+        $context = new LayoutContext(['some data']);
+        $firstBlockView = new BlockView();
+        $firstBlockView->vars = ['attr' => 'first block view data'];
+        $secondContext = new LayoutContext(['some data']);
+        $secondContext->data()->set('custom_data_key', 'custom_data_value');
+        $secondBlockView = new BlockView();
+        $secondBlockView->vars = ['attr' => 'second block view data'];
+
+        $context->getResolver()->setDefined([0]);
+        $context->resolve();
+        $secondContext->getResolver()->setDefined([0]);
+        $secondContext->resolve();
+
+        $cache->save($context, $firstBlockView);
+        $cache->save($secondContext, $secondBlockView);
+
+        self::assertEquals($firstBlockView, $cache->fetch($context));
+        self::assertEquals($secondBlockView, $cache->fetch($secondContext));
+
+        $secondContextWithAdditionalData = new LayoutContext(['some data']);
+        $secondContextWithAdditionalData->data()->set('custom_data_key', 'custom_data_value');
+        $secondContextWithAdditionalData->data()->set('additional_data_key', 'additional_data_value');
+        $secondContextWithAdditionalData->getResolver()->setDefined([0]);
+        $secondContextWithAdditionalData->resolve();
+        self::assertNull($cache->fetch($secondContextWithAdditionalData));
     }
 }

@@ -52,6 +52,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     {
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
+        $this->checkCsrfHeader($server);
 
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
@@ -100,7 +101,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         );
 
         // make sure that REST API call does not start the session
-        self::assertSessionNotStarted($method, $uri);
+        static::assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }
@@ -115,7 +116,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected function assertResponseContains($expectedContent, Response $response, $ignoreOrder = false)
     {
         $content = self::jsonToArray($response->getContent());
-        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
+        $expectedContent = self::processTemplateData($this->getResponseData($expectedContent));
 
         self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false, !$ignoreOrder));
     }
@@ -319,7 +320,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         if ($fileName) {
             if ($this->isRelativePath($fileName)) {
-                $fileName = $this->getTestResourcePath('responses', $fileName);
+                $fileName = $this->getTestResourcePath($this->getResponseDataFolderName(), $fileName);
             }
             file_put_contents($fileName, $content);
         } else {

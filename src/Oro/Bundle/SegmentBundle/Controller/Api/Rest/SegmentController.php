@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for Segment entity.
+ *
  * @RouteResource("segment")
  * @NamePrefix("oro_api_")
  */
@@ -72,6 +75,8 @@ class SegmentController extends RestController implements ClassResourceInterface
      *
      * @param int $id
      *
+     * @Rest\Delete(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Delete Segment",
      *      resource=true
@@ -84,7 +89,7 @@ class SegmentController extends RestController implements ClassResourceInterface
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -94,6 +99,8 @@ class SegmentController extends RestController implements ClassResourceInterface
      *
      * @param int $id
      *
+     * @Rest\Post(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Run Static Segment",
      *      resource=true
@@ -101,7 +108,7 @@ class SegmentController extends RestController implements ClassResourceInterface
      * @AclAncestor("oro_segment_update")
      * @return Response
      */
-    public function postRunAction($id)
+    public function postRunAction(int $id)
     {
         /** @var Segment $segment */
         $segment = $this->getManager()->find($id);

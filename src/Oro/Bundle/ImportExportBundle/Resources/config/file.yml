@@ -1,6 +1,0 @@
-parameters:
-    oro_importexport.file.mime_type_guesser.class:    Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser
-
-services:
-    oro_importexport.file.mime_type_guesser:
-        class: '%oro_importexport.file.mime_type_guesser.class%'

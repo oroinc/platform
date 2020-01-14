@@ -5,11 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldDescriptionUtil;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\ApiBundle\Util\FieldDescriptionUtil;
 
 trait ResourceConsistencyTestTrait
 {

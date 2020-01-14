@@ -1,54 +1,38 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var TabCollectionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var module = require('module');
-    var config = module.config();
-    var TabItemView = require('./tab-item-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    let config = require('module-config').default(module.id);
+    const TabItemView = require('./tab-item-view');
 
     config = _.extend({
         templateClassName: 'nav nav-tabs responsive-tabs'
     }, config);
 
-    TabCollectionView = BaseCollectionView.extend({
+    const TabCollectionView = BaseCollectionView.extend({
         listSelector: '[data-name="tabs-list"]',
         className: 'tab-collection oro-tabs clearfix',
         itemView: TabItemView,
         useDropdown: false,
-        events: {
-            'click a': 'onTabClick'
-        },
         listen: {
             'change collection': 'onChange'
         },
 
-        template: require('tpl!oroui/templates/tab-collection-container.html'),
+        template: require('tpl-loader!oroui/templates/tab-collection-container.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function TabCollectionView() {
-            TabCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function TabCollectionView(options) {
+            TabCollectionView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             _.extend(this, _.defaults(_.pick(options, ['useDropdown']), this));
 
-            TabCollectionView.__super__.initialize.apply(this, arguments);
-        },
-
-        onTabClick: function(e) {
-            var $el = $(e.target);
-
-            e.preventDefault();
-
-            if ($el.closest('.dropdown').find('[data-dropdown-label]').html() !== $el.html()) {
-                $el.trigger('shown.bs.tab');
-            }
+            TabCollectionView.__super__.initialize.call(this, options);
         },
 
         onChange: function(changedModel) {
@@ -67,7 +51,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = TabCollectionView.__super__.getTemplateData.call(this);
+            const data = TabCollectionView.__super__.getTemplateData.call(this);
 
             data.templateClassName = config.templateClassName;
             data.tabOptions = {
@@ -78,7 +62,7 @@ define(function(require) {
         },
 
         render: function() {
-            TabCollectionView.__super__.render.apply(this, arguments);
+            TabCollectionView.__super__.render.call(this);
 
             this.$el.attr('data-layout', 'separate');
             this.initLayout().done(_.bind(this.handleLayoutInit, this));

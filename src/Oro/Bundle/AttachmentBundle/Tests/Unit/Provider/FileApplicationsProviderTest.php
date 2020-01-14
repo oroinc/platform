@@ -4,9 +4,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,16 +14,16 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
     private const PARENT_ENTITY_ID = 1;
     private const PARENT_ENTITY_FIELD_NAME = 'sampleField';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentEntityConfigProvider;
 
     /** @var FileApplicationsProvider */
     private $provider;
 
     protected function setUp()
     {
-        $this->configManager = $this->createMock(ConfigManager::class);
-        $this->provider = new FileApplicationsProvider($this->configManager);
+        $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
+        $this->provider = new FileApplicationsProvider($this->attachmentEntityConfigProvider);
     }
 
     public function testGetFileApplicationsWhenNoParentData(): void
@@ -38,10 +38,10 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileApplications(): void
     {
-        $this->configManager
+        $this->attachmentEntityConfigProvider
             ->expects(self::once())
             ->method('getFieldConfig')
-            ->with('attachment', self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
+            ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
             ->willReturn($config = $this->createMock(Config::class));
 
         $config
@@ -67,5 +67,19 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityFieldName(self::PARENT_ENTITY_FIELD_NAME);
 
         return $file;
+    }
+
+    public function testGetFileApplicationsWhenNoFieldConfig(): void
+    {
+        $this->attachmentEntityConfigProvider
+            ->expects(self::once())
+            ->method('getFieldConfig')
+            ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
+            ->willReturn(null);
+
+        self::assertEquals(
+            [CurrentApplicationProviderInterface::DEFAULT_APPLICATION],
+            $this->provider->getFileApplications($this->getFile())
+        );
     }
 }

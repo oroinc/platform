@@ -1,17 +1,3 @@
-parameters:
-    oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
-    oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
-    oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
-
-    oro_config.form.config_subscriber.class:                                     Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
-
-    oro_config.type.form.class:                                                  Oro\Bundle\ConfigBundle\Form\Type\FormType
-    oro_config.type.form_field.class:                                            Oro\Bundle\ConfigBundle\Form\Type\FormFieldType
-    oro_config.type.config_checkbox.class:                                       Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
-    oro_config.type.parent_scope_checkbox.class:                                 Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox
-
-    oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
-
 services:
     oro_config.config_bag:
         class: Oro\Bundle\ConfigBundle\Config\ConfigBag
@@ -40,7 +26,7 @@ services:
             - '@oro_config.config_bag'
 
     oro_config.scope.user:
-        class: '%oro_config.user.class%'
+        class: Oro\Bundle\ConfigBundle\Config\UserScopeManager
         public: false
         parent: oro_config.scope_manager.abstract
         calls:
@@ -49,7 +35,7 @@ services:
             - { name: oro_config.scope, scope: user, priority: 255 }
 
     oro_config.scope.global:
-        class: '%oro_config.global.class%'
+        class: Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
         public: false
         parent: oro_config.scope_manager.abstract
         tags:
@@ -58,8 +44,7 @@ services:
     # a template definition for scoped config managers
     # actually this service is replaced with an alias to the most priority scoped config manager
     oro_config.manager:
-        class: 'Oro\Bundle\ConfigBundle\Config\ConfigManager'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\ConfigBundle\Config\ConfigManager
         public: true
         arguments:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
@@ -91,20 +76,19 @@ services:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
 
     oro_config.provider.system_configuration.form_provider:
-        class: '%oro_config.provider.system_configuration.form_provider.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
         public: true
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
 
     oro_config.form.config_subscriber:
-        class: '%oro_config.form.config_subscriber.class%'
+        class: Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
         arguments:
           - '@oro_config.user'
           - '@oro_entity.doctrine_helper'
 
     oro_config.type.form:
-        class:                        '%oro_config.type.form.class%'
+        class: Oro\Bundle\ConfigBundle\Form\Type\FormType
         arguments:
             - '@oro_config.form.config_subscriber'
             - '@service_container'
@@ -112,22 +96,22 @@ services:
             - { name: form.type, alias: oro_config_form_type }
 
     oro_config.type.form_field:
-        class:                        '%oro_config.type.form_field.class%'
+        class: Oro\Bundle\ConfigBundle\Form\Type\FormFieldType
         tags:
             - { name: form.type, alias: oro_config_form_field_type }
 
     oro_config.type.parent_scope_checkbox:
-        class:                        '%oro_config.type.parent_scope_checkbox.class%'
+        class: Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox
         tags:
             - { name: form.type, alias: oro_config_parent_scope_checkbox_type }
 
     oro_config.type.config_checkbox:
-        class:                        '%oro_config.type.config_checkbox.class%'
+        class: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
         tags:
             - { name: form.type, alias: oro_config_checkbox }
 
     oro_config.type.config_file:
-        class: 'Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType'
+        class: Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType
         arguments:
             - '@oro_config.form.config_file_data_transformer'
         tags:
@@ -135,7 +119,6 @@ services:
 
     oro_config.form.handler.config:
         class: Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_config.global'
@@ -144,14 +127,13 @@ services:
         alias: oro_config.form.handler.config
 
     oro_config.manager.api:
-        class: '%oro_config.manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\ConfigBundle\Config\ConfigApiManager
         public: true
         arguments:
             - '@oro_config.provider.system_configuration.form_provider'
 
     oro_config.form.config_file_data_transformer:
-        class: 'Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer'
+        class: Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
@@ -180,6 +162,8 @@ services:
     oro_config.configuration_search_provider.chain:
         class: Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider
         public: false
+        arguments:
+            - !tagged_iterator oro_config.configuration_search_provider
 
     oro_config.configuration_search_provider.group:
         class: Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider
@@ -188,7 +172,7 @@ services:
             - '@oro_config.config_bag'
             - '@translator'
         tags:
-            - { name: oro_config.configuration_search_provider, priority: 0 }
+            - { name: oro_config.configuration_search_provider }
 
     oro_config.configuration_search_provider.field:
         class: Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider
@@ -198,4 +182,4 @@ services:
             - '@translator'
             - '@oro_config.manager'
         tags:
-            - { name: oro_config.configuration_search_provider, priority: 10 }
+            - { name: oro_config.configuration_search_provider, priority: -10 }

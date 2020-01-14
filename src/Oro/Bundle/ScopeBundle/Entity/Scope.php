@@ -7,11 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\ScopeBundle\Model\ExtendScope;
 
 /**
- * Class Scope
- * @Config()
- *
+ * Represents a set of application parameters that can be used to find application data suitable for these parameters.
  * @ORM\Table("oro_scope")
- * @ORM\Entity(repositoryClass="Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository")
+ * @ORM\Entity()
+ * @Config()
  */
 class Scope extends ExtendScope
 {

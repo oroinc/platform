@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
@@ -10,7 +11,6 @@ use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -40,7 +40,7 @@ class AttachmentManager
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     private $registry;
 
     /**
@@ -49,7 +49,7 @@ class AttachmentManager
      * @param MimeTypeChecker $mimeTypeChecker
      * @param AssociationManager $associationManager
      * @param UrlGeneratorInterface $urlGenerator
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
     public function __construct(
         FileUrlProviderInterface $fileUrlProvider,
@@ -57,7 +57,7 @@ class AttachmentManager
         MimeTypeChecker $mimeTypeChecker,
         AssociationManager $associationManager,
         UrlGeneratorInterface $urlGenerator,
-        RegistryInterface $registry
+        ManagerRegistry $registry
     ) {
         $this->fileUrlProvider = $fileUrlProvider;
         $this->fileIconProvider = $fileIconProvider;
@@ -163,7 +163,7 @@ class AttachmentManager
      */
     public function getAttachmentIconClass(FileExtensionInterface $entity): string
     {
-        return $this->fileIconProvider->getAttachmentIconClass($entity);
+        return $this->fileIconProvider->getExtensionIconClass($entity);
     }
 
     /**
@@ -209,7 +209,7 @@ class AttachmentManager
     private function getFileByIdAndFilename(int $fileId, string $filename): ?File
     {
         /** @var File $file */
-        $file = $this->registry->getEntityManagerForClass(File::class)->getRepository(File::class)->find($fileId);
+        $file = $this->registry->getManagerForClass(File::class)->getRepository(File::class)->find($fileId);
 
         if (!$file || !\in_array($filename, [$file->getFilename(), $file->getOriginalFilename()], false)) {
             return null;

@@ -1,13 +1,11 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var SelectChoiceLauncher;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var module = require('module');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    let config = require('module-config').default(module.id);
 
-    var config = module.config();
     config = _.extend({
         iconHideText: true
     }, config);
@@ -22,7 +20,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.ActionLauncher
      * @extends Backbone.View
      */
-    SelectChoiceLauncher = Backbone.View.extend({
+    const SelectChoiceLauncher = Backbone.View.extend({
         /** @property */
         enabled: true,
 
@@ -67,14 +65,14 @@ define(function(require) {
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
-        template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/action-launcher.html'),
 
         /**
          * Defines map of events => handlers
          * @return {Object}
          */
         events: function() {
-            var events = {};
+            const events = {};
             events['shown.bs.dropdown'] = 'onDropdownShown';
             events['click .dropdown-menu a'] = 'onClick';
             return events;
@@ -83,8 +81,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SelectChoiceLauncher() {
-            SelectChoiceLauncher.__super__.constructor.apply(this, arguments);
+        constructor: function SelectChoiceLauncher(options) {
+            SelectChoiceLauncher.__super__.constructor.call(this, options);
         },
 
         /**
@@ -104,7 +102,7 @@ define(function(require) {
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
+            const opts = options || {};
 
             if (!opts.action) {
                 throw new TypeError('"action" is required');
@@ -144,14 +142,14 @@ define(function(require) {
 
             this.action = opts.action;
 
-            SelectChoiceLauncher.__super__.initialize.apply(this, arguments);
+            SelectChoiceLauncher.__super__.initialize.call(this, options);
         },
 
         /**
          * @return {String}
          */
         _convertToLauncherMode: function() {
-            var str = '';
+            let str = '';
 
             if (this.icon) {
                 str = this.iconHideText ? 'icon-only' : 'icon-text';
@@ -172,11 +170,11 @@ define(function(require) {
             delete this.action;
             delete this.runAction;
 
-            SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
+            SelectChoiceLauncher.__super__.dispose.call(this);
         },
 
         getTemplateData: function() {
-            var label = this.label || this.action.label;
+            const label = this.label || this.action.label;
 
             this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
@@ -202,7 +200,7 @@ define(function(require) {
          */
         render: function() {
             this.$el.empty();
-            var $el = $(this.template(this.getTemplateData()));
+            const $el = $(this.template(this.getTemplateData()));
             $el.insertAfter(this.$el);
             this.$el.remove();
             this.setElement($el);
@@ -216,13 +214,12 @@ define(function(require) {
          * @return {Boolean}
          */
         onClick: function(e) {
-            var $link;
-            var actionOptions = {};
+            const actionOptions = {};
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
             this.trigger('click', this, e.currentTarget);
-            $link = $(e.currentTarget);
+            const $link = $(e.currentTarget);
             actionOptions.key = $link.data('key');
             actionOptions.index = parseInt($link.data('index'));
             actionOptions.item = this.items[actionOptions.index];

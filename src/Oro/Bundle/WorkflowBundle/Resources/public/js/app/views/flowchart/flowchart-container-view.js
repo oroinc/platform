@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartContainerView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var errorHandler = require('oroui/js/error');
-    var FlowchartControlView = require('oroworkflow/js/app/views/flowchart/viewer/flowchart-control-view');
-    var ZoomableAreaView = require('oroui/js/app/views/zoomable-area-view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
-    var errorMessageTemplate = require('tpl!oroworkflow/templates/flowchart/flowchart-error-message.html');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const errorHandler = require('oroui/js/error');
+    const FlowchartControlView = require('oroworkflow/js/app/views/flowchart/viewer/flowchart-control-view');
+    const ZoomableAreaView = require('oroui/js/app/views/zoomable-area-view');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
+    const errorMessageTemplate = require('tpl-loader!oroworkflow/templates/flowchart/flowchart-error-message.html');
 
-    FlowchartContainerView = BaseView.extend({
+    const FlowchartContainerView = BaseView.extend({
         autoRender: true,
 
-        template: require('tpl!oroworkflow/templates/flowchart/flowchart-container.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/flowchart-container.html'),
 
         zoomableDefaults: {
             autozoom: true,
@@ -66,19 +65,19 @@ define(function(require) {
         },
 
         refresh: function() {
-            var chartView = this.subview('chart');
+            const chartView = this.subview('chart');
             if (chartView) {
                 chartView.jsPlumbManager.organizeBlocks();
             }
 
-            var zoomView = this.subview('zoom');
+            const zoomView = this.subview('zoom');
             if (zoomView) {
                 zoomView.model.autoZoom();
             }
         },
 
         handleFlowchartComputeError: function(error) {
-            var data;
+            let data;
 
             if (this._isUnderComputeError) {
                 return;

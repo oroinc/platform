@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var DeactivateFormWidgetComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var mediator = require('oroui/js/mediator');
-    var widgetManager = require('oroui/js/widget-manager');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const mediator = require('oroui/js/mediator');
+    const widgetManager = require('oroui/js/widget-manager');
 
-    DeactivateFormWidgetComponent = BaseComponent.extend({
+    const DeactivateFormWidgetComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -26,8 +25,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DeactivateFormWidgetComponent() {
-            DeactivateFormWidgetComponent.__super__.constructor.apply(this, arguments);
+        constructor: function DeactivateFormWidgetComponent(options) {
+            DeactivateFormWidgetComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -36,7 +35,7 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            var self = this;
+            const self = this;
 
             widgetManager.getWidgetInstance(
                 this.options._wid,
@@ -53,7 +52,7 @@ define(function(require) {
                         mediator.trigger('widget_success:' + widget.getAlias());
                         mediator.trigger('widget_success:' + widget.getWid());
 
-                        var response = {message: __('oro.workflow.activated')};
+                        let response = {message: __('oro.workflow.activated')};
 
                         if (!_.isEmpty(self.options.deactivated)) {
                             response = _.extend(response, {

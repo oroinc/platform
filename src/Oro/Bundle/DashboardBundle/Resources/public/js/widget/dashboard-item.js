@@ -5,19 +5,18 @@ define([
     'oroui/js/mediator',
     'oro/block-widget',
     'oroui/js/delete-confirmation',
-    'tpl!orodashboard/templates/widget/dashboard-item.html'
+    'tpl-loader!orodashboard/templates/widget/dashboard-item.html'
 ], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation, dashboardItemTpl) {
     'use strict';
 
-    var DashboardItemWidget;
-    var $ = Backbone.$;
+    const $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
      * @class   orodashboard.DashboardItemWidget
      * @extends oro.BlockWidget
      */
-    DashboardItemWidget = BlockWidget.extend({
+    const DashboardItemWidget = BlockWidget.extend({
         /**
          * Widget events
          *
@@ -69,8 +68,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function DashboardItemWidget() {
-            DashboardItemWidget.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardItemWidget(options) {
+            DashboardItemWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -91,7 +90,7 @@ define([
                 this.options.title = this.$el.data('widget-title');
             }
 
-            DashboardItemWidget.__super__.initialize.apply(this, arguments);
+            DashboardItemWidget.__super__.initialize.call(this, options);
         },
 
         /**
@@ -115,12 +114,12 @@ define([
          */
         initializeWidget: function(options) {
             this._initState(options);
-            DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
+            DashboardItemWidget.__super__.initializeWidget.call(this, options);
         },
 
         _afterLayoutInit: function() {
             this.$el.removeClass('invisible');
-            DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
+            DashboardItemWidget.__super__._afterLayoutInit.call(this);
         },
 
         /**
@@ -179,7 +178,7 @@ define([
             }
 
             this.state.expanded = false;
-            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            const collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
             collapseControl.attr('title', collapseControl.data('collapsed-title')).toggleClass('collapsed');
 
             if (isInit) {
@@ -188,7 +187,7 @@ define([
             } else {
                 this.trigger('collapse', this.$el, this);
                 mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
-                var self = this;
+                const self = this;
                 this.widgetContentContainer.slideUp({
                     complete: function() {
                         self.widget.addClass('collapsed');
@@ -216,8 +215,8 @@ define([
 
             this.state.expanded = true;
 
-            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
-            var $chart = this.$el.find('.chart');
+            const collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            const $chart = this.$el.find('.chart');
             collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
 
             this.widget.removeClass('collapsed');
@@ -246,8 +245,8 @@ define([
          * Trigger remove action
          */
         onRemoveFromDashboard: function() {
-            var that = this;
-            var confirm = new DeleteConfirmation({
+            const that = this;
+            const confirm = new DeleteConfirmation({
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
 
@@ -273,13 +272,13 @@ define([
          * @private
          */
         _onContentLoad: function(content) {
-            var title = $(content).data('widget-title');
+            const title = $(content).data('widget-title');
 
             if (title) {
                 this.setTitle(title);
             }
 
-            DashboardItemWidget.__super__._onContentLoad.apply(this, arguments);
+            DashboardItemWidget.__super__._onContentLoad.call(this, content);
         }
     });
 

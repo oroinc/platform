@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var WysiwygDialogView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WysiwygDialogView = BaseView.extend({
+    const WysiwygDialogView = BaseView.extend({
         autoRender: true,
 
         // PLEASE don't make this value less than 180px - IE will display editor with bugs
         // (to adjust need to also change tinymce iframe stylesheet body{min-height:100px} style,
-        // see Oro\Bundle\FormBundle\Resources\public\css\wysiwyg-editor.css)
+        // see Oro\Bundle\FormBundle\Resources\public\css\scss\tinymce\wysiwyg-editor.scss)
         minimalWysiwygEditorHeight: 180,
 
         /**
@@ -27,8 +26,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WysiwygDialogView() {
-            WysiwygDialogView.__super__.constructor.apply(this, arguments);
+        constructor: function WysiwygDialogView(options) {
+            WysiwygDialogView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -36,7 +35,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['minimalWysiwygEditorHeight', 'editorComponentName']));
-            WysiwygDialogView.__super__.initialize.apply(this, arguments);
+            WysiwygDialogView.__super__.initialize.call(this, options);
         },
 
         render: function() {
@@ -59,18 +58,18 @@ define(function(require) {
         },
 
         calcWysiwygHeight: function() {
-            var content = this.getDialogContainer();
-            var widgetContent = this.$el.closest('.widget-content')[0] || content.children().first().get(0);
-            var editorHeight = this.getEditorView().getHeight();
-            var style = getComputedStyle(content[0]);
-            var availableHeight = editorHeight +
+            const content = this.getDialogContainer();
+            const widgetContent = this.$el.closest('.widget-content')[0] || content.children().first().get(0);
+            const editorHeight = this.getEditorView().getHeight();
+            const style = getComputedStyle(content[0]);
+            const availableHeight = editorHeight +
                 content[0].offsetHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) +
                 -widgetContent.offsetHeight;
             return Math.floor(Math.max(availableHeight, this.minimalWysiwygEditorHeight));
         },
 
         getEditorView: function() {
-            var editor = this.pageComponent(this.editorComponentName);
+            const editor = this.pageComponent(this.editorComponentName);
             if (!editor) {
                 throw new Error('Could not find message editor');
             }

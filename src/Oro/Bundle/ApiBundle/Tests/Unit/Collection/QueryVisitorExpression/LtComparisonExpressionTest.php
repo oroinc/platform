@@ -36,7 +36,7 @@ class LtComparisonExpressionTest extends \PHPUnit\Framework\TestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, 'integer')],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }

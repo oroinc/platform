@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var FunctionChoiceView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var optionTemplate = require('tpl!oroquerydesigner/templates/function-choice.html');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const optionTemplate = require('tpl-loader!oroquerydesigner/templates/function-choice.html');
 
-    FunctionChoiceView = BaseView.extend({
+    const FunctionChoiceView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'converters', 'aggregates'
         ]),
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FunctionChoiceView() {
-            FunctionChoiceView.__super__.constructor.apply(this, arguments);
+        constructor: function FunctionChoiceView(options) {
+            FunctionChoiceView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -35,10 +34,10 @@ define(function(require) {
          * @param {boolean} [convertersOnly=false]
          */
         setActiveFunctions: function(criteria, convertersOnly) {
-            var foundGroups = [];
-            var foundGroupKey = null;
-            var content = '';
-            var functions = [];
+            const foundGroups = [];
+            let foundGroupKey = null;
+            let content = '';
+            const functions = [];
 
             _.each(this.converters, function(item, name) {
                 if (this._matchApplicable(item.applicable, criteria)) {
@@ -66,7 +65,7 @@ define(function(require) {
 
                 _.each(foundGroups, function(foundGroup) {
                     _.each(this[foundGroup.group_type][foundGroup.group_name].functions, function(func) {
-                        var existingFuncIndex = -1;
+                        let existingFuncIndex = -1;
 
                         _.any(functions, function(val, index) {
                             if (val.name === func.name) {
@@ -78,8 +77,8 @@ define(function(require) {
 
                         if (existingFuncIndex !== -1) {
                             // override existing function and use its labels if needed
-                            var existingLabel = functions[existingFuncIndex].label;
-                            var existingTitle = functions[existingFuncIndex].title;
+                            const existingLabel = functions[existingFuncIndex].label;
+                            const existingTitle = functions[existingFuncIndex].title;
                             functions[existingFuncIndex] = _.extend({}, foundGroup, func);
                             if (_.isNull(functions[existingFuncIndex].label)) {
                                 functions[existingFuncIndex].label = existingLabel;
@@ -123,7 +122,7 @@ define(function(require) {
 
         _disable: function(flag) {
             this.$el.prop('disabled', flag).inputWidget('refresh');
-            var $widgetContainer = this.$el.inputWidget('getContainer');
+            const $widgetContainer = this.$el.inputWidget('getContainer');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
             }

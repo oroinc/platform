@@ -1,14 +1,22 @@
 services:
-    oro_workflow.entity_manager_clearer_stub:
+    oro_workflow.tests.entity_manager_clearer_stub:
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\EntityManagerClearerStub
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine'
 
     oro_workflow.test_activity_scope_provider:
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         tags:
             - { name: oro_scope.provider, scopeType: workflow_definition, priority: -255 }
+
+    oro_workflow.tests.notification_manager:
+        decorates: oro_notification.manager
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\NotificationManager
+        parent: oro_notification.manager
+
+    oro_workflow.tests.notification_email_handler:
+        decorates: oro_notification.email_handler
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\EmailNotificationHandler
+        parent: oro_notification.email_handler

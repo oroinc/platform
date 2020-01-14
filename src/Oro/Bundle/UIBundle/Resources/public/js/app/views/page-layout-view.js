@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var PageLayoutView;
-    var $ = require('jquery');
-    var tools = require('oroui/js/tools');
-    var Chaplin = require('chaplin');
-    var mediator = require('oroui/js/mediator');
-    var formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
-    var utils = Chaplin.utils;
+    const $ = require('jquery');
+    const tools = require('oroui/js/tools');
+    const Chaplin = require('chaplin');
+    const mediator = require('oroui/js/mediator');
+    const formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
+    const utils = Chaplin.utils;
 
-    PageLayoutView = Chaplin.Layout.extend({
+    const PageLayoutView = Chaplin.Layout.extend({
         events: {
             'submit form': 'onSubmit',
             'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PageLayoutView() {
-            PageLayoutView.__super__.constructor.apply(this, arguments);
+        constructor: function PageLayoutView(options) {
+            PageLayoutView.__super__.constructor.call(this, options);
 
             if (!this.settings.routeLinks) {
                 // in case route links is turned of -- prevent navigation on empty hash
@@ -51,7 +50,7 @@ define(function(require) {
          * @override
          */
         adjustTitle: function(subtitle, raw) {
-            var title;
+            let title;
             if (!raw) {
                 if (!subtitle) {
                     subtitle = '';
@@ -73,12 +72,12 @@ define(function(require) {
          * @override
          */
         registerGlobalRegions: function(instance) {
-            var name;
-            var selector;
-            var version;
-            var _i;
-            var _len;
-            var _ref = utils.getAllPropertyVersions(instance, 'regions');
+            let name;
+            let selector;
+            let version;
+            let _i;
+            let _len;
+            const _ref = utils.getAllPropertyVersions(instance, 'regions');
 
             if (instance.hasOwnProperty('regions')) {
                 _ref.push(instance.regions);
@@ -105,9 +104,9 @@ define(function(require) {
          * @override
          */
         openLink: function(event) {
-            var href;
-            var el = event.currentTarget;
-            var $el = $(el);
+            let href;
+            const el = event.currentTarget;
+            const $el = $(el);
 
             if (
                 utils.modifierKeyPressed(event) ||
@@ -137,7 +136,7 @@ define(function(require) {
                 !Chaplin.mediator.execute('compareUrl', href) &&
                 href.substr(0, 11) !== 'javascript:'
             ) {
-                var payload = {prevented: false, target: el};
+                const payload = {prevented: false, target: el};
                 Chaplin.mediator.publish('openLink:before', payload);
                 if (payload.prevented !== false) {
                     event.preventDefault();
@@ -149,7 +148,7 @@ define(function(require) {
             if (!(href !== null && href !== void 0) || href === '' || href.charAt(0) === '#') {
                 return;
             }
-            var skipRouting = this.settings.skipRouting;
+            const skipRouting = this.settings.skipRouting;
             switch (typeof skipRouting) {
                 case 'function':
                     if (!skipRouting(href, el)) {
@@ -170,7 +169,7 @@ define(function(require) {
             }
 
             // now it's possible to pass redirect options over elements data-options attribute
-            var options = $el.data('options') || {};
+            const options = $el.data('options') || {};
             utils.redirectTo({url: href}, options);
             event.preventDefault();
         },
@@ -184,14 +183,14 @@ define(function(require) {
         },
 
         onSubmit: function(event) {
-            var data;
-            var options;
+            let data;
+            let options;
 
             if (event.isDefaultPrevented()) {
                 return;
             }
 
-            var $form = $(event.target);
+            const $form = $(event.target);
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
                 return;
@@ -203,8 +202,8 @@ define(function(require) {
 
             $form.data('sent', true);
 
-            var url = $form.attr('action');
-            var method = $form.attr('method') || 'GET';
+            let url = $form.attr('action');
+            const method = $form.attr('method') || 'GET';
 
             if (url && url.indexOf('#') === 0) {
                 return;

@@ -1,30 +1,12 @@
-parameters:
-    oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
-    oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
-    oro_tag.tag.form.handler.tag.class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
-
-    oro_tag.form.type.tag_select.class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
-    oro_tag.form.type.taxonomy_select.class: Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType
-
-    oro_tag.form.subscriber.tag_select.class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
-    oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
-
-    oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-
-    oro_tag.tag.form.type.taxonomy.class: Oro\Bundle\TagBundle\Form\Type\TaxonomyType
-    oro_tag.tag.form.handler.taxonomy.class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
-
 services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType]
 
     oro_tag.form.handler.tag:
-        class: '%oro_tag.tag.form.handler.tag.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
         public: true
         arguments:
             - '@oro_tag.form.tag'
@@ -32,12 +14,12 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.tag:
-        class: '%oro_tag.tag.form.type.tag.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagType
         tags:
             - { name: form.type, alias: oro_tag_tag }
 
     oro_tag.form.type.tag_select:
-        class: '%oro_tag.form.type.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
         arguments:
             - '@security.authorization_checker'
             - '@oro_tag.form.transformer.tag_select'
@@ -46,13 +28,13 @@ services:
             - { name: form.type, alias: oro_tag_select }
 
     oro_tag.form.subscriber.tag_select:
-        class: '%oro_tag.form.subscriber.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
         arguments:
             - '@oro_tag.tag.manager'
             - '@oro_tag.helper.taggable_helper'
 
     oro_tag.form.transformer.tag_select:
-        class: '%oro_tag.form.transformer.tag_select.class%'
+        class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
         arguments:  ['@oro_tag.tag.manager']
 
     # Entity configuration choice
@@ -77,20 +59,18 @@ services:
 
     # API
     oro_tag.form.type.tag.api:
-        class: '%oro_tag.tag.form.type.tag.api.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TagApiType
         tags:
             - { name: form.type, alias: oro_tag_tag }
 
     oro_tag.form.tag.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType, null]
 
     oro_tag.form.handler.api:
-        class: '%oro_tag.tag.form.handler.tag.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
         public: true
         arguments:
             - '@oro_tag.form.type.tag.api'
@@ -99,7 +79,6 @@ services:
 
     oro_tag.form.handler.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_tag.form.taggable.api'
@@ -132,14 +111,12 @@ services:
 
     oro_tag.form.taxonomy:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_taxonomy_form", Oro\Bundle\TagBundle\Form\Type\TaxonomyType]
 
     oro_tag.form.handler.taxonomy:
-        class: '%oro_tag.tag.form.handler.taxonomy.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
         public: true
         arguments:
             - '@oro_tag.form.taxonomy'
@@ -147,12 +124,12 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.taxonomy:
-        class: '%oro_tag.tag.form.type.taxonomy.class%'
+        class: Oro\Bundle\TagBundle\Form\Type\TaxonomyType
         tags:
             - { name: form.type, alias: oro_tag_taxonomy }
 
     oro_tag.form.type.taxonomy_select:
-       class: '%oro_tag.form.type.taxonomy_select.class%'
+       class: Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType
        tags:
            - { name: form.type, alias: oro_taxonomy_select }
 

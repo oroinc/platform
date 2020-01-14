@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var TransitionHandler = require('oroworkflow/js/transition-handler');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const TransitionHandler = require('oroworkflow/js/transition-handler');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
 
-    var ButtonComponent = BaseComponent.extend({
+    const ButtonComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -23,15 +23,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ButtonComponent() {
-            ButtonComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ButtonComponent(options) {
+            ButtonComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            ButtonComponent.__super__.initialize.apply(this, arguments);
+            ButtonComponent.__super__.initialize.call(this, options);
 
             this.options = options || {};
 
@@ -44,7 +44,7 @@ define(function(require) {
          * @private
          */
         _processButton: function() {
-            var self = this;
+            const self = this;
             if (this.$button.data('enabled')) {
                 if (this.options.displayType === 'dialog') {
                     this.$button.data('executor', function() {

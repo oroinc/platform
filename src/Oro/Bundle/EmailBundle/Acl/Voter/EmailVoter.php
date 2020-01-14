@@ -9,8 +9,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -18,7 +16,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 /**
  * Security voter that prevents finding available mailboxes
  */
-class EmailVoter implements VoterInterface, ServiceSubscriberInterface
+class EmailVoter implements VoterInterface
 {
     /**
      * If you want to change content of this array, please pay attention to classes
@@ -31,17 +29,20 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
         EmailAttachment::class,
     ];
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
+    /** @var MailboxManager */
+    private $mailboxManager;
 
     /**
-     * @param ContainerInterface $container
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param MailboxManager                $mailboxManager
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker, MailboxManager $mailboxManager)
     {
-        $this->container = $container;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -73,7 +74,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$object || !is_object($object)) {
+        if (!is_object($object)) {
             return self::ACCESS_ABSTAIN;
         }
 
@@ -94,14 +95,13 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
         $emailUsers = $object->getEmailUsers();
         foreach ($attributes as $attribute) {
             foreach ($emailUsers as $emailUser) {
-                if ($this->container->get(AuthorizationCheckerInterface::class)->isGranted($attribute, $emailUser)) {
+                if ($this->authorizationChecker->isGranted($attribute, $emailUser)) {
                     return self::ACCESS_GRANTED;
                 }
 
                 $mailbox = $emailUser->getMailboxOwner();
                 if ($mailbox !== null && $token instanceof UsernamePasswordOrganizationToken) {
-                    $manager = $this->container->get(MailboxManager::class);
-                    $mailboxes = $manager->findAvailableMailboxes(
+                    $mailboxes = $this->mailboxManager->findAvailableMailboxes(
                         $token->getUser(),
                         $token->getOrganization()
                     );
@@ -132,16 +132,5 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
         }
 
         return $object;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return [
-            AuthorizationCheckerInterface::class,
-            MailboxManager::class,
-        ];
     }
 }

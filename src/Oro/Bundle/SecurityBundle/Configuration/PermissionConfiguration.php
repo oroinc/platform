@@ -18,8 +18,8 @@ class PermissionConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-        $rootNode = $builder->root(self::ROOT_NODE);
+        $builder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $builder->getRootNode();
 
         $rootNode->useAttributeAsKey('name')
             ->beforeNormalization()
@@ -68,6 +68,10 @@ class PermissionConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                     ->arrayNode('exclude_entities')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
+                    ->arrayNode('apply_to_interfaces')
                         ->prototype('scalar')
                         ->end()
                     ->end()

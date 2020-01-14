@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerModal;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
-    var widgetPickerModalTemplate = require('tpl!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
+    const widgetPickerModalTemplate = require('tpl-loader!oroui/templates/widget-picker/widget-picker-modal-template.html');
 
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
-    var WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
+    const WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
 
-    WidgetPickerModal = Modal.extend({
+    const WidgetPickerModal = Modal.extend({
         className: 'modal oro-modal-normal widget-picker__modal  modal--fullscreen-small-device',
 
         defaultOptions: {
@@ -35,8 +34,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetPickerModal() {
-            WidgetPickerModal.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerModal(options) {
+            WidgetPickerModal.__super__.constructor.call(this, options);
         },
 
         /**
@@ -52,10 +51,10 @@ define(function(require) {
          * @inheritDoc
          */
         open: function(cb) {
-            WidgetPickerModal.__super__.open.apply(this, arguments);
+            WidgetPickerModal.__super__.open.call(this, cb);
 
             if (!this.component) {
-                var widgetPickerCollection = new BaseCollection(
+                const widgetPickerCollection = new BaseCollection(
                     this.options.dashboard.getAvailableWidgets(),
                     {model: WidgetPickerModel}
                 );

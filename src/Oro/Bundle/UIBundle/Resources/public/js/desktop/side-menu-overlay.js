@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var SideMenuOverlayView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroui/templates/side-menu-overlay.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroui/templates/side-menu-overlay.html');
 
-    var ESCAPE_KEY_CODE = 27;
+    const ESCAPE_KEY_CODE = 27;
 
-    SideMenuOverlayView = BaseView.extend({
+    const SideMenuOverlayView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -47,9 +46,9 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SideMenuOverlayView() {
+        constructor: function SideMenuOverlayView(options) {
             this.onSearch = _.debounce(this.onSearch, this.timeout);
-            SideMenuOverlayView.__super__.constructor.apply(this, arguments);
+            SideMenuOverlayView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -100,7 +99,7 @@ define(function(require) {
         updateContent: function($menu) {
             this.searchContent = $menu.children().filter(':not(.divider)');
 
-            var $menuItem = $('<li/>', {
+            const $menuItem = $('<li/>', {
                 'class': 'menu-item ui-helper'
             }).append(this.$('[data-role="overlay-design-helper"]'));
 
@@ -135,8 +134,8 @@ define(function(require) {
                 return;
             }
 
-            var $title = this.$('[data-role="overlay-title"]');
-            var $last = this.searchContent.filter(':visible').last();
+            const $title = this.$('[data-role="overlay-title"]');
+            const $last = this.searchContent.filter(':visible').last();
 
             if (undoComputedWidth || $last.length === 0 || $last.position().left === 0) {
                 $title.css('width', '');
@@ -196,7 +195,7 @@ define(function(require) {
                 return;
             }
 
-            var value = $(event.target).val();
+            const value = $(event.target).val();
 
             if (event.keyCode === ESCAPE_KEY_CODE) {
                 if (value.length !== 0) {
@@ -226,8 +225,8 @@ define(function(require) {
 
         clearSearchContent: function() {
             $.each(this.searchContent, function() {
-                var $this = $(this);
-                var $title = $this.find('.title');
+                const $this = $(this);
+                const $title = $this.find('.title');
 
                 $title.html($this.data('original-text'));
                 $this.show();
@@ -238,17 +237,17 @@ define(function(require) {
          * @param {String} value
          */
         search: function(value) {
-            var regex = tools.safeRegExp(value, 'ig');
-            var highlight = '<span class="highlight">$&</span>';
-            var testValue = function(string) {
+            const regex = tools.safeRegExp(value, 'ig');
+            const highlight = '<span class="highlight">$&</span>';
+            const testValue = function(string) {
                 return regex.test(string);
             };
 
             this.searchContent.hide();
 
             $.each(this.searchContent, function() {
-                var $this = $(this);
-                var $title = $this.find('.title');
+                const $this = $(this);
+                const $title = $this.find('.title');
 
                 if (testValue($this.text().trim())) {
                     $title.html(
@@ -257,7 +256,7 @@ define(function(require) {
 
                     $this.show();
 
-                    var groups = $this.data('related-groups');
+                    let groups = $this.data('related-groups');
                     if (groups) {
                         groups = groups.split(';');
 

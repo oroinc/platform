@@ -15,12 +15,9 @@ separate tables for `text`, `datetime`, `decimal` and `integer` value, and anoth
 Table that stores text data has `fulltext` index.
 
 ```yml
-parameters:
-    oro_search.engine.class: Oro\Bundle\SearchBundle\Engine\Orm
-
 services:
     oro_search.search.engine:
-        class: %oro_search.engine.class%
+        class: Oro\Bundle\SearchBundle\Engine\Orm
         arguments:
             - @doctrine
             - @oro_entity.doctrine_helper

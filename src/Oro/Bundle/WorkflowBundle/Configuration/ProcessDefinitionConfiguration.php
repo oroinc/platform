@@ -24,8 +24,8 @@ class ProcessDefinitionConfiguration extends AbstractConfiguration implements Co
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('configuration');
+        $treeBuilder = new TreeBuilder('configuration');
+        $rootNode = $treeBuilder->getRootNode();
         $this->addDefinitionNodes($rootNode);
 
         return $treeBuilder;

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ActionHeaderCell;
-    var Backgrid = require('backgrid');
-    var ActionsPanel = require('../actions-panel');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!orodatagrid/templates/datagrid/action-header-cell.html');
+    const Backgrid = require('backgrid');
+    const ActionsPanel = require('../actions-panel');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/action-header-cell.html');
 
     /**
      *
@@ -14,7 +13,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.headerCell.ActionHeaderCell
      * @extends oroui/js/app/views/base/view
      */
-    ActionHeaderCell = BaseView.extend({
+    const ActionHeaderCell = BaseView.extend({
         keepElement: false,
         /** @property */
         className: 'action-column renderable',
@@ -36,12 +35,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionHeaderCell() {
-            ActionHeaderCell.__super__.constructor.apply(this, arguments);
+        constructor: function ActionHeaderCell(options) {
+            ActionHeaderCell.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            ActionHeaderCell.__super__.initialize.apply(this, arguments);
+            ActionHeaderCell.__super__.initialize.call(this, options);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
@@ -50,7 +49,7 @@ define(function(require) {
 
             this.createActionsPanel();
 
-            var datagrid = this.column.get('datagrid');
+            const datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
             this.listenTo(datagrid.massActions, 'reset', this.rebuildAndRender);
@@ -64,16 +63,16 @@ define(function(require) {
                 return;
             }
             delete this.column;
-            ActionHeaderCell.__super__.dispose.apply(this, arguments);
+            ActionHeaderCell.__super__.dispose.call(this);
             delete this.actionsPanel;
         },
 
         createActionsPanel: function() {
-            var actions = [];
-            var datagrid = this.column.get('datagrid');
+            const actions = [];
+            const datagrid = this.column.get('datagrid');
 
             this.column.get('massActions').each(function(Action) {
-                var ActionModule = Action.get('module');
+                const ActionModule = Action.get('module');
 
                 actions.push(
                     new ActionModule({
@@ -86,7 +85,7 @@ define(function(require) {
         },
 
         render: function() {
-            var panel = this.subview('actionsPanel');
+            const panel = this.subview('actionsPanel');
             this.$el.empty();
             if (panel.haveActions()) {
                 this.$el.append(this.getTemplateFunction()(this.getTemplateData()));

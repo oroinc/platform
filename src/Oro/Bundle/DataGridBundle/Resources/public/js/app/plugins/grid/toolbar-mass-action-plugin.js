@@ -1,14 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ToolbarMassActionPlugin;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var ShowComponentAction = require('oro/datagrid/action/show-component-action');
-    var ToolbarMassActionComponent = require('orodatagrid/js/app/components/toolbar-mass-action-component');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const ShowComponentAction = require('oro/datagrid/action/show-component-action');
+    const ToolbarMassActionComponent = require('orodatagrid/js/app/components/toolbar-mass-action-component');
 
-    var config = require('module').config();
+    let config = require('module-config').default(module.id);
     config = _.extend({
         icon: 'ellipsis-h',
         wrapperClassName: 'toolbar-mass-actions',
@@ -16,14 +15,14 @@ define(function(require) {
         attributes: {'data-placement': 'bottom-end'}
     }, config);
 
-    ToolbarMassActionPlugin = BasePlugin.extend({
+    const ToolbarMassActionPlugin = BasePlugin.extend({
         enable: function() {
             this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
             ToolbarMassActionPlugin.__super__.enable.call(this);
         },
 
         onBeforeToolbarInit: function(toolbarOptions) {
-            var options = {
+            const options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
                     componentConstructor: ToolbarMassActionComponent,

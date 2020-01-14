@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var FiltersStateView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var ANIMATED_INIT_CLASS = 'animated-init';
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const ANIMATED_INIT_CLASS = 'animated-init';
 
-    FiltersStateView = BaseView.extend({
+    const FiltersStateView = BaseView.extend({
         POPOVER_DELAY: 300,
 
         filters: [],
 
-        template: require('tpl!../../../templates/filters-state-view.html'),
+        template: require('tpl-loader!orofilter/templates/filters-state-view.html'),
 
-        popoverTemplate: require('tpl!../../../templates/filters-state-popover.html'),
+        popoverTemplate: require('tpl-loader!orofilter/templates/filters-state-popover.html'),
 
         events: {
             'click .filters-state': 'onClick',
@@ -24,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FiltersStateView() {
-            FiltersStateView.__super__.constructor.apply(this, arguments);
+        constructor: function FiltersStateView(options) {
+            FiltersStateView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -39,11 +38,11 @@ define(function(require) {
                 this.$el.addClass(ANIMATED_INIT_CLASS);
             }
 
-            FiltersStateView.__super__.initialize.apply(this, arguments);
+            FiltersStateView.__super__.initialize.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = FiltersStateView.__super__.getTemplateData.apply(this, arguments);
+            const data = FiltersStateView.__super__.getTemplateData.call(this);
             data.filters = [];
             _.each(this.filters, function(filter) {
                 if (!filter.isEmptyValue()) {
@@ -60,7 +59,7 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            FiltersStateView.__super__.render.apply(this, arguments);
+            FiltersStateView.__super__.render.call(this);
 
             if (_.isEmpty(this.filters)) {
                 this.$el.hide();
@@ -78,7 +77,7 @@ define(function(require) {
         },
 
         onMouseEnter: function(e) {
-            var $filtersState = this.$('.filters-state');
+            const $filtersState = this.$('.filters-state');
             if ($filtersState[0].scrollWidth > $filtersState[0].clientWidth) {
                 $filtersState.popover({
                     content: $filtersState.text(),
@@ -100,7 +99,7 @@ define(function(require) {
                 clearTimeout(this.popoverDelay);
                 delete this.popoverDelay;
             }
-            var $filtersState = this.$('.filters-state');
+            const $filtersState = this.$('.filters-state');
             $filtersState.popover('hide');
             $filtersState.popover('dispose');
         },

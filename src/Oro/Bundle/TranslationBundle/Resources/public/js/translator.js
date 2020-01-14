@@ -1,19 +1,18 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var _ = require('underscore');
-    var Translator = require('translator');
-    var module = require('module');
+    const _ = require('underscore');
+    const Translator = require('orotranslation/lib/translator');
+    const config = require('module-config').default(module.id);
 
     window.Translator = Translator; // add global variable for translations JSONP-loader Translator.fromJSON({...})
 
-    var dict = {};
-    var debug = false;
-    var add = Translator.add;
-    var trans = Translator.trans;
-    var transChoice = Translator.transChoice;
-    var fromJSON = Translator.fromJSON;
-    var config = module.config();
+    const dict = {};
+    let debug = false;
+    const add = Translator.add;
+    const trans = Translator.trans;
+    const transChoice = Translator.transChoice;
+    const fromJSON = Translator.fromJSON;
 
     Translator.placeHolderPrefix = '{{ ';
     Translator.placeHolderSuffix = ' }}';
@@ -24,9 +23,9 @@ define(function(require) {
      *
      * @param {string} id
      */
-    Translator.add = function(id) {
+    Translator.add = function(id, ...rest) {
         dict[id] = 1;
-        add.apply(Translator, arguments);
+        add.call(Translator, id, ...rest);
     };
 
     /**
@@ -44,14 +43,14 @@ define(function(require) {
         if (typeof placeholders !== 'undefined') {
             placeholders = _.clone(placeholders);
         }
-        var string;
+        let string;
         if (typeof number === 'undefined') {
             string = trans.call(Translator, id, placeholders);
         } else {
             string = transChoice.call(Translator, id, number, placeholders);
         }
 
-        var hasTranslation = checkTranslation(id);
+        const hasTranslation = checkTranslation(id);
 
         if (!config.debugTranslator) {
             return string;
@@ -97,8 +96,8 @@ define(function(require) {
         if (!debug) {
             return true;
         }
-        var domains = Translator.defaultDomains;
-        var checker = function(domain) {
+        let domains = Translator.defaultDomains;
+        const checker = function(domain) {
             return dict.hasOwnProperty(domain ? domain + ':' + id : id);
         };
         domains = _.union([undefined], _.isArray(domains) ? domains : [domains]);

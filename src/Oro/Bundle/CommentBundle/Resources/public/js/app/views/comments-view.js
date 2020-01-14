@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var CommentsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var CommentsHeaderView = require('orocomment/js/app/views/comments-header-view');
-    var CommentsNoDataView = require('orocomment/js/app/views/comments-no-data-view');
-    var CommentItemView = require('orocomment/js/app/views/comment-item-view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var template = require('text!orocomment/templates/comment/comments-view.html');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const CommentsHeaderView = require('orocomment/js/app/views/comments-header-view');
+    const CommentsNoDataView = require('orocomment/js/app/views/comments-no-data-view');
+    const CommentItemView = require('orocomment/js/app/views/comment-item-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const template = require('text-loader!orocomment/templates/comment/comments-view.html');
 
-    CommentsView = BaseView.extend({
+    const CommentsView = BaseView.extend({
         template: template,
         events: {
             'click .add-comment-button': 'onAddCommentClick',
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentsView() {
-            CommentsView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentsView(options) {
+            CommentsView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,17 +29,17 @@ define(function(require) {
          */
         initialize: function(options) {
             this.canCreate = options.canCreate;
-            CommentsView.__super__.initialize.apply(this, arguments);
+            CommentsView.__super__.initialize.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = CommentsView.__super__.getTemplateData.apply(this, arguments);
+            const data = CommentsView.__super__.getTemplateData.call(this);
             data.canCreate = this.canCreate;
             return data;
         },
 
         render: function() {
-            CommentsView.__super__.render.apply(this, arguments);
+            CommentsView.__super__.render.call(this);
             this.subview('header', new CommentsHeaderView({
                 el: this.$('.comments-view-header'),
                 collection: this.collection,

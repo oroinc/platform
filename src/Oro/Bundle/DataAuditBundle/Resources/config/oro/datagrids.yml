@@ -36,7 +36,6 @@ datagrids:
                 callable: "@oro_dataaudit.datagrid.entity_type_provider->getEntityType"
             objectId:
                 label: oro.dataaudit.datagrid.entity_id
-                frontend_type: integer
             objectName:
                 label: oro.dataaudit.datagrid.entity_name
             data:
@@ -73,7 +72,7 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                id: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                id: DESC
         filters:
             columns:
                 action:
@@ -96,7 +95,7 @@ datagrids:
                           field_options:
                               choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
                 objectId:
-                    type: number-range
+                    type: string
                     data_name: a.objectId
                 objectName:
                     type: string
@@ -162,5 +161,5 @@ datagrids:
                 loggedAt:
                     data_name: a.loggedAt
             default:
-                id: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                id: DESC
         filters: ~

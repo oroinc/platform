@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var MultiCheckboxView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    MultiCheckboxView = BaseView.extend({
+    const MultiCheckboxView = BaseView.extend({
         defaults: {
             selectAttrs: {},
             value: [],
             items: null
         },
 
-        template: require('tpl!oroform/templates/multi-checkbox-view.html'),
+        template: require('tpl-loader!oroform/templates/multi-checkbox-view.html'),
 
         events: {
             'change input[type=checkbox]': 'onCheckboxToggle'
@@ -22,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MultiCheckboxView() {
-            MultiCheckboxView.__super__.constructor.apply(this, arguments);
+        constructor: function MultiCheckboxView(options) {
+            MultiCheckboxView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -32,14 +31,14 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = {};
+            const opts = {};
             $.extend(true, opts, this.defaults, options);
             _.extend(this, _.pick(opts, 'items', 'value', 'selectAttrs'));
-            MultiCheckboxView.__super__.initialize.apply(this, arguments);
+            MultiCheckboxView.__super__.initialize.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = MultiCheckboxView.__super__.getTemplateData.apply(this, arguments);
+            const data = MultiCheckboxView.__super__.getTemplateData.call(this);
             data.name = this.selectAttrs.name || _.uniqueId('multi-checkbox');
             data.values = this.value;
             data.options = this.items;
@@ -53,7 +52,7 @@ define(function(require) {
         },
 
         onCheckboxToggle: function(e) {
-            var values = this.getValue();
+            let values = this.getValue();
             if (e.target.checked && _.indexOf(values, e.target.value) === -1) {
                 values.push(e.target.value);
             } else if (!e.target.checked && _.indexOf(values, e.target.value) !== -1) {
@@ -71,7 +70,7 @@ define(function(require) {
         },
 
         setValue: function(values) {
-            var oldValue = this.getValue();
+            const oldValue = this.getValue();
             if (!_.haveEqualSet(oldValue, values)) {
                 this.value = values;
                 this.getSelectElement().val(values).trigger('change');

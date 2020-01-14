@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var CapabilityItemView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @export orouser/js/views/role-view
      */
-    CapabilityItemView = BaseView.extend({
+    const CapabilityItemView = BaseView.extend({
         className: 'role-capability__item',
 
-        template: require('tpl!orouser/templates/role/capability-item.html'),
+        template: require('tpl-loader!orouser/templates/role/capability-item.html'),
 
         autoRender: true,
 
@@ -25,8 +24,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CapabilityItemView() {
-            CapabilityItemView.__super__.constructor.apply(this, arguments);
+        constructor: function CapabilityItemView(options) {
+            CapabilityItemView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -35,7 +34,7 @@ define(function(require) {
         render: function() {
             CapabilityItemView.__super__.render.call(this);
 
-            var $input = this.$('input');
+            const $input = this.$('input');
 
             $input.inputWidget('isInitialized')
                 ? $input.inputWidget('refresh')
@@ -46,7 +45,7 @@ define(function(require) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = CapabilityItemView.__super__.getTemplateData.call(this);
+            const data = CapabilityItemView.__super__.getTemplateData.call(this);
             data.isAccessLevelChanged = this.model.isAccessLevelChanged();
             return data;
         },
@@ -55,7 +54,7 @@ define(function(require) {
          * @param e
          */
         onChange: function(e) {
-            var value = this.model.get(e.currentTarget.checked ? 'selected_access_level' : 'unselected_access_level');
+            const value = this.model.get(e.currentTarget.checked ? 'selected_access_level' : 'unselected_access_level');
             this.model.set('access_level', value);
         }
     });

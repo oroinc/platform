@@ -47,18 +47,16 @@ layout:
                     blockType: container
                 page_content:
                     blockType: container
-                require_js:
+                layout_js:
                     blockType: container
-                requirejs_scripts:
-                    blockType: requires
+                layout_js_modules_config:
+                    blockType: js_modules_config
                     options:
-                        provider_alias: oro_layout_requirejs_config_provider
-                require_modules:
-                    blockType: container
-                app_script:
-                    blockType: script
+                        publicPath: '="layout-build/" ~ context["theme"] ~ "/"'
+                layout_js_build_scripts:
+                    blockType: js_build
                     options:
-                        content: 'require(["oroui/js/app"]);'
+                        src: '="layout-build/" ~ context["theme"] ~ "/app.js"'
             tree:
                 root:
                     head:
@@ -75,7 +73,6 @@ layout:
                                         page_main_header: ~
                                         page_sidebar: ~
                                         page_content: ~
-                        require_js:
-                            requirejs_scripts: ~
-                        require_modules:
-                            app_script: ~
+                        layout_js:
+                            layout_js_modules_config: ~
+                            layout_js_build_scripts: ~

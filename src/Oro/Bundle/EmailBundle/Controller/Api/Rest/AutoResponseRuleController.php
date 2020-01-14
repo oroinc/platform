@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use BadMethodCallException;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -11,6 +12,8 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for AutoResponseRule entity.
+ *
  * @RouteResource("autoresponserule")
  * @NamePrefix("oro_api_")
  */
@@ -18,6 +21,8 @@ class AutoResponseRuleController extends RestController
 {
     /**
      * @param int $id
+     *
+     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete Autoresponse Rule",
@@ -31,7 +36,7 @@ class AutoResponseRuleController extends RestController
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

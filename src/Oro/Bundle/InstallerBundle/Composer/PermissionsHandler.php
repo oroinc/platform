@@ -19,19 +19,6 @@ class PermissionsHandler
     const VAR_GROUP = '{group}';
 
     /**
-     * @var Process
-     */
-    protected $process;
-
-    /**
-     * @param Process $process
-     */
-    public function setProcess(Process $process)
-    {
-        $this->process = $process;
-    }
-
-    /**
      * @param string $directory
      * @return bool
      */
@@ -105,16 +92,21 @@ class PermissionsHandler
      */
     protected function runProcess($commandline)
     {
-        if (null === $this->process) {
-            $this->process = new Process(null);
+        $process = $this->getProcess($commandline);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
         }
 
-        $this->process->setCommandLine($commandline);
-        $this->process->run();
-        if (!$this->process->isSuccessful()) {
-            throw new ProcessFailedException($this->process);
-        }
+        return trim($process->getOutput());
+    }
 
-        return trim($this->process->getOutput());
+    /**
+     * @param string $commandline
+     * @return Process
+     */
+    protected function getProcess($commandline): Process
+    {
+        return new Process($commandline);
     }
 }

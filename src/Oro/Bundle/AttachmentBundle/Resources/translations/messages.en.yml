@@ -33,6 +33,9 @@ oro:
             entity_plural_label:     Files
             entity_description:      Files attached to emails, comments, notes or other entity records.
             id.label:                Id
+            uuid:
+                label:               UUID
+                description:         Universally Unique Identifier of the file.
             filename.label:          File name
             original_filename:
                 label:               Original file name
@@ -62,16 +65,42 @@ oro:
                 label:               Parent entity field name
                 description:         The field name where this file is stored of the entity to which this file belongs.
 
+            uploaded_by.label: Uploaded By
+            name.label: Name
+            image.label: Image
+            image_width.label: Width
+            image_height.label: Height
+
+        fileitem:
+            entity_label: File Item
+            entity_plural_label: File Items
+            id.label: Id
+            file.label: File
+            image.label: Image
+            sort_order.label: Sort Order
+
+            file:
+                add.label: Add File
+                plural_label: Files
+            image:
+                add.label: Add Image
+                plural_label: Images
+
         config:
-            file_size.label:     File size
+            file_size_settings.label: File Size Settings
+            file_size.label:     File Size (MB)
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings
-            mime_types.label:    MIME types
+            mime_types.label:    MIME Types
             upload_file_mime_types.label:  File MIME types
             upload_file_mime_types.tooltip: List of MIME file types that are permitted for upload.
             upload_image_mime_types.label: Image MIME types
             upload_image_mime_types.tooltip: List of MIME image types that are permitted for upload.
+
+            max_number_of_files:
+                label: 'Maximum Number Of Files'
+                tooltip: 'Maximum Number Of Files'
 
         action:
             add:                 Add attachment
@@ -84,6 +113,13 @@ oro:
         formatter:
             image_link:
                 default: N/A
+
+        frontend:
+            file:
+                file.label: File
+                mime_type.label: Type
+                file_size.label: Size
+                created_at.label: Created At
 
     entity_extend:
         form:

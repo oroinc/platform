@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var ViewComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var tools = require('oroui/js/tools');
-    var errorHandler = require('oroui/js/error');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const errorHandler = require('oroui/js/error');
 
     /**
      * Creates a view passed through 'view' option and binds it with _sourceElement
      * Passes all events triggered on component to the created view.
      */
-    ViewComponent = BaseComponent.extend({
+    const ViewComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function ViewComponent() {
-            ViewComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ViewComponent(options) {
+            ViewComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -25,12 +24,12 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var subPromises = _.values(options._subPromises);
-            var viewOptions = _.defaults(
+            const subPromises = _.values(options._subPromises);
+            const viewOptions = _.defaults(
                 _.omit(options, '_sourceElement', '_subPromises', 'view'),
                 {el: options._sourceElement}
             );
-            var initializeView = _.bind(this._initializeView, this, viewOptions);
+            const initializeView = _.bind(this._initializeView, this, viewOptions);
 
             // mark element
             options._sourceElement.attr('data-bound-view', options.view);
@@ -38,11 +37,11 @@ define(function(require) {
             this._deferredInit();
             if (subPromises.length) {
                 // ensure that all nested components are already initialized
-                $.when.apply($, subPromises).then(function() {
-                    tools.loadModules(options.view, initializeView);
+                $.when(...subPromises).then(function() {
+                    loadModules(options.view, initializeView);
                 });
             } else {
-                tools.loadModules(options.view, initializeView);
+                loadModules(options.view, initializeView);
             }
         },
 
@@ -60,10 +59,10 @@ define(function(require) {
             this.view = new View(options);
 
             // pass all component events to view
-            this.on('all', function() {
+            this.on('all', function(eventName, ...args) {
                 // add 'component:' prefix to event name
-                arguments[0] = 'component:' + arguments[0];
-                this.view.trigger.apply(this.view, arguments);
+                eventName = 'component:' + eventName;
+                this.view.trigger(eventName, ...args);
             }, this);
 
             if (this.view.deferredRender) {

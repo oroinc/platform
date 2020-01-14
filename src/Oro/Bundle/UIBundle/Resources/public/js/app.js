@@ -1,25 +1,35 @@
-define(function(require, exports, module) {
-    'use strict';
+const config = require('module-config').default(module.id);
 
-    var _ = require('underscore');
-    var Application = require('oroui/js/app/application');
-    var routes = require('oroui/js/app/routes');
-    require('oroui/js/extend/polyfill');
-    require('app-modules!');
+if ('publicPath' in config) {
+    // eslint-disable-next-line no-undef, camelcase
+    __webpack_public_path__ = config.publicPath;
+}
 
-    var options = _.extend(module.config(), {
-        // load routers
-        routes: function(match) {
-            var i;
-            for (i = 0; i < routes.length; i += 1) {
-                match(routes[i][0], routes[i][1]);
+module.exports = Promise.all([
+    require('oronavigation/js/routes-loader'),
+    require('orotranslation/js/translation-loader')
+]).then(function() {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Application = require('oroui/js/app/application');
+    const routes = require('oroui/js/app/routes');
+    const promises = require('app-modules').default;
+    promises.push($.when($.ready));
+
+    return Promise.all(promises).then(function() {
+        const options = _.extend({}, config, {
+            // load routers
+            routes: function(match) {
+                let i;
+                for (i = 0; i < routes.length; i += 1) {
+                    match(routes[i][0], routes[i][1]);
+                }
+            },
+            // define template for page title
+            titleTemplate: function(data) {
+                return data.subtitle || '';
             }
-        },
-        // define template for page title
-        titleTemplate: function(data) {
-            return data.subtitle || '';
-        }
+        });
+        return new Application(options);
     });
-
-    return new Application(options);
 });

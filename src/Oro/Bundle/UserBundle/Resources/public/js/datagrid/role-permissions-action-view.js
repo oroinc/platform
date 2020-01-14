@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var RolePermissionsActionView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
 
-    RolePermissionsActionView = BaseView.extend({
+    const RolePermissionsActionView = BaseView.extend({
         className: 'dropleft',
 
         icon: '',
 
         autoRender: true,
 
-        template: require('tpl!orouser/templates/datagrid/role-permissions-action-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/role-permissions-action-view.html'),
 
         /**
          * @type {AccessLevelsCollection}
@@ -35,8 +34,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function RolePermissionsActionView() {
-            RolePermissionsActionView.__super__.constructor.apply(this, arguments);
+        constructor: function RolePermissionsActionView(options) {
+            RolePermissionsActionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -64,7 +63,7 @@ define(function(require) {
         },
 
         render: function() {
-            var dropdown = this.subview('dropdown');
+            const dropdown = this.subview('dropdown');
             if (dropdown) {
                 this.$('[data-toggle="dropdown"]').dropdown('dispose');
                 dropdown.$el.detach();
@@ -76,8 +75,8 @@ define(function(require) {
         },
 
         onDropdownOpen: function(e) {
-            var dropdown = this.subview('dropdown');
-            var accessLevels = this.accessLevels;
+            let dropdown = this.subview('dropdown');
+            const accessLevels = this.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
                     el: this.$('[data-role="dropdown-menu-content"]'),

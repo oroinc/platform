@@ -46,7 +46,7 @@
 
 {% block attribute_label_widget %}
     {% if label|trans|first != '_' %}
-        <label>{{ label|trans }}:</label>
+        <label class="entity-label">{{ label|trans }}:</label>
     {% endif %}
 {% endblock %}
 
@@ -60,10 +60,6 @@
 
 {% block attribute_decimal_widget %}
     {{ value|oro_format_decimal }}
-{% endblock %}
-
-{% block attribute_html_escaped_widget %}
-    {{ value|oro_html_escape }}
 {% endblock %}
 
 {% block attribute_boolean_widget %}
@@ -98,11 +94,52 @@
 {% endblock %}
 
 {% block attribute_image_widget %}
-    <img src="{{ resized_image_url(value, width, height) }}" alt="{{ label }}" width="{{ width }}" height="{{ height }}">
+    {% set attr = layout_attr_defaults(attr, {
+        'src': resized_image_url(value, width, height),
+        'alt': label,
+        'width': width,
+        'height': height
+    }) %}
+    <img {{ block('block_attributes') }}>
 {% endblock %}
 
 {% block attribute_file_widget %}
     {{ oro_file_view(value) }}
+{% endblock %}
+
+{% block attribute_multiimages_widget %}
+    {% set collection = value %}
+    {%- for item in collection -%}
+        {% set value = item.file %}
+        {% set label = '' %}
+        {{ block('attribute_image_widget') }}
+    {%- endfor -%}
+{% endblock %}
+
+{% block attribute_multifiles_widget %}
+    {% set collection = value %}
+    <div class="table-responsive">
+        <table class="grid table">
+            <thead class="grid-header">
+            <tr class="grid-header-row">
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.file.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.mime_type.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.file_size.label'|trans }}</th>
+                <th class="grid-cell">{{ 'oro.attachment.frontend.file.created_at.label'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody class="grid-body">
+            {%- for item in collection -%}
+                <tr class="grid-row">
+                    <td class="grid-cell">{{ oro_file_view(item.file) }}</td>
+                    <td class="grid-cell">{{ item.file.extension|upper }}</td>
+                    <td class="grid-cell">{{ file_size(item.file.fileSize) }}</td>
+                    <td class="grid-cell">{{ item.file.createdAt|oro_format_datetime() }}</td>
+                </tr>
+            {%- endfor -%}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block attribute_localized_fallback_widget %}

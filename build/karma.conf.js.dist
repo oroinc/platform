@@ -1,46 +1,96 @@
-/* global module */
-module.exports = function(config) {
-  'use strict';
+/* eslint indent: ["error", 2] */
+/* eslint-env node */
+const fs = require('fs');
+const glob = require('glob');
+const path = require('path');
+const args = require('minimist')(process.argv.slice(4));
 
+const appDir = path.resolve('.');
+const environment = args.env || 'dev';
+const theme = args.theme || 'admin.oro';
+
+const webpackConfig = (function() {
+  const OroConfig = require('./webpack-config-builder/oro-webpack-config');
+  OroConfig
+    .enableLayoutThemes()
+    .setPublicPath('public/')
+    .setCachePath('var/cache');
+
+  const {resolve, module, resolveLoader} = OroConfig.getWebpackConfig()({
+    skipCSS: true,
+    skipBabel: true,
+    theme: theme,
+    symfony: environment
+  }, {})[0];
+
+  const rules = [...module.rules];
+  const index = rules.findIndex(rule => rule.loader === 'config-loader');
+  rules.splice(index, 1, {
+    ...rules[index],
+    options: {
+      ...rules[index].options,
+      relativeTo: appDir
+    }
+  });
+
+  return {
+    resolve: {
+      ...resolve,
+      alias: {
+        ...resolve.alias,
+        'dynamic-imports$':
+            path.resolve('vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Karma/dynamic-imports.js')
+      },
+      modules: [
+        appDir,
+        path.resolve('vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Karma'),
+        ...resolve.modules
+      ]
+    },
+    module: {
+      ...module,
+      rules
+    },
+    resolveLoader
+  };
+})();
+
+const specMask = args.mask || 'vendor/oro/**/Tests/JS/**/*Spec.js';
+const specFileName = args.spec || `var/cache/${environment}/${theme}/indexSpec.js`;
+
+if (!args.spec && !(args['skip-indexing'] && fs.existsSync(specFileName))) {
+  console.log('[%o] Collecting Spec files by mask "%s"...', new Date(), specMask);
+  const files = glob.sync(specMask, {follow: true});
+  console.log('[%o] Found %d Spec files', new Date(), files.length);
+  fs.mkdirSync(path.dirname(specFileName), {recursive: true});
+  fs.writeFileSync(specFileName, files.map(file => `require('${file}');`).join('\n'));
+}
+console.log('[%o] Starting Karma for "%s"...', new Date(), specFileName);
+
+module.exports = function(config) {
   config.set({
     // base path, that will be used to resolve files and exclude
-    basePath: '../../../../',
+    basePath: '../../../../', // back to application dir from vendor/oro/platform/build/
     baseUrl: '/',
 
-    frameworks: ['jasmine', 'requirejs-exposure', 'requirejs'],
+    frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
     files: [
-      'public/js/require-config.js',
-      '**/Karma/main.js',
-
-      // test framework's libs and their configuration
-      {pattern: '**/Karma/lib/**/require-config.js', watched: false, included: true},
-      {pattern: '**/Karma/lib/**/*.js', watched: false, included: false},
-
-      // fixtures
-      {pattern: '**/Tests/JS/Fixture/**/*', included: false},
-
-      {pattern: 'public/js/**/*.js', watched: false, included: false},
-      {pattern: 'public/bundles/**/*.js', included: false},
-      {pattern: 'public/bundles/**/*.html', included: false},
-      {pattern: '**/Tests/JS/**/*Spec.js', included: false}
+      specFileName
     ],
 
     // list of files to exclude
-    exclude: [
-      'public/bundles/bowerassets/**/*Spec.js',
-      'public/bundles/npmassets/**/*Spec.js',
-    ],
+    exclude: [],
 
     preprocessors: {
-      'public/bundles/*/js/**/*.js': ['requirejs-exposure']//, 'coverage']
+      '**/*Spec.js': ['webpack']
     },
 
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress'
     // CLI --reporters progress
-    reporters: ['progress', /*'coverage',*/ 'junit'],
+    reporters: ['progress', /* 'coverage', */ 'junit'],
 
     junitReporter: {
       // will be resolved to basePath (in the same way as files/exclude patterns)
@@ -49,10 +99,10 @@ module.exports = function(config) {
       useBrowserName: false
     },
 
-    /*coverageReporter: {
+    /* coverageReporter: {
       type: 'html',
       dir:  'build/logs/js-coverage/'
-    },*/
+    }, */
 
     // web server port
     // CLI --port 9876
@@ -101,13 +151,25 @@ module.exports = function(config) {
     concurrency: Infinity,
 
     plugins: [
-      'karma-requirejs',
+      'karma-webpack',
       'karma-jasmine',
       'karma-junit-reporter',
-      'karma-coverage',
-      'karma-chrome-launcher',
       'karma-firefox-launcher',
-      'karma-requirejs-exposure'
-    ]
+      'karma-chrome-launcher'
+    ],
+
+    webpack: {
+      ...webpackConfig,
+      devtool: false,
+      mode: 'none',
+      optimization: {
+        namedModules: true
+      }
+    },
+    webpackMiddleware: {
+      // turn off webpack bash output when running the tests
+      noInfo: true,
+      stats: 'errors-only'
+    }
   });
 };

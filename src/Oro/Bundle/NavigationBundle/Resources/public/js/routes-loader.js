@@ -1,23 +1,24 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var _ = require('underscore');
-    var module = require('module');
-    var routing = require('routing');
+    let config = require('module-config').default(module.id);
+    const routing = require('routing');
 
-    try {
-        var routes = JSON.parse(require('text!oro/routes'));
-    } catch (e) {
-        throw new Error('Failed to load JS routes.');
-    }
+    return fetch(config.routesResource)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(routes) {
+            config = Object.assign({debug: false, data: {}}, config);
+            if (!config.debug) {
+                // processed correctly only in case when routing comes via controller
+                Object.assign(routes, config.data);
+            }
+            routing.setRoutingData(routes);
 
-    var config = _.extend({debug: false, data: {}}, module.config());
-    if (!config.debug) {
-        // processed correctly only in case when routing comes via controller
-        routes = _.extend(routes, config.data);
-    }
-
-    routing.setRoutingData(routes);
-
-    return routing;
+            return routing;
+        })
+        .catch(function() {
+            throw new Error('Unable to load routes from "' + config.routesResource + '"');
+        });
 });

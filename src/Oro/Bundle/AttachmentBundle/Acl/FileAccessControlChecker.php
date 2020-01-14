@@ -3,22 +3,22 @@
 namespace Oro\Bundle\AttachmentBundle\Acl;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 
 /**
  * Checks if File should be checked with ACL.
  */
 class FileAccessControlChecker
 {
-    /** @var ConfigManager */
-    private $configManager;
+    /** @var AttachmentEntityConfigProviderInterface */
+    private $attachmentEntityConfigProvider;
 
     /**
-     * @param ConfigManager $configManager
+     * @param AttachmentEntityConfigProviderInterface $configManager
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(AttachmentEntityConfigProviderInterface $configManager)
     {
-        $this->configManager = $configManager;
+        $this->attachmentEntityConfigProvider = $configManager;
     }
 
     /**
@@ -34,9 +34,10 @@ class FileAccessControlChecker
             return false;
         }
 
-        $config = $this->configManager
-            ->getFieldConfig('attachment', $parentEntityClass, $parentEntityFieldName);
-
+        $config = $this->attachmentEntityConfigProvider->getFieldConfig($parentEntityClass, $parentEntityFieldName);
+        if (!$config) {
+            return false;
+        }
 
         return (bool) $config->get('acl_protected', false, true);
     }

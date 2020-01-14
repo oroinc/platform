@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -17,12 +17,13 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
+/**
+ * The default implementation of a datagrid processor for "board" mode.
+ */
 class DefaultProcessor implements BoardProcessorInterface
 {
-    const NAME = 'default';
-
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
@@ -31,16 +32,16 @@ class DefaultProcessor implements BoardProcessorInterface
     protected $choiceHelper;
 
     /**
-     * @param EntityManager $em
+     * @param ManagerRegistry     $doctrine
      * @param EntityClassResolver $entityClassResolver
-     * @param ChoiceFieldHelper $choiceHelper
+     * @param ChoiceFieldHelper   $choiceHelper
      */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EntityClassResolver $entityClassResolver,
         ChoiceFieldHelper $choiceHelper
     ) {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->entityClassResolver = $entityClassResolver;
         $this->choiceHelper = $choiceHelper;
     }
@@ -52,18 +53,19 @@ class DefaultProcessor implements BoardProcessorInterface
     {
         $entityName = $datagridConfig->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
         $property = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_KEY];
-        $metadata = $this->em->getClassMetadata($entityName);
-        $result = [];
+        $em = $this->doctrine->getManagerForClass($entityName);
+        $metadata = $em->getClassMetadata($entityName);
 
+        $result = [];
         if ($metadata->hasAssociation($property)) {
             $mapping = $metadata->getAssociationMapping($property);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
                 $targetEntity = $metadata->getAssociationTargetClass($property);
-                $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
-                $labelField = $this->getLabelField($property, $boardConfig, $targetEntityMetadata);
+                $targetEntityMetadata = $em->getClassMetadata($targetEntity);
+                $labelField = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_VALUE_KEY]
+                    ?? $this->choiceHelper->guessLabelField($targetEntityMetadata, $property);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                $orderBy = isset($boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_ORDER_BY]) ?
-                    $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_ORDER_BY] : null;
+                $orderBy = $boardConfig[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_ORDER_BY] ?? null;
                 $result = $this->choiceHelper->getChoices(
                     $targetEntity,
                     $keyField,
@@ -96,11 +98,12 @@ class DefaultProcessor implements BoardProcessorInterface
             $qb = $datasource->getQueryBuilder();
             $rootAlias = $datagridConfig->getOrmQuery()->getRootAlias();
             $rootEntity = $datagridConfig->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
-            $metaData = $this->em->getClassMetadata($rootEntity);
+            $em = $this->doctrine->getManagerForClass($rootEntity);
+            $metaData = $em->getClassMetadata($rootEntity);
             $idKeyField = $metaData->getSingleIdentifierFieldName();
             $idExpr = sprintf('%s.%s', $rootAlias, $idKeyField);
 
-            $unionQb = new UnionQueryBuilder($this->em, true, 'ids');
+            $unionQb = new UnionQueryBuilder($em, true, 'ids');
             $unionQb->addSelect('id', 'id', Type::INTEGER);
             foreach ($boardData['board_options'] as $optionIds) {
                 /** @var QueryBuilder $queryClone */
@@ -166,14 +169,6 @@ class DefaultProcessor implements BoardProcessorInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getName()
-    {
-        return static::NAME;
-    }
-
-    /**
      * @param array $options
      * @param string $default
      * @return array
@@ -216,25 +211,5 @@ class DefaultProcessor implements BoardProcessorInterface
         }
 
         return $default;
-    }
-
-    /**
-     * @param $columnName
-     * @param array $config
-     * @param $targetEntityMetadata
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    protected function getLabelField($columnName, $config, $targetEntityMetadata)
-    {
-        if (isset($config[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_VALUE_KEY])) {
-            $labelField = $config[Configuration::GROUP_KEY][Configuration::GROUP_PROPERTY_VALUE_KEY];
-        } else {
-            $labelField = $this->choiceHelper->guessLabelField($targetEntityMetadata, $columnName);
-        }
-
-        return $labelField;
     }
 }

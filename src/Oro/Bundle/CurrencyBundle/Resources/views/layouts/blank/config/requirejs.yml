@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oro/datagrid/cell/multi-currency-cell': 'orocurrency/js/datagrid/cell/multi-currency-cell.js'

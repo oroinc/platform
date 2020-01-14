@@ -1,27 +1,26 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var NewEmailMessageComponent;
-    var _ = require('underscore');
-    var module = require('module');
-    var sync = require('orosync/js/sync');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const _ = require('underscore');
+    const config = require('module-config').default(module.id);
+    const sync = require('orosync/js/sync');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    NewEmailMessageComponent = BaseComponent.extend({
+    const NewEmailMessageComponent = BaseComponent.extend({
         onNewEmailDebounced: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function NewEmailMessageComponent() {
-            NewEmailMessageComponent.__super__.constructor.apply(this, arguments);
+        constructor: function NewEmailMessageComponent(options) {
+            NewEmailMessageComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var channel = module.config().wsChannel;
+            const channel = config.wsChannel;
             this.onNewEmailDebounced = _.debounce(this.onNewEmail.bind(this, options._sourceElement), 6000, true);
             sync.subscribe(channel, this.onMessage.bind(this));
         },

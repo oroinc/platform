@@ -1,5 +1,5 @@
 oro.entity_pagination:
-    pager_of_%total%_record|pager_of_%total%_records: 'of %total% Record|of %total% Records'
+    pager_of_%count%_record|pager_of_%count%_records: 'of %count% Record|of %count% Records'
     first: 'First'
     last: 'Last'
 

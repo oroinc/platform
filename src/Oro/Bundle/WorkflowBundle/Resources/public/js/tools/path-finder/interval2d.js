@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var util = require('./util');
-    var Line2d = require('./line2d');
-    var draw = require('./draw');
+    const util = require('./util');
+    const Line2d = require('./line2d');
+    const draw = require('./draw');
 
     /**
      * Interval on 2d surface specified by two points
@@ -111,10 +111,10 @@ define(function(require) {
         } else if (this.simpleLength === 0) {
             return interval.includesPoint(this.a) ? this.a : null;
         }
-        var point = this.line.intersection(interval.line);
+        const point = this.line.intersection(interval.line);
         if (!isNaN(point.x)) {
-            var v1;
-            var v2;
+            let v1;
+            let v2;
             if (this.a.x !== this.b.x) {
                 // compare by x
                 v1 = util.between(point.x, this.a.x, this.b.x);
@@ -143,7 +143,7 @@ define(function(require) {
      * @returns {boolean}
      */
     Interval2d.prototype.includesPoint = function(point) {
-        var line = this.line;
+        const line = this.line;
         return line.slope === Infinity
             ? (point.x === this.a.x && util.between(point.y, this.a.y, this.b.y))
             : (util.between(point.x, this.a.x, this.b.x) && point.y === line.intercept + point.x * line.slope);
@@ -172,7 +172,7 @@ define(function(require) {
             if (this._line) {
                 return this._line;
             }
-            var slope = (this.a.y - this.b.y) / (this.a.x - this.b.x);
+            const slope = (this.a.y - this.b.y) / (this.a.x - this.b.x);
             if (slope === Infinity || slope === -Infinity) {
                 this._line = new Line2d(Infinity, this.a.x);
             } else {

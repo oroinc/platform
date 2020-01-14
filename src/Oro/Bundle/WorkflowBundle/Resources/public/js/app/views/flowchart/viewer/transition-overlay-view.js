@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartViewerTransitionOverlayView;
-    var FlowchartJsPlumbOverlayView = require('../jsplumb/overlay-view');
+    const FlowchartJsPlumbOverlayView = require('../jsplumb/overlay-view');
 
-    FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/viewer/transition.html'),
+    const FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
+        template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/transition.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartViewerTransitionOverlayView() {
-            FlowchartViewerTransitionOverlayView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartViewerTransitionOverlayView(options) {
+            FlowchartViewerTransitionOverlayView.__super__.constructor.call(this, options);
         },
 
         className: function() {
-            var classNames = [FlowchartViewerTransitionOverlayView.__super__.className.call(this)];
+            const classNames = [FlowchartViewerTransitionOverlayView.__super__.className.call(this)];
             classNames.push('workflow-transition-overlay');
             return classNames.join(' ');
         }

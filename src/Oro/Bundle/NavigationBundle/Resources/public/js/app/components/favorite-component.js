@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var FavoriteComponent;
-    var _ = require('underscore');
-    var BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
-    var CollectionView = require('oroui/js/app/views/base/collection-view');
-    var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
-    var ItemView = require('oronavigation/js/app/views/bookmark-item-view');
-    var favoriteItemTemplate = require('tpl!oronavigation/templates/favorite-item.html');
+    const _ = require('underscore');
+    const BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
+    const CollectionView = require('oroui/js/app/views/base/collection-view');
+    const ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
+    const ItemView = require('oronavigation/js/app/views/bookmark-item-view');
+    const favoriteItemTemplate = require('tpl-loader!oronavigation/templates/favorite-item.html');
 
-    FavoriteComponent = BaseBookmarkComponent.extend({
+    const FavoriteComponent = BaseBookmarkComponent.extend({
         typeName: 'favorite',
 
         /**
@@ -33,8 +32,8 @@ define(function(require) {
          * @protected
          */
         _createButtonView: function() {
-            var options = this._options.buttonOptions || {};
-            var collection = this.collection;
+            const options = this._options.buttonOptions || {};
+            const collection = this.collection;
 
             _.extend(options, {
                 el: this._options._sourceElement,
@@ -51,9 +50,9 @@ define(function(require) {
          * @protected
          */
         _createTabView: function() {
-            var options = this._options.tabOptions || {};
-            var collection = this.collection;
-            var TabItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
+            const options = this._options.tabOptions || {};
+            const collection = this.collection;
+            const TabItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
                 template: favoriteItemTemplate
             });
 
@@ -70,8 +69,8 @@ define(function(require) {
             model.set('type', this.typeName);
             model.set('position', this.collection.length);
 
-            var url = model.get('url');
-            var urlPart = url.split('?');
+            const url = model.get('url');
+            const urlPart = url.split('?');
             if (model.get('url') !== urlPart[0]) {
                 model.set('url', urlPart[0]);
             }

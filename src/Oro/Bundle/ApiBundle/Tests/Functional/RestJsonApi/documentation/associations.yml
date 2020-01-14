@@ -2,11 +2,12 @@ parameters:
     id:
         dataType: 'integer'
         required: true
+        actualType: 'integer'
         readonly: true
     owner:
         dataType: 'integer'
         required: false
-        actualType: ~
+        actualType: 'model'
         subType: 'businessunits'
     staff:
         dataType: 'integer'
@@ -17,11 +18,12 @@ response:
     id:
         dataType: 'integer'
         required: true
+        actualType: 'integer'
         readonly: true
     owner:
         dataType: 'integer'
         required: false
-        actualType: ~
+        actualType: 'model'
         subType: 'businessunits'
     staff:
         dataType: 'integer'

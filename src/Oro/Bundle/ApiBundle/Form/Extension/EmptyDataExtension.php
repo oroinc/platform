@@ -34,18 +34,19 @@ class EmptyDataExtension extends AbstractTypeExtension
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $dataClass = $options['data_class'];
+        $emptyData = $options['empty_data'] ?? null;
         $emptyData = null !== $dataClass
-            ? $this->getEmptyDataForDataClass($dataClass)
-            : $this->getEmptyData($options['empty_data']);
+            ? $this->getEmptyDataForDataClass($dataClass, $emptyData)
+            : $this->getEmptyData($emptyData);
         $builder->setEmptyData($emptyData);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return FormType::class;
+        return [FormType::class];
     }
 
     /**
@@ -70,15 +71,24 @@ class EmptyDataExtension extends AbstractTypeExtension
 
     /**
      * @param mixed $dataClass
+     * @param mixed $emptyData
      *
      * @return \Closure
      */
-    private function getEmptyDataForDataClass($dataClass)
+    private function getEmptyDataForDataClass($dataClass, $emptyData)
     {
-        return function (FormInterface $form) use ($dataClass) {
-            return $form->isEmpty() && !$form->isRequired()
-                ? null
-                : $this->entityInstantiator->instantiate($dataClass);
+        return function (FormInterface $form, $viewData) use ($dataClass, $emptyData) {
+            $result = null;
+            if (!$form->isEmpty() || $form->isRequired()) {
+                if ($emptyData instanceof \Closure) {
+                    $result = $emptyData($form, $viewData);
+                }
+                if (null === $result) {
+                    $result = $this->entityInstantiator->instantiate($dataClass);
+                }
+            }
+
+            return $result;
         };
     }
 }

@@ -67,8 +67,10 @@ oro:
                     label: Username
                 password:
                     label: Password
+                check_saved_connection:
+                    label: Check Connection (Saved Settings)
                 check_connection:
-                  label: Check SMTP Connection
+                    label: Check Connection (New Settings)
 
             signature_configuration:
                 label: Signature
@@ -144,9 +146,13 @@ oro:
             entity_name.label:   Entity name
             entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
-            translations.label:  Translations
+            translations.label: Email Template Translations
             organization.label:  Organization
             visible.label:       Visible
+
+            sections:
+                general: General
+                template_data: Template Data
 
             # sections for email template variables
             variables:
@@ -178,6 +184,23 @@ oro:
 
             # errors
             failed_to_compile: This email template can't be used
+
+        emailtemplatetranslation:
+            entity_label: 'Email Template Translations'
+            entity_plural_label: 'Email Template Translations'
+
+            id.label: 'Id'
+            subject.label: 'Subject'
+            subject_fallback.label: 'Fallback subject'
+            content.label: 'Content'
+            content_fallback.label: 'Fallback content'
+            localization.label: 'Localization'
+            template.label: 'Template'
+
+            form:
+                default_localization: 'Default'
+                use_parent_localization: 'Use %name% (Parent Localization)'
+                use_default_localization: 'Use Default Localization'
 
         attachment:
             copy_to_record: Copy to Record

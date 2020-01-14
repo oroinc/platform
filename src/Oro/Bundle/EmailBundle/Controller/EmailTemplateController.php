@@ -114,8 +114,13 @@ class EmailTemplateController extends Controller
             $this->submitPostPutRequest($form, $request);
         }
 
-        $templateRendered = $this->get('oro_email.email_renderer')
-            ->compilePreview($emailTemplate, $form->get('translation')->getData());
+        $localization = $form->get('activeLocalization')->getData();
+        $localizedTemplate = $localization
+            ? $this->get('oro_email.provider.email_template_content_provider')
+                ->getLocalizedModel($emailTemplate, $localization)
+            : $emailTemplate;
+
+        $templateRendered = $this->get('oro_email.email_renderer')->compilePreview($localizedTemplate);
 
         return array(
             'content'     => $templateRendered,

@@ -3,7 +3,7 @@
     {% if url %}
         <a href="{{ url }}" data-filename="{{ fileName }}"
            {% if additional['galleryId'] is defined %}data-gallery="{{ additional['galleryId'] }}"{% endif %}
-           class="no-hash" title="{{ fileName }}">
+           class="no-hash" title="{{ title }}">
     {% endif %}
         {{ oro_format_filename(fileName) }}
     {% if url %}

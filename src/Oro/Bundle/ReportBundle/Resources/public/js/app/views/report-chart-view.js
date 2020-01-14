@@ -1,12 +1,11 @@
 define(function(request) {
     'use strict';
 
-    var ReportChartView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = request('jquery');
-    var _ = request('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = request('jquery');
+    const _ = request('underscore');
 
-    ReportChartView = BaseView.extend({
+    const ReportChartView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -27,10 +26,10 @@ define(function(request) {
          * @inheritDoc
          */
         constructor: function ReportChartView(options) {
-            var $el = $(options.el);
+            const $el = $(options.el);
 
             this.$choiceElement = $el.find(this.defaults.templates.name({baseName: $el.data('ftid')}));
-            ReportChartView.__super__.constructor.apply(this, arguments);
+            ReportChartView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -58,8 +57,8 @@ define(function(request) {
         },
 
         getNameChoiceElement: function() {
-            var options = this.options;
-            var selector = options.templates.name({
+            const options = this.options;
+            const selector = options.templates.name({
                 baseName: options.baseName
             });
 
@@ -67,8 +66,8 @@ define(function(request) {
         },
 
         getParentElement: function(block) {
-            var options = this.options;
-            var selector = options.templates.parent({
+            const options = this.options;
+            const selector = options.templates.parent({
                 baseName: options.baseName,
                 block: block
             });
@@ -77,8 +76,8 @@ define(function(request) {
         },
 
         getTargetElement: function(block, chart) {
-            var options = this.options;
-            var selector = options.templates.target({
+            const options = this.options;
+            const selector = options.templates.target({
                 baseName: options.baseName,
                 block: block,
                 chart: chart
@@ -88,8 +87,8 @@ define(function(request) {
         },
 
         updateChartFormVisibility: function() {
-            var options = this.options;
-            var name = this.getNameChoiceElement().val();
+            const options = this.options;
+            const name = this.getNameChoiceElement().val();
 
             _.each(options.blocks, function(block) {
                 this.getParentElement(block).hide();
@@ -101,7 +100,7 @@ define(function(request) {
             delete this.options;
             delete this.$choiceElement;
 
-            ReportChartView.__super__.dispose.apply(this, arguments);
+            ReportChartView.__super__.dispose.call(this);
         }
     });
 

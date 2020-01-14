@@ -225,9 +225,8 @@
                                     </div>
 
                                     {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
-
                                     <% print('<sc' + 'ript>'); %>
-                                    require(['jquery'], function($) {
+                                    loadModules(['jquery'], function($) {
                                     $('#{{ form.transition_prototype_icon.vars.id }}').inputWidget('val', '<%- buttonIcon %>');
                                     });
                                     <% print('</sc' + 'ript>'); %>

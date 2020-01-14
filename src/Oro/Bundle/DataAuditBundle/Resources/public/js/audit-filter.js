@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var AuditFilter;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var DateTimeFilter = require('oro/filter/datetime-filter');
-    var ChoiceFilter = require('oro/filter/choice-filter');
-    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
-    var template = require('tpl!orodataaudit/templates/audit-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const DateTimeFilter = require('oro/filter/datetime-filter');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const choiceTemplate = require('tpl-loader!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    const template = require('tpl-loader!orodataaudit/templates/audit-filter.html');
 
-    AuditFilter = DateTimeFilter.extend({
+    const AuditFilter = DateTimeFilter.extend({
         template: template,
         templateSelector: null,
         criteriaValueSelectors: _.extend({}, DateTimeFilter.prototype.criteriaValueSelectors, {
@@ -34,7 +33,7 @@ define(function(require) {
         auditTypeFilterContainerSelector: '.audit-type-filter-container',
 
         events: function() {
-            var events = {
+            const events = {
                 change: 'applyValue'
             };
             events['change ' + this.auditTypeFilterContainerSelector] = '_onAuditTypeFilterChange';
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AuditFilter() {
-            AuditFilter.__super__.constructor.apply(this, arguments);
+        constructor: function AuditFilter(options) {
+            AuditFilter.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -98,10 +97,10 @@ define(function(require) {
         },
 
         _getParts: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var datePartTemplate = this._getTemplate('fieldTemplate');
-            var parts = [];
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            const datePartTemplate = this._getTemplate('fieldTemplate');
+            const parts = [];
             parts.push(datePartTemplate({
                 name: 'audit',
                 choices: this.choices,

@@ -1,13 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var AddressRegionView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var RegionCollection = require('oroaddress/js/region/collection');
-    var Backbone = require('backbone');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const RegionCollection = require('oroaddress/js/region/collection');
+    const Backbone = require('backbone');
+    let config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         switchState: false
     });
     require('jquery.select2');
@@ -19,7 +18,7 @@ define(function(require) {
      * @class   oro.region.View
      * @extends Backbone.View
      */
-    AddressRegionView = Backbone.View.extend({
+    const AddressRegionView = Backbone.View.extend({
         events: {
             change: 'selectionChanged',
             redraw: 'redraw'
@@ -30,8 +29,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AddressRegionView() {
-            AddressRegionView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressRegionView(options) {
+            AddressRegionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -87,7 +86,7 @@ define(function(require) {
         },
 
         addRequiredFlag: function() {
-            var label = this.getInputLabel(this.target);
+            const label = this.getInputLabel(this.target);
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
@@ -96,7 +95,7 @@ define(function(require) {
         },
 
         removeRequiredFlag: function() {
-            var label = this.getInputLabel(this.target);
+            const label = this.getInputLabel(this.target);
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
@@ -105,9 +104,9 @@ define(function(require) {
         },
 
         getInputLabel: function(el) {
-            var label;
-            var input = _.result(el.data('select2'), 'focusser') || el;
-            var id = input.attr('id');
+            let label;
+            const input = _.result(el.data('select2'), 'focusser') || el;
+            const id = input.attr('id');
 
             if (id) {
                 label = $('label[for="' + id + '"]');
@@ -130,7 +129,7 @@ define(function(require) {
          */
         selectionChanged: function() {
             this.$el.trigger('value:changing');
-            var validator = this.target.closest('form').data('validator');
+            const validator = this.target.closest('form').data('validator');
             if (validator) {
                 validator.hideElementErrors(this.target[0]);
             }
@@ -142,7 +141,7 @@ define(function(require) {
             if (this.$simpleEl) {
                 this.$simpleEl.hide();
             }
-            var countryId = this.$el.val();
+            const countryId = this.$el.val();
             if (countryId) {
                 this.collection.setCountryId(countryId);
                 this.collection.fetch({reset: true});
@@ -157,7 +156,7 @@ define(function(require) {
                 this.displaySelect2(true);
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
-                var value = this.target.data('selected-data') || '';
+                const value = this.target.data('selected-data') || '';
                 this.target.select2('val', value);
 
                 if (this.$simpleEl) {

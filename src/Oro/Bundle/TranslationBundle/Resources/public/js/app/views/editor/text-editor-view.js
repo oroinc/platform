@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var TextEditorView;
-    var BaseView = require('oroform/js/app/views/editor/text-editor-view');
+    const BaseView = require('oroform/js/app/views/editor/text-editor-view');
 
     // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
-    TextEditorView = BaseView.extend({
-        template: require('tpl!../../../../templates/text-editor.html'),
+    const TextEditorView = BaseView.extend({
+        template: require('tpl-loader!../../../../templates/text-editor.html'),
 
         events: {
             'change [name=value]': 'onChange',
@@ -17,8 +16,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TextEditorView() {
-            TextEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function TextEditorView(options) {
+            TextEditorView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -56,7 +55,7 @@ define(function(require) {
          */
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE && (e.ctrlKey || e.shiftKey)) {
-                var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
+                const postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
                     if (this.validator.form()) {
                         this.trigger('save' + postfix + 'Action');

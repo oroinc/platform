@@ -9,51 +9,35 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * The registry of action buttons.
+ */
 class ButtonProvider
 {
-    /** @var ButtonProviderExtensionInterface[] */
-    protected $extensions;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    /** @var iterable|ButtonProviderExtensionInterface[] */
+    private $extensions;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
-    public function __construct()
-    {
-        $this->logger = new NullLogger();
-    }
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
-     * @param LoggerInterface $logger
-     *
-     * @return $this
+     * @param iterable|ButtonProviderExtensionInterface[] $extensions
+     * @param EventDispatcherInterface                    $eventDispatcher
+     * @param LoggerInterface                             $logger
      */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
-    }
-
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        iterable $extensions,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger
+    ) {
+        $this->extensions = $extensions;
         $this->eventDispatcher = $eventDispatcher;
-    }
-
-    /**
-     * @param ButtonProviderExtensionInterface $extension
-     */
-    public function addExtension(ButtonProviderExtensionInterface $extension)
-    {
-        $this->extensions[] = $extension;
+        $this->logger = $logger;
     }
 
     /**
@@ -68,9 +52,7 @@ class ButtonProvider
             $collection->consume($extension, $searchContext);
         }
 
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(OnButtonsMatched::NAME, new OnButtonsMatched($collection));
-        }
+        $this->eventDispatcher->dispatch(OnButtonsMatched::NAME, new OnButtonsMatched($collection));
 
         return $collection;
     }
@@ -149,7 +131,7 @@ class ButtonProvider
     /**
      * @param ArrayCollection $errors
      */
-    protected function processErrors(ArrayCollection $errors)
+    private function processErrors(ArrayCollection $errors)
     {
         foreach ($errors as $error) {
             $this->logger->error($error['message'], $error['parameters']);

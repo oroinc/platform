@@ -61,6 +61,7 @@
 {% endmacro %}
 
 {% macro renderFormatted(entity, entity_class, field_name, item) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set value = item.value %}
     {% set type  = item.type %}
 
@@ -82,22 +83,17 @@
         {% set value = value ? value | oro_format_date : null %}
     {% elseif type == 'datetime' %}
         {% set value = value ? value | oro_format_datetime : null %}
-    {% elseif type == 'file' %}
-        {% set value %}
-            {{ oro_file_view(value) }}
-        {% endset %}
-    {% elseif type == 'image' %}
-        {% if entity_class is null %}
-            {% set entityInfo = entity %}
-        {% else %}
-            {% set entityInfo = entity_class %}
-        {% endif %}
-        {% set value %}
-            {{ oro_image_view(value) }}
-        {% endset %}
     {% endif %}
 
-    {% if type != 'html' %}
+    {% if type == 'wysiwyg' %}
+        {% if item.value is not null %}
+            <div class="alert alert-info alert--compact" role="alert">
+                <span class="fa-info alert-icon" aria-hidden="true"></span>
+                {{ 'oro.entity_config.entity.information_message'|trans }}
+            </div>
+        {% endif %}
+        {{ UI.renderCollapsibleHtml(value|render_content|oro_html_sanitize|default('N/A'|trans)|raw, entity, item.label, 'More', 'Less') }}
+    {% elseif type != 'html' %}
         {{ value|default('N/A'|trans) }}
     {% endif %}
 {% endmacro %}

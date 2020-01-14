@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -71,6 +72,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testNormalizeEmptyDataForToOneAssociation()
@@ -96,6 +98,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testNormalizeDataForToManyAssociation()
@@ -149,6 +152,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testNormalizeEmptyDataForToManyAssociation()
@@ -174,6 +178,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         ];
 
         self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidEntityTypeForToOneAssociation()
@@ -211,6 +216,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidIdentifierForToOneAssociation()
@@ -250,6 +256,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidEntityTypesForToManyAssociation()
@@ -303,6 +310,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
     public function testProcessWithInvalidIdentifiersForToManyAssociation()
@@ -361,6 +369,109 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
                     ->setSource(ErrorSource::createByPointer('/data/1/id'))
             ],
             $this->context->getErrors()
+        );
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessWithNotResolvedIdentifierForToOneAssociation()
+    {
+        $parentMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata->setClassName('Test\Class');
+        $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
+            ->setTargetMetadata($associationTargetMetadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->willReturn('Test\Class');
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->willReturn(null);
+
+        $this->context->setRequestData(['data' => ['type' => 'entity', 'id' => 'val']]);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setAssociationName(self::ASSOCIATION_NAME);
+        $this->context->setIsCollection(false);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            self::ASSOCIATION_NAME => [
+                'id'    => null,
+                'class' => 'Test\Class'
+            ]
+        ];
+
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals(
+            [
+                'requestData.id' => new NotResolvedIdentifier('val', 'Test\Class')
+            ],
+            $this->context->getNotResolvedIdentifiers()
+        );
+    }
+
+    public function testProcessWithNotResolvedIdentifiersForToManyAssociation()
+    {
+        $parentMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata->setClassName('Test\Class');
+        $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
+            ->setTargetMetadata($associationTargetMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+                ]
+            );
+        $this->entityIdTransformer->expects(self::exactly(2))
+            ->method('reverseTransform')
+            ->willReturnCallback(
+                function ($value, EntityMetadata $metadata) {
+                    if ('val1' === $value) {
+                        return null;
+                    }
+
+                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+                }
+            );
+
+        $this->context->setRequestData(
+            [
+                'data' => [
+                    ['type' => 'entity1', 'id' => 'val1'],
+                    ['type' => 'entity2', 'id' => 'val2']
+                ]
+            ]
+        );
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setAssociationName(self::ASSOCIATION_NAME);
+        $this->context->setIsCollection(true);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            self::ASSOCIATION_NAME => [
+                [
+                    'id'    => null,
+                    'class' => 'Test\Class1'
+                ],
+                [
+                    'id'    => 'normalized::Test\Class::val2',
+                    'class' => 'Test\Class2'
+                ]
+            ]
+        ];
+
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertFalse($this->context->hasErrors());
+        self::assertEquals(
+            [
+                'requestData.0.id' => new NotResolvedIdentifier('val1', 'Test\Class')
+            ],
+            $this->context->getNotResolvedIdentifiers()
         );
     }
 }

@@ -97,6 +97,10 @@
     flex-grow: 1;
     min-width: $fallback-item-fallback-min-width;
     max-width: $fallback-item-fallback-max-width;
+
+    + .fallback-item-value {
+        margin-top: $form-container-control-row-space;
+    }
 }
 
 .fallback-item-use-fallback {

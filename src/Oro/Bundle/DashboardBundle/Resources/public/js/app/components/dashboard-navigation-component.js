@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var DashboardNavigationComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var dashboardUtil = require('orodashboard/js/dashboard-util');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const dashboardUtil = require('orodashboard/js/dashboard-util');
 
-    DashboardNavigationComponent = BaseComponent.extend({
+    const DashboardNavigationComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
         /**
          * @inheritDoc
          */
-        constructor: function DashboardNavigationComponent() {
-            DashboardNavigationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function DashboardNavigationComponent(options) {
+            DashboardNavigationComponent.__super__.constructor.call(this, options);
         },
 
         listen: function() {
-            var listenTo = {};
+            const listenTo = {};
             listenTo['datagrid:beforeRemoveRow:' + this.gridName + ' mediator'] = 'onBeforeRemoveRow';
             return listenTo;
         },

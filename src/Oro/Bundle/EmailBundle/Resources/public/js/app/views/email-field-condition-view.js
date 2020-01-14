@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var EmailFieldConditionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
-    var CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    const CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
 
-    EmailFieldConditionView = FieldConditionView.extend({
+    const EmailFieldConditionView = FieldConditionView.extend({
         entityData: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function EmailFieldConditionView() {
-            EmailFieldConditionView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailFieldConditionView(options) {
+            EmailFieldConditionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -33,17 +32,17 @@ define(function(require) {
         },
 
         initChoiceInputView: function() {
-            var fields = this.entityData.fields.map(function(field) {
+            const fields = this.entityData.fields.map(function(field) {
                 return {
                     id: field.name,
                     text: field.label
                 };
             });
-            var choiceInputData = [{
+            const choiceInputData = [{
                 text: __('oro.entity.field_choice.fields'),
                 children: fields
             }];
-            var fieldChoiceView = new CustomsetFieldChoiceView({
+            const fieldChoiceView = new CustomsetFieldChoiceView({
                 autoRender: true,
                 el: this.$choiceInput,
                 select2: _.extend({}, this.options.fieldChoice.select2, {

@@ -4,8 +4,6 @@ define([
 ], function(Backgrid, CellFormatter) {
     'use strict';
 
-    var RelationCell;
-
     /**
      * String column cell. Added missing behaviour.
      *
@@ -13,7 +11,7 @@ define([
      * @class   oro.datagrid.cell.StringCell
      * @extends Backgrid.StringCell
      */
-    RelationCell = Backgrid.StringCell.extend({
+    const RelationCell = Backgrid.StringCell.extend({
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
@@ -22,8 +20,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function RelationCell() {
-            RelationCell.__super__.constructor.apply(this, arguments);
+        constructor: function RelationCell(options) {
+            RelationCell.__super__.constructor.call(this, options);
         }
     });
 

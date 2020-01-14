@@ -1,20 +1,20 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
-    var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
-    var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
+    const GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
+    const gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
 
-    var config = require('module').config();
+    let config = require('module-config').default(module.id);
     config = _.extend({
         GridViewsView: GridViewsView
     }, config);
 
-    var gridViewsBuilder = {
+    const gridViewsBuilder = {
         /**
          * Runs grid views builder
          * Builder interface implementation
@@ -28,7 +28,7 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            var self = {
+            const self = {
                 metadata: _.defaults(options.metadata, {
                     gridViews: {},
                     options: {}
@@ -40,14 +40,14 @@ define(function(require) {
                 showInCustomElement: options.showViewsInCustomElement,
                 GridViewsView: config.GridViewsView,
                 buildViews: function(grid) {
-                    var gridViews = gridViewsBuilder.build.call(this, grid.collection);
+                    const gridViews = gridViewsBuilder.build.call(this, grid.collection);
                     deferred.resolve(gridViews);
                 }
             };
 
             if (_.isString(self.GridViewsView)) {
                 self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
-                    tools.loadModules(this.GridViewsView)
+                    loadModules(this.GridViewsView)
                         .then(_.bind(function(GridViewsView) {
                             this.GridViewsView = GridViewsView;
                             buildViews.call(this, grid);
@@ -60,7 +60,7 @@ define(function(require) {
                     if (self.$gridEl.find('.filter-box').length) {
                         self.buildViews(grid);
                     } else {
-                        var _buildViews = function(collection, $gridEl) {
+                        const _buildViews = function(collection, $gridEl) {
                             if (!$gridEl.is('#' + this.$gridEl.attr('id'))) {
                                 return;
                             }
@@ -86,12 +86,12 @@ define(function(require) {
          * @returns {orodatagrid.datagrid.GridViewsView}
          */
         build: function(collection) {
-            var gridViews;
-            var $gridViews;
-            var GridViewsView = this.GridViewsView;
-            var options = gridViewsBuilder.combineGridViewsOptions.call(this);
+            let gridViews;
+            let $gridViews;
+            const GridViewsView = this.GridViewsView;
+            const options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
-                var gridViewsOptions = _.extend({collection: collection}, options);
+                const gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
                     $gridViews = $(gridGridViewsSelector);
@@ -117,11 +117,10 @@ define(function(require) {
          * @returns {Object}
          */
         combineGridViewsOptions: function() {
-            var options = this.metadata.gridViews;
-            var collection;
+            const options = this.metadata.gridViews;
 
             gridViewsBuilder.normalizeGridViewModelsData(options.views, this.metadata.initialState);
-            collection = new GridViewsCollection(options.views, {gridName: options.gridName});
+            const collection = new GridViewsCollection(options.views, {gridName: options.gridName});
 
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;

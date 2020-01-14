@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsDialogWidget;
-    var _ = require('underscore');
-    var DialogWidget = require('oro/dialog-widget');
-    var actionsTemplate = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const DialogWidget = require('oro/dialog-widget');
+    const actionsTemplate =
+        require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * @class DatagridSettingsDialogWidget
      * @extends DialogWidget
      */
-    DatagridSettingsDialogWidget = DialogWidget.extend({
+    const DatagridSettingsDialogWidget = DialogWidget.extend({
         /**
          * View constructor
          * @property {Constructor.View}
@@ -51,8 +51,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatagridSettingsDialogWidget() {
-            DatagridSettingsDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsDialogWidget(options) {
+            DatagridSettingsDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -67,7 +67,7 @@ define(function(require) {
 
             options.dialogOptions = _.extend({}, this.dialogOptions, options.dialogOptions);
 
-            DatagridSettingsDialogWidget.__super__.initialize.apply(this, arguments);
+            DatagridSettingsDialogWidget.__super__.initialize.call(this, options);
         },
 
         /**
@@ -101,7 +101,7 @@ define(function(require) {
         hide: function() {
             this.loadingBar.appendTo('#oroplatform-header');
 
-            DatagridSettingsDialogWidget.__super__.hide.apply(this, arguments);
+            DatagridSettingsDialogWidget.__super__.hide.call(this);
         }
     });
 

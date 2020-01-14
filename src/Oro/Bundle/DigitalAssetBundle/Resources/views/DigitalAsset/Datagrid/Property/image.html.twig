@@ -1,0 +1,5 @@
+{% if record.rootEntity.sourceFile %}
+    <img src="{{ filtered_image_url(record.rootEntity.sourceFile, 'digital_asset_in_dialog') }}"
+         alt="{{ oro_file_title(record.rootEntity.sourceFile) }}"
+         class="digital-asset-thumbnail" />
+{% endif %}

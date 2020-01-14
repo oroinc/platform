@@ -3,19 +3,19 @@
 namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
-use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * The content provider that return navigation elements.
+ * Returns navigation elements.
  */
-class NavigationElementsContentProvider extends AbstractContentProvider
+class NavigationElementsContentProvider implements ContentProviderInterface
 {
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /**
      * @param ConfigurationProvider $configurationProvider
@@ -67,20 +67,12 @@ class NavigationElementsContentProvider extends AbstractContentProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'navigationElements';
-    }
-
-    /**
      * @param string $element
      * @param string $route
      *
      * @return bool
      */
-    protected function hasConfigValue($element, $route)
+    private function hasConfigValue($element, $route)
     {
         $navigationElements = $this->configurationProvider->getNavigationElements();
 
@@ -91,9 +83,9 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      * @param string $element
      * @param string $route
      *
-     * @return null|bool
+     * @return bool|null
      */
-    protected function getConfigValue($element, $route)
+    private function getConfigValue($element, $route)
     {
         $navigationElements = $this->configurationProvider->getNavigationElements();
 

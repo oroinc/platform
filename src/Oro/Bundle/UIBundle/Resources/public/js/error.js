@@ -1,24 +1,24 @@
-define([
-    'module',
-    'routing',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'oroui/js/modal',
-    'underscore'
-], function(module, routing, mediator, tools, Modal, _) {
+define(function(require, exports, module) {
     'use strict';
 
-    var defaults = _.defaults(module.config(), {
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const Modal = require('oroui/js/modal');
+    const _ = require('underscore');
+    const config = require('module-config').default(module.id);
+
+    const defaults = _.defaults(config, {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
         message: _.__('oro.ui.error.performing'),
         loginRoute: 'oro_user_security_login'
     });
 
-    var ERROR_USER_INPUT = 'user_input_error';
-    var console = window.console;
+    const ERROR_USER_INPUT = 'user_input_error';
+    const console = window.console;
 
-    var errorHandler = {
+    const errorHandler = {
         /**
          * Global Ajax error handler
          *
@@ -30,8 +30,8 @@ define([
             if (this.isXHRStatus(xhr, 401)) {
                 this._processRedirect(xhr.responseJSON || {});
             } else if (xhr.readyState === 4) {
-                var errorMessage = this.getErrorMessage(event, xhr, settings);
-                var isShowError = Boolean(errorMessage);
+                const errorMessage = this.getErrorMessage(event, xhr, settings);
+                const isShowError = Boolean(errorMessage);
 
                 if (!isShowError) {
                     this.showErrorInConsole(xhr);
@@ -42,10 +42,10 @@ define([
         },
 
         isXHRStatus: function(xhr, testStatus) {
-            var status = 0;
+            let status = 0;
             if (_.isObject(xhr)) {
                 status = xhr.status;
-                var responseCode = _.result(xhr.responseJSON, 'code');
+                const responseCode = _.result(xhr.responseJSON, 'code');
                 if (!_.isUndefined(responseCode)) {
                     status = responseCode;
                 }
@@ -60,7 +60,7 @@ define([
          * @return {Boolean}
          */
         getErrorMessage: function(event, xhr, settings) {
-            var errorMessage = true;
+            let errorMessage = true;
 
             if (settings.errorHandlerMessage !== undefined && !this.isXHRStatus(xhr, 403)) {
                 errorMessage = settings.errorHandlerMessage;
@@ -90,7 +90,7 @@ define([
             } else if (_.isString(context)) {
                 this.showFlashError(context);
             } else if (_.isObject(context) && context.responseJSON && context.responseJSON.message) {
-                var message = this.prepareErrorMessage(context.responseJSON);
+                const message = this.prepareErrorMessage(context.responseJSON);
                 this.showFlashError(message);
             } else if (this.isXHRStatus(context, 403)) {
                 this.showFlashError(_.__('oro.ui.forbidden_error'));
@@ -102,7 +102,7 @@ define([
         },
 
         prepareErrorMessage: function(response) {
-            var message = response.message + ': ';
+            let message = response.message + ': ';
             if (_.has(response, 'errors') && !_.isNull(response.errors)) {
                 _.each(response.errors.children, function(child) {
                     if (_.has(child, 'errors') && !_.isNull(child.errors)) {
@@ -120,7 +120,7 @@ define([
          * @param {Object|Error} context
          */
         showErrorInConsole: function(context) {
-            var errorStyle = 'font-weight: bold;';
+            const errorStyle = 'font-weight: bold;';
             console.error('%cDebug:', errorStyle, context);
         },
 
@@ -136,15 +136,15 @@ define([
          * @deprecated
          */
         modalHandler: function(xhr) {
-            var message = defaults.message;
+            let message = defaults.message;
             if (tools.debug) {
                 message += '<br><b>Debug:</b>' + xhr.responseText;
             }
 
-            var responseObject = xhr.responseJSON || {};
-            var errorType = responseObject.type;
+            const responseObject = xhr.responseJSON || {};
+            const errorType = responseObject.type;
 
-            var modal = new Modal({
+            const modal = new Modal({
                 title: errorType === ERROR_USER_INPUT ? defaults.headerUserError : defaults.headerServerError,
                 content: responseObject.message || message,
                 cancelText: false
@@ -159,7 +159,7 @@ define([
          * @private
          */
         _processRedirect: function(response) {
-            var hashUrl = '';
+            const hashUrl = '';
             // @TODO add extra parameter for redirect after login
             /* if (Navigation.isEnabled()) {
                 var navigation = Navigation.getInstance();

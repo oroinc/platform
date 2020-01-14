@@ -1,31 +1,24 @@
-parameters:
-    oro_entity_merge.mass_action.iterable_result_factory.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeIterableResultFactory
-    oro_entity_merge.mass_action.merge.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction
-    oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler
-    oro_entity_merge.mass_action.merge_mass_action_listener.class: Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener
 services:
     oro_entity_merge.mass_action.iterable_result_factory:
-        class: '%oro_entity_merge.mass_action.iterable_result_factory.class%'
+        class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeIterableResultFactory
         parent: oro_datagrid.extension.mass_action.iterable_result_factory
 
     oro_entity_merge.mass_action.merge:
-        class: '%oro_entity_merge.mass_action.merge.class%'
+        class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction
         arguments:
             - '@oro_entity_config.provider.merge'
             - '@translator'
         shared: false
-        public: true
         tags:
-            - { name:  oro_datagrid.extension.mass_action.type, type: merge }
+            - { name: oro_datagrid.extension.mass_action.type, type: merge }
 
     oro_entity_merge.mass_action.iterable_result_factory_registry:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry
-        public: false
-        calls:
-            - ['addFactory', ['@oro_entity_merge.mass_action.iterable_result_factory']]
+        arguments:
+            - ['@oro_entity_merge.mass_action.iterable_result_factory']
 
     oro_entity_merge.mass_action.dispatcher:
-        class: '%oro_datagrid.mass_action.dispatcher.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher
         arguments:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.mass_action.helper'
@@ -33,13 +26,13 @@ services:
             - '@oro_entity_merge.mass_action.iterable_result_factory_registry'
 
     oro_entity_merge.mass_action.data_handler:
-        class: '%oro_entity_merge.mass_action.data_handler.class%'
+        class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler
         public: true
         arguments:
             - '@oro_entity_merge.doctrine_helper'
 
     oro_entity_merge.mass_action.merge_mass_action_listener:
-       class: '%oro_entity_merge.mass_action.merge_mass_action_listener.class%'
+       class: Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener
        arguments:
            - '@oro_entity_config.provider.merge'
        tags:

@@ -152,6 +152,24 @@ class ApiDocMetadataParser implements ParserInterface
     }
 
     /**
+     * @param PropertyMetadata            $metadata
+     * @param EntityDefinitionFieldConfig $config
+     *
+     * @return array
+     */
+    private function getPropertyData(PropertyMetadata $metadata, EntityDefinitionFieldConfig $config)
+    {
+        $dataType = $this->dataTypeConverter->convertDataType($metadata->getDataType());
+
+        return [
+            'description' => $config->getDescription(),
+            'required'    => !$metadata->isNullable(),
+            'dataType'    => $dataType,
+            'actualType'  => $dataType
+        ];
+    }
+
+    /**
      * @param FieldMetadata               $metadata
      * @param EntityDefinitionFieldConfig $config
      *
@@ -159,11 +177,7 @@ class ApiDocMetadataParser implements ParserInterface
      */
     private function getFieldData(FieldMetadata $metadata, EntityDefinitionFieldConfig $config)
     {
-        return [
-            'description' => $config->getDescription(),
-            'required'    => !$metadata->isNullable(),
-            'dataType'    => $this->dataTypeConverter->convertDataType($metadata->getDataType())
-        ];
+        return $this->getPropertyData($metadata, $config);
     }
 
     /**
@@ -178,14 +192,12 @@ class ApiDocMetadataParser implements ParserInterface
         EntityDefinitionFieldConfig $config,
         RequestType $requestType
     ) {
-        $result = [
-            'description' => $config->getDescription(),
-            'required'    => !$metadata->isNullable(),
-            'dataType'    => $this->dataTypeConverter->convertDataType($metadata->getDataType())
-        ];
+        $result = $this->getPropertyData($metadata, $config);
         if (!DataType::isAssociationAsField($metadata->getDataType())) {
             $result['subType'] = $this->getEntityType($metadata->getTargetClassName(), $requestType);
-            $result['actualType'] = $metadata->isCollection() ? ApiDocDataTypes::COLLECTION : null;
+            $result['actualType'] = $metadata->isCollection()
+                ? ApiDocDataTypes::COLLECTION
+                : ApiDocDataTypes::MODEL;
         }
 
         return $result;

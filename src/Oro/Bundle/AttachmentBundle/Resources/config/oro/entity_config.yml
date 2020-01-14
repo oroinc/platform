@@ -27,6 +27,12 @@ entity_config:
                     options:
                         priority:           90
                         default_value:      1
+                    constraints:
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                            min:            1
+                            max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
                         options:
@@ -72,12 +78,13 @@ entity_config:
                 maxsize: # integer
                     options:
                         value_type:         integer
-                        allowed_type:       [file, image]
+                        allowed_type:       [file, image, multiFile, multiImage]
                     constraints:
                         - NotBlank:         ~
                         - Type:             integer
                         - Range:
                             min:            1
+                            max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
@@ -88,7 +95,7 @@ entity_config:
                             empty_data:     1
                             tooltip:        oro.attachment.max_size.tooltip
 
-                # the thubnail picture width in pixels
+                # picture thumbnail width in pixels
                 width: # integer
                     options:
                         value_type:         integer
@@ -106,7 +113,7 @@ entity_config:
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_width.tooltip
 
-                # the thubnail picture height in pixels
+                # picture thumbnail height in pixels
                 height: # integer
                     options:
                         value_type:         integer
@@ -126,6 +133,8 @@ entity_config:
 
                 # the list of all allowed MIME types
                 mimetypes: # string (MIME types are delimited by linefeed (\n) symbol)
+                    options:
+                        allowed_type:       [file, image, multiFile, multiImage]
                     constraints:
                         - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: ~
                     form:
@@ -136,3 +145,22 @@ entity_config:
                             required:       false
                             label:          oro.attachment.mimetypes
                             tooltip:        oro.attachment.mimetypes.tooltip
+
+                # the max number of files
+                max_number_of_files: # integer
+                    options:
+                        value_type:         integer
+                        allowed_type:       [multiFile, multiImage]
+                    constraints:
+                        - Type:             integer
+                        - Range:
+                              min:          1
+                              max:          32767
+                    form:
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        options:
+                            required:       false
+                            label:          oro.attachment.config.max_number_of_files.label
+                            block:          general
+                            subblock:       properties
+                            tooltip:        oro.attachment.config.max_number_of_files.tooltip

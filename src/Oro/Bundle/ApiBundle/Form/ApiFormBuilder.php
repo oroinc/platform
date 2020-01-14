@@ -7,6 +7,11 @@ use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilder;
 
+/**
+ * A builder for creating API Form instances.
+ * This builder adds NullTransformer to correct handling of NULL and empty string values.
+ * It is required because by default Symfony Forms replaces NULL with empty string.
+ */
 class ApiFormBuilder extends FormBuilder
 {
     /** @var array|null */
@@ -43,7 +48,7 @@ class ApiFormBuilder extends FormBuilder
     {
         $viewTransformers = parent::getViewTransformers();
         // if a field does not have any view transformer use a transformer that does nothing,
-        // this is required because by default Symfony Forms replaces NULL with empty string
+        // it is required because by default Symfony Forms replaces NULL with empty string
         if (empty($viewTransformers)) {
             if (null === $this->emptyViewTransformers) {
                 $this->emptyViewTransformers = [NullTransformer::getInstance()];

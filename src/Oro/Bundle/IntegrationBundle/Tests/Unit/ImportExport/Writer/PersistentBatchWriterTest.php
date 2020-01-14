@@ -32,7 +32,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->registry        = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $this->registry        = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
         $this->logger          = $this->createMock('Psr\Log\LoggerInterface');

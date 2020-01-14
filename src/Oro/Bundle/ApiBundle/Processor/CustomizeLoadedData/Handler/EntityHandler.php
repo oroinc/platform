@@ -91,7 +91,6 @@ class EntityHandler
         );
         $customizationContext->setSharedData($context['sharedData']);
 
-        /** @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass */
         $group = $this->collection ? 'collection' : 'item';
         $customizationContext->setFirstGroup($group);
         $customizationContext->setLastGroup($group);

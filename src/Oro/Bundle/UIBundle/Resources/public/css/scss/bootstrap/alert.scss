@@ -114,4 +114,14 @@
             }
         }
     }
+
+    &--compact {
+        padding: $alert-compact-inner-offset;
+        margin-bottom: $alert-compact-offset-buttom;
+        display: $alert-compact-display;
+
+        .alert-icon {
+            padding-left: $alert-compact-icon-inner-offset;
+        }
+    }
 }

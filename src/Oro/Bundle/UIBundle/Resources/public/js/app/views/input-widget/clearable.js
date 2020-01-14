@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ClearableInputWidgetView;
-    var $ = require('jquery');
-    var template = require('tpl!oroui/templates/clearable.html');
-    var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+    const $ = require('jquery');
+    const template = require('tpl-loader!oroui/templates/clearable.html');
+    const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
 
-    ClearableInputWidgetView = AbstractInputWidgetView.extend({
+    const ClearableInputWidgetView = AbstractInputWidgetView.extend({
         refreshOnChange: true,
 
         widgetFunctionName: 'clearable',
@@ -26,12 +25,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ClearableInputWidgetView() {
-            ClearableInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function ClearableInputWidgetView(options) {
+            ClearableInputWidgetView.__super__.constructor.call(this, options);
         },
 
         render: function() {
-            var $container = $(this.template({placeholderIcon: this.$el.data('placeholder-icon')}));
+            const $container = $(this.template({placeholderIcon: this.$el.data('placeholder-icon')}));
             this.$input = this.$el;
             this.$el.after($container);
             $container.prepend(this.$input);

@@ -1,18 +1,18 @@
-/* global $, bootbox, Util */
+/* global $, bootbox */
 // eslint-disable-next-line no-unused-vars
 function Util(rootMessagesElements) {
     'use strict';
 
     rootMessagesElements = rootMessagesElements || $('#alerts');
 
-    var messageTemplate = '<div class="alert fade in alert-{message-type} alert-dismissible" role="alert"> ' +
+    const messageTemplate = '<div class="alert fade in alert-{message-type} alert-dismissible" role="alert"> ' +
         '<span class="fa-{message-type}" aria-hidden="true"></span>' +
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
         '<span aria-hidden="true">&times;</span></button> ' +
         '{message} ' +
         '</div>';
 
-    var defaultDialogOptions = {
+    const defaultDialogOptions = {
         title: 'Is this something you really want to do?',
         message: 'Test message. Just a stub',
         className: 'confirm-dialog',
@@ -31,7 +31,7 @@ function Util(rootMessagesElements) {
     };
 
     function displayMessage(type, message) {
-        var html = messageTemplate
+        const html = messageTemplate
             .replace(/\{message-type}/g, type)
             .replace('{message}', message);
         rootMessagesElements.append(html);
@@ -52,7 +52,7 @@ function Util(rootMessagesElements) {
             cancelCallback = cancelCallback || function() {
             };
 
-            var dialogOptions = $.extend(true, defaultDialogOptions, {
+            const dialogOptions = $.extend(true, defaultDialogOptions, {
                 title: title,
                 message: message,
                 onEscape: cancelCallback,
@@ -74,7 +74,7 @@ function Util(rootMessagesElements) {
             window.location = url;
         },
         displayCookieMessage: function() {
-            var message = $.cookie('message');
+            const message = $.cookie('message');
             if (message) {
                 this.success(message);
                 $.removeCookie('message', {path: '/'});

@@ -2,30 +2,9 @@ parameters:
     oro_locale.entity.localization.class: Oro\Bundle\LocaleBundle\Entity\Localization
     oro_locale.entity.localized_fallback_value.class: Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
 
-    oro_locale.calendar.class: Oro\Bundle\LocaleBundle\Model\Calendar
-    oro_locale.calendar_factory.class: Oro\Bundle\LocaleBundle\Model\CalendarFactory
-
-    oro_locale.format_converter.date_time.registry.class: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry
-    oro_locale.format_converter.date_time.intl.class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
-    oro_locale.format_converter.date_time.moment.class: Oro\Bundle\LocaleBundle\Converter\MomentDateTimeFormatConverter
-    oro_locale.format_converter.date_time.php.class: Oro\Bundle\LocaleBundle\Converter\PhpDateTimeFormatConverter
-
-    oro_locale.formatter.name.class:      Oro\Bundle\LocaleBundle\Formatter\NameFormatter
-    oro_locale.formatter.address.class:   Oro\Bundle\LocaleBundle\Formatter\AddressFormatter
-    oro_locale.formatter.date_time.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter
-    oro_locale.formatter.number.class:    Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
-
-    oro_locale.dql.formatter.name.class:  Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter
-
-    oro_locale.entity_name_provider.class: Oro\Bundle\LocaleBundle\Provider\EntityNameProvider
-
-    oro_locale.locale_listener.class:   Oro\Bundle\LocaleBundle\EventListener\LocaleListener
-
-    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
-
 services:
     oro_locale.settings:
-        class: 'Oro\Bundle\LocaleBundle\Model\LocaleSettings'
+        class: Oro\Bundle\LocaleBundle\Model\LocaleSettings
         public: true
         arguments:
             - '@oro_config.manager'
@@ -38,7 +17,6 @@ services:
 
     oro_locale.configuration_provider:
         class: Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider
-        public: false
         arguments:
             - '@oro_locale.name_format_configuration.provider'
             - '@oro_locale.address_format_configuration.provider'
@@ -46,7 +24,6 @@ services:
 
     oro_locale.name_format_configuration.provider:
         class: Oro\Bundle\LocaleBundle\Configuration\NameFormatConfigurationProvider
-        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/locale_name_format.php'
@@ -54,7 +31,6 @@ services:
 
     oro_locale.address_format_configuration.provider:
         class: Oro\Bundle\LocaleBundle\Configuration\AddressFormatConfigurationProvider
-        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/locale_address_format.php'
@@ -62,14 +38,13 @@ services:
 
     oro_locale.locale_data_configuration.provider:
         class: Oro\Bundle\LocaleBundle\Configuration\LocaleDataConfigurationProvider
-        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/locale_data.php'
             - '%kernel.debug%'
 
     oro_locale.helper.localization:
-        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
+        class: Oro\Bundle\LocaleBundle\Helper\LocalizationHelper
         arguments:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
@@ -78,7 +53,7 @@ services:
         alias: oro_locale.helper.localization
 
     oro_locale.helper.default_locale_localization:
-        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
+        class: Oro\Bundle\LocaleBundle\Helper\LocalizationHelper
         arguments:
            - '@oro_locale.manager.localization'
            - '@oro_locale.provider.config_default_localization'
@@ -88,8 +63,7 @@ services:
             - { name: oro_service_link, service: oro_locale.helper.localization }
 
     oro_locale.listener.orm.localization_listener:
-        class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
-        public: false
+        class: Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener
         arguments:
             - '@oro_locale.translation.strategy.localization_fallback_strategy'
             - '@oro_locale.manager.localization'
@@ -99,7 +73,7 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postRemove }
 
     oro_locale.datagrid.extension.localized_value:
-        class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension'
+        class: Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
@@ -108,13 +82,12 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_locale.datagird.formatter.localized_value_property:
-        class: 'Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty'
+        class: Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: localized_value }
+            - { name: oro_datagrid.extension.formatter.property, type: localized_value }
 
     oro_locale.translation.strategy.localization_fallback_strategy:
-        class: 'Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy'
-        public: false
+        class: Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy
         arguments:
             - '@doctrine'
             - '@oro_locale.cache.provider.tree_fallback_strategy'
@@ -124,12 +97,11 @@ services:
     # Calendar
     oro_locale.calendar:
         shared: false
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        class: '%oro_locale.calendar.class%'
+        class: Oro\Bundle\LocaleBundle\Model\Calendar
 
     oro_locale.calendar_factory:
-        class: '%oro_locale.calendar_factory.class%'
+        class: Oro\Bundle\LocaleBundle\Model\CalendarFactory
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
@@ -137,10 +109,13 @@ services:
 
     # Converters
     oro_locale.format_converter.date_time.registry:
-        class: '%oro_locale.format_converter.date_time.registry.class%'
+        class: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry
+        arguments:
+            - [] # converter names
+            - ~ # service locator for converters
 
     oro_locale.format_converter.date_time.intl:
-        class: '%oro_locale.format_converter.date_time.intl.class%'
+        class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -148,7 +123,7 @@ services:
             - { name: oro_locale.format_converter.date_time, alias: intl }
 
     oro_locale.format_converter.date_time.moment:
-        class: '%oro_locale.format_converter.date_time.moment.class%'
+        class: Oro\Bundle\LocaleBundle\Converter\MomentDateTimeFormatConverter
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -156,7 +131,7 @@ services:
             - { name: oro_locale.format_converter.date_time, alias: moment }
 
     oro_locale.format_converter.date_time.php:
-        class: '%oro_locale.format_converter.date_time.php.class%'
+        class: Oro\Bundle\LocaleBundle\Converter\PhpDateTimeFormatConverter
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -165,7 +140,7 @@ services:
 
     # event listeners
     oro_locale.locale_listener:
-        class: '%oro_locale.locale_listener.class%'
+        class: Oro\Bundle\LocaleBundle\EventListener\LocaleListener
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.provider.current_localization'
@@ -178,7 +153,7 @@ services:
 
     # Formatters
     oro_locale.formatter.name:
-        class: '%oro_locale.formatter.name.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\NameFormatter
         arguments:
             - '@oro_locale.settings'
 
@@ -187,7 +162,7 @@ services:
             - { name: oro_service_link, service: oro_locale.formatter.name }
 
     oro_locale.formatter.address:
-        class: '%oro_locale.formatter.address.class%'
+        class: Oro\Bundle\LocaleBundle\Formatter\AddressFormatter
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.name'
@@ -196,23 +171,21 @@ services:
             - [setPhoneProvider, ['@oro_address.provider.phone']]
 
     oro_locale.formatter.date_time:
-        class: '%oro_locale.formatter.date_time.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter
         public: true
         arguments:
             - '@oro_locale.settings'
             - '@translator'
 
     oro_locale.formatter.number:
-        class: '%oro_locale.formatter.number.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
         public: true
         arguments:
             - '@oro_locale.settings'
 
     # DQL formatter
     oro_locale.dql.formatter.name:
-        class: '%oro_locale.dql.formatter.name.class%'
+        class: Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter
         arguments:
             - '@oro_locale.formatter.name'
 
@@ -221,15 +194,14 @@ services:
             - { name: oro_service_link, service: oro_locale.dql.formatter.name }
 
     oro_locale.formatter.language_code:
-        class: 'Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter
         public: true
         arguments:
             - '@translator'
             - '@oro_locale.settings'
 
     oro_locale.formatter.formatting_code:
-        class: 'Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter'
+        class: Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter
         arguments:
             - '@translator'
             - '@oro_locale.settings'
@@ -237,7 +209,6 @@ services:
     # Twig extensions
     oro_locale.twig.date_format:
         class: Oro\Bundle\LocaleBundle\Twig\DateFormatExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -245,7 +216,6 @@ services:
 
     oro_locale.twig.locale:
         class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -253,7 +223,6 @@ services:
 
     oro_locale.twig.calendar:
         class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -269,7 +238,6 @@ services:
 
     oro_locale.twig.address:
         class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -277,15 +245,13 @@ services:
 
     oro_locale.twig.number:
         class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.localization:
-        class: 'Oro\Bundle\LocaleBundle\Twig\LocalizationExtension'
-        public: false
+        class: Oro\Bundle\LocaleBundle\Twig\LocalizationExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -293,7 +259,6 @@ services:
 
     oro_locale.format.datetime:
         class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
-        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -302,7 +267,6 @@ services:
 
     oro_locale.format.date:
         class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
-        public: false
         arguments:
             - '@oro_locale.formatter.date_time'
             - '@translator'
@@ -311,15 +275,13 @@ services:
 
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
-        public: false
         arguments:
             - '@oro_locale.formatter.number'
         tags:
             - { name: oro_formatter, formatter: currency, data_type: money }
 
     oro_locale.entity_name_provider:
-        class: '%oro_locale.entity_name_provider.class%'
-        public: false
+        class: Oro\Bundle\LocaleBundle\Provider\EntityNameProvider
         arguments:
             - '@oro_locale.formatter.name.link'
             - '@oro_locale.dql.formatter.name.link'
@@ -327,20 +289,20 @@ services:
             - { name: oro_entity.name_provider, priority: -80 }
 
     oro_locale.validator.localization:
-        class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator'
+        class: Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator
         public: true
         tags:
             - { name: validator.constraint_validator, alias: oro_locale.localization_validator }
 
     oro_locale.validator.default_localization:
-        class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator'
+        class: Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator
         arguments:
             - '@oro_locale.manager.localization'
         tags:
             - { name: validator.constraint_validator, alias: oro_locale.default_localization_validator }
 
     oro_locale.acl.voter.localization:
-        class: 'Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter'
+        class: Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.manager'
@@ -350,13 +312,13 @@ services:
             - { name: security.voter }
 
     oro_locale.repository.localization:
-        class: 'Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository'
+        class: Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_locale.entity.localization.class%'
 
     oro_locale.provider.localization_choices:
-        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
+        class: Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider
         public: true
         arguments:
             - '@oro_locale.settings'
@@ -365,32 +327,32 @@ services:
             - '@oro_locale.manager.localization'
 
     oro_locale.manager.localization:
-        class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\LocaleBundle\Manager\LocalizationManager
         public: true
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_config.global'
+            - '@oro_config.manager'
             - '@oro.cache.memory_cache_chain'
 
     oro_locale.provider.current_localization:
-        class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
+        class: Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider
         arguments:
-            - !tagged oro_locale.extension.current_localization
+            - !tagged_iterator oro_locale.extension.current_localization
 
     oro_locale.provider.config_default_localization:
-        class: 'Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider'
+        class: Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider
         arguments:
             - '@oro_locale.manager.localization'
 
     oro_locale.entity_generator.extension:
-        class: '%oro_locale.entity_generator.extension.class%'
+        class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+        arguments:
+            - [] # a map of default fallback fields
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
     oro_locale.twig.date_time_organization:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
-        public: false
         parent: oro_locale.twig.date_time
         deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
         tags:
@@ -404,26 +366,32 @@ services:
             - { name: layout.data_provider, alias: locale }
 
     oro_locale.localization_scope_criteria_provider:
-        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider'
-        public: false
+        class: Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider
         arguments:
             - "@oro_locale.provider.current_localization"
         tags:
             - { name: oro_scope.provider, scopeType: web_content, priority: 1 }
 
-    oro_locale.provider.chain_preferred_language_provider:
-        class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLanguageProvider
-
-    oro_locale.provider.default_preferred_language_provider:
-        class: Oro\Bundle\LocaleBundle\Provider\DefaultPreferredLanguageProvider
-        public: false
+    oro_locale.provider.preferred_localization_provider:
+        class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLocalizationProvider
         arguments:
-            - '@oro_locale.settings'
+            - !tagged_iterator oro_locale.preferred_localization_provider
+
+    Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface:
+        alias: 'oro_locale.provider.preferred_localization_provider'
+        public: true
+
+    # Application default localization
+    # This provider should be called last
+    oro_locale.provider.preferred_localization_provider.default:
+        class: Oro\Bundle\LocaleBundle\Provider\DefaultPreferredLocalizationProvider
+        arguments:
+            - '@oro_locale.manager.localization'
         tags:
-            - { name: oro_locale.preferred_language_provider, priority: 255 }
+            - { name: oro_locale.preferred_localization_provider, priority: -255 }
 
     oro_locale_config.event_listener.localization_change:
-        class: 'Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener'
+        class: Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener
         arguments:
             - '@oro_config.user'
             - '@doctrine'

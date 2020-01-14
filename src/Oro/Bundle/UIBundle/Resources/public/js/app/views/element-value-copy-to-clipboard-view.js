@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ElementValueCopyToClipboardView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var error = require('oroui/js/error');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var messenger = require('oroui/js/messenger');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const error = require('oroui/js/error');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const messenger = require('oroui/js/messenger');
 
-    ElementValueCopyToClipboardView = BaseView.extend({
+    const ElementValueCopyToClipboardView = BaseView.extend({
         options: {
             elementSelector: null,
             messages: {
@@ -27,8 +26,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ElementValueCopyToClipboardView() {
-            ElementValueCopyToClipboardView.__super__.constructor.apply(this, arguments);
+        constructor: function ElementValueCopyToClipboardView(options) {
+            ElementValueCopyToClipboardView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -41,15 +40,15 @@ define(function(require) {
         },
 
         clickHandler: function() {
-            var $source = this.options.elementSelector !== null ? $(this.options.elementSelector) : this.$el;
-            var textToCopy = $source.text();
-            var $textarea = this.createUtilityTextarea(textToCopy);
+            const $source = this.options.elementSelector !== null ? $(this.options.elementSelector) : this.$el;
+            const textToCopy = $source.text();
+            const $textarea = this.createUtilityTextarea(textToCopy);
 
             $source.closest('.ui-dialog, body').append($textarea);
 
             if (tools.isIOS()) {
-                var selection = window.getSelection();
-                var range = document.createRange();
+                const selection = window.getSelection();
+                const range = document.createRange();
 
                 range.selectNodeContents($textarea[0]);
                 selection.removeAllRanges();
@@ -92,7 +91,7 @@ define(function(require) {
          * @return {jQuery}
          */
         createUtilityTextarea: function(value) {
-            var $textarea = $('<textarea/>', {'contenteditable': 'true', 'aria-hidden': 'true'});
+            const $textarea = $('<textarea/>', {'contenteditable': 'true', 'aria-hidden': 'true'});
 
             $textarea.css({position: 'fixed', top: '-1000px'}).val(value);
 

@@ -1,20 +1,20 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var mediator = require('oroui/js/mediator');
-    var sync = require('orosync/js/sync');
-    var messenger = require('oroui/js/messenger');
-    var __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const sync = require('orosync/js/sync');
+    const messenger = require('oroui/js/messenger');
+    const __ = require('orotranslation/js/translator');
 
-    var topic = require('module').config().topic;
+    const topic = require('module-config').default(module.id).topic;
 
-    var showNotification = function(message) {
+    const showNotification = function(message) {
         if (message.finished) {
             messenger.notificationMessage('warning', __('oro.attribute.attributes_import_has_finished'));
         }
     };
 
-    var onPageChange = function() {
+    const onPageChange = function() {
         sync.unsubscribe(topic, showNotification);
         mediator.off('page:request', onPageChange);
     };

@@ -1,23 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var ConditionBuilderView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var ConditionItemView = require('oroquerydesigner/js/app/views/condition-builder/condition-item-view');
-    var ConditionOperatorView = require('oroquerydesigner/js/app/views/condition-builder/condition-operator-view');
-    var ConditionsGroupView = require('oroquerydesigner/js/app/views/condition-builder/conditions-group-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const __ = require('orotranslation/js/translator');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const ConditionItemView = require('oroquerydesigner/js/app/views/condition-builder/condition-item-view');
+    const ConditionOperatorView = require('oroquerydesigner/js/app/views/condition-builder/condition-operator-view');
+    const ConditionsGroupView = require('oroquerydesigner/js/app/views/condition-builder/conditions-group-view');
     require('jquery-ui');
 
     /**
      * @typedef {ConditionBuilderView|ConditionItemView|ConditionsGroupView|ConditionOperatorView} ConditionView
      */
 
-    ConditionBuilderView = BaseView.extend({
+    const ConditionBuilderView = BaseView.extend({
         CONDITION_GROUP_CLASS: 'conditions-group',
         CONDITION_ITEM_CLASS: 'condition-item',
         CONDITION_OPERATOR_CLASS: 'condition-operator',
@@ -70,7 +70,7 @@ define(function(require) {
         autoRender: true,
 
         events: function() {
-            var events = {};
+            const events = {};
             events['mousedown ' + this.options.criteriaListSelector] = '_onCriteriaListMousedown';
             return events;
         },
@@ -113,8 +113,8 @@ define(function(require) {
                 this.stopListening(condition);
             }, this);
 
-            var props = ['criteriaModules', 'conditions', 'eventBus', 'value', '$criteriaList', '$content'];
-            for (var i = 0; i < props.length; i++) {
+            const props = ['criteriaModules', 'conditions', 'eventBus', 'value', '$criteriaList', '$content'];
+            for (let i = 0; i < props.length; i++) {
                 delete this[props[i]];
             }
 
@@ -141,7 +141,7 @@ define(function(require) {
         },
 
         _prepareOptions: function(options) {
-            var opts = $.extend(true, {}, this.defaults, options);
+            const opts = $.extend(true, {}, this.defaults, options);
             opts.conditionsGroup = $.extend({}, opts.sortable, opts.conditionsGroup, {
                 helper: this._renderHelper.bind(this),
                 start: this._onConditionsGroupGrab.bind(this),
@@ -176,7 +176,7 @@ define(function(require) {
         },
 
         _checkValueChange: function() {
-            var value = this._collectValue();
+            const value = this._collectValue();
             if (!tools.isEqualsLoosely(value, this.value)) {
                 this.value = value;
                 this.trigger('change', this.value);
@@ -210,7 +210,7 @@ define(function(require) {
          * @returns {ConditionView|undefined}
          */
         getConditionViewOfElement: function(elem) {
-            var cid = $(elem)
+            const cid = $(elem)
                 .filter('[data-role="condition-content"],[data-condition-cid]')
                 .closest('[data-condition-cid]').data('conditionCid');
             return this.conditions[cid];
@@ -235,8 +235,8 @@ define(function(require) {
          * @param {ConditionView} conditionView
          */
         unassignConditionSubview: function(conditionView) {
-            var name = 'condition:' + conditionView.cid;
-            var index = _.indexOf(this.subviews, conditionView);
+            const name = 'condition:' + conditionView.cid;
+            const index = _.indexOf(this.subviews, conditionView);
             if (index !== -1) {
                 this.subviews.splice(index, 1);
             }
@@ -255,7 +255,7 @@ define(function(require) {
             if (criteria === 'conditions-group-aggregated') {
                 criteria = 'conditions-group';
             }
-            var $criteria = this.$criteriaList.find('[data-criteria="' + criteria + '"]');
+            const $criteria = this.$criteriaList.find('[data-criteria="' + criteria + '"]');
             return $criteria.data('origin') || $criteria;
         },
 
@@ -276,7 +276,7 @@ define(function(require) {
          * @param {Object} optionsUpdate
          */
         updateCriteriaOptions: function(criteriaName, optionsUpdate) {
-            var $criteria = this.$criteriaList.find('[data-criteria="' + criteriaName + '"]');
+            const $criteria = this.$criteriaList.find('[data-criteria="' + criteriaName + '"]');
             _.extend($criteria.data('options'), optionsUpdate);
         },
 
@@ -291,13 +291,13 @@ define(function(require) {
          * @protected
          */
         _loadCriteriaModules: function() {
-            var deferred = $.Deferred();
-            var promise = this.criteriaModules = deferred.promise();
+            const deferred = $.Deferred();
+            const promise = this.criteriaModules = deferred.promise();
             // if some criteria requires addition modules, load them before initialization
-            var modules = this.$criteriaList.find('[data-module]').map(function(i, elem) {
+            const modules = this.$criteriaList.find('[data-module]').map(function(i, elem) {
                 return $(elem).data('module');
             }).get();
-            tools.loadModules(_.object(modules, modules), function(modules) {
+            loadModules(_.object(modules, modules), function(modules) {
                 this.criteriaModules = modules;
                 deferred.resolve(modules);
             }, this);
@@ -311,8 +311,8 @@ define(function(require) {
          * @returns {{view: {Function}, viewOptions: {Object}}}
          */
         _getConditionItemViewExtraOptions: function(criteria) {
-            var $criteria = this.getCriteriaOrigin(criteria);
-            var moduleName = $criteria.data('module');
+            const $criteria = this.getCriteriaOrigin(criteria);
+            const moduleName = $criteria.data('module');
             return {
                 view: this.criteriaModules[moduleName],
                 viewOptions: $criteria.data('options')
@@ -330,14 +330,14 @@ define(function(require) {
         },
 
         _renderValue: function(value) {
-            var lastValue = _.last(value);
+            const lastValue = _.last(value);
             //  If the last value item is a group of aggregated condition item, specify its group type
             if (this._isGroupOfAggregatedConditionItems(lastValue)) {
                 Object.defineProperty(lastValue, 'criteria', {value: 'conditions-group-aggregated'});
             }
 
-            var subviews = this._createConditionGroupSubviews(value);
-            var elements = _.map(subviews, function(view) {
+            const subviews = this._createConditionGroupSubviews(value);
+            const elements = _.map(subviews, function(view) {
                 return view.el;
             });
             this.$content.append(elements);
@@ -349,8 +349,8 @@ define(function(require) {
         },
 
         _renderCondition: function(criteria, value) {
-            var condition;
-            var validation = this.options.validation[criteria] || this.options.validation['condition-item'];
+            let condition;
+            const validation = this.options.validation[criteria] || this.options.validation['condition-item'];
             if (['conditions-group', 'conditions-group-aggregated'].indexOf(criteria) !== -1) {
                 condition = new ConditionsGroupView({
                     criteria: criteria,
@@ -384,7 +384,7 @@ define(function(require) {
          */
         _createConditionGroupSubviews: function(groupValue) {
             return _.map(groupValue, function(value, index) {
-                var criteria;
+                let criteria;
                 if (typeof value === 'string') {
                     criteria = this._getCriteriaOfConditionValue(groupValue[index + 1]);
                     return this._createConditionOperatorView(criteria, value);
@@ -396,8 +396,7 @@ define(function(require) {
         },
 
         _getCriteriaOfConditionValue: function(value) {
-            var criteria;
-            criteria = value.criteria || (_.isArray(value) ? 'conditions-group' : 'condition-item');
+            const criteria = value.criteria || (_.isArray(value) ? 'conditions-group' : 'condition-item');
             return criteria;
         },
 
@@ -407,12 +406,12 @@ define(function(require) {
          * @param {string=} operation
          */
         _createConditionOperatorView: function(beforeCriteria, operation) {
-            var operations = this.options.operations;
+            let operations = this.options.operations;
             if (beforeCriteria === 'conditions-group-aggregated') {
                 operations = ['AND'];
             }
 
-            var operatorView = new ConditionOperatorView({
+            const operatorView = new ConditionOperatorView({
                 autoRender: true,
                 tagName: 'li',
                 label: __('oro.querydesigner.condition_operation'),
@@ -426,7 +425,7 @@ define(function(require) {
         },
 
         _renderHelper: function(e, $condition) {
-            var $criteria = this.getCriteriaOrigin($condition.data('criteria'));
+            const $criteria = this.getCriteriaOrigin($condition.data('criteria'));
             this.currentDraggingElementHeight = $condition.height();
             return $criteria.clone()
                 .css({width: $criteria.outerWidth(), height: $criteria.outerHeight()})
@@ -438,8 +437,8 @@ define(function(require) {
         },
 
         _onStructureUpdate: function(e, ui) {
-            var group;
-            var condition;
+            let group;
+            let condition;
 
             if (ui.placeholder && ui.placeholder.hasClass('hide') ||
                 ui.sender && !$.contains(this.el, ui.sender[0]) ||
@@ -451,7 +450,7 @@ define(function(require) {
                 }
             } else if (ui.sender && ui.sender.is(this.$criteriaList)) {
                 // new condition
-                var criteria = ui.item.data('criteria');
+                const criteria = ui.item.data('criteria');
                 if (criteria !== 'aggregated-condition-item' || this._getConditionsGroupAggregated()) {
                     // regular condition
                     condition = this._renderCondition(criteria);
@@ -466,7 +465,7 @@ define(function(require) {
                 // existing condition rearrange
                 group = this.getConditionViewOfElement(ui.item.parent());
                 condition = this.getConditionViewOfElement(ui.item);
-                var oldGroup = this.getConditionViewOfElement(e.target);
+                const oldGroup = this.getConditionViewOfElement(e.target);
                 if (oldGroup !== group) {
                     oldGroup.unassignConditionSubview(condition);
                     group.assignConditionSubview(condition);
@@ -485,7 +484,7 @@ define(function(require) {
          * @param {ConditionView} closedConditionView
          */
         _onConditionClose: function(closedConditionView) {
-            var parentConditionView = _.find(this.conditions, function(conditionView) {
+            const parentConditionView = _.find(this.conditions, function(conditionView) {
                 return conditionView.subviews.indexOf(closedConditionView) !== -1;
             });
             this._updateOperators();
@@ -502,8 +501,8 @@ define(function(require) {
 
         _onCriteriaGrab: function(e, ui) {
             // create clone element just to remember place of item
-            var $origin = ui.item;
-            var $clone = $origin.clone();
+            const $origin = ui.item;
+            const $clone = $origin.clone();
             $origin.data('clone', $clone);
             $clone
                 .data('origin', $origin)
@@ -516,8 +515,8 @@ define(function(require) {
 
         _onCriteriaDrop: function(e, ui) {
             // put item back instead of it's clone
-            var $origin = ui.item;
-            var $clone = $origin.data('clone');
+            const $origin = ui.item;
+            const $clone = $origin.data('clone');
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
             this.$conditionContainer.removeClass('drag-start drop-area-over');
         },
@@ -557,7 +556,7 @@ define(function(require) {
         },
 
         _syncDropAreaOver: function(e, ui) {
-            var hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
+            const hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
 
             this.$conditionContainer
                 .toggleClass('drag-start', !hasPlaceholder)
@@ -565,7 +564,7 @@ define(function(require) {
         },
 
         _syncDropAreaOut: function(e, ui) {
-            var hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
+            const hasPlaceholder = this.$content.find('.sortable-placeholder').length !== 0;
 
             this.$conditionContainer
                 .removeClass('drag-start')
@@ -573,11 +572,11 @@ define(function(require) {
         },
 
         _isPlaceholderInValidPosition: function($condition, $placeholder) {
-            var criteria = $condition.data('criteria');
-            var groupAggregated = this._getConditionsGroupAggregated();
-            var condition = this.getConditionViewOfElement($condition);
-            var value = condition ? condition.getValue() : null;
-            var isValid;
+            const criteria = $condition.data('criteria');
+            const groupAggregated = this._getConditionsGroupAggregated();
+            const condition = this.getConditionViewOfElement($condition);
+            const value = condition ? condition.getValue() : null;
+            let isValid;
 
             if (!$.contains(this.el, $condition[0]) || !$.contains(this.el, $placeholder[0])) {
                 return false;
@@ -624,24 +623,24 @@ define(function(require) {
         },
 
         _updateOperators: function() {
-            var $conditions = this.$conditionContainer.find('.conditions-group>[data-condition-cid]');
+            const $conditions = this.$conditionContainer.find('.conditions-group>[data-condition-cid]');
 
             // remove operators for first items in groups
-            var selector = '.%s:first-child, .%s:last-child, .%s+.%s'.replace(/%s/g, this.CONDITION_OPERATOR_CLASS);
+            const selector = '.%s:first-child, .%s:last-child, .%s+.%s'.replace(/%s/g, this.CONDITION_OPERATOR_CLASS);
             $conditions.filter(selector).each(function(i, elem) {
-                var operator = this.getConditionViewOfElement(elem);
-                var group = this.getConditionViewOfElement(operator.$el.parent());
+                const operator = this.getConditionViewOfElement(elem);
+                const group = this.getConditionViewOfElement(operator.$el.parent());
                 operator.dispose();
                 group.unassignConditionSubview(operator);
             }.bind(this));
 
             // add condition operators where it is needed
             $conditions.filter('.condition:not(:first-child)').each(function(i, elem) {
-                var condition = this.getConditionViewOfElement(elem);
+                const condition = this.getConditionViewOfElement(elem);
                 if (condition && !condition.$el.prev().is('.' + this.CONDITION_OPERATOR_CLASS)) {
-                    var operator = this._createConditionOperatorView(condition.criteria);
+                    const operator = this._createConditionOperatorView(condition.criteria);
                     condition.$el.before(operator.$el);
-                    var group = this.getConditionViewOfElement(operator.$el.parent());
+                    const group = this.getConditionViewOfElement(operator.$el.parent());
                     group.assignConditionSubview(operator);
                 }
             }.bind(this));

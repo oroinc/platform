@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var HintView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var hintTemplate = require('tpl!orodatagrid/templates/hint/hint-view-template.html');
-    var _ = require('underscore');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const hintTemplate = require('tpl-loader!orodatagrid/templates/hint/hint-view-template.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    var popoverConfig = {
+    const popoverConfig = {
         content: '',
         trigger: 'manual',
         placement: 'bottom',
@@ -16,7 +15,7 @@ define(function(require) {
         template: hintTemplate()
     };
 
-    HintView = BaseView.extend({
+    const HintView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -35,15 +34,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HintView() {
-            HintView.__super__.constructor.apply(this, arguments);
+        constructor: function HintView(options) {
+            HintView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var whiteList = ['offsetOfEl', 'textEl', 'popoverConfig'];
+            const whiteList = ['offsetOfEl', 'textEl', 'popoverConfig'];
 
             _.extend(this, _.pick(options, whiteList));
 
@@ -55,7 +54,7 @@ define(function(require) {
                 this.popoverConfig
             ));
 
-            HintView.__super__.initialize.apply(this, arguments);
+            HintView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -85,7 +84,7 @@ define(function(require) {
          * @returns {boolean}
          */
         fullLabelIsVisible: function() {
-            var textEl = this.$(this.textEl).get(0) || null;
+            const textEl = this.$(this.textEl).get(0) || null;
 
             return textEl ? (textEl.scrollWidth <= textEl.offsetWidth) : true;
         },
@@ -96,9 +95,9 @@ define(function(require) {
          * @return {String}
          */
         calcPopoverOffset: function() {
-            var x = 0;
-            var y = 0;
-            var $offsetOfEl = $(this.offsetOfEl);
+            const x = 0;
+            let y = 0;
+            const $offsetOfEl = $(this.offsetOfEl);
 
             if ($offsetOfEl.length) {
                 y = $offsetOfEl[0].getBoundingClientRect().bottom - this.$el[0].getBoundingClientRect().bottom;
@@ -117,7 +116,7 @@ define(function(require) {
 
             this.$el.popover('hide');
             this.$el.popover('dispose');
-            HintView.__super__.dispose.apply(this, arguments);
+            HintView.__super__.dispose.call(this);
         }
     });
 

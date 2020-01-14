@@ -1,25 +1,23 @@
 parameters:
     oro_importexport.entity.import_export_result.class: Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
-    oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
-    oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
-    oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
+
     oro_importexport.import.size_of_batch: 100
     oro_importexport.export.size_of_batch: 5000
     oro_importexport.importexport_dir: import_export
 
 services:
     oro_importexport.template_fixture.entity_registry:
-        class: '%oro_importexport.template_fixture.entity_registry.class%'
+        class: Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
         calls:
             - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.template_fixture.manager:
-        class: '%oro_importexport.template_fixture.manager.class%'
+        class: Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
         arguments:
             - '@oro_importexport.template_fixture.entity_registry'
 
     oro_importexport.action.execute_job:
-        class: '%oro_importexport.action.execute_job.class%'
+        class: Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_importexport.job_executor'
@@ -27,7 +25,7 @@ services:
             - { name: oro_action.action, alias: execute_job }
 
     oro_importexport.formatter.formatter_provider:
-        class: 'Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider'
+        class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
         arguments:
             - '@service_container'
             - []
@@ -35,7 +33,7 @@ services:
         public: false
 
     oro_importexport.formatter.excel_datetime:
-        class: 'Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter'
+        class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
         public: true
         arguments:
             - '@oro_locale.settings'
@@ -46,7 +44,7 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: time, format_type: excel}
 
     oro_importexport.formatter.locale_number:
-        class: 'Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter'
+        class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
         public: true
         arguments:
             - '@oro_locale.formatter.number'
@@ -57,7 +55,7 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
 
     oro_importexport.async.import_export_result_summarizer:
-        class: 'Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer'
+        class: Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer
         arguments:
             - '@router'
             - '@oro_config.global'
@@ -68,13 +66,13 @@ services:
         alias: 'oro_importexport.async.import_export_result_summarizer'
 
     oro_importexport.writer.writer_chain:
-        class: 'Oro\Bundle\ImportExportBundle\Writer\WriterChain'
+        class: Oro\Bundle\ImportExportBundle\Writer\WriterChain
 
     oro_importexport.reader.reader_chain:
-        class: 'Oro\Bundle\ImportExportBundle\Reader\ReaderChain'
+        class: Oro\Bundle\ImportExportBundle\Reader\ReaderChain
 
     oro_importexport.file.file_manager:
-        class: 'Oro\Bundle\ImportExportBundle\File\FileManager'
+        class: Oro\Bundle\ImportExportBundle\File\FileManager
         public: true
         arguments:
           - '@knp_gaufrette.filesystem_map'
@@ -83,7 +81,7 @@ services:
         alias: 'oro_importexport.file.file_manager'
 
     oro_importexport.file.batch_file_manager.abstract:
-        class: 'Oro\Bundle\ImportExportBundle\File\BatchFileManager'
+        class: Oro\Bundle\ImportExportBundle\File\BatchFileManager
         abstract: true
         arguments:
           - '@oro_importexport.file.file_manager'
@@ -101,11 +99,13 @@ services:
           - '%oro_importexport.export.size_of_batch%'
 
     oro_importexport.job.context.aggregator_registry:
-        class: 'Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry'
+        class: Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry
         public: false
+        arguments:
+            - !tagged_iterator oro_importexport.job.context.aggregator
 
     oro_importexport.job.context.aggregator.selective:
-        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator'
+        class: Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator
         public: false
         arguments:
             - '@oro_importexport.context_registry'
@@ -113,7 +113,7 @@ services:
             - { name: 'oro_importexport.job.context.aggregator' }
 
     oro_importexport.job.context.aggregator.simple:
-        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator'
+        class: Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator
         public: false
         arguments:
             - '@oro_importexport.context_registry'
@@ -121,13 +121,13 @@ services:
             - { name: 'oro_importexport.job.context.aggregator' }
 
     oro_importexport.configuration.registry:
-        class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'
+        class: Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry
 
     Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry:
         alias: oro_importexport.configuration.registry
 
     oro_importexport.twig_extension.get_import_export_configuration:
-        class: 'Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension'
+        class: Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -137,7 +137,7 @@ services:
         alias: 'oro_importexport.twig_extension.get_import_export_configuration'
 
     oro_importexport.twig_extension.basename:
-        class: 'Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension'
+        class: Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension
         public: false
         tags:
             - { name: twig.extension }

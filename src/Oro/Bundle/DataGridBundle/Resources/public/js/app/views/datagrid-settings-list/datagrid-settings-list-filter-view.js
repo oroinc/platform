@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsListFilterView;
-    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-filter.html');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid-settings/datagrid-settings-filter.html');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @class DatagridSettingsListFilterView
      * @extends BaseView
      */
-    DatagridSettingsListFilterView = BaseView.extend({
+    const DatagridSettingsListFilterView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -42,8 +41,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatagridSettingsListFilterView() {
-            DatagridSettingsListFilterView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListFilterView(options) {
+            DatagridSettingsListFilterView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -51,15 +50,15 @@ define(function(require) {
          */
         initialize: function(options) {
             this.onSearch = _.debounce(this.onSearch, 100);
-            DatagridSettingsListFilterView.__super__.initialize.apply(this, arguments);
+            DatagridSettingsListFilterView.__super__.initialize.call(this, options);
         },
 
         /**
          * Update view
          */
         updateView: function() {
-            var search = this.model.get('search');
-            var renderable = Boolean(this.model.get('renderable'));
+            const search = this.model.get('search');
+            const renderable = Boolean(this.model.get('renderable'));
             this.$('[data-role="datagrid-settings-search"]').val(search);
             this.$('[data-role="datagrid-settings-search-wrapper"]').toggleClass('empty', !search.length);
             this.$('[data-role="datagrid-settings-show-all"]').toggleClass('active', !renderable);

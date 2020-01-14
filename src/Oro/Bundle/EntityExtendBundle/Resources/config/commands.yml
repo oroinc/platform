@@ -19,7 +19,6 @@ services:
 
     Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand:
         parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand
         public: false
         tags:
             - { name: console.command }
@@ -27,7 +26,6 @@ services:
 
     Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand:
         parent: 'Oro\Bundle\EntityExtendBundle\Command\CacheCommand'
-        class: Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand
         public: false
         tags:
             - { name: console.command }

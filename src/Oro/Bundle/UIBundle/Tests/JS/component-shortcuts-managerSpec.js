@@ -1,17 +1,10 @@
-require({
-    config: {
-        'oroui/js/component-shortcuts-manager': {
-            reservedKeys: ['options', 'testOption']
-        }
-    }
-});
-
-define(['underscore'], function(_) {
+define(function(require) {
     'use strict';
 
-    var componentShortcutsManager;
+    const _ = require('underscore');
+    const componentShortcutsManagerModuleInjector = require('inject-loader!oroui/js/component-shortcuts-manager');
 
-    var testWidgetConfiguration = {
+    const testWidgetConfiguration = {
         moduleName: 'test-path-to-module',
         options: {
             widgetName: 'test-path-to-widget'
@@ -19,16 +12,30 @@ define(['underscore'], function(_) {
     };
 
     describe('Component Shortcuts Manager', function() {
-        beforeEach(function(done) {
-            requirejs.undef('oroui/js/component-shortcuts-manager');
-            require(['oroui/js/component-shortcuts-manager'], function(m) {
-                componentShortcutsManager = m;
-                done();
+        let componentShortcutsManager;
+
+        beforeEach(function() {
+            componentShortcutsManager = componentShortcutsManagerModuleInjector({
+                'module-config': {
+                    'default': () => ({reservedKeys: ['options', 'someReservedName']})
+                }
             });
         });
 
         it('Initialize manager with custom module config', function() {
-            expect(componentShortcutsManager.reservedKeys).toEqual(['options', 'testOption']);
+            expect(() => {
+                componentShortcutsManager.add('someComponent', {
+                    moduleName: 'some/module/name'
+                });
+            }).not.toThrowError();
+
+            expect(() => {
+                componentShortcutsManager.add('someReservedName', {
+                    moduleName: 'some/module/name'
+                });
+            }).toThrow(
+                new Error('Component shortcut `someReservedName` is reserved!')
+            );
         });
 
         it('Add shortcut', function() {
@@ -74,9 +81,9 @@ define(['underscore'], function(_) {
         });
 
         it('Get all shortcuts', function() {
-            var iterations = 5;
+            const iterations = 5;
 
-            for (var i = 0; i < iterations; i++) {
+            for (let i = 0; i < iterations; i++) {
                 componentShortcutsManager.add('test_' + i, testWidgetConfiguration);
             }
 
@@ -85,9 +92,9 @@ define(['underscore'], function(_) {
 
         it('Get component object data', function() {
             componentShortcutsManager.add('test', testWidgetConfiguration);
-            var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {test: true});
-            var shortcut = componentShortcutsManager.getAll()['test'];
-            var elemData = {};
+            const testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {test: true});
+            const shortcut = componentShortcutsManager.getAll()['test'];
+            const elemData = {};
             elemData[shortcut.dataKey] = {test: true};
 
             expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({
@@ -97,10 +104,10 @@ define(['underscore'], function(_) {
         });
 
         it('Get component object data - simple', function() {
-            var shortcut = {
+            const shortcut = {
                 dataKey: 'pageComponentTest'
             };
-            var elemData = {};
+            const elemData = {};
             elemData[shortcut.dataKey] = 'component-name';
             expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({
                 pageComponentModule: 'component-name',
@@ -110,9 +117,9 @@ define(['underscore'], function(_) {
 
         it('Get component object data - scalar', function() {
             componentShortcutsManager.add('test', _.extend({}, testWidgetConfiguration, {scalarOption: 'height'}));
-            var testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
-            var shortcut = componentShortcutsManager.getAll()['test'];
-            var elemData = {};
+            const testPageComponentOptions = _.extend({}, testWidgetConfiguration.options, {height: 80});
+            const shortcut = componentShortcutsManager.getAll()['test'];
+            const elemData = {};
             elemData[shortcut.dataKey] = 80;
 
             expect(componentShortcutsManager.getComponentData(shortcut, elemData)).toEqual({

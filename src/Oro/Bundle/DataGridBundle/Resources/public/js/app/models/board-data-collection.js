@@ -11,27 +11,25 @@ define([
      * @augment BaseCollection
      * @exports RoutingCollection
      */
-    var BoardDataCollection;
-
-    BoardDataCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
+    const BoardDataCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
         /**
          * @inheritDoc
          */
-        constructor: function BoardDataCollection() {
-            BoardDataCollection.__super__.constructor.apply(this, arguments);
+        constructor: function BoardDataCollection(...args) {
+            BoardDataCollection.__super__.constructor.apply(this, args);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(models, options) {
-            BoardDataCollection.__super__.initialize.apply(this, arguments);
+            BoardDataCollection.__super__.initialize.call(this, models, options);
         },
 
         updateBoardItem: function(item, update) {
             item = this.get(item.get('id'));
-            var itemIndex = this.indexOf(item);
-            var insertIndex;
+            const itemIndex = this.indexOf(item);
+            let insertIndex;
             if (update.insertAfter) {
                 update.insertAfter = this.get(update.insertAfter);
                 if (!update.insertAfter) {

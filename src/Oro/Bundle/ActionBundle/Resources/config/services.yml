@@ -1,7 +1,6 @@
 services:
     oro_action.handler.delete:
         class: 'Oro\Bundle\ActionBundle\Handler\DeleteHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.delete_handler_registry'
@@ -75,6 +74,7 @@ services:
     oro_action.operation_registry:
         class: 'Oro\Bundle\ActionBundle\Model\OperationRegistry'
         arguments:
+            - [] # filters
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
             - '@oro_action.provider.current_application'
@@ -140,13 +140,13 @@ services:
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
-
     oro_action.provider.doctrine_type_mapping:
         class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
+        arguments:
+            - [] # extensions
 
     oro_action.form.handler.operation_button:
         class: 'Oro\Bundle\ActionBundle\Handler\OperationFormHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@form.factory'
@@ -166,7 +166,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: oro_datagrid.extension.action.provider, priority: 250 }
+            - { name: oro_datagrid.extension.action.provider, priority: -250 }
 
     oro_action.datagrid.extension.delete_mass_action:
         class: 'Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension'
@@ -185,12 +185,13 @@ services:
         arguments:
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: button-widget }
 
     oro_action.datagrid.mass_action_provider.registry:
         class: 'Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry'
+        arguments:
+            - ~ # service locator for mass action providers
 
     oro_action.layout.data_provider.button_provider:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider'
@@ -203,19 +204,17 @@ services:
 
     oro_action.provider.button_search_context:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_action.helper.context'
 
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        lazy: true
-        calls:
-            - [setLogger, ['@logger']]
-            - [setEventDispatcher, ['@event_dispatcher']]
+        arguments:
+            - [] # extensions
+            - '@event_dispatcher'
+            - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_action }
 

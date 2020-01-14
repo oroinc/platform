@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Filter;
 
+use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
@@ -44,9 +45,12 @@ class EmailStringFilter extends StringFilter
         $sourceParameters = $sourceParametersCollection->toArray();
 
         $expression = $this->buildExpr($ds, $parsedData['type'], $this->getDataFieldName(), $parsedData);
-        $parameters = array_diff(
+        $parameters = array_udiff(
             $ds->getQueryBuilder()->getParameters()->toArray(),
-            $sourceParameters
+            $sourceParameters,
+            function (Parameter $a, Parameter $b) {
+                return $a <=> $b;
+            }
         );
 
         $ds->getQueryBuilder()->setParameters($sourceParametersCollection);

@@ -1,0 +1,7 @@
+configs:
+    orotranslation/js/translation-loader: {}
+    orotranslation/js/translator: {}
+dynamic-imports:
+    commons:
+        - orotranslation/js/app/views/editor/text-editor-view
+        - orotranslation/js/translator

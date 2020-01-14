@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var AddressBookView = require('oroaddress/js/address-book');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const AddressBookView = require('oroaddress/js/address-book');
 
-    AddressBookComponent = BaseComponent.extend({
+    const AddressBookComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
             'addressListUrl', 'addressBookSelector', 'addresses', 'addressMapOptions'
         ]),
@@ -15,8 +14,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AddressBookComponent() {
-            AddressBookComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookComponent(options) {
+            AddressBookComponent.__super__.constructor.call(this, options);
         },
 
         /**

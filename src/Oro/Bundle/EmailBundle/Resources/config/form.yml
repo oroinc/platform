@@ -1,66 +1,34 @@
-parameters:
-    oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
-    oro_email.form.subscriber.autoresponserule.class:     Oro\Bundle\EmailBundle\Form\EventListener\AutoResponseRuleSubscriber
-    oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
-    oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
-    oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
-    oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
-    oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
-    oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
-    oro_email.form.type.system_emailtemplate_select.class: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType
-    oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
-    oro_email.form.handler.emailtemplate.class:           Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
-    oro_email.form.type.emailtemplate.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType
-    oro_email.form.handler.email.class:                   Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
-    oro_email.form.handler.email.api.class:               Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler
-    oro_email.form.type.email.class:                      Oro\Bundle\EmailBundle\Form\Type\EmailType
-    oro_email.form.type.email.api.class:                  Oro\Bundle\EmailBundle\Form\Type\EmailApiType
-    oro_email.form.type.email_folder.api.class:           Oro\Bundle\EmailBundle\Form\Type\EmailFolderApiType
-    oro_email.form.type.email_address.class:              Oro\Bundle\EmailBundle\Form\Type\EmailAddressType
-    oro_email.form.type.email_address.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailAddressApiType
-    oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
-    oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
-    oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
-    oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
-    oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
-    oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
-    oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
-    oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
-    oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
-    oro_email.form.type.email_address_from.class:         Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType
-    oro_email.form.type.email_address_recipients.class:   Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType
-
 services:
     oro_email.form.subscriber.emailtemplate:
-        class: '%oro_email.form.subscriber.emailtemplate.class%'
+        class: Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
         arguments:
             - '@security.token_storage'
 
     oro_email.form.subscriber.autoresponserule:
-        class: '%oro_email.form.subscriber.autoresponserule.class%'
+        class: Oro\Bundle\EmailBundle\Form\EventListener\AutoResponseRuleSubscriber
         arguments:
             - '@oro_security.token_accessor'
 
     oro_email.form.type.autoresponserule:
-        class: '%oro_email.form.type.autoresponserule.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
         arguments:
             - '@oro_email.form.subscriber.autoresponserule'
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
 
     oro_email.form.type.autoresponse_template:
-        class: '%oro_email.form.type.autoresponse_template.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
         arguments:
             - '@oro_config.global'
             - '@oro_config.user'
-            - '@oro_locale.settings'
             - '@doctrine'
             - '@oro_locale.manager.localization'
+            - '@oro_ui.html_tag_helper'
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template }
 
     oro_email.form.type.autoresponse_template_choice:
-        class: '%oro_email.form.type.autoresponse_template_choice.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
         arguments:
             - '@oro_security.token_accessor'
             - '@translator'
@@ -68,7 +36,7 @@ services:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
 
     oro_email.form.extension.mailbox_unbound_rules:
-        class: '%oro_email.form.extension.mailbox_unbound_rules.class%'
+        class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
         arguments:
             - '@doctrine'
         tags:
@@ -76,28 +44,25 @@ services:
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["oro_email_emailtemplate", Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType, null]
 
     oro_email.form.type.emailtemplate:
-        class: '%oro_email.form.type.emailtemplate.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
         arguments:
             - '@oro_config.user'
-            - '@oro_locale.settings'
-        calls:
-            - [setLocalizationManager, ['@oro_locale.manager.localization']]
+            - '@oro_locale.manager.localization'
         tags:
             - { name: form.type, alias: oro_email_emailtemplate }
 
-    oro_email.form.type.emailtemplate_translation:
-        class: '%oro_email.form.type.emailtemplate_translation.class%'
+    oro_email.form.email_template_localization_type:
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
         arguments:
-            - '@oro_config.user'
-            - 'Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType'
+            - '@translator'
+            - '@oro_locale.manager.localization'
         tags:
-            - { name: form.type, alias: oro_email_emailtemplate_translatation }
+            - { name: form.type }
 
     oro_email.form.type.emailtemplate_rich_text:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType
@@ -105,31 +70,28 @@ services:
             - { name: form.type, alias: oro_email_template_rich_text }
 
     oro_email.form.type.emailtemplate_select:
-        class: '%oro_email.form.type.emailtemplate_select.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
         tags:
             - { name: form.type, alias: oro_email_template_list }
 
     oro_email.form.type.system_emailtemplate_select:
-        class: '%oro_email.form.type.system_emailtemplate_select.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType
         arguments:
             - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_email_system_template_list }
 
     oro_email.form.handler.emailtemplate:
-        class: '%oro_email.form.handler.emailtemplate.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
         public: true
         arguments:
             - '@oro_email.form.emailtemplate'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
             - '@translator'
-        calls:
-            - [setDefaultLocale, ['%stof_doctrine_extensions.default_locale%']]
 
     oro_email.form.handler.email:
-        class: '%oro_email.form.handler.email.class%'
+        class: Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
         public: true
         arguments:
             - '@oro_email.form.email'
@@ -150,7 +112,7 @@ services:
         alias: 'oro_email.form.email'
 
     oro_email.form.type.email:
-        class: '%oro_email.form.type.email.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailType
         arguments:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
@@ -161,8 +123,7 @@ services:
             - { name: form.type, alias: oro_email_email }
 
     oro_email.form.handler.email.api:
-        class: '%oro_email.form.handler.email.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler
         public: true
         arguments:
             - '@oro_email.form.email.api'
@@ -176,7 +137,6 @@ services:
 
     oro_email.form.email.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -184,27 +144,27 @@ services:
             - Oro\Bundle\EmailBundle\Form\Type\EmailApiType
 
     oro_email.form.type.email.api:
-        class: '%oro_email.form.type.email.api.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailApiType
         tags:
             - { name: form.type, alias: oro_email_email_api }
 
     oro_email.form.type.email_folder.api:
-        class: '%oro_email.form.type.email_folder.api.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailFolderApiType
         tags:
             - { name: form.type, alias: oro_email_email_folder_api }
 
     oro_email.form.type.email_address:
-        class: '%oro_email.form.type.email_address.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAddressType
         tags:
             - { name: form.type, alias: oro_email_email_address }
 
     oro_email.form.type.email_address.api:
-        class: '%oro_email.form.type.email_address.api.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAddressApiType
         tags:
             - { name: form.type, alias: oro_email_email_address_api }
 
     oro_email.form.type.attachment:
-        class: '%oro_email.form.type.attachment.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email_attachment_transformer'
@@ -212,22 +172,22 @@ services:
             - { name: form.type, alias: oro_email_attachment }
 
     oro_email.form.type.attachments:
-        class: '%oro_email.form.type.attachments.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
         tags:
             - { name: form.type, alias: oro_email_attachments }
 
     oro_email.form.type.email_link_to_scope:
-        class: '%oro_email.form.type.email_link_to_scope.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
         tags:
             - { name: form.type, alias: oro_email_link_to_scope }
 
     oro_email.form.type.mailbox_grid:
-        class: '%oro_email.form.type.mailbox_grid.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
         tags:
             - { name: form.type, alias: oro_email_mailbox_grid }
 
     oro_email.form.type.mailbox:
-        class: '%oro_email.form.type.mailbox.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\MailboxType
         arguments:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.encoder.default'
@@ -236,8 +196,7 @@ services:
             - { name: form.type, alias: oro_email_mailbox }
 
     oro_email.form.handler.mailbox:
-        class: '%oro_email.form.handler.mailbox.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
         public: true
         arguments:
             - '@form.factory'
@@ -247,34 +206,34 @@ services:
             - '@event_dispatcher'
 
     oro_email.form.handler.email_configuration:
-        class: 'Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler'
+        class: Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler
         public: true
         arguments:
             - '@event_dispatcher'
 
     oro_email.form.configurator.email_configuration:
-        class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
+        class: Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator
         public: true
         arguments:
             - '@oro_security.encoder.default'
             - '@validator'
 
     oro_email.form.factory:
-        class: '%oro_email.form.factory.class%'
+        class: Oro\Bundle\EmailBundle\Form\Model\Factory
 
     oro_email.form.type.email_folder_tree:
-        class: '%oro_email.form.type.email_folder_tree.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
         tags:
             - { name: form.type, alias: oro_email_email_folder_tree }
 
     oro_email.form.type.filter.originfolder:
-        class: '%oro_email.form.type.filter.originfolder.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_originfolder_filter }
 
     oro_email.form.type.email_address_from:
-        class: '%oro_email.form.type.email_address_from.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
@@ -283,7 +242,7 @@ services:
             - { name: form.type, alias: oro_email_email_address_from }
 
     oro_email.form.type.email_origin_from:
-        class: 'Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
@@ -295,7 +254,7 @@ services:
             - { name: form.type, alias: oro_email_email_origin_from }
 
     oro_email.form.type.email_address_recipients:
-        class: '%oro_email.form.type.email_address_recipients.class%'
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType
         arguments:
             - '@oro_config.global'
         tags:
@@ -306,4 +265,4 @@ services:
         arguments:
             - '@security.authorization_checker'
         tags:
-            - { name: form.type_extension, extended_type: 'Oro\Bundle\EmailBundle\Form\Type\EmailType' }
+            - { name: form.type_extension, extended_type: Oro\Bundle\EmailBundle\Form\Type\EmailType }

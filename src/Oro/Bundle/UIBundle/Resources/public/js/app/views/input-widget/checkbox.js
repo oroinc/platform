@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var CheckboxInputWidget;
-    var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
-    var $ = require('jquery');
-    var defaultTemplate = require('tpl!oroui/templates/checkbox/default-template.html');
+    const AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    const $ = require('jquery');
+    const defaultTemplate = require('tpl-loader!oroui/templates/checkbox/default-template.html');
 
-    CheckboxInputWidget = AbstractInputWidget.extend({
+    const CheckboxInputWidget = AbstractInputWidget.extend({
         /**
          * @property {Template}
          */
@@ -26,8 +25,8 @@ define(function(require) {
          * @inheritDoc
          * @returns {*}
          */
-        constructor: function CheckboxInputWidget() {
-            return CheckboxInputWidget.__super__.constructor.apply(this, arguments);
+        constructor: function CheckboxInputWidget(options) {
+            return CheckboxInputWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -51,7 +50,7 @@ define(function(require) {
         _buildCustomCheckbox: function() {
             this.type = this.$el.attr('type');
 
-            var container = document.createElement('span');
+            const container = document.createElement('span');
             container.className = 'checkbox-view';
             container.innerHTML = this.template({
                 type: this.type
@@ -73,7 +72,7 @@ define(function(require) {
             this.$checkboxContainer.before(this.$el);
             this.$checkboxContainer.remove();
 
-            CheckboxInputWidget.__super__.disposeWidget.apply(this, arguments);
+            CheckboxInputWidget.__super__.disposeWidget.call(this);
         }
     });
 

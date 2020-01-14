@@ -50,19 +50,19 @@ define([
         },
 
         onSelectVar: function(e) {
-            var variable = e.target.text;
+            const variable = e.target.text;
             this.options.onSelect(variable);
             e.preventDefault();
         },
 
         render: function() {
-            var o = this.options;
-            var currentDatePart = o.part;
-            var dateVars = this._getVariablesByPart(currentDatePart);
-            var tooltipTemplate = _.template(o.tooltipTemplate);
-            var htmlTemplate = _.template(o.htmlTemplate);
+            const o = this.options;
+            const currentDatePart = o.part;
+            const dateVars = this._getVariablesByPart(currentDatePart);
+            const tooltipTemplate = _.template(o.tooltipTemplate);
+            const htmlTemplate = _.template(o.htmlTemplate);
 
-            var $dv = $(htmlTemplate({
+            const $dv = $(htmlTemplate({
                 attributes: '',
                 title: __('oro.filter.date.variable.title'),
                 tooltipHTML: tooltipTemplate({
@@ -77,7 +77,7 @@ define([
         },
 
         _getVariablesByPart: function(datePart) {
-            var dateVars = this.options.dateVars;
+            const dateVars = this.options.dateVars;
             return dateVars[datePart] ? dateVars[datePart] : dateVars.value;
         }
     });

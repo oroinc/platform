@@ -17,45 +17,55 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides information required to build the activity list, delegating the retrieving of this information
  * to providers registered for each of activity entity.
  *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ActivityListChainProvider
+class ActivityListChainProvider implements ResetInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var string[] */
+    private $activityClasses;
 
-    /** @var ActivityListProviderInterface[] */
-    protected $providers;
+    /** @var string[] [activity class => activity ACL class, ...] */
+    private $activityAclClasses;
+
+    /** @var ContainerInterface */
+    private $providerContainer;
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var EntityRoutingHelper */
-    protected $routingHelper;
-
-    /** @var array */
-    protected $targetClasses;
-
-    /** @var string[] */
-    protected $activities;
-
-    /** @var string[] */
-    protected $ownerActivities;
+    private $routingHelper;
 
     /** @var TokenAccessorInterface */
     private $tokenAccessor;
 
+    /** @var array [accessible flag => [class name, ...], ...] */
+    private $targetClasses;
+
+    /** @var string[] */
+    private $ownerActivityClasses;
+
+    /** @var ActivityListProviderInterface[] */
+    private $providers;
+
     /**
+     * @param string[]               $activityClasses
+     * @param string[]               $activityAclClasses
+     * @param ContainerInterface     $providerContainer
      * @param DoctrineHelper         $doctrineHelper
      * @param ConfigManager          $configManager
      * @param TranslatorInterface    $translator
@@ -63,45 +73,54 @@ class ActivityListChainProvider
      * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
+        array $activityClasses,
+        array $activityAclClasses,
+        ContainerInterface $providerContainer,
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator,
         EntityRoutingHelper $routingHelper,
         TokenAccessorInterface $tokenAccessor
     ) {
+        $this->activityClasses = $activityClasses;
+        $this->activityAclClasses = $activityAclClasses;
+        $this->providerContainer = $providerContainer;
         $this->doctrineHelper = $doctrineHelper;
-        $this->configManager  = $configManager;
-        $this->translator     = $translator;
-        $this->routingHelper  = $routingHelper;
-        $this->tokenAccessor  = $tokenAccessor;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
+        $this->routingHelper = $routingHelper;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
-     * Add activity list provider
-     *
-     * @param ActivityListProviderInterface $provider
+     * {@inheritDoc}
      */
-    public function addProvider(ActivityListProviderInterface $provider)
+    public function reset()
     {
-        $this->providers[$provider->getActivityClass()] = $provider;
-
-        $this->activities      = null;
-        $this->ownerActivities = null;
-        $this->targetClasses   = null;
+        $this->ownerActivityClasses = null;
+        $this->targetClasses = null;
+        $this->providers = null;
     }
 
     /**
-     * Get all registered providers
+     * Gets all registered activity list providers.
      *
      * @return ActivityListProviderInterface[] [activity class => provider, ...]
      */
-    public function getProviders()
+    public function getProviders(): array
     {
+        if (null === $this->providers) {
+            $this->providers = [];
+            foreach ($this->activityClasses as $activityClass) {
+                $this->providers[$activityClass] = $this->providerContainer->get($activityClass);
+            }
+        }
+
         return $this->providers;
     }
 
     /**
-     * Get array with all target classes (entities where activity can be assigned to)
+     * Gets the list of all target entity classes (entities to which an activity can be assigned to).
      *
      * @param bool $accessible Whether only targets are ready to be used in a business logic should be returned.
      *                         It means that an association with the target entity should exist
@@ -109,81 +128,91 @@ class ActivityListChainProvider
      *
      * @return string[]
      */
-    public function getTargetEntityClasses($accessible = true)
+    public function getTargetEntityClasses(bool $accessible = true): array
     {
-        if (null === $this->targetClasses || !isset($this->targetClasses[$accessible])) {
+        $accessibleKey = (string)$accessible;
+        if (null === $this->targetClasses || !isset($this->targetClasses[$accessibleKey])) {
             $targetClasses = [];
             /** @var ConfigIdInterface[] $configIds */
             $configIds = $this->configManager->getIds('entity');
             foreach ($configIds as $configId) {
                 $entityClass = $configId->getClassName();
-                foreach ($this->providers as $provider) {
+                $providers = $this->getProviders();
+                foreach ($providers as $provider) {
                     if ($provider->isApplicableTarget($entityClass, $accessible)) {
                         $targetClasses[] = $entityClass;
                         break;
                     }
                 }
             }
-            $this->targetClasses[$accessible] = $targetClasses;
+            $this->targetClasses[$accessibleKey] = $targetClasses;
         }
 
-        return $this->targetClasses[$accessible];
+        return $this->targetClasses[$accessibleKey];
     }
 
     /**
-     * @param string $targetClassName
-     * @param string $activityClassName
+     * @param string $targetClass
+     * @param string $activityClass
      *
      * @return bool
      */
-    public function isApplicableTarget($targetClassName, $activityClassName)
+    public function isApplicableTarget(string $targetClass, string $activityClass): bool
     {
         return
-            isset($this->providers[$activityClassName])
-            && $this->providers[$activityClassName]->isApplicableTarget($targetClassName);
+            \in_array($activityClass, $this->activityClasses, true)
+            && $this->getProviderByClass($activityClass)->isApplicableTarget($targetClass);
     }
 
     /**
-     * Get array with supported activity classes
+     * Gets the list of supported activity classes.
      *
-     * @return array
+     * @return string[]
      */
-    public function getSupportedActivities()
+    public function getSupportedActivities(): array
     {
-        if (null === $this->activities) {
-            $this->activities = array_keys($this->providers);
-        }
-
-        return $this->activities;
+        return $this->activityClasses;
     }
 
     /**
-     * Get array with supported activity owner classes
+     * Gets the list of supported activity owner classes.
      *
-     * @return array
+     * @return string[]
      */
-    public function getSupportedOwnerActivities()
+    public function getSupportedOwnerActivities(): array
     {
-        if (null === $this->ownerActivities) {
-            $this->ownerActivities = [];
-            foreach ($this->providers as $provider) {
-                $this->ownerActivities[] = $provider->getAclClass();
+        if (null === $this->ownerActivityClasses) {
+            $this->ownerActivityClasses = [];
+            foreach ($this->activityClasses as $activityClass) {
+                $this->ownerActivityClasses[] = $this->activityAclClasses[$activityClass] ?? $activityClass;
             }
         }
 
-        return $this->ownerActivities;
+        return $this->ownerActivityClasses;
     }
 
     /**
-     * Check if given activity entity supports by activity list providers
+     * Gets a supported activity owner class for the given activity class.
      *
-     * @param $entity
+     * @param string $activityClass
+     *
+     * @return string
+     */
+    public function getSupportedOwnerActivity(string $activityClass): string
+    {
+        return $this->activityAclClasses[$activityClass] ?? $activityClass;
+    }
+
+    /**
+     * Checks if the given activity entity is supported by activity list providers.
+     *
+     * @param object $entity
      *
      * @return bool
      */
-    public function isSupportedEntity($entity)
+    public function isSupportedEntity($entity): bool
     {
-        return in_array(
+        return \in_array(
             $this->doctrineHelper->getEntityClass($entity),
             $this->getSupportedActivities(),
             true
@@ -191,15 +220,16 @@ class ActivityListChainProvider
     }
 
     /**
-     * Check if given target entity supports by target classes list
+     * Checks if the given target entity (an entity to which an activity can be assigned to) is supported
+     * by activity list providers.
      *
-     * @param $entity
+     * @param object $entity
      *
      * @return bool
      */
-    public function isSupportedTargetEntity($entity)
+    public function isSupportedTargetEntity($entity): bool
     {
-        return in_array(
+        return \in_array(
             $this->doctrineHelper->getEntityClass($entity),
             $this->getTargetEntityClasses(),
             true
@@ -207,15 +237,15 @@ class ActivityListChainProvider
     }
 
     /**
-     * Check if given owner activity entity supports by activity list providers
+     * Checks if the given owner activity entity is supported by activity list providers.
      *
-     * @param $entity
+     * @param object $entity
      *
      * @return bool
      */
-    public function isSupportedOwnerEntity($entity)
+    public function isSupportedOwnerEntity($entity): bool
     {
-        return in_array(
+        return \in_array(
             $this->doctrineHelper->getEntityClass($entity),
             $this->getSupportedOwnerActivities(),
             true
@@ -223,44 +253,41 @@ class ActivityListChainProvider
     }
 
     /**
-     * Returns new activity list entity for given activity
+     * Gets a new ActivityList entity for the given activity entity.
      *
      * @param object $activityEntity
      *
-     * @return ActivityList
+     * @return ActivityList|null
      */
-    public function getActivityListEntitiesByActivityEntity($activityEntity)
+    public function getActivityListEntitiesByActivityEntity($activityEntity): ?ActivityList
     {
-        $provider = $this->getProviderForEntity($activityEntity);
-
-        return $this->getActivityListEntityForEntity($activityEntity, $provider);
+        return $this->getActivityListEntityForEntity($activityEntity, $this->getProviderForEntity($activityEntity));
     }
 
     /**
      * Get activity list by class and id of entity
      *
-     * @param object $entity
+     * @param object        $entity
      * @param EntityManager $entityManager
      *
-     * @return mixed
+     * @return ActivityList|null
      */
-    public function getActivityListByEntity($entity, EntityManager $entityManager)
+    public function getActivityListByEntity($entity, EntityManager $entityManager): ?ActivityList
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        foreach ($this->providers as $provider) {
-            if ($entityClass === $provider->getAclClass()) {
-                $entityClass = $provider->getActivityClass();
-                $entityId = $provider->getActivityId($entity);
+        foreach ($this->activityClasses as $activityClass) {
+            $aclClass = $this->activityAclClasses[$activityClass] ?? $activityClass;
+            if ($entityClass === $aclClass) {
+                $entityClass = $activityClass;
+                $entityId = $this->getProviderByClass($activityClass)->getActivityId($entity);
             }
         }
 
-        return $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
-            [
-                'relatedActivityClass' => $entityClass,
-                'relatedActivityId'    => $entityId
-            ]
-        );
+        return $entityManager->getRepository(ActivityList::class)->findOneBy([
+            'relatedActivityClass' => $entityClass,
+            'relatedActivityId'    => $entityId
+        ]);
     }
 
     /**
@@ -269,23 +296,21 @@ class ActivityListChainProvider
      * @param object        $entity
      * @param EntityManager $entityManager
      *
-     * @return ActivityList
+     * @return ActivityList|null
      */
-    public function getUpdatedActivityList($entity, EntityManager $entityManager)
+    public function getUpdatedActivityList($entity, EntityManager $entityManager): ?ActivityList
     {
-        $provider        = $this->getProviderForEntity($entity);
         $existListEntity = $this->getActivityListByEntity($entity, $entityManager);
-
-        if ($existListEntity) {
-            return $this->getActivityListEntityForEntity(
-                $entity,
-                $provider,
-                ActivityList::VERB_UPDATE,
-                $existListEntity
-            );
+        if (!$existListEntity) {
+            return null;
         }
 
-        return null;
+        return $this->getActivityListEntityForEntity(
+            $entity,
+            $this->getProviderForEntity($entity),
+            ActivityList::VERB_UPDATE,
+            $existListEntity
+        );
     }
 
     /**
@@ -293,33 +318,34 @@ class ActivityListChainProvider
      *
      * @return array
      */
-    public function getActivityListOption(Config $config)
+    public function getActivityListOption(Config $config): array
     {
+        $templates = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
-        $templates            = [];
-
-        foreach ($this->providers as $provider) {
-            $hasComment = false;
-
+        $providers = $this->getProviders();
+        foreach ($providers as $activityClass => $provider) {
             if ($provider instanceof FeatureToggleableInterface && !$provider->isFeaturesEnabled()) {
                 continue;
             }
 
+            $hasComment = false;
             if ($provider instanceof CommentProviderInterface) {
-                $hasComment = $provider->isCommentsEnabled($provider->getActivityClass());
+                $hasComment = $provider->isCommentsEnabled($activityClass);
             }
+
             $template = $provider->getTemplate();
-            if ($provider instanceof ActivityListGroupProviderInterface &&
-                $config->get('oro_activity_list.grouping')) {
+            if ($provider instanceof ActivityListGroupProviderInterface
+                && $config->get('oro_activity_list.grouping')
+            ) {
                 $template = $provider->getGroupedTemplate();
             }
 
-            $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
-            $templates[$this->routingHelper->getUrlSafeClassName($provider->getActivityClass())] = [
+            $entityConfig = $entityConfigProvider->getConfig($activityClass);
+            $templates[$this->routingHelper->getUrlSafeClassName($activityClass)] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $template,
-                'has_comments' => $hasComment,
+                'has_comments' => $hasComment
             ];
         }
 
@@ -331,9 +357,10 @@ class ActivityListChainProvider
      *
      * @return string|null
      */
-    public function getSubject($entity)
+    public function getSubject($entity): ?string
     {
-        foreach ($this->providers as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->isApplicable($entity)) {
                 return $provider->getSubject($entity);
             }
@@ -347,9 +374,10 @@ class ActivityListChainProvider
      *
      * @return string|null
      */
-    public function getDescription($entity)
+    public function getDescription($entity): ?string
     {
-        foreach ($this->providers as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->isApplicable($entity)) {
                 return $provider->getDescription($entity);
             }
@@ -359,55 +387,78 @@ class ActivityListChainProvider
     }
 
     /**
-     * Get activity list provider for given activity owner entity
+     * Gets an activity list provider for the given activity class.
      *
-     * @param $activityOwnerEntity
+     * @param string $activityClass
      *
      * @return ActivityListProviderInterface
+     *
+     * @throws \LogicException if a provider for the given activity class does not exist
      */
-    public function getProviderForOwnerEntity($activityOwnerEntity)
+    public function getProviderByClass(string $activityClass): ActivityListProviderInterface
     {
-        foreach ($this->providers as $provider) {
-            if ($provider->getAclClass() === $this->doctrineHelper->getEntityClass($activityOwnerEntity)) {
-                return $this->getProviderForEntity($provider->getActivityClass());
+        if (null === $this->providers) {
+            if (!$this->providerContainer->has($activityClass)) {
+                throw $this->createProviderNotFoundException($activityClass);
             }
+
+            return $this->providerContainer->get($activityClass);
         }
+
+        if (!isset($this->providers[$activityClass])) {
+            throw $this->createProviderNotFoundException($activityClass);
+        }
+
+        return $this->providers[$activityClass];
     }
 
     /**
-     * Get activity list provider for given activity entity
+     * Gets an activity list provider for the given activity entity.
      *
-     * @param $activityEntity
+     * @param object $activityEntity
      *
      * @return ActivityListProviderInterface
+     *
+     * @throws \LogicException if a provider for the given activity entity does not exist
      */
-    public function getProviderForEntity($activityEntity)
+    public function getProviderForEntity($activityEntity): ActivityListProviderInterface
     {
         return $this->getProviderByClass($this->doctrineHelper->getEntityClass($activityEntity));
     }
 
     /**
-     * Get activity list provider for entity class name
+     * Gets an activity list provider for the given activity owner class.
      *
-     * @param string $className
+     * @param string $activityOwnerClass
      *
      * @return ActivityListProviderInterface
+     *
+     * @throws \LogicException if a provider for the given owner class does not exist
      */
-    public function getProviderByClass($className)
+    public function getProviderByOwnerClass(string $activityOwnerClass): ActivityListProviderInterface
     {
-        return $this->providers[$className];
+        foreach ($this->activityClasses as $activityClass) {
+            $aclClass = $this->activityAclClasses[$activityClass] ?? $activityClass;
+            if ($aclClass === $activityOwnerClass) {
+                return $this->getProviderByClass($activityClass);
+            }
+        }
+
+        throw $this->createProviderNotFoundException($activityOwnerClass);
     }
 
     /**
-     * Get activity list provider for entity owner class name
+     * Gets an activity list provider for the given activity owner entity.
      *
-     * @param string $className
+     * @param object $activityOwnerEntity
      *
      * @return ActivityListProviderInterface
+     *
+     * @throws \LogicException if a provider for the given owner entity does not exist
      */
-    public function getProviderByOwnerClass($className)
+    public function getProviderForOwnerEntity($activityOwnerEntity): ActivityListProviderInterface
     {
-        return $this->providers[$className];
+        return $this->getProviderByOwnerClass($this->doctrineHelper->getEntityClass($activityOwnerEntity));
     }
 
     /**
@@ -418,73 +469,84 @@ class ActivityListChainProvider
      *
      * @return ActivityList|null
      */
-    protected function getActivityListEntityForEntity(
+    private function getActivityListEntityForEntity(
         $entity,
         ActivityListProviderInterface $provider,
-        $verb = ActivityList::VERB_CREATE,
-        $list = null
-    ) {
-        if ($provider->isApplicable($entity)) {
-            if (!$list) {
-                $list = new ActivityList();
-            }
-
-            $list->setSubject($provider->getSubject($entity));
-            $list->setDescription($provider->getDescription($entity));
-            $this->setDate($entity, $provider, $list);
-            $list->setOwner($provider->getOwner($entity));
-            if ($provider instanceof ActivityListUpdatedByProviderInterface) {
-                $list->setUpdatedBy($provider->getUpdatedBy($entity));
-            } else {
-                $updatedByUser = $this->tokenAccessor->getUser();
-                if ($updatedByUser instanceof User) {
-                    $list->setUpdatedBy($updatedByUser);
-                }
-            }
-
-            $list->setVerb($verb);
-
-            if ($verb === ActivityList::VERB_UPDATE) {
-                $activityListTargets = $list->getActivityListTargets();
-                foreach ($activityListTargets as $target) {
-                    $list->removeActivityListTarget($target);
-                }
-            } else {
-                $className = $this->doctrineHelper->getEntityClass($entity);
-                $list->setRelatedActivityClass($className);
-                $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-                $list->setOrganization($provider->getOrganization($entity));
-            }
-
-            $targets = $provider->getTargetEntities($entity);
-            foreach ($targets as $target) {
-                if ($list->supportActivityListTarget($this->doctrineHelper->getEntityClass($target))) {
-                    $list->addActivityListTarget($target);
-                }
-            }
-
-            return $list;
+        string $verb = ActivityList::VERB_CREATE,
+        ActivityList $list = null
+    ): ?ActivityList {
+        if (!$provider->isApplicable($entity)) {
+            return null;
         }
 
-        return null;
+        if (null === $list) {
+            $list = new ActivityList();
+        }
+
+        $list->setSubject($provider->getSubject($entity));
+        $list->setDescription($provider->getDescription($entity));
+        $this->setDate($entity, $provider, $list);
+        $list->setOwner($provider->getOwner($entity));
+        if ($provider instanceof ActivityListUpdatedByProviderInterface) {
+            $list->setUpdatedBy($provider->getUpdatedBy($entity));
+        } else {
+            $updatedByUser = $this->tokenAccessor->getUser();
+            if ($updatedByUser instanceof User) {
+                $list->setUpdatedBy($updatedByUser);
+            }
+        }
+
+        $list->setVerb($verb);
+        if ($verb === ActivityList::VERB_UPDATE) {
+            $activityListTargets = $list->getActivityListTargets();
+            foreach ($activityListTargets as $target) {
+                $list->removeActivityListTarget($target);
+            }
+        } else {
+            $className = $this->doctrineHelper->getEntityClass($entity);
+            $list->setRelatedActivityClass($className);
+            $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
+            $list->setOrganization($provider->getOrganization($entity));
+        }
+
+        $targets = $provider->getTargetEntities($entity);
+        foreach ($targets as $target) {
+            if ($list->supportActivityListTarget($this->doctrineHelper->getEntityClass($target))) {
+                $list->addActivityListTarget($target);
+            }
+        }
+
+        return $list;
     }
 
     /**
-     * Set Create and Update fields
+     * Sets CreatedAt and UpdatedAt fields for the given activity list.
      *
-     * @param $entity
+     * @param object                        $entity
      * @param ActivityListProviderInterface $provider
-     * @param ActivityList $list
+     * @param ActivityList                  $list
      */
-    protected function setDate($entity, ActivityListProviderInterface $provider, $list)
+    private function setDate($entity, ActivityListProviderInterface $provider, ActivityList $list): void
     {
         if ($provider instanceof ActivityListDateProviderInterface) {
-            if ($provider->getCreatedAt($entity)) {
-                $list->setCreatedAt($provider->getCreatedAt($entity));
+            $createdAt = $provider->getCreatedAt($entity);
+            if ($createdAt) {
+                $list->setCreatedAt($createdAt);
             }
-            if ($provider->getUpdatedAt($entity)) {
-                $list->setUpdatedAt($provider->getUpdatedAt($entity));
+            $updatedAt = $provider->getUpdatedAt($entity);
+            if ($updatedAt) {
+                $list->setUpdatedAt($updatedAt);
             }
         }
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return \LogicException
+     */
+    private function createProviderNotFoundException(string $className): \LogicException
+    {
+        return new \LogicException(sprintf('An activity list provider for "%s" does not exist.', $className));
     }
 }

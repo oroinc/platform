@@ -1,31 +1,28 @@
-parameters:
-    oro_form.autocomplete.security.class:  Oro\Bundle\FormBundle\Autocomplete\Security
-    oro_form.autocomplete.search_registry.class: Oro\Bundle\FormBundle\Autocomplete\SearchRegistry
-    oro_form.autocomplete.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-    oro_form.autocomplete.full_name.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler
-
 services:
     oro_form.autocomplete.security:
-        class: '%oro_form.autocomplete.security.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\FormBundle\Autocomplete\Security
         public: true
         arguments:
+            - [] # autocomplete ACL resources
             - '@security.authorization_checker'
 
     oro_form.autocomplete.search_registry:
-        class: '%oro_form.autocomplete.search_registry.class%'
+        class: Oro\Bundle\FormBundle\Autocomplete\SearchRegistry
         public: true
+        arguments:
+            - ~ # service locator for autocomplete search handlers
 
     oro_form.autocomplete.search_handler:
-        class: '%oro_form.autocomplete.search_handler.class%'
+        class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
         abstract: true
         calls:
             - [initSearchIndexer, ["@oro_search.index", '@oro_search.provider.search_mapping']]
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper,["@oro_security.acl_helper"]]
+            - [setLogger,["@logger"]]
 
     oro_form.autocomplete.full_name.search_handler:
-        class: '%oro_form.autocomplete.full_name.search_handler.class%'
+        class: Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler
         abstract: true
         parent: oro_form.autocomplete.search_handler
         calls:

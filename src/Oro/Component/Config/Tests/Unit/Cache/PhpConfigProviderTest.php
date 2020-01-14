@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Config\Tests\Unit\Cache;
 
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 {

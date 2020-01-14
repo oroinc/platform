@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var DropdownSelectView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var dropdownSelectTemplate = require('tpl!oroui/templates/dropdown-select.html');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const dropdownSelectTemplate = require('tpl-loader!oroui/templates/dropdown-select.html');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    DropdownSelectView = BaseView.extend({
+    const DropdownSelectView = BaseView.extend({
         template: dropdownSelectTemplate,
         className: 'operator',
         selectOptions: [],
@@ -28,13 +27,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DropdownSelectView() {
-            DropdownSelectView.__super__.constructor.apply(this, arguments);
+        constructor: function DropdownSelectView(options) {
+            DropdownSelectView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             if (!_.has(options, 'selectedValue')) {
-                var firstOption = _.first(this.selectOptions);
+                const firstOption = _.first(this.selectOptions);
                 if (_.isString(firstOption)) {
                     this.selectedValue = firstOption;
                 } else if (_.isObject(firstOption) && _.has(firstOption, 'value')) {
@@ -57,18 +56,18 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = DropdownSelectView.__super__.getTemplateData.call(this);
+            const data = DropdownSelectView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this, 'buttonClass', 'useButtonGroup', 'useCaret', 'label'));
             data.options = _.map(this.selectOptions, this._selectOptionIteratee, this);
-            var selectedOption = _.findWhere(data.options, {selected: true});
+            const selectedOption = _.findWhere(data.options, {selected: true});
             data.selectedLabel = selectedOption.label;
             data.selectedValue = selectedOption.value;
             return data;
         },
 
         _selectOptionIteratee: function(option) {
-            var value;
-            var label;
+            let value;
+            let label;
             if (_.isString(option)) {
                 value = option;
             } else if (_.isArray(option)) {
@@ -79,7 +78,7 @@ define(function(require) {
                 label = option.label;
             }
 
-            var result = {
+            const result = {
                 value: value || label,
                 label: label || value
             };
@@ -98,10 +97,10 @@ define(function(require) {
 
         select: function(value) {
             this.selectedValue = value;
-            var escapedValue = value.replace(/[&<>"'`]/g, function(a) {
+            const escapedValue = value.replace(/[&<>"'`]/g, function(a) {
                 return '\\' + a;
             });
-            var $option = this.$('[data-value="' + escapedValue + '"]');
+            const $option = this.$('[data-value="' + escapedValue + '"]');
             this.$('.dropdown-menu li').removeClass('selected');
             this.$('.dropdown-menu li [data-value]').removeAttr('aria-selected');
             $option.closest('li').addClass('selected');

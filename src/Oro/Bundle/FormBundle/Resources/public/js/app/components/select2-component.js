@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var Select2Component;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var Select2View = require('oroform/js/app/views/select2-view');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const Select2View = require('oroform/js/app/views/select2-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    Select2Component = BaseComponent.extend({
-        resultTemplate: require('text!oroui/templates/select2/default-template.html'),
-        selectionTemplate: require('text!oroui/templates/select2/default-template.html'),
+    const Select2Component = BaseComponent.extend({
+        resultTemplate: require('text-loader!oroui/templates/select2/default-template.html'),
+        selectionTemplate: require('text-loader!oroui/templates/select2/default-template.html'),
         url: '',
         type: 'GET',
         perPage: 10,
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function Select2Component() {
-            Select2Component.__super__.constructor.apply(this, arguments);
+        constructor: function Select2Component(options) {
+            Select2Component.__super__.constructor.call(this, options);
         },
 
         /**
@@ -30,7 +29,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var config = options.configs || {};
+            let config = options.configs || {};
 
             // Check enable icon for each option and set default template
             if (config.showIcon) {
@@ -68,7 +67,7 @@ define(function(require) {
         },
 
         preConfig: function(config) {
-            var that = this;
+            const that = this;
             if (this.url) {
                 config.ajax = {
                     url: this.url,
@@ -111,9 +110,9 @@ define(function(require) {
                 config.initSelection = config.initSelection ||
                     _.partial(this.constructor.initSelection, this.constructor, config);
                 if (this.excluded) {
-                    var excluded = this.excluded;
+                    const excluded = this.excluded;
                     config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
-                        var response = func.call(this, data, page);
+                        const response = func.call(this, data, page);
                         response.results = _.filter(response.results, function(item) {
                             return !_.contains(excluded, item.id);
                         });
@@ -130,11 +129,11 @@ define(function(require) {
                     if (!query.term || query.term.length < 1) {
                         return results;
                     }
-                    var expression = tools.safeRegExp(query.term, 'im');
+                    const expression = tools.safeRegExp(query.term, 'im');
 
-                    var sortIteratorDelegate = function(first, second) {
-                        var inFirst = first.text.search(expression);
-                        var inSecond = second.text.search(expression);
+                    const sortIteratorDelegate = function(first, second) {
+                        const inFirst = first.text.search(expression);
+                        const inSecond = second.text.search(expression);
 
                         if (inFirst === -1 || inSecond === -1) {
                             return inSecond - inFirst;
@@ -169,16 +168,15 @@ define(function(require) {
         }
     }, {
         initSelection: function(self, config, element, callback) {
-            var selectedData;
-            var dataIds;
-            var handleResults = _.partial(self.handleResults, self, config, callback);
-            var setSelect2ValueById = _.partial(self.setSelect2ValueById, self, config, element, callback);
-            var inputValue = element.inputWidget('val');
-            var currentValue = inputValue === '' ? [] : tools.ensureArray(inputValue);
+            let dataIds;
+            const handleResults = _.partial(self.handleResults, self, config, callback);
+            const setSelect2ValueById = _.partial(self.setSelect2ValueById, self, config, element, callback);
+            const inputValue = element.inputWidget('val');
+            const currentValue = inputValue === '' ? [] : tools.ensureArray(inputValue);
 
             if (config.forceSelectedData && element.data('selected-data')) {
-                var data = element.data('selected-data');
-                var result = [];
+                const data = element.data('selected-data');
+                const result = [];
                 if (!_.isObject(data)) {
                     _.each(data.split(config.separator), function(item) {
                         result.push(JSON.parse(item));
@@ -188,14 +186,14 @@ define(function(require) {
                 return;
             }
 
-            selectedData = _.filter(
+            const selectedData = _.filter(
                 tools.ensureArray(element.data('selected-data')),
                 function(item) {
                     return _.isObject(item);
                 }
             );
 
-            var emptySelection = selectedData.length === 0 ||
+            const emptySelection = selectedData.length === 0 ||
                 (selectedData.length === 1 && _.first(selectedData).id === null && _.first(selectedData).name === null);
 
             if (!emptySelection) {
@@ -218,12 +216,12 @@ define(function(require) {
             }
         },
         setSelect2ValueById: function(self, config, element, callback, id) {
-            var ids = _.isArray(id) ? id.join(config.separator) : id;
-            var handleResults = _.partial(self.handleResults, self, config, callback);
-            var select2Obj = element.data('select2');
-            var ajaxOptions = select2Obj.opts.ajax;
-            var searchData = ajaxOptions.data(ids, 1, true);
-            var url = _.isFunction(ajaxOptions.url) ? ajaxOptions.url.call(select2Obj, ids, 1) : ajaxOptions.url;
+            const ids = _.isArray(id) ? id.join(config.separator) : id;
+            const handleResults = _.partial(self.handleResults, self, config, callback);
+            const select2Obj = element.data('select2');
+            const ajaxOptions = select2Obj.opts.ajax;
+            const searchData = ajaxOptions.data(ids, 1, true);
+            const url = _.isFunction(ajaxOptions.url) ? ajaxOptions.url.call(select2Obj, ids, 1) : ajaxOptions.url;
 
             searchData.search_by_id = true;
             element.trigger('select2-data-request');
@@ -248,7 +246,7 @@ define(function(require) {
             if (config.multiple === true) {
                 callback(data);
             } else {
-                var item = data.pop();
+                const item = data.pop();
                 if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
                     callback(item.children.pop());
                 } else {
@@ -264,8 +262,8 @@ define(function(require) {
     }
 
     function getTitle(data, properties) {
-        var title = '';
-        var result;
+        let title = '';
+        let result;
         if (data) {
             if (properties === undefined) {
                 if (data.text !== undefined) {
@@ -292,8 +290,8 @@ define(function(require) {
             if ($.isEmptyObject(object)) {
                 return undefined;
             }
-            var result = '';
-            var highlight = function(str) {
+            let result = '';
+            const highlight = function(str) {
                 return object.children ? str : highlightSelection(str, query);
             };
             if (object._html !== undefined) {

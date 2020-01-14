@@ -5,16 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about string attribute type.
+ */
 class StringAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'string';
-    }
-
     /**
      * {@inheritdoc}
      */

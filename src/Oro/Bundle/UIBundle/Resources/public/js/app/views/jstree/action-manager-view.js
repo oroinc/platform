@@ -1,26 +1,25 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ActionManagerView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var ActionManager = require('oroui/js/jstree-action-manager');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var config = require('module').config();
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const ActionManager = require('oroui/js/jstree-action-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    let config = require('module-config').default(module.id);
     config = _.extend({
         inlineActionsCount: null
     }, config);
 
-    ActionManagerView = BaseView.extend({
+    const ActionManagerView = BaseView.extend({
         /**
          * @property {Function}
          */
-        template: require('tpl!oroui/templates/jstree-actions-wrapper.html'),
+        template: require('tpl-loader!oroui/templates/jstree-actions-wrapper.html'),
 
         /**
          * @property {Function}
          */
-        inlineTemplate: require('tpl!oroui/templates/jstree-inline-actions-wrapper.html'),
+        inlineTemplate: require('tpl-loader!oroui/templates/jstree-inline-actions-wrapper.html'),
 
         /**
          * @property {Object}
@@ -43,8 +42,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionManagerView() {
-            ActionManagerView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionManagerView(options) {
+            ActionManagerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -55,14 +54,14 @@ define(function(require) {
             this.options.$tree = this.$el.closest(this.elements.wrapper)
                 .find(this.elements.container);
 
-            ActionManagerView.__super__.initialize.apply(this, arguments);
+            ActionManagerView.__super__.initialize.call(this, options);
 
             this.options.$tree.one('ready.jstree.actions', _.bind(this.collectActions, this));
         },
 
         collectActions: function() {
             _.each(ActionManager.getActions(this.options), function(action) {
-                var options = _.extend({}, this.options.actions[action.name] || {}, {
+                const options = _.extend({}, this.options.actions[action.name] || {}, {
                     $tree: this.options.$tree,
                     action: action.name
                 });
@@ -73,7 +72,7 @@ define(function(require) {
         },
 
         render: function() {
-            var template;
+            let template;
             if (this.options.inlineActionsCount && this.subviews.length <= this.options.inlineActionsCount) {
                 template = 'inlineTemplate';
             }
@@ -83,7 +82,7 @@ define(function(require) {
 
             this.$el.append(this.getTemplateFunction(template)(this.getTemplateData()));
 
-            var $actions = this.$el.find(this.elements.actions);
+            const $actions = this.$el.find(this.elements.actions);
             _.each(this.subviews, function(subview) {
                 $actions.append(subview.render().$el);
             }, this);
@@ -107,7 +106,7 @@ define(function(require) {
 
             delete this.options;
             delete this.elements;
-            ActionManagerView.__super__.dispose.apply(this, arguments);
+            ActionManagerView.__super__.dispose.call(this);
         }
     });
 

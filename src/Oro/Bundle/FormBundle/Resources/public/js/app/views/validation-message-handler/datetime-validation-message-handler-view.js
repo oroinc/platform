@@ -1,30 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var DateTimeValidationMessageHandlerView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var AbstractValidationMessageHandlerView =
+    const $ = require('jquery');
+    const AbstractValidationMessageHandlerView =
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
 
-    DateTimeValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
+    const DateTimeValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function DateTimeValidationMessageHandlerView() {
-            DateTimeValidationMessageHandlerView.__super__.constructor.apply(this, arguments);
+        constructor: function DateTimeValidationMessageHandlerView(options) {
+            DateTimeValidationMessageHandlerView.__super__.constructor.call(this, options);
         },
 
         delegateEvents: function() {
             DateTimeValidationMessageHandlerView.__super__.delegateEvents.call(this);
-
-            var datepickerEvents = _.map(['datepicker:dialogHide', 'datepicker:dialogReposition'], function(eventName) {
+            const datepickerEvents = ['datepicker:dialogHide', 'datepicker:dialogReposition'].map(eventName => {
                 return eventName + this.eventNamespace();
             }, this);
             this.$el.parent().find('.datepicker-input').on(datepickerEvents.join(' '),
                 this.onDatepickerDialogReposition.bind(this));
-
-            var timepickerEvents = _.map(['showTimepicker', 'hideTimepicker'], function(eventName) {
+            const timepickerEvents = ['showTimepicker', 'hideTimepicker'].map(eventName => {
                 return eventName + this.eventNamespace();
             }, this);
 
@@ -44,14 +40,14 @@ define(function(require) {
         },
 
         isDatepickerActive: function() {
-            var $input = $(this.el).parent().find('.datepicker-input');
+            const $input = $(this.el).parent().find('.datepicker-input');
 
             return $input.data('datepicker').dpDiv.is(':visible') && $input.is($.datepicker._lastInput) &&
                 $input.hasClass('ui-datepicker-dialog-is-below');
         },
 
         isTimepickerActive: function() {
-            var $list = $(this.el).parent().find('.timepicker-input').data('timepicker-list');
+            const $list = $(this.el).parent().find('.timepicker-input').data('timepicker-list');
 
             return $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
         },
@@ -62,7 +58,7 @@ define(function(require) {
         },
 
         onTimepickerDialogToggle: function(e) {
-            var $list = this.$el.parent().find('.timepicker-input').data('timepicker-list');
+            const $list = this.$el.parent().find('.timepicker-input').data('timepicker-list');
 
             this.active = $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
             this.update();

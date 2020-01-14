@@ -1,26 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var PermissionReadOnlyView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var accessLevels = require('orouser/js/constants/access-levels');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const accessLevels = require('orouser/js/constants/access-levels');
 
-    PermissionReadOnlyView = BaseView.extend({
+    const PermissionReadOnlyView = BaseView.extend({
         tagName: 'li',
 
         className: 'action-permissions__item dropdown',
 
-        template: require('tpl!orouser/templates/datagrid/permission/permission-readonly-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/permission/permission-readonly-view.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function PermissionReadOnlyView() {
-            PermissionReadOnlyView.__super__.constructor.apply(this, arguments);
+        constructor: function PermissionReadOnlyView(options) {
+            PermissionReadOnlyView.__super__.constructor.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = PermissionReadOnlyView.__super__.getTemplateData.apply(this, arguments);
+            const data = PermissionReadOnlyView.__super__.getTemplateData.call(this);
             data.noAccess = accessLevels.NONE === this.model.get('access_level');
             return data;
         }

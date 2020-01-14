@@ -3,9 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -104,7 +104,7 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
     {
         $container = $this->kernel->getContainer();
 
-        /** @var RegistryInterface $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $container->get('doctrine');
         $connection = $doctrine->getConnection();
 

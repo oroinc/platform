@@ -79,6 +79,7 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit\Framework\TestCas
                     ['priority' => 20, 'alias' => 'taggedService1Alias'],
                 ],
                 'taggedService2' => [
+                    []
                 ],
                 'taggedService3' => [
                     ['priority' => 10, 'alias' => 'taggedService3Alias'],

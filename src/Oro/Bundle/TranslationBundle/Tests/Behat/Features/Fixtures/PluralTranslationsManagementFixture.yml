@@ -19,6 +19,6 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
 Oro\Bundle\TranslationBundle\Entity\Translation:
     language_ru_translation:
         translationKey: '@oro_entity_pagination_translation_key'
-        value: <('%total% запись (единственное число)|%total% записи (множ. число 1 форма)|%total% записей (множ. число 2 форма)')>
+        value: <('%count% запись (единственное число)|%count% записи (множ. число 1 форма)|%count% записей (множ. число 2 форма)')>
         language: '@language_ru'
         scope: 1

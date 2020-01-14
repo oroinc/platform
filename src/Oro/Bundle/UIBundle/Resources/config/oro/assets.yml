@@ -1,22 +1,22 @@
 css:
     inputs:
-        - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
+        - 'bundles/npmassets/timepicker/jquery.timepicker.css'
 
-        - 'bundles/bowerassets/jstree/dist/themes/default/style.min.css'
+        - 'bundles/npmassets/jstree/dist/themes/default/style.min.css'
 
         # Bootstrap port
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
         # libraries' styles
-        - 'bundles/bowerassets/font-awesome/css/font-awesome.css'
+        - 'bundles/npmassets/font-awesome/scss/font-awesome.scss'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
-        - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
-        - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
+        - 'bundles/npmassets/lightgallery/dist/css/lg-transitions.css'
+        - 'bundles/npmassets/lightgallery/dist/css/lightgallery.css'
         - 'bundles/npmassets/overlayscrollbars/css/OverlayScrollbars.css'
-        - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
-        - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
+        - 'bundles/npmassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
+        - 'bundles/npmassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
 
         # customized libraries' styles
         - 'bundles/oroui/css/jquery-ui.grid.css'
@@ -26,8 +26,8 @@ css:
         # custom styles
         - 'bundles/oroui/css/scss/main.scss'
         - 'bundles/oroui/css/all.css'
-    output: css/themes/oro/oro.css
+    output: css/oro/oro.css
 css_ie:
     inputs:
         - 'bundles/oroui/css/scss/ie/main-ie.scss'
-    output: css/themes/oro/oro-ie.css
+    output: css/oro/oro-ie.css

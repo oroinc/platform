@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
@@ -134,6 +135,18 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError->setStatusCode(1000);
 
         $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testFixIncludedEntityPath()
+    {
+        $error = new Error();
+        $error->setSource(ErrorSource::createByPropertyPath('association1.field1'));
+
+        $expectedError = clone $error;
+        $expectedError->setSource(clone $error->getSource());
+
+        $this->errorCompleter->fixIncludedEntityPath('/included/0', $error, $this->requestType);
         self::assertEquals($expectedError, $error);
     }
 }

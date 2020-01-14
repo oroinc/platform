@@ -2,12 +2,12 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
-    var GoogleSyncCheckbox;
+    const _ = require('underscore');
+    const scriptjs = require('scriptjs');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
 
-    GoogleSyncCheckbox = BaseComponent.extend({
+    const GoogleSyncCheckbox = BaseComponent.extend({
         clientId: null,
 
         $clientIdElement: null,
@@ -17,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function GoogleSyncCheckbox() {
-            GoogleSyncCheckbox.__super__.constructor.apply(this, arguments);
+        constructor: function GoogleSyncCheckbox(options) {
+            GoogleSyncCheckbox.__super__.constructor.call(this, options);
         },
 
         /**
@@ -37,9 +37,9 @@ define(function(require) {
                 googleWarningMessage: options.googleWarningMessage
             });
 
-            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+            scriptjs('//apis.google.com/js/client.js?onload=checkAuth', function() {
                 this.listenTo(this.view, 'requestToken', this.requestToken);
-            }, this));
+            }.bind(this));
         },
 
         requestToken: function() {
@@ -57,7 +57,7 @@ define(function(require) {
         },
 
         requestProfile: function() {
-            var request = gapi.client.gmail.users.getProfile({
+            const request = gapi.client.gmail.users.getProfile({
                 userId: 'me'
             });
 

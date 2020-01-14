@@ -169,12 +169,20 @@ JS;
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
-            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+            // loadModules should be available at this point.
+            // loadModules is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where loadModules is loaded.
+            if (typeof loadModules === 'undefined') {
+                return true;
+            }
+
+            if ((document.querySelector('script[src*="/app.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null))
+                || (typeof(jQuery) !== 'undefined' && jQuery.active)
             ) {
                 return false;
             }
@@ -212,32 +220,40 @@ JS;
             if (document.body.classList.contains('loading')) {
                 return false;
             }
+            
+            if (document.body.classList.contains('img-loading')) {
+                return false;
+            }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
-            // Require should be available at this point.
-            // Require is absent on lightweight pages like login, forgot password, embedded forms, etc.
-            // Next checks are valid only for pages where require is loaded.
-            if (typeof require === 'undefined') {
+            // loadModules should be available at this point.
+            // loadModules is absent on lightweight pages like login, forgot password, embedded forms, etc.
+            // Next checks are valid only for pages where loadModules is loaded.
+            if (typeof loadModules === 'undefined') {
                 return true;
             }
             
             try {
-                if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                    && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+                if ((document.querySelector('script[src*="/app.js"]') !== null
+                    && (typeof(jQuery) === 'undefined' || jQuery == null))
+                    || (typeof(jQuery) !== 'undefined' && jQuery.active)
                 ) {
                     return false;
                 }
                 
                 if (!window.mediatorCachedForSelenium) {
-                    window.mediatorCachedForSelenium = require('oroui/js/mediator');
+                    loadModules(['oroui/js/mediator'], function(mediator) {
+                        window.mediatorCachedForSelenium = mediator;
+                    });
+                    return false;
                 }
                 
-                var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
+                var isInAction = window.mediatorCachedForSelenium.execute('isInAction');
                 
-                if (isInAction !== false || jQuery.active) {
+                if (isInAction !== false) {
                     return false;
                 }
             } catch (e) {

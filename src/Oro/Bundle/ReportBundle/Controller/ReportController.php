@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -39,8 +39,8 @@ class ReportController extends AbstractController
     public static function getSubscribedServices()
     {
         return array_merge(parent::getSubscribedServices(), [
-            'oro_entity_config.provider.entity' => ConfigProvider::class,
-            EntityProvider::class,
+            'oro_report.entity_provider' => EntityProvider::class,
+            ConfigManager::class,
             EntityNameProvider::class,
             QueryDesignerManager::class,
             Manager::class,
@@ -71,8 +71,8 @@ class ReportController extends AbstractController
         $this->checkReport($entity);
         $this->get(EntityNameProvider::class)->setCurrentItem($entity);
 
-        $reportGroup = $this->get('oro_entity_config.provider.entity')
-            ->getConfig($entity->getEntity())
+        $reportGroup = $this->get(ConfigManager::class)
+            ->getEntityConfig('entity', $entity->getEntity())
             ->get('plural_label');
         $parameters  = [
             'entity'      => $entity,
@@ -239,7 +239,7 @@ class ReportController extends AbstractController
         return [
             'entity'   => $entity,
             'form'     => $reportForm->createView(),
-            'entities' => $this->get(EntityProvider::class)->getEntities(),
+            'entities' => $this->get('oro_report.entity_provider')->getEntities(),
             'metadata' => $this->get(QueryDesignerManager::class)->getMetadata('report')
         ];
     }

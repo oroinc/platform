@@ -1,7 +1,6 @@
 services:
     oro_api.update.processor:
         class: Oro\Bundle\ApiBundle\Processor\UpdateProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update
@@ -32,13 +31,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
-    oro_api.update.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
-        arguments:
-            - '@oro_api.entity_id_transformer_registry'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
-
     #
     # security_check
     #
@@ -46,7 +38,9 @@ services:
     oro_api.update.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
@@ -62,7 +56,7 @@ services:
     oro_api.update.entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update, group: data_security_check, priority: 10 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\UserBundle\Entity\User as RealUserEntity;
@@ -30,8 +30,8 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var TemplateEmailManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $templateEmailManager;
+    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
+    protected $emailTemplateManager;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
@@ -55,7 +55,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->manager = $this->createMock(UserManager::class);
-        $this->templateEmailManager = $this->createMock(TemplateEmailManager::class);
+        $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -65,7 +65,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             $this->form,
             $requestStack,
             $this->manager,
-            $this->templateEmailManager,
+            $this->emailTemplateManager,
             $this->userConfigManager,
             $this->flashBag,
             $this->translator,
@@ -150,7 +150,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
@@ -212,7 +212,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->templateEmailManager
+        $this->emailTemplateManager
             ->expects($this->never())
             ->method('sendTemplateEmail');
 

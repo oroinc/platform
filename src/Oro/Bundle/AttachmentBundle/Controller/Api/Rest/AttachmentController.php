@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -13,6 +14,8 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * API CRUD controller for Attachment entity.
+ *
  * @RouteResource("attachment")
  * @NamePrefix("oro_api_")
  */
@@ -23,6 +26,8 @@ class AttachmentController extends RestController implements ClassResourceInterf
      *
      * @param int $id
      *
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get attachment",
      *      resource=true
@@ -32,7 +37,7 @@ class AttachmentController extends RestController implements ClassResourceInterf
      *
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -41,6 +46,8 @@ class AttachmentController extends RestController implements ClassResourceInterf
      * Delete attachment.
      *
      * @param int $id
+     *
+     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete attachment",
@@ -56,7 +63,7 @@ class AttachmentController extends RestController implements ClassResourceInterf
      *
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

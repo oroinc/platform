@@ -5,8 +5,24 @@ system_configuration:
             title:  oro.attachment.config.attachment.label
         attachment_mime_types_settings:
             title:  oro.attachment.config.mime_types.label
-
+        attachment_file_size_settings:
+            title:  oro.attachment.config.file_size_settings.label
     fields:
+        oro_attachment.maxsize:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            options:
+                required: true
+                label: oro.attachment.config.file_size.label
+                empty_data: 1
+                tooltip: oro.attachment.max_size.tooltip
+                constraints:
+                    - NotBlank: ~
+                    - Type: integer
+                    - Range:
+                        min: 1
+                        max: 2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
+
         oro_attachment.upload_file_mime_types:
             data_type: string
             type: Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType
@@ -34,6 +50,9 @@ system_configuration:
                             attachment_settings:
                                 priority: -10
                                 children:
+                                    attachment_file_size_settings:
+                                        children:
+                                            - oro_attachment.maxsize
                                     attachment_mime_types_settings:
                                         children:
                                             - oro_attachment.upload_file_mime_types

@@ -83,7 +83,7 @@ class EnabledHateoasTest extends RestPlainApiTestCase
             ['HTTP_HATEOAS' => true]
         );
 
-        $expectedContent = $this->loadData('hateoas_create.yml', 'responses');
+        $expectedContent = $this->loadData('hateoas_create.yml', $this->getResponseDataFolderName());
         $expectedContent = self::processTemplateData(Yaml::parse($expectedContent));
         $expectedContent['id'] = $this->getResourceId($response);
         $this->assertResponseContains($expectedContent, $response);

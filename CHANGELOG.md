@@ -2,7 +2,73 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 4.1.0-beta
+## 4.1.0
+
+### Changed
+
+#### ConfigBundle
+* The handling of `priority` attribute for `oro_config.configuration_search_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_config.configuration_search_provider, priority: 100 }` should be changed to
+  `{ name: oro_config.configuration_search_provider, priority: -100 }`
+
+#### DataGridBundle
+* The handling of `priority` attribute for `oro_datagrid.extension.action.provider` and
+  `oro_datagrid.extension.mass_action.iterable_result_factory` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_datagrid.extension.action.provider, priority: 100 }` should be changed to
+  `{ name: oro_datagrid.extension.action.provider, priority: -100 }`
+
+#### TranslationBundle
+* The handling of `priority` attribute for `oro_translation.extension.translation_context_resolver` and
+  `oro_translation.extension.translation_strategy` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_translation.extension.translation_context_resolver, priority: 100 }` should be changed to
+  `{ name: oro_translation.extension.translation_context_resolver, priority: -100 }`
+
+#### WorkflowBundle
+* The handling of `priority` attribute for `oro.workflow.configuration.handler` and
+  `oro.workflow.definition_builder.extension` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro.workflow.configuration.handler, priority: 100 }` should be changed to
+  `{ name: oro.workflow.configuration.handler, priority: -100 }`
+
+### Added
+
+#### AttachmentBundle
+* Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](./src/Oro/Bundle/AttachmentBundle/README.md).
+
+### Removed
+
+#### ActivityListBundle
+* The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+* The `getAclClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `acl_class` attribute of the `oro_activity_list.provider` DIC tag instead.
+
+#### DataGridBundle
+* The `getName()` method was removed from `Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface`.
+  Use the `alias` attribute of the `oro_datagrid.board_processor` DIC tag instead.
+
+#### EntityConfigBundle
+* The `getType()` method was removed from `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface`.
+  Use the `type` attribute of the `oro_entity_config.attribute_type` DIC tag instead.
+
+#### ReminderBundle
+* The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
+  Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
+
+#### UIBundle
+* The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+  Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
+* Unneeded `isEnabled()` and `setEnabled()` methods were removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+
+## 4.1.0-rc (2019-12-10)
+[Show detailed list of changes](incompatibilities-4-1-rc.md)
+
+## 4.1.0-beta (2019-09-30)
+[Show detailed list of changes](incompatibilities-4-1-beta.md)
 
 ### Changed
 
@@ -73,6 +139,10 @@ The current file describes significant changes in the code that may affect the u
   to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
 * The class `ConfigContext` was moved from `Oro\Bundle\ApiBundle\Processor\Config` namespace
   to `Oro\Bundle\ApiBundle\Processor\GetConfig` namespace.
+* The priority of `oro_api.validate_included_forms` processor was changed from `-70` to `-68`.
+* The priority of `oro_api.validate_form` processor was changed from `-90` to `-70`.
+* The priority of `oro_api.post_validate_included_forms` processor was changed from `-96` to `-78`.
+* The priority of `oro_api.post_validate_form` processor was changed from `-97` to `-80`.
 
 #### AssetBundle
 * The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
@@ -108,6 +178,69 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * The constant `SCOPE_KEY` in `Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider`
   was replaced with `USER`.
+
+### Removed
+
+#### All Bundles
+* All `*.class` parameters were removed from the dependency injection container.
+
+#### Math component
+* The deprecated method `Oro\Component\Math\BigDecimal::withScale()` was removed. Use `toScale()` method instead.  
+
+#### DataGridBundle
+* The DIC parameter `oro_datagrid.extension.orm_sorter.class` was removed.
+  If you use `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC`
+  or `%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC` in `Resources/config/oro/datagrids.yml`,
+  replace them to `ASC` and `DESC` strings.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_PATH` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_PATH` instead.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_TYPE_PATH` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_TYPE_PATH`
+  and `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getDatasourceType()` instead.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_ACL_PATH` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::ACL_RESOURCE_PATH`
+  and `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::getAclResource()` instead.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::BASE_DATAGRID_CLASS_PATH` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::BASE_DATAGRID_CLASS_PATH` instead.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_ACL_CHECK` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_ACL_APPLY_PATH`
+  and `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::isDatasourceSkipAclApply()` instead.
+* The deprecated constant `Oro\Bundle\DataGridBundle\Datagrid\Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH` was removed.
+  Use `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH` instead.
+* The deprecated class `Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper`
+  and service `oro_datagrid.grid_configuration.helper` were removed.
+
+#### EntityConfigBundle
+* The deprecated class `Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent` was removed.
+  It was replaced with `Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent`.
+* The deprecated class `Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent` was removed.
+  It was replaced with `Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent`.
+
+#### EntityExtendBundle
+* Removed *HTML* field type, all HTML fields were converted to Text fields.  
+
+#### QueryDesignerBundle
+* The deprecated constant `Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension::NAME_PATH` was removed.
+
+#### MigrationBundle
+* The deprecated method `Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension::put()` was removed. Use `set()` method instead.
+* The deprecated constants `MAIN_FIXTURES_PATH` and `DEMO_FIXTURES_PATH` were removed from `Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand`.
+  Use `oro_migration.locator.fixture_path_locator` service instead.
+
+#### SoapBundle
+* The deprecated `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` class was removed. Use `Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter` instead.  
+
+#### SecurityBundle
+* The deprecated method `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface::getGlobalOwnerFieldName()` was removed. Use `getOrganizationFieldName()` method instead.  
+
+#### TagBundle
+* The deprecated constant `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension::GRID_NAME_PATH` was removed.
+
+#### TranslationBundle
+* The deprecated option `is_translated_group` for `Symfony\Component\Form\Extension\Core\Type\ChoiceType` was removed.
+  Use `translatable_groups` option instead.
+* The deprecated option `is_translated_option` for `Symfony\Component\Form\Extension\Core\Type\ChoiceType` was removed.
+  Use `translatable_options` option instead.
 
 ## 4.0.0 (2019-07-31)
 [Show detailed list of changes](incompatibilities-4-0.md)
@@ -181,12 +314,6 @@ The current file describes significant changes in the code that may affect the u
 [Show detailed list of changes](incompatibilities-4-0-rc.md)
 
 ### Added
-
-#### ChainProcessor component
-* The method `setResolver($key, ?ParameterValueResolverInterface $resolver)` was added to
-  `Oro\Component\ChainProcessor\ParameterBagInterface`. It allows to resolve a parameter value
-  when the parameter is requested at the first time. This can be helpful for rare used parameters with time consuming
-  value resolving.
 
 #### ApiBundle
 * The class `Oro\Bundle\ApiBundle\Request\ValueTransformer` (service ID is `oro_api.value_transformer`) was added

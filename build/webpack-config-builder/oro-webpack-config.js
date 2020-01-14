@@ -1,23 +1,33 @@
-const path = require('path');
-const webpackMerge = require('webpack-merge');
+const webpack = require('webpack');
+const AppConfigLoader = require('./app-config-loader');
+const AppModulesFileWriter = require('./writer/app-modules-file-writer');
+const CleanupStatsPlugin = require('./plugin/stats/cleanup-stats-plugin');
+const ConfigsFileWriter = require('./writer/configs-file-writer');
+const EntryPointFileWriter = require('./writer/scss-entry-point-file-writer');
+const LayoutModulesConfigLoader = require('./modules-config/layout-modules-config-loader');
+const LayoutStyleLoader = require('./style/layout-style-loader');
+const MapModulesPlugin = require('./plugin/map/map-modules-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HappyPack = require('happypack');
+const ModulesConfigLoader = require('./modules-config/modules-config-loader');
+const DynamicImportsFileWriter = require('./writer/dynamic-imports-file-writer');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const CleanupStatsPlugin = require('./cleanup-stats-plugin');
-
-const AssetConfigLoader = require('./asset-config-loader');
-const ConfigLoader = require('./config-loader');
-const StyleLoader = require('./style-loader');
-const LayoutStyleLoader = require('./layout-style-loader');
-const EntryPointFileWriter = require('./entry-point-file-writer');
+const prepareModulesShim = require('./prepare-modules-shim');
+const StyleLoader = require('./style/style-loader');
+const ThemeConfigFactory = require('./theme-config-factory');
+const path = require('path');
 const postcssConfig = path.join(__dirname, '../postcss.config.js');
-
+const prepareModulesMap = require('./plugin/map/prepare-modules-map');
+const resolve = require('enhanced-resolve');
+const webpackMerge = require('webpack-merge');
+const babelConfig = require('./../babel.config.js');
 
 class ConfigBuilder {
     constructor() {
         this._publicPath = 'public/';
         this._adminTheme = 'admin.oro';
         this._enableLayoutThemes = false;
-        this.layoutThemes = null;
+        this._defaultLayoutThemes = null;
     }
 
     /**
@@ -57,12 +67,11 @@ class ConfigBuilder {
     }
 
     /**
-     * Enable build of Layout themes. To learn more see
-     * {@link https://github.com/oroinc/platform/blob/3.1/src/Oro/Bundle/LayoutBundle/Resources/doc/theme_definition.md}
+     * Enable build of Layout themes.
      */
     enableLayoutThemes(themes) {
         if (themes) {
-            this.layoutThemes = themes;
+            this._defaultLayoutThemes = themes;
         }
         this._enableLayoutThemes = true;
         return this;
@@ -73,15 +82,41 @@ class ConfigBuilder {
      * @returns {Function}
      */
     getWebpackConfig() {
-        return (env, args) => {
-            this._isProduction = args.mode === 'production';
-            let theme = env ? env.theme : undefined;
-            this._symfonyEnv = env ? env.symfony : undefined;
-            this._configuration = AssetConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
+        return (env = {}, args = {}) => {
+            this._initialize(args, env);
+
+            let selectedTheme = env.theme;
+            this._validateThemeName(selectedTheme);
+
+            let themes = [];
+            // Admin themes
+            if (selectedTheme === undefined) {
+                // themes.push(this._adminTheme.split(".")[1]);
+                themes.push(this._adminTheme);
+            } else if (this._adminThemes.indexOf(selectedTheme) !== -1) {
+                // themes.push(selectedTheme.split(".")[1]);
+                themes.push(selectedTheme);
+            }
+
+            // Layout Themes
+            if (this._enableLayoutThemes) {
+                if (selectedTheme === undefined) {
+                    // build all layout themes
+                    let layoutThemes = {};
+                    if (this._defaultLayoutThemes) {
+                        themes = [...themes, ...this._defaultLayoutThemes];
+                    } else {
+                        themes = [...themes, ...Object.keys(this._layoutModulesConfigLoader.themes)];
+                    }
+                } else if (this._layoutThemes.indexOf(selectedTheme) !== -1) {
+                    // build single layout theme
+                    themes.push(selectedTheme);
+                }
+            }
 
             const resolvedPublicPath = path.resolve(this._publicPath);
 
-            const stats = env && env.stats ? env.stats : {
+            const stats = env.stats || {
                 hash: false,
                 version: false,
                 children: false,
@@ -95,32 +130,63 @@ class ConfigBuilder {
                 warnings: false
             };
             let webpackConfig = {
-                stats: stats,
-                context: resolvedPublicPath,
-                entry: this._getEntryPoints(theme),
-                output: {
-                    path: resolvedPublicPath,
-                    filename: '[name].bundle.js',
+                watchOptions: {
+                    aggregateTimeout: 200,
+                    ignored: [
+                        /[\/\\]node_modules[\/\\].*\.js$/,
+                        /[\/\\]bundles[\/\\](npmassets|components)[\/\\].*\.js$/
+                    ]
                 },
-                devtool: 'inline-cheap-module-source-map',
-                mode: 'none',
-                resolve: {
-                    modules: [
-                        resolvedPublicPath,
-                        resolvedPublicPath + '/bundles',
-                        path.join(__dirname, '../node_modules'),
-                    ],
-                    symlinks: false
+                stats: stats,
+                output: {
+                    filename: '[name].js',
+                    // Because we use third party libraries 'chunkFilename' should include only [name]
+                    chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
+                },
+                devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
+                mode: 'development',
+                optimization: {
+                    namedModules: true,
+                    splitChunks: {
+                        cacheGroups: {
+                            commons: {
+                                name: 'commons',
+                                minSize: 30,
+                                minChunks: 2,
+                                priority: 10,
+                                reuseExistingChunk: true
+                            },
+                            vendors: {
+                                test: /[\/\\]node_modules[\/\\]/,
+                                name: 'vendors',
+                                priority: -10
+                            },
+                            tinymce: {
+                                test: /tinymce/,
+                                name: 'tinymce.min',
+                                minChunks: 1,
+                            },
+                            fusioncharts: {
+                                test: /fusioncharts/,
+                                name: 'fusioncharts',
+                                minChunks: 1
+                            }
+                        }
+                    }
                 },
                 resolveLoader: {
                     modules: [
                         resolvedPublicPath,
+                        path.join(__dirname, './loader'),
                         resolvedPublicPath + '/bundles',
                         path.join(__dirname, '../node_modules'),
                     ]
                 },
-
                 module: {
+                    noParse: [
+                        /[\/\\]bundles[\/\\](npmassets|components)[\/\\](?!jquery|asap)[\/\\].*\.js$/,
+                        /[\/\\]bundles[\/\\]\.*[\/\\]lib[\/\\](?!chaplin|bootstrap|jquery\.dialog).*\.js$/
+                    ],
                     rules: [
                         {
                             test: /\.s?css$/,
@@ -155,7 +221,6 @@ class ConfigBuilder {
                                     includePaths: [
                                         resolvedPublicPath + '/bundles',
                                         path.resolve(__dirname, '../node_modules'),
-
                                     ],
                                     sourceMap: true
                                 }
@@ -178,14 +243,47 @@ class ConfigBuilder {
                     new MiniCssExtractPlugin({
                         filename: '[name].css'
                     }),
-                    new CleanupStatsPlugin()
+                    new CleanupStatsPlugin(),
+                    // Ignore all locale files of moment.js
+                    new webpack.IgnorePlugin({
+                        resourceRegExp: /^\.[\/\\]locale$/,
+                        contextRegExp: /moment$/
+                    }),
+                    new webpack.optimize.MinChunkSizePlugin({
+                        minChunkSize: 30000 // Minimum number of characters
+                    })
                 ]
             };
+
+            if (!env.skipJS && !env.skipBabel) {
+                let happyPackOptions = {
+                    id: 'babel',
+                    loaders: [
+                        {
+                            loader: 'babel-loader',
+                            options: babelConfig
+                        }
+                    ]
+                };
+
+                webpackConfig.plugins.push(new HappyPack(happyPackOptions));
+
+                webpackConfig.module.rules.push({
+                    test: /\.js$/,
+                    exclude: [
+                        /[\/\\]platform[\/\\]build[\/\\]/,
+                        /[\/\\]bundles[\/\\](?:npmassets|components)[\/\\]/,
+                        /[\/\\]bundles[\/\\].+[\/\\]lib[\/\\]?/
+                    ],
+                    use: 'happypack/loader?id=babel'
+                });
+            }
+
             if (args.hot) {
-                const https = this._configuration.devServerOptions.https;
+                const https = this._appConfig.devServerOptions.https;
                 const schema = https ? 'https' : 'http';
-                const devServerHost = this._configuration.devServerOptions.host;
-                const devServerPort = this._configuration.devServerOptions.port;
+                const devServerHost = this._appConfig.devServerOptions.host;
+                const devServerPort = this._appConfig.devServerOptions.port;
                 webpackConfig.devServer = {
                     contentBase: resolvedPublicPath,
                     host: devServerHost,
@@ -201,7 +299,6 @@ class ConfigBuilder {
                 };
                 webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
             }
-
 
             //Additional setting for production mode
             if (this._isProduction) {
@@ -221,79 +318,150 @@ class ConfigBuilder {
                 });
             }
 
-            return webpackConfig;
+            let webpackConfigs = [];
+
+            themes.forEach((theme) => {
+                let themeConfig,
+                    buildPublicPath;
+                if (this._isAdminTheme(theme)) {
+                    buildPublicPath = '/build/';
+                    themeConfig = this._themeConfigFactory.create(theme, buildPublicPath, '/Resources/config/jsmodules.yml');
+                } else {
+                    buildPublicPath = `/layout-build/${theme}/`;
+                    themeConfig = this._layoutThemeConfigFactory.create(theme, buildPublicPath, '/config/jsmodules.yml');
+                }
+                let resolvedBuildPath = path.join(resolvedPublicPath, buildPublicPath);
+
+                let resolverConfig = {
+                    modules: [
+                        resolvedBuildPath,
+                        resolvedPublicPath,
+                        resolvedPublicPath + '/bundles',
+                        resolvedPublicPath + '/js',
+                        path.join(__dirname, '../node_modules'),
+                    ],
+                    alias: {
+                        ...themeConfig.aliases,
+                        'node_modules/spectrum-colorpicker/spectrum$': 'npmassets/spectrum-colorpicker/spectrum.css',
+                        'node_modules/font-awesome/scss/font-awesome$': 'npmassets/font-awesome/scss/font-awesome.scss',
+                        'node_modules/codemirror/lib/codemirror$': 'npmassets/codemirror/lib/codemirror.css',
+                        'node_modules/codemirror/theme/hopscotch$': 'npmassets/codemirror/theme/hopscotch.css',
+                    },
+                    symlinks: false
+                };
+                let resolver = (resolver => {
+                    return moduleName => resolver({}, '', moduleName, {});
+                })(resolve.create.sync({...resolverConfig}));
+
+                let cssEntryPoints = !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
+                let jsEntryPoints = !env.skipJS && Object.keys(themeConfig.aliases).length
+                    ? this._getJsEntryPoints(theme) : {};
+
+                let entryPoints = {...cssEntryPoints, ...jsEntryPoints};
+                if (Object.keys(entryPoints).length === 0) {
+                    return;
+                }
+                webpackConfigs.push(webpackMerge({
+                    entry: entryPoints,
+                    output: {
+                        publicPath: buildPublicPath,
+                        path: resolvedBuildPath,
+                    },
+                    context: resolvedPublicPath,
+                    resolve: {
+                        ...resolverConfig,
+                        plugins: [
+                            new MapModulesPlugin(prepareModulesMap(resolver, themeConfig.map))
+                        ],
+                    },
+                    module: {
+                        rules: [
+                            {
+                                test: /[\/\\]configs\.json$/,
+                                loader: 'config-loader',
+                                options: {
+                                    resolver,
+                                    relativeTo: resolvedPublicPath
+                                }
+                            },
+                            ...prepareModulesShim(resolver, themeConfig.shim)
+                        ]
+                    }
+                }, webpackConfig));
+            });
+
+            return webpackConfigs;
         };
     }
 
-    /**
-     * @param {string|undefined} selectedTheme
-     * @return {Object} List of entry points
-     * @private
-     */
-    _getEntryPoints(selectedTheme) {
-        const configLoader = new ConfigLoader(this._configuration.paths, '/Resources/public/themes/', 'settings.yml');
-        const entryPointFileWriter = new EntryPointFileWriter(this._publicPath);
-        const styleLoader = new StyleLoader(configLoader);
-        const layoutConfigLoader = new ConfigLoader(
-            this._configuration.paths,
+    _initialize(args, env) {
+        this._isProduction = args.mode === 'production';
+        this._symfonyEnv = env.symfony;
+        this._appConfig = AppConfigLoader.getConfig(this._cachePath, this._symfonyEnv);
+
+        this._modulesConfigLoader = new ModulesConfigLoader(
+            this._appConfig.paths,
+            '/Resources/public/themes/',
+            'settings.yml'
+        );
+        this._adminThemes = this._modulesConfigLoader.themeNames.map(themeName => 'admin.' + themeName);
+        this._styleLoader = new StyleLoader(this._modulesConfigLoader);
+        this._themeConfigFactory = new ThemeConfigFactory(
+            this._modulesConfigLoader,
+            new DynamicImportsFileWriter(this._publicPath),
+            new AppModulesFileWriter(this._publicPath),
+            new ConfigsFileWriter(this._publicPath)
+        );
+
+        this._layoutModulesConfigLoader = new LayoutModulesConfigLoader(
+            this._appConfig.paths,
             '/Resources/views/layouts/',
             'theme.yml'
         );
+        this._layoutThemes = this._layoutModulesConfigLoader.themeNames;
+        const entryPointFileWriter = new EntryPointFileWriter(this._publicPath);
+        this._layoutStyleLoader = new LayoutStyleLoader(this._layoutModulesConfigLoader, entryPointFileWriter);
+        this._layoutThemeConfigFactory = new ThemeConfigFactory(
+            this._layoutModulesConfigLoader,
+            new DynamicImportsFileWriter(this._publicPath),
+            new AppModulesFileWriter(this._publicPath),
+            new ConfigsFileWriter(this._publicPath)
+        );
 
-        let entryPoints = {};
-        const adminThemes = configLoader.themeNames.map(themeName => 'admin.' + themeName);
-        const layoutThemes = layoutConfigLoader.themeNames;
-
-        this._validateSelectedThemeName(adminThemes, layoutThemes, selectedTheme);
-
-        // Build Admin themes
-        if (selectedTheme === undefined) {
-            entryPoints = styleLoader.getThemeEntryPoints(this._adminTheme.split(".")[1]);
-        }
-        else if (adminThemes.indexOf(selectedTheme) !== -1) {
-            entryPoints = styleLoader.getThemeEntryPoints(selectedTheme.split(".")[1]);
-        }
-
-        // Build Layout Themes
-        if (this._enableLayoutThemes) {
-            const layoutStyleLoader = new LayoutStyleLoader(layoutConfigLoader, entryPointFileWriter);
-            if (selectedTheme === undefined) {
-                // build all layout themes
-                let themes = {};
-                if (this.layoutThemes) {
-                    themes = Object.keys(layoutConfigLoader.themes)
-                        .filter(key => this.layoutThemes.includes(key))
-                        .reduce((obj, key) => {
-                            obj[key] = layoutConfigLoader.themes[key];
-                            return obj;
-                        }, {});
-                } else {
-                    themes = layoutConfigLoader.themes;
-                }
-
-                for (let theme in themes) {
-                    entryPoints = Object.assign({}, entryPoints, layoutStyleLoader.getThemeEntryPoints(theme));
-                }
-
-            } else if (layoutThemes.indexOf(selectedTheme) !== -1) {
-                // build single layout theme
-                entryPoints = Object.assign({}, entryPoints, layoutStyleLoader.getThemeEntryPoints(selectedTheme));
-            }
-        }
-
-        return entryPoints;
     }
 
-    _validateSelectedThemeName(adminThemes, layoutThemes, selectedTheme) {
-        let existingThemes = adminThemes;
-        if (this._enableLayoutThemes) {
-            existingThemes = existingThemes.concat(layoutThemes);
+    _getJsEntryPoints(theme) {
+        return {
+            'app': [
+                'whatwg-fetch',
+                'oroui/js/app',
+                'oroui/js/app/services/app-ready-load-modules'
+            ]
+        };
+    }
+
+    _getCssEntryPoints(theme, buildPath) {
+        if (this._isAdminTheme(theme)) {
+            return this._styleLoader.getThemeEntryPoints(theme.split(".")[1]);
         }
-        if (selectedTheme !== undefined && !existingThemes.includes(selectedTheme)) {
+
+        return this._layoutStyleLoader.getThemeEntryPoints(theme, buildPath);
+    }
+
+    _validateThemeName(theme) {
+        let existingThemes = this._adminThemes;
+        if (this._enableLayoutThemes) {
+            existingThemes = existingThemes.concat(this._layoutThemes);
+        }
+        if (theme !== undefined && !existingThemes.includes(theme)) {
             throw new Error(
-                'Theme "' + selectedTheme + '" doesn\'t exists. Existing themes:' + existingThemes.join(', ')
+                'Theme "' + theme + '" doesn\'t exists. Existing themes:' + existingThemes.join(', ')
             );
         }
+    }
+
+    _isAdminTheme(theme) {
+        return this._adminThemes.indexOf(theme) !== -1;
     }
 }
 

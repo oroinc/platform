@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var CommentsNoDataView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!orocomment/templates/comment/comments-no-data.html');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!orocomment/templates/comment/comments-no-data.html');
 
-    CommentsNoDataView = BaseView.extend({
+    const CommentsNoDataView = BaseView.extend({
         template: template,
 
         listen: {
@@ -19,8 +18,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentsNoDataView() {
-            CommentsNoDataView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentsNoDataView(options) {
+            CommentsNoDataView.__super__.constructor.call(this, options);
         }
     });
 

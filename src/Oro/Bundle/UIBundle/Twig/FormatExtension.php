@@ -103,7 +103,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         $router = $this->container->get('router');
 
         $prevBaseUrl = $router->getContext()->getBaseUrl();
-        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
+        $baseUrlWithoutFrontController = preg_replace('/\/[\w\_]+\.php$/', '', $prevBaseUrl);
         $router->getContext()->setBaseUrl($baseUrlWithoutFrontController);
 
         $url = $router->generate($name, $parameters);
@@ -163,19 +163,19 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
      *
      * @return string
      */
-    public function getAgeAsString($date, $options)
+    public function getAgeAsString($date, $options = [])
     {
         if (!$date) {
             return '';
         }
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
-            return isset($options['default']) ? $options['default'] : '';
+            return $options['default'] ?? '';
         }
 
         $age = $dateDiff->y;
 
-        return $this->getTranslator()->transChoice('oro.age', $age, ['%count%' => $age], 'messages');
+        return $this->getTranslator()->trans('oro.age', ['%count%' => $age], 'messages');
     }
 
     /**

@@ -8,7 +8,8 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Exception\TranslationProviderException;
 use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Locales;
 
 /**
  * @dbIsolationPerTest
@@ -154,12 +155,12 @@ class OroLanguageUpdateCommandTest extends WebTestCase
      */
     private function getLanguageName(Language $language)
     {
-        $name = Intl::getLanguageBundle()->getLanguageName($language->getCode(), null, 'en');
+        $name = Languages::getName($language->getCode(), 'en');
         if ($name) {
             return $name;
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName($language->getCode(), 'en');
+        $name = Locales::getName($language->getCode(), 'en');
         if ($name) {
             return $name;
         }

@@ -1,23 +1,23 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var settings = require('oroworkflow/js/tools/path-finder/settings');
-    var Path = require('oroworkflow/js/tools/path-finder/path');
-    var directions = require('oroworkflow/js/tools/path-finder/directions');
-    var ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
-    var module = require('module');
+    const settings = require('oroworkflow/js/tools/path-finder/settings');
+    const Path = require('oroworkflow/js/tools/path-finder/path');
+    const directions = require('oroworkflow/js/tools/path-finder/directions');
+    const ComplexityError = require('oroworkflow/js/tools/path-finder/complexity-error');
+    const config = require('module-config').default(module.id);
 
-    var MAX_COMPLEXITY_NUMBER = module.config().MAX_COMPLEXITY_NUMBER || 80000;
+    const MAX_COMPLEXITY_NUMBER = config.MAX_COMPLEXITY_NUMBER || 80000;
 
-    var directionIds = [
+    const directionIds = [
         directions.BOTTOM_TO_TOP.id,
         directions.TOP_TO_BOTTOM.id,
         directions.LEFT_TO_RIGHT.id,
         directions.RIGHT_TO_LEFT.id
     ];
 
-    var shortDirectionUid = {};
-    for (var i = directionIds.length - 1; i >= 0; i--) {
+    const shortDirectionUid = {};
+    for (let i = directionIds.length - 1; i >= 0; i--) {
         shortDirectionUid[directionIds[i]] = i;
     }
 
@@ -40,8 +40,8 @@ define(function(require) {
         if (!this.to.length) {
             throw new Error('Please add required destination before this call (use addTo())');
         }
-        var siblings = path.getSiblings();
-        for (var i = siblings.length - 1; i >= 0; i--) {
+        const siblings = path.getSiblings();
+        for (let i = siblings.length - 1; i >= 0; i--) {
             this.internalAddFrom(siblings[i]);
         }
     };
@@ -53,10 +53,10 @@ define(function(require) {
      * @param {number} heuristic
      */
     Finder.prototype.binarySearch = function(heuristic) {
-        var from = -1;
-        var to = this.from.length;
+        let from = -1;
+        let to = this.from.length;
         while (to - from > 1) {
-            var mid = Math.floor((from + to) / 2);
+            const mid = Math.floor((from + to) / 2);
             if (this.from[mid].heuristic > heuristic) {
                 to = mid;
             } else {
@@ -73,7 +73,7 @@ define(function(require) {
      */
     Finder.prototype.internalAddFrom = function(path) {
         path.heuristic = this.getHeuristic(path);
-        var index = this.binarySearch(path.heuristic);
+        const index = this.binarySearch(path.heuristic);
         this.from.splice(index + 1, 0, path);
     };
 
@@ -83,7 +83,7 @@ define(function(require) {
      * @param {Path} path
      */
     Finder.prototype.addTo = function(path) {
-        this.to.push.apply(this.to, path.getSiblings());
+        this.to.push(...path.getSiblings());
     };
 
     /**
@@ -92,15 +92,15 @@ define(function(require) {
      * @returns {Path}
      */
     Finder.prototype.find = function() {
-        var i;
-        var result;
-        var current;
-        var operationsCount = 0;
+        let i;
+        let result;
+        let current;
+        let operationsCount = 0;
         // that must be optimized
-        var from = this.from;
-        var to = this.to;
+        const from = this.from;
+        const to = this.to;
         // that must be optimized
-        var closedNodes = [];
+        const closedNodes = [];
         this.filterNonTraversablePathes(from);
         this.filterNonTraversablePathes(to);
         while ((current = from.shift())) {
@@ -121,12 +121,12 @@ define(function(require) {
             operationsCount++;
             closedNodes[current.uid] = true;
             // replaced current.eachAvailableStep(registerPossiblePath);
-            var toNode = current.toNode;
+            const toNode = current.toNode;
             for (i = 0; i < directionIds.length; i++) {
-                var conn = toNode.connections[directionIds[i]];
+                const conn = toNode.connections[directionIds[i]];
                 if (conn && conn !== current && conn.traversable) {
-                    var vectorId = conn === toNode ? conn.vector.id : -conn.vector.id;
-                    var pathUid = toNode.uid * 8 + shortDirectionUid[vectorId];
+                    const vectorId = conn === toNode ? conn.vector.id : -conn.vector.id;
+                    const pathUid = toNode.uid * 8 + shortDirectionUid[vectorId];
                     if (closedNodes[pathUid]) {
                         continue;
                     }
@@ -144,8 +144,8 @@ define(function(require) {
      * @param {Array.<Path>} pathes
      */
     Finder.prototype.filterNonTraversablePathes = function(pathes) {
-        for (var i = pathes.length - 1; i >= 0; i--) {
-            var current = pathes[i];
+        for (let i = pathes.length - 1; i >= 0; i--) {
+            const current = pathes[i];
             if (current.connection.a.used && current.connection.b.used) {
                 pathes.splice(i, 1);
                 i--;
@@ -160,10 +160,10 @@ define(function(require) {
      * @returns {number}
      */
     Finder.prototype.getHeuristic = function(path) {
-        var anglesCount;
-        var distance = this.to[0].toNode.simpleDistanceTo(path.toNode);
-        var sub = 0;
-        for (var i = this.to.length - 1; i >= 0; i--) {
+        let anglesCount;
+        let distance = this.to[0].toNode.simpleDistanceTo(path.toNode);
+        let sub = 0;
+        for (let i = this.to.length - 1; i >= 0; i--) {
             if (path.canJoinWith(this.to[i])) {
                 sub = path.connection.cost;
                 distance = 0;
@@ -172,9 +172,9 @@ define(function(require) {
             }
         }
         if (anglesCount === undefined) {
-            var newFrom = path.toNode;
-            var to = this.to[0].toNode;
-            var midNodesDirection = to.sub(newFrom);
+            const newFrom = path.toNode;
+            const to = this.to[0].toNode;
+            const midNodesDirection = to.sub(newFrom);
             if (Math.abs(midNodesDirection.x) < 0.00001) {
                 midNodesDirection.x = 0;
             }
@@ -183,8 +183,8 @@ define(function(require) {
             }
             midNodesDirection.x = Math.sign(midNodesDirection.x);
             midNodesDirection.y = Math.sign(midNodesDirection.y);
-            var newDirection = path.connection.directionFrom(path.fromNode);
-            var toDirection = this.to[0].connection.directionFrom(to);
+            const newDirection = path.connection.directionFrom(path.fromNode);
+            const toDirection = this.to[0].connection.directionFrom(to);
             if (newDirection.x === toDirection.x && newDirection.y === toDirection.y) {
                 // 3 possible cases
                 if ((newDirection.x === 0 && (midNodesDirection.y === 0 || midNodesDirection.y === newDirection.y)) ||

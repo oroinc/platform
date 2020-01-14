@@ -1,14 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/messenger'
-], function($, _, Backbone, __, messenger) {
+define(function(require) {
     'use strict';
 
-    var service;
-    var subscriptions = [];
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+
+    let service;
+    let subscriptions = [];
 
     /**
      * Oro.Synchronizer - saves provided sync service internally and
@@ -30,7 +27,7 @@ define([
         }
         service = serv;
         while (subscriptions.length) {
-            service.subscribe.apply(service, subscriptions.shift());
+            service.subscribe(...subscriptions.shift());
         }
         return sync;
     }
@@ -54,7 +51,7 @@ define([
      */
     function unsubscribeModel(model) {
         if (model.id) {
-            var args = [_.result(model, 'url')];
+            const args = [_.result(model, 'url')];
             if (_.isFunction(model['[[SetCallback]]'])) {
                 args.push(model['[[SetCallback]]']);
             }
@@ -62,7 +59,7 @@ define([
         }
     }
 
-    var events = {
+    const events = {
         add: subscribeModel,
         error: function(collection) {
             _.each(collection.models, unsubscribeModel);
@@ -123,10 +120,10 @@ define([
      * @param {string} channel name of a channel
      * @param {Function} callback
      */
-    sync.subscribe = function() {
-        var args = _.toArray(arguments);
+    sync.subscribe = function(channel, callback) {
+        const args = [channel, callback];
         if (service) {
-            service.subscribe.apply(service, args);
+            service.subscribe(...args);
         } else {
             subscriptions.push(args);
         }
@@ -141,10 +138,10 @@ define([
      * @param {Function?} callback
      */
     sync.unsubscribe = function(channel, callback) {
-        var cleaner;
-        var args = _.toArray(arguments);
+        let cleaner;
+        const args = [channel, callback];
         if (service) {
-            service.unsubscribe.apply(service, args);
+            service.unsubscribe(...args);
         } else {
             cleaner = !callback
                 ? function(args) {

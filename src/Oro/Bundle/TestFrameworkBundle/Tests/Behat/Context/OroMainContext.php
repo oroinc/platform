@@ -17,6 +17,7 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
@@ -515,6 +516,28 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see only "At least one of the fields First name, Last name must be defined." error message
+     *
+     * @Then /^(?:|I should )see only "(?P<title>[^"]+)" error message$/
+     */
+    public function iShouldSeeStrictErrorMessage($title)
+    {
+        $errorElement = $this->spin(function (MinkContext $context) {
+            return $context->getSession()->getPage()->find('css', '.alert-error');
+        });
+
+        self::assertNotFalse($errorElement, 'Error message not found on page');
+        $message = $errorElement->find('css', 'ul')->getText();
+        $errorElement->find('css', 'button.close')->press();
+
+        self::assertEquals($title, $message, sprintf(
+            'Expect that "%s" error message contains "%s" string, but it isn\'t',
+            $message,
+            $title
+        ));
+    }
+
+    /**
      * Accepts alert.
      * Example: I accept alert
      *
@@ -553,8 +576,8 @@ class OroMainContext extends MinkContext implements
         $session = $driver->getWebDriverSession();
 
         try {
-            $session->accept_alert();
             $alertMessage = $session->getAlert_text();
+            $session->accept_alert();
         } catch (NoAlertOpenError $e) {
             return;
         }
@@ -626,7 +649,18 @@ class OroMainContext extends MinkContext implements
      */
     public function closeUiDialog()
     {
-        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+        $buttons = $this->getSession()->getPage()->findAll('css', 'button.ui-dialog-titlebar-close');
+        /**
+         * The last dialog window in most cases will be visible,
+         * because dialog adds one after another to HTML tree
+         */
+        rsort($buttons);
+        foreach ($buttons as $button) {
+            if ($button->isVisible()) {
+                $button->press();
+                break;
+            }
+        }
     }
 
     /**
@@ -1951,7 +1985,7 @@ JS;
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s-]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s\-]+)"$/
      *
      * @param string $pageTitle
      */
@@ -2124,6 +2158,38 @@ JS;
         self::assertTrue($childElement->isVisible(), sprintf(
             'Element "%s" found inside iframe, but it\'s not visible',
             $childElementName,
+            $iframeName
+        ));
+
+        $driver->switchToWindow();
+    }
+
+    /**
+     * Example: Then I should see "sample text" inside "Default Addresses" iframe
+     *
+     * @Then /^(?:|I )should see "(?P<text>[^\"]+)" inside "(?P<iframeName>(?:[^"]|\\")*)" iframe$/
+     *
+     * @param string $text
+     * @param string $iframeName
+     */
+    public function iShouldSeeTextInsideIframe(string $text, string $iframeName)
+    {
+        $iframeElement = $this->createElement($iframeName);
+        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
+            'Iframe element "%s" not found on page',
+            $iframeName
+        ));
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $driver->switchToIFrameByElement($iframeElement);
+
+        $iframeBody = $this->getSession()->getPage()->find('css', 'body');
+        $element = $iframeBody->find('named', ['content', $text]);
+        self::assertNotNull($element, sprintf('Text "%s" not found inside iframe "%s"', $text, $iframeName));
+        self::assertTrue($element->isVisible(), sprintf(
+            'Text "%s" found inside iframe "%s", but it\'s not visible',
+            $text,
             $iframeName
         ));
 
@@ -2383,5 +2449,62 @@ JS;
     protected function fixStepArgument($argument)
     {
         return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
+    }
+
+    /**
+     * Checks downloading file for a certain link
+     * Example: And I download file "some_link_name.jpg"
+     * @Given /^I download file "([^"]*)"$/
+     */
+    public function iDownloadFile($linkTitle)
+    {
+        $link = $this->getSession()->getPage()->findLink($linkTitle);
+
+        self::assertNotNull($link);
+        if (!$link->hasAttribute('href')) {
+            throw new \InvalidArgumentException(sprintf(
+                'Link "%s" is not downloadable (no href attribute)',
+                $linkTitle
+            ));
+        }
+
+        $url = $this->locatePath($link->getAttribute('href'));
+
+        $pathToSave = tempnam(sys_get_temp_dir(), 'downloaded_file');
+
+        self::assertTrue(
+            (new FileDownloader())->download($url, $pathToSave, $this->getSession()),
+            sprintf('Can not download file for link "%s"', $linkTitle)
+        );
+    }
+
+    /**
+     * @Then /^"(?P<element>[^"]*)" element "(?P<attribute>[^"]*)" attribute should contain "(?P<value>[^"]*)"$/
+     *
+     * @param string $element
+     * @param string $attribute
+     * @param string $value
+     */
+    public function elementAttributeContains($element, $attribute, $value)
+    {
+        $element = $this->createElement($element);
+        $this->assertNotNull($element);
+        $this->assertTrue($element->isValid());
+        $this->assertContains($value, $element->getAttribute($attribute));
+    }
+
+    /**
+     * @Then /^"(?P<element>[^"]*)" element "(?P<attribute>[^"]*)" attribute should not contain "(?P<value>[^"]*)"$/
+     *
+     * @param string $element
+     * @param string $attribute
+     * @param string $value
+     */
+    public function elementAttributeNotContains($element, $attribute, $value)
+    {
+        $element = $this->createElement($element);
+        $this->assertNotNull($element);
+        $this->assertTrue($element->isValid());
+        $this->assertNotContains($value, $element->getAttribute($attribute));
     }
 }

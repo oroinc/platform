@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappi
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -43,15 +44,17 @@ class OroEmailBundle extends Bundle
 
         $this->addDoctrineOrmMappingsPass($container);
         $container->addCompilerPass(new Compiler\EmailOwnerConfigurationPass());
-        $container->addCompilerPass(new Compiler\EmailBodyLoaderPass());
-        $container->addCompilerPass(new Compiler\EmailFlagManagerLoaderPass());
         $container->addCompilerPass(new Compiler\EmailSynchronizerPass());
         $container->addCompilerPass(new Compiler\EmailTemplateVariablesPass());
         $container->addCompilerPass(new Compiler\TwigSandboxConfigurationPass());
         $container->addCompilerPass(new Compiler\EmailRecipientsProviderPass());
         $container->addCompilerPass(new Compiler\MailboxProcessPass());
         $container->addCompilerPass(new Compiler\OverrideServiceSwiftMailer());
-        $container->addCompilerPass(new Compiler\VariableProcessorPass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_email.emailtemplate.variable_processor',
+            'oro_email.emailtemplate.variable_processor',
+            'alias'
+        ));
         $container->addCompilerPass(new Compiler\SwiftMailerTransportPass(), PassConfig::TYPE_OPTIMIZE);
 
         $addTopicPass = AddTopicMetaPass::create()

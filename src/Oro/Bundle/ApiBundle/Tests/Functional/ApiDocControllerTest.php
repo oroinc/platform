@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -11,9 +12,19 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ApiDocControllerTest extends WebTestCase
 {
+    use ApiFeatureTrait;
+
     protected function setUp()
     {
         $this->initClient();
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    private function getConfigManager(): ConfigManager
+    {
+        return self::getContainer()->get('oro_config.global');
     }
 
     /**
@@ -123,6 +134,28 @@ class ApiDocControllerTest extends WebTestCase
     public function testRestJsonApiUnknownResource()
     {
         $response = $this->sendApiDocResourceRequest('rest_json_api', 'get', 'unknown');
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testViewOnDisabledFeature()
+    {
+        $this->disableApiFeature();
+        try {
+            $response = $this->sendApiDocRequest('rest_json_api');
+        } finally {
+            $this->enableApiFeature();
+        }
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testResourceOnDisabledFeature()
+    {
+        $this->disableApiFeature();
+        try {
+            $response = $this->sendApiDocResourceRequest('rest_json_api', 'get', 'users');
+        } finally {
+            $this->enableApiFeature();
+        }
         self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
     }
 }

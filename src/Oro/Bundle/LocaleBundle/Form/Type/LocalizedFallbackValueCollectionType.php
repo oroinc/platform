@@ -9,6 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -61,7 +63,9 @@ class LocalizedFallbackValueCollectionType extends AbstractType
             [
                 'entry_type' => $options['entry_type'],
                 'entry_options' => $options['entry_options'],
-                'exclude_parent_localization' => $options['exclude_parent_localization']]
+                'exclude_parent_localization' => $options['exclude_parent_localization'],
+                'use_tabs' => $options['use_tabs']
+            ]
         )->add(
             self::FIELD_IDS,
             CollectionType::class,
@@ -82,7 +86,18 @@ class LocalizedFallbackValueCollectionType extends AbstractType
             'field' => 'string', // field used to store data - string or text
             'entry_type' => TextType::class,   // value form type
             'entry_options' => [],       // value form options
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false,
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        if ($options['use_tabs']) {
+            array_splice($view->vars['block_prefixes'], -1, 0, [$this->getBlockPrefix() . '_tabs']);
+        }
     }
 }

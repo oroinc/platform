@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var InputWidgetManager = require('oroui/js/input-widget-manager');
-    var UniformSelectInputWidget = require('oroui/js/app/views/input-widget/uniform-select');
-    var UniformFileInputWidget = require('oroui/js/app/views/input-widget/uniform-file');
-    var Select2InputWidget = require('oroui/js/app/views/input-widget/select2');
-    var NumberInputWidget = require('oroui/js/app/views/input-widget/number');
-    var CheckboxInputWidget = require('oroui/js/app/views/input-widget/checkbox');
-    var ClearableInputWidget = require('oroui/js/app/views/input-widget/clearable');
+    const InputWidgetManager = require('oroui/js/input-widget-manager');
+    const UniformSelectInputWidget = require('oroui/js/app/views/input-widget/uniform-select');
+    const UniformFileInputWidget = require('oroui/js/app/views/input-widget/uniform-file');
+    const Select2InputWidget = require('oroui/js/app/views/input-widget/select2');
+    const NumberInputWidget = require('oroui/js/app/views/input-widget/number');
+    const CheckboxInputWidget = require('oroui/js/app/views/input-widget/checkbox');
+    const ClearableInputWidget = require('oroui/js/app/views/input-widget/clearable');
 
     InputWidgetManager.addWidget('uniform-select', {
         selector: 'select:not(.no-uniform):not([multiple])',

@@ -1,17 +1,16 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var TextFilter;
-    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
-    var template = require('tpl!orofilter/templates/filter/text-filter.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var EmptyFilter = require('./empty-filter');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
+    const wrapperTemplate = require('tpl-loader!orofilter/templates/filter/filter-wrapper.html');
+    const template = require('tpl-loader!orofilter/templates/filter/text-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const EmptyFilter = require('oro/filter/empty-filter');
+    const tools = require('oroui/js/tools');
+    const mediator = require('oroui/js/mediator');
 
-    var config = require('module').config();
+    let config = require('module-config').default(module.id);
     config = _.extend({
         notAlignCriteria: tools.isMobile()
     }, config);
@@ -28,7 +27,7 @@ define(function(require) {
      * @class   oro.filter.TextFilter
      * @extends oro.filter.EmptyFilter
      */
-    TextFilter = EmptyFilter.extend({
+    const TextFilter = EmptyFilter.extend({
         wrappable: true,
 
         notAlignCriteria: config.notAlignCriteria,
@@ -92,8 +91,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TextFilter() {
-            TextFilter.__super__.constructor.apply(this, arguments);
+        constructor: function TextFilter(options) {
+            TextFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -109,7 +108,7 @@ define(function(require) {
                 };
             }
 
-            TextFilter.__super__.initialize.apply(this, arguments);
+            TextFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -179,7 +178,7 @@ define(function(require) {
          * @inheritDoc
          */
         _isDOMValueChanged: function() {
-            var thisDOMValue = this._readDOMValue();
+            const thisDOMValue = this._readDOMValue();
             return (
                 !_.isEmpty(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.value) &&
@@ -237,7 +236,7 @@ define(function(require) {
          * @protected
          */
         _onClickOutsideCriteria: function(e) {
-            var elem = this.$(this.criteriaSelector);
+            const elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._applyValueAndHideCriteria();
@@ -266,7 +265,7 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $filter = $(this.template({
+            const $filter = $(this.template({
                 renderMode: this.renderMode
             }));
             this._wrap($filter);
@@ -323,15 +322,15 @@ define(function(require) {
                 // no need to align criteria on mobile version, it is aligned over CSS
                 return;
             }
-            var $container = this.$el.closest('.filter-box');
+            const $container = this.$el.closest('.filter-box');
             if (!$container.length) {
                 return;
             }
-            var $dropdown = this.$(this.criteriaSelector);
+            const $dropdown = this.$(this.criteriaSelector);
             $dropdown.css('margin-left', 'auto');
-            var rect = $dropdown.get(0).getBoundingClientRect();
-            var containerRect = $container.get(0).getBoundingClientRect();
-            var shift = rect.right - containerRect.right;
+            const rect = $dropdown.get(0).getBoundingClientRect();
+            const containerRect = $container.get(0).getBoundingClientRect();
+            let shift = rect.right - containerRect.right;
             if (shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container
@@ -391,8 +390,8 @@ define(function(require) {
          * @return {String}
          * @protected
          */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+        _getCriteriaHint: function(...args) {
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
 
             if (!value.value) {
                 return this.placeholder;

@@ -1,8 +1,5 @@
 parameters:
     oro_windows.entity.windows_state.class: Oro\Bundle\WindowsBundle\Entity\WindowsState
-    oro_windows.manager.windows_state.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
-    oro_windows.manager.windows_state_registry.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry
-    oro_windows.manager.windows_state_request.class: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager
 
 services:
     oro_windows.twig.extension:
@@ -14,27 +11,24 @@ services:
             - { name: twig.extension }
 
     oro_windows.manager.windows_state_registry:
-        class: '%oro_windows.manager.windows_state_registry.class%'
-        arguments:
-            - '@oro_windows.manager.windows_state'
-
-    oro_windows.manager.windows_state.abstract:
-        class: '%oro_windows.manager.windows_state.class%'
-        abstract: true
-        arguments:
-            - '@security.token_storage'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_windows.manager.windows_state_request'
-
-    oro_windows.manager.windows_state:
-        parent: oro_windows.manager.windows_state.abstract
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry
         public: true
         arguments:
+            - [] # user classes that have an assigned windows state manager
+            - ~ # service locator for windows state managers
+            - '@security.token_storage'
+
+    oro_windows.manager.windows_state:
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
+        arguments:
+            - '@security.token_storage'
+            - '@doctrine'
+            - '@oro_windows.manager.windows_state_request'
             - '%oro_windows.entity.windows_state.class%'
-            - '%oro_user.entity.class%'
+        tags:
+            - { name: oro_windows.windows_state_manager, user_class: Oro\Bundle\UserBundle\Entity\User }
 
     oro_windows.manager.windows_state_request:
-        class: '%oro_windows.manager.windows_state_request.class%'
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager
         arguments:
             - '@request_stack'

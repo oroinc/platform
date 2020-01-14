@@ -1,23 +1,22 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var DateFilter;
-    var template = require('tpl!orofilter/templates/filter/date-filter.html');
-    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
-    var dropdownTemplate = require('tpl!orofilter/templates/filter/date-filter-dropdown.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var __ = require('orotranslation/js/translator');
-    var ChoiceFilter = require('./choice-filter');
-    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
-    var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
-    var DateVariableHelper = require('orofilter/js/date-variable-helper');
-    var DateValueHelper = require('orofilter/js/date-value-helper');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var layout = require('oroui/js/layout');
-    var config = require('module').config();
+    const template = require('tpl-loader!orofilter/templates/filter/date-filter.html');
+    const fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
+    const dropdownTemplate = require('tpl-loader!orofilter/templates/filter/date-filter-dropdown.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const __ = require('orotranslation/js/translator');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
+    const DateVariableHelper = require('orofilter/js/date-variable-helper');
+    const DateValueHelper = require('orofilter/js/date-value-helper');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const layout = require('oroui/js/layout');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         inputClass: 'date-visual-element'
@@ -28,7 +27,7 @@ define(function(require) {
     /**
      * Date filter: filter type as option + interval begin and end dates
      */
-    DateFilter = ChoiceFilter.extend({
+    const DateFilter = ChoiceFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -197,8 +196,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DateFilter() {
-            DateFilter.__super__.constructor.apply(this, arguments);
+        constructor: function DateFilter(options) {
+            DateFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -234,7 +233,7 @@ define(function(require) {
             // temp code to keep backward compatible
             if ($.isPlainObject(this.dateParts)) {
                 this.dateParts = _.map(this.dateParts, function(option, i) {
-                    var value = i.toString();
+                    const value = i.toString();
 
                     return {
                         value: value,
@@ -245,14 +244,14 @@ define(function(require) {
             }
 
             if (_.isUndefined(this.emptyPart)) {
-                var firstPart = _.first(this.dateParts).value;
+                const firstPart = _.first(this.dateParts).value;
                 this.emptyPart = {
                     type: (_.isEmpty(this.dateParts) ? '' : firstPart),
                     value: firstPart
                 };
             }
 
-            DateFilter.__super__.initialize.apply(this, arguments);
+            DateFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -274,8 +273,8 @@ define(function(require) {
         },
 
         onChangeFilterType: function(e) {
-            var select = this.$el.find(e.currentTarget);
-            var value = select.val();
+            const select = this.$el.find(e.currentTarget);
+            const value = select.val();
             this.changeFilterType(value);
         },
 
@@ -284,20 +283,20 @@ define(function(require) {
          */
         _applyValueAndHideCriteria: function() {
             this._beforeApply();
-            DateFilter.__super__._applyValueAndHideCriteria.apply(this);
+            DateFilter.__super__._applyValueAndHideCriteria.call(this);
         },
 
         changeFilterType: function(value) {
-            var startSeparatorEndSelector =
+            const startSeparatorEndSelector =
                 [this.selectors.startContainer, this.selectors.separator, this.selectors.endContainer].join(',');
-            var startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
-            var separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
-            var type = parseInt(value, 10);
+            const startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
+            const separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
+            const type = parseInt(value, 10);
             if (!isNaN(type)) {
                 // it's type
                 this.$(startSeparatorEndSelector).css('display', '');
                 this.$el.addClass(this.customClass);
-                var typeDefinedValues = [
+                const typeDefinedValues = [
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
                     this.typeDefinedValues.this_month,
@@ -346,15 +345,15 @@ define(function(require) {
          * @inheritDoc
          */
         _renderCriteria: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var part = {value: value.part, type: value.part};
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const part = {value: value.part, type: value.part};
 
             this.dateWidgetOptions.part = part.type;
 
             this._updateRangeFilter(value, false);
 
-            var displayValue = this._formatDisplayValue(value);
-            var $filter = $(
+            const displayValue = this._formatDisplayValue(value);
+            const $filter = $(
                 this.template({
                     inputClass: this.inputClass,
                     value: displayValue,
@@ -375,7 +374,7 @@ define(function(require) {
                 this._updateTooltipVisibility(value.part);
             }
             this.on('update', _.bind(function() {
-                var value = this.getValue();
+                const value = this.getValue();
                 if (value) {
                     this._updateTooltipVisibility(value.part);
                 }
@@ -387,13 +386,13 @@ define(function(require) {
         },
 
         _getParts: function() {
-            var value = _.extend({}, this.emptyValue, this.getValue());
-            var part = {value: value.part, type: value.part};
+            const value = _.extend({}, this.emptyValue, this.getValue());
+            const part = {value: value.part, type: value.part};
 
-            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
-            var datePartTemplate = this._getTemplate('fieldTemplate');
-            var parts = [];
+            const selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            const selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
+            const datePartTemplate = this._getTemplate('fieldTemplate');
+            const parts = [];
 
             // add date parts only if embed template used
             if (this.templateTheme !== '') {
@@ -429,12 +428,12 @@ define(function(require) {
          * @protected
          */
         _renderSubViews: function() {
-            var name;
-            var selector;
-            var pickerView;
-            var options;
-            var value = this.criteriaValueSelectors.value;
-            var Picker = this._getPickerConstructor();
+            let name;
+            let selector;
+            let pickerView;
+            let options;
+            const value = this.criteriaValueSelectors.value;
+            const Picker = this._getPickerConstructor();
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
                     continue;
@@ -477,14 +476,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
-            var hint = '';
-            var option;
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+        _getCriteriaHint: function(...args) {
+            let hint = '';
+            let option;
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
             if (value.value) {
-                var start = value.value.start;
-                var end = value.value.end;
-                var type = value.type ? value.type.toString() : '';
+                const start = value.value.start;
+                const end = value.value.end;
+                const type = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
@@ -577,8 +576,8 @@ define(function(require) {
          * @protected
          */
         _updateRangeFilter: function(value, updateDom) {
-            var oldValue = tools.deepClone(value);
-            var type = parseInt(value.type);
+            const oldValue = tools.deepClone(value);
+            const type = parseInt(value.type);
             if (value.value &&
                 (type === this.typeValues.between || type === this.typeValues.notBetween)) {
                 if (value.value.start && value.value.end) {
@@ -586,10 +585,10 @@ define(function(require) {
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
                         !this.dateVariableHelper.isDateVariable(value.value.start)) {
                         // swap end/start date if no variables are used and end date is behind start date
-                        var end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
-                        var start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
+                        const end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
+                        const start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
                         if (end < start) {
-                            var endValue = value.value.end;
+                            const endValue = value.value.end;
                             value.value.end = value.value.start;
                             value.value.start = endValue;
                         }
@@ -666,8 +665,8 @@ define(function(require) {
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
-                var start = this.subview('start');
-                var end = this.subview('end');
+                const start = this.subview('start');
+                const end = this.subview('end');
                 if (start && start.updateFront) {
                     start.updateFront();
                 }
@@ -682,10 +681,9 @@ define(function(require) {
          * @inheritDoc
          */
         _writeDOMValue: function(value) {
-            var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
-            $typeInput = this.$(this.criteriaValueSelectors.date_type);
+            const $typeInput = this.$(this.criteriaValueSelectors.date_type);
             if ($typeInput.val() !== value.type) {
                 $typeInput.val(value.type).trigger('change');
             }
@@ -721,9 +719,9 @@ define(function(require) {
         },
 
         _getSelectedChoiceLabel: function(property, value) {
-            var selectedChoiceLabel = '';
+            let selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
-                var foundChoice = _.find(this[property], function(choice) {
+                const foundChoice = _.find(this[property], function(choice) {
                     return (String(choice.value) === String(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
@@ -748,7 +746,7 @@ define(function(require) {
          * @inheritDoc
          */
         _isDOMValueChanged: function() {
-            var thisDOMValue = this._readDOMValue();
+            const thisDOMValue = this._readDOMValue();
             return (
                 !_.isUndefined(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.type) &&

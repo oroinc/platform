@@ -1,13 +1,5 @@
 parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
-    oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
-    oro_segment.static_segment_manager.class:
-    oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_segment.query.dynamic_segment.query_builder.class:   Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
-    oro_segment.query.static_segment.query_builder.class:    Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
-    oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
-    oro_segment.grid.datagrid_configuration_builder.class:   Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
-    oro_segment.validator.sorting_validator.class:           Oro\Bundle\SegmentBundle\Validator\SortingValidator
 
 services:
     oro_segment.entity_provider:
@@ -16,7 +8,6 @@ services:
 
     oro_segment.static_segment_manager:
         class: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -28,8 +19,7 @@ services:
         alias: oro_segment.static_segment_manager
 
     oro_segment.segment_manager:
-        class: '%oro_segment.segment_manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
         public: true
         lazy: true
         arguments:
@@ -46,8 +36,7 @@ services:
             - [ setNamespace, [ 'oro_segment_manager' ] ]
 
     oro_segment.segment_manager.api:
-        class: '%oro_segment.segment_manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -100,18 +89,18 @@ services:
             - [ addQueryBuilder, ['static', '@oro_segment.query.static_segment.query_builder'] ]
 
     oro_segment.query.dynamic_segment.query_builder:
-        class: '%oro_segment.query.dynamic_segment.query_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
         arguments:
             - '@oro_segment.query.segment_query_converter_factory.link'
             - '@doctrine'
 
     oro_segment.query.static_segment.query_builder:
-        class: '%oro_segment.query.static_segment.query_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
 
     oro_segment.event_listener.doctrine_pre_remove:
-        class: '%oro_segment.event_listener.doctrine_pre_remove.class%'
+        class: Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -125,7 +114,7 @@ services:
         alias: oro_segment.entity_name_provider
 
     oro_segment.grid.datagrid_configuration_builder:
-        class: '%oro_segment.grid.datagrid_configuration_builder.class%'
+        class: Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
         public: false
         parent: oro_report.grid.base_configuration_builder
 
@@ -138,7 +127,7 @@ services:
             - { name: twig.extension }
 
     oro_segment.validator.sorting_validator:
-        class: '%oro_segment.validator.sorting_validator.class%'
+        class: Oro\Bundle\SegmentBundle\Validator\SortingValidator
         arguments:
             - '@translator'
         tags:

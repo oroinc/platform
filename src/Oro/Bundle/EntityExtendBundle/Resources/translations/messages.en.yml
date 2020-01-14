@@ -45,7 +45,8 @@ oro:
                 manyToMany:         Many to many
                 enum:               Select
                 multiEnum:          Multi-Select
-                html_escaped:       HTML
+                multiFile:          Multiple Files
+                multiImage:         Multiple Images
 
                 ref-one:            System relation
                 ref-many:           System relation
@@ -57,6 +58,7 @@ oro:
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
                 currency:           Currency
                 money_value:        Money Value
+                guid:               GUID
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key

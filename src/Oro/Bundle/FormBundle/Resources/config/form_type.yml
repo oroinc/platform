@@ -1,70 +1,27 @@
-parameters:
-    oro_form.type.date.class:                                    Oro\Bundle\FormBundle\Form\Type\OroDateType
-    oro_form.type.datetime.class:                                Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
-    oro_form.type.time_interval.class:                           Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
-    oro_form.type.duration.class:                                Oro\Bundle\FormBundle\Form\Type\OroDurationType
-    oro_form.type.money.class:                                   Oro\Bundle\FormBundle\Form\Type\OroMoneyType
-    oro_form.type.choice.class:                                  Oro\Bundle\FormBundle\Form\Type\OroChoiceType
-    oro_form.type.percent.class:                                 Oro\Bundle\FormBundle\Form\Type\OroPercentType
-    oro_form.type.entity_identifier.class:                       Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
-    oro_form.type.jqueryselect2_hidden.class:                    Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
-    oro_form.type.icon.class:                                    Oro\Bundle\FormBundle\Form\Type\OroIconType
-    oro_form.type.multiple_entity.class:                         Oro\Bundle\FormBundle\Form\Type\MultipleEntityType
-    oro_form.type.collection.class:                              Oro\Bundle\FormBundle\Form\Type\CollectionType
-    oro_form.type.entity_create_or_select.class:                 Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType
-    oro_form.type.entity_create_or_select_choice.class:          Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType
-    oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
-    oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
-    oro_form.type.oro_autocomplete.class:                        Oro\Bundle\FormBundle\Form\Type\OroAutocompleteType
-    oro_form.type.simple_color_picker.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType
-    oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
-    oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
-    oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
-    oro_form.type.download_links.class:                          Oro\Bundle\FormBundle\Form\Type\DownloadLinksType
-    oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
-    oro_form.type.resizeable_rich_text.class:                    Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType
-    oro_form.type.data_changeset.class:                          Oro\Bundle\FormBundle\Form\Type\DataChangesetType
-    oro_form.type.entity_changeset.class:                        Oro\Bundle\FormBundle\Form\Type\EntityChangesetType
-
-    oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
-    oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
-    oro_form.extension.constraint_as_option.class:               Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension
-    oro_form.extension.js_validation.class:                      Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension
-    oro_form.extension.js_validation.constraints_provider.class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
-    oro_form.extension.js_validation.repeated.class:             Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
-    oro_form.extension.additional_attr.class:                    Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension
-    oro_form.extension.data_transformer.class:                   Oro\Bundle\FormBundle\Form\Extension\DataTransformerExtension
-    oro_form.extension.sortable.class:                           Oro\Bundle\FormBundle\Form\Extension\SortableExtension
-
-    oro_form.form_handler.api.class:                             Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
-
-    oro_form.validator.entity_class.class:                       Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
-    oro_form.validator.related_entity.class:                     Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
-
 services:
     # Form types
     oro_form.type.date:
-        class: '%oro_form.type.date.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroDateType
         tags:
             - { name: form.type, alias: oro_date }
 
     oro_form.type.datetime:
-        class: '%oro_form.type.datetime.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
         tags:
             - { name: form.type, alias: oro_datetime }
 
     oro_form.type.time_interval:
-        class: '%oro_form.type.time_interval.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
         tags:
             - { name: form.type, alias: oro_time_interval }
 
     oro_form.type.duration:
-        class: '%oro_form.type.duration.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroDurationType
         tags:
             - { name: form.type, alias: oro_duration }
 
     oro_form.type.money:
-        class: '%oro_form.type.money.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroMoneyType
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.number'
@@ -72,24 +29,24 @@ services:
             - { name: form.type, alias: oro_money }
 
     oro_form.type.choice:
-        class: '%oro_form.type.choice.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroChoiceType
         tags:
             - { name: form.type, alias: oro_choice }
 
     oro_form.type.percent:
-        class: '%oro_form.type.percent.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroPercentType
         tags:
             - { name: form.type, alias: oro_percent }
 
     oro_form.type.icon:
-        class: '%oro_form.type.icon.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroIconType
         arguments:
             - '@kernel'
         tags:
             - { name: form.type, alias: oro_icon_select }
 
     oro_form.type.entity_identifier:
-        class: '%oro_form.type.entity_identifier.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: oro_entity_identifier }
@@ -100,7 +57,7 @@ services:
             - { name: form.type, alias: oro_entity_tree_select }
 
     oro_form.type.jqueryselect2_hidden:
-        class: '%oro_form.type.jqueryselect2_hidden.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_form.autocomplete.search_registry'
@@ -109,7 +66,7 @@ services:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
 
     oro_form.type.multiple_entity:
-        class: '%oro_form.type.multiple_entity.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\MultipleEntityType
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@security.authorization_checker'
@@ -117,26 +74,26 @@ services:
             - { name: form.type, alias: oro_multiple_entity }
 
     oro_form.type.collection:
-        class: '%oro_form.type.collection.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\CollectionType
         tags:
              - { name: form.type, alias: oro_collection }
 
     oro_form.type.entity_create_or_select:
-        class: '%oro_form.type.entity_create_or_select.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select }
 
     oro_form.type.entity_create_or_select_choice:
-        class: '%oro_form.type.entity_create_or_select_choice.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_choice }
 
     oro_form.type.simple_color_picker:
-        class: '%oro_form.type.simple_color_picker.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType
         arguments:
             - '@oro_config.user'
             - '@translator'
@@ -144,43 +101,43 @@ services:
             - { name: form.type, alias: oro_simple_color_picker }
 
     oro_form.type.simple_color_choice:
-        class: '%oro_form.type.simple_color_choice.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
         arguments:
             - '@oro_config.user'
         tags:
             - { name: form.type, alias: oro_simple_color_choice }
 
     oro_form.type.color_table:
-        class: '%oro_form.type.color_table.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroColorTableType
         tags:
             - { name: form.type, alias: oro_color_table }
 
     oro_form.type.rich_text:
-        class: '%oro_form.type.rich_text.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroRichTextType
         arguments:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
             - '@assets.context'
-            - '%kernel.cache_dir%'
+            - '@oro_ui.html_tag_helper'
         calls:
             - [setAssetHelper, ['@assets.packages']]
         tags:
             - { name: form.type, alias: oro_rich_text }
 
     oro_form.type.resizeable_rich_text:
-        class: '%oro_form.type.resizeable_rich_text.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType
         tags:
             - { name: form.type, alias: oro_resizeable_rich_text }
 
     oro_form.type.data_changeset:
-        class: '%oro_form.type.data_changeset.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\DataChangesetType
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_data_changeset }
 
     oro_form.type.entity_changeset:
-        class: '%oro_form.type.entity_changeset.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\EntityChangesetType
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
@@ -207,9 +164,9 @@ services:
 
     # Form extensions
     oro_form.extension.data_block:
-        class: '%oro_form.extension.data_block.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.date_time_extension:
          class: Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension
@@ -217,9 +174,9 @@ services:
              - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
 
     oro_form.extension.client_validation:
-        class: '%oro_form.extension.client_validation.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.tooltip_extension:
         class: Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension
@@ -227,80 +184,82 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@translator.default'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.hint_extension:
         class: Oro\Bundle\FormBundle\Form\Extension\HintFormExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.constraint_as_option:
-        class: '%oro_form.extension.constraint_as_option.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension
         arguments:
             - '@oro_form.validator.constraint_factory'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.js_validation:
-        class: '%oro_form.extension.js_validation.class%'
-        arguments: ['@oro_form.extension.js_validation.constraints_provider']
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension
+        arguments:
+            - '@oro_form.extension.js_validation.constraints_provider'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.js_validation.constraints_provider:
-        class: '%oro_form.extension.js_validation.constraints_provider.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
         arguments:
             - '@validator.mapping.class_metadata_factory'
 
 
     oro_form.extension.js_validation.repeated:
-        class: '%oro_form.extension.js_validation.repeated.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
         tags:
             - { name: form.type_extension, alias: repeated, extended_type: Symfony\Component\Form\Extension\Core\Type\RepeatedType }
 
     oro_form.extension.additional_attr:
-        class: '%oro_form.extension.additional_attr.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.data_transformer:
-        class: '%oro_form.extension.data_transformer.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\DataTransformerExtension
         arguments:
             - '@service_container'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.sortable:
-        class: '%oro_form.extension.sortable.class%'
+        class: Oro\Bundle\FormBundle\Form\Extension\SortableExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.extra_fields_validation:
         class: Oro\Bundle\FormBundle\Form\Extension\ExtraFieldsValidationExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_form.extension.strip_tags:
-        class: 'Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension'
+        class: Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension
         arguments:
-            - '@oro_ui.html_tag_helper'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_ui.html_tag_helper }
 
     oro_form.type.encoded_placeholder_password:
-        class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
+        class: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
         arguments:
             - '@oro_security.encoder.default'
         tags:
             - { name: form.type, alias: oro_encoded_placeholder_password }
 
     oro_form.type.textlist:
-        class: '%oro_form.type.textlist.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroTextListType
         tags:
             - { name: form.type, alias: oro_textlist }
 
     oro_form.type.oro_entity_create_or_select_inline:
-        class: '%oro_form.type.oro_entity_create_or_select_inline.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
         arguments:
             - '@security.authorization_checker'
             - '@oro_entity_config.config_manager'
@@ -310,32 +269,32 @@ services:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
 
     oro_form.type.oro_autocomplete:
-        class: '%oro_form.type.oro_autocomplete.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\OroAutocompleteType
         arguments:
             - '@oro_form.autocomplete.search_registry'
         tags:
             - { name: form.type, alias: oro_autocomplete }
 
     oro_form.type.link:
-        class: '%oro_form.type.link.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\LinkType
         tags:
             - { name: form.type, alias: oro_link_type }
 
     oro_form.type.download_links:
-        class: '%oro_form.type.download_links.class%'
+        class: Oro\Bundle\FormBundle\Form\Type\DownloadLinksType
         arguments:
             - '@assets.packages'
         tags:
             - { name: form.type, alias: oro_download_links_type }
 
     oro_form.form_handler.api:
-        class: '%oro_form.form_handler.api.class%'
+        class: Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
         arguments:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_form.validator.entity_class:
-        class: '%oro_form.validator.entity_class.class%'
+        class: Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_class_name_helper'
@@ -343,7 +302,7 @@ services:
             - { name: validator.constraint_validator, alias: oro_form.entity_class_validator }
 
     oro_form.validator.related_entity:
-        class: '%oro_form.validator.related_entity.class%'
+        class: Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_class_name_helper'
@@ -383,8 +342,13 @@ services:
             - { name: form.type, alias: oro_related_entity_standalone_collection_api }
 
     oro_form.type.hidden_number:
-        class: 'Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType'
+        class: Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType
         arguments:
             - '@oro_locale.formatter.number'
         tags:
             - { name: form.type, alias: oro_hidden_number }
+
+    oro_form.type.checkbox:
+        class: Oro\Bundle\FormBundle\Form\Type\CheckboxType
+        tags:
+            - { name: form.type, alias: oro_checkbox }

@@ -1,26 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var EmailTranslationView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailTranslationView = BaseView.extend({
+    const EmailTranslationView = BaseView.extend({
         events: {
-            'show [data-role="change-language"]': 'onChangeLanguage'
+            'shown.bs.tab [data-role="change-localization"]': 'onChangeLocalizationTab'
         },
 
         /**
          * @inheritDoc
          */
-        constructor: function EmailTranslationView() {
-            EmailTranslationView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTranslationView(options) {
+            EmailTranslationView.__super__.constructor.call(this, options);
         },
 
-        onChangeLanguage: function(e) {
-            var $target = $(e.target || window.event.target);
-            var dataRelated = $target.attr('data-related');
-            $($target.closest('form').find(':input.translation')).each(function(key, el) {
+        onChangeLocalizationTab: function(e) {
+            const $target = $(e.target || window.event.target);
+            const dataRelated = $target.attr('data-related');
+            $($target.closest('form').find(':input.active-localization')).each(function(key, el) {
                 $(el).val(dataRelated);
             });
         }

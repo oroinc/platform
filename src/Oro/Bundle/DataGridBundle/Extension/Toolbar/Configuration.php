@@ -28,9 +28,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('toolbarOptions');
 
-        $builder->root('toolbarOptions')
+        $builder->getRootNode()
             ->children()
                 ->booleanNode('hide')->defaultFalse()->end()
                 ->booleanNode('addResetAction')->defaultTrue()->end()

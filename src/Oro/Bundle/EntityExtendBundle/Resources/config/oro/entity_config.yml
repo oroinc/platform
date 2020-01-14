@@ -1,7 +1,7 @@
 entity_config:
     extend:
         entity:
-            require_js:                     ['oroentityextend/js/init-entity-extend-relation']
+            jsmodules:                     ['oroentityextend/js/init-entity-extend-relation']
             grid_action:
                 -
                     name:                   oro.entity_extend.entity_config.extend.entity.grid_action.remove
@@ -547,7 +547,7 @@ entity_config:
                 searchable:
                     options:
                         value_type:         boolean
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany, html_escaped]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
                         required_property:
                             config_id:
                                 scope:      extend

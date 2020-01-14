@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EntityView;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var DialogWidget = require('oro/dialog-widget');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const DialogWidget = require('oro/dialog-widget');
 
     /**
      * @export  oroform/js/multiple-entity/view
      * @class   oroform.MultipleEntity.View
      * @extends Backbone.View
      */
-    EntityView = Backbone.View.extend({
+    const EntityView = Backbone.View.extend({
         attributes: {
             'class': 'list-group-item'
         },
@@ -32,8 +31,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EntityView() {
-            EntityView.__super__.constructor.apply(this, arguments);
+        constructor: function EntityView(options) {
+            EntityView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -41,7 +40,11 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            this.template = _.template(this.options.template);
+            if (typeof this.options.template === 'string') {
+                this.template = _.template(this.options.template);
+            } else {
+                this.template = this.options.template;
+            }
             this.listenTo(this.model, 'destroy', this.remove);
             if (this.options.defaultRequired) {
                 this.listenTo(this.model, 'change:isDefault', this.toggleDefault);
@@ -56,7 +59,7 @@ define(function(require) {
         viewDetails: function(e) {
             e.stopImmediatePropagation();
             e.preventDefault();
-            var widget = new DialogWidget({
+            const widget = new DialogWidget({
                 url: this.options.model.get('link'),
                 title: this.options.model.get('label'),
                 dialogOptions: {
@@ -85,7 +88,7 @@ define(function(require) {
         },
 
         render: function() {
-            var data = this.model.toJSON();
+            const data = this.model.toJSON();
             data.hasDefault = this.options.hasDefault;
             data.name = this.options.name;
             this.$el.append(this.template(data));

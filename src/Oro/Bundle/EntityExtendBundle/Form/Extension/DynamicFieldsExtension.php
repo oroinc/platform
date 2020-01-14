@@ -10,16 +10,18 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * Adds extended fields to the form based on the configuration for the entity/field.
+ * Adds extended fields to a form based on the configuration for an entity/field.
  */
-class DynamicFieldsExtension extends AbstractTypeExtension
+class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
     
@@ -29,22 +31,32 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var DynamicFieldsHelper */
-    private $dynamicFieldsHelper;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param ConfigManager                        $configManager
-     * @param DoctrineHelper                       $doctrineHelper
-     * @param DynamicFieldsHelper                  $dynamicFieldsHelper
+     * @param ConfigManager      $configManager
+     * @param DoctrineHelper     $doctrineHelper
+     * @param ContainerInterface $container
      */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        DynamicFieldsHelper $dynamicFieldsHelper
+        ContainerInterface $container
     ) {
-        $this->configManager    = $configManager;
-        $this->doctrineHelper   = $doctrineHelper;
-        $this->dynamicFieldsHelper = $dynamicFieldsHelper;
+        $this->configManager = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_entity_extend.form.extension.dynamic_fields_helper' => DynamicFieldsHelper::class
+        ];
     }
 
     /**
@@ -126,13 +138,13 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            if (!$this->dynamicFieldsHelper->shouldBeInitialized($className, $formConfig, $view, true)) {
+            if (!$this->getDynamicFieldsHelper()->shouldBeInitialized($className, $formConfig, $view, true)) {
                 continue;
             }
 
             $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
 
-            $this->dynamicFieldsHelper->addInitialElements($view, $form, $extendConfig);
+            $this->getDynamicFieldsHelper()->addInitialElements($view, $form, $extendConfig);
         }
     }
 
@@ -155,7 +167,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function isApplicable(array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) || empty($options['compound'])) {
             return false;
         }
 
@@ -175,10 +187,17 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param ConfigProvider  $extendConfigProvider
      *
      * @return bool
-     * @deprecated please use \Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper::isApplicableField()
      */
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
-        return $this->dynamicFieldsHelper->isApplicableField($extendConfig, $extendConfigProvider);
+        return $this->getDynamicFieldsHelper()->isApplicableField($extendConfig, $extendConfigProvider);
+    }
+
+    /**
+     * @return DynamicFieldsHelper
+     */
+    protected function getDynamicFieldsHelper(): DynamicFieldsHelper
+    {
+        return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');
     }
 }

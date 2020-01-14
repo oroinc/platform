@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $finder = new NodeJsExecutableFinder;
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_asset')
+        $treeBuilder = new TreeBuilder('oro_asset');
+        $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('nodejs_path')
                     ->info('Path to NodeJs executable')
@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Path to NPM executable')
                 ->end()
                 ->scalarNode('build_timeout')
-                    ->defaultValue(300)
+                    ->defaultValue(900)
                     ->info('Assets build timeout in seconds, null to disable timeout')
                 ->end()
                 ->scalarNode('npm_install_timeout')

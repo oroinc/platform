@@ -2,7 +2,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
 ], function(localeSettings, moment, __) {
     'use strict';
 
-    var datetimeVendor = 'moment';
+    const datetimeVendor = 'moment';
 
     /**
      * Datetime formatter
@@ -257,7 +257,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {moment}
          */
         getMomentForBackendDate: function(value) {
-            var momentDate = moment.utc(value);
+            const momentDate = moment.utc(value);
             if (!momentDate.isValid()) {
                 throw new Error('Invalid backend date ' + value);
             }
@@ -289,7 +289,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {moment}
          */
         getMomentForBackendTime: function(value) {
-            var momentTime = moment.utc(value, ['HH:mm:ss', 'HH:mm']);
+            const momentTime = moment.utc(value, ['HH:mm:ss', 'HH:mm']);
             if (!momentTime.isValid()) {
                 throw new Error('Invalid backend time ' + value);
             }
@@ -319,10 +319,10 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {string}
          */
         formatSmartDateTime: function(value) {
-            var dateMoment = this.getMomentForBackendDateTime(value).tz(this.timezone);
-            var todayMoment = moment().tz(this.timezone);
+            const dateMoment = this.getMomentForBackendDateTime(value).tz(this.timezone);
+            const todayMoment = moment().tz(this.timezone);
             // full date with year
-            var result = this.formatDate(value);
+            let result = this.formatDate(value);
 
             if (result === todayMoment.format(this.getDateFormat())) {
                 // same day, only show time
@@ -365,7 +365,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {moment} in UTC time zone
          */
         getMomentForBackendDateTime: function(value) {
-            var momentDateTime = moment.utc(value);
+            const momentDateTime = moment.utc(value);
             if (!momentDateTime.isValid()) {
                 throw new Error('Invalid backend datetime ' + value);
             }

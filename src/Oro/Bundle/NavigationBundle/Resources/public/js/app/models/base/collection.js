@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var BaseNavigationItemCollection;
-    var mediator = require('oroui/js/mediator');
-    var BaseNavigationModel = require('oronavigation/js/app/models/base/model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    const mediator = require('oroui/js/mediator');
+    const BaseNavigationModel = require('oronavigation/js/app/models/base/model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
 
-    BaseNavigationItemCollection = BaseCollection.extend({
+    const BaseNavigationItemCollection = BaseCollection.extend({
         model: BaseNavigationModel,
 
         /**
          * @inheritDoc
          */
-        constructor: function BaseNavigationItemCollection() {
-            BaseNavigationItemCollection.__super__.constructor.apply(this, arguments);
+        constructor: function BaseNavigationItemCollection(...args) {
+            BaseNavigationItemCollection.__super__.constructor.apply(this, args);
         },
 
         getCurrentModel: function() {

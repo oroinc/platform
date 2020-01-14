@@ -2,18 +2,18 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var _ = require('underscore');
-    var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
+    const _ = require('underscore');
+    const ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
 
     // fixtures
-    var options = JSON.parse(require('text!./Fixture/expression-editor-options.json'));
-    var html = require('text!./Fixture/expression-editor-template.html');
+    const options = require('./Fixture/expression-editor-options.json');
+    const html = require('text-loader!./Fixture/expression-editor-template.html');
 
     // variables
-    var expressionEditorUtil = null;
-    var expressionEditorView = null;
-    var typeahead = null;
-    var el = null;
+    let expressionEditorUtil = null;
+    let expressionEditorView = null;
+    let typeahead = null;
+    let el = null;
 
     describe('oroform/js/app/views/expression-editor-view', function() {
         beforeEach(function() {
@@ -47,7 +47,7 @@ define(function(require) {
         });
 
         describe('check rule editor validation', function() {
-            var checks = {
+            const checks = {
                 'product': false,
                 'product.': false,
                 'product.id': true,
@@ -101,7 +101,7 @@ define(function(require) {
             it('chain select', function() {
                 el.value = 'pro';
                 typeahead.lookup();
-                for (var i = 0; i < 5; i++) {
+                for (let i = 0; i < 5; i++) {
                     typeahead.select();
                 }
 
@@ -125,7 +125,7 @@ define(function(require) {
             });
 
             it('check suggested items if previous item is entity or scalar(not operation)', function() {
-                var values = ['product.featured', '1', '1 in [1,2,3]', '(1 == 1)'];
+                const values = ['product.featured', '1', '1 in [1,2,3]', '(1 == 1)'];
                 _.each(values, function(value) {
                     el.value = value + ' ';
                     el.selectionStart = el.value.length;
@@ -153,7 +153,7 @@ define(function(require) {
             });
 
             it('check suggested items if previous item is operation', function() {
-                var values = ['', '+', '(1 =='];
+                const values = ['', '+', '(1 =='];
                 _.each(values, function(value) {
                     el.value = value + ' ';
                     el.selectionStart = el.value.length;
@@ -208,7 +208,7 @@ define(function(require) {
 
         describe('check value update after inserting selected value', function() {
             it('inserting in the field start', function() {
-                var checks = [];
+                const checks = [];
                 checks.push([2, 'pro', 'product.']);
                 checks.push([8, 'product. == 10', 'product.attributeFamily. == 10']);
                 checks.push([12, 'product.id !', 'product.id != ']);
@@ -230,7 +230,7 @@ define(function(require) {
                 el.value = 'pricel';
                 typeahead.lookup();
                 typeahead.select();
-                var $dataSource = expressionEditorView.getDataSource('pricelist').$widget;
+                const $dataSource = expressionEditorView.getDataSource('pricelist').$widget;
 
                 expect($dataSource.is(':visible')).toBeTruthy();
 

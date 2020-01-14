@@ -3,7 +3,7 @@ services:
         class: Symfony\Component\DependencyInjection\ServiceLocator
         public: false
         arguments:
-            - [] # actions. Will be set in Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionLocatorPass
+            - [] # conditions
         tags:
             - { name: container.service_locator }
 

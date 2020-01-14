@@ -75,7 +75,7 @@ class Table extends Element
      */
     public function getRowByContentElement($content, $elementName, $failIfNotFound = true)
     {
-        /** @var TableRow|bool $row */
+        /** @var TableRow|null $row */
         $row = $this->spin(function () use ($elementName, $content) {
             $element = $this->findElementContains($elementName, $content);
 
@@ -83,7 +83,7 @@ class Table extends Element
         }, 2);
 
         if ($failIfNotFound) {
-            self::assertNotFalse($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+            self::assertNotNull($row, sprintf(static::ERROR_NO_ROW_CONTENT, $content));
         }
         if ($row) {
             $row->setOwner($this);

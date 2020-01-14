@@ -233,6 +233,33 @@
 {% endmacro %}
 
 {#
+    Render collapsible html block
+    Parameters:
+        data  - rendered data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderCollapsibleHtml(data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
+    {% if is_granted('VIEW', entity, fieldName) and data is not empty %}
+        {% set collapseView = {
+            storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
+            uid: '[' ~ fieldName ~ '][' ~ entity.id ~ ']',
+            animationSpeed: 0,
+            closeClass: 'overflows',
+            checkOverflow: true,
+            open: false
+        } %}
+        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
+            <div class="control-label" data-collapse-container>
+                {{ data|raw }}
+            </div>
+            <a href="#" class="control-label toggle-more" data-collapse-trigger>{{ moreText|trans }}</a>
+            <a href="#" class="control-label toggle-less" data-collapse-trigger>{{ lessText|trans }}</a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{#
     Render html property block. HTML rendering may be switched off with system config.
     Parameters:
         title - property title
@@ -1507,6 +1534,16 @@
         {{ form_widget(form) }}
     </tr>
     {% endspaceless %}
+{% endmacro %}
+
+{% macro render_birthday(birthday) %}
+    {% if birthday is not empty %}
+        {{ birthday|oro_format_date }}
+        {% set age = birthday|age_string %}
+        {{ age is not empty ? '(' ~ age ~ ')': null }}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {% endif %}
 {% endmacro %}
 
 {% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}

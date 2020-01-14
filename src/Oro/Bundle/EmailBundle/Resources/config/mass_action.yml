@@ -1,30 +1,24 @@
-parameters:
-    oro_email.mass_action.mark.read.class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkReadMassAction
-    oro_email.mass_action.mark.unread.class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkUnreadMassAction
-    oro_email.mass_action.mark_handler.class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler
 services:
     oro_email.mass_action.mark.read:
-        class: '%oro_email.mass_action.mark.read.class%'
+        class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkReadMassAction
         arguments:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkread }
 
     oro_email.mass_action.mark.unread:
-        class: '%oro_email.mass_action.mark.unread.class%'
+        class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkUnreadMassAction
         arguments:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkunread }
 
     oro_email.mass_action.mark_handler:
-        class: '%oro_email.mass_action.mark_handler.class%'
+        class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'

@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var CheckConnectionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
-    var messenger = require('oroui/js/messenger');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const layout = require('oroui/js/layout');
+    const messenger = require('oroui/js/messenger');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    CheckConnectionView = BaseView.extend({
+    const CheckConnectionView = BaseView.extend({
         SUCCESS_MESSAGE_DELAY: 5000,
 
         route: 'oro_imap_connection_check',
@@ -38,8 +37,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CheckConnectionView() {
-            CheckConnectionView.__super__.constructor.apply(this, arguments);
+        constructor: function CheckConnectionView(options) {
+            CheckConnectionView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -49,8 +48,8 @@ define(function(require) {
         },
 
         render: function() {
-            var imap = this.model.get('imap');
-            var $container = this.ensureContainer();
+            const imap = this.model.get('imap');
+            const $container = this.ensureContainer();
             if ('folders' in imap) {
                 $container.replaceWith(imap.folders);
                 layout.initPopover(this.$el.find('.folder-tree'));
@@ -61,7 +60,7 @@ define(function(require) {
         },
 
         ensureContainer: function() {
-            var $container = this.$el.find('.folder-tree');
+            let $container = this.$el.find('.folder-tree');
             if ($container.length === 0) {
                 $container = $('<div/>', {'class': 'control-group folder-tree'});
                 this.$el.find('[data-role=check-connection-btn]')
@@ -71,8 +70,8 @@ define(function(require) {
         },
 
         requestAPI: function() {
-            var data = this.$el.find('.check-connection').serializeArray();
-            var $messageContainer = this.$el.find('.check-connection-messages');
+            const data = this.$el.find('.check-connection').serializeArray();
+            const $messageContainer = this.$el.find('.check-connection-messages');
             mediator.execute('showLoading');
             this.clear();
             $messageContainer.find('.alert').remove();
@@ -92,7 +91,7 @@ define(function(require) {
                 }, this),
                 errorHandlerMessage: false,
                 error: _.bind(function(response) {
-                    var responseJSON = response.responseJSON;
+                    const responseJSON = response.responseJSON;
                     _.each(responseJSON.errors, function(errorMessage) {
                         messenger.notificationFlashMessage('error', errorMessage, {
                             container: $messageContainer,
@@ -107,7 +106,7 @@ define(function(require) {
         },
 
         showMessage: function(type, message, container) {
-            var delay = type === 'error' ? 0 : this.SUCCESS_MESSAGE_DELAY;
+            const delay = type === 'error' ? 0 : this.SUCCESS_MESSAGE_DELAY;
             messenger.notificationFlashMessage(type, __(message), {
                 container: container,
                 delay: delay
@@ -115,8 +114,8 @@ define(function(require) {
         },
 
         prepareData: function(data) {
-            var result = [];
-            var start = this.formPrefix.length;
+            const result = [];
+            const start = this.formPrefix.length;
             if (start > 0) {
                 _.each(data, _.bind(function(item) {
                     if (item.name.indexOf(this.formPrefix) === 0) {
@@ -135,7 +134,7 @@ define(function(require) {
         },
 
         _getUrlParams: function() {
-            var params = {
+            const params = {
                 for_entity: this.entity,
                 organization: this.organization
             };

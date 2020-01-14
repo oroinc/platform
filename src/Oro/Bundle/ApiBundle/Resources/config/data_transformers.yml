@@ -1,20 +1,17 @@
 services:
     oro_api.data_transformer_registry:
-        public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry
         arguments:
             - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass
             - '@oro_api.request_expression_matcher'
-        lazy: true
 
     oro_api.data_transformer.datetime:
-        public: false
         class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
         tags:
             - { name: oro.api.data_transformer, dataType: datetime, requestType: rest }
 
     oro_api.data_transformer.date:
-        public: false
         class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
         arguments:
             - false
@@ -22,7 +19,6 @@ services:
             - { name: oro.api.data_transformer, dataType: date, requestType: rest }
 
     oro_api.data_transformer.time:
-        public: false
         class: Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer
         arguments:
             - true
@@ -31,8 +27,6 @@ services:
             - { name: oro.api.data_transformer, dataType: time, requestType: rest }
 
     oro_api.data_transformer.entity_type:
-        public: false
-        lazy: true
         class: Oro\Bundle\ApiBundle\DataTransformer\EntityClassToEntityTypeTransformer
         arguments:
             - '@oro_api.value_normalizer'
@@ -40,20 +34,17 @@ services:
             - { name: oro.api.data_transformer, dataType: entityType }
 
     oro_api.data_transformer.empty_json_array_to_null:
-        public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\EmptyArrayToNullTransformer
         tags:
             - { name: oro.api.data_transformer, dataType: json_array }
             - { name: oro.api.data_transformer, dataType: simple_array }
 
     oro_api.data_transformer.decimal:
-        public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DecimalToStringTransformer
         tags:
             - { name: oro.api.data_transformer, dataType: decimal }
 
     oro_api.data_transformer.money:
-        public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\MoneyToStringTransformer
         tags:
             - { name: oro.api.data_transformer, dataType: money }

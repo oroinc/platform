@@ -3,10 +3,10 @@ define(function(require) {
 
     require('jasmine-jquery');
 
-    var DialogWidget = require('oro/dialog-widget');
-    var $ = require('jquery');
+    const DialogWidget = require('oro/dialog-widget');
+    const $ = require('jquery');
 
-    var content = require('text!./Fixture/dialog-widget-content.html');
+    const content = require('text-loader!./Fixture/dialog-widget-content.html');
 
     describe('oro/dialog-widget', function() {
         describe('check focus on dialog content', function() {

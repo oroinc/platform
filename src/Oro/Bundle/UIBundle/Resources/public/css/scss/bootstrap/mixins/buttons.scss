@@ -16,8 +16,8 @@
     $focus-color: null,
     $focus-box-shadow: null,
     $disabled-color: $color,
-    $disabled-background-color: $background,
-    $disabled-border-color: $border,
+    $disabled-background: $background,
+    $disabled-border: $border,
     $disabled-opacity: null
 ) {
     color: $color;
@@ -54,8 +54,8 @@
     &.disabled,
     &:disabled {
         color: $disabled-color;
-        background-color: $disabled-background-color;
-        border-color: $disabled-border-color;
+        background-color: $disabled-background;
+        border-color: $disabled-border;
         opacity: $disabled-opacity;
     }
 

@@ -1,7 +1,7 @@
 define([
     'jquery',
     'underscore',
-    'tpl!oroui/templates/message-item.html',
+    'tpl-loader!oroui/templates/message-item.html',
     'oroui/js/tools',
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
@@ -11,7 +11,7 @@ define([
 ], function($, _, template, tools, MultiUseResourceManager, SHA256, mediator, error) {
     'use strict';
 
-    var defaults = {
+    const defaults = {
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
@@ -19,12 +19,12 @@ define([
         insertMethod: 'appendTo',
         style: 'default'
     };
-    var queue = [];
-    var groupedMessages = {};
-    var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
-    var noFlashTags = ['a'];
+    let queue = [];
+    const groupedMessages = {};
+    const notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    const noFlashTags = ['a'];
 
-    var resolveContainer = function(options) {
+    const resolveContainer = function(options) {
         if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
             options.container = defaults.temporaryContainer;
         }
@@ -34,9 +34,9 @@ define([
      * Same arguments as for Oro.NotificationMessage
      */
     function showMessage(type, message, options) {
-        var opt = _.extend({}, defaults, options || {});
+        const opt = _.extend({}, defaults, options || {});
         resolveContainer(opt);
-        var $el = $(opt.template({
+        const $el = $(opt.template({
             type: type,
             message: message,
             style: opt.style
@@ -49,10 +49,10 @@ define([
             $el.find('[data-dismiss="alert"]').remove();
         }
 
-        var delay = opt.delay || (opt.flash && 5000);
-        var actions = {
+        const delay = opt.delay || (opt.flash && 5000);
+        const actions = {
             close: function() {
-                var result = $el.alert('close');
+                const result = $el.alert('close');
                 mediator.trigger('layout:adjustHeight');
                 return result;
             },
@@ -93,19 +93,18 @@ define([
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
          */
-        notificationMessage: function(type, message, options) {
-            var container = (options || {}).container || defaults.container;
-            var afterReload = (options || {}).afterReload || false;
-            var afterReloadQueue = [];
-            var args = Array.prototype.slice.call(arguments);
-            var actions = {close: $.noop};
+        notificationMessage: function(...args) {
+            const container = (args[2] || {}).container || defaults.container;
+            const afterReload = (args[2] || {}).afterReload || false;
+            let afterReloadQueue = [];
+            let actions = {close: $.noop};
 
             if (afterReload && window.localStorage) {
                 afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
                 afterReloadQueue.push(args);
                 localStorage.setItem('oroAfterReloadMessages', JSON.stringify(afterReloadQueue));
             } else if (container && $(container).length) {
-                actions = showMessage.apply(null, args);
+                actions = showMessage(...args);
             } else {
                 // if container is not ready then save message for later
                 queue.push(args);
@@ -133,8 +132,8 @@ define([
          *      at the moment there's only one method 'close', allows to close the message
          */
         notificationFlashMessage: function(type, message, options) {
-            var isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
-            var namespace = (options || {}).namespace;
+            const isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
+            let namespace = (options || {}).namespace;
 
             if (!namespace) {
                 // eslint-disable-next-line new-cap
@@ -162,7 +161,7 @@ define([
          *      at the moment there's only one method 'close', allows to close the message
          */
         showErrorMessage: function(message, err) {
-            var msg = message;
+            const msg = message;
             if (!_.isUndefined(err) && !_.isNull(err)) {
                 error.showErrorInConsole(err);
             }
@@ -181,7 +180,7 @@ define([
             }
 
             while (queue.length) {
-                showMessage.apply(null, queue.shift());
+                showMessage(...queue.shift());
             }
         },
 
@@ -193,7 +192,7 @@ define([
             if (!type) {
                 type = 'process';
             }
-            var _this = this;
+            const _this = this;
             if (!groupedMessages[message]) {
                 groupedMessages[message] = new MultiUseResourceManager({
                     listen: {
@@ -208,7 +207,7 @@ define([
                     }
                 });
             }
-            var holderId = groupedMessages[message].hold();
+            const holderId = groupedMessages[message].hold();
             promise.always(function() {
                 groupedMessages[message].release(holderId);
             });
@@ -221,7 +220,7 @@ define([
          * @param {Object=} options
          */
         clear: function(namespace, options) {
-            var opt = _.extend({}, defaults, options || {});
+            const opt = _.extend({}, defaults, options || {});
             $(opt.container).add(opt.temporaryContainer)
                 .find('[data-messenger-namespace=' + namespace + ']').remove();
         },

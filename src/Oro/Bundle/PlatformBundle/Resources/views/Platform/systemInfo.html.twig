@@ -11,6 +11,14 @@
 {% block content_data %}
     {% import _self as systeminfo %}
 
+    {% set deploymentSection %}
+        <div class="row-fluid">
+            <div class="responsive-block package-list">
+                {{ systeminfo.deploymentVariables(deploymentVariables) }}
+            </div>
+        </div>
+    {% endset %}
+
     {% set packagesSection %}
         <div class="row-fluid">
             <div class="responsive-block package-list">
@@ -26,8 +34,14 @@
 
     {% set dataBlocks = [
         {
-            'title': 'oro.platform.packages'|trans,
+            'title': 'oro.platform.deployment_variables'|trans,
             'class': 'active',
+            'subblocks': [
+            {'data' : [deploymentSection]}
+        ]
+        },
+        {
+            'title': 'oro.platform.packages'|trans,
             'subblocks': [
                 {'data' : [packagesSection]}
             ]
@@ -69,4 +83,17 @@
             {{ 'oro.platform.no_packages'|trans }}
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro deploymentVariables(variables) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {% for variable in variables %}
+                    {{ UI.renderProperty(variable.label|trans, variable.value|default('N/A')) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endmacro %}

@@ -11,12 +11,10 @@ use Monolog\Logger;
 class BatchLogHandler extends AkeneoBatchLogHandler
 {
     /** @var bool */
-    protected $isActive = false;
+    protected $isActive = true;
 
     /**
      * {@inheritDoc}
-     *
-     * todo: Remove after update AkeneoBatchBundle to version without call of Monolog\Handler\StreamHandler constructor
      */
     public function __construct($logDir)
     {
@@ -25,7 +23,7 @@ class BatchLogHandler extends AkeneoBatchLogHandler
         $this->filePermission = null;
         $this->useLocking = false;
 
-        $this->setLevel(Logger::DEBUG);
+        $this->setLevel(Logger::WARNING);
         $this->bubble = true;
     }
 

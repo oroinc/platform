@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartControlView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
 
-    FlowchartControlView = BaseView.extend({
+    const FlowchartControlView = BaseView.extend({
         autoRender: true,
 
-        template: require('tpl!oroworkflow/templates/flowchart/controls.html'),
+        template: require('tpl-loader!oroworkflow/templates/flowchart/controls.html'),
 
         events: {
             'change [name="toggle-transition-labels"]': function(e) {
@@ -19,8 +18,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartControlView() {
-            FlowchartControlView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartControlView(options) {
+            FlowchartControlView.__super__.constructor.call(this, options);
         }
     });
 

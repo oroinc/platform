@@ -35,14 +35,10 @@ class EntityFieldStructure implements \Serializable
 
     /**
      * @param string $name
-     *
-     * @return self
      */
     public function setName($name)
     {
         $this->name = $name;
-
-        return $this;
     }
 
     /**
@@ -55,14 +51,10 @@ class EntityFieldStructure implements \Serializable
 
     /**
      * @param string $type
-     *
-     * @return self
      */
     public function setType($type)
     {
         $this->type = $type;
-
-        return $this;
     }
 
     /**
@@ -75,14 +67,10 @@ class EntityFieldStructure implements \Serializable
 
     /**
      * @param string $label
-     *
-     * @return self
      */
     public function setLabel($label)
     {
         $this->label = $label;
-
-        return $this;
     }
 
     /**
@@ -95,14 +83,10 @@ class EntityFieldStructure implements \Serializable
 
     /**
      * @param string $relationType
-     *
-     * @return self
      */
     public function setRelationType($relationType)
     {
         $this->relationType = $relationType;
-
-        return $this;
     }
 
     /**
@@ -115,14 +99,10 @@ class EntityFieldStructure implements \Serializable
 
     /**
      * @param string $relatedEntityName
-     *
-     * @return self
      */
     public function setRelatedEntityName($relatedEntityName)
     {
         $this->relatedEntityName = $relatedEntityName;
-
-        return $this;
     }
 
     /**
@@ -136,14 +116,10 @@ class EntityFieldStructure implements \Serializable
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return self
      */
     public function addOption($name, $value)
     {
         $this->options[$name] = $value;
-
-        return $this;
     }
 
     /**

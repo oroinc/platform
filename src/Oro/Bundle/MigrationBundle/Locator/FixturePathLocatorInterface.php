@@ -3,9 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Locator;
 
 /**
- * Give interface for Path Locators.
- *
- * @package Oro\Bundle\MigrationBundle\Locator
+ * Provides an interface for retrieving the path to data fixtures.
  */
 interface FixturePathLocatorInterface
 {

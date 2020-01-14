@@ -1,33 +1,31 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var tools = require('oroui/js/tools');
-    var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
-    var FiltersManager = require('orofilter/js/collection-filters-manager');
-    var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
-    var module = require('module');
-    var config = module.config();
-    var cachedFilters = {};
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mapFilterModuleName = require('orofilter/js/map-filter-module-name');
+    let FiltersManager = require('orofilter/js/collection-filters-manager');
+    const FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
+    let config = require('module-config').default(module.id);
+    const cachedFilters = {};
 
     config = _.extend({
         FiltersManager: FiltersManager
     }, config);
 
-    var methods = {
+    const methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
          */
         initBuilder: function() {
-            var modules;
-            var deferred = $.Deferred();
+            const deferred = $.Deferred();
 
             _.defaults(this.metadata, {filters: {}});
-            modules = methods.collectModules.call(this);
-            tools.loadModules(modules, function(modules) {
+            const modules = methods.collectModules.call(this);
+            loadModules(modules, function(modules) {
                 this.modules = modules;
                 deferred.resolve();
             }, this);
@@ -39,9 +37,9 @@ define(function(require) {
          * Collects required modules
          */
         collectModules: function() {
-            var modules = {};
+            const modules = {};
             _.each(this.metadata.filters || {}, function(filter) {
-                var type = filter.type;
+                const type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
 
@@ -58,14 +56,14 @@ define(function(require) {
 
             FiltersManager = this.modules.FiltersManager || FiltersManager;
 
-            var options = _.extend(
+            const options = _.extend(
                 methods.combineOptions.call(this),
                 _.pick(this, 'collection'),
                 _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
                     'useFiltersStateAnimationOnInit')
             );
 
-            var filterContainer;
+            let filterContainer;
 
             if (this.filterContainerSelector) {
                 // Since potentially filter container can be moved outside grid container by another component
@@ -83,13 +81,13 @@ define(function(require) {
             } else if (this.filtersStateElement) {
                 options.filtersStateElement = this.filtersStateElement;
             } else {
-                var $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
+                const $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
 
                 options.filtersStateElement = $container.length
                     ? $container : $('<div/>').prependTo(filterContainer);
             }
 
-            var filtersList = new FiltersManager(options);
+            const filtersList = new FiltersManager(options);
             filtersList.render();
             filtersList.$el.prependTo(filterContainer);
 
@@ -111,9 +109,9 @@ define(function(require) {
          * @returns {Object}
          */
         combineOptions: function() {
-            var filters = {};
-            var modules = this.modules;
-            var collection = this.collection;
+            const filters = {};
+            const modules = this.modules;
+            const collection = this.collection;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
@@ -123,7 +121,7 @@ define(function(require) {
                     if (options.lazy) {
                         options.loader = methods.createFilterLoader.call(this, options);
                     }
-                    var Filter = modules[options.type].extend(options);
+                    const Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
                 }
             }, this);
@@ -135,7 +133,7 @@ define(function(require) {
         },
 
         loadFilters: function(gridName) {
-            var filterNames = _.map(this.filterLoaders, _.property('name'));
+            const filterNames = _.map(this.filterLoaders, _.property('name'));
             if (!filterNames.length) {
                 return;
             }
@@ -146,15 +144,15 @@ define(function(require) {
                     loader.success.call(this, cachedFilters[loader.cacheId]);
                 });
 
-            var params = {
+            const params = {
                 gridName: gridName,
                 filterNames: _.map(this.filterLoaders, _.property('name'))
             };
             params[this.metadata.options.gridName] = this.metadata.gridParams;
 
-            var url = routing.generate('oro_datagrid_filter_metadata', params);
+            const url = routing.generate('oro_datagrid_filter_metadata', params);
 
-            var self = this;
+            const self = this;
             $.get(url)
                 .done(function(data) {
                     _.each(self.filterLoaders, function(loader) {
@@ -191,8 +189,7 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            var self;
-            self = {
+            const self = {
                 filterLoaders: [],
                 deferred: deferred,
                 $el: options.$el,

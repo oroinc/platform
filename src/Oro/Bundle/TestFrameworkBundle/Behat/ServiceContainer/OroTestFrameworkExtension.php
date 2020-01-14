@@ -18,7 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\NullCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -157,7 +157,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         /** @var KernelInterface $kernel */
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $container->setParameter('kernel.log_dir', $kernel->getLogDir());
-        $container->setParameter('kernel.root_dir', $kernel->getRootDir());
         $container->setParameter('kernel.project_dir', $kernel->getProjectDir());
         $container->setParameter('kernel.secret', $kernel->getContainer()->getParameter('kernel.secret'));
     }
@@ -331,7 +330,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_behat_isolators',
-            new YamlCumulativeFileLoader('Tests/Behat/isolators.yml')
+            new NullCumulativeFileLoader('Tests/Behat/isolators.yml')
         );
         $resources = array_reverse($configLoader->load());
         foreach ($resources as $resource) {

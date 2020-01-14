@@ -62,6 +62,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(array $params, array $expected)
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.bundles', ['MonologBundle']);
 
         foreach ($params as $name => $value) {
             $container->setParameter($name, $value);

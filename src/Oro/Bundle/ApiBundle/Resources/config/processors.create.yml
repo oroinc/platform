@@ -1,7 +1,6 @@
 services:
     oro_api.create.processor:
         class: Oro\Bundle\ApiBundle\Processor\CreateProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - create
@@ -51,7 +50,9 @@ services:
     oro_api.create.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - '@oro_api.security.authorization_checker'
+            - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl.group_provider.chain'
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }

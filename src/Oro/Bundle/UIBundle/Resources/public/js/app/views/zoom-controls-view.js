@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var ZoomControlsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
-    ZoomControlsView = BaseView.extend({
+    const ZoomControlsView = BaseView.extend({
         autoRender: true,
-        template: require('tpl!../../../templates/zoom-controls.html'),
+        template: require('tpl-loader!../../../templates/zoom-controls.html'),
 
         events: {
             'click .btn-zoom-in': 'onZoomInClick',
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ZoomControlsView() {
-            ZoomControlsView.__super__.constructor.apply(this, arguments);
+        constructor: function ZoomControlsView(options) {
+            ZoomControlsView.__super__.constructor.call(this, options);
         },
 
         onZoomInClick: function(e) {

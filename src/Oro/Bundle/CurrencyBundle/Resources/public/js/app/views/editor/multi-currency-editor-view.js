@@ -1,6 +1,14 @@
 define(function(require) {
     'use strict';
 
+    const TextEditorView = require('oroform/js/app/views/editor/text-editor-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const multiCurrencyFormatter = require('orocurrency/js/formatter/multi-currency');
+    require('jquery.select2');
+
     /**
      * Multi currency cell content editor.
      *
@@ -62,16 +70,7 @@ define(function(require) {
      * @augments [TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
      * @exports MultiCurrencyEditorView
      */
-    var MultiCurrencyEditorView;
-    var TextEditorView = require('oroform/js/app/views/editor/text-editor-view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var multiCurrencyFormatter = require('orocurrency/js/formatter/multi-currency');
-    require('jquery.select2');
-
-    MultiCurrencyEditorView = TextEditorView.extend(/** @lends MultiCurrencyEditorView.prototype */{
+    const MultiCurrencyEditorView = TextEditorView.extend(/** @lends MultiCurrencyEditorView.prototype */{
         /**
          * Option for select2 widget to show or hide search input for list of currencies
          * @protected
@@ -79,7 +78,7 @@ define(function(require) {
         MINIMUM_RESULTS_FOR_SEARCH: 8,
 
         className: function() {
-            var classes = ['multi-currency-editor'];
+            const classes = ['multi-currency-editor'];
             if (this.isSingleCurrency()) {
                 classes.push('multi-currency-editor__single-currency');
             } else {
@@ -88,7 +87,7 @@ define(function(require) {
             return classes.join(' ');
         },
 
-        template: require('tpl!../../../../templates/multi-currency-editor.html'),
+        template: require('tpl-loader!../../../../templates/multi-currency-editor.html'),
 
         availableCurrencies: [],
 
@@ -105,16 +104,16 @@ define(function(require) {
 
         constructor: function MultiCurrencyEditorView(options) {
             this.availableCurrencies = options.choices;
-            MultiCurrencyEditorView.__super__.constructor.apply(this, arguments);
+            MultiCurrencyEditorView.__super__.constructor.call(this, options);
         },
 
         render: function() {
             MultiCurrencyEditorView.__super__.render.call(this);
-            var _this = this;
+            const _this = this;
             if (this.isSingleCurrency()) {
                 return;
             }
-            var select2options = {
+            const select2options = {
                 selectOnBlur: false,
                 openOnEnter: false,
                 minimumResultsForSearch: this.MINIMUM_RESULTS_FOR_SEARCH,
@@ -128,7 +127,7 @@ define(function(require) {
             }, this));
 
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                var currencyPrestine = _this._currencyPrestine;
+                const currencyPrestine = _this._currencyPrestine;
                 _this._currencyPrestine = false;
                 switch (e.keyCode) {
                     case _this.ENTER_KEY_CODE:
@@ -165,10 +164,10 @@ define(function(require) {
          * @returns {String}
          */
         getValue: function() {
-            var $currency = this.$('input[name=currency]');
-            var currency = $currency.data('select2') ? $currency.select2('val') : $currency.val();
-            var amount = this.$('input[name=value]').val();
-            var value = numberFormatter.unformatStrict(amount);
+            const $currency = this.$('input[name=currency]');
+            const currency = $currency.data('select2') ? $currency.select2('val') : $currency.val();
+            const amount = this.$('input[name=value]').val();
+            const value = numberFormatter.unformatStrict(amount);
             if (amount.length === 0 || isNaN(value)) {
                 return '';
             }
@@ -176,7 +175,7 @@ define(function(require) {
         },
 
         getValidationRules: function() {
-            var rules = MultiCurrencyEditorView.__super__.getValidationRules.call(this);
+            const rules = MultiCurrencyEditorView.__super__.getValidationRules.call(this);
             rules.Number = true;
             return rules;
         },
@@ -187,13 +186,13 @@ define(function(require) {
          * @returns {Array}
          */
         getCurrencyData: function() {
-            var useSymbol = localeSettings.getCurrencyViewType() === 'symbol';
-            var availableCurrencies = this.availableCurrencies;
-            var modelCurrency = _.result(this.getModelValue(), 'currency');
+            const useSymbol = localeSettings.getCurrencyViewType() === 'symbol';
+            let availableCurrencies = this.availableCurrencies;
+            const modelCurrency = _.result(this.getModelValue(), 'currency');
             if (modelCurrency && _.indexOf(availableCurrencies, modelCurrency) === -1) {
                 availableCurrencies = availableCurrencies.concat(modelCurrency);
             }
-            var data = _.map(availableCurrencies, function(code) {
+            const data = _.map(availableCurrencies, function(code) {
                 return {
                     id: code,
                     text: useSymbol ? localeSettings.getCurrencySymbol(code) : code
@@ -203,15 +202,15 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            var result = this.parseRawValue(value);
+            const result = this.parseRawValue(value);
             result.amount = result.amount === null ? '' : numberFormatter.formatMonetary(result.amount);
             result.currency = result.currency.length === 3 ? result.currency : localeSettings.getCurrency();
             return result;
         },
 
         isChanged: function() {
-            var value = this.parseRawValue(this.getValue());
-            var modelValue = this.getModelValue();
+            const value = this.parseRawValue(this.getValue());
+            const modelValue = this.getModelValue();
             return value.amount !== modelValue.amount || value.currency !== modelValue.currency;
         },
 
@@ -219,7 +218,7 @@ define(function(require) {
             if (!this._currencySelectionIsOpen && !this._isSelection) {
                 _.defer(_.bind(function() {
                     if (!this.disposed && !$.contains(this.el, document.activeElement)) {
-                        MultiCurrencyEditorView.__super__.onFocusout.apply(this, arguments);
+                        MultiCurrencyEditorView.__super__.onFocusout.call(this, e);
                     }
                 }, this));
             }
@@ -231,7 +230,7 @@ define(function(require) {
         },
 
         onCurrencySelectOpen: function(e) {
-            var select2 = this.$(e.target).data('select2');
+            const select2 = this.$(e.target).data('select2');
             if (select2) {
                 select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
                     this._isSelection = true;// to suppress focusout event
@@ -244,7 +243,7 @@ define(function(require) {
 
         onCurrencySelectClose: function(e) {
             this._currencySelectionIsOpen = false;
-            var select2 = this.$(e.target).data('select2');
+            const select2 = this.$(e.target).data('select2');
             if (!select2) {
                 return;
             }
@@ -252,7 +251,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = MultiCurrencyEditorView.__super__.getTemplateData.apply(this, arguments);
+            const data = MultiCurrencyEditorView.__super__.getTemplateData.call(this);
             data.singleCurrency = this.isSingleCurrency();
             data.currentCurrencyLabel = localeSettings.getCurrencyViewType() === 'symbol'
                 ? localeSettings.getCurrencySymbol(data.value.currency)
@@ -261,7 +260,7 @@ define(function(require) {
         },
 
         isSingleCurrency: function() {
-            var currencyData = this.getCurrencyData();
+            const currencyData = this.getCurrencyData();
             return (currencyData.length < 2);
         },
 

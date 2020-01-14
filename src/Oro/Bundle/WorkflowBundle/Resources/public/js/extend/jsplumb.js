@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var jsPlumb = require('jsplumb');
-    var JsPlumb = jsPlumb.constructor;
-    var _each;
-    var _gel;
+    const _ = require('underscore');
+    const jsPlumb = require('jsplumb').jsPlumb;
+    const JsPlumb = jsPlumb.constructor;
+    let _each;
+    let _gel;
 
     /* original jsPlumb methods */
     /* eslint-disable */
@@ -39,19 +39,19 @@ define(function(require) {
     // as much as it can, without ever going more than once per `wait` duration;
     // but if you'd like to disable the execution on the leading edge, pass
     // `{leading: false}`. To disable execution on the trailing edge, ditto.
-    var throttleAndWaitRepaint = !_.isFunction(window.requestAnimationFrame)
+    const throttleAndWaitRepaint = !_.isFunction(window.requestAnimationFrame)
         ? _.throttle
         : function(func, wait, options) {
-            var context;
-            var args;
-            var result;
-            var timeout = null;
-            var previous = 0;
-            var locked = false;
+            let context;
+            let args;
+            let result;
+            let timeout = null;
+            let previous = 0;
+            let locked = false;
             if (!options) {
                 options = {};
             }
-            var later = function() {
+            const later = function() {
                 if (locked) {
                     timeout = setTimeout(later, 0);
                     return;
@@ -63,17 +63,17 @@ define(function(require) {
                     context = args = null;
                 }
             };
-            var unlock = function() {
+            const unlock = function() {
                 locked = false;
             };
-            return function() {
-                var now = _.now();
+            return function(...params) {
+                const now = _.now();
                 if (!previous && options.leading === false) {
                     previous = now;
                 }
-                var remaining = wait - (now - previous);
+                const remaining = wait - (now - previous);
                 context = this;
-                args = arguments;
+                args = params;
                 if (remaining <= 0 || remaining > wait) {
                     if (locked) {
                         return;
@@ -95,8 +95,8 @@ define(function(require) {
     /**
      * Override for initDraggable method to make the listener handler debounced
      */
-    JsPlumb.prototype.initDraggable = _.wrap(JsPlumb.prototype.initDraggable, function(initDraggable, el) {
-        initDraggable.apply(this, _.rest(arguments));
+    JsPlumb.prototype.initDraggable = _.wrap(JsPlumb.prototype.initDraggable, function(initDraggable, el, ...rest) {
+        initDraggable.call(this, el, ...rest);
         _each(el, function(el) {
             el = _gel(el);
             if (el) {

@@ -1,16 +1,22 @@
-define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
-], function(_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+define(function(require) {
     'use strict';
 
-    var MultipleEntityView;
-    var $ = Backbone.$;
+    const _ = require('underscore');
+    const routing = require('routing');
+    const Backbone = require('backbone');
+    const EntityView = require('./multiple-entity/view');
+    const DialogWidget = require('oro/dialog-widget');
+    const $ = Backbone.$;
 
     /**
      * @export  oroform/js/multiple-entity
      * @class   oroform.MultipleEntity
      * @extends Backbone.View
      */
-    MultipleEntityView = Backbone.View.extend({
+    const MultipleEntityView = Backbone.View.extend({
+        template: require('tpl-loader!oroform/js/multiple-entity/templates/multiple-entities.html'),
+        elementTemplate: require('tpl-loader!oroform/js/multiple-entity/templates/multiple-entity.html'),
+
         options: {
             addedElement: null,
             allowAction: true,
@@ -35,8 +41,8 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         /**
          * @inheritDoc
          */
-        constructor: function MultipleEntityView() {
-            MultipleEntityView.__super__.constructor.apply(this, arguments);
+        constructor: function MultipleEntityView(options) {
+            MultipleEntityView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,7 +50,12 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            this.template = _.template(this.options.template);
+            if (typeof this.options.template === 'string') {
+                this.template = _.template(this.options.template);
+            }
+            if (typeof this.options.elementTemplate === 'string') {
+                this.elementTemplate = _.template(this.options.elementTemplate);
+            }
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
@@ -66,16 +77,16 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         handleRemove: function(item) {
-            var itemId = item && item.get('id');
+            const itemId = item && item.get('id');
             if (!itemId) {
                 return;
             }
 
-            var addedElVal = this.$addedEl.val();
-            var removedElVal = this.$removedEl.val();
+            const addedElVal = this.$addedEl.val();
+            const removedElVal = this.$removedEl.val();
 
-            var added = (addedElVal && addedElVal.split(',')) || [];
-            var removed = (removedElVal && removedElVal.split(',')) || [];
+            let added = (addedElVal && addedElVal.split(',')) || [];
+            const removed = (removedElVal && removedElVal.split(',')) || [];
 
             if (_.contains(added, itemId)) {
                 added = _.without(added, itemId);
@@ -129,21 +140,21 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         _isInitialCollectionItem: function(itemId) {
-            var isInitial = !!_.find(this.initialCollectionItems, function(id) {
+            const isInitial = !!_.find(this.initialCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isInitial;
         },
 
         _isAddedCollectionItem: function(itemId) {
-            var isAdded = !!_.find(this.addedCollectionItems, function(id) {
+            const isAdded = !!_.find(this.addedCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isAdded;
         },
 
         _isRemovedCollectionItem: function(itemId) {
-            var isRemoved = !!_.find(this.removedCollectionItems, function(id) {
+            const isRemoved = !!_.find(this.removedCollectionItems, function(id) {
                 return String(id) === String(itemId);
             });
             return isRemoved;
@@ -164,11 +175,11 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             if (item.get('id') === this.$defaultEl.val()) {
                 item.set('isDefault', true);
             }
-            var entityView = new EntityView({
+            const entityView = new EntityView({
                 model: item,
                 name: this.options.name,
                 hasDefault: this.options.defaultElement,
-                template: this.options.elementTemplate
+                template: this.elementTemplate
             });
             entityView.on('removal', _.bind(this.handleRemove, this));
             this.$entitiesContainer.append(entityView.render().$el);
@@ -176,8 +187,8 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
 
         addEntities: function(e) {
             if (!this.selectorDialog) {
-                var url = this._getSelectionWidgetUrl();
-                var routeAdditionalParams = $(e.target).data('route_additional_params');
+                let url = this._getSelectionWidgetUrl();
+                const routeAdditionalParams = $(e.target).data('route_additional_params');
                 if (routeAdditionalParams) {
                     url = url + (url.indexOf('?') === -1 ? '?' : '&') + $.param(routeAdditionalParams);
                 }
@@ -201,12 +212,12 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         _getSelectionWidgetUrl: function() {
-            var url = this.options.selectionUrl ||
+            const url = this.options.selectionUrl ||
                 routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams);
-            var separator = url.indexOf('?') > -1 ? '&' : '?';
-            var added = this.$addedEl.val();
-            var removed = this.$removedEl.val();
-            var defaultEl = this.$defaultEl.val();
+            const separator = url.indexOf('?') > -1 ? '&' : '?';
+            const added = this.$addedEl.val();
+            const removed = this.$removedEl.val();
+            const defaultEl = this.$defaultEl.val();
 
             return url + separator +
                 'added=' + (added || '') +
@@ -221,7 +232,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         processSelectedEntities: function(added, addedModels, removed) {
-            var self = this;
+            const self = this;
 
             _.intersection(added, removed).forEach(function(itemId) {
                 if (self._isInitialCollectionItem(itemId)) {
@@ -249,8 +260,8 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             _.each(addedModels, _.bind(function(model) {
                 this.getCollection().add(model);
             }, this));
-            for (var i = 0; i < removed.length; i++) {
-                var model = this.getCollection().get(removed[i]);
+            for (let i = 0; i < removed.length; i++) {
+                const model = this.getCollection().get(removed[i]);
                 if (model) {
                     model.set('id', null);
                     model.destroy();

@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
-    var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
-    var _ = require('underscore');
-    var Graph = require('./path-finder/graph');
-    var Rectangle = require('./path-finder/rectangle');
-    var finderSettings = require('./path-finder/settings');
-    var Finder = require('./path-finder/finder');
-    var directions = require('./path-finder/directions');
+    const JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
+    const _ = require('underscore');
+    const Graph = require('./path-finder/graph');
+    const Rectangle = require('./path-finder/rectangle');
+    const finderSettings = require('./path-finder/settings');
+    const Finder = require('./path-finder/finder');
+    const directions = require('./path-finder/directions');
 
     function JsPlumbSmartlineManager(jsPlumbInstance, settings) {
         this.settings = _.extend({}, this.settings, settings);
@@ -40,7 +40,7 @@ define(function(require) {
                 this.refreshCache();
             }
 
-            var cacheRecord = this.cache.connections[connector.getId()];
+            const cacheRecord = this.cache.connections[connector.getId()];
             if (!cacheRecord) {
                 return [];
             }
@@ -57,20 +57,20 @@ define(function(require) {
         },
 
         getState: function() {
-            var state = {
+            const state = {
                 rectangles: {},
                 connections: []
             };
-            var endpoints = this.jsPlumbInstance.sourceEndpointDefinitions;
-            for (var id in endpoints) {
+            const endpoints = this.jsPlumbInstance.sourceEndpointDefinitions;
+            for (const id in endpoints) {
                 if (endpoints.hasOwnProperty(id)) {
                     state.rectangles[id] = this.jsPlumbInstance.getCachedData(id);
                 }
             }
 
-            var connections = this.jsPlumbInstance.getConnections();
-            for (var i = connections.length - 1; i >= 0; i--) {
-                var conn = connections[i];
+            const connections = this.jsPlumbInstance.getConnections();
+            for (let i = connections.length - 1; i >= 0; i--) {
+                const conn = connections[i];
                 if (conn.sourceId in state.rectangles && conn.targetId in state.rectangles) {
                     state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
@@ -92,16 +92,16 @@ define(function(require) {
         },
 
         _refreshCache: function() {
-            var _this = this;
-            var connections = [];
-            var rects = {};
-            var graph = new Graph();
-            var settings = this.settings;
+            const _this = this;
+            const connections = [];
+            const rects = {};
+            const graph = new Graph();
+            const settings = this.settings;
             this.cache.state = this.getState();
             this.cache.connections = {};
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
-                var clientRect;
-                var el = document.getElementById(id);
+                let clientRect;
+                const el = document.getElementById(id);
                 if (el) {
                     clientRect = new Rectangle(
                         el.offsetLeft - settings.blockHMargin,
@@ -133,12 +133,12 @@ define(function(require) {
             });
 
             _.each(connections, function(conn) {
-                var finder = new Finder(graph);
+                const finder = new Finder(graph);
 
                 finder.addTo(graph.getPathFromCid(conn[1], directions.BOTTOM_TO_TOP));
                 finder.addFrom(graph.getPathFromCid(conn[0], directions.TOP_TO_BOTTOM));
 
-                var path = finder.find();
+                const path = finder.find();
                 if (path) {
                     graph.updateWithPath(path);
                     _this.cache.connections[conn[3].connector.getId()] = {

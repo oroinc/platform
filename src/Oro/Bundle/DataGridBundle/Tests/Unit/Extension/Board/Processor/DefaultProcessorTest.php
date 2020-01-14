@@ -2,59 +2,46 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board\Processor;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor;
+use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityClassResolver;
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $choiceHelper;
+    /** @var ChoiceFieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $choiceHelper;
 
-    /**
-     * @var DefaultProcessor
-     */
-    protected $processor;
+    /** @var DefaultProcessor */
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
 
-        $this->entityClassResolver = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->choiceHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
 
         $this->processor = new DefaultProcessor(
-            $this->em,
+            $doctrine,
             $this->entityClassResolver,
             $this->choiceHelper
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(DefaultProcessor::NAME, $this->processor->getName());
     }
 
     public function testGetBoardOptions()
@@ -73,9 +60,7 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityClass')
             ->with('Test:Entity')
             ->will($this->returnValue('Test\Entity'));
-        $entityMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityMetaData = $this->createMock(ClassMetadata::class);
         $entityMetaData->expects($this->once())
             ->method('hasAssociation')
             ->with('group_field')
@@ -93,9 +78,7 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Test\Entity')
             ->will($this->returnValue($entityMetaData));
 
-        $targetMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $targetMetaData = $this->createMock(ClassMetadata::class);
         $targetMetaData->expects($this->once())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
@@ -135,7 +118,7 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessDatasourceNotORM()
     {
         $config = DatagridConfiguration::create([]);
-        $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $dataSource = $this->createMock(DatasourceInterface::class);
         $dataSource->expects($this->never())
             ->method($this->anything());
         $this->processor->processDatasource($dataSource, [], $config);

@@ -1,15 +1,14 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ContentSidebarView;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var layoutHelper = require('oroui/js/tools/layout-helper');
-    var mediator = require('oroui/js/mediator');
-    var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
-    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var config = require('module').config();
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const layoutHelper = require('oroui/js/tools/layout-helper');
+    const mediator = require('oroui/js/mediator');
+    const ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
+    const PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         autoRender: true,
@@ -20,7 +19,7 @@ define(function(require) {
         resizableSidebar: !tools.isMobile()
     }, config);
 
-    ContentSidebarView = BaseView.extend({
+    const ContentSidebarView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'autoRender',
             'fixSidebarHeight',
@@ -50,8 +49,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ContentSidebarView() {
-            ContentSidebarView.__super__.constructor.apply(this, arguments);
+        constructor: function ContentSidebarView(options) {
+            ContentSidebarView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -61,7 +60,7 @@ define(function(require) {
             if (this.resizableSidebar) {
                 this.initResizableSidebar();
             }
-            ContentSidebarView.__super__.initialize.call(this, arguments);
+            ContentSidebarView.__super__.initialize.call(this, options);
 
             mediator.on('swipe-action-left', this.minimize, this);
             mediator.on('swipe-action-right', this.maximize, this);
@@ -77,7 +76,7 @@ define(function(require) {
 
             this._toggle(this.getSidebarState());
 
-            ContentSidebarView.__super__.render.apply(this, arguments);
+            ContentSidebarView.__super__.render.call(this);
         },
 
         initResizableSidebar: function() {
@@ -124,7 +123,7 @@ define(function(require) {
          * @param {String} state
          */
         _toggle: function(state) {
-            var show = state === 'on';
+            const show = state === 'on';
 
             if (this.resizableSidebar) {
                 if (!show) {

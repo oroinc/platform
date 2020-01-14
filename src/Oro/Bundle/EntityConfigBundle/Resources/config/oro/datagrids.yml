@@ -227,7 +227,7 @@ datagrids:
                 loggedAt:
                     data_name: log.loggedAt
             default:
-                loggedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                loggedAt: DESC
 
     audit-log-grid:
         extends: entity-audit-grid

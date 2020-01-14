@@ -1,0 +1,9 @@
+<a href="<%- previewMetadata.download %>" class="no-hash digital-asset-filename"
+   title="<%- previewMetadata.title %>" data-role="digital-asset-filename">
+    <% if (isImageType && previewMetadata.preview) { %>
+        <img src="<%- previewMetadata.preview %>" alt="<%- previewMetadata.title %>"/>
+    <% } else { %>
+        <i class="<%- previewMetadata.icon %>"></i>
+    <% } %>
+    <%- previewMetadata.filename %>
+</a>

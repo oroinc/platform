@@ -1,19 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var CheckSmtpConnectionView = require('../views/check-smtp-connection-view');
-    var CheckSmtpConnectionModel = require('../models/check-smtp-connection-model');
-    var CheckSmtpConnectionComponent;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const CheckSmtpConnectionView = require('../views/check-smtp-connection-view');
+    const CheckSavedSmtpConnectionView = require('../views/check-saved-smtp-connection-view');
+    const CheckSmtpConnectionModel = require('../models/check-smtp-connection-model');
 
-    CheckSmtpConnectionComponent = BaseComponent.extend({
+    const CheckSmtpConnectionComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function CheckSmtpConnectionComponent() {
-            CheckSmtpConnectionComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CheckSmtpConnectionComponent(options) {
+            CheckSmtpConnectionComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -24,14 +24,19 @@ define(function(require) {
          */
         initialize: function(options) {
             if (options.elementNamePrototype) {
-                var viewOptions = _.extend({
-                    model: new CheckSmtpConnectionModel({}),
+                const viewOptions = _.extend({
                     el: $(options._sourceElement).closest(options.parentElementSelector),
                     entity: options.forEntity || 'user',
                     entityId: options.id,
                     organization: options.organization || ''
                 }, options.viewOptions || {});
-                this.view = new CheckSmtpConnectionView(viewOptions);
+
+                if (options.view !== 'saved') {
+                    viewOptions.model = new CheckSmtpConnectionModel({});
+                    this.view = new CheckSmtpConnectionView(viewOptions);
+                } else {
+                    this.view = new CheckSavedSmtpConnectionView(viewOptions);
+                }
             } else {
                 // unable to initialize
                 $(options._sourceElement).remove();

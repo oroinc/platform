@@ -1,27 +1,26 @@
 define(function(require) {
     'use strict';
 
-    var ActionPermissionsFieldView;
-    var mediator = require('oroui/js/mediator');
-    var ActionPermissionsReadonlyFieldView = require('./action-permissions-readonly-field-view');
-    var PermissionView = require('orouser/js/datagrid/permission/permission-view');
+    const mediator = require('oroui/js/mediator');
+    const ActionPermissionsReadonlyFieldView = require('./action-permissions-readonly-field-view');
+    const PermissionView = require('orouser/js/datagrid/permission/permission-view');
 
-    ActionPermissionsFieldView = ActionPermissionsReadonlyFieldView.extend({
+    const ActionPermissionsFieldView = ActionPermissionsReadonlyFieldView.extend({
         autoRender: false,
 
         animationDuration: 0,
 
         className: 'field-permission-container',
 
-        template: require('tpl!orouser/templates/datagrid/action-permissions-field-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/action-permissions-field-view.html'),
 
         permissionView: PermissionView,
 
         /**
          * @inheritDoc
          */
-        constructor: function ActionPermissionsFieldView() {
-            ActionPermissionsFieldView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionPermissionsFieldView(options) {
+            ActionPermissionsFieldView.__super__.constructor.call(this, options);
         },
 
         /**

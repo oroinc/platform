@@ -1,8 +1,0 @@
-config:
-    paths:
-        'orocomment/js/app/components/comment-component': 'bundles/orocomment/js/app/components/comment-component.js'
-
-build:
-    paths:
-        'orocomment/templates/comment/comment-item-view.html': 'empty:'
-        'orocomment/templates/comment/comment-list-view.html': 'empty:'

@@ -5,11 +5,10 @@ define(function(require) {
      * Displays header of board column
      * @augments BaseView
      */
-    var ColumnHeaderView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var HintView = require('orodatagrid/js/app/views/hint-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const HintView = require('orodatagrid/js/app/views/hint-view');
 
-    ColumnHeaderView = BaseView.extend({
+    const ColumnHeaderView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -18,7 +17,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        template: require('tpl!../../../../templates/board/column-header-view.html'),
+        template: require('tpl-loader!../../../../templates/board/column-header-view.html'),
 
         events: {
             mouseenter: 'onMouseEnter',
@@ -28,8 +27,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnHeaderView() {
-            ColumnHeaderView.__super__.constructor.apply(this, arguments);
+        constructor: function ColumnHeaderView(options) {
+            ColumnHeaderView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -65,7 +64,7 @@ define(function(require) {
             }));
 
             this.hintTimeout = setTimeout(function() {
-                var hint = this.subview('hint');
+                const hint = this.subview('hint');
 
                 if (hint && !hint.fullLabelIsVisible()) {
                     hint.show();

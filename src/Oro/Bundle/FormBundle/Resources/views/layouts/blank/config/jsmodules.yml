@@ -1,0 +1,44 @@
+aliases:
+    jquery.validate$: npmassets/jquery-validation/dist/jquery.validate
+    jquery.validate-additional-methods$: npmassets/jquery-validation/dist/additional-methods
+    oro/autocomplete-component$: oroform/js/app/components/autocomplete-component
+    oro/select2-autocomplete-component$: oroform/js/app/components/select2-autocomplete-component
+    oro/select2-component$: oroform/js/app/components/select2-component
+    oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
+    xregexp$: npmassets/xregexp/xregexp-all
+configs:
+    oroform/js/extend/tinymce: {}
+    oroform/js/extend/validate: {}
+dynamic-imports:
+    commons:
+        - oro/autocomplete-component
+        - oro/select2-autocomplete-component
+        - oro/select2-component
+        - oro/select2-tree-autocomplete-component
+        - oroform/js/app/components/inline-editable-view-component
+        - oroform/js/app/components/select-create-inline-type-async-component
+        - oroform/js/app/components/select-create-inline-type-component
+        - oroform/js/app/views/editor/text-editor-view
+        - oroform/js/app/views/form-validate-view
+        - oroform/js/validator/callback
+        - oroform/js/validator/count
+        - oroform/js/validator/date
+        - oroform/js/validator/datetime
+        - oroform/js/validator/email
+        - oroform/js/validator/length
+        - oroform/js/validator/notblank
+        - oroform/js/validator/notnull
+        - oroform/js/validator/number
+        - oroform/js/validator/numeric-range
+        - oroform/js/validator/open-range
+        - oroform/js/validator/range
+        - oroform/js/validator/regex
+        - oroform/js/validator/repeated
+        - oroform/js/validator/time
+        - oroform/js/validator/type
+        - oroform/js/validator/url
+map:
+    "*":
+        jquery.validate: oroform/js/extend/validate
+    oroform/js/extend/validate:
+        jquery.validate: jquery.validate

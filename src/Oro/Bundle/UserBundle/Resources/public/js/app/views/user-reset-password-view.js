@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UserResetPasswordView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var __ = require('orotranslation/js/translator');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const __ = require('orotranslation/js/translator');
+    const _ = require('underscore');
 
-    UserResetPasswordView = BaseView.extend({
+    const UserResetPasswordView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat(['passwordInputSelector']),
@@ -20,9 +19,9 @@ define(function(require) {
             passwordMinLength: 1
         },
 
-        passwordShowHideTemplate: require('tpl!orouser/templates/user-reset-password-show-hide.html'),
+        passwordShowHideTemplate: require('tpl-loader!orouser/templates/user-reset-password-show-hide.html'),
 
-        passwordSuggestionTemplate: require('tpl!orouser/templates/user-reset-password-suggestion.html'),
+        passwordSuggestionTemplate: require('tpl-loader!orouser/templates/user-reset-password-suggestion.html'),
 
         charsets: {
             lower_case: 'abcdefghijklmnopqrstuvwxyz',
@@ -39,7 +38,7 @@ define(function(require) {
         },
 
         render: function() {
-            var $passwordInput = this._getPasswordInput();
+            const $passwordInput = this._getPasswordInput();
 
             $passwordInput.after(this.passwordShowHideTemplate({
                 title: __('oro.user.show_hide_password.label')
@@ -49,12 +48,12 @@ define(function(require) {
                 label: __('oro.user.suggest_password.label')
             }));
 
-            return UserResetPasswordView.__super__.render.apply(this, arguments);
+            return UserResetPasswordView.__super__.render.call(this);
         },
 
         onShowHideButtonClick: function(e) {
-            var $passwordInput = this._getPasswordInput();
-            var $target = this.$(e.target);
+            const $passwordInput = this._getPasswordInput();
+            const $target = this.$(e.target);
 
             if ($target.hasClass('fa-eye')) {
                 $passwordInput.attr('type', 'password');
@@ -74,9 +73,9 @@ define(function(require) {
         },
 
         _generatePassword: function() {
-            var length = this._getRequiredPasswordLength();
-            var rules = this._getPasswordRequirements();
-            var pass = '';
+            const length = this._getRequiredPasswordLength();
+            const rules = this._getPasswordRequirements();
+            let pass = '';
 
             // make sure we have at least one symbol for each rule, shuffle them later
             rules.forEach(function(rule) {
@@ -86,10 +85,10 @@ define(function(require) {
             }.bind(this));
 
             // create a pool for picking random chars that is reasonably strong
-            var charset = this.charsets.lower_case + this.charsets.upper_case + this.charsets.numbers;
+            const charset = this.charsets.lower_case + this.charsets.upper_case + this.charsets.numbers;
 
             // fill up to the minLength with random symbols
-            for (var i = pass.length; i < length; ++i) {
+            for (let i = pass.length; i < length; ++i) {
                 pass = pass + charset.charAt(_.random(charset.length - 1));
             }
 
@@ -110,7 +109,7 @@ define(function(require) {
         },
 
         _getPasswordRequirements: function() {
-            var rules = this._getPasswordInput().data('suggest-rules');
+            const rules = this._getPasswordInput().data('suggest-rules');
 
             return rules ? rules.split(',') : [];
         }

@@ -1,13 +1,11 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/pagination-input.html',
+    'tpl-loader!orodatagrid/templates/datagrid/pagination-input.html',
     'jquery',
     'underscore',
     './pagination',
     'jquery.numeric'
 ], function(template, $, _, Pagination) {
     'use strict';
-
-    var PaginationInput;
 
     /**
      * Datagrid pagination with input field
@@ -16,7 +14,7 @@ define([
      * @class   orodatagrid.datagrid.PaginationInput
      * @extends orodatagrid.datagrid.Pagination
      */
-    PaginationInput = Pagination.extend({
+    const PaginationInput = Pagination.extend({
         /** @property */
         template: template,
 
@@ -38,8 +36,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function PaginationInput() {
-            PaginationInput.__super__.constructor.apply(this, arguments);
+        constructor: function PaginationInput(options) {
+            PaginationInput.__super__.constructor.call(this, options);
         },
 
         /**
@@ -50,9 +48,9 @@ define([
         onChangePageByInput: function(e) {
             e.preventDefault();
 
-            var pageIndex = parseInt($(e.target).val(), 10);
-            var collection = this.collection;
-            var state = collection.state;
+            let pageIndex = parseInt($(e.target).val(), 10);
+            const collection = this.collection;
+            const state = collection.state;
 
             if (_.isNaN(pageIndex)) {
                 $(e.target).val(state.currentPage);
@@ -80,7 +78,7 @@ define([
          * @return Array.<Object> an array of page handle objects hashes
          */
         makeHandles: function() {
-            var handles = [];
+            const handles = [];
 
             handles.push({
                 type: 'input'
@@ -92,7 +90,7 @@ define([
          * Render pagination view and add validation for input with positive integer value
          */
         render: function() {
-            PaginationInput.__super__.render.apply(this, arguments);
+            PaginationInput.__super__.render.call(this);
             this.$('input').numeric({decimal: false, negative: false});
             return this;
         }

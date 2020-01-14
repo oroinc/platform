@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowActivateBtnView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var activationHandler = require('oroworkflow/js/activation-handler');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const activationHandler = require('oroworkflow/js/activation-handler');
 
-    WorkflowActivateBtnView = BaseView.extend({
+    const WorkflowActivateBtnView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -24,21 +23,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowActivateBtnView() {
-            WorkflowActivateBtnView.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowActivateBtnView(options) {
+            WorkflowActivateBtnView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            WorkflowActivateBtnView.__super__.initialize.apply(this, arguments);
+            WorkflowActivateBtnView.__super__.initialize.call(this, options);
 
             this.options = $.extend(true, {}, this.options, _.pick(options, _.keys(this.options)));
         },
 
-        delegateEvents: function() {
-            WorkflowActivateBtnView.__super__.delegateEvents.apply(this, arguments);
+        delegateEvents: function(events) {
+            WorkflowActivateBtnView.__super__.delegateEvents.call(this, events);
             this.$el.on('click' + this.eventNamespace(), this.options.selectors.button, this.onClick.bind(this));
             this.$el.on({
                 activation_success: this.onActivationSuccess
@@ -65,7 +64,7 @@ define(function(require) {
          */
         onClick: function(e) {
             e.preventDefault();
-            var el = this.$el.find(this.options.selectors.button);
+            const el = this.$el.find(this.options.selectors.button);
             activationHandler.call(el, el.attr('href'), el.data('name'), el.data('label'));
         },
 
@@ -77,7 +76,7 @@ define(function(require) {
             this.$el.off('click' + this.eventNamespace());
             this.$el.off('activation_success');
 
-            WorkflowActivateBtnView.__super__.dispose.apply(this, arguments);
+            WorkflowActivateBtnView.__super__.dispose.call(this);
         }
     });
 

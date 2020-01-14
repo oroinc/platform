@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -76,6 +77,8 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      *
      * @param int $id Business unit item id
      *
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update business unit",
      *      resource=true
@@ -83,7 +86,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * @AclAncestor("oro_business_unit_update")
      * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -91,7 +94,9 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     /**
      * REST GET item
      *
-     * @param string $id
+     * @param int $id
+     *
+     * @Rest\Get(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get business unit item",
@@ -100,7 +105,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * @AclAncestor("oro_business_unit_view")
      * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -150,6 +155,8 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      *
      * @param int $id
      *
+     * @Rest\Delete(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Delete business unit",
      *      resource=true
@@ -162,7 +169,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }

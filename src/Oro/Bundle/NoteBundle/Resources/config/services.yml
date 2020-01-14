@@ -4,7 +4,6 @@ parameters:
 services:
     oro_note.manager:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -16,7 +15,6 @@ services:
 
     oro_note.manager.api:
         class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -31,7 +29,7 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - {name: oro_activity_list.provider, priority: 40}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\NoteBundle\Entity\Note, priority: 40 }
 
     oro_note.activity_entity_delete_handler_extension:
         class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension

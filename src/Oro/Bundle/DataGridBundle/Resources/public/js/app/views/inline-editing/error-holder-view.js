@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var InlineEditorErrorHolderView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!orodatagrid/templates/inline-editing/error-holder.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/inline-editing/error-holder.html');
 
     /* The same like `getBoundingClientRect` but takes in account all child nodes, i.e. calculates real occupied rect
      *  for case when a child goes beyond its parent
@@ -14,9 +13,9 @@ define(function(require) {
         if (!el || !_.isFunction(el.getBoundingClientRect)) {
             return null;
         }
-        var rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom', 'left', 'width', 'height']);
+        const rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom', 'left', 'width', 'height']);
         _.forEach(el.childNodes, function(child) {
-            var childRect = getTreeRect(child);
+            const childRect = getTreeRect(child);
             if (childRect) {
                 rect.top = Math.min(rect.top, childRect.top);
                 rect.left = Math.min(rect.left, childRect.left);
@@ -31,7 +30,7 @@ define(function(require) {
 
     require('jquery-ui');
 
-    InlineEditorErrorHolderView = BaseView.extend({
+    const InlineEditorErrorHolderView = BaseView.extend({
         keepElement: true,
 
         DEFAULT_POSITION: 'top',
@@ -81,8 +80,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function InlineEditorErrorHolderView() {
-            InlineEditorErrorHolderView.__super__.constructor.apply(this, arguments);
+        constructor: function InlineEditorErrorHolderView(options) {
+            InlineEditorErrorHolderView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -98,7 +97,7 @@ define(function(require) {
         },
 
         render: function() {
-            var $form = this.$('form');
+            const $form = this.$('form');
             this.$('.error-holder').remove();
             this.$el.toggleClass('has-error', !_.isEmpty(this._errors));
             if (!_.isEmpty(this._errors)) {
@@ -121,10 +120,10 @@ define(function(require) {
         },
 
         getWithinRect: function() {
-            var rect = _.pick(this.within[0].getBoundingClientRect(),
+            const rect = _.pick(this.within[0].getBoundingClientRect(),
                 ['top', 'right', 'bottom', 'left', 'width', 'height']);
-            var headerHeight = this.within.find('thead:first').outerHeight();
-            var scroll = $.position.scrollbarWidth();
+            const headerHeight = this.within.find('thead:first').outerHeight();
+            const scroll = $.position.scrollbarWidth();
 
             // subtract header height
             rect.top += headerHeight;
@@ -146,13 +145,13 @@ define(function(require) {
         },
 
         updatePosition: function() {
-            var errorMessageElements = this.getErrorMessageElements();
+            const errorMessageElements = this.getErrorMessageElements();
             if (errorMessageElements.length === 0) {
                 return;
             }
-            var withinRect = this.getWithinRect();
-            var positionSequence = _.keys(this.POSITION_CLASSES);
-            var initialPosition = this.getPositionByClass();
+            const withinRect = this.getWithinRect();
+            const positionSequence = _.keys(this.POSITION_CLASSES);
+            const initialPosition = this.getPositionByClass();
             // check if current position is default and correct
             if (initialPosition === this.DEFAULT_POSITION) {
                 if (this.checkPosition(initialPosition, withinRect, errorMessageElements[0])) {
@@ -162,10 +161,10 @@ define(function(require) {
                 // if initial position is'n default it needs to try default position as well
                 positionSequence.unshift(this.DEFAULT_POSITION);
             }
-            var initialOpacity = errorMessageElements.css('opacity');
+            const initialOpacity = errorMessageElements.css('opacity');
             errorMessageElements.css('opacity', 0);
-            for (var i = 0; i < positionSequence.length; i++) {
-                var position = positionSequence[i];
+            for (let i = 0; i < positionSequence.length; i++) {
+                const position = positionSequence[i];
                 this.setPositionClass(position);
                 if (this.checkPosition(position, withinRect, errorMessageElements[0])) {
                     break;
@@ -175,7 +174,7 @@ define(function(require) {
         },
 
         checkPosition: function(position, withinRect, errorMessageElement) {
-            var methodName = 'check' + _.capitalize(position);
+            const methodName = 'check' + _.capitalize(position);
             if (_.isFunction(this[methodName])) {
                 return this[methodName](withinRect, errorMessageElement);
             } else {
@@ -187,7 +186,7 @@ define(function(require) {
             if (this.$(this.DROPUPS.join(', ')).length > 0) { // don't show error above if dropup is present
                 return false;
             }
-            var messageRect = getTreeRect(errorMessageElement);
+            const messageRect = getTreeRect(errorMessageElement);
             return messageRect && messageRect.top >= withinRect.top && messageRect.right <= withinRect.right;
         },
 
@@ -195,17 +194,17 @@ define(function(require) {
             if (this.$(this.DROPDOWNS.join(', ')).length > 0) { // don't show error below if dropdown is present
                 return false;
             }
-            var messageRect = getTreeRect(errorMessageElement);
+            const messageRect = getTreeRect(errorMessageElement);
             return messageRect && messageRect.bottom <= withinRect.bottom && messageRect.right <= withinRect.right;
         },
 
         checkRight: function(withinRect, errorMessageElement) {
-            var messageRect = getTreeRect(errorMessageElement);
+            const messageRect = getTreeRect(errorMessageElement);
             return messageRect && messageRect.right <= withinRect.right;
         },
 
         checkLeft: function(withinRect, errorMessageElement) {
-            var messageRect = getTreeRect(errorMessageElement);
+            const messageRect = getTreeRect(errorMessageElement);
             return messageRect && messageRect.left >= withinRect.left;
         },
 
@@ -219,7 +218,7 @@ define(function(require) {
         },
 
         parseValidatorErrors: function(errorList) {
-            var errors = {};
+            const errors = {};
             _.each(errorList, function(errorItem) {
                 errors[errorItem.element.getAttribute('name')] = errorItem.message;
             }, this);
@@ -227,7 +226,7 @@ define(function(require) {
         },
 
         setPositionClass: function(position) {
-            var classesToRemove = _.values(_.omit(this.POSITION_CLASSES, position));
+            const classesToRemove = _.values(_.omit(this.POSITION_CLASSES, position));
             this.$el.removeClass(classesToRemove.join(' '));
             if (position !== this.DEFAULT_POSITION) {
                 this.$el.addClass(_.result(this.POSITION_CLASSES, position));
@@ -235,7 +234,7 @@ define(function(require) {
         },
 
         getPositionByClass: function() {
-            var position = _.findKey(this.POSITION_CLASSES, function(value) {
+            const position = _.findKey(this.POSITION_CLASSES, function(value) {
                 return this.$el.hasClass(value);
             }, this);
             return position || this.DEFAULT_POSITION;

@@ -1,0 +1,13 @@
+oro.digitalasset:
+    dam:
+        form:
+            choose_file.label: Choose File
+            choose_image.label: Choose Image
+        choose_another.label: Choose another
+        remove.label: Remove
+        dialog:
+            select_file: Select File
+            cancel.label: Cancel
+            delete_confirmation:
+                title: Delete Confirmation
+                message: Are you sure you want to delete this item?

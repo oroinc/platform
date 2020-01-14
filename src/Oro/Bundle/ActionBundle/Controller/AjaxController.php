@@ -86,6 +86,10 @@ class AjaxController extends AbstractController
             } elseif ($actionData->getRedirectUrl()) {
                 if ($request->isXmlHttpRequest()) {
                     $response['redirectUrl'] = $actionData->getRedirectUrl();
+                    if ($actionData->isNewTab() === true) {
+                        $response['newTab'] = $actionData->isNewTab();
+                        $response['pageReload'] = false;
+                    }
                 } else {
                     return $this->redirect($actionData->getRedirectUrl());
                 }

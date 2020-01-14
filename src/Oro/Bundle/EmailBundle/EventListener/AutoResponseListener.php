@@ -9,7 +9,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Used to send auto response for multiple emails
@@ -32,6 +32,17 @@ class AutoResponseListener extends MailboxEmailListener implements
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_email.autoresponserule_manager' => AutoResponseManager::class,
+            MessageProducerInterface::class
+        ];
+    }
+
+    /**
      * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
@@ -44,8 +55,10 @@ class AutoResponseListener extends MailboxEmailListener implements
         if (!$emailIds) {
             return;
         }
-        
-        $this->getProducer()->send(Topics::SEND_AUTO_RESPONSES, ['ids' => $emailIds]);
+
+        /** @var MessageProducerInterface $producer */
+        $producer = $this->container->get(MessageProducerInterface::class);
+        $producer->send(Topics::SEND_AUTO_RESPONSES, ['ids' => $emailIds]);
     }
 
     /**
@@ -55,7 +68,8 @@ class AutoResponseListener extends MailboxEmailListener implements
     {
         $emailIds = [];
         if (!empty($this->emailBodies)) {
-            $autoResponseManager = $this->getAutoResponseManager();
+            /** @var AutoResponseManager $autoResponseManager */
+            $autoResponseManager = $this->container->get('oro_email.autoresponserule_manager');
             foreach ($this->emailBodies as $emailBody) {
                 $email = $emailBody->getEmail();
                 if ($autoResponseManager->hasAutoResponses($email)) {
@@ -66,32 +80,5 @@ class AutoResponseListener extends MailboxEmailListener implements
         }
 
         return $emailIds;
-    }
-
-    /**
-     * @return AutoResponseManager
-     */
-    protected function getAutoResponseManager()
-    {
-        return $this->container->get(AutoResponseManager::class);
-    }
-
-    /**
-     * @return MessageProducerInterface
-     */
-    protected function getProducer()
-    {
-        return $this->container->get(MessageProducerInterface::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return [
-            AutoResponseManager::class,
-            MessageProducerInterface::class
-        ];
     }
 }

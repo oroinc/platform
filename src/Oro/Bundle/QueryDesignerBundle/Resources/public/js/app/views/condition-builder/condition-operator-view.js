@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ConditionOperatorView;
-    var _ = require('underscore');
-    var template = require('tpl!oroquerydesigner/templates/condition-builder/condition-operator.html');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const template = require('tpl-loader!oroquerydesigner/templates/condition-builder/condition-operator.html');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     require('jquery.select2');
 
-    ConditionOperatorView = BaseView.extend({
+    const ConditionOperatorView = BaseView.extend({
         template: template,
         className: 'operator',
         operations: null,
@@ -26,8 +25,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ConditionOperatorView() {
-            ConditionOperatorView.__super__.constructor.apply(this, arguments);
+        constructor: function ConditionOperatorView(options) {
+            ConditionOperatorView.__super__.constructor.call(this, options);
         },
 
         events: {
@@ -44,7 +43,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = ConditionOperatorView.__super__.getTemplateData.call(this);
+            const data = ConditionOperatorView.__super__.getTemplateData.call(this);
 
             _.extend(data, _.pick(this, 'label', 'operations', 'selectedOperation'));
 

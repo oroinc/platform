@@ -1,13 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var viewportManager;
-    var module = require('module');
-    var mediator = require('oroui/js/mediator');
-    var _ = require('underscore');
-    var error = require('oroui/js/error');
+    const config = require('module-config').default(module.id);
+    const mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const error = require('oroui/js/error');
 
-    viewportManager = {
+    const viewportManager = {
         options: {
             /**
              * @default
@@ -89,8 +88,8 @@ define(function(require) {
          */
         isApplicable: function(testViewport) {
             this.getViewport();
-            var checker;
-            var isApplicable = true;
+            let checker;
+            let isApplicable = true;
 
             _.each(testViewport, function(testValue, check) {
                 checker = this['_' + check + 'Checker'];
@@ -118,15 +117,15 @@ define(function(require) {
          * See [documentation](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/css-variables.md)
          */
         _collectCSSBreakpoints: function(cssVariables) {
-            var regexpMax = /(max-width:\s?)([(\d+)]*)/g;
-            var regexpMin = /(min-width:\s?)([(\d+)]*)/g;
+            const regexpMax = /(max-width:\s?)([(\d+)]*)/g;
+            const regexpMin = /(min-width:\s?)([(\d+)]*)/g;
 
             return _.reduce(cssVariables, function(collection, cssVar, varName) {
                 if (new RegExp(this.breakpointCSSVarPrefix).test(varName)) {
-                    var _result;
+                    let _result;
 
-                    var matchMax = cssVar.match(regexpMax);
-                    var matchMin = cssVar.match(regexpMin);
+                    const matchMax = cssVar.match(regexpMax);
+                    const matchMin = cssVar.match(regexpMin);
 
                     if (matchMax || matchMin) {
                         _result = {
@@ -151,10 +150,10 @@ define(function(require) {
          * @private
          */
         _prepareScreenMaps: function(cssVariables) {
-            var moduleScreenMap = this._getModuleScreenMaps();
-            var cssVariablesScreenMap = this._collectCSSBreakpoints(cssVariables);
+            const moduleScreenMap = this._getModuleScreenMaps();
+            const cssVariablesScreenMap = this._collectCSSBreakpoints(cssVariables);
 
-            var screenMap = _.filter(
+            let screenMap = _.filter(
                 _.extend(
                     {},
                     _.indexBy(this.options.screenMap, 'name'),
@@ -193,10 +192,10 @@ define(function(require) {
 
         _sortScreenTypes: function(screenMap) {
             return screenMap.sort(function(a, b) {
-                var aMax = a.max || Infinity;
-                var aMin = a.min || 0;
-                var bMax = b.max || Infinity;
-                var bMin = b.min || 0;
+                const aMax = a.max || Infinity;
+                const aMin = a.min || 0;
+                const bMax = b.max || Infinity;
+                const bMin = b.min || 0;
                 return aMax - bMax || aMin - bMin;
             });
         },
@@ -207,10 +206,10 @@ define(function(require) {
          * @private
          */
         _getModuleScreenMaps: function() {
-            var arr = [];
+            let arr = [];
 
-            if (!_.isUndefined(module.config().screenMap)) {
-                arr = module.config().screenMap;
+            if (!_.isUndefined(config.screenMap)) {
+                arr = config.screenMap;
             }
 
             return arr;
@@ -223,7 +222,7 @@ define(function(require) {
          * @private
          */
         _getScreenByTypes: function(screenType) {
-            var defaultVal = null;
+            const defaultVal = null;
 
             if (_.isNull(screenType)) {
                 return defaultVal;
@@ -252,7 +251,7 @@ define(function(require) {
          * @private
          */
         _onResize: function() {
-            var oldViewportType = this.viewport.type;
+            const oldViewportType = this.viewport.type;
             this._calcViewport();
 
             if (!oldViewportType || oldViewportType !== this.viewport.type) {
@@ -265,14 +264,14 @@ define(function(require) {
          * @private
          */
         _calcViewport: function() {
-            var viewportWidth = window.innerWidth;
+            const viewportWidth = window.innerWidth;
             this.viewport.width = viewportWidth;
-            var screenMap = this.options.screenMap;
-            var inRange;
-            var screen;
-            var _result = [];
+            const screenMap = this.options.screenMap;
+            let inRange;
+            let screen;
+            const _result = [];
 
-            for (var i = 0, stop = screenMap.length; i < stop; i++) {
+            for (let i = 0, stop = screenMap.length; i < stop; i++) {
                 screen = screenMap[i];
 
                 inRange = this._isInRange({
@@ -327,8 +326,8 @@ define(function(require) {
                 return true;
             }
 
-            var viewport = this._getScreenByTypes(this.viewport.type);
-            var maxViewport = this._getScreenByTypes(maxScreenType);
+            const viewport = this._getScreenByTypes(this.viewport.type);
+            const maxViewport = this._getScreenByTypes(maxScreenType);
 
             return (_.isObject(viewport) && _.isObject(maxViewport))
                 ? viewport.max <= maxViewport.max
@@ -346,8 +345,8 @@ define(function(require) {
                 return true;
             }
 
-            var viewport = this._getScreenByTypes(this.viewport.type);
-            var minViewport = this._getScreenByTypes(minScreenType);
+            const viewport = this._getScreenByTypes(this.viewport.type);
+            const minViewport = this._getScreenByTypes(minScreenType);
 
             return (_.isObject(viewport) && _.isObject(minViewport))
                 ? viewport.max >= minViewport.max

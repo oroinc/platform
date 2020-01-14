@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var CommentsHeaderView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!orocomment/templates/comment/comments-header-view.html');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!orocomment/templates/comment/comments-header-view.html');
 
-    CommentsHeaderView = BaseView.extend({
+    const CommentsHeaderView = BaseView.extend({
         template: template,
 
         listen: {
@@ -23,8 +22,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentsHeaderView() {
-            CommentsHeaderView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentsHeaderView(options) {
+            CommentsHeaderView.__super__.constructor.call(this, options);
         },
 
         onLoadMoreClick: function(e) {

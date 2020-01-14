@@ -9,14 +9,15 @@ use Oro\Bundle\DataGridBundle\Extension\UnsupportedGridPrefixesTrait;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
+/**
+ * The base class for the tag related extensions for the datagrid.
+ */
 abstract class AbstractTagsExtension extends AbstractExtension
 {
     use UnsupportedGridPrefixesTrait;
 
     const GRID_FILTERS_PATH = '[filters][columns]';
     const GRID_SORTERS_PATH = '[sorters][columns]';
-    /** @deprecated since 1.10. Use config->getName() instead */
-    const GRID_NAME_PATH     = 'name';
     const FILTER_COLUMN_NAME = 'tagname';
     const PROPERTY_ID_PATH   = '[properties][id]';
 

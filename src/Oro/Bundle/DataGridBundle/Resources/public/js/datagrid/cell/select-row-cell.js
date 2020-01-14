@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var SelectRowCell;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Backgrid = require('backgrid');
-    var template = require('tpl!orodatagrid/templates/datagrid/select-row-cell.html');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Backgrid = require('backgrid');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/select-row-cell.html');
 
     /**
      * Renders a checkbox for row selection.
@@ -14,7 +13,7 @@ define(function(require) {
      * @class   oro.datagrid.cell.SelectRowCell
      * @extends BaseView
      */
-    SelectRowCell = BaseView.extend({
+    const SelectRowCell = BaseView.extend({
         /** @property */
         className: 'select-row-cell renderable',
 
@@ -36,8 +35,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SelectRowCell() {
-            SelectRowCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectRowCell(options) {
+            SelectRowCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -70,7 +69,7 @@ define(function(require) {
             }
             delete this.column;
             delete this.$checkbox;
-            SelectRowCell.__super__.dispose.apply(this, arguments);
+            SelectRowCell.__super__.dispose.call(this);
         },
 
         /**
@@ -99,7 +98,7 @@ define(function(require) {
          */
         render: function() {
             // work around with trigger event to get current state of model (selected or not)
-            var state = {selected: false};
+            const state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.html(this.template({
                 checked: state.selected

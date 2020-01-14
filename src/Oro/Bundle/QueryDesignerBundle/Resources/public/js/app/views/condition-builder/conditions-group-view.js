@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ConditionsGroupView;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var AbstractConditionContainerView =
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const AbstractConditionContainerView =
         require('oroquerydesigner/js/app/views/condition-builder/abstract-condition-container-view');
-    var template = require('tpl!oroquerydesigner/templates/condition-builder/conditions-group.html');
+    const template = require('tpl-loader!oroquerydesigner/templates/condition-builder/conditions-group.html');
 
-    ConditionsGroupView = AbstractConditionContainerView.extend({
+    const ConditionsGroupView = AbstractConditionContainerView.extend({
         template: template,
 
         /**
          * @inheritDoc
          */
-        constructor: function ConditionsGroupView() {
-            ConditionsGroupView.__super__.constructor.apply(this, arguments);
+        constructor: function ConditionsGroupView(options) {
+            ConditionsGroupView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -36,15 +35,15 @@ define(function(require) {
 
         _collectValue: function() {
             return _.map(this.$('>.conditions-group>[data-condition-cid]'), function(elem) {
-                var cid = elem.getAttribute('data-condition-cid');
-                var conditionView = this.subview('condition:' + cid);
+                const cid = elem.getAttribute('data-condition-cid');
+                const conditionView = this.subview('condition:' + cid);
                 return conditionView && conditionView.getValue();
             }.bind(this));
         },
 
         _checkValueChange: function() {
-            var isEmptyValue;
-            var value = this._collectValue();
+            let isEmptyValue;
+            const value = this._collectValue();
             if (!tools.isEqualsLoosely(value, this.value)) {
                 this.value = value;
                 isEmptyValue = _.isEmpty(this.value);
@@ -66,8 +65,8 @@ define(function(require) {
         },
 
         unassignConditionSubview: function(conditionView) {
-            var name = 'condition:' + conditionView.cid;
-            var index = _.indexOf(this.subviews, conditionView);
+            const name = 'condition:' + conditionView.cid;
+            const index = _.indexOf(this.subviews, conditionView);
             if (index !== -1) {
                 this.subviews.splice(index, 1);
             }

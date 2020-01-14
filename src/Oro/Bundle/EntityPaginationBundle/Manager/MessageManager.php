@@ -68,8 +68,7 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' .
-                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
         }
 
         return $message;
@@ -86,8 +85,7 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' .
-                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
         }
 
         return $message;
@@ -130,7 +128,7 @@ class MessageManager
             return null;
         }
 
-        $message .= $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+        $message .= $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
 
         $this->storage->setInfoMessageShown($entityName, $scope);
 

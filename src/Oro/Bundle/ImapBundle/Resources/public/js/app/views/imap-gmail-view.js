@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ImapGmailView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
-    ImapGmailView = BaseView.extend({
+    const ImapGmailView = BaseView.extend({
         events: {
             'click button[name$="[userEmailOrigin][check]"]': 'onClickConnect',
             'click button[name$="[userEmailOrigin][checkFolder]"]': 'onCheckFolder',
@@ -32,8 +31,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ImapGmailView() {
-            ImapGmailView.__super__.constructor.apply(this, arguments);
+        constructor: function ImapGmailView(options) {
+            ImapGmailView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -115,8 +114,8 @@ define(function(require) {
          * @returns {{type: string, accessToken: *, clientId: *, user: *, imapPort: *, imapHost: *, imapEncryption: *, smtpPort: *, smtpHost: *, smtpEncryption: *, accessTokenExpiresAt: *, refreshToken: *}}
          */
         getData: function() {
-            var accessToken = this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val();
-            var refreshToken = this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val();
+            let accessToken = this.$el.find('input[name$="[userEmailOrigin][accessToken]"]').val();
+            let refreshToken = this.$el.find('input[name$="[userEmailOrigin][refreshToken]"]').val();
 
             if (!accessToken) {
                 accessToken = this.accessToken;
@@ -177,7 +176,7 @@ define(function(require) {
          * Change style for block with error message to show
          */
         showErrorMessage: function() {
-            var $errorBlock = this.getErrorBlock();
+            const $errorBlock = this.getErrorBlock();
 
             if ($errorBlock.length > 0) {
                 $errorBlock.html(this.errorMessage);
@@ -189,7 +188,7 @@ define(function(require) {
          * Change style for block with error message to hide
          */
         hideErrorMessage: function() {
-            var $errorBlock = this.getErrorBlock();
+            const $errorBlock = this.getErrorBlock();
             if ($errorBlock.length > 0) {
                 $errorBlock.hide();
             }

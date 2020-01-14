@@ -33,7 +33,6 @@ services:
 
     oro_behat_statistic.database.connection:
         class: Doctrine\DBAL\Connection
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory:   ['Doctrine\DBAL\DriverManager', getConnection]
         arguments: ['%oro_behat_statistic.connection%']

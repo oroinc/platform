@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var AbstractFormatter = require('./abstract-formatter');
-    var formatter = require('orolocale/js/formatter/number');
+    const _ = require('underscore');
+    const AbstractFormatter = require('orofilter/js/formatter/abstract-formatter');
+    const formatter = require('orolocale/js/formatter/number');
 
     /**
      * A floating point number formatter. Doesn't understand notation at the moment.
@@ -13,7 +13,7 @@ define(function(require) {
      * @extends orofilter.formatter.AbstractFormatter
      * @throws {RangeError} If decimals < 0 or > 20.
      */
-    var NumberFormatter = function(options) {
+    const NumberFormatter = function(options) {
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
@@ -71,10 +71,10 @@ define(function(require) {
             } else {
                 number = number.toFixed(this.decimals);
 
-                var parts = number.split('.');
-                var integerPart = parts[0];
-                var isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
-                var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
+                const parts = number.split('.');
+                const integerPart = parts[0];
+                const isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
+                const decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
 
                 return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
             }
@@ -93,19 +93,19 @@ define(function(require) {
             if (formattedData === null || /^\s+$/.test(formattedData) || formattedData === '') {
                 return void 0;
             }
-            var rawData = '';
-            var i;
+            let rawData = '';
+            let i;
 
             if (this.percent && formattedData.indexOf('%') > -1) {
                 formattedData = formattedData.replace(/%/g, '');
             }
 
-            var thousands = formattedData.trim().split(this.orderSeparator);
+            const thousands = formattedData.trim().split(this.orderSeparator);
             for (i = 0; i < thousands.length; i++) {
                 rawData += thousands[i];
             }
 
-            var decimalParts = rawData.split(this.decimalSeparator);
+            const decimalParts = rawData.split(this.decimalSeparator);
             rawData = '';
             for (i = 0; i < decimalParts.length; i++) {
                 rawData = rawData + decimalParts[i] + '.';
@@ -115,7 +115,7 @@ define(function(require) {
                 rawData = rawData.slice(0, rawData.length - 1);
             }
 
-            var result = rawData * 1;
+            let result = rawData * 1;
             if (!this.percent) {
                 result = result.toFixed(this.decimals) * 1;
             }

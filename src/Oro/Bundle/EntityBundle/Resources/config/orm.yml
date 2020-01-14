@@ -2,18 +2,9 @@ parameters:
     doctrine.orm.entity_manager.class: Oro\Bundle\EntityBundle\ORM\OroEntityManager
     doctrine.orm.configuration.class:  Oro\Bundle\EntityBundle\ORM\OrmConfiguration
 
-    oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
-    oro_entity.repository.factory.class:                       Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory
-    oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
-    oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
-    oro_entity.orm.native_query_executor_helper.class:         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
-    oro_entity.orm.insert_from_select_query_executor.class:    Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
-    oro_entity.query_hint_resolver.class:                      Oro\Component\DoctrineUtils\ORM\QueryHintResolver
-
 services:
     oro_entity.doctrine_helper:
-        class: '%oro_entity.doctrine_helper.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EntityBundle\ORM\DoctrineHelper
         public: true
         arguments:
             - '@doctrine'
@@ -34,7 +25,7 @@ services:
         lazy: true
 
     oro_entity.entity_identifier_accessor:
-        class: '%oro_entity.entity_identifier_accessor.class%'
+        class: Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
         arguments:
             - '@oro_entity.doctrine_helper'
 
@@ -42,26 +33,41 @@ services:
         alias: oro_entity.entity_identifier_accessor
 
     oro_entity.orm.entity_class_resolver:
-        class: '%oro_entity.orm.entity_class_resolver.class%'
+        class: Oro\Bundle\EntityBundle\ORM\EntityClassResolver
         arguments:
             - '@doctrine'
 
     oro_entity.query_hint_resolver:
-        class: '%oro_entity.query_hint_resolver.class%'
+        class: Oro\Component\DoctrineUtils\ORM\QueryHintResolver
+        arguments:
+            - [] # walkers
+            - ~ # service container for providers of the walker parameters
+            - [] # aliases
 
     oro_entity.orm.native_query_executor_helper:
-        class: '%oro_entity.orm.native_query_executor_helper.class%'
+        class: Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
         arguments:
             - '@doctrine'
 
-    oro_entity.orm.insert_from_select_query_executor:
-        class: '%oro_entity.orm.insert_from_select_query_executor.class%'
-        public: true
+    oro_entity.orm.abstract.insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\AbstractInsertQueryExecutor
+        abstract: true
         arguments:
             - '@oro_entity.orm.native_query_executor_helper'
 
+    oro_entity.orm.insert_from_select_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
+        parent: oro_entity.orm.abstract.insert_query_executor
+        public: true
+
+    oro_entity.orm.multi_insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor
+        parent: oro_entity.orm.abstract.insert_query_executor
+        public: true
+        shared: false
+
     oro_entity.repository.factory:
-        class: '%oro_entity.repository.factory.class%'
+        class: Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory
         public: false
         arguments:
             - '@service_container'

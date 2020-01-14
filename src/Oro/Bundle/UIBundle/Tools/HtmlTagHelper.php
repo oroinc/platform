@@ -2,53 +2,172 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
+use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * This class helps format HTML
  */
 class HtmlTagHelper
 {
+    const SUB_DIR = 'ezyang';
+    const MODE = 0775;
+
     const MAX_STRING_LENGTH = 256;
 
-    /** @var HtmlTagProvider */
-    protected $htmlTagProvider;
+    const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
 
-    /** @var string */
-    protected $cacheDir;
+    /**
+     * @var \HtmlPurifier[]
+     */
+    private $htmlPurifiers = [];
 
-    /** @var SanitizeHTMLTransformer|null */
-    protected $purifyTransformer;
+    /**
+     * @var array
+     */
+    private $additionalAttributes = [];
+
+    /**
+     * @var array
+     */
+    private $additionalElements = [];
+
+    /**
+     * @var HtmlTagProvider
+     */
+    private $htmlTagProvider;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
+     * @var \HTMLPurifier_ErrorCollector
+     */
+    private $lastErrorCollector;
 
     /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
      */
-    public function __construct(
-        HtmlTagProvider $htmlTagProvider,
-        $cacheDir = null
-    ) {
+    public function __construct(HtmlTagProvider $htmlTagProvider, $cacheDir = null)
+    {
         $this->htmlTagProvider = $htmlTagProvider;
         $this->cacheDir = $cacheDir;
     }
 
     /**
-     * Remove html elements except allowed
-     *
-     * @param string $string
-     *
+     * @return \HTMLPurifier_ErrorCollector
+     */
+    public function getLastErrorCollector()
+    {
+        return $this->lastErrorCollector;
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $attributeName
+     * @param string $attributeType
+     */
+    public function setAttribute(string $elementName, string $attributeName, string $attributeType): void
+    {
+        $this->additionalAttributes[$elementName][$attributeName] = $attributeType;
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $type
+     * @param string $contents
+     * @param string $attributeCollections
+     * @param bool $excludeSameElement
+     */
+    public function setElement(
+        string $elementName,
+        string $type,
+        string $contents,
+        string $attributeCollections,
+        bool $excludeSameElement = false
+    ): void {
+        $this->additionalElements[$elementName] = [
+            'type' => $type,
+            'contents' => $contents,
+            'attribute_collections' => $attributeCollections,
+            'excludeSameElement' => $excludeSameElement
+        ];
+    }
+
+    /**
+     * @param string $value
+     * @param string $scope
      * @return string
      */
-    public function sanitize($string)
+    public function sanitize($value, $scope = 'default')
     {
-        $transformer = new SanitizeHTMLTransformer(
-            $this->htmlTagProvider,
-            implode(',', $this->htmlTagProvider->getAllowedElements()),
-            $this->cacheDir
-        );
+        if (!$value) {
+            $this->lastErrorCollector = null;
 
-        return $transformer->transform($string);
+            return $value;
+        }
+
+        if (!array_key_exists($scope, $this->htmlPurifiers)) {
+            $html5Config = \HTMLPurifier_HTML5Config::createDefault();
+            $config = \HTMLPurifier_Config::create($html5Config);
+
+            $config->set('Core.CollectErrors', true);
+
+            $config->set('HTML.DefinitionID', __CLASS__);
+            $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
+
+            // add inline data support
+            $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
+            $config->set('Attr.EnableID', true);
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
+            $config->set('CSS.AllowImportant', true);
+            $config->set('CSS.AllowTricky', true);
+            $config->set('CSS.Proprietary', true);
+            $config->set('CSS.Trusted', true);
+
+            $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
+            if (strpos($allowedTags, '<iframe>') !== false) {
+                $config->set('HTML.SafeIframe', true);
+                $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
+            }
+
+            $this->fillAllowedElementsConfig($config, $scope);
+            $this->fillCacheConfig($config);
+
+            $def = $config->maybeGetRawHTMLDefinition();
+            if ($def) {
+                foreach ($this->additionalElements as $elementName => $data) {
+                    $element = $def->addElement(
+                        $elementName,
+                        $data['type'],
+                        $data['contents'],
+                        $data['attribute_collections']
+                    );
+
+                    if ($data['excludeSameElement'] === true) {
+                        $element->excludes = [$elementName => true];
+                    }
+                }
+
+                foreach ($this->additionalAttributes as $elementName => $attributeData) {
+                    foreach ($attributeData as $attributeName => $attributeType) {
+                        $def->addAttribute($elementName, $attributeName, $attributeType);
+                    }
+                }
+            }
+
+            $this->htmlPurifiers[$scope] = new \HTMLPurifier($config);
+        }
+
+        $result = $this->htmlPurifiers[$scope]->purify($value);
+        $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector');
+
+        return $result;
     }
 
     /**
@@ -59,15 +178,7 @@ class HtmlTagHelper
      */
     public function purify($string)
     {
-        if (!$this->purifyTransformer) {
-            $this->purifyTransformer = new SanitizeHTMLTransformer(
-                $this->htmlTagProvider,
-                null,
-                $this->cacheDir
-            );
-        }
-
-        return trim($this->purifyTransformer->transform($string));
+        return trim($this->sanitize($string));
     }
 
     /**
@@ -82,7 +193,7 @@ class HtmlTagHelper
         $string = str_replace('>', '> ', $string);
 
         if ($uiAllowedTags) {
-            return strip_tags($string, $this->htmlTagProvider->getAllowedTags());
+            return strip_tags($string, $this->htmlTagProvider->getAllowedTags('default'));
         }
 
         $result = trim(strip_tags($string));
@@ -147,5 +258,53 @@ class HtmlTagHelper
         );
 
         return implode(' ', $words);
+    }
+
+    /**
+     * Configure cache
+     *
+     * @param \HTMLPurifier_Config $config
+     */
+    private function fillCacheConfig($config)
+    {
+        if ($this->cacheDir) {
+            $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . self::SUB_DIR;
+            $this->touchCacheDir($cacheDir);
+            $config->set('Cache.SerializerPath', $cacheDir);
+            $config->set('Cache.SerializerPermissions', self::MODE);
+        } else {
+            $config->set('Cache.DefinitionImpl', null);
+        }
+    }
+
+    /**
+     * Configure allowed tags
+     *
+     * @param \HTMLPurifier_Config $config
+     * @param string $scope
+     */
+    private function fillAllowedElementsConfig($config, $scope)
+    {
+        $converter = new TagDefinitionConverter();
+        $allowedElements = implode(',', $this->htmlTagProvider->getAllowedElements($scope));
+        if ($allowedElements) {
+            $config->set('HTML.AllowedElements', $converter->getElements($allowedElements));
+            $config->set('HTML.AllowedAttributes', $converter->getAttributes($allowedElements));
+        } else {
+            $config->set('HTML.Allowed', '');
+        }
+    }
+
+    /**
+     * Create cache dir if need
+     *
+     * @param string $cacheDir
+     */
+    private function touchCacheDir($cacheDir)
+    {
+        $fs = new Filesystem();
+        if (!$fs->exists($cacheDir)) {
+            $fs->mkdir($cacheDir, self::MODE);
+        }
     }
 }

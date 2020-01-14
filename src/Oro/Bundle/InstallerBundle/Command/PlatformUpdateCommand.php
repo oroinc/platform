@@ -163,14 +163,10 @@ class PlatformUpdateCommand extends AbstractCommand
 
             $commandExecutor
                 ->runCommand('assets:install', $assetsOptions)
-                ->runCommand('oro:assets:build', ['--npm-install' => true])
                 ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
                 ->runCommand('oro:localization:dump', ['--process-isolation' => true])
                 ->runCommand('oro:translation:dump', ['--process-isolation' => true])
-                ->runCommand(
-                    'oro:requirejs:build',
-                    ['--ignore-errors' => true, '--process-isolation' => true]
-                );
+                ->runCommand('oro:assets:build', ['--npm-install' => true]);
         }
 
         return $this;

@@ -7,17 +7,12 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 
+/**
+ * Provides metadata about multi-enum attribute type.
+ */
 class MultiEnumAttributeType extends EnumAttributeType
 {
     use ArrayOrTraversableGuardTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'multiEnum';
-    }
 
     /**
      * {@inheritdoc}

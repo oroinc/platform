@@ -79,11 +79,13 @@ class DeleteEntitiesByDeleteHandler implements ProcessorInterface
 
         $em->getConnection()->beginTransaction();
         try {
+            $flushAllOptions = [];
             foreach ($data as $entity) {
-                $handler->delete($entity);
+                $flushAllOptions[] = $handler->delete($entity, false);
             }
+            $handler->flushAll($flushAllOptions);
             $em->getConnection()->commit();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $em->getConnection()->rollBack();
 
             throw $e;

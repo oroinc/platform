@@ -105,7 +105,7 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $this
             ->buildViolation($this->constraint->message)
             ->setParameters(['{{ region }}' => 'Region', '{{ country }}' => 'Country'])
-            ->atPath(null)
+            ->atPath('')
             ->assertRaised();
     }
 }

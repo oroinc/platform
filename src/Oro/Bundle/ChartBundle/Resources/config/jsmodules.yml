@@ -1,0 +1,19 @@
+aliases:
+    bean$: npmassets/bean/bean
+    flotr2$: npmassets/flotr2/flotr2.amd
+dynamic-imports:
+    orochart:
+        - flotr2
+        - orochart/js/app/components/bar-chart-component
+        - orochart/js/app/components/base-chart-component
+        - orochart/js/app/components/flow-chart-component
+        - orochart/js/app/components/horizontal_bar-chart-component
+        - orochart/js/app/components/line-chart-component
+        - orochart/js/app/components/multiline-chart-component
+        - orochart/js/app/components/pie-chart-component
+        - orochart/js/data_formatter
+        - orochart/js/flotr2/funnel
+shim:
+    flotr2:
+        imports:
+            - jquery

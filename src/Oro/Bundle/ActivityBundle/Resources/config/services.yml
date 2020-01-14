@@ -1,7 +1,6 @@
 services:
     oro_activity.manager:
         class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_entity.doctrine_helper'
@@ -41,8 +40,9 @@ services:
 
     oro_activity.widget_provider.activities:
         class: Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
+        arguments:
+            - [] # providers
 
     oro_activity.widget_provider.activities.main:
         class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
@@ -91,7 +91,6 @@ services:
 
     oro_activity.manager.activity.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -100,7 +99,6 @@ services:
 
     oro_activity.manager.activity_entity.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -109,7 +107,6 @@ services:
 
     oro_activity.manager.activity_search.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -119,7 +116,6 @@ services:
 
     oro_activity.activity_entity_delete_handler.proxy:
         class: Oro\Bundle\ActivityBundle\Handler\ActivityEntityDeleteHandlerProxy
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_activity.activity_entity_delete_handler'
@@ -139,7 +135,6 @@ services:
 
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@translator'
@@ -153,7 +148,6 @@ services:
 
     oro_activity.form.handler.activity_entity.api:
         class: Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_activity.form.activity_entity.api'
@@ -176,7 +170,6 @@ services:
 
     oro_activity.manager.activity_target.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -185,7 +178,6 @@ services:
 
     oro_activity.manager.activity_context.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:

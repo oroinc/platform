@@ -31,7 +31,6 @@ services:
     #currencyConfig
     oro_currency.config.currency:
         class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         lazy: true
         arguments:
@@ -61,7 +60,7 @@ services:
             - '@oro_currency.helper.currency_name'
             - '@oro_currency.converter.currency_to_string'
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_currency.datagrid.column_options_guesser:
         class: Oro\Bundle\CurrencyBundle\Grid\CurrencyColumnOptionsGuesser

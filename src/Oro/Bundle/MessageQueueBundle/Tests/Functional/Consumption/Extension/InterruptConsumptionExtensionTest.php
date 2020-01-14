@@ -86,9 +86,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
      */
     private function assertInterruptionMessage(string $expectedMessage)
     {
-        $logs = $this->logger->getLogs('warning');
-
-        self::assertEquals($expectedMessage, reset($logs));
+        $this->assertTrue($this->logger->hasRecord($expectedMessage, 'warning'));
     }
 
     private function clearMessages()

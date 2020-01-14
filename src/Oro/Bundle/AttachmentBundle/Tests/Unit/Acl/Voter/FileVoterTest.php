@@ -73,19 +73,23 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         $this->token = $this->createMock(TokenInterface::class);
     }
 
+    public function testVoteWhenNoSubject(): void
+    {
+        self::assertSame(
+            VoterInterface::ACCESS_ABSTAIN,
+            $this->voter->vote($this->token, null, ['VIEW'])
+        );
+    }
+
     /**
      * @dataProvider supportsDataProvider
      *
      * @param array $attributes
-     * @param mixed $subject
+     * @param object $subject
      * @param int $expectedResult
      */
-    public function testVoteWhenUnsupported($attributes, $subject, int $expectedResult): void
+    public function testVoteWhenUnsupported(array $attributes, $subject, int $expectedResult): void
     {
-        $this->doctrineHelper
-            ->method('getEntityClass')
-            ->willReturn(get_class($subject));
-
         self::assertSame(
             $expectedResult,
             $this->voter->vote($this->token, $subject, $attributes)
@@ -106,11 +110,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
             'unsupported attribute' => [
                 'attributes' => ['UNSUPPORTED_ATTRIBUTE'],
                 'subject' => new File(),
-                'expectedResult' => VoterInterface::ACCESS_ABSTAIN,
-            ],
-            'empty class' => [
-                'attributes' => ['VIEW'],
-                'subject' => null,
                 'expectedResult' => VoterInterface::ACCESS_ABSTAIN,
             ],
             'empty attributes' => [
@@ -172,10 +171,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     private function mockDoctrineHelper(): void
     {
-        $this->doctrineHelper
-            ->method('getEntityClass')
-            ->willReturn(File::class);
-
         $this->doctrineHelper
             ->method('getSingleEntityIdentifier')
             ->willReturn(self::FILE_ID);
@@ -360,6 +355,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass(self::PARENT_ENTITY_CLASS);
         $file->setParentEntityId(self::PARENT_ENTITY_ID);
         $file->setParentEntityFieldName(self::PARENT_ENTITY_FIELD_NAME);
+        $file->setUuid('test-uuid');
 
         return $file;
     }

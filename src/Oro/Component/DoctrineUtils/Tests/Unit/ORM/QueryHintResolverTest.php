@@ -2,24 +2,63 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var QueryHintResolver */
-    protected $queryHintResolver;
-
-    protected function setUp()
+    /**
+     * @param array $walkers
+     * @param array $providers
+     * @param array $aliases
+     *
+     * @return QueryHintResolver
+     */
+    private function getQueryHintResolver(array $walkers = [], array $providers = [], array $aliases = [])
     {
-        $this->queryHintResolver = new QueryHintResolver();
+        $containerBuilder = TestContainerBuilder::create();
+        foreach ($providers as $id => $provider) {
+            $containerBuilder->add($id, $provider);
+        }
+
+        return new QueryHintResolver(
+            $walkers,
+            $containerBuilder->getContainer($this),
+            $aliases
+        );
+    }
+
+    /**
+     * @return Query
+     */
+    private function getQuery()
+    {
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->any())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+
+        return new Query($em);
     }
 
     public function testAddHint()
     {
         $query = $this->getQuery();
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             'test',
             true
@@ -39,7 +78,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query = $this->getQuery();
         $query->setHint('test', true);
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             'test',
             true
@@ -58,7 +98,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->getQuery();
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'walker_class'
@@ -78,7 +119,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'walker_class');
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'walker_class'
@@ -97,7 +139,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->getQuery();
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             Query::HINT_CUSTOM_TREE_WALKERS,
             'walker_class'
@@ -117,7 +160,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['walker_class']);
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             Query::HINT_CUSTOM_TREE_WALKERS,
             'walker_class'
@@ -137,7 +181,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
 
-        $added = $this->queryHintResolver->addHint(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $added = $queryHintResolver->addHint(
             $query,
             Query::HINT_CUSTOM_TREE_WALKERS,
             'walker_class'
@@ -157,7 +202,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
 
-        $this->queryHintResolver->addHints(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $queryHintResolver->addHints(
             $query,
             [
                 'HINT_REFRESH',
@@ -180,7 +226,8 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query->setParameter('parameter_name', 10);
         $query->setParameter('parameter_name2', 100);
 
-        $this->queryHintResolver->addHints(
+        $queryHintResolver = $this->getQueryHintResolver();
+        $queryHintResolver->addHints(
             $query,
             [
                 ['name' => 'HINT_WITH_PARAMETER', 'value' => ':parameter_name'],
@@ -190,7 +237,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                'HINT_WITH_PARAMETER' => 10,
+                'HINT_WITH_PARAMETER'  => 10,
                 'HINT_WITH_PARAMETER2' => ['id' => 100]
             ],
             $query->getHints()
@@ -203,16 +250,30 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
         $query->setHint('test_output', true);
 
-        $this->queryHintResolver->addOutputWalker('test_output', 'Test\OutputWalker', null, 'HINT_1');
-
-        $walkerHintProvider = $this->createMock('Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface');
-        $this->queryHintResolver->addTreeWalker('test_tree', 'Test\TreeWalker', $walkerHintProvider, 'HINT_2');
+        $walkerHintProvider = $this->createMock(QueryWalkerHintProviderInterface::class);
         $walkerHintProvider->expects($this->once())
             ->method('getHints')
             ->with('hint_2_param')
             ->willReturn(['test.tree_walker.hint' => 'val1']);
 
-        $this->queryHintResolver->resolveHints(
+        $queryHintResolver = $this->getQueryHintResolver(
+            [
+                'test_output' => [
+                    'class'         => 'Test\OutputWalker',
+                    'output'        => true,
+                    'hint_provider' => null
+                ],
+                'test_tree'   => [
+                    'class'         => 'Test\TreeWalker',
+                    'output'        => false,
+                    'hint_provider' => 'test_tree_provider'
+                ]
+            ],
+            ['test_tree_provider' => $walkerHintProvider],
+            ['HINT_1' => 'test_output', 'HINT_2' => 'test_tree']
+        );
+
+        $queryHintResolver->resolveHints(
             $query,
             [
                 ['name' => 'HINT_2', 'value' => 'hint_2_param'],
@@ -236,60 +297,47 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveCustomHintName()
     {
-        $this->queryHintResolver->addTreeWalker('test', 'Test\Walker', null, 'HINT_TEST');
+        $queryHintResolver = $this->getQueryHintResolver(
+            [
+                'test_tree' => [
+                    'class'         => 'Test\Walker',
+                    'output'        => false,
+                    'hint_provider' => null
+                ]
+            ],
+            [],
+            ['HINT_TEST' => 'test']
+        );
 
         $this->assertEquals(
             'test',
-            $this->queryHintResolver->resolveHintName('HINT_TEST')
+            $queryHintResolver->resolveHintName('HINT_TEST')
         );
         $this->assertEquals(
             'test',
-            $this->queryHintResolver->resolveHintName('test')
+            $queryHintResolver->resolveHintName('test')
         );
     }
 
     public function testResolveDoctrineHintName()
     {
+        $queryHintResolver = $this->getQueryHintResolver();
         $this->assertEquals(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            $this->queryHintResolver->resolveHintName('HINT_CUSTOM_OUTPUT_WALKER')
+            $queryHintResolver->resolveHintName('HINT_CUSTOM_OUTPUT_WALKER')
         );
         $this->assertEquals(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            $this->queryHintResolver->resolveHintName(Query::HINT_CUSTOM_OUTPUT_WALKER)
+            $queryHintResolver->resolveHintName(Query::HINT_CUSTOM_OUTPUT_WALKER)
         );
     }
 
     public function testResolveUndefinedHintName()
     {
+        $queryHintResolver = $this->getQueryHintResolver();
         $this->assertEquals(
             'HINT_UNDEFINED',
-            $this->queryHintResolver->resolveHintName('HINT_UNDEFINED')
+            $queryHintResolver->resolveHintName('HINT_UNDEFINED')
         );
-    }
-
-    /**
-     * @return Query
-     */
-    protected function getQuery()
-    {
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configuration->expects($this->any())
-            ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->any())
-            ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
-
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->any())
-            ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
-
-        return new Query($em);
     }
 }

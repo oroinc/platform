@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var SegmentChoiceMock;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    SegmentChoiceMock = BaseView.extend({
+    const SegmentChoiceMock = BaseView.extend({
         data: null,
 
         value: '',
 
         entity: null,
 
-        constructor: function SegmentChoiceMock() {
+        constructor: function SegmentChoiceMock(...args) {
             SegmentChoiceMock.lastCreatedInstance = this;
             spyOn(this, 'setValue').and.callThrough();
             spyOn(this, 'setData').and.callThrough();
-            SegmentChoiceMock.__super__.constructor.apply(this, arguments);
+            SegmentChoiceMock.__super__.constructor.apply(this, args);
         },
 
         initialize: function(options) {

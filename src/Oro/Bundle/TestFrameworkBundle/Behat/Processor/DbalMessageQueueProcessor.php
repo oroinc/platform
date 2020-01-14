@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Job\Job;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -85,7 +85,7 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
      */
     public function cleanUp()
     {
-        /** @var RegistryInterface $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         $connection = $doctrine->getConnection();
 
@@ -105,7 +105,7 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
      */
     private function isEmptyTables()
     {
-        /** @var RegistryInterface $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
         $connection = $doctrine->getConnection();

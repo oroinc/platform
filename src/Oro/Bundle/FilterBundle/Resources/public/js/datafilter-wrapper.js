@@ -4,9 +4,7 @@ define([
 ], function($, _) {
     'use strict';
 
-    var dataFilterWrapper;
-
-    dataFilterWrapper = {
+    const dataFilterWrapper = {
         /**
          * @property {boolean}
          */
@@ -14,7 +12,7 @@ define([
 
         _getWrapperTemplate: function() {
             if (!this.wrapperTemplate) {
-                var wrapperTemplateSrc = '';
+                let wrapperTemplateSrc = '';
                 if (this.wrapperTemplateSelector) {
                     wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
                 }
@@ -35,7 +33,7 @@ define([
 
             this._appendFilter($filter);
 
-            var events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown'].map(function(eventName) {
+            const events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown'].map(function(eventName) {
                 return eventName + this._eventNamespace();
             }.bind(this)).join(' ');
 

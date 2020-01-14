@@ -136,6 +136,31 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
+     * Gets a form object related to the given entity.
+     *
+     * @param object $entity
+     *
+     * @return FormInterface|null
+     */
+    public function findForm($entity): ?FormInterface
+    {
+        if ($this->form->getData() === $entity) {
+            return $this->form;
+        }
+
+        if (null === $this->includedEntities) {
+            return null;
+        }
+
+        $data = $this->includedEntities->getData($entity);
+        if (null === $data) {
+            return null;
+        }
+
+        return $data->getForm();
+    }
+
+    /**
      * Finds a form field by its property path.
      *
      * @param string             $propertyPath The name of an entity field
@@ -146,6 +171,24 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function findFormField(string $propertyPath, FormInterface $form = null): ?FormInterface
     {
         return FormUtil::findFormFieldByPropertyPath($form ?? $this->getForm(), $propertyPath);
+    }
+
+    /**
+     * Finds the name of a form field by its property path.
+     *
+     * @param string             $propertyPath The name of an entity field
+     * @param FormInterface|null $form         The parent form of the searching child form
+     *
+     * @return string|null
+     */
+    public function findFormFieldName(string $propertyPath, FormInterface $form = null): ?string
+    {
+        $fieldForm = $this->findFormField($propertyPath, $form);
+        if (null === $fieldForm) {
+            return null;
+        }
+
+        return $fieldForm->getName();
     }
 
     /**

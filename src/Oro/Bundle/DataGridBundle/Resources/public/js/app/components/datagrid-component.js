@@ -1,28 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var DataGridComponent;
-    var helpers;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
-    var Backbone = require('backbone');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var GridView = require('orodatagrid/js/datagrid/grid');
-    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
-    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
-    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
-    var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    var DatagridSettingsPlugin = require('orodatagrid/js/app/plugins/grid/datagrid-settings-plugin');
-    var ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
-    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
-    var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
-    var StickedScrollbarPlugin = require('orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mediator = require('oroui/js/mediator');
+    const Backbone = require('backbone');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const PageableCollection = require('orodatagrid/js/pageable-collection');
+    const GridView = require('orodatagrid/js/datagrid/grid');
+    const mapActionModuleName = require('orodatagrid/js/map-action-module-name');
+    const mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    const PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    const FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
+    const FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    const DatagridSettingsPlugin = require('orodatagrid/js/app/plugins/grid/datagrid-settings-plugin');
+    const ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
+    const MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
+    const DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
+    const StickedScrollbarPlugin = require('orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin');
 
-    helpers = {
+    const helpers = {
         cellType: function(type) {
             return type + 'Cell';
         },
@@ -34,7 +33,7 @@ define(function(require) {
         }
     };
 
-    DataGridComponent = BaseComponent.extend({
+    const DataGridComponent = BaseComponent.extend({
         currentAppearanceKey: 'grid',
 
         currentAppearanceId: void 0,
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DataGridComponent() {
-            DataGridComponent.__super__.constructor.apply(this, arguments);
+        constructor: function DataGridComponent(options) {
+            DataGridComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -64,7 +63,7 @@ define(function(require) {
             options.builders.push('orodatagrid/js/inline-editing/builder');
             options.builders.push('orodatagrid/js/appearance/builder');
 
-            var self = this;
+            const self = this;
             this._deferredInit();
             this.built = $.Deferred();
 
@@ -72,16 +71,16 @@ define(function(require) {
             this.fixStates(options);
             this.processOptions(options);
 
-            var optionsProcessedPromises = [];
-            var builderImpl = [];
+            const optionsProcessedPromises = [];
+            const builderImpl = [];
 
             /**
              * #1. Let builders process datagrid options
              */
             _.each(options.builders, function(module) {
-                var built = $.Deferred();
+                const built = $.Deferred();
                 optionsProcessedPromises.push(built.promise());
-                require([module], function(impl) {
+                loadModules(module, function(impl) {
                     builderImpl.push(impl);
                     if (!_.has(impl, 'processDatagridOptions')) {
                         built.resolve();
@@ -91,7 +90,7 @@ define(function(require) {
                 });
             });
 
-            $.when.apply($, optionsProcessedPromises).always(_.bind(function() {
+            $.when(...optionsProcessedPromises).always(_.bind(function() {
                 /**
                  * #2. Init datagrid
                  */
@@ -101,15 +100,15 @@ define(function(require) {
                     /**
                      * #3. Run builders
                      */
-                    var buildersReadyPromises = [];
+                    const buildersReadyPromises = [];
 
                     function throwNoInitMethodError() {
                         throw new TypeError('Builder does not have init method');
                     }
                     // run related builders
-                    for (var i = 0; i < builderImpl.length; i++) {
-                        var builder = builderImpl[i];
-                        var built = $.Deferred();
+                    for (let i = 0; i < builderImpl.length; i++) {
+                        const builder = builderImpl[i];
+                        const built = $.Deferred();
                         buildersReadyPromises.push(built.promise());
 
                         if (!_.has(builder, 'init') || typeof builder.init !== 'function') {
@@ -120,14 +119,14 @@ define(function(require) {
                         builder.init(built, options);
                     }
 
-                    $.when.apply($, buildersReadyPromises).always(function() {
+                    $.when(...buildersReadyPromises).always(function(...components) {
                         /**
                          * #4. Done
                          */
                         if (self.changeAppearanceEnabled) {
                             self.selectAppearanceById(options.metadata.state.appearanceData.id);
                         }
-                        self.subComponents = _.compact(arguments);
+                        self.subComponents = _.compact(components);
                         self._resolveDeferredInit();
                         self.$componentEl.find('.view-loading').remove();
                         self.$el.show();
@@ -173,7 +172,7 @@ define(function(require) {
 
             this.themeOptions = options.themeOptions || {};
 
-            var customModules = _.extend(options.metadata.customModules || {}, this.themeOptions.customModules);
+            const customModules = _.extend(options.metadata.customModules || {}, this.themeOptions.customModules);
 
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
@@ -192,7 +191,7 @@ define(function(require) {
             this.collectModules();
 
             // load all dependencies and build grid
-            tools.loadModules(this.modules, this.build, this);
+            loadModules(this.modules, this.build, this);
 
             this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
                 this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
@@ -212,21 +211,21 @@ define(function(require) {
          * Collects required modules
          */
         collectModules: function() {
-            var modules = this.modules;
-            var metadata = this.metadata;
+            const modules = this.modules;
+            const metadata = this.metadata;
             // cells
             _.each(metadata.columns, function(column) {
-                var type = column.type;
+                const type = column.type;
                 modules[helpers.cellType(type)] = mapCellModuleName(type);
             });
             // row actions
             _.each(_.values(metadata.rowActions), function(action) {
-                var type = action.frontend_type;
+                const type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
             // mass actions
             _.each(_.values(metadata.massActions), function(action) {
-                var type = action.frontend_type;
+                const type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
 
@@ -240,7 +239,7 @@ define(function(require) {
             // preload all action confirmation modules
             _.each(this.data.data, function(model) {
                 _.each(model.action_configuration, function(config) {
-                    var module = config.confirmation && config.confirmation.component;
+                    const module = config.confirmation && config.confirmation.component;
                     if (module) {
                         // the key does not matter, the module just added to list to have it preloaded
                         modules[module] = module;
@@ -253,34 +252,31 @@ define(function(require) {
          * Build grid
          */
         build: function(modules) {
-            var collectionModels;
-            var collectionOptions;
-            var grid;
-            var collection;
+            let collectionModels;
 
-            var Grid = modules.GridView || GridView;
-            var Collection = modules.PageableCollection || PageableCollection;
+            const Grid = modules.GridView || GridView;
+            const Collection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
             if (this.data && this.data.data) {
                 collectionModels = this.data.data;
             }
 
-            collectionOptions = this.combineCollectionOptions(modules);
+            const collectionOptions = this.combineCollectionOptions(modules);
             if (this.data && this.data.options) {
                 _.extend(collectionOptions, this.data.options);
             }
 
-            collection = new Collection(collectionModels, collectionOptions);
+            const collection = new Collection(collectionModels, collectionOptions);
 
             // create grid
-            var options = this.combineGridOptions();
+            const options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
 
             options.el = this.$el[0];
 
             options.themeOptionsConfigurator(Grid, options);
-            grid = new Grid(_.extend({collection: collection}, options));
+            const grid = new Grid(_.extend({collection: collection}, options));
 
             this.grid = grid;
             grid.render();
@@ -301,7 +297,7 @@ define(function(require) {
                 this.traceChanges();
             }
 
-            var deferredBuilt = this.built;
+            const deferredBuilt = this.built;
             if (grid.deferredRender) {
                 grid.deferredRender.then(function() {
                     deferredBuilt.resolve(grid);
@@ -316,11 +312,11 @@ define(function(require) {
         },
 
         selectAppearanceById: function(id) {
-            var appearanceOptions = _.find(this.metadata.options.appearances, function(item) {
+            const appearanceOptions = _.find(this.metadata.options.appearances, function(item) {
                 return item.id === id || (id === '' && item.id === void 0 /* non specified on default view */);
             });
             if (!appearanceOptions) {
-                var error = new Error('Could not find appearance `' + id + '`');
+                const error = new Error('Could not find appearance `' + id + '`');
                 setTimeout(function() {
                     throw error;
                 }, 0);
@@ -347,7 +343,7 @@ define(function(require) {
                 // grid doesn't need any modifications
                 return;
             }
-            var Plugin = options.plugin;
+            const Plugin = options.plugin;
             if (!Plugin) {
                 throw new Error('Could not find plugin for appearance key `' + key + '`');
             }
@@ -362,7 +358,7 @@ define(function(require) {
          * @returns {Object}
          */
         combineCollectionOptions: function(modules) {
-            var options = _.extend({
+            const options = _.extend({
                 /*
                  * gridName contains extended information "inputName + scopeName"
                  * (allows to differentiate grid instances)
@@ -388,22 +384,21 @@ define(function(require) {
          * @returns {Object}
          */
         combineGridOptions: function() {
-            var columns;
-            var rowActions = {};
-            var defaultOptions = {
+            const rowActions = {};
+            const defaultOptions = {
                 sortable: false
             };
-            var modules = this.modules;
-            var metadata = this.metadata;
-            var plugins = this.metadata.plugins || [];
+            const modules = this.modules;
+            const metadata = this.metadata;
+            const plugins = this.metadata.plugins || [];
 
             // columns
-            columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
+            const columns = _.map(metadata.columns, function(cell) {
+                const cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
                     'order', 'manageable', 'required', 'shortenableLabel'];
-                var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
-                var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
-                var cellType = modules[helpers.cellType(cell.type)];
+                const cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
+                const extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
+                let cellType = modules[helpers.cellType(cell.type)];
                 if (!_.isEmpty(extendOptions)) {
                     cellType = cellType.extend(extendOptions);
                 }
@@ -417,7 +412,7 @@ define(function(require) {
             });
 
             // mass actions
-            var massActions = this.buildMassActionsOptions(this.metadata.massActions);
+            const massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (!this.themeOptions.headerHide) {
                 if (this.metadata.enableFloatingHeaderPlugin) {
@@ -450,7 +445,7 @@ define(function(require) {
                 }
             }
 
-            var appearances = metadata.options.appearances || [];
+            const appearances = metadata.options.appearances || [];
             switch (appearances.length) {
                 case 0:
                     break;
@@ -495,8 +490,8 @@ define(function(require) {
          * @returns {Array}
          */
         buildMassActionsOptions: function(actions) {
-            var modules = this.modules;
-            var massActions = [];
+            const modules = this.modules;
+            const massActions = [];
 
             _.each(actions, function(options, action) {
                 if (_.has(modules, helpers.actionType(options.frontend_type))) {
@@ -544,7 +539,7 @@ define(function(require) {
          * Enables tracing of collection changes to reflect datagrid state in URL.
          */
         traceChanges: function() {
-            var self = this;
+            const self = this;
 
             this.updateStateInUrl();
 
@@ -562,8 +557,8 @@ define(function(require) {
          * Reflects datagrid state in URL.
          */
         updateStateInUrl: function() {
-            var key = this.collection.stateHashKey();
-            var hash = this.collection.stateHashValue(true);
+            const key = this.collection.stateHashKey();
+            const hash = this.collection.stateHashValue(true);
 
             mediator.execute('changeUrlParam', key, hash);
         }

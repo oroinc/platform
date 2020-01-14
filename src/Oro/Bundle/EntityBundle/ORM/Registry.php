@@ -80,7 +80,7 @@ class Registry extends BaseRegistry
      */
     public function getManagerForClass($class)
     {
-        if (array_key_exists($class, $this->managersMap)) {
+        if (\array_key_exists($class, $this->managersMap)) {
             return $this->cachedManagers[$this->managersMap[$class]];
         }
 

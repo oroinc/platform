@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Nelmio\ApiDocBundle\Extractor as NelmioExtractor;
 use Nelmio\ApiDocBundle\Formatter as NelmioFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
@@ -18,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ApiDocCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
     private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE     = 'oro_api.rest.request_type_provider';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.chain_routing_options_resolver';
@@ -25,14 +28,16 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
     private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
+    private const API_DOC_MARKDOWN_FORMATTER_SERVICE        = 'nelmio_api_doc.formatter.markdown_formatter';
+    private const API_DOC_SWAGGER_FORMATTER_SERVICE         = 'nelmio_api_doc.formatter.swagger_formatter';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
     private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
+    private const API_SOURCE_LISTENER_SERVICE               = 'oro_api.listener.api_source';
 
     /**
      * {@inheritdoc}
@@ -43,13 +48,12 @@ class ApiDocCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $this->configureApiDocAnnotationHandler($container);
+        $this->configureUnderlyingViews($container);
         $this->configureApiDocExtractor($container);
-        $this->configureSimpleFormatter($container);
-        $this->configureHtmlFormatter($container);
+        $this->configureApiDocFormatters($container);
         $this->registerRoutingOptionsResolvers($container);
-        $this->registerRequestTypeProviders($container);
         $this->configureRequestTypeProvider($container);
+        $this->configureApiSourceListener($container);
     }
 
     /**
@@ -101,14 +105,50 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    private function configureApiDocAnnotationHandler(ContainerBuilder $container)
+    private function configureUnderlyingViews(ContainerBuilder $container)
     {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::API_DOC_ANNOTATION_HANDLER_SERVICE,
-            self::API_DOC_ANNOTATION_HANDLER_TAG_NAME,
-            'addHandler'
-        );
+        $underlyingViews = $this->getUnderlyingViews($container);
+        foreach ($underlyingViews as $view => $underlyingView) {
+            $this->registerUnderlyingViewHandler($container, $view, $underlyingView);
+        }
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(2, $underlyingViews);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array [view name => underlying view name, ...]
+     */
+    private function getUnderlyingViews(ContainerBuilder $container)
+    {
+        $underlyingViews = [];
+        $views = $this->getApiDocViews($container);
+        foreach ($views as $name => $view) {
+            if (\array_key_exists('underlying_view', $view) && $view['underlying_view']) {
+                $underlyingViews[$name] = $view['underlying_view'];
+            }
+        }
+
+        return $underlyingViews;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $view
+     * @param string           $underlyingView
+     */
+    private function registerUnderlyingViewHandler(ContainerBuilder $container, string $view, string $underlyingView)
+    {
+        $container
+            ->register(
+                self::API_DOC_ANNOTATION_HANDLER_SERVICE . '.' . $view,
+                AddApiDocViewAnnotationHandler::class
+            )
+            ->setArguments([$view, $underlyingView])
+            ->setPublic(false)
+            ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
     }
 
     /**
@@ -152,16 +192,14 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    private function configureSimpleFormatter(ContainerBuilder $container)
+    private function configureApiSourceListener(ContainerBuilder $container)
     {
-        $formatterDef = $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE);
-        $formatterDef->setPublic(true);
+        $config = DependencyInjectionUtil::getConfig($container);
+        $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
+            ->setArgument(1, $config['api_doc_cache']['excluded_features']);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function configureHtmlFormatter(ContainerBuilder $container)
+    private function configureApiDocFormatters(ContainerBuilder $container)
     {
         // rename default HTML formatter service
         $defaultHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
@@ -203,6 +241,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
         foreach ($htmlFormatters as $htmlFormatter) {
             $container->getDefinition($htmlFormatter)->addMethodCall('setViews', [$views]);
         }
+
+        // make other formatter services public as it is required for "api:doc:dump" and "api:swagger:dump" commands
+        $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE)->setPublic(true);
+        $container->getDefinition(self::API_DOC_MARKDOWN_FORMATTER_SERVICE)->setPublic(true);
+        $container->getDefinition(self::API_DOC_SWAGGER_FORMATTER_SERVICE)->setPublic(true);
     }
 
     /**
@@ -210,57 +253,38 @@ class ApiDocCompilerPass implements CompilerPassInterface
      */
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)
     {
-        $chainServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE
-        );
-        if (null !== $chainServiceDef) {
-            $services = [];
-            $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
-            $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
-            foreach ($taggedServices as $id => $attributes) {
-                foreach ($attributes as $attribute) {
-                    $view = DependencyInjectionUtil::getRequiredAttribute(
-                        $attribute,
-                        'view',
+        $services = [];
+        $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
+        $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $view = $this->getRequiredAttribute(
+                    $attributes,
+                    'view',
+                    $id,
+                    self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
+                );
+                if (!in_array($view, $views, true)) {
+                    throw new LogicException(sprintf(
+                        'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
+                        . ' Possible values: %s.',
+                        $view,
+                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
                         $id,
-                        self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
-                    );
-                    if (!in_array($view, $views, true)) {
-                        throw new LogicException(sprintf(
-                            'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
-                            . ' Possible values: %s.',
-                            $view,
-                            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
-                            $id,
-                            implode(', ', $views)
-                        ));
-                    }
-                    $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
+                        implode(', ', $views)
+                    ));
                 }
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-            foreach ($services as $service) {
-                $chainServiceDef->addMethodCall('addResolver', $service);
+                $services[$this->getPriorityAttribute($attributes)][] = [new Reference($id), $view];
             }
         }
-    }
+        if (empty($services)) {
+            return;
+        }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function registerRequestTypeProviders(ContainerBuilder $container)
-    {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::REST_DOC_VIEW_DETECTOR_SERVICE,
-            self::REQUEST_TYPE_PROVIDER_TAG,
-            'addRequestTypeProvider'
-        );
+        $services = $this->sortByPriorityAndFlatten($services);
+        $container
+            ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
+            ->replaceArgument(0, $services);
     }
 
     /**

@@ -1,13 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/modal',
-    'oroui/js/tools',
-    'backbone',
-    'oroworkflow/js/transition-executor'
-], function($, _, __, Modal, tools, Backbone, performTransition) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Modal = require('oroui/js/modal');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const Backbone = require('backbone');
+    const performTransition = require('oroworkflow/js/transition-executor');
 
     /**
      * Transition button click handler
@@ -16,15 +16,15 @@ define([
      * @class   oroworkflow.WorkflowTransitionHandler
      */
     return function(pageRefresh) {
-        var element = $(this);
+        const element = $(this);
         pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
-        var resetInProgress = function() {
+        const resetInProgress = function() {
             element.data('_in-progress', false);
         };
 
-        var showDialog = function() {
-            var dialogOptions = {
+        const showDialog = function() {
+            let dialogOptions = {
                 title: element.data('transition-label') || element.html(),
                 url: element.data('dialog-url'),
                 stateEnabled: false,
@@ -37,7 +37,7 @@ define([
                     autoResize: true
                 }
             };
-            var additionalOptions = element.data('dialog-options');
+            const additionalOptions = element.data('dialog-options');
             if (additionalOptions) {
                 if (!_.isUndefined(additionalOptions)) {
                     additionalOptions.dialogOptions = _.extend(
@@ -48,8 +48,8 @@ define([
                 dialogOptions = _.extend(dialogOptions, additionalOptions);
             }
 
-            tools.loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
-                var _widget = new Widget(dialogOptions);
+            loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
+                const _widget = new Widget(dialogOptions);
                 Backbone.listenTo(_widget, 'widgetRemove', _.bind(function() {
                     resetInProgress();
                 }, this));
@@ -61,9 +61,9 @@ define([
         /**
          * @param {function} callback
          */
-        var showConfirmationModal = function(callback) {
-            var message = element.data('message');
-            var modalOptions = {};
+        const showConfirmationModal = function(callback) {
+            const message = element.data('message');
+            let modalOptions = {};
             if (typeof message === 'string') {
                 modalOptions = {
                     content: message,
@@ -73,8 +73,8 @@ define([
                 modalOptions = message;
             }
 
-            var confirmation = element.data('confirmation') || {};
-            var placeholders = {};
+            const confirmation = element.data('confirmation') || {};
+            let placeholders = {};
             if (confirmation.message_parameters !== undefined) {
                 placeholders = confirmation.message_parameters;
             }
@@ -91,7 +91,7 @@ define([
                 modalOptions.cancelText = __(confirmation.cancelText, $.extend({}, placeholders));
             }
 
-            var confirm = new Modal(modalOptions);
+            const confirm = new Modal(modalOptions);
 
             callback = callback || function() {
                 performTransition(element, null, pageRefresh);
@@ -111,7 +111,7 @@ define([
         element.one('transitions_success', resetInProgress);
         element.one('transitions_failure', resetInProgress);
 
-        var dialogUrl = element.data('dialogUrl');
+        const dialogUrl = element.data('dialogUrl');
         if (!_.isEmpty(element.data('confirmation')) || !dialogUrl && !_.isEmpty(element.data('message'))) {
             showConfirmationModal(dialogUrl ? showDialog : null);
         } else if (dialogUrl) {

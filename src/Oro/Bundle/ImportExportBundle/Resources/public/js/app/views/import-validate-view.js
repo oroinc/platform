@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ImportValidateView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var WidgetManager = require('oroui/js/widget-manager');
-    var Messenger = require('oroui/js/messenger');
-    var DeleteConfirmation = require('oroui/js/standart-confirmation');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const WidgetManager = require('oroui/js/widget-manager');
+    const Messenger = require('oroui/js/messenger');
+    const DeleteConfirmation = require('oroui/js/standart-confirmation');
 
-    ImportValidateView = BaseView.extend({
+    const ImportValidateView = BaseView.extend({
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat([
@@ -20,15 +19,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ImportValidateView() {
-            ImportValidateView.__super__.constructor.apply(this, arguments);
+        constructor: function ImportValidateView(options) {
+            ImportValidateView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            ImportValidateView.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            ImportValidateView.__super__.initialize.call(this, options);
 
             WidgetManager.getWidgetInstance(this.wid, this.onWidgetLoad.bind(this));
         },
@@ -36,19 +35,19 @@ define(function(require) {
         render: function() {
             this.refreshActiveInputWidgets();
 
-            return ImportValidateView.__super__.render.apply(this, arguments);
+            return ImportValidateView.__super__.render.call(this);
         },
 
         onImportButtonClick: function() {
-            var $form = this.getCurrentlyActiveTabContent().find('form');
-            var importProcessorAliasesToConfirmMessages = this.importProcessorAliasesToConfirmMessages;
+            const $form = this.getCurrentlyActiveTabContent().find('form');
+            const importProcessorAliasesToConfirmMessages = this.importProcessorAliasesToConfirmMessages;
 
             $form.find('input[name=isValidateJob]').val(false);
 
-            var currentlyChosenProcessorAlias = this.getCurrentlyChosenProcessorAlias();
+            const currentlyChosenProcessorAlias = this.getCurrentlyChosenProcessorAlias();
 
             if (importProcessorAliasesToConfirmMessages[currentlyChosenProcessorAlias] !== undefined) {
-                var confirm = new DeleteConfirmation({
+                const confirm = new DeleteConfirmation({
                     content: importProcessorAliasesToConfirmMessages[currentlyChosenProcessorAlias]
                 });
 
@@ -63,7 +62,7 @@ define(function(require) {
         },
 
         onValidateImportButtonClick: function() {
-            var $form = this.getCurrentlyActiveTabContent().find('form');
+            const $form = this.getCurrentlyActiveTabContent().find('form');
 
             $form.find('input[name=isValidateJob]').val(true);
             $form.submit();
@@ -88,7 +87,7 @@ define(function(require) {
             widget._onContentLoad = function(content) {
                 if (_.has(content, 'success')) {
                     if (content.success) {
-                        var message = _.has(content, 'message')
+                        const message = _.has(content, 'message')
                             ? content.message
                             : __('oro.importexport.import.success.message');
                         Messenger.notificationFlashMessage('success', message);
@@ -111,7 +110,7 @@ define(function(require) {
         },
 
         resetWidgetFormToActiveTabForm: function(widget) {
-            var $tabContent = this.getCurrentlyActiveTabContent();
+            const $tabContent = this.getCurrentlyActiveTabContent();
 
             widget.form = $tabContent.find('form');
         },
@@ -121,7 +120,7 @@ define(function(require) {
         },
 
         getCurrentlyChosenProcessorAlias: function() {
-            var form = this.getCurrentlyActiveTabContent().find('form');
+            const form = this.getCurrentlyActiveTabContent().find('form');
 
             return form.find('select[name="oro_importexport_import[processorAlias]"]').val();
         },

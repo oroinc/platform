@@ -1,0 +1,22 @@
+entity_config:
+    attachment:
+        field:
+            items:
+                # Tells whether or not to use DAM for file uploading.
+                use_dam:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                        allowed_type: [file, image, multiFile, multiImage]
+                        create_only: true
+                    form:
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
+                        options:
+                            choices:
+                                Yes: 1
+                                No: 0
+                            placeholder: false
+                            block: general
+                            subblock: properties
+                            label: oro.digitalasset.entity_config.attachment.field.items.use_dam.label
+                            tooltip: oro.digitalasset.entity_config.attachment.field.items.use_dam.tooltip

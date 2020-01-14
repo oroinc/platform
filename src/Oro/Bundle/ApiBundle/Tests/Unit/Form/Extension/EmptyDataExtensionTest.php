@@ -42,9 +42,9 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         return $emptyDataNormalizer;
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        self::assertEquals(FormType::class, $this->emptyDataExtension->getExtendedType());
+        self::assertEquals([FormType::class], EmptyDataExtension::getExtendedTypes());
     }
 
     /**
@@ -205,6 +205,29 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('instantiate')
             ->with('Test\Class')
             ->willReturn($object);
+
+        self::assertSame($object, $emptyDataNormalizer($form, ''));
+    }
+
+    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClassAndExistingEmptyDataNormalizer()
+    {
+        $object = new \stdClass();
+        $options = [
+            'data_class' => 'Test\Class',
+            'empty_data' => function () use ($object) {
+                return $object;
+            }
+        ];
+
+        $emptyDataNormalizer = $this->expectBuildForm($options);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::once())
+            ->method('isEmpty')
+            ->willReturn(false);
+
+        $this->entityInstantiator->expects(self::never())
+            ->method('instantiate');
 
         self::assertSame($object, $emptyDataNormalizer($form, ''));
     }

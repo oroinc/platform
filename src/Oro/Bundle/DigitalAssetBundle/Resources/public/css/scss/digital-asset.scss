@@ -1,0 +1,71 @@
+/* @theme: admin.oro; */
+
+.digital-asset {
+    &-item {
+        display: flex;
+
+        > .digital-asset-filename {
+            @include text-line-truncate($dam-section-width);
+            display: inline-block;
+            padding: side-values($dam-file-inner-offset);
+
+            > img {
+                display: inline-block;
+                overflow: hidden;
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        [class^="fa-"],
+        [class*="fa-"] {
+            margin-#{$start}: $dam-item-fa-right;
+            margin-top: $content-padding-small;
+
+            &.fa-edit {
+                margin-top: $content-padding-small + 1;
+            }
+
+            &:hover {
+                &:after {
+                    color: $primary-550;
+                }
+            }
+        }
+    }
+
+    &-thumbnail {
+        width: $dam-thumbnail-width;
+        height: $dam-thumbnail-height;
+    }
+
+    &-dialog {
+        .widget-actions {
+            .btn {
+                min-width: 76px;
+            }
+        }
+
+        .grid-views {
+            margin: 26px 0 12px 0;
+        }
+
+        .form-source-file {
+            .validation-failed {
+                max-width: $field-width;
+            }
+        }
+    }
+
+    &-image-grid {
+        .grid-body-cell-originalFilename {
+            [class*="fa-"] {
+                display: none;
+            }
+        }
+    }
+
+    &-controls {
+        white-space: nowrap;
+    }
+}

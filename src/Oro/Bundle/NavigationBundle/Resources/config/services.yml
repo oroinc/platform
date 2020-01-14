@@ -5,39 +5,12 @@ parameters:
     oro_navigation.entity.page_state.class:                    Oro\Bundle\NavigationBundle\Entity\PageState
     oro_navigation.entity.menu_update.class:                   Oro\Bundle\NavigationBundle\Entity\MenuUpdate
 
-    oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
-    oro_menu.factory.class:                                    Knp\Menu\MenuFactory
-
-    oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
-
-    oro_navigation.navigation_item_menu.builder.class:         Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
-    oro_navigation.navigation_history_menu.builder.class:      Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder
-    oro_navigation.navigation_mostviewed_menu.builder.class:   Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder
-
-    oro_navigation.item.builder.pinbar.class:                  Oro\Bundle\NavigationBundle\Entity\Builder\PinbarTabBuilder
-    oro_navigation.item.builder.favorite.class:                Oro\Bundle\NavigationBundle\Entity\Builder\NavigationItemBuilder
-    oro_navigation.item.builder.history.class:                 Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder
-    oro_navigation.item.factory.class:                         Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
-
-    oro_navigation.menu.matcher.voter.request:                 Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
-    oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
-
-    oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
-    oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
-
-    oro_navigation.form.type.pagestate.class:                  Oro\Bundle\NavigationBundle\Form\Type\PageStateType
-    oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
-
-    oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
-    oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
-
 services:
     Knp\Menu\Twig\Helper:
         alias: knp_menu.helper
 
     oro_menu_acl_extension:
-        class: '%oro_menu.factory.acl_extension.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
         arguments:
             - '@router.default'
             - '@security.authorization_checker'
@@ -48,30 +21,31 @@ services:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
     oro_navigation.menu_extension.routing:
-        class: 'Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension'
+        class: Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension
         arguments:
             - '@router.default'
         tags:
             - { name: oro_navigation.menu_extension, priority: 110 }
 
     oro_menu.factory:
-        class: '%oro_menu.factory.class%'
+        class: Knp\Menu\MenuFactory
 
     oro_menu.array_loader:
-        class: 'Knp\Menu\Loader\ArrayLoader'
+        class: Knp\Menu\Loader\ArrayLoader
         public: false
         arguments:
             - "@oro_menu.factory"
 
     oro_menu.manipulator:
-        class: 'Knp\Menu\Util\MenuManipulator'
+        class: Knp\Menu\Util\MenuManipulator
         public: false
 
     oro_menu.builder_chain:
         class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
+            - [] # builders
+            - ~ # service locator
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'
             - '@oro_menu.manipulator'
@@ -82,12 +56,12 @@ services:
         alias: oro_menu.builder_chain
 
     oro_menu.configuration_resolver:
-        class: '%oro_menu.configuration_resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
         arguments:
             - '@service_container'
 
     oro_menu.configuration_builder:
-        class: '%oro_menu.configuration_builder.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
         arguments:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
@@ -97,8 +71,7 @@ services:
             - { name: oro_menu.builder }
 
     oro_navigation.tree.menu_update_tree_handler:
-        class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler
         public: true
         arguments:
             - '@translator'
@@ -111,7 +84,7 @@ services:
             - { name: twig.extension }
 
     oro_navigation.item.builder.pinbar:
-        class: '%oro_navigation.item.builder.pinbar.class%'
+        class: Oro\Bundle\NavigationBundle\Entity\Builder\PinbarTabBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.utils.pinbar_tab_url_normalizer'
@@ -123,7 +96,7 @@ services:
             - { name: oro_navigation.item.builder, alias: pinbar }
 
     oro_navigation.item.builder.favorite:
-        class: '%oro_navigation.item.builder.favorite.class%'
+        class: Oro\Bundle\NavigationBundle\Entity\Builder\NavigationItemBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
@@ -132,7 +105,7 @@ services:
             - { name: oro_navigation.item.builder, alias: favorite }
 
     oro_navigation.item.builder.history:
-        class: '%oro_navigation.item.builder.history.class%'
+        class: Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
@@ -141,7 +114,7 @@ services:
             - { name: oro_navigation.item.builder, alias: history }
 
     oro_navigation.item.builder.mostviewed:
-        class: '%oro_navigation.item.builder.history.class%'
+        class: Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
@@ -150,9 +123,10 @@ services:
             - { name: oro_navigation.item.builder, alias: mostviewed }
 
     oro_navigation.item.factory:
-        class: '%oro_navigation.item.factory.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
         public: true
+        arguments:
+            - ~ # service locator for builders
 
     oro_navigation.item.pinbar.post_persist_listener:
         class: Oro\Bundle\NavigationBundle\Entity\Listener\PinbarPostPersist
@@ -168,7 +142,7 @@ services:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\NavigationBundle\Entity\AbstractNavigationHistoryItem', event: preUpdate }
 
     oro_navigation.pinbar_menu.builder:
-        class: '%oro_navigation.navigation_item_menu.builder.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_navigation.provider.navigation_items'
@@ -176,7 +150,7 @@ services:
             - { name: oro_menu.builder, alias: pinbar }
 
     oro_navigation.favorites_menu.builder:
-        class: '%oro_navigation.navigation_item_menu.builder.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_navigation.provider.navigation_items'
@@ -184,7 +158,7 @@ services:
             - { name: oro_menu.builder, alias: favorite }
 
     oro_navigation.history_menu.builder:
-        class: '%oro_navigation.navigation_history_menu.builder.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_navigation.provider.navigation_items'
@@ -195,7 +169,7 @@ services:
             - { name: oro_menu.builder, alias: history }
 
     oro_navigation.mostviewed_menu.builder:
-        class: '%oro_navigation.navigation_mostviewed_menu.builder.class%'
+        class: Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_navigation.provider.navigation_items'
@@ -204,12 +178,12 @@ services:
             - { name: oro_menu.builder, alias: mostviewed }
 
     knp_voter_request:
-        class: '%oro_navigation.menu.matcher.voter.request%'
+        class: Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
         tags:
             - { name: knp_menu.voter, request: true }
 
     knp_menu.voter.router:
-        class: '%oro_navigation.menu.matcher.voter.routepattern%'
+        class: Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
         tags:
             - { name: knp_menu.voter, request: true }
 
@@ -245,12 +219,12 @@ services:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
     oro_navigation.title_service:
-        class: '%oro_navigation.title_service.class%'
+        class: Oro\Bundle\NavigationBundle\Provider\TitleService
         arguments:
           - '@oro_navigation.title_reader.registry'
           - '@oro_navigation.title_translator'
           - '@oro_config.user'
-          - '@oro_navigation.chain_breadcrumb_manager.link'
+          - '@oro_navigation.chain_breadcrumb_manager'
         lazy: true
 
     Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface:
@@ -261,7 +235,7 @@ services:
             - { name: oro_service_link, service: oro_navigation.title_service }
 
     oro_navigation.title_translator:
-        class: '%oro_navigation.title_translator.class%'
+        class: Oro\Bundle\NavigationBundle\Provider\TitleTranslator
         public: false
         arguments:
           - '@translator.default'
@@ -271,7 +245,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
         public: false
         arguments:
-          - !tagged oro_navigation.title_reader
+          - !tagged_iterator oro_navigation.title_reader
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
@@ -311,13 +285,12 @@ services:
 
     oro_navigation.form.pagestate:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments: ["pagestate", Oro\Bundle\NavigationBundle\Form\Type\PageStateType, null]
 
     oro_navigation.form.type.pagestate:
-        class:                        '%oro_navigation.form.type.pagestate.class%'
+        class: Oro\Bundle\NavigationBundle\Form\Type\PageStateType
         tags:
             - { name: form.type, alias: pagestate }
 
@@ -339,8 +312,7 @@ services:
             - { name: form.type, alias: oro_route_choice }
 
     oro_navigation.form.handler.pagestate:
-        class: '%oro_navigation.form.handler.pagestate.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
         public: true
         arguments:
             - "@oro_navigation.form.pagestate"
@@ -363,21 +335,19 @@ services:
             - { name: twig.extension }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
-    oro_navigation.breadcrumb_manager:
-        class: '%oro_navigation.breadcrumbs_manager.class%'
+    oro_navigation.breadcrumb_manager.default:
+        class: Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
         arguments:
             - '@oro_menu.builder_chain'
             - '@knp_menu.matcher'
             - '@router'
-
-    oro_navigation.chain_breadcrumb_manager.link:
         tags:
-            - { name: oro_service_link,  service: oro_navigation.chain_breadcrumb_manager }
+            - { name: oro_breadcrumbs.provider, priority: -255 }
 
     oro_navigation.chain_breadcrumb_manager:
-        class: '%oro_navigation.chain_breadcrumbs_manager.class%'
-        calls:
-          - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
+        class: Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
+        arguments:
+            - !tagged_iterator oro_breadcrumbs.provider
 
     Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface:
         alias: oro_navigation.chain_breadcrumb_manager
@@ -385,14 +355,13 @@ services:
     oro_navigation.menu_update.builder.menu_default_visibility:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.localization'
+            - '@oro_locale.helper.default_locale_localization'
             - '@oro_navigation.provider.menu_update_provider'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
     oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - "@doctrine"
@@ -454,7 +423,7 @@ services:
             - { name: validator.constraint_validator }
 
     oro_navigation.validator.unique_pinbar_tab_url:
-        class: 'Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidator'
+        class: Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidator
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
@@ -479,7 +448,7 @@ services:
             - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
 
     oro_navigation.repository.menu_update:
-        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        class: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_navigation.entity.menu_update.class%'
@@ -513,7 +482,6 @@ services:
 
     oro_navigation.configuration.provider:
         class: Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         parent: oro.static_config_provider.abstract
         arguments:
@@ -535,19 +503,17 @@ services:
             - '@oro_navigation.manager.menu_update'
 
     oro_navigation.utils.pinbar_tab_url_normalizer:
-        class: 'Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer
         public: true
 
     oro_navigation.provider.pinbar_tab_title:
-        class: 'Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProvider'
+        class: Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProvider
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_navigation.title_service'
 
     oro_navigation.provider.navigation_items:
-        class: 'Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider
         public: true
         arguments:
             - '@oro_entity.doctrine_helper'

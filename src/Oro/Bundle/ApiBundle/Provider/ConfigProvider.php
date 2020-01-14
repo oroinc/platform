@@ -5,16 +5,21 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides the configuration for a specific API resource.
  */
-class ConfigProvider
+class ConfigProvider implements ResetInterface
 {
+    private const KEY_DELIMITER = '|';
+
     /** @var ActionProcessorInterface */
     private $processor;
 
@@ -48,15 +53,72 @@ class ConfigProvider
         RequestType $requestType,
         array $extras = []
     ): Config {
-        if (empty($className)) {
+        if (!$className) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
-        if (array_key_exists($cacheKey, $this->cache)) {
+        $identifierFieldsOnly = false;
+        $hasDefinitionExtra = false;
+        $cacheKey = (string)$requestType . self::KEY_DELIMITER . $version . self::KEY_DELIMITER . $className;
+        foreach ($extras as $extra) {
+            $part = $extra->getCacheKeyPart();
+            if ($part) {
+                $cacheKey .= self::KEY_DELIMITER . $part;
+            }
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                $identifierFieldsOnly = true;
+            } elseif ($extra instanceof EntityDefinitionConfigExtra) {
+                $hasDefinitionExtra = true;
+            }
+        }
+        if (!$hasDefinitionExtra) {
+            throw new \LogicException(sprintf(
+                'The "%s" config extra must be specified. Class Name: %s.',
+                EntityDefinitionConfigExtra::class,
+                $className
+            ));
+        }
+
+        if (!$identifierFieldsOnly) {
+            return $this->loadConfig($className, $version, $requestType, $extras, false, $cacheKey);
+        }
+
+        if (\array_key_exists($cacheKey, $this->cache)) {
             return clone $this->cache[$cacheKey];
         }
 
+        $config = $this->loadConfig($className, $version, $requestType, $extras, true, $cacheKey);
+        $this->cache[$cacheKey] = $config;
+
+        return clone $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->cache = [];
+    }
+
+    /**
+     * @param string      $className
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
+     * @param bool        $identifierFieldsOnly
+     * @param string      $cacheKey
+     *
+     * @return Config
+     */
+    private function loadConfig(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras,
+        bool $identifierFieldsOnly,
+        string $cacheKey
+    ): Config {
         if (isset($this->processing[$cacheKey])) {
             throw new RuntimeException(sprintf(
                 'Cannot build the configuration of "%s" because this causes the circular dependency.',
@@ -66,7 +128,13 @@ class ConfigProvider
 
         /** @var ConfigContext $context */
         $context = $this->processor->createContext();
-        $this->initContext($context, $className, $version, $requestType, $extras);
+        $context->setClassName($className);
+        $context->setVersion($version);
+        $context->getRequestType()->set($requestType);
+        $context->set(FilterIdentifierFieldsConfigExtra::NAME, $identifierFieldsOnly);
+        if (!empty($extras)) {
+            $context->setExtras($extras);
+        }
 
         $this->processing[$cacheKey] = true;
         try {
@@ -77,64 +145,14 @@ class ConfigProvider
 
         $config = $this->buildResult($context);
 
-        $this->cache[$cacheKey] = $config;
-
-        return clone $config;
-    }
-
-    /**
-     * Removes all already built configs from the internal cache.
-     */
-    public function clearCache(): void
-    {
-        $this->cache = [];
-    }
-
-    /**
-     * @param ConfigContext          $context
-     * @param string                 $className
-     * @param string                 $version
-     * @param RequestType            $requestType
-     * @param ConfigExtraInterface[] $extras
-     */
-    private function initContext(
-        ConfigContext $context,
-        string $className,
-        string $version,
-        RequestType $requestType,
-        array $extras
-    ): void {
-        $context->setClassName($className);
-        $context->setVersion($version);
-        $context->getRequestType()->set($requestType);
-        if (!empty($extras)) {
-            $context->setExtras($extras);
-        }
-    }
-
-    /**
-     * @param string                 $className
-     * @param string                 $version
-     * @param RequestType            $requestType
-     * @param ConfigExtraInterface[] $extras
-     *
-     * @return string
-     */
-    private function buildCacheKey(
-        string $className,
-        string $version,
-        RequestType $requestType,
-        array $extras
-    ): string {
-        $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
-        foreach ($extras as $extra) {
-            $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $cacheKey .= '|' . $part;
+        if ($identifierFieldsOnly) {
+            $definition = $config->getDefinition();
+            if (null !== $definition) {
+                $definition->setKey($this->buildConfigKey($className, $extras));
             }
         }
 
-        return $cacheKey;
+        return $config;
     }
 
     /**
@@ -151,8 +169,8 @@ class ConfigProvider
                 continue;
             }
             $part = $extra->getCacheKeyPart();
-            if (!empty($part)) {
-                $configKey .= '|' . $part;
+            if ($part) {
+                $configKey .= self::KEY_DELIMITER . $part;
             }
         }
 
@@ -172,14 +190,12 @@ class ConfigProvider
         }
         $extras = $context->getExtras();
         foreach ($extras as $extra) {
-            $sectionName = $extra->getName();
-            if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
-                $config->set($sectionName, $context->get($sectionName));
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                $sectionName = $extra->getName();
+                if ($context->has($sectionName)) {
+                    $config->set($sectionName, $context->get($sectionName));
+                }
             }
-        }
-        $definition = $config->getDefinition();
-        if ($definition) {
-            $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
         }
 
         return $config;

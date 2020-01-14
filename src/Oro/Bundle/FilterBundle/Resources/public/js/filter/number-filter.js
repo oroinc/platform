@@ -1,19 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var NumberFilter;
-
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var ChoiceFilter = require('./choice-filter');
-    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const NumberFormatter = require('orofilter/js/formatter/number-formatter');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Number filter: formats value as a number
      */
-    NumberFilter = ChoiceFilter.extend({
+    const NumberFilter = ChoiceFilter.extend({
         /**
          * @property {Boolean}
          */
@@ -22,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function NumberFilter() {
-            NumberFilter.__super__.constructor.apply(this, arguments);
+        constructor: function NumberFilter(options) {
+            NumberFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -43,7 +41,7 @@ define(function(require) {
 
             this._filterArrayChoices();
             this.formatter = new NumberFormatter(this.formatterOptions);
-            NumberFilter.__super__.initialize.apply(this, arguments);
+            NumberFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -70,7 +68,7 @@ define(function(require) {
          * @inheritDoc
          */
         _formatRawValue: function(value) {
-            var formatted = _.clone(value);
+            const formatted = _.clone(value);
 
             formatted.value = this._toRawValue(value.value);
 
@@ -81,7 +79,7 @@ define(function(require) {
          * @inheritDoc
          */
         _formatDisplayValue: function(value) {
-            var formatted = _.clone(value);
+            const formatted = _.clone(value);
 
             formatted.value = this._toDisplayValue(value.value);
 
@@ -165,7 +163,7 @@ define(function(require) {
         _writeDOMValue: function(data) {
             this._initInputWidget();
 
-            return NumberFilter.__super__._writeDOMValue.apply(this, arguments);
+            return NumberFilter.__super__._writeDOMValue.call(this, data);
         },
 
         /**
@@ -174,13 +172,13 @@ define(function(require) {
          * @private
          */
         _isValid: function() {
-            var rawValue = this.formatter.toRaw(this._readDOMValue().value);
-            var validValue = rawValue === void 0 || this._checkNumberRules(rawValue);
+            const rawValue = this.formatter.toRaw(this._readDOMValue().value);
+            const validValue = rawValue === void 0 || this._checkNumberRules(rawValue);
 
             if (!validValue) {
                 return false;
             } else {
-                return NumberFilter.__super__._isValid.apply(this, arguments);
+                return NumberFilter.__super__._isValid.call(this);
             }
         },
 
@@ -195,7 +193,7 @@ define(function(require) {
                 return true;
             }
 
-            var result = true;
+            let result = true;
 
             if (!_.isNumber(value) || _.isNaN(value)) {
                 this._showNumberWarning();

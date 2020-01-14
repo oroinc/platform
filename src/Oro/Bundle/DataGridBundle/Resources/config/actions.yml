@@ -1,75 +1,58 @@
-parameters:
-    oro_datagrid.extension.action.type.navigate.class:    Oro\Bundle\DataGridBundle\Extension\Action\Actions\NavigateAction
-    oro_datagrid.extension.action.type.ajax.class:        Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxAction
-    oro_datagrid.extension.action.type.delete.class:      Oro\Bundle\DataGridBundle\Extension\Action\Actions\DeleteAction
-    oro_datagrid.extension.action.type.ajaxdelete.class:  Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxDeleteAction
-    oro_datagrid.extension.action.type.frontend.class:    Oro\Bundle\DataGridBundle\Extension\Action\Actions\FrontendAction
-
 services:
     oro_datagrid.extension.action.factory:
         class: Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory
-        public: false
         arguments:
-            - '@service_container'
+            - ~ # service locator for actions
 
     oro_datagrid.extension.action.metadata_factory:
         class: Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory
-        public: false
         arguments:
             - '@translator'
 
     oro_datagrid.extension.action.type.navigate:
-        class: '%oro_datagrid.extension.action.type.navigate.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\NavigateAction
         shared: false
-        public: true
         tags:
-            - { name:  oro_datagrid.extension.action.type, type: navigate }
+            - { name: oro_datagrid.extension.action.type, type: navigate }
 
     oro_datagrid.extension.action.type.ajax:
-        class: '%oro_datagrid.extension.action.type.ajax.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajax }
 
     oro_datagrid.extension.action.type.delete:
-        class: '%oro_datagrid.extension.action.type.delete.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\DeleteAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: delete }
 
     oro_datagrid.extension.action.type.ajaxdelete:
-        class: '%oro_datagrid.extension.action.type.ajaxdelete.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxDeleteAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdelete }
 
     oro_datagrid.extension.action.type.frontend:
-        class: '%oro_datagrid.extension.action.type.frontend.class%'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\FrontendAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: frontend }
 
     oro_datagrid.extension.action.type.import:
-        class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: import }
 
     oro_datagrid.extension.action.type.export:
-        class: 'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction'
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: export }
 
     oro_datagrid.extension.action.type.trigger_event:
         class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\TriggerEventAction
         shared: false
-        public: true
         tags:
-            - { name:  oro_datagrid.extension.action.type, type: trigger-event }
+            - { name: oro_datagrid.extension.action.type, type: trigger-event }

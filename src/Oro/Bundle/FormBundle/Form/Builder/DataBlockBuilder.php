@@ -7,6 +7,9 @@ use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Builds blocks configuration for the given FormView instance.
+ */
 class DataBlockBuilder
 {
     /** @var TemplateRendererInterface */
@@ -73,11 +76,11 @@ class DataBlockBuilder
                     $tmpChild = $tmpChild->parent;
                 }
 
-                $subBlock->addData(
-                    $this->templateRenderer->render(
-                        '{{ form_row(' . $this->formVariableName . $formPath . ') }}'
-                    )
+                $html = $this->templateRenderer->render(
+                    '{{ form_row(' . $this->formVariableName . $formPath . ') }}'
                 );
+
+                $subBlock->setData(array_merge($subBlock->getData(), [$child->vars['name'] => $html]));
             }
 
             $this->doBuild($child);

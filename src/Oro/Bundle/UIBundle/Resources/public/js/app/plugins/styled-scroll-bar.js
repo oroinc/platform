@@ -1,19 +1,19 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var NAME = 'styledScrollBar';
-    var DATA_KEY = 'oro.' + NAME;
+    const NAME = 'styledScrollBar';
+    const DATA_KEY = 'oro.' + NAME;
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseClass = require('oroui/js/base-class');
-    var error = require('oroui/js/error');
-    var OverlayScrollBars = require('overlayScrollbars');
-    var config = require('module').config();
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseClass = require('oroui/js/base-class');
+    const error = require('oroui/js/error');
+    const OverlayScrollBars = require('overlayScrollbars');
+    const config = require('module-config').default(module.id);
 
-    var allowedConfig = _.omit(config, 'callbacks');
+    const allowedConfig = _.omit(config, 'callbacks');
 
-    var ScrollBar = BaseClass.extend({
+    const ScrollBar = BaseClass.extend({
         scrollBar: null,
 
         /**
@@ -25,7 +25,7 @@ define(function(require) {
          * @inheritDoc
          */
         listen: function() {
-            var listenTo = {};
+            const listenTo = {};
 
             listenTo['layout:reposition mediator'] = _.debounce(this.update.bind(this),
                 this.options('autoUpdateInterval'));
@@ -37,7 +37,7 @@ define(function(require) {
          */
         constructor: function ScrollBar(options, element) {
             this.element = element;
-            ScrollBar.__super__.constructor.apply(this, arguments);
+            ScrollBar.__super__.constructor.call(this, options, element);
         },
 
         /**
@@ -71,18 +71,18 @@ define(function(require) {
          * Proxy for OverlayScrollBars.options method
          * @returns {Object|undefined}
          */
-        options: function() {
-            return this.scrollBar.options.apply(this.scrollBar, arguments);
+        options: function(...args) {
+            return this.scrollBar.options(...args);
         },
 
         /**
          * Proxy for OverlayScrollBars.update method
          */
-        update: function() {
+        update: function(...args) {
             if (this.disposed) {
                 return;
             }
-            this.scrollBar.update.apply(this.scrollBar, arguments);
+            this.scrollBar.update(...args);
         },
 
         /**
@@ -96,8 +96,8 @@ define(function(require) {
          * Proxy for OverlayScrollBars.scroll method
          * @returns {Object|undefined}
          */
-        scroll: function() {
-            return this.scrollBar.scroll.apply(this.scrollBar, arguments);
+        scroll: function(...args) {
+            return this.scrollBar.scroll(...args);
         },
 
         /**
@@ -132,14 +132,13 @@ define(function(require) {
         }
     });
 
-    $.fn[NAME] = function(options) {
-        var args = _.rest(arguments);
-        var isMethodCall = typeof options === 'string';
-        var response = this;
+    $.fn[NAME] = function(options, ...args) {
+        const isMethodCall = typeof options === 'string';
+        let response = this;
 
         this.each(function(index) {
-            var $element = $(this);
-            var instance = $element.data(DATA_KEY);
+            const $element = $(this);
+            const instance = $element.data(DATA_KEY);
 
             if (!instance) {
                 $element.data(DATA_KEY, new ScrollBar(options, this));
@@ -157,7 +156,7 @@ define(function(require) {
                     return false;
                 }
 
-                var result = instance[options].apply(instance, args);
+                const result = instance[options](...args);
 
                 if (result !== void 0 && index === 0) {
                     response = result;

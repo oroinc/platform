@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var AbstractAction;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var routing = require('routing');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var Modal = require('oroui/js/modal');
-    var ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
-    var Chaplin = require('chaplin');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const routing = require('routing');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const tools = require('oroui/js/tools');
+    const Modal = require('oroui/js/modal');
+    const ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
+    const Chaplin = require('chaplin');
 
     /**
      * Abstract action class. Subclasses should override execute method which is invoked when action is running.
@@ -24,7 +24,7 @@ define(function(require) {
      * @class   oro.datagrid.action.AbstractAction
      * @extends Backbone.View
      */
-    AbstractAction = Backbone.View.extend({
+    const AbstractAction = Backbone.View.extend({
         /** @property {Function} */
         launcher: ActionLauncher,
 
@@ -94,8 +94,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function AbstractAction() {
-            AbstractAction.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractAction(options) {
+            AbstractAction.__super__.constructor.call(this, options);
         },
 
         /**
@@ -126,7 +126,7 @@ define(function(require) {
                 action: this
             });
 
-            AbstractAction.__super__.initialize.apply(this, arguments);
+            AbstractAction.__super__.initialize.call(this, options);
         },
 
         /**
@@ -145,7 +145,7 @@ define(function(require) {
                 delete this.confirmModal;
             }
 
-            AbstractAction.__super__.dispose.apply(this, arguments);
+            AbstractAction.__super__.dispose.call(this);
         },
 
         /**
@@ -155,13 +155,12 @@ define(function(require) {
          * @return {orodatagrid.datagrid.ActionLauncher}
          */
         createLauncher: function(options) {
-            var launcher;
             options = options || {};
             if (_.isUndefined(options.icon) && !_.isUndefined(this.icon)) {
                 options.icon = this.icon;
             }
             _.defaults(options, this.launcherOptions);
-            launcher = new (this.launcher)(options);
+            const launcher = new (this.launcher)(options);
             this.launcherInstanse = launcher;
             // schedule dispose
             this.subviews.push(launcher);
@@ -211,9 +210,9 @@ define(function(require) {
          * @protected
          */
         _getDefaultMessages: function() {
-            var defaultMessages = Chaplin.utils.getAllPropertyVersions(this, 'defaultMessages');
+            let defaultMessages = Chaplin.utils.getAllPropertyVersions(this, 'defaultMessages');
             defaultMessages.unshift({});
-            defaultMessages = _.extend.apply(_, defaultMessages);
+            defaultMessages = _.extend(...defaultMessages);
             return defaultMessages;
         },
 
@@ -232,17 +231,17 @@ define(function(require) {
             this.frontend_options = this.frontend_options || {};
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
-            require(['oro/' + this.frontend_handle + '-widget'], _.bind(function(WidgetType) {
-                var widget = new WidgetType(this.frontend_options);
+            loadModules('oro/' + this.frontend_handle + '-widget', function(WidgetType) {
+                const widget = new WidgetType(this.frontend_options);
                 widget.render();
-            }, this));
+            }.bind(this));
         },
 
         _handleRedirect: function() {
             if (this.dispatched) {
                 return;
             }
-            var url = this.getLinkWithParameters();
+            const url = this.getLinkWithParameters();
             mediator.execute('redirectTo', {url: url}, {redirect: true});
         },
 
@@ -283,9 +282,9 @@ define(function(require) {
         },
 
         _showAjaxSuccessMessage: function(data) {
-            var defaultMessage = data.successful ? this.messages.success : this.messages.error;
-            var type = data.successful ? 'success' : 'error';
-            var message = data.message || __(defaultMessage);
+            const defaultMessage = data.successful ? this.messages.success : this.messages.error;
+            const type = data.successful ? 'success' : 'error';
+            const message = data.message || __(defaultMessage);
             if (message) {
                 mediator.execute('showFlashMessage', type, message);
             }
@@ -303,8 +302,8 @@ define(function(require) {
             }
 
             // Add original query parameters as them may be valuable for backend logic
-            var originalUrl = this.datagrid.collection.url;
-            var originalRequestParameters = tools.unpackFromQueryString(
+            const originalUrl = this.datagrid.collection.url;
+            const originalRequestParameters = tools.unpackFromQueryString(
                 originalUrl.substring(originalUrl.indexOf('?'), originalUrl.length)
             );
 
@@ -358,7 +357,7 @@ define(function(require) {
         },
 
         getConfirmDialogOptions: function() {
-            var options = {
+            const options = {
                 title: __(this.messages.confirm_title),
                 content: this.getConfirmContentMessage(),
                 okText: __(this.messages.confirm_ok),

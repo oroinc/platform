@@ -4,22 +4,24 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain as BaseMappingDriverChain;
 
+/**
+ * Adds a memory cache for the result value of isTransient() method.
+ */
 class MappingDriverChain extends BaseMappingDriverChain
 {
     /** @var bool[] */
-    protected $isTransientCache = [];
+    private $isTransientCache = [];
 
     /**
      * {@inheritdoc}
      */
     public function isTransient($className)
     {
-        if (array_key_exists($className, $this->isTransientCache)) {
+        if (isset($this->isTransientCache[$className])) {
             return $this->isTransientCache[$className];
         }
 
         $result = parent::isTransient($className);
-
         $this->isTransientCache[$className] = $result;
 
         return $result;

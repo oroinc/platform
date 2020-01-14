@@ -6,6 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -13,15 +14,17 @@ use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Persists supplied data to the database within a transaction
+ */
 class PersistentBatchWriter implements
     ItemWriterInterface,
     StepExecutionAwareInterface,
     StepExecutionRestoreInterface
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EventDispatcherInterface */
@@ -40,13 +43,13 @@ class PersistentBatchWriter implements
     protected $previousStepExecution;
 
     /**
-     * @param RegistryInterface        $registry
+     * @param ManagerRegistry          $registry
      * @param EventDispatcherInterface $eventDispatcher
      * @param ContextRegistry          $contextRegistry
      * @param LoggerInterface          $logger
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
         ContextRegistry $contextRegistry,
         LoggerInterface $logger
@@ -91,10 +94,7 @@ class PersistentBatchWriter implements
 
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
-                $importContext->setValue(
-                    'error_entries_count',
-                    (int)$importContext->getValue('error_entries_count') + count($items)
-                );
+                $importContext->incrementErrorEntriesCount(count($items));
 
                 $this->logger->warning($event->getWarning());
 

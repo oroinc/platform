@@ -13,20 +13,12 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * This command load fixtures
- *
- * @package Oro\Bundle\MigrationBundle\Command
+ * The CLI command to load data fixtures.
  */
 class LoadDataFixturesCommand extends Command
 {
     const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
     const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
-
-    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
-    const MAIN_FIXTURES_PATH = 'Migrations/Data/ORM';
-
-    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
-    const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
 
     /** @var string */
     protected static $defaultName = 'oro:migration:data:load';

@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
@@ -28,14 +29,23 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
+
     protected function setUp()
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $this->context = $this->createMock(ContextInterface::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
-        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
+        $this->formType = new OroRichTextType(
+            $this->configManager,
+            $this->htmlTagProvider,
+            $this->context,
+            $this->htmlTagHelper
+        );
         $this->formType->setAssetHelper($this->assetsHelper);
         parent::setUp();
     }
@@ -75,8 +85,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      * @dataProvider optionsDataProvider
      * @param array $options
      * @param bool $globalEnable
-     * @param bool $isExtendedPurification
-     * @param bool $isPurificationNeeded
      * @param array $viewData
      * @param array $elements
      * @param bool $expectedEnable
@@ -85,8 +93,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function testBuildForm(
         array $options,
         $globalEnable,
-        $isExtendedPurification,
-        $isPurificationNeeded,
         array $viewData,
         array $elements,
         $expectedEnable = true,
@@ -116,12 +122,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         $this->htmlTagProvider->expects($this->once())
             ->method('getAllowedElements')
             ->willReturn($elements);
-        $this->htmlTagProvider->expects($this->once())
-            ->method('isExtendedPurification')
-            ->willReturn($isExtendedPurification);
-        $this->htmlTagProvider->expects($this->exactly(2))
-            ->method('isPurificationNeeded')
-            ->willReturn($isPurificationNeeded);
         $this->htmlTagProvider->expects($this->any())
             ->method('getUriSchemes')
             ->willReturn(['http' => true, 'https' => true]);
@@ -138,7 +138,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         foreach ($viewData as $key => $value) {
             $this->assertArrayHasKey($key, $view->vars);
             $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
-            
+
             $expected = json_decode($value['data-page-component-options'], true);
             ksort($expected);
 
@@ -156,8 +156,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider()
     {
         $toolbar = [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-             | fullscreen'
+            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ];
         $elements = [
             '@[style|class]',
@@ -193,8 +193,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => 'bundles/oroform/css/tinymce',
+                'content_css' => 'build/css/tinymce/wysiwyg-editor.css',
+                'skin_url' => 'build/css/tinymce',
                 'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
                 'toolbar' => $toolbar,
                 'valid_elements' => '',
@@ -206,57 +206,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'cache_suffix' => '',
                 'document_base_url' => '/prefix//',
                 'paste_data_images' => false,
-            ]
-        ];
-
-        $extendedAttrs = [
-            'data-page-component-module' => 'oroui/js/app/components/view-component',
-            'data-page-component-options' => [
-                'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => 'bundles/oroform/css/tinymce',
-                'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
-                'toolbar' => $toolbar,
-                'valid_elements' => '',
-                'menubar' => false,
-                'statusbar' => false,
-                'relative_urls' => false,
-                'remove_script_host' => false,
-                'convert_urls' => true,
-                'cache_suffix' => '',
-                'document_base_url' => '/prefix//',
-                'paste_data_images' => false,
-                'valid_children' => '+body[style]',
-                'inline_styles' => true,
-            ]
-        ];
-
-        $disabledPurificationAttrs = [
-            'data-page-component-module' => 'oroui/js/app/components/view-component',
-            'data-page-component-options' => [
-                'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => 'bundles/oroform/css/tinymce',
-                'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
-                'toolbar' => $toolbar,
-                'valid_elements' => '',
-                'menubar' => false,
-                'statusbar' => false,
-                'relative_urls' => false,
-                'remove_script_host' => false,
-                'cache_suffix' => '',
-                'document_base_url' => '/prefix//',
-                'paste_data_images' => false,
-                'verify_html' => false,
-                'cleanup_on_startup' => false,
-                'trim_span_elements' => false,
-                'cleanup' => false,
-                'convert_urls' => false,
-                'force_br_newlines' => false,
-                'force_p_newlines' => false,
-                'forced_root_block' => '',
-                'valid_children' => '+body[style]',
-                'inline_styles' => true,
             ]
         ];
 
@@ -264,38 +213,14 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'default options options' => [
                 [],
                 true,
-                false,
-                true,
                 [
                     'attr' => $defaultAttrs
-                ],
-                [],
-            ],
-            'default options, extended purification' => [
-                [],
-                true,
-                true,
-                true,
-                [
-                    'attr' => $extendedAttrs
-                ],
-                [],
-            ],
-            'default options, purification disabled' => [
-                [],
-                true,
-                true,
-                false,
-                [
-                    'attr' => $disabledPurificationAttrs
                 ],
                 [],
             ],
             'default options global disabled' => [
                 [],
                 false,
-                false,
-                true,
                 [
                     'attr' => $defaultAttrs
                 ],
@@ -304,8 +229,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ],
             'global enabled local disabled' => [
                 ['wysiwyg_enabled' => false],
-                true,
-                false,
                 true,
                 [
                     'attr' => $defaultAttrs
@@ -322,8 +245,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                         'toolbar_type' => OroRichTextType::TOOLBAR_SMALL
                     ]
                 ],
-                true,
-                false,
                 true,
                 [
                     'attr' => [
@@ -354,8 +275,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                     ]
                 ],
                 true,
-                false,
-                true,
                 [
                     'attr' => [
                         'data-page-component-module' => 'oroui/js/app/components/view-component',
@@ -369,8 +288,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
+                                'content_css' => 'subfolder/build/css/tinymce/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/build/css/tinymce'
                             ]
                         )
                     ]

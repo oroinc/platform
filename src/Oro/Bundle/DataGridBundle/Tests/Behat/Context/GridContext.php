@@ -1429,7 +1429,24 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function clickOnRow($content, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $grid->getRowByContent($content)->click();
+        //Spin prevents misclick while grid is rerendered dynamically
+        $result = $this->spin(function () use ($grid, $content) {
+            try {
+                $grid->getRowByContent($content)->click();
+            } catch (\Exception $exception) {
+                return null;
+            }
+
+            return true;
+        });
+
+        if ($result === null) {
+            $row = $grid->getRowByContent($content);
+            self::assertNotNull($row, sprintf('Row %s is not found', $content));
+
+            $row->click();
+        }
+
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
     }
@@ -1898,6 +1915,7 @@ TEXT;
 
         // Actually element "GridFilterManager" points to all filter dropdowns, so we have to find out
         // which one is the actual filter manager dropdown.
+        /** @var GridFilterManager[]|null $filterDropdowns */
         $filterDropdowns = $this->spin(function () use ($grid) {
             $elements = $grid->getElements($grid->getMappedChildElementName('GridFilterManager'));
 
@@ -1906,10 +1924,9 @@ TEXT;
             });
         }, 3);
 
+        self::assertNotNull($filterDropdowns, 'Filter manager dropdown was not found');
         $filterManager = array_shift($filterDropdowns);
-        self::assertNotNull($filterManager, 'Filter manager dropdown was not found');
 
-        /** @var GridFilterManager $filterManager */
         $filterManager->checkColumnFilter($filter);
 
         $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
@@ -2238,7 +2255,11 @@ TEXT;
      */
     private function getGridColumnManager($grid)
     {
-        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        /** @var $colunmManager GridColumnManager $colunmManager */
+        $colunmManager =  $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        $colunmManager->setGrid($grid);
+
+        return $colunmManager;
     }
 
     /**

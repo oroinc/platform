@@ -1,17 +1,16 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var FlashMessageView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var messenger = require('oroui/js/messenger');
-    var _ = require('underscore');
-    var config = require('module').config();
+    const BaseView = require('oroui/js/app/views/base/view');
+    const messenger = require('oroui/js/messenger');
+    const _ = require('underscore');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
-        template: require('tpl!oroui/templates/message-item.html') // default admin template
+        template: require('tpl-loader!oroui/templates/message-item.html') // default admin template
     }, config);
 
-    FlashMessageView = BaseView.extend({
+    const FlashMessageView = BaseView.extend({
         autoRender: true,
 
         template: config.temlpate,
@@ -23,26 +22,26 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlashMessageView() {
-            FlashMessageView.__super__.constructor.apply(this, arguments);
+        constructor: function FlashMessageView(options) {
+            FlashMessageView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             if (this.initializeMessenger) {
                 this._initializeMessenger();
             }
 
-            return FlashMessageView.__super__.initialize.apply(this, arguments);
+            return FlashMessageView.__super__.initialize.call(this, options);
         },
 
         /**
          * Initialize messenger
          */
         _initializeMessenger: function() {
-            var options = {
+            const options = {
                 container: this.container
             };
 
@@ -63,7 +62,7 @@ define(function(require) {
 
             this.messages = [];
 
-            return FlashMessageView.__super__.render.apply(this, arguments);
+            return FlashMessageView.__super__.render.call(this);
         }
     });
 

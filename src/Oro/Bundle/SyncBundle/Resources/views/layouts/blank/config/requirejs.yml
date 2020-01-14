@@ -1,7 +1,0 @@
-config:
-    paths:
-        'orosync/js/content/grid-builder': 'bundles/orosync/js/content/grid-builder.js'
-        'orosync/js/content-manager': 'bundles/orosync/js/content-manager.js'
-        'orosync/js/app/modules/content-manager-module': 'bundles/orosync/js/app/modules/content-manager-module.js'
-    appmodules:
-        - orosync/js/app/modules/content-manager-module

@@ -1,27 +1,28 @@
 services:
     oro_workflow.exclusion_provider:
-        class: '%oro_entity.exclusion_provider.chain.class%'
+        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         calls:
             - [addProvider, ['@oro_entity.exclusion_provider']]
 
     oro_workflow.entity_provider:
-        class: '%oro_entity.entity_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityProvider
         parent: oro_entity.entity_provider.abstract
+        lazy: true
         calls:
             - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
 
     oro_workflow.entity_field_provider:
         class: 'Oro\Bundle\WorkflowBundle\Field\FieldProvider'
         parent: oro_entity.entity_field_provider.abstract
+        lazy: true
         calls:
             - [setEntityProvider, ['@oro_workflow.entity_provider']]
             - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
 
     oro_workflow.entity_field_list_provider:
-        class: '%oro_entity.entity_field_list_provider.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
         public: true
         arguments:
             - '@oro_workflow.entity_field_provider'
             - '@oro_workflow.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'

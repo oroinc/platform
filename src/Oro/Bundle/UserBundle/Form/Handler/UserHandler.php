@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
@@ -36,14 +36,14 @@ class UserHandler extends AbstractUserHandler
     /** @var ConfigManager */
     protected $userConfigManager;
 
-    /** @var TemplateEmailManager */
-    private $templateEmailManager;
+    /** @var EmailTemplateManager */
+    private $emailTemplateManager;
 
     /**
      * @param FormInterface $form
      * @param RequestStack $requestStack
      * @param UserManager $manager
-     * @param TemplateEmailManager|null $templateEmailManager
+     * @param EmailTemplateManager|null $emailTemplateManager
      * @param ConfigManager $userConfigManager
      * @param FlashBagInterface $flashBag
      * @param TranslatorInterface $translator
@@ -53,7 +53,7 @@ class UserHandler extends AbstractUserHandler
         FormInterface $form,
         RequestStack $requestStack,
         UserManager $manager,
-        TemplateEmailManager $templateEmailManager = null,
+        EmailTemplateManager $emailTemplateManager = null,
         ConfigManager $userConfigManager = null,
         FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
@@ -61,7 +61,7 @@ class UserHandler extends AbstractUserHandler
     ) {
         parent::__construct($form, $requestStack, $manager);
 
-        $this->templateEmailManager = $templateEmailManager;
+        $this->emailTemplateManager = $emailTemplateManager;
         $this->userConfigManager = $userConfigManager;
         $this->flashBag = $flashBag;
         $this->translator = $translator;
@@ -158,13 +158,13 @@ class UserHandler extends AbstractUserHandler
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
-        if (in_array(null, [$this->userConfigManager, $this->templateEmailManager], true)) {
+        if (in_array(null, [$this->userConfigManager, $this->emailTemplateManager], true)) {
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
         $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
         $senderName = $this->userConfigManager->get('oro_notification.email_notification_sender_name');
 
-        $this->templateEmailManager->sendTemplateEmail(
+        $this->emailTemplateManager->sendTemplateEmail(
             From::emailAddress($senderEmail, $senderName),
             [$user],
             new EmailTemplateCriteria(self::INVITE_USER_TEMPLATE, User::class),

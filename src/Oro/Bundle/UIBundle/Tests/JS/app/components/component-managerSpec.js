@@ -2,11 +2,9 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
-    var ComponentManager = require('oroui/js/app/components/component-manager');
-    var requirejsExposure = require('requirejs-exposure');
-    var exposure = requirejsExposure.disclose('oroui/js/app/components/component-manager');
-    var componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
+    const $ = require('jquery');
+    const componentManagerModuleInjector = require('inject-loader!oroui/js/app/components/component-manager');
+    const componentsLoadModule = require('../../Fixture/app/components/component-manager/components-loader-mock');
     require('oroui/js/app/modules/component-shortcuts-module');
     require('orofrontend/js/app/modules/component-shortcuts-module');
 
@@ -15,6 +13,14 @@ define(function(require) {
     }
 
     describe('Component Manager', function() {
+        let ComponentManager;
+
+        beforeEach(function() {
+            ComponentManager = componentManagerModuleInjector({
+                'oroui/js/app/services/load-modules': jasmine.createSpy().and.callFake(componentsLoadModule)
+            });
+        });
+
         it('Initialize widget placed inside own separated layout', function() {
             window.setFixtures([
                 '<div id="container" data-layout="separate">',
@@ -24,8 +30,8 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
 
             expect(elements.length).toEqual(0);
         });
@@ -37,9 +43,9 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
-            var $element = $(elements[0]);
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
+            const $element = $(elements[0]);
 
             expect(elements.length).toEqual(1);
             expect($element.data()).toEqual({
@@ -57,9 +63,9 @@ define(function(require) {
                 '</div>'
             ].join(''));
 
-            var manager = new ComponentManager($('#container'));
-            var elements = manager._collectElements();
-            var $element = $(elements[0]);
+            const manager = new ComponentManager($('#container'));
+            const elements = manager._collectElements();
+            const $element = $(elements[0]);
 
             expect(elements.length).toEqual(1);
             expect($element.data()).toEqual({
@@ -72,19 +78,8 @@ define(function(require) {
         });
 
         describe('required sibling components', function() {
-            var tools = exposure.retrieve('tools');
-            var originalLoadModules = tools.loadModules;
-
-            beforeEach(function() {
-                tools.loadModules = jasmine.createSpy().and.callFake(componentsLoadModule);
-            });
-
-            afterEach(function() {
-                exposure.retrieve('tools').loadModules = originalLoadModules;
-            });
-
             describe('override required componentName with options', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
@@ -110,7 +105,7 @@ define(function(require) {
             });
 
             describe('remove dependency over component extend', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
@@ -128,7 +123,7 @@ define(function(require) {
             });
 
             describe('complex dependencies', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
@@ -154,7 +149,7 @@ define(function(require) {
             });
 
             describe('missing required sibling component', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
@@ -172,7 +167,7 @@ define(function(require) {
             });
 
             describe('options parameter is not able to remove dependency', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
@@ -197,7 +192,7 @@ define(function(require) {
             });
 
             describe('circular dependency', function() {
-                var manager;
+                let manager;
                 beforeEach(function(done) {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',

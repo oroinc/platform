@@ -224,6 +224,7 @@ class RunnerTest extends WebTestCase
 
     public function testShouldRunUpdatePlatformCommandWithoutErrors()
     {
+        $this->markTestSkipped('Test will be removed in scope of BAP-18764');
         $logger = $this->createLoggerMock();
         $logger->expects($this->exactly(2))
             ->method('info');

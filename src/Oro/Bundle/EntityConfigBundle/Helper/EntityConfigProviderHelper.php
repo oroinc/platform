@@ -24,7 +24,7 @@ class EntityConfigProviderHelper
     }
 
     /**
-     * Return configured layout actions and requirejs modules
+     * Return configured layout actions and js modules
      *
      * @param  EntityConfigModel $entity
      * @param null $displayOnly Param used to bind layout action with certain flag. If it is passed only actions
@@ -34,7 +34,7 @@ class EntityConfigProviderHelper
     public function getLayoutParams(EntityConfigModel $entity, $displayOnly = null)
     {
         $actions = [];
-        $requireJsModules = [];
+        $jsModules = [];
 
         $providers = $this->configManager->getProviders();
         /** @var ConfigProvider $provider */
@@ -50,10 +50,10 @@ class EntityConfigProviderHelper
                 }
             }
 
-            $requireJsModules = array_merge($requireJsModules, $propertyConfig->getRequireJsModules());
+            $jsModules = array_merge($jsModules, $propertyConfig->getJsModules());
         }
 
-        return [$actions, $requireJsModules];
+        return [$actions, $jsModules];
     }
 
     /**

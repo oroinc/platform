@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var Select2AclUserMultiselectComponent;
-    var Select2AclUserAutocompleteComponent = require('oro/select2-acl-user-autocomplete-component');
+    const Select2AclUserAutocompleteComponent = require('oro/select2-acl-user-autocomplete-component');
 
-    Select2AclUserMultiselectComponent = Select2AclUserAutocompleteComponent.extend({
+    const Select2AclUserMultiselectComponent = Select2AclUserAutocompleteComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function Select2AclUserMultiselectComponent() {
-            Select2AclUserMultiselectComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2AclUserMultiselectComponent(options) {
+            Select2AclUserMultiselectComponent.__super__.constructor.call(this, options);
         },
 
         preConfig: function(config) {

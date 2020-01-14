@@ -31,9 +31,4 @@ class TitleSerializedContentProviderTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue('title_content'));
         $this->assertEquals('title_content', $this->provider->getContent());
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('titleSerialized', $this->provider->getName());
-    }
 }

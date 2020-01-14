@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'autobahn'
-], function($, _, Backbone, ab) {
+define(function(require) {
     'use strict';
 
-    var defaultOptions = {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const ab = require('autobahn');
+
+    const defaultOptions = {
         port: 80,
         debug: false,
         path: ''
@@ -16,7 +16,7 @@ define([
      * Wraps callback in order to make it compatible with autobahn event callback
      */
     function wrapCallback(callback) {
-        var wrapper = function(channel, attributes) {
+        const wrapper = function(channel, attributes) {
             callback(attributes);
         };
         wrapper.origCallback = callback;
@@ -75,8 +75,8 @@ define([
                 $.ajax(this.options.syncTicketUrl, {
                     method: 'POST',
                     success: (function(response) {
-                        var protocol = this.options.secure ? 'wss' : 'ws';
-                        var wsuri = [
+                        const protocol = this.options.secure ? 'wss' : 'ws';
+                        let wsuri = [
                             protocol,
                             '://',
                             this.options.host,
@@ -119,7 +119,7 @@ define([
          *      if was no function corresponded then removes all callbacks for a channel
          */
         unsubscribe: function(channel, callback) {
-            var callbacks = this.channels[channel];
+            let callbacks = this.channels[channel];
             if (!callbacks) {
                 return;
             }
@@ -166,7 +166,7 @@ define([
             if (code !== ab.CONNECTION_CLOSED) {
                 this.trigger('connection_lost', _.extend({code: code}, details));
 
-                var that = this;
+                const that = this;
                 window.setTimeout(function() {
                     that.connect();
                 }, this.retryCount * this.options.retryDelay);

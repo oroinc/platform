@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderInterface;
 use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {

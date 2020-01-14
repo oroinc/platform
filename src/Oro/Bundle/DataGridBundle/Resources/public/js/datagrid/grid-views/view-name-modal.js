@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var __ = require('orotranslation/js/translator');
-    var Modal = require('oroui/js/modal');
-    var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
-    var nameErrorTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html');
+    const __ = require('orotranslation/js/translator');
+    const Modal = require('oroui/js/modal');
+    const contentTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-modal.html');
+    const nameErrorTemplate = require('tpl-loader!orodatagrid/templates/datagrid/view-name-error-modal.html');
 
-    var ViewNameModal = Modal.extend({
+    const ViewNameModal = Modal.extend({
         contentTemplate: contentTemplate,
 
         nameErrorTemplate: nameErrorTemplate,
@@ -21,8 +21,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ViewNameModal() {
-            ViewNameModal.__super__.constructor.apply(this, arguments);
+        constructor: function ViewNameModal(options) {
+            ViewNameModal.__super__.constructor.call(this, options);
         },
 
         /**

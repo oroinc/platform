@@ -28,6 +28,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringStartsWith('ROLE_FOO', $role->getRole());
         $this->assertEquals(Role::PREFIX_ROLE, $role->getPrefix());
+        $this->assertStringStartsWith(Role::PREFIX_ROLE, (string)$role);
     }
 
     public function testLabel()
@@ -40,7 +41,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $role->setLabel($label);
 
         $this->assertEquals($label, $role->getLabel());
-        $this->assertEquals($label, (string)$role);
+        $this->assertNotEquals($label, (string)$role);
     }
 
     public function testClone()

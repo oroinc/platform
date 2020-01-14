@@ -1,19 +1,19 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var cssVars = require('css-vars-ponyfill');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const cssVars = require('css-vars-ponyfill');
+    let config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         onlyLegacy: false,
         preserveStatic: false,
         updateDOM: false,
         updateURLs: false
     });
 
-    var cssVariablesManager = {
+    const cssVariablesManager = {
         /**
          * @property {Object}
          */
@@ -29,7 +29,8 @@ define(function(require) {
          * @returns {(target?: any) => JQueryPromise<T>}
          */
         initialize: function() {
-            this.getComputedVariables();
+            this.createHandlers();
+            this.getComputedVariables(document.head, this.deferred);
 
             cssVars(_.extend(config, {
                 onComplete: _.bind(function(cssText, styleNodes, cssVariables) {
@@ -59,32 +60,59 @@ define(function(require) {
         },
 
         /**
+         * Create mediator methods
+         */
+        createHandlers: function() {
+            mediator.setHandler('fetch:head:computedVars', this.getHeadBreakpoints, this);
+        },
+
+        /**
          * Get hot computed variables
          */
-        getComputedVariables: function() {
-            var regexp = /(--[\w-]*:)/g;
-            var regexpVal = /:\s?[\w\d-(): ]*/g;
-            var content = window.getComputedStyle(document.head, ':before').getPropertyValue('content');
+        getComputedVariables: function(context, defer) {
+            if (!context) {
+                context = document.head;
+            }
+
+            const regexp = /(--[\w-]*:)/g;
+            const regexpVal = /:\s?[\w\d-(): ]*/g;
+            let content = window.getComputedStyle(context, ':before').getPropertyValue('content');
+            const breakpoint = {};
 
             if (content === 'none') {
-                this.deferred.resolve(this.cssVariables);
-                mediator.trigger('css:breakpoints:fetched', this.cssVariables);
+                mediator.trigger('css:breakpoints:fetched', breakpoint);
+                if (defer) {
+                    defer.resolve(breakpoint);
+                }
                 return;
             }
 
             content = content.split('|');
             content.forEach(_.bind(function(value, i) {
-                var name = value.match(regexp);
-                var varVal = value.match(regexpVal);
+                const name = value.match(regexp);
+                const varVal = value.match(regexpVal);
                 if (name && varVal) {
-                    this.cssVariables[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
+                    breakpoint[name[0].slice(0, -1)] = varVal[0].substr(1).trim();
                 }
 
                 if (i === content.length - 1) {
-                    this.deferred.resolve(this.cssVariables);
-                    mediator.trigger('css:breakpoints:fetched', this.cssVariables);
+                    if (defer) {
+                        defer.resolve(breakpoint);
+                    }
+                    mediator.trigger('css:breakpoints:fetched', breakpoint);
                 }
             }, this));
+
+            return breakpoint;
+        },
+
+        /**
+         * Callback mediator handler
+         * @param context
+         * @returns {*}
+         */
+        getHeadBreakpoints: function(context) {
+            return this.getComputedVariables(context);
         }
     };
 

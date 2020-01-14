@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var Backbone = require('backbone');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const Backbone = require('backbone');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailNotificationView = BaseView.extend({
+    const EmailNotificationView = BaseView.extend({
         tagName: 'li',
 
         attributes: {
@@ -32,12 +31,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailNotificationView() {
-            EmailNotificationView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationView(options) {
+            EmailNotificationView.__super__.constructor.call(this, options);
         },
 
         render: function() {
-            EmailNotificationView.__super__.render.apply(this, arguments);
+            EmailNotificationView.__super__.render.call(this);
             this.$el.toggleClass('highlight', !this.model.get('seen'));
             this.initLayout();
         },
@@ -51,16 +50,16 @@ define(function(require) {
         },
 
         onClickOpenEmail: function() {
-            var url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
+            const url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
             this.model.set({seen: true});
             mediator.execute('redirectTo', {url: url});
         },
 
         onClickReadStatus: function(e) {
             e.stopPropagation();
-            var model = this.model;
-            var status = model.get('seen');
-            var url = routing.generate('oro_email_mark_seen', {
+            const model = this.model;
+            const status = model.get('seen');
+            const url = routing.generate('oro_email_mark_seen', {
                 id: model.get('id'),
                 status: status ? 0 : 1,
                 checkThread: 0

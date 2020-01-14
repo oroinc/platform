@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var ActivityConditionView;
-    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
-    var CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
-    var ChoiceFilter = require('oro/filter/choice-filter');
-    var MultiSelectFilter = require('oro/filter/multiselect-filter');
-    var activityConditionTemplate = require('tpl!oroactivitylist/templates/activity-condition.html');
+    const choiceTemplate = require('tpl-loader!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    const CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
+    const ChoiceFilter = require('oro/filter/choice-filter');
+    const MultiSelectFilter = require('oro/filter/multiselect-filter');
+    const activityConditionTemplate = require('tpl-loader!oroactivitylist/templates/activity-condition.html');
 
-    ActivityConditionView = FieldConditionView.extend({
+    const ActivityConditionView = FieldConditionView.extend({
         TYPE_CHOICE_ENTITY: '$activity',
         template: activityConditionTemplate,
         choiceSelectionTemplate: '<span class="entity-field-path"><span></span><b><%=text %></b></span>',
@@ -30,7 +29,7 @@ define(function(require) {
         }],
 
         getDefaultOptions: function() {
-            var defaultOptions = ActivityConditionView.__super__.getDefaultOptions.call(this);
+            const defaultOptions = ActivityConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {
                 listOptions: {},
                 filters: {},
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityConditionView() {
-            ActivityConditionView.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityConditionView(options) {
+            ActivityConditionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -61,7 +60,7 @@ define(function(require) {
         onChoiceInputReady: function(provider) {
             ActivityConditionView.__super__.onChoiceInputReady.call(this, provider);
 
-            var data = $.extend(true, {
+            const data = $.extend(true, {
                 criterion: {
                     data: {
                         filterType: 'hasActivity',
@@ -74,7 +73,7 @@ define(function(require) {
             this._attachActivityFilter(data.criterion.data.filterType);
             this._attachTypeFilter(this.options.listOptions, data.criterion.data.activityType);
 
-            var filterOptions = _.findWhere(this.options.filters, {
+            const filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
             });
             if (!filterOptions) {
@@ -100,7 +99,7 @@ define(function(require) {
         },
 
         _attachTypeFilter: function(listOptions, activityType) {
-            var typeChoices = _.mapObject(listOptions, _.property('label'));
+            const typeChoices = _.mapObject(listOptions, _.property('label'));
 
             this.typeFilter = new MultiSelectFilter({
                 showLabel: false,
@@ -116,8 +115,8 @@ define(function(require) {
 
         _onTypeFilterUpdate: function() {
             this._onUpdate();
-            var oldEntity = this.$choiceInput.data('entity');
-            var newEntity = this.TYPE_CHOICE_ENTITY;
+            const oldEntity = this.$choiceInput.data('entity');
+            const newEntity = this.TYPE_CHOICE_ENTITY;
 
             if (oldEntity !== newEntity) {
                 this.subview('choice-input').setValue('');
@@ -133,8 +132,8 @@ define(function(require) {
                 return results;
             }
 
-            var fields = _.first(results).children;
-            var activities = _.filter(fields, function(item) {
+            let fields = _.first(results).children;
+            const activities = _.filter(fields, function(item) {
                 return item.id[0] === '$';
             });
             fields = _.reject(fields, function(item) {
@@ -167,7 +166,7 @@ define(function(require) {
         },
 
         _getFilterCriterion: function() {
-            var filter = {
+            const filter = {
                 filter: this.filter.name,
                 data: this.filter.getValue()
             };
@@ -189,14 +188,14 @@ define(function(require) {
         },
 
         _getInitialChoiceInputValue: function() {
-            var criterion = _.result(this.getValue(), 'criterion');
+            const criterion = _.result(this.getValue(), 'criterion');
             if (criterion) {
                 return _.result(criterion.data, 'activityFieldName');
             }
         },
 
         _getFilterValue: function() {
-            var criterion = _.result(this.getValue(), 'criterion');
+            const criterion = _.result(this.getValue(), 'criterion');
             if (criterion && criterion.data) {
                 return _.result(criterion.data.filter, 'data');
             }
@@ -209,7 +208,7 @@ define(function(require) {
         },
 
         _collectValue: function() {
-            var value = ActivityConditionView.__super__._collectValue.call(this);
+            const value = ActivityConditionView.__super__._collectValue.call(this);
             return _.omit(value, 'columnName');
         },
 
@@ -222,7 +221,7 @@ define(function(require) {
         },
 
         initChoiceInputView: function() {
-            var fieldChoiceView = new CustomsetFieldChoiceView({
+            const fieldChoiceView = new CustomsetFieldChoiceView({
                 autoRender: true,
                 el: this.$choiceInput,
                 select2: _.extend({}, this.options.fieldChoice.select2, {

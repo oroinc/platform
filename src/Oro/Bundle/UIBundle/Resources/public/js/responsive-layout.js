@@ -13,35 +13,35 @@ define(function(require) {
      * Module just adds css classes, so you can define you style for each case
      */
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const tools = require('oroui/js/tools');
+    const mediator = require('oroui/js/mediator');
 
-    var SCROLLBAR_WIDTH = scrollHelper.scrollbarWidth() || 17;
-    var DESKTOP_SERVICE_AREA = 80 + 32 + 24 * 2 + SCROLLBAR_WIDTH; // menu, sidebar, content paddings, scollbar widths;
-    var MOBILE_SERVICE_AREA = 16 * 2; // content paddings;
-    var SERVICE_AREA = tools.isMobile() ? MOBILE_SERVICE_AREA : DESKTOP_SERVICE_AREA;
+    const SCROLLBAR_WIDTH = scrollHelper.scrollbarWidth() || 17;
+    const DESKTOP_SERVICE_AREA = 80 + 32 + 24 * 2 + SCROLLBAR_WIDTH; // menu, sidebar, content paddings, scollbar widths;
+    const MOBILE_SERVICE_AREA = 16 * 2; // content paddings;
+    const SERVICE_AREA = tools.isMobile() ? MOBILE_SERVICE_AREA : DESKTOP_SERVICE_AREA;
 
-    var SCREEN_SMALL = 1366 - SERVICE_AREA; // HD ~16:9 1366x768
-    var SCREEN_MEDIUM = 1440 - SERVICE_AREA; // WXGA+ 16:10 1440x900
-    var SCREEN_LARGE = 1680 - SERVICE_AREA; // WSXGA+ 16:10 1680x1050
+    const SCREEN_SMALL = 1366 - SERVICE_AREA; // HD ~16:9 1366x768
+    const SCREEN_MEDIUM = 1440 - SERVICE_AREA; // WXGA+ 16:10 1440x900
+    const SCREEN_LARGE = 1680 - SERVICE_AREA; // WSXGA+ 16:10 1680x1050
 
-    var ADDED_CLASSES_DATA_KEY = 'responsive-classes';
+    const ADDED_CLASSES_DATA_KEY = 'responsive-classes';
 
-    var SELECTORS = {
+    const SELECTORS = {
         SECTION: '.responsive-section',
         CELL: '.responsive-cell',
         BLOCK: '.responsive-block'
     };
 
-    var MODIFIERS = {
+    const MODIFIERS = {
         SECTION_NO_BLOCKS: 'responsive-section-no-blocks',
         CELL_NO_BLOCKS: 'responsive-cell-no-blocks'
     };
 
-    var SIZES = [
+    const SIZES = [
         {
             modifierClassName: 'responsive-small',
             width: {
@@ -76,14 +76,14 @@ define(function(require) {
      * @return {boolean} true if section was updated
      */
     function updateSection($section) {
-        var $cells = $section.find(SELECTORS.CELL + ':first').siblings().addBack();
-        var sectionWidth = $section.outerWidth();
-        var classNames = [getSizeClass(sectionWidth)];
-        var hasBlocks = false;
-        var isChanged = false;
+        const $cells = $section.find(SELECTORS.CELL + ':first').siblings().addBack();
+        const sectionWidth = $section.outerWidth();
+        const classNames = [getSizeClass(sectionWidth)];
+        let hasBlocks = false;
+        let isChanged = false;
 
         $cells.each(function(index, cell) {
-            var $cell = $(cell);
+            const $cell = $(cell);
 
             if (updateCell($cell)) {
                 isChanged = true;
@@ -110,15 +110,14 @@ define(function(require) {
      * @return {boolean} true if cell was updated
      */
     function updateCell($cell) {
-        var isChanged;
-        var $blocks = $cell.find(SELECTORS.BLOCK + ':first').siblings().addBack();
-        var classNames = [];
+        const $blocks = $cell.find(SELECTORS.BLOCK + ':first').siblings().addBack();
+        const classNames = [];
 
         if ($blocks.length === 0) {
             classNames.push(MODIFIERS.CELL_NO_BLOCKS);
         }
 
-        isChanged = updateClasses($cell, classNames);
+        const isChanged = updateClasses($cell, classNames);
 
         return isChanged;
     }
@@ -131,7 +130,7 @@ define(function(require) {
      * @returns {Object}
      */
     function getSizeClass(sectionWidth) {
-        var size = _.find(SIZES, function(value) {
+        const size = _.find(SIZES, function(value) {
             return (sectionWidth >= value.width.from &&
                 (sectionWidth <= value.width.to || value.width.to === null));
         });
@@ -147,8 +146,8 @@ define(function(require) {
      * @return {boolean} if classes are changed
      */
     function updateClasses($target, classNames) {
-        var addedClasses = $target.data(ADDED_CLASSES_DATA_KEY) || [];
-        var isChanged = !_.isEqual(addedClasses, classNames);
+        const addedClasses = $target.data(ADDED_CLASSES_DATA_KEY) || [];
+        const isChanged = !_.isEqual(addedClasses, classNames);
 
         if (isChanged) {
             $target.removeClass(addedClasses.join(' '));
@@ -167,7 +166,7 @@ define(function(require) {
          * @param {HTMLElement} [context]
          */
         update: function(context) {
-            var isChanged = false;
+            let isChanged = false;
 
             $(context || window.document).find(SELECTORS.SECTION).addBack(SELECTORS.SECTION).each(function() {
                 isChanged = updateSection($(this)) || isChanged;

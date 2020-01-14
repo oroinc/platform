@@ -71,7 +71,7 @@ datagrids:
         options:
             toolbarOptions:
                 hide: true
-            requireJSModules:
+            jsmodules:
                 - oroemail/js/datagrid/auto-response-rules-extension
 
     base-email-grid:
@@ -182,7 +182,7 @@ datagrids:
                 subject: { data_name: subject }
                 receivedAt: { data_name: receivedAt }
                 mailbox: { data_name: originId }
-            default: { receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC' }
+            default: { receivedAt: DESC }
         options:
             entityHint: oro.email.entity_plural_label
 
@@ -419,7 +419,7 @@ datagrids:
                 fromEmailAddress: { data_name: fromEmailAddress }
                 receivedAt:  { data_name: receivedAt }
             default:
-                receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                receivedAt: DESC
 
     dashboard-recent-emails-sent-grid:
         extends: dashboard-recent-emails-grid
@@ -453,7 +453,7 @@ datagrids:
             columns:
                 sentAt:  { data_name: e.sentAt }
             default:
-                sentAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                sentAt: DESC
 
     dashboard-recent-emails-new-grid:
         extends: dashboard-recent-emails-grid
@@ -487,9 +487,9 @@ datagrids:
                 fromEmailAddress: { data_name: fromEmailAddress }
                 receivedAt:  { data_name: receivedAt }
             default:
-                receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                receivedAt: DESC
         options:
-            requireJSModules:
+            jsmodules:
                 - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:

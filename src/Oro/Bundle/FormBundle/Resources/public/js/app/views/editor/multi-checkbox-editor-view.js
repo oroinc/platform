@@ -1,6 +1,12 @@
 define(function(require) {
     'use strict';
 
+    const SelectEditorView = require('./select-editor-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    require('jquery.multiselect');
+    require('jquery.multiselect.filter');
+
     /**
      * Multi-select content editor. Please note that it requires column data format
      * corresponding to multi-select-cell.
@@ -51,17 +57,9 @@ define(function(require) {
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports MultiCheckboxEditorView
      */
-
-    var MultiCheckboxEditorView;
-    var SelectEditorView = require('./select-editor-view');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    require('jquery.multiselect');
-    require('jquery.multiselect.filter');
-
-    MultiCheckboxEditorView = SelectEditorView.extend(/** @lends MultiCheckboxEditorView.prototype */{
+    const MultiCheckboxEditorView = SelectEditorView.extend(/** @lends MultiCheckboxEditorView.prototype */{
         className: 'multi-checkbox-editor',
-        template: require('tpl!oroform/templates/editor/multi-checkbox-editor.html'),
+        template: require('tpl-loader!oroform/templates/editor/multi-checkbox-editor.html'),
 
         /**
          * Jquery object that wraps select DOM element with initialized multiselect plugin
@@ -84,8 +82,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function MultiCheckboxEditorView() {
-            MultiCheckboxEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function MultiCheckboxEditorView(options) {
+            MultiCheckboxEditorView.__super__.constructor.call(this, options);
         },
 
         onApplyChanges: function() {
@@ -181,12 +179,12 @@ define(function(require) {
         },
 
         getValue: function() {
-            var value = this.$('select').val();
+            const value = this.$('select').val();
             return _.isArray(value) ? value : [];
         },
 
         getTemplateData: function() {
-            var data = MultiCheckboxEditorView.__super__.getTemplateData.call(this);
+            const data = MultiCheckboxEditorView.__super__.getTemplateData.call(this);
             _.extend(data, {
                 options: this.availableChoices
             });
@@ -194,8 +192,8 @@ define(function(require) {
         },
 
         isChanged: function() {
-            var val = this.getValue();
-            var old = this.getModelValue();
+            const val = this.getValue();
+            let old = this.getModelValue();
             if (!_.isArray(old)) {
                 old = old === 0 || old ? [old] : [];
             }

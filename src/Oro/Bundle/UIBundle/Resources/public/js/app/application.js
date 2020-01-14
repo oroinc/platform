@@ -1,16 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var Application;
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var BaseController = require('oroui/js/app/controllers/base/controller');
-    var PageLayoutView = require('oroui/js/app/views/page-layout-view');
-    var readyStateTracker = require('oroui/js/app/ready-state-tracker');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const BaseController = require('oroui/js/app/controllers/base/controller');
+    const PageLayoutView = require('oroui/js/app/views/page-layout-view');
 
-    Application = Chaplin.Application.extend({
+    const Application = Chaplin.Application.extend({
         initialize: function(options) {
             this.options = options || {};
 
@@ -29,7 +27,7 @@ define(function(require) {
             mediator.setHandler('redirectTo', function() {});
             mediator.setHandler('refreshPage', function() {});
 
-            Application.__super__.initialize.apply(this, arguments);
+            Application.__super__.initialize.call(this, options);
 
             mediator.setHandler('changeRoute', function(route, options) {
                 options = options || {};
@@ -37,10 +35,6 @@ define(function(require) {
                 this.router.changeURL(null, null, route, options);
                 mediator.trigger('route:change');
             }, this);
-
-            mediator.once('dispatcher:dispatch', function() {
-                readyStateTracker.markReady('app');
-            });
         },
 
         /**
@@ -70,14 +64,13 @@ define(function(require) {
          * @returns {string}
          */
         combineRouteUrl: function(path, query) {
-            var routeUrl;
             // if first argument is a route object (or a current record from content-manager)
             if (typeof path === 'object') {
                 query = path.query;
                 path = path.path;
             }
             path = (path[0] !== '/' ? '/' : '') + path;
-            routeUrl = path + (query ? '?' + query : '');
+            const routeUrl = path + (query ? '?' + query : '');
             return routeUrl;
         },
 
@@ -89,9 +82,9 @@ define(function(require) {
          */
         combineFullUrl: function(path, query) {
             // root is always supposed to have trailing slash
-            var root = this.options.root || '\/';
-            var url = this.combineRouteUrl(path, query);
-            var fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
+            const root = this.options.root || '\/';
+            const url = this.combineRouteUrl(path, query);
+            const fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
             return fullUrl;
         },
 

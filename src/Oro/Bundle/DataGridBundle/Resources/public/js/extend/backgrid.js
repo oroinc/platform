@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backgrid = require('bowerassets/backgrid/lib/backgrid');
+    const _ = require('underscore');
+    const Backgrid = require('npmassets/backgrid/lib/backgrid');
 
     /**
      * Cells should be removed durung dispose cycle
@@ -21,11 +21,11 @@ define(function(require) {
         }
         */
 
-        var column = this.column;
-        var model = this.model;
-        var $el = this.$el;
+        const column = this.column;
+        const model = this.model;
+        const $el = this.$el;
 
-        var Formatter = Backgrid.resolveNameToClass(column.get('formatter') ||
+        let Formatter = Backgrid.resolveNameToClass(column.get('formatter') ||
             this.formatter, 'Formatter');
 
         if (!_.isFunction(Formatter.fromRaw) && !_.isFunction(Formatter.toRaw)) {
@@ -46,8 +46,8 @@ define(function(require) {
 
         this.listenTo(column, 'change:editable change:sortable change:renderable',
             function(column) {
-                var changed = column.changedAttributes();
-                for (var key in changed) {
+                const changed = column.changedAttributes();
+                for (const key in changed) {
                     if (changed.hasOwnProperty(key)) {
                         $el.toggleClass(key, changed[key]);
                     }
@@ -66,10 +66,10 @@ define(function(require) {
      model's raw value for this cell's column.
      */
     Backgrid.Cell.prototype.render = function() {
-        var $el = this.$el;
+        const $el = this.$el;
         $el.empty();
-        var model = this.model;
-        var columnName = this.column.get('name');
+        const model = this.model;
+        const columnName = this.column.get('name');
         $el.text(this.formatter.fromRaw(model.get(columnName), model));
         // $el.addClass(columnName);
         // this.updateStateClassesMaybe();
@@ -83,13 +83,13 @@ define(function(require) {
      * Please find support code in ../datagrid/row.js
      */
     Backgrid.Cell.prototype.delegatedEventBinding = true;
-    var oldDelegateEvents = Backgrid.Cell.prototype.delegateEvents;
+    const oldDelegateEvents = Backgrid.Cell.prototype.delegateEvents;
     Backgrid.Cell.prototype.delegateEvents = function() {
         if (_.isFunction(this.events)) {
             oldDelegateEvents.call(this);
         }
     };
-    var oldUndelegateEvents = Backgrid.Cell.prototype.undelegateEvents;
+    const oldUndelegateEvents = Backgrid.Cell.prototype.undelegateEvents;
     Backgrid.Cell.prototype.undelegateEvents = function() {
         if (_.isFunction(this.events)) {
             oldUndelegateEvents.call(this);

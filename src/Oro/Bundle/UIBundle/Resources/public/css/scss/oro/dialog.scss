@@ -85,12 +85,12 @@
     }
 
     &-content {
-        padding: $dialog-content-inner-offset;
         margin: $dialog-content-outer-offset;
         background: $primary-inverse;
         position: $dialog-content-position;
         min-width: $dialog-content-min-width;
         width: $dialog-content-width;
+        max-width: 100%;
         min-height: $dialog-content-min-height; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
         overflow: $dialog-content-overflow;
         flex-shrink: $dialog-content-flex-shrink;
@@ -102,6 +102,7 @@
 
         .widget-content {
             position: relative;
+            margin: $dialog-content-inner-offset;
         }
     }
 

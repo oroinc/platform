@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var FieldsGroupsCollectionView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
 
-    FieldsGroupsCollectionView = BaseView.extend({
+    const FieldsGroupsCollectionView = BaseView.extend({
         PRIMARY_FILED_SELECTOR: '[name$="[primary]"]',
 
         events: {
@@ -16,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FieldsGroupsCollectionView() {
-            FieldsGroupsCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function FieldsGroupsCollectionView(options) {
+            FieldsGroupsCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -42,7 +41,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onChangeInFiledGroup: function(e) {
-            var $fieldsGroup = this.$(e.currentTarget);
+            const $fieldsGroup = this.$(e.currentTarget);
             if (!this.$(e.target).is(this.PRIMARY_FILED_SELECTOR) &&
                 !this.$(this.PRIMARY_FILED_SELECTOR + ':checked').length) {
                 $fieldsGroup.find(this.PRIMARY_FILED_SELECTOR).prop('checked', true);

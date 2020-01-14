@@ -3,118 +3,95 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\PhoneProviderPass;
+use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContainerBuilder */
     private $container;
 
-    /**
-     * Environment setup
-     */
+    /** @var Definition */
+    private $phoneProvider;
+
+    /** @var PhoneProviderPass */
+    private $compiler;
+
     protected function setUp()
     {
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
-    }
-
-    public function testProcessNotRegisterProvider()
-    {
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo('oro_address.provider.phone'))
-            ->will($this->returnValue(false));
-
-        $this->container->expects($this->never())
-            ->method('getDefinition');
-        $this->container->expects($this->never())
-            ->method('findTaggedServiceIds');
-
-        $compilerPass = new PhoneProviderPass();
-        $compilerPass->process($this->container);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Tag attribute "class" is required for "provider1" service
-     */
-    public function testProcessNoClass()
-    {
-        $serviceIds = array(
-            'provider1' => array(array()),
+        $this->container = new ContainerBuilder();
+        $this->phoneProvider = $this->container->setDefinition(
+            'oro_address.provider.phone',
+            new Definition(PhoneProvider::class, [[], null])
         );
 
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo('oro_address.provider.phone'))
-            ->will($this->returnValue(true));
+        $this->compiler = new PhoneProviderPass();
+    }
 
-        $this->container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($this->equalTo('oro_address.phone_provider'))
-            ->will($this->returnValue($serviceIds));
+    public function testProcessWhenNoProviders()
+    {
+        $this->compiler->process($this->container);
 
-        $this->container->expects($this->never())
-            ->method('getDefinition')
-            ->with($this->equalTo('oro_address.provider.phone'));
+        self::assertEquals([], $this->phoneProvider->getArgument(0));
 
-        $compilerPass = new PhoneProviderPass();
-        $compilerPass->process($this->container);
+        $serviceLocatorReference = $this->phoneProvider->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The attribute "class" is required for "oro_address.phone_provider" tag. Service: "provider1".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessNoClass()
+    {
+        $this->container->register('provider1')
+            ->addTag('oro_address.phone_provider');
+
+        $this->compiler->process($this->container);
     }
 
     public function testProcess()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->getMock();
-        $definition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with(
-                $this->equalTo('addPhoneProvider'),
-                $this->equalTo(array('Test\Class1', new Reference('provider4')))
-            );
-        $definition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with(
-                $this->equalTo('addPhoneProvider'),
-                $this->equalTo(array('Test\Class1', new Reference('provider1')))
-            );
-        $definition->expects($this->at(2))
-            ->method('addMethodCall')
-            ->with(
-                $this->equalTo('addPhoneProvider'),
-                $this->equalTo(array('Test\Class2', new Reference('provider2')))
-            );
-        $definition->expects($this->at(3))
-            ->method('addMethodCall')
-            ->with(
-                $this->equalTo('addPhoneProvider'),
-                $this->equalTo(array('Test\Class1', new Reference('provider3')))
-            );
+        $this->container->register('provider1')
+            ->addTag('oro_address.phone_provider', ['class' => 'Test\Class1']);
+        $this->container->register('provider2')
+            ->addTag('oro_address.phone_provider', ['class' => 'Test\Class2']);
+        $this->container->register('provider3')
+            ->addTag('oro_address.phone_provider', ['class' => 'Test\Class1', 'priority' => 100]);
+        $this->container->register('provider4')
+            ->addTag('oro_address.phone_provider', ['class' => 'Test\Class1', 'priority' => -100]);
 
-        $serviceIds = array(
-            'provider1' => array(array('class' => 'Test\Class1')),
-            'provider2' => array(array('class' => 'Test\Class2')),
-            'provider3' => array(array('class' => 'Test\Class1', 'priority' => 100)),
-            'provider4' => array(array('class' => 'Test\Class1', 'priority' => -100)),
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                'Test\Class1' => ['provider4', 'provider1', 'provider3'],
+                'Test\Class2' => ['provider2']
+            ],
+            $this->phoneProvider->getArgument(0)
         );
 
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo('oro_address.provider.phone'))
-            ->will($this->returnValue(true));
-
-        $this->container->expects($this->once())
-            ->method('getDefinition')
-            ->with($this->equalTo('oro_address.provider.phone'))
-            ->will($this->returnValue($definition));
-        $this->container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($this->equalTo('oro_address.phone_provider'))
-            ->will($this->returnValue($serviceIds));
-
-        $compilerPass = new PhoneProviderPass();
-        $compilerPass->process($this->container);
+        $serviceLocatorReference = $this->phoneProvider->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'provider1' => new ServiceClosureArgument(new Reference('provider1')),
+                'provider2' => new ServiceClosureArgument(new Reference('provider2')),
+                'provider3' => new ServiceClosureArgument(new Reference('provider3')),
+                'provider4' => new ServiceClosureArgument(new Reference('provider4'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
     }
 }

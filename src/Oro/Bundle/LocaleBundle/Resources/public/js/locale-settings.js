@@ -1,7 +1,9 @@
-define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_, settings, moduleInst) {
+define(function(require, exports, module) {
     'use strict';
 
-    var moduleConfig = moduleInst.config();
+    const _ = require('underscore');
+    const settings = require('js/oro.locale_data');
+    const moduleConfig = require('module-config').default(module.id);
 
     /**
      * Locale settings
@@ -9,7 +11,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
      * @export  orolocale/js/locale-settings
      * @class   oro.LocaleSettings
      */
-    var localeSettings = {
+    const localeSettings = {
         defaults: {
             locale: 'en_US',
             language: 'en',
@@ -173,7 +175,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
         },
 
         _deepExtend: function(target, source) {
-            for (var prop in source) {
+            for (const prop in source) {
                 if (source.hasOwnProperty(prop)) {
                     if (_.isObject(target[prop])) {
                         target[prop] = this._deepExtend(target[prop], source[prop]);
@@ -254,10 +256,10 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
          * @returns {number} shift in minutes
          */
         calculateTimeZoneShift: function(tz) {
-            var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/);
-            var sign = Number(matches[1] + '1');
-            var hours = Number(matches[2]);
-            var minutes = Number(matches[3]);
+            const matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/);
+            const sign = Number(matches[1] + '1');
+            const hours = Number(matches[2]);
+            const minutes = Number(matches[3]);
             return sign * (hours * 60 + minutes);
         },
 
@@ -331,7 +333,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
          */
         getCalendarMonthNames: function(width, asArray) {
             width = (width && this.settings.calendar.months.hasOwnProperty(width)) ? width : 'wide';
-            var result = this.settings.calendar.months[width];
+            let result = this.settings.calendar.months[width];
             if (asArray) {
                 result = _.map(result, function(v) {
                     return v;
@@ -351,7 +353,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
          */
         getCalendarDayOfWeekNames: function(width, asArray) {
             width = (width && this.settings.calendar.dow.hasOwnProperty(width)) ? width : 'wide';
-            var result = this.settings.calendar.dow[width];
+            const result = this.settings.calendar.dow[width];
             return asArray ? _.values(result) : _.clone(result);
         },
 
@@ -362,8 +364,8 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
          * @returns {Array}
          */
         getSortedDayOfWeekNames: function(width) {
-            var dowNames = this.getCalendarDayOfWeekNames(width, true);
-            var splitPoint = this.getCalendarFirstDayOfWeek() - 1;
+            let dowNames = this.getCalendarDayOfWeekNames(width, true);
+            const splitPoint = this.getCalendarFirstDayOfWeek() - 1;
             if (splitPoint > 0 && splitPoint < dowNames.length) {
                 dowNames = dowNames.slice(splitPoint).concat(dowNames.slice(0, splitPoint));
             }
@@ -386,14 +388,14 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
          * @returns {Array}
          */
         getLocaleFallback: function(locale) {
-            var locales = [locale, this.settings.locale, this.defaults.locale];
+            const locales = [locale, this.settings.locale, this.defaults.locale];
 
-            var getLocaleLang = function(locale) {
+            const getLocaleLang = function(locale) {
                 return locale ? locale.split('_')[0] : locale;
             };
 
-            var possibleLocales = [];
-            for (var i = 0; i < locales.length; i++) {
+            const possibleLocales = [];
+            for (let i = 0; i < locales.length; i++) {
                 if (locales[i]) {
                     possibleLocales.push(locales[i]);
                     possibleLocales.push(getLocaleLang(locales[i]));

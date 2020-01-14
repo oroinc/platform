@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var ActionComponentDropdownLauncher;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
-    var DatagridSettingsDialogWidget = require('./datagrid-settings-dialog-widget');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
+    const DatagridSettingsDialogWidget = require('./datagrid-settings-dialog-widget');
 
     /**
      * @class ActionComponentDropdownLauncher
      * @extends ActionLauncher
      */
-    ActionComponentDropdownLauncher = ActionLauncher.extend({
-        template: require('tpl!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
+    const ActionComponentDropdownLauncher = ActionLauncher.extend({
+        template: require('tpl-loader!orodatagrid/templates/datagrid/action-component-dropdown-launcher.html'),
 
         /**
          * @type {Object}
@@ -33,7 +32,6 @@ define(function(require) {
         wrapperClassName: undefined,
 
         events: {
-            'click .dropdown-menu': 'onDropdownMenuClick',
             'show.bs.dropdown': 'onBeforeOpen',
             'shown.bs.dropdown': 'onOpen',
             'hide.bs.dropdown': 'onHide'
@@ -46,8 +44,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionComponentDropdownLauncher() {
-            ActionComponentDropdownLauncher.__super__.constructor.apply(this, arguments);
+        constructor: function ActionComponentDropdownLauncher(options) {
+            ActionComponentDropdownLauncher.__super__.constructor.call(this, options);
         },
 
         /**
@@ -70,7 +68,7 @@ define(function(require) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = ActionComponentDropdownLauncher.__super__.getTemplateData.call(this);
+            const data = ActionComponentDropdownLauncher.__super__.getTemplateData.call(this);
             data.wrapperClassName = this.wrapperClassName;
             return data;
         },
@@ -85,7 +83,7 @@ define(function(require) {
                 this.$('.dropdown-toggle').on('click' + this.eventNamespace(), _.bind(this.openDialogWidget, this));
             }
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
-            var Component = this.componentConstructor;
+            const Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
             return this;
         },
@@ -109,17 +107,6 @@ define(function(require) {
         },
 
         /**
-         * Prevents dropdown menu from closing on click
-         *
-         * @param {jQuery.Event} e
-         */
-        onDropdownMenuClick: function(e) {
-            if (!this.$(e.target).is('.close')) {
-                e.stopPropagation();
-            }
-        },
-
-        /**
          * Handles bootstrap dropdown show event
          *
          * @param {jQuery.Event} showEvent
@@ -137,9 +124,9 @@ define(function(require) {
             if (_.isFunction(this.component.updateViews)) {
                 this.component.updateViews();
             }
-            var $dropdownMenu = this.$('>.dropdown-menu');
+            const $dropdownMenu = this.$('>.dropdown-menu');
             if ($dropdownMenu.length) {
-                var rect = $dropdownMenu[0].getBoundingClientRect();
+                const rect = $dropdownMenu[0].getBoundingClientRect();
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });
@@ -153,7 +140,16 @@ define(function(require) {
         /**
          * Handles dropdown menu hide
          */
-        onHide: function() {
+        onHide: function(e) {
+            if (e.clickEvent && !this.$(e.clickEvent.target).is('.close')) {
+                const $clickTarget = this.$(e.clickEvent.target);
+                if ($clickTarget.get(0) && !$clickTarget.is('.close')) {
+                    // prevent closing dropdown on click within menu, except it's 'close' button
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             mediator.trigger('dropdown-launcher:hide');
         },
 

@@ -15,9 +15,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('export');
 
-        $builder->root('export')
+        $builder->getRootNode()
             ->treatTrueLike(
                 [
                     'csv' => [

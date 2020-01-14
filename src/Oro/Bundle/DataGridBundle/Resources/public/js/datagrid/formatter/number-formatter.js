@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var CellFormatter = require('./cell-formatter');
-    var formatter = require('orolocale/js/formatter/number');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const CellFormatter = require('./cell-formatter');
+    const formatter = require('orolocale/js/formatter/number');
 
     function getFormatter(style) {
-        var functionName = 'format' + style.charAt(0).toUpperCase() + style.slice(1);
+        const functionName = 'format' + style.charAt(0).toUpperCase() + style.slice(1);
         if (!_.isFunction(formatter[functionName])) {
             throw new Error('Formatter doesn\'t support "' + style + '" number style');
         }
@@ -50,7 +50,7 @@ define(function(require) {
          * @inheritDoc
          */
         toRaw: function(formattedData) {
-            var rawData = null;
+            let rawData = null;
             if (formattedData !== null && formattedData !== '') {
                 rawData = formatter.unformat(formattedData);
             }

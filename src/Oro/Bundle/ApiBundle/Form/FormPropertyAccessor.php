@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * This property accessor allows to set NULL to a property value
  * even if it is not acceptable by a setter.
- * This is required to avoid exceptions like "Argument 1 passed to Class::setProperty()
- * must be an instance of Class, null given." during submitting API form.
+ * It is required to avoid exceptions like 'Expected argument of type "SomeType",
+ * "NULL" given at property path "property"' during submitting API form.
  * If NULL is not allowed for a property, the NotNull or NotBlank validation constraint
  * must be configured for this property.
  */
@@ -33,7 +34,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     {
         try {
             $this->propertyAccessor->setValue($objectOrArray, $propertyPath, $value);
-        } catch (\TypeError $e) {
+        } catch (InvalidArgumentException $e) {
             if (null !== $value || !\is_object($objectOrArray)) {
                 throw $e;
             }

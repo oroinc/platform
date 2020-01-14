@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var TagUpdateView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var TagView = require('./view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const TagView = require('./view');
 
     /**
      * @export  orotag/js/update-view
      * @class   orotag.UpdateView
      * @extends orotag.View
      */
-    TagUpdateView = TagView.extend({
+    const TagUpdateView = TagView.extend({
         /** @property */
-        template: require('tpl!../templates/update-tag-list.html'),
+        template: require('tpl-loader!../templates/update-tag-list.html'),
 
         /** @property */
         tagsOverlayTemplate: _.template(
@@ -40,8 +39,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function TagUpdateView() {
-            TagUpdateView.__super__.constructor.apply(this, arguments);
+        constructor: function TagUpdateView(options) {
+            TagUpdateView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -73,11 +72,11 @@ define(function(require) {
             this.$tagOverlayId = $(this.options.tagOverlayId);
             this._renderOverlay();
 
-            TagView.prototype.initialize.apply(this, arguments);
+            TagView.prototype.initialize.call(this, options);
 
             this._prepareCollections();
 
-            var onCollectionChange = _.bind(function() {
+            const onCollectionChange = _.bind(function() {
                 this.render();
                 this._updateHiddenInputs();
             }, this);
@@ -95,7 +94,7 @@ define(function(require) {
          */
         _addItem: function(e) {
             e.preventDefault();
-            var tag = e.added;
+            const tag = e.added;
 
             if (!_.isUndefined(tag)) {
                 this.getCollection().addItem(tag);
@@ -116,8 +115,8 @@ define(function(require) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            var $el = $(e.currentTarget).parents('li');
-            var id = $($el).data('id');
+            const $el = $(e.currentTarget).parents('li');
+            const id = $($el).data('id');
             if (!_.isUndefined(id)) {
                 this.getCollection().removeItem(id, this.options.filter);
             }
@@ -142,7 +141,7 @@ define(function(require) {
          * @private
          */
         _prepareCollections: function() {
-            var allTags = $.parseJSON($(this.options.fieldId).val());
+            let allTags = $.parseJSON($(this.options.fieldId).val());
             if (!_.isArray(allTags)) {
                 allTags = [];
             }

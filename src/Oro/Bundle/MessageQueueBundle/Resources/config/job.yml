@@ -20,7 +20,6 @@ services:
 
     oro_message_queue.job.processor:
         class: 'Oro\Component\MessageQueue\Job\JobProcessor'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_message_queue.job.storage'
@@ -39,7 +38,7 @@ services:
         class: 'Oro\Component\MessageQueue\Job\Extension\ChainExtension'
         public: false
         arguments:
-            - []
+            - !tagged_iterator oro_message_queue.job.extension
 
     oro_message_queue.job.root_job_status_calculator:
         class: 'Oro\Component\MessageQueue\Job\RootJobStatusCalculator'

@@ -1,33 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var RecentEmailsContentView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var routing = require('routing');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
+    const routing = require('routing');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
     require('jquery.select2');
 
-    RecentEmailsContentView = BaseWidgetSetupView.extend({
-        template: require('tpl!oroemail/templates/sidebar-widget/recent-emails/recent-emails-setup-view.html'),
+    const RecentEmailsContentView = BaseWidgetSetupView.extend({
+        template: require('tpl-loader!oroemail/templates/sidebar-widget/recent-emails/recent-emails-setup-view.html'),
 
         foldersData: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function RecentEmailsContentView() {
-            RecentEmailsContentView.__super__.constructor.apply(this, arguments);
+        constructor: function RecentEmailsContentView(options) {
+            RecentEmailsContentView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
-            RecentEmailsContentView.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            RecentEmailsContentView.__super__.initialize.call(this, options);
             $.getJSON(routing.generate('oro_email_emailorigin_list'),
                 _.bind(function(data) {
                     this.foldersData = this.parseFoldersData(data);
@@ -38,9 +37,9 @@ define(function(require) {
         },
 
         parseFoldersData: function(data) {
-            var mailboxes = [];
+            let mailboxes = [];
             _.each(data, function(mailbox, text) {
-                var folders;
+                let folders;
                 if (mailbox.active) {
                     folders =
                         _.where(mailbox.folder, {syncEnabled: true})
@@ -66,14 +65,14 @@ define(function(require) {
         },
 
         getFolderInfo: function(id) {
-            var info = {
+            const info = {
                 name: '',
                 mailbox: ''
             };
             id = Number(id);
             if (this.foldersData !== null && id) {
                 _.each(this.foldersData, function(mailbox) {
-                    var folder;
+                    let folder;
                     if (info.name.length === 0) {
                         if ('children' in mailbox) {
                             folder = _.find(mailbox.children, function(folder) {
@@ -93,7 +92,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = this.model.toJSON();
+            const data = this.model.toJSON();
             data.foldersData = this.foldersData;
             return data;
         },
@@ -111,8 +110,8 @@ define(function(require) {
         },
 
         render: function() {
-            RecentEmailsContentView.__super__.render.apply(this, arguments);
-            var loadingView = this.subview('loading');
+            RecentEmailsContentView.__super__.render.call(this);
+            const loadingView = this.subview('loading');
             this.$el.find('[name=defaultActionId]').inputWidget('create', 'select2');
             if (this.foldersData !== null) {
                 if (loadingView) {
@@ -132,14 +131,14 @@ define(function(require) {
         },
 
         fetchFromData: function() {
-            var data = RecentEmailsContentView.__super__.fetchFromData.call(this);
+            const data = RecentEmailsContentView.__super__.fetchFromData.call(this);
             data.limit = Number(data.limit);
             return data;
         },
 
         onSubmit: function() {
-            var settings = this.fetchFromData();
-            var folderInfo = this.getFolderInfo(settings.folderId);
+            const settings = this.fetchFromData();
+            const folderInfo = this.getFolderInfo(settings.folderId);
             settings.folderName = folderInfo.name;
             settings.mailboxName = folderInfo.mailbox;
             if (!tools.isEqualsLoosely(settings, this.model.get('settings'))) {

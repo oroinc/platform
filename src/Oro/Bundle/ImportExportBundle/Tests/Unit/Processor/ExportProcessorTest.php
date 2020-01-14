@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 
 class ExportProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -46,11 +47,15 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $serializedValue = array('serialized');
         $expectedValue = array('expected');
 
-        $serializer = $this->createMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->once())
-            ->method('serialize')
+            ->method('normalize')
             ->with($entity, null)
-            ->will($this->returnValue($serializedValue));
+            ->willReturn($serializedValue);
+        $serializer->expects($this->once())
+            ->method('encode')
+            ->with($serializedValue, null)
+            ->willReturnArgument(0);
 
         $dataConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->once())
@@ -70,11 +75,15 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $entity = $this->createMock(\stdClass::class);
         $expectedValue = array('expected');
 
-        $serializer = $this->createMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->once())
-            ->method('serialize')
+            ->method('normalize')
             ->with($entity, null)
-            ->will($this->returnValue($expectedValue));
+            ->willReturn($expectedValue);
+        $serializer->expects($this->once())
+            ->method('encode')
+            ->with($expectedValue, null)
+            ->willReturnArgument(0);
 
         $this->processor->setSerializer($serializer);
         $this->processor->setImportExportContext($this->context);

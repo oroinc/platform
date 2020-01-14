@@ -22,8 +22,15 @@
                     <button class="btn btn-primary check-connection-messages"
                             data-role="check-smtp-connection"
                             data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
-                            data-page-component-options="{{ options|json_encode }}"
+                            data-page-component-options="{{ options|merge({view: 'new'})|json_encode }}"
                     >{{ 'oro.email.system_configuration.smtp_settings.check_connection.label'|trans }}</button>
+                </span>
+                <span class="form-text">
+                    <button class="btn btn-primary check-connection-messages"
+                            data-role="check-saved-smtp-connection"
+                            data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
+                            data-page-component-options="{{ options|merge({view: 'saved'})|json_encode }}"
+                    >{{ 'oro.email.system_configuration.smtp_settings.check_saved_connection.label'|trans }}</button>
                 </span>
                 <div class="check-connection-messages check-smtp-connection-messages"></div>
             </div>
@@ -138,7 +145,7 @@
     </div>
 {% endblock %}
 
-{% block oro_email_emailtemplate_translatation_widget %}
+{% block oro_email_emailtemplate_localizations_widget %}
     {% import _self as emailFormFealds %}
 
     {% import 'OroUIBundle::macros.html.twig' as UI %}
@@ -152,40 +159,18 @@
         }) }}>
             <ul class="nav nav-tabs" role="tablist">
                 {% spaceless %}
-                    {% if simple_way %}
-                        {% for translationsField in form %}
-                            {% set tabId = tabId ~ '-' ~ loop.index %}
-                            {{ emailFormFealds.renderTabNavItem(translationsField, labels, null, tabId) }}
-                        {% endfor %}
-                    {% else %}
-                        {% for translationsLocales in form %}
-                            {% set tabId = tabId ~ '-' ~ loop.index %}
-                            {% for translationsField in translationsLocales %}
-                                {% set tabId = tabId ~ '-' ~ loop.index %}
-                                {{ emailFormFealds.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name), tabId) }}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
+                    {% for templateLocalization in form %}
+                        {{ emailFormFealds.renderTabNavItem(templateLocalization, loop.first, tabId ~ '-' ~ loop.index) }}
+                    {% endfor %}
                 {% endspaceless %}
             </ul>
         </div>
         <div class="oro-tabs__content">
             <div class="tab-content">
                 {% spaceless %}
-                    {% if simple_way %}
-                        {% for translationsField in form %}
-                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
-                            {{ emailFormFealds.renderTab(translationsField, tabContentId) }}
-                        {% endfor %}
-                    {% else %}
-                        {% for translationsLocales in form %}
-                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
-                            {% for translationsField in translationsLocales %}
-                                {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
-                                {{ emailFormFealds.renderTab(translationsField, tabContentId) }}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
+                    {% for templateLocalization in form %}
+                        {{ emailFormFealds.renderTab(templateLocalization, loop.first, tabContentId ~ '-' ~ loop.index) }}
+                    {% endfor %}
                 {% endspaceless %}
             </div>
         </div>
@@ -314,33 +299,67 @@
     </div>
 {% endblock %}
 
+{% block oro_email_emailtemplate_localization_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        {{ form_row(form.subject) }}
+        {% if form.subjectFallback is defined %}
+            {{- form_row(form.subjectFallback) }}
+        {% endif %}
+
+        {{ form_row(form.content) }}
+        {% if form.contentFallback is defined %}
+            {{- form_row(form.contentFallback) }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block _oro_email_emailtemplate_translations_template_fallback_checkbox_row %}
+    <div class="control-group control-group-checkbox">
+        <div class="control-label wrap">&nbsp;</div>
+        <div class="controls">
+            {{ form_widget(form) }}
+            {{ form_label(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _oro_email_autoresponserule_template_new_entity_oro_email_emailtemplate_template_fallback_checkbox_row %}
+    <div class="control-group control-group-checkbox">
+        <div class="control-label wrap">&nbsp;</div>
+        <div class="controls">
+            {{ form_widget(form) }}
+            {{ form_label(form) }}
+        </div>
+    </div>
+{% endblock %}
+
 {#
     Renders tab `li` tag for bootstrap tab panels
     paramters:
         form         - instance of FormView, it's a view for localized field
-        localeLabels - array with user friendly labels for locale codes
-        isDefault    - is current locale's tab label should be marked as default
+        isActive - is current tab active
         uniqid       - is unique identifier
 #}
-{% macro renderTabNavItem(form, localeLabels, isDefault = false, uniqid = null) %}
-    {% set locale = form.vars.name %}
-    {% set selected = (app.request.locale == locale) ? 'true' : 'false' %}
-
+{% macro renderTabNavItem(form, isActive = false, uniqid = null) %}
     <li class="nav-item">
         <a href="#"
-           class="nav-link {% if (app.request.locale == locale) %}active{% endif %}"
-           data-role="change-language"
-           data-target=".emailtemplate-translatation-fields-{{ locale }}"
+           class="nav-link {% if isActive %}active{% endif %}"
+           data-role="change-localization"
+           data-target=".emailtemplate-translatation-fields-{{ form.vars.name }}"
            data-toggle="tab"
-           data-related="{{ locale }}"
+           data-related="{{ form.vars.name }}"
            role="tab"
-           aria-selected="{{ selected }}"
-       {% if uniqid %}
-           id="{{ uniqid ~ '-tab'}}"
-           aria-controls="{{ uniqid }}"
-       {% endif %}
+           aria-selected="{{ isActive ? 'true' : 'false' }}"
+                {% if uniqid %}
+                    id="{{ uniqid ~ '-tab'}}"
+                    aria-controls="{{ uniqid }}"
+                {% endif %}
         >
-            {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
+            {%- if form.vars.localization_title is not empty -%}
+                {{ form.vars.localization_title }}
+            {%- else -%}
+                {{ 'oro.email.emailtemplatetranslation.form.default_localization'|trans }}
+            {%- endif -%}
         </a>
     </li>
 {% endmacro %}
@@ -349,17 +368,27 @@
     Renders content of bootstrap tab panel
     paramters:
         form   - instance of FormView, it's a view for localized field
+        isActive - is current tab active
         uniqid - is unique identifier
 #}
-{% macro renderTab(form, uniqid = null) %}
-    {% set locale = form.vars.name %}
+{% macro renderTab(form, isActive = false, uniqid = null) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}"
+    <div class="emailtemplate-translatation-fields-{{ form.vars.name }} tab-pane{% if isActive %} active{% endif %}"
          role="tabpanel"
-        {% if uniqid %}
-            id="{{ uniqid }}"
-            aria-labelledby="{{ uniqid ~ '-tab' }}"
-        {% endif %}
+            {% if uniqid %}
+                id="{{ uniqid }}"
+                aria-labelledby="{{ uniqid ~ '-tab' }}"
+            {% endif %}
+            {{ UI.renderPageComponentAttributes({
+                view: 'oroemail/js/app/views/email-template-localization-view',
+                options: {
+                    'localization': {
+                        'id': form.vars.localization_id,
+                        'parentId': form.vars.localization_parent_id,
+                    }
+                }
+            }) }}
     >
         {{ form_widget(form) }}
     </div>

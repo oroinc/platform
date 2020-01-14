@@ -37,7 +37,6 @@ services:
 
     oro_sync.client.connection_checker:
         class: Oro\Bundle\SyncBundle\Client\ConnectionChecker
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_sync.websocket_client.basic'
@@ -62,6 +61,8 @@ services:
     oro_sync.authentication.origin.origin_provider_chain:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
         public: false
+        arguments:
+            - !tagged_iterator oro_sync.origin_provider
 
     oro_sync.authentication.origin.application_origin_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider

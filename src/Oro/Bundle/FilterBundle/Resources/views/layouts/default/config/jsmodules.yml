@@ -1,0 +1,4 @@
+map:
+    "*":
+        orofilter/templates/filter/filter-hint.html: orofilter/default/templates/filters/filter-hint.html
+        orofilter/templates/filters-container.html: orofilter/default/templates/filters/filters-container.html

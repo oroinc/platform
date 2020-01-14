@@ -1,22 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var DatagridManageFilterView;
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var DatagridModuleManagerView = require('orodatagrid/js/app/views/grid/datagrid-module-manager-view');
-    var DatagridSettingsListCollection = require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const DatagridModuleManagerView = require('orodatagrid/js/app/views/grid/datagrid-module-manager-view');
+    const DatagridSettingsListCollection =
+        require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-collection');
 
     /**
      * @class DatagridManageFilterView
      * @extends DatagridModuleManagerView
      */
-    DatagridManageFilterView = DatagridModuleManagerView.extend({
+    const DatagridManageFilterView = DatagridModuleManagerView.extend({
         /**
          * @inheritDoc
          */
-        constructor: function DatagridManageFilterView() {
-            DatagridManageFilterView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridManageFilterView(options) {
+            DatagridManageFilterView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -24,12 +24,12 @@ define(function(require) {
          * @param options
          */
         initialize: function(options) {
-            var filterCollection = this._applyState(options.collection, this.grid.collection.state.filters);
+            const filterCollection = this._applyState(options.collection, this.grid.collection.state.filters);
 
             this.collection = new DatagridSettingsListCollection(filterCollection);
 
             this.defaultState = this._getEnabledState();
-            DatagridManageFilterView.__super__.initialize.apply(this, arguments);
+            DatagridManageFilterView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -39,7 +39,7 @@ define(function(require) {
             this.listenTo(this.grid.collection, 'sync', this._onSync);
             this.listenTo(this.collection, 'change:renderable', _.debounce(this._pushState, this.pushStateTimeout));
 
-            return DatagridModuleManagerView.__super__.delegateListeners.apply(this, arguments);
+            return DatagridModuleManagerView.__super__.delegateListeners.call(this);
         },
 
         /**
@@ -47,7 +47,7 @@ define(function(require) {
          * @private
          */
         _pushState: function() {
-            var enabledState = this._getEnabledState();
+            const enabledState = this._getEnabledState();
             if (_.haveEqualSet(this.defaultState, enabledState)) {
                 return;
             }
@@ -72,7 +72,7 @@ define(function(require) {
          * @protected
          */
         _getEnabledState: function() {
-            var state = [];
+            const state = [];
 
             this.collection.each(function(filter) {
                 if (filter.get('renderable')) {
@@ -92,7 +92,7 @@ define(function(require) {
          */
         _applyState: function(collectionFilters, stateFilters) {
             _.each(collectionFilters, function(filter) {
-                var stateKey = '__' + filter['name'];
+                const stateKey = '__' + filter['name'];
                 if (_.has(stateFilters, stateKey)) {
                     filter['enabled'] = stateFilters[stateKey] !== '0';
                 }

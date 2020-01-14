@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var HighlightTextView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Popover = require('bootstrap-popover');
-    var FuzzySearch = require('oroui/js/fuzzy-search');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var highlightSwitcherTemplate = require('tpl!oroui/templates/highlight-switcher.html');
-    var inputWidgetManager = require('oroui/js/input-widget-manager');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Popover = require('bootstrap-popover');
+    const FuzzySearch = require('oroui/js/fuzzy-search');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const highlightSwitcherTemplate = require('tpl-loader!oroui/templates/highlight-switcher.html');
+    const inputWidgetManager = require('oroui/js/input-widget-manager');
 
-    HighlightTextView = BaseView.extend({
+    const HighlightTextView = BaseView.extend({
         /**
          * @inheritDoc
          */
@@ -124,8 +123,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HighlightTextView() {
-            HighlightTextView.__super__.constructor.apply(this, arguments);
+        constructor: function HighlightTextView(options) {
+            HighlightTextView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -139,7 +138,7 @@ define(function(require) {
             this.replaceBy = '<mark class="' + this.highlightClass + '">$&</mark>';
             this.combinedHighlightSelectors = this.highlightSelectors.join(', ');
 
-            HighlightTextView.__super__.initialize.apply(this, arguments);
+            HighlightTextView.__super__.initialize.call(this, options);
 
             this.renderHighlightSwitcher();
             this.update(this.text);
@@ -167,7 +166,7 @@ define(function(require) {
                 this.fuzzySearch = fuzzySearch;
             }
             this.text = text;
-            var regexp = this.text;
+            let regexp = this.text;
 
             if (this.fuzzySearch) {
                 regexp = this.text.toLowerCase().replace(/\s/g, '').split('');
@@ -206,7 +205,7 @@ define(function(require) {
          * @param {Element} groupEl
          */
         showGroupContainingHighlighted: function(groupEl) {
-            var $groupEl = $(groupEl);
+            const $groupEl = $(groupEl);
             if (this.isElementHighlighted($groupEl)) {
                 $groupEl.find(this.findNotFoundClass).removeClass(this.notFoundClass);
             }
@@ -219,7 +218,7 @@ define(function(require) {
          * @return {Array}
          */
         findElements: function(selectors) {
-            var elements = [];
+            const elements = [];
             _.each(selectors, function(selector) {
                 this.$(selector).each(function() {
                     elements.push({
@@ -238,7 +237,7 @@ define(function(require) {
          * @param {Object} element
          */
         toggleElement: function(element) {
-            var $el = element.$el;
+            const $el = element.$el;
             if (!$el.is(':visible')) {
                 return;
             }
@@ -248,7 +247,7 @@ define(function(require) {
                 return;
             }
 
-            var $parent = $el.closest(this.toggleSelectors[element.selector]);
+            const $parent = $el.closest(this.toggleSelectors[element.selector]);
             if (this.isElementHighlighted($parent) && !this.showNotFoundItems) {
                 $el.addClass(this.notFoundClass);
             }
@@ -261,7 +260,7 @@ define(function(require) {
          * @return {boolean}
          */
         isElementHighlighted: function($el) {
-            var $highlighted = $el.find(this.findElementHighlightClass);
+            let $highlighted = $el.find(this.findElementHighlightClass);
             if ($el.hasClass(this.elementHighlightClass)) {
                 $highlighted = $highlighted.add($el);
             }
@@ -276,7 +275,7 @@ define(function(require) {
          * @return {boolean}
          */
         isElementContentHighlighted: function($el, filterVisible) {
-            var $highlighted = $el.find(this.findHighlightClass);
+            let $highlighted = $el.find(this.findHighlightClass);
             if (filterVisible !== false) {
                 $highlighted = $highlighted.filter(':visible');
             }
@@ -289,8 +288,8 @@ define(function(require) {
          * @return {boolean}
          */
         isApplicableSwitcher: function() {
-            var foundHighlight = this.$el.find(this.findHighlightClass);
-            var foundSiblings = this.$el.find(this.findFoundClass).siblings().not(this.findHighlightClass);
+            const foundHighlight = this.$el.find(this.findHighlightClass);
+            const foundSiblings = this.$el.find(this.findFoundClass).siblings().not(this.findHighlightClass);
             return foundHighlight.length && foundSiblings.length;
         },
 
@@ -301,13 +300,13 @@ define(function(require) {
             this.unhighlightElementContent(this.$el);
 
             _.each(this.$el.find(this.findElementHighlightClass), function(element) {
-                var $el = $(element);
-                var popover = $el.data(Popover.DATA_KEY);
+                const $el = $(element);
+                const popover = $el.data(Popover.DATA_KEY);
 
                 $el.removeClass(this.elementHighlightClass);
 
                 if (popover !== void 0) {
-                    var $content = $('<div/>').html(popover.getContent());
+                    const $content = $('<div/>').html(popover.getContent());
                     this.unhighlightElementContent($content);
                     popover.updateContent($content.html());
                 }
@@ -323,11 +322,11 @@ define(function(require) {
          * @param {Object} element
          */
         highlightElement: function(element) {
-            var result = false;
-            var $content;
-            var $el = element.$el;
-            var $highlightTarget = $el;
-            var popover;
+            let result = false;
+            let $content;
+            const $el = element.$el;
+            let $highlightTarget = $el;
+            let popover;
 
             if ($el.attr('data-toggle') === 'popover' && (popover = $el.data(Popover.DATA_KEY)) !== void 0) {
                 $content = $('<div/>').html(popover.getContent());
@@ -373,19 +372,22 @@ define(function(require) {
          * @param {jQuery} $content
          */
         highlightElementContent: function($content) {
-            var result = false;
+            let result = false;
 
             _.each($content.contents(), function(children) {
-                var $children = $(children);
+                const $children = $(children);
                 if (children.nodeType === Node.TEXT_NODE) {
-                    var text = children.textContent;
+                    let text = children.textContent;
                     if (this.textContainsSearchTerm(text)) {
                         result = true;
                         text = text.replace(this.findText, this.replaceBy);
                         $children.replaceWith(text);
                     }
                 } else {
-                    if (!$children.is(this.combinedHighlightSelectors)) {
+                    if (
+                        children.nodeType === Node.ELEMENT_NODE &&
+                        !$children.is(this.combinedHighlightSelectors)
+                    ) {
                         result = this.highlightElement({
                             $el: $children
                         }) || result;
@@ -403,8 +405,8 @@ define(function(require) {
          */
         unhighlightElementContent: function($content) {
             $content.find(this.findHighlightClass).each(function(index, el) {
-                var $el = $(el);
-                var parent = el.parentNode;
+                const $el = $(el);
+                const parent = el.parentNode;
 
                 $el.contents().unwrap();
 
@@ -452,7 +454,7 @@ define(function(require) {
          * Check highlight switcher state and get value from localStorage
          */
         checkHighlightSwitcherState: function() {
-            var switcherState = persistentStorage.getItem(this.highlightStateStorageKey);
+            const switcherState = persistentStorage.getItem(this.highlightStateStorageKey);
             if (this.highlightStateStorageKey && switcherState) {
                 this.showNotFoundItems = switcherState === 'true';
             }
@@ -498,8 +500,8 @@ define(function(require) {
          * @param {jQuery} $element
          */
         _isFieldChoice: function($element) {
-            var $child;
-            var isFieldChoice = this._isField($element) && $element.is('select');
+            let $child;
+            const isFieldChoice = this._isField($element) && $element.is('select');
             if (!isFieldChoice) {
                 $child = $element.find('select');
                 if ($child.length) {
@@ -525,8 +527,8 @@ define(function(require) {
          * @param {jQuery} $element
          */
         _isField: function($element) {
-            var elementName = $element[0].getAttribute('data-name');
-            var fieldName = 'field__value';
+            const elementName = $element[0].getAttribute('data-name');
+            const fieldName = 'field__value';
 
             return elementName === fieldName;
         },
@@ -560,7 +562,7 @@ define(function(require) {
          * @return {boolean}
          */
         select2ContainsSearchText: function($el) {
-            var result = false;
+            let result = false;
 
             if (this.findText) {
                 if ($el.is('select')) {
@@ -570,11 +572,11 @@ define(function(require) {
                         return !result;
                     }.bind(this));
                 } else {
-                    var initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
+                    const initializeOptions = _.result($el.data('inputWidget'), 'initializeOptions');
 
                     if (_.isArray(initializeOptions.data)) {
                         result = _.some(initializeOptions.data, function(item) {
-                            var text = _.isString(item) ? item : item.text;
+                            const text = _.isString(item) ? item : item.text;
 
                             return this.findText.test(text);
                         }, this);

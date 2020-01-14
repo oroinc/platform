@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var DeviceInnerPageView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroviewswitcher/templates/switcher-inner-page.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!oroviewswitcher/templates/switcher-inner-page.html');
 
-    DeviceInnerPageView = BaseView.extend({
+    const DeviceInnerPageView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'data'
         ]),
@@ -44,14 +43,14 @@ define(function(require) {
                 this.$el.addClass('closed-head-panel');
             }
 
-            DeviceInnerPageView.__super__.initialize.apply(this, arguments);
+            DeviceInnerPageView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = DeviceInnerPageView.__super__.getTemplateData.apply(this, arguments);
+            const data = DeviceInnerPageView.__super__.getTemplateData.call(this);
 
             return _.extend({}, data, this.data);
         },
@@ -95,7 +94,7 @@ define(function(require) {
          * Updates HTML of the view
          */
         updateMarkup: function() {
-            var viewName = this.getActiveView();
+            const viewName = this.getActiveView();
             this.$('.view-switcher__item').removeClass('active');
             this.$('.view-switcher .' + viewName).addClass('active');
             this.$('.content-area__wrapper').attr('data-view-name', viewName);
@@ -107,7 +106,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onViewSwitchClick: function(e) {
-            var viewName = this.$(e.currentTarget).data('view-name');
+            const viewName = this.$(e.currentTarget).data('view-name');
             e.preventDefault();
             if (viewName === this.getActiveView()) {
                 return;
@@ -127,7 +126,7 @@ define(function(require) {
          * @param event
          */
         proxyClickEvent: function(event) {
-            var actionName = $(event.currentTarget).data('click-action');
+            const actionName = $(event.currentTarget).data('click-action');
             mediator.trigger('demo-page-action:' + actionName, event);
         }
     });

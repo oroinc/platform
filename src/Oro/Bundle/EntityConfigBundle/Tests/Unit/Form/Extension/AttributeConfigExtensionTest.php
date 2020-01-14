@@ -189,9 +189,9 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertFalse($this->builder->has('attribute'));
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        $this->assertEquals(ConfigType::class, $this->extension->getExtendedType());
+        $this->assertEquals([ConfigType::class], AttributeConfigExtension::getExtendedTypes());
     }
 
     public function testOnPostSetData()

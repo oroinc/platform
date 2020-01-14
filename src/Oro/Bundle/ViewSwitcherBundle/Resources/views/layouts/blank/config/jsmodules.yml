@@ -1,0 +1,5 @@
+app-modules:
+    - oroviewswitcher/js/app/modules/device-emulate-module
+configs:
+    oroviewswitcher/js/app/modules/device-emulate-module: {}
+    oroviewswitcher/js/app/views/device-switcher-view: {}

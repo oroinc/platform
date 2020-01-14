@@ -1,10 +1,10 @@
 placeholders:
     placeholders:
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                locale_requirejs_config:
+                locale_js_modules_config:
                     order: 100
 
     items:
-        locale_requirejs_config:
-            template: OroLocaleBundle::requirejs.config.js.twig
+        locale_js_modules_config:
+            template: OroLocaleBundle::js_modules_config.html.twig

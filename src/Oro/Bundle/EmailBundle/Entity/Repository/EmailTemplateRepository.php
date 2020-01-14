@@ -4,9 +4,8 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -65,12 +64,12 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Return templates query builder filtered by entity name
      *
-     * @param string       $entityName    entity class
+     * @param string $entityName entity class
      * @param Organization $organization
-     * @param bool         $includeNonEntity if true - system templates will be included in result set
-     * @param bool         $includeSystemTemplates
-     * @param bool         $visibleOnly
-     * @param array        $excludeNames
+     * @param bool $includeNonEntity if true - system templates will be included in result set
+     * @param bool $includeSystemTemplates
+     * @param bool $visibleOnly
+     * @param array $excludeNames
      *
      * @return QueryBuilder
      */
@@ -122,6 +121,7 @@ class EmailTemplateRepository extends EntityRepository
     {
         return $this->createQueryBuilder('e')
             ->select('e.entityName')
+            ->where('e.entityName IS NOT NULL')
             ->distinct();
     }
 
@@ -140,25 +140,18 @@ class EmailTemplateRepository extends EntityRepository
 
     /**
      * @param EmailTemplateCriteria $criteria
-     * @param string $language
      * @return EmailTemplate|null
-     * @throws NonUniqueResultException
+     * @throws NonUniqueResultException|NoResultException
      */
-    public function findOneLocalized(EmailTemplateCriteria $criteria, string $language): ?EmailTemplate
+    public function findWithLocalizations(EmailTemplateCriteria $criteria): ?EmailTemplate
     {
-        $queryBuilder = $this->createQueryBuilder('t')->select('t');
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->select('t', 'translations')
+            ->leftJoin('t.translations', 'translations');
+
         $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
 
-        $query = $queryBuilder->getQuery();
-        $query
-            ->setHint(
-                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
-                TranslationWalker::class
-            )
-            ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $language)
-            ->useQueryCache(false); // due to bug https://github.com/Atlantic18/DoctrineExtensions/issues/1021
-
-        return $query->getOneOrNullResult();
+        return $queryBuilder->getQuery()->getSingleResult();
     }
 
     /**
@@ -170,7 +163,7 @@ class EmailTemplateRepository extends EntityRepository
         $queryBuilder = $this->createQueryBuilder('t')->select('1');
         $this->resolveEmailTemplateCriteria($queryBuilder, $criteria);
 
-        return (bool) $queryBuilder->getQuery()->getResult();
+        return (bool)$queryBuilder->getQuery()->getResult();
     }
 
     /**

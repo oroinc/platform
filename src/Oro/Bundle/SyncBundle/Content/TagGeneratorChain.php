@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
+/**
+ * Delegates the generation of tags to child generators.
+ * Child generators should be responsible for cache calls for the same data.
+ */
 class TagGeneratorChain implements TagGeneratorInterface
 {
-    /** @var TagGeneratorInterface[] */
-    protected $generators = [];
+    /** @var iterable|TagGeneratorInterface[] */
+    private $generators;
 
     /**
-     * @param TagGeneratorInterface $generator
-     *
-     * @return TagGeneratorChain
+     * @param iterable|TagGeneratorInterface[] $generators
      */
-    public function addGenerator(TagGeneratorInterface $generator)
+    public function __construct(iterable $generators)
     {
-        $this->generators[] = $generator;
-
-        return $this;
+        $this->generators = $generators;
     }
 
     /**
@@ -34,21 +34,19 @@ class TagGeneratorChain implements TagGeneratorInterface
     }
 
     /**
-     * Delegate tag generation to registered strategies
-     * Strategy should be responsible for cache calls for the same data
-     *
      * {@inheritdoc}
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $tags = [];
-
         foreach ($this->generators as $generator) {
             if ($generator->supports($data)) {
-                $tags = array_merge($tags, $generator->generate($data, $includeCollectionTag, $processNestedData));
+                $tags[] = $generator->generate($data, $includeCollectionTag, $processNestedData);
             }
         }
-        $tags = array_unique($tags);
+        if ($tags) {
+            $tags = array_values(array_unique(array_merge(...$tags)));
+        }
 
         return $tags;
     }

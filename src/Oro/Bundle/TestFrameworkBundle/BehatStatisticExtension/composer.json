@@ -2,14 +2,14 @@
     "name": "oroinc/behat-statistic-extension",
     "description": "Added database statistic formatter and suite divider",
     "require": {
-        "php": "7.1.*",
+        "php": "~7.3.13",
         "behat/behat": "3.4.*",
         "doctrine/dbal": "2.5.5",
         "symfony/config": "3.4.*"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "phpunit/phpunit": "7.5.*",
+        "phpunit/phpunit": "7.5.15",
         "symfony/process": "3.4.*",
         "symfony/yaml": "3.4.*",
         "symfony/console": "3.4.*"
@@ -27,10 +27,6 @@
         "oro": {
             "type": "composer",
             "url": "https://packagist.orocrm.com"
-        },
-        "asset-packagist": {
-            "type": "composer",
-            "url": "https://asset-packagist.orocrm.com"
         }
     },
     "config": {

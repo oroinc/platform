@@ -1,15 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var defaultOptionalValidationHandler = require('oroform/js/optional-validation-handler');
+    const $ = require('jquery');
+    const moduleRegistry = require('oroui/js/app/services/module-registry');
+    const defaultOptionalValidationHandler = require('oroform/js/optional-validation-handler');
 
     return {
         /**
          * @constructor
          */
         initialize: function(formElement) {
-            var self = this;
+            const self = this;
 
             formElement.on(
                 'change',
@@ -26,7 +27,7 @@ define(function(require) {
                 'validation-optional-group-value-changed',
                 '[data-validation-optional-group]',
                 function(event) {
-                    var shouldBeBubbled = self.handleFormChanges($(this), $(event.target));
+                    const shouldBeBubbled = self.handleFormChanges($(this), $(event.target));
                     if (!shouldBeBubbled) {
                         event.stopPropagation();
                     }
@@ -43,7 +44,7 @@ define(function(require) {
          * @return {boolean}
          */
         handleFormChanges: function($group, $element) {
-            var optionalValidationHandler = this.getHandler($group);
+            const optionalValidationHandler = this.getHandler($group);
 
             return optionalValidationHandler.handle($group, $element);
         },
@@ -54,14 +55,14 @@ define(function(require) {
          * @return {boolean}
          */
         initializeOptionalValidationGroupHandlers: function($formElement) {
-            var self = this;
+            const self = this;
 
-            var rootOptionalValidationGroups = this.getRootLevelOptionalValidationGroups($formElement);
+            const rootOptionalValidationGroups = this.getRootLevelOptionalValidationGroups($formElement);
             rootOptionalValidationGroups.each(function(index, group) {
-                var $group = $(group);
+                const $group = $(group);
                 self.initializeOptionalValidationGroupHandlers($group);
 
-                var optionalValidationHandler = self.getHandler($group);
+                const optionalValidationHandler = self.getHandler($group);
                 optionalValidationHandler.initialize($group);
             });
         },
@@ -85,9 +86,9 @@ define(function(require) {
             /**
              * Handlers should be preloaded using app-module
              */
-            var handler = $group.data('validation-optional-group-handler');
+            const handler = $group.data('validation-optional-group-handler');
 
-            return handler ? require(handler) : defaultOptionalValidationHandler;
+            return handler ? moduleRegistry.get(handler) : defaultOptionalValidationHandler;
         }
     };
 });

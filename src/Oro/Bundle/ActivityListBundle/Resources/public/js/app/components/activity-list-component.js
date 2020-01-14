@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var ActivityListComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var tools = require('oroui/js/tools');
-    var mediator = require('oroui/js/mediator');
-    var ActivityView = require('../views/activity-view');
-    var ActivityListView = require('../views/activity-list-view');
-    var ActivityModel = require('../models/activity-list-model');
-    var ActivityCollection = require('../models/activity-list-collection');
-    var MultiSelectFilter = require('oro/filter/multiselect-filter');
-    var DatetimeFilter = require('oro/filter/datetime-filter');
-    var dataFilterWrapper = require('orofilter/js/datafilter-wrapper');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mediator = require('oroui/js/mediator');
+    const ActivityView = require('../views/activity-view');
+    const ActivityListView = require('../views/activity-list-view');
+    const ActivityModel = require('../models/activity-list-model');
+    const ActivityCollection = require('../models/activity-list-collection');
+    const MultiSelectFilter = require('oro/filter/multiselect-filter');
+    const DatetimeFilter = require('oro/filter/datetime-filter');
+    const dataFilterWrapper = require('orofilter/js/datafilter-wrapper');
 
-    ActivityListComponent = BaseComponent.extend({
+    const ActivityListComponent = BaseComponent.extend({
         defaults: {
             activityListOptions: {
                 configuration: {},
@@ -48,8 +47,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActivityListComponent() {
-            ActivityListComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityListComponent(options) {
+            ActivityListComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -61,7 +60,7 @@ define(function(require) {
 
             if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
-                tools.loadModules(this.options.modules, function(modules) {
+                loadModules(this.options.modules, function(modules) {
                     _.extend(this.options.activityListOptions, modules);
                     this._init();
                     this._resolveDeferredInit();
@@ -72,9 +71,8 @@ define(function(require) {
         },
 
         processOptions: function() {
-            var defaults;
-            var activityListData;
-            defaults = $.extend(true, {}, this.defaults);
+            let activityListData;
+            const defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
             _.defaults(this.options.commentOptions, defaults.commentOptions);
@@ -102,12 +100,10 @@ define(function(require) {
         },
 
         _init: function() {
-            var activityOptions;
-            var collection;
-            activityOptions = this.options.activityListOptions;
+            const activityOptions = this.options.activityListOptions;
 
             // setup activity list collection
-            collection = this.collection = new ActivityCollection(this.options.activityListData, {
+            const collection = this.collection = new ActivityCollection(this.options.activityListData, {
                 model: activityOptions.itemModel
             });
             collection.route = activityOptions.urls.route;
@@ -183,20 +179,18 @@ define(function(require) {
          * @param {ActivityModel} model
          */
         initComments: function(model) {
-            var itemView;
-            var commentOptions;
-            var activityClass = model.getRelatedActivityClass();
-            var configuration = this.options.activityListOptions.configuration[activityClass];
+            const activityClass = model.getRelatedActivityClass();
+            const configuration = this.options.activityListOptions.configuration[activityClass];
 
             if (!configuration || !configuration.has_comments) {
                 // comments component is not configured for the activity
                 return;
             }
 
-            itemView = this.listView.getItemView(model);
+            const itemView = this.listView.getItemView(model);
 
             // makes copy of commentOptions
-            commentOptions = $.extend(true, {}, this.options.commentOptions);
+            const commentOptions = $.extend(true, {}, this.options.commentOptions);
             // extend commentOptions with model related options
             _.extend(commentOptions, {
                 relatedEntityId: model.get('relatedActivityId'),
@@ -211,17 +205,16 @@ define(function(require) {
          * @param $el
          */
         renderFilters: function($el) {
-            var activityClass;
-            var activityOptions;
-            var DateRangeFilterWithMeta;
-            var $filterContainer = $el.find('.filter-container');
+            let activityClass;
+            let activityOptions;
+            const $filterContainer = $el.find('.filter-container');
 
             /*
              * render "Activity Type" filter
              */
             // prepare choices
-            var activityTypeChoices = {};
-            var configuration = this.options.activityListOptions.configuration;
+            const activityTypeChoices = {};
+            const configuration = this.options.activityListOptions.configuration;
             for (activityClass in configuration) {
                 if (configuration.hasOwnProperty(activityClass)) {
                     activityOptions = configuration[activityClass];
@@ -244,7 +237,8 @@ define(function(require) {
              * Render "Date Range" filter
              */
             // create instance
-            DateRangeFilterWithMeta = DatetimeFilter.extend(this.options.activityListOptions.dateRangeFilterMetadata);
+            const DateRangeFilterWithMeta =
+                DatetimeFilter.extend(this.options.activityListOptions.dateRangeFilterMetadata);
             this.dateRangeFilter = new DateRangeFilterWithMeta({
                 label: __('oro.activitylist.widget.filter.date_picker.title')
             });
@@ -258,7 +252,7 @@ define(function(require) {
         },
 
         registerWidget: function() {
-            var listView = this.listView;
+            const listView = this.listView;
             mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function(widget) {
                 widget.getAction('refresh', 'top', function(action) {
                     action.on('click', _.bind(listView.refresh, listView));

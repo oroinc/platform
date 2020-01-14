@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
+use Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\Event\Events;
+use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 use Oro\Bundle\UIBundle\View\ScrollData;
@@ -36,6 +37,7 @@ use Twig\TwigFunction;
  *   - oro_url_add_query
  *   - oro_is_url_local
  *   - skype_button
+ *   - oro_form_additional_data (Returns Additional section data which is used for rendering)
  *
  * Provides Twig filters that expose some common PHP functions:
  *   - oro_js_template_content
@@ -45,6 +47,7 @@ use Twig\TwigFunction;
  *   - ceil
  *   - oro_preg_replace
  *   - oro_sort_by
+ *   - url_decode
  *
  * Provides a Twig tag to work with placeholders:
  *   - placeholder
@@ -56,13 +59,19 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 {
     const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
 
+    // Big number is set to guarantee Additional section is rendered at the end
+    public const ADDITIONAL_SECTION_PRIORITY = 10000;
+
+    // Represents key which is used for Additional section in array of blocks to identify it and make possible to work
+    public const ADDITIONAL_SECTION_KEY = 'oro_additional_section_key';
+
     /** @var ContainerInterface */
     protected $container;
 
     /**
      * Protect extension from infinite loop during a widget rendering
      *
-     * @var bool
+     * @var array
      */
     protected $renderedWidgets = [];
 
@@ -91,19 +100,14 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * @return ContentProviderManager
+     * @return UserAgent
      */
-    protected function getContentProviderManager()
+    protected function getUserAgent()
     {
-        return $this->container->get(ContentProviderManager::class);
-    }
+        /** @var UserAgentProviderInterface $userAgentProvider */
+        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
 
-    /**
-     * @return UserAgentProviderInterface
-     */
-    protected function getUserAgentProvider()
-    {
-        return $this->container->get(UserAgentProviderInterface::class);
+        return $userAgentProvider->getUserAgent();
     }
 
     /**
@@ -138,8 +142,12 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             new TwigFilter('uniqid', 'uniqid'),
             new TwigFilter('floor', 'floor'),
             new TwigFilter('ceil', 'ceil'),
+            new TwigFilter('render_content', static function ($string) {
+                return $string;
+            }),
             new TwigFilter('oro_preg_replace', [$this, 'pregReplace']),
-            new TwigFilter('oro_sort_by', [$this, 'sortBy'])
+            new TwigFilter('oro_sort_by', [$this, 'sortBy']),
+            new TwigFilter('url_decode', 'urldecode')
         ];
     }
 
@@ -167,6 +175,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             new TwigFunction(
                 'oro_form_process',
                 [$this, 'processForm'],
+                ['needs_environment' => true]
+            ),
+            new TwigFunction(
+                'oro_form_additional_data',
+                [$this, 'renderAdditionalData'],
                 ['needs_environment' => true]
             ),
             new TwigFunction(
@@ -246,6 +259,51 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
+     * @param TwigEnvironment $environment
+     * @param FormView $form
+     * @param string $label
+     * @param array $additionalData
+     *
+     * @return array
+     */
+    public function renderAdditionalData(
+        TwigEnvironment $environment,
+        FormView $form,
+        string $label,
+        array $additionalData = []
+    ): array {
+        foreach ($form->children as $child) {
+            if (empty($child->vars['extra_field'])) {
+                continue;
+            }
+
+            $additionalData[$child->vars['name']] = $environment->render(
+                'OroUIBundle::form_row.html.twig',
+                ['child' => $child]
+            );
+        }
+
+        if ($additionalData) {
+            $additionalData = [
+                self::ADDITIONAL_SECTION_KEY =>
+                    [
+                        'title' => $label,
+                        'priority' => self::ADDITIONAL_SECTION_PRIORITY,
+                        'subblocks' => [
+                            [
+                                'title' => '',
+                                'useSpan' => false,
+                                'data' => $additionalData
+                            ]
+                        ]
+                    ]
+            ];
+        }
+
+        return $additionalData;
+    }
+
+    /**
      * @param TwigEnvironment   $environment
      * @param array             $data
      * @param object            $entity
@@ -302,7 +360,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             $options['url'],
             $widgetType,
             $options['wid'],
-            isset($options['widgetTemplate']) ? $options['widgetTemplate'] : null
+            $options['widgetTemplate'] ?? null
         );
 
         $request = $this->getRequest();
@@ -406,7 +464,9 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function getContent(array $additionalContent = null, array $keys = null)
     {
-        $content = $this->getContentProviderManager()->getContent($keys);
+        /** @var TwigContentProviderManager $contentProviderManager */
+        $contentProviderManager = $this->container->get('oro_ui.content_provider.manager.twig');
+        $content = $contentProviderManager->getContent($keys);
         if ($additionalContent) {
             $content = array_merge($content, $additionalContent);
         }
@@ -480,7 +540,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function isMobile()
     {
-        return $this->getUserAgentProvider()->getUserAgent()->isMobile();
+        return $this->getUserAgent()->isMobile();
     }
 
 
@@ -491,7 +551,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function isDesktop()
     {
-        return $this->getUserAgentProvider()->getUserAgent()->isDesktop();
+        return $this->getUserAgent()->isDesktop();
     }
 
     /**
@@ -577,7 +637,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function sortBy(array $array, array $options = [])
     {
-        $sortingType = self::getOption($options, 'sorting-type', 'number');
+        $sortingType = $options['sorting-type'] ?? 'number';
         if ($sortingType === 'number') {
             $sortingFlags = SORT_NUMERIC;
         } else {
@@ -589,26 +649,12 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
         ArrayUtil::sortBy(
             $array,
-            self::getOption($options, 'reverse', false),
-            self::getOption($options, 'property', 'priority'),
+            $options['reverse'] ?? false,
+            $options['property'] ?? 'priority',
             $sortingFlags
         );
 
         return $array;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
-     */
-    protected static function getOption($options, $name, $defaultValue = null)
-    {
-        return isset($options[$name])
-            ? $options[$name]
-            : $defaultValue;
     }
 
     /**
@@ -632,7 +678,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             $options['name'] = 'call';
         }
 
-        $templateName = isset($options['template']) ? $options['template'] : self::SKYPE_BUTTON_TEMPLATE;
+        $templateName = $options['template'] ?? self::SKYPE_BUTTON_TEMPLATE;
         unset($options['template']);
 
         return $environment->render($templateName, ['options' => $options]);
@@ -644,10 +690,10 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     public static function getSubscribedServices()
     {
         return [
+            'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,
+            'oro_ui.user_agent_provider' => UserAgentProviderInterface::class,
             EventDispatcherInterface::class,
             RequestStack::class,
-            ContentProviderManager::class,
-            UserAgentProviderInterface::class,
         ];
     }
 }

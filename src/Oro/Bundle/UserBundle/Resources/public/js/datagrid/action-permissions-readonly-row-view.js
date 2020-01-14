@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ActionPermissionsReadonlyRowView;
-    var _ = require('underscore');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
-    var ReadonlyFieldView = require('orouser/js/datagrid/action-permissions-readonly-field-view');
-    var PermissionModel = require('orouser/js/models/role/permission-model');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
+    const ReadonlyFieldView = require('orouser/js/datagrid/action-permissions-readonly-field-view');
+    const PermissionModel = require('orouser/js/models/role/permission-model');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    ActionPermissionsReadonlyRowView = BaseView.extend({
+    const ActionPermissionsReadonlyRowView = BaseView.extend({
         tagName: 'tr',
 
         className: 'grid-row collapsed',
@@ -19,7 +18,7 @@ define(function(require) {
 
         animationDuration: 0,
 
-        template: require('tpl!orouser/templates/datagrid/action-permissions-row-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/action-permissions-row-view.html'),
 
         permissionItemView: PermissionReadOnlyView,
 
@@ -28,8 +27,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ActionPermissionsReadonlyRowView() {
-            ActionPermissionsReadonlyRowView.__super__.constructor.apply(this, arguments);
+        constructor: function ActionPermissionsReadonlyRowView(options) {
+            ActionPermissionsReadonlyRowView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -37,7 +36,7 @@ define(function(require) {
          */
         initialize: function(options) {
             ActionPermissionsReadonlyRowView.__super__.initialize.call(this, options);
-            var fields = this.model.get('fields');
+            let fields = this.model.get('fields');
             if (typeof fields === 'string') {
                 fields = JSON.parse(fields);
             }
@@ -56,7 +55,7 @@ define(function(require) {
 
         render: function() {
             ActionPermissionsReadonlyRowView.__super__.render.call(this);
-            var fields = this.model.get('fields');
+            const fields = this.model.get('fields');
             this.subview('permissions-items', new BaseCollectionView({
                 el: this.$('[data-name=action-permissions-items]'),
                 tagName: 'ul',

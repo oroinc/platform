@@ -31,7 +31,16 @@ class FieldsTransformer
 
             $newValue = $field->getNewValue();
             $oldValue = $field->getOldValue();
-            if (in_array($field->getDataType(), ['date', 'datetime', 'array', 'jsonarray'], true)) {
+            $simpleTypes = [
+                'date' => true,
+                'date_immutable' => true,
+                'datetime' => true,
+                'datetimetz' => true,
+                'time' => true,
+                'array' => true,
+                'jsonarray' => true,
+            ];
+            if (array_key_exists($field->getDataType(), $simpleTypes)) {
                 $newValue = [
                     'value' => $newValue,
                     'type' => $field->getDataType(),
@@ -45,6 +54,13 @@ class FieldsTransformer
                 'old' => $oldValue,
                 'new' => $newValue,
             ];
+
+            if (method_exists($field, 'getCollectionDiffs')) {
+                $collectionDiffs = $field->getCollectionDiffs();
+                if ($collectionDiffs['added'] || $collectionDiffs['changed'] || $collectionDiffs['removed']) {
+                    $data[$field->getField()]['collectionDiffs'] = $field->getCollectionDiffs();
+                }
+            }
 
             if ($field->getTranslationDomain()) {
                 $data[$field->getField()]['translationDomain'] = $field->getTranslationDomain();

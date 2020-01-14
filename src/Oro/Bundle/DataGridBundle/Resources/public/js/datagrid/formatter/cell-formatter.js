@@ -9,7 +9,7 @@ define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
      * @class   orodatagrid.datagrid.formatter.CellFormatter
      * @extends Backgrid.CellFormatter
      */
-    var CellFormatter = function() {};
+    const CellFormatter = function() {};
 
     CellFormatter.prototype = new Backgrid.CellFormatter();
 
@@ -21,7 +21,7 @@ define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
             if (rawData === null) {
                 return '';
             }
-            var result = Backgrid.CellFormatter.prototype.fromRaw.apply(this, arguments);
+            const result = Backgrid.CellFormatter.prototype.fromRaw.call(this, rawData);
             return textUtil.prepareText(result);
         }
     });

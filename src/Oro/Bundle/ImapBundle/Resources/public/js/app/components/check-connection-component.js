@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var CheckConnectionView = require('../views/check-connection-view');
-    var CheckConnectionModel = require('../models/check-connection-model');
-    var CheckConnectionComponent;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const CheckConnectionView = require('../views/check-connection-view');
+    const CheckConnectionModel = require('../models/check-connection-model');
 
-    CheckConnectionComponent = BaseComponent.extend({
+    const CheckConnectionComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
-        constructor: function CheckConnectionComponent() {
-            CheckConnectionComponent.__super__.constructor.apply(this, arguments);
+        constructor: function CheckConnectionComponent(options) {
+            CheckConnectionComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -24,7 +23,7 @@ define(function(require) {
          */
         initialize: function(options) {
             if (options.elementNamePrototype) {
-                var viewOptions = _.extend({
+                const viewOptions = _.extend({
                     model: new CheckConnectionModel({}),
                     el: $(options._sourceElement).closest(options.parentElementSelector),
                     entity: options.forEntity || 'user',

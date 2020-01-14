@@ -10,6 +10,9 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 
+/**
+ * The toolbar extension for DataGrid.
+ */
 class ToolbarExtension extends AbstractExtension
 {
     /**
@@ -110,7 +113,7 @@ class ToolbarExtension extends AbstractExtension
 
         $options = $config->offsetGetByPath(ToolbarExtension::OPTIONS_PATH, []);
 
-        // get user specified require js modules from options
+        // get user specified js modules from options
         if (isset($options[MetadataObject::REQUIRED_MODULES_KEY])) {
             $data->offsetAddToArray(
                 MetadataObject::REQUIRED_MODULES_KEY,

@@ -58,7 +58,7 @@ datagrids:
                 createdAt:
                     data_name: process.createdAt
             default:
-                label: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                label: ASC
         actions:
             view:
                 type:         navigate
@@ -293,7 +293,7 @@ datagrids:
         filters: ~
         sorters: ~
         options:
-            requireJSModules:
+            jsmodules:
                 - oroworkflow/js/datagrid/workflow-datagrid-builder
             toolbarOptions:
                 placement:

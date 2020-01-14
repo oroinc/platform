@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
 
     function BasePlugin(main, manager, options) {
         this.main = main;
@@ -49,7 +49,7 @@ define(function(require) {
             this.trigger('disposed');
             this.off();
             this.stopListening();
-            for (var prop in this) {
+            for (const prop in this) {
                 if (this.hasOwnProperty(prop)) {
                     delete this[prop];
                 }

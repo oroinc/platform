@@ -70,6 +70,14 @@ services:
     Oro\Bundle\PlatformBundle\Provider\PackageProvider:
         alias: oro_platform.provider.package
 
+    oro_platform.provider.deployment_variables:
+        class: 'Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider'
+        arguments:
+            - '@parameter_bag'
+
+    Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider:
+        alias: oro_platform.provider.deployment_variables
+
     oro_platform.twig.platform_extension:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
         public: false
@@ -80,7 +88,6 @@ services:
 
     oro_platform.optional_listeners.manager:
         class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
            - []
@@ -116,7 +123,6 @@ services:
 
     oro_platform.command_executor:
         class: Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '%kernel.project_dir%/bin/console'
@@ -134,3 +140,6 @@ services:
             - [] # services. Will be set in Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass
         tags:
             - { name: container.service_locator }
+
+    Doctrine\Persistence\ManagerRegistry:
+        alias: 'doctrine'

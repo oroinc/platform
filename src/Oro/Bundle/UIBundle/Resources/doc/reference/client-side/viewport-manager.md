@@ -92,12 +92,12 @@ screenMap: [
 
 #####You can override these breakpoints [via scss variables](https://github.com/oroinc/customer-portal/blob/master/src/Oro/Bundle/FrontendBundle/Resources/doc/frontendStylesCustomization.md#how-to-change-media-breakpoints)
 
-###Overriding via require config for specific theme
+###Overriding via js module config for specific theme
 #####This config will has the highest priority
 
-```javascript
-require({
-    config: {
+```twig
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
         'oroui/js/viewport-manager': {
             screenMap: [
                 {
@@ -114,16 +114,15 @@ require({
                 }
             ]
         }
-    }
-});
+}); }}
 
 ```
 
 
 ####To delete inherited screen type need set `skip: true` for a specific screen name
-```javascript
-require({
-    config: {
+```twig
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
         'oroui/js/viewport-manager': {
             screenMap: [
                 {
@@ -137,7 +136,7 @@ require({
             ]
         }
     }
-});
+}); }}
 ```
 
 ## Screen Types

@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerModalView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
-    var WidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
-    var WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
-    var ModalView = require('oroui/js/modal');
-    var constants = require('orosidebar/js/sidebar-constants');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const widgetPickerModalTemplate = require('text-loader!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    const WidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
+    const WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
+    const ModalView = require('oroui/js/modal');
+    const constants = require('orosidebar/js/sidebar-constants');
 
-    var __ = require('orotranslation/js/translator');
+    const __ = require('orotranslation/js/translator');
 
-    WidgetPickerModalView = ModalView.extend({
+    const WidgetPickerModalView = ModalView.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal widget-picker__modal',
 
@@ -46,8 +45,8 @@ define(function(require) {
          * @inheritDoc
          */
         open: function(cb) {
-            WidgetPickerModalView.__super__.open.apply(this, arguments);
-            var widgetPickerCollection = new BaseCollection(
+            WidgetPickerModalView.__super__.open.call(this, cb);
+            const widgetPickerCollection = new BaseCollection(
                 this.availableWidgets,
                 {model: WidgetPickerModel}
             );
@@ -76,16 +75,16 @@ define(function(require) {
          * @param {Function} afterLoadFunc
          */
         loadWidget: function(widgetPickerModel, afterLoadFunc) {
-            var position = this.sidebarPosition;
-            var widgetCollection = this.widgetCollection;
-            var widgetData = widgetPickerModel.getData();
-            var placement = null;
+            const position = this.sidebarPosition;
+            const widgetCollection = this.widgetCollection;
+            const widgetData = widgetPickerModel.getData();
+            let placement = null;
             if (position === constants.SIDEBAR_LEFT) {
                 placement = 'left';
             } else if (position === constants.SIDEBAR_RIGHT) {
                 placement = 'right';
             }
-            var widget = new WidgetContainerModel(_.extend({}, widgetData, {
+            const widget = new WidgetContainerModel(_.extend({}, widgetData, {
                 position: widgetCollection.length,
                 placement: placement
             }), {collection: widgetCollection});

@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var DatePickerView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var moment = require('moment');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const moment = require('moment');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
-    DatePickerView = BaseView.extend({
+    const DatePickerView = BaseView.extend({
         defaults: {
             dateInputAttrs: {
                 autocomplete: 'off'
@@ -53,8 +52,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatePickerView() {
-            DatePickerView.__super__.constructor.apply(this, arguments);
+        constructor: function DatePickerView(options) {
+            DatePickerView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -66,7 +65,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = {};
+            const opts = {};
             $.extend(true, opts, this.defaults, options);
             $.extend(this, _.pick(opts, ['nativeMode', 'backendFormat']));
 
@@ -83,7 +82,7 @@ define(function(require) {
                 this.updateFront();
             }
 
-            DatePickerView.__super__.initialize.apply(this, arguments);
+            DatePickerView.__super__.initialize.call(this, options);
         },
 
         /**
@@ -103,7 +102,7 @@ define(function(require) {
             }
             this.$frontDateField.off().remove();
             this.$el.unwrap();
-            DatePickerView.__super__.initialize.apply(this, arguments);
+            DatePickerView.__super__.dispose.call(this);
         },
 
         /**
@@ -123,7 +122,7 @@ define(function(require) {
          * @param {boolean} disabled
          */
         setDisabled: function(disabled) {
-            var event = disabled ? 'disabled' : 'enabled';
+            const event = disabled ? 'disabled' : 'enabled';
             this.$el.prop('disabled', disabled).trigger(event);
             this.$frontDateField.datepicker(disabled ? 'disable' : 'enable').trigger(event);
         },
@@ -151,7 +150,7 @@ define(function(require) {
          * @param {Object} options
          */
         initPickerWidget: function(options) {
-            var widgetOptions = options.datePickerOptions;
+            const widgetOptions = options.datePickerOptions;
             _.extend(widgetOptions, {
                 onSelect: _.bind(this.onSelect, this)
             });
@@ -191,7 +190,7 @@ define(function(require) {
          * Handles pick date event
          */
         onSelect: function() {
-            var form = this.$frontDateField.parents('form');
+            const form = this.$frontDateField.parents('form');
             if (form.length && form.data('validator')) {
                 form.validate()
                     .element(this.$frontDateField);
@@ -214,7 +213,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            var backendFormattedValue = this.getBackendFormattedValue();
+            const backendFormattedValue = this.getBackendFormattedValue();
             if (!_.isUndefined(backendFormattedValue) && this.$el.val() !== backendFormattedValue) {
                 this._preventFrontendUpdate = true;
                 this.$el.val(backendFormattedValue).trigger('change');
@@ -224,7 +223,7 @@ define(function(require) {
 
         onOriginChange: function() {
             this.updateFront();
-            var form = this.$el.closest('form');
+            const form = this.$el.closest('form');
             if (form.length && form.data('validator')) {
                 form.validate()
                     .element(this.$el);
@@ -247,8 +246,8 @@ define(function(require) {
          * @returns {string}
          */
         getBackendFormattedValue: function() {
-            var momentInstance = this.getFrontendMoment();
-            var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+            const momentInstance = this.getFrontendMoment();
+            const format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
                 return momentInstance.utc().format(format);
             } else if (momentInstance === null) {
@@ -262,8 +261,8 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function() {
-            var value = '';
-            var momentInstance = this.getOriginalMoment();
+            let value = '';
+            const momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.format(this.getDateFormat());
             }
@@ -276,9 +275,9 @@ define(function(require) {
          * @returns {moment}
          */
         getOriginalMoment: function() {
-            var value = this.$el.val();
-            var format = this.backendFormat;
-            var momentInstance = moment.utc(value, format, true);
+            const value = this.$el.val();
+            const format = this.backendFormat;
+            const momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }
@@ -290,14 +289,14 @@ define(function(require) {
          * @returns {moment}
          */
         getFrontendMoment: function() {
-            var value = this.$frontDateField.val();
+            const value = this.$frontDateField.val();
 
             if (_.isEmpty(_.trim(value))) {
                 return null;
             }
 
-            var format = this.getDateFormat();
-            var momentInstance = moment.utc(value, format, true);
+            const format = this.getDateFormat();
+            const momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }

@@ -1,30 +1,27 @@
-parameters:
-    oro_workflow.security.acl.manager.class: Oro\Bundle\WorkflowBundle\Acl\AclManager
-    oro_workflow.security.acl.voter.entity.class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
-
 services:
     oro_workflow.security.acl.manager:
-        class: '%oro_workflow.security.acl.manager.class%'
+        class: Oro\Bundle\WorkflowBundle\Acl\AclManager
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry.system'
 
     oro_workflow.security.acl.voter.entity:
-        class: '%oro_workflow.security.acl.voter.entity.class%'
+        class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.permission_registry'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter, priority: 500 }
+            - { name: container.service_subscriber, id: oro_workflow.permission_registry }
 
     oro_workflow.acl.voter.workflow_edit_voter:
-        class: 'Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter'
+        class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter
         public: false
         tags:
             - { name: security.voter }
 
     oro_workflow.filter.privilege_workflow_filter:
-        class: 'Oro\Bundle\WorkflowBundle\Acl\Filter\AclPrivilegeWorkflowFilter'
+        class: Oro\Bundle\WorkflowBundle\Acl\Filter\AclPrivilegeWorkflowFilter
         public: false
         tags:
             - { name: oro.security.filter.acl_privilege }

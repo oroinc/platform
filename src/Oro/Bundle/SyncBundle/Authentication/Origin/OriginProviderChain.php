@@ -3,21 +3,19 @@
 namespace Oro\Bundle\SyncBundle\Authentication\Origin;
 
 /**
- * Store all origin providers to have one point to get all origins
+ * Collects origins from all child providers.
  */
 class OriginProviderChain implements OriginProviderInterface
 {
-    /**
-     * @var OriginProviderInterface[]
-     */
-    private $providers = [];
+    /** @var iterable|OriginProviderInterface[] */
+    private $providers;
 
     /**
-     * @param OriginProviderInterface $provider
+     * @param iterable|OriginProviderInterface[] $providers
      */
-    public function addProvider(OriginProviderInterface $provider)
+    public function __construct(iterable $providers)
     {
-        $this->providers[] = $provider;
+        $this->providers = $providers;
     }
 
     /**
@@ -26,11 +24,13 @@ class OriginProviderChain implements OriginProviderInterface
     public function getOrigins(): array
     {
         $origins = [];
-
         foreach ($this->providers as $provider) {
-            $origins = array_merge($origins, $provider->getOrigins());
+            $origins[] = $provider->getOrigins();
+        }
+        if ($origins) {
+            $origins = array_values(array_unique(array_merge(...$origins)));
         }
 
-        return array_unique($origins);
+        return $origins;
     }
 }

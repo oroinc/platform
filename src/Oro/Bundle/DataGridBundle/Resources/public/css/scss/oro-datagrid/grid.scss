@@ -143,6 +143,18 @@
         }
     }
 
+    &.row-disabled {
+        opacity: $oro-datagrid-row-disabled-opacity;
+    }
+
+    &.row-new {
+        background-color: $cell-success-background;
+
+        &:hover {
+            background-color: darken($cell-success-background, 5%);
+        }
+    }
+
     &.row-edit-mode,
     &:hover {
         background-color: $oro-datagrid-cell-background-hover;

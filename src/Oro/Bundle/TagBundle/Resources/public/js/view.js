@@ -1,30 +1,29 @@
 define(function(require) {
     'use strict';
 
-    var TagView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var Backbone = require('backbone');
-    var TagCollection = require('./collection');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const Backbone = require('backbone');
+    const TagCollection = require('./collection');
 
     /**
      * @export  orotag/js/view
      * @class   orotag.View
      * @extends Backbone.View
      */
-    TagView = Backbone.View.extend({
+    const TagView = Backbone.View.extend({
         options: {
             filter: null
         },
 
         /** @property */
-        template: require('tpl!../templates/tag-list.html'),
+        template: require('tpl-loader!../templates/tag-list.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function TagView() {
-            TagView.__super__.constructor.apply(this, arguments);
+        constructor: function TagView(options) {
+            TagView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -48,7 +47,7 @@ define(function(require) {
          * @returns {*}
          */
         filter: function(e) {
-            var $el = $(e.target);
+            const $el = $(e.target);
 
             // clear all active links
             $el.parents('ul').find('a.active').removeClass('active');
@@ -76,7 +75,7 @@ define(function(require) {
          * @returns {}
          */
         render: function() {
-            var templateData = this.getCollection().getFilteredCollection(this.options.filter);
+            const templateData = this.getCollection().getFilteredCollection(this.options.filter);
             templateData.options = this.options;
             this.$tagsHolder.html(this.template(templateData));
             return this;

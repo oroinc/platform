@@ -32,19 +32,19 @@ services:
             - [addHandler, ['@oro_workflow.configuration.handler.variable']]
             - [addHandler, ['@oro_workflow.configuration.handler.transition']]
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 0 }
+            - { name: oro.workflow.configuration.handler }
 
     oro_workflow.configuration.handler.clean:
         class: Oro\Bundle\WorkflowBundle\Configuration\Handler\CleanConfigurationHandler
         arguments:
             - '@request_stack'
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 299 }
+            - { name: oro.workflow.configuration.handler, priority: -299 }
 
     oro_workflow.configuration.handler.filter:
         class: Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 300 }
+            - { name: oro.workflow.configuration.handler, priority: -300 }
 
     oro_workflow.configuration.config.process_definition_sole:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration
@@ -121,14 +121,15 @@ services:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
         arguments:
             - '@oro_workflow.workflow_assembler'
+            - !tagged_iterator oro.workflow.definition_builder.extension
 
     oro_workflow.configuration.builder.workflow_definition.handle:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_workflow.configuration.config.workflow_sole'
             - '@oro_workflow.configuration.builder.workflow_definition'
+            - !tagged_iterator oro.workflow.configuration.handler
 
     oro_workflow.configuration.builder.process_configuration:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder
@@ -140,7 +141,6 @@ services:
 
     oro_workflow.configuration.checker:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_action.expression.context_accessor'

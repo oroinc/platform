@@ -3,9 +3,7 @@ define([
 ], function(BaseModel) {
     'use strict';
 
-    var NoteModel;
-
-    NoteModel = BaseModel.extend({
+    const NoteModel = BaseModel.extend({
         defaults: {
             id: '',
             message: '',
@@ -27,8 +25,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function NoteModel() {
-            NoteModel.__super__.constructor.apply(this, arguments);
+        constructor: function NoteModel(attrs, options) {
+            NoteModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

@@ -2,16 +2,16 @@
 define(function(require) {
     'use strict';
 
-    var ImapGmailComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const scriptjs = require('scriptjs');
+    const ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const routing = require('routing');
 
-    ImapGmailComponent = BaseComponent.extend({
+    const ImapGmailComponent = BaseComponent.extend({
         ViewType: ImapGmailView,
 
         scopes: ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email'],
@@ -19,8 +19,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ImapGmailComponent() {
-            ImapGmailComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ImapGmailComponent(options) {
+            ImapGmailComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -34,7 +34,7 @@ define(function(require) {
             this.formParentName = _.result(options, 'formParentName') || '';
             this.originId = _.result(options, 'id') || null;
 
-            var viewConfig = this.prepareViewOptions(options);
+            const viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
 
             this.view.setAccessToken(_.result(options, 'accessToken') || '');
@@ -43,9 +43,9 @@ define(function(require) {
 
             this.listenTo(this.view, 'getFolders', this.onGetFolders);
 
-            require(['//apis.google.com/js/client.js?onload=checkAuth'], _.bind(function() {
+            scriptjs('//apis.google.com/js/client.js?onload=checkAuth', function() {
                 this.listenTo(this.view, 'checkConnection', this.onCheckConnection);
-            }, this));
+            }.bind(this));
         },
 
         /**
@@ -74,8 +74,8 @@ define(function(require) {
          * Request to google API to get google auth code
          */
         requestGoogleAuthCode: function(emailAddress) {
-            var data = this.view.getData();
-            var args = {};
+            const data = this.view.getData();
+            const args = {};
 
             if (data.clientId.length === 0) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
@@ -144,12 +144,12 @@ define(function(require) {
             args = args || {};
 
             (function(wrapped) {
-                window.open = function() {
+                window.open = function(...openArgs) {
                     window.open = wrapped;
 
-                    var win = wrapped.apply(this, arguments);
+                    const win = wrapped.apply(this, openArgs);
                     if (win) {
-                        var i = setInterval(function() {
+                        const i = setInterval(function() {
                             if (win.closed) {
                                 clearInterval(i);
                                 setTimeout(function() {
@@ -212,7 +212,7 @@ define(function(require) {
          * Request to server to get template with button Retrieve Folders
          */
         requestFormGetFolder: function() {
-            var data = this.view.getData();
+            const data = this.view.getData();
             data.formParentName = this.formParentName;
             mediator.execute('showLoading');
 
@@ -252,7 +252,7 @@ define(function(require) {
          */
         onGetFolders: function(value) {
             delete value.type;
-            var data = this.prepareDataForForm(value);
+            const data = this.prepareDataForForm(value);
             mediator.execute('showLoading');
 
             $.ajax({
@@ -287,13 +287,13 @@ define(function(require) {
          * @returns {{oro_imap_configuration_gmail: {}}}
          */
         prepareDataForForm: function(values) {
-            var data = {
+            const data = {
                 oro_imap_configuration_gmail: {},
                 formParentName: this.formParentName,
                 id: this.originId
             };
 
-            for (var i in values) {
+            for (const i in values) {
                 if (values.hasOwnProperty(i)) {
                     data.oro_imap_configuration_gmail[i] = values[i];
                 }

@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
  */
 class ConsoleToken extends AbstractToken implements OrganizationAwareTokenInterface
 {
+    use AuthenticatedTokenTrait;
     use OrganizationAwareTokenTrait;
 
     /**

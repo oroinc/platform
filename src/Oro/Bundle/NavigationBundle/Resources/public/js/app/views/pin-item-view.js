@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var PinItemView;
-    var mediator = require('oroui/js/mediator');
-    var __ = require('orotranslation/js/translator');
-    var BookmarkItemView = require('oronavigation/js/app/views/bookmark-item-view');
+    const mediator = require('oroui/js/mediator');
+    const __ = require('orotranslation/js/translator');
+    const BookmarkItemView = require('oronavigation/js/app/views/bookmark-item-view');
 
-    PinItemView = BookmarkItemView.extend({
+    const PinItemView = BookmarkItemView.extend({
         className: 'pin-holder',
 
-        template: require('tpl!oronavigation/templates/pin-item.html'),
+        template: require('tpl-loader!oronavigation/templates/pin-item.html'),
 
         listen: {
             'change:url model': 'render',
@@ -21,8 +20,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PinItemView() {
-            PinItemView.__super__.constructor.apply(this, arguments);
+        constructor: function PinItemView(options) {
+            PinItemView.__super__.constructor.call(this, options);
         },
 
         remove: function() {
@@ -39,7 +38,7 @@ define(function(require) {
         },
 
         outdatedContentHandler: function(event) {
-            var url = this.model.get('url');
+            const url = this.model.get('url');
             if (mediator.execute('compareUrl', url, event.path)) {
                 if (!this.$el.hasClass('outdated')) {
                     this.markOutdated();
@@ -73,8 +72,7 @@ define(function(require) {
          * @inheritDoc
          */
         checkCurrentUrl: function() {
-            var url;
-            url = this.model.get('url');
+            const url = this.model.get('url');
             return mediator.execute('compareNormalizedUrl', url, {ignoreGetParameters: ['restore']});
         },
 
@@ -82,7 +80,7 @@ define(function(require) {
          * @inheritDoc
          */
         setActiveItem: function() {
-            var isUrlSame = this.checkCurrentUrl();
+            const isUrlSame = this.checkCurrentUrl();
             this.$el.toggleClass('active', isUrlSame);
             this.$el.find('a').data('options', {forceStartup: !isUrlSame});
         }

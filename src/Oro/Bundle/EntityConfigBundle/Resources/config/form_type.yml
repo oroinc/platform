@@ -1,15 +1,6 @@
-parameters:
-    oro_entity_config.extension.config.class:               Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension
-    oro_entity_config.config_type_helper.class:             Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper
-
-    oro_entity_config.type.integer.class:                   Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
-    oro_entity_config.type.text.class:                      Oro\Bundle\EntityConfigBundle\Form\Type\TextType
-    oro_entity_config.type.textarea.class:                  Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType
-    oro_entity_config.type.choice.class:                    Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
-
 services:
     oro_entity_config.type.config:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType
         arguments:
             - '@oro_entity_config.translation.helper'
             - '@oro_entity_config.config_manager'
@@ -18,46 +9,46 @@ services:
             - { name: form.type, alias: oro_entity_config_type }
 
     oro_entity_config.extension.config:
-        class: '%oro_entity_config.extension.config.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_entity_config.config_type_helper:
-        class: '%oro_entity_config.config_type_helper.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
 
     oro_entity_config.type.integer:
-        class: '%oro_entity_config.type.integer.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
         arguments:
             - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_integer }
 
     oro_entity_config.type.text:
-        class: '%oro_entity_config.type.text.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\TextType
         arguments:
             - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_text }
 
     oro_entity_config.type.textarea:
-        class: '%oro_entity_config.type.textarea.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType
         arguments:
             - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_textarea }
 
     oro_entity_config.type.choice:
-        class: '%oro_entity_config.type.choice.class%'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
         arguments:
             - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_choice }
 
     oro_entity_config.form.extension.attribute_config_extension:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension'
+        class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
             - '@oro_entity_config.provider.serialized_field_provider'
@@ -76,25 +67,26 @@ services:
         alias: oro_entity_config.form.handler.config_field_handler
 
     oro_entity_config.form.type.attribute_family_type:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType
         arguments:
             - '@translator'
         tags:
             - { name: form.type, alias: oro_attribute_family }
 
     oro_entity_config.form.type.attribute_group_collection:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType
         tags:
             - { name: form.type, alias: oro_entity_config_attribute_group_collection }
 
     oro_entity_config.form.type.attribute_group:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType
         tags:
             - { name: form.type, alias: oro_entity_config_attribute_group }
 
     oro_entity_config.form.type.attribute_multi_select:
-        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType'
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_entity_config_attribute_multi_select }

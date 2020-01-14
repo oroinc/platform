@@ -3,16 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
+use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
@@ -27,18 +34,27 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->willReturn(null);
 
-        $normalizers = new ObjectNormalizerRegistry();
+        $requestExpressionMatcher = new RequestExpressionMatcher();
+        $dataTransformerRegistry = new DataTransformerRegistry(
+            [DataType::DATETIME => [['transformer1', null]]],
+            TestContainerBuilder::create()
+                ->add('transformer1', new DateTimeToStringTransformer())
+                ->getContainer($this),
+            $requestExpressionMatcher
+        );
         $this->objectNormalizer = new ObjectNormalizer(
-            $normalizers,
+            new ObjectNormalizerRegistry(
+                [['normalizer1', \DateTimeInterface::class, null]],
+                TestContainerBuilder::create()
+                    ->add('normalizer1', new DateTimeNormalizer($dataTransformerRegistry))
+                    ->getContainer($this),
+                $requestExpressionMatcher
+            ),
             new DoctrineHelper($doctrine),
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
             new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
-        );
-
-        $normalizers->addNormalizer(
-            new DateTimeNormalizer()
         );
     }
 
@@ -49,7 +65,11 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     private function normalizeObject($object)
     {
-        $normalizedObjects = $this->objectNormalizer->normalizeObjects([$object]);
+        $normalizedObjects = $this->objectNormalizer->normalizeObjects(
+            [$object],
+            null,
+            [ApiContext::REQUEST_TYPE => new RequestType([RequestType::REST])]
+        );
 
         return reset($normalizedObjects);
     }
@@ -137,7 +157,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             [
                 'id'            => 123,
                 'name'          => 'product_name',
-                'updatedAt'     => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
+                'updatedAt'     => '2015-12-01T10:20:30Z',
                 'category'      => 'category_name',
                 'owner'         => 'user_name',
                 'price'         => null,

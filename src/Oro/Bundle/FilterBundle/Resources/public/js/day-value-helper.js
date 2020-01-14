@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var moment = require('moment');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const _ = require('underscore');
+    const moment = require('moment');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
 
     /**
      * DayValueHelper provides validation passed value and formatting it into Display/Raw formats

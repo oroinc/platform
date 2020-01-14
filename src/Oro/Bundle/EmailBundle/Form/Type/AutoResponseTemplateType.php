@@ -7,10 +7,10 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -32,34 +32,34 @@ class AutoResponseTemplateType extends AbstractType
     /** @var ConfigManager */
     protected $userConfig;
 
-    /** @var LocaleSettings */
-    protected $localeSettings;
-
     /** @var Registry */
     protected $registry;
 
     /** @var LocalizationManager */
     protected $localizationManager;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param ConfigManager $cm
      * @param ConfigManager $userConfig
-     * @param LocaleSettings $localeSettings
      * @param Registry $registry
      * @param LocalizationManager $localizationManager
+     * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         ConfigManager $cm,
         ConfigManager $userConfig,
-        LocaleSettings $localeSettings,
         Registry $registry,
-        LocalizationManager $localizationManager
+        LocalizationManager $localizationManager,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->cm = $cm;
         $this->userConfig = $userConfig;
-        $this->localeSettings = $localeSettings;
         $this->registry = $registry;
         $this->localizationManager = $localizationManager;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -67,6 +67,8 @@ class AutoResponseTemplateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $localizations = $this->localizationManager->getLocalizations();
+
         $builder
             ->add('entityName', HiddenType::class, [
                 'attr' => [
@@ -82,32 +84,20 @@ class AutoResponseTemplateType extends AbstractType
                 ],
             ])
             ->add('type', ChoiceType::class, [
-                'label'    => 'oro.email.emailtemplate.type.label',
+                'label' => 'oro.email.emailtemplate.type.label',
                 'multiple' => false,
                 'expanded' => true,
-                'choices'  => [
+                'choices' => [
                     'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
                     'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',
                 ],
-                'required' => true
+                'required' => true,
             ])
-            ->add('translations', EmailTemplateTranslationType::class, [
-                'label'    => 'oro.email.emailtemplate.translations.label',
-                'locales'  => $this->getLanguages(),
-                'labels'   => $this->getLocaleLabels(),
-                'content_options' => [
-                    'constraints' => [
-                        new Assert\NotBlank(),
-                    ],
-                    'attr' => [
-                        'data-default-value' => $this->cm->get('oro_email.signature', ''),
-                    ],
-                ],
-                'subject_options' => [
-                    'constraints' => [
-                        new Assert\NotBlank(),
-                    ],
-                ],
+            ->add('translations', EmailTemplateTranslationCollectionType::class, [
+                'localizations' => $localizations,
+                'wysiwyg_enabled' => $this->userConfig->get('oro_form.wysiwyg_enabled') ?? false,
+                'wysiwyg_options' => $this->getWysiwygOptions(),
+                'block_name' => 'oro_email_emailtemplate',
             ])
             ->add('visible', CheckboxType::class, [
                 'label' => 'oro.email.autoresponserule.form.template.visible.label',
@@ -122,7 +112,8 @@ class AutoResponseTemplateType extends AbstractType
 
             if (!$event->getData()) {
                 $emailTemplate = new EmailTemplate();
-                $emailTemplate->setContent($this->cm->get('oro_email.signature', ''));
+                $signature = $this->htmlTagHelper->sanitize($this->cm->get('oro_email.signature', ''));
+                $emailTemplate->setContent($signature);
                 $emailTemplate->setEntityName(Email::ENTITY_CLASS);
                 $event->setData($emailTemplate);
             }
@@ -141,6 +132,8 @@ class AutoResponseTemplateType extends AbstractType
 
             $template->setName($proposedName);
         });
+
+        $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
     }
 
     /**
@@ -176,7 +169,7 @@ class AutoResponseTemplateType extends AbstractType
      */
     protected function templateExists($name)
     {
-        return (bool) $this->getEmailTemplateRepository()
+        return (bool)$this->getEmailTemplateRepository()
             ->createQueryBuilder('et')
             ->select('COUNT(et.id)')
             ->where('et.name = :name')
@@ -200,30 +193,17 @@ class AutoResponseTemplateType extends AbstractType
     /**
      * @return array
      */
-    protected function getLanguages()
+    protected function getWysiwygOptions()
     {
-        return array_map(function (Localization $localization) {
-            return $localization->getLanguageCode();
-        }, $this->getEnabledLocalizations());
-    }
+        if ($this->userConfig->get('oro_email.sanitize_html')) {
+            return [];
+        }
 
-    /**
-     * @return Localization[]
-     */
-    private function getEnabledLocalizations()
-    {
-        $ids = array_map(function ($id) {
-            return (int)$id;
-        }, (array)$this->userConfig->get(Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS)));
-
-        return $this->localizationManager->getLocalizations($ids);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getLocaleLabels()
-    {
-        return $this->localeSettings->getLocalesByCodes($this->getLanguages(), $this->localeSettings->getLanguage());
+        return [
+            'valid_elements' => null, //all elements are valid
+            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
+            'relative_urls' => true,
+            'forced_root_block' => '',
+        ];
     }
 }

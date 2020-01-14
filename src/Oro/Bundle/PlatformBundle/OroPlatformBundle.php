@@ -4,11 +4,13 @@ namespace Oro\Bundle\PlatformBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass;
-use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DebugSecurityVoterCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\MergeServiceLocatorsCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerStorageCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineConfigurationPass;
@@ -24,7 +26,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * The PlatformBundle bundle class.
  */
-
 class OroPlatformBundle extends Bundle
 {
     const PACKAGE_NAME = 'oro/platform';
@@ -66,6 +67,26 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new UndoLazyEntityManagerPass());
         $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
         $container->addCompilerPass(new TwigServiceLocatorPass());
-        $container->addCompilerPass(new DataCollectorCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new DebugSecurityVoterCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new ProfilerStorageCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'form.type_extension',
+            'oro_platform.form.type_extension.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'doctrine.event_listener',
+            'oro_platform.doctrine.event_listener.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'doctrine.orm.entity_listener',
+            'oro_platform.doctrine.event_listener.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+                'oro_platform.tests.merge_service_locators',
+                'oro_platform.tests.merge_service_locators.service_locator'
+            ), PassConfig::TYPE_BEFORE_REMOVING);
+        }
     }
 }

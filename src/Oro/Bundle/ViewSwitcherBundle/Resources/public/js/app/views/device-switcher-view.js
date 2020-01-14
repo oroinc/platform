@@ -1,20 +1,19 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var DeviceSwitcherView;
-    var document = window.document;
-    var location = window.location;
-    var history = window.history;
-    var COOKIE_KEY = 'demo_version';
-    var COOKIE_VALUE = 'mobile';
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DeviceInnerPageView = require('oroviewswitcher/js/app/views/device-inner-page-view');
-    var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var config = require('module').config();
-    var stateDefault = {
+    const document = window.document;
+    const location = window.location;
+    const history = window.history;
+    const COOKIE_KEY = 'demo_version';
+    const COOKIE_VALUE = 'mobile';
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DeviceInnerPageView = require('oroviewswitcher/js/app/views/device-inner-page-view');
+    const LoadingBarView = require('oroui/js/app/views/loading-bar-view');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const config = require('module-config').default(module.id);
+    const stateDefault = {
         items: [{
             name: 'desktop',
             title: 'Desktop',
@@ -30,7 +29,7 @@ define(function(require) {
         }]
     };
 
-    DeviceSwitcherView = BaseView.extend({
+    const DeviceSwitcherView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'updateUrlDeviceFragment', 'updateFaviconPage',
             'state', 'pageModel', 'switcherStyle'
@@ -116,6 +115,11 @@ define(function(require) {
         switcherStyle: null,
 
         /**
+         * @type {String}
+         */
+        applicationUrl: null,
+
+        /**
          * @inheritDoc
          */
         listen: {
@@ -135,7 +139,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var updateFavicon = _.once(_.bind(this.updateFavicon, this));
+            const updateFavicon = _.once(_.bind(this.updateFavicon, this));
 
             if (config.frameUrlSegment) {
                 this.frameUrlSegment = config.frameUrlSegment;
@@ -150,12 +154,12 @@ define(function(require) {
             this.updateCookie();
             this.createPageView(options._sourceElement[0]);
             document.addEventListener('load', _.bind(function(e) {
-                var url;
-                var logoutLink;
-                var loginLink;
-                var logoutHref;
-                var htmlElement;
-                var iframe = this.getFrameWindow();
+                let url;
+                let logoutLink;
+                let loginLink;
+                let logoutHref;
+                let htmlElement;
+                const iframe = this.getFrameWindow();
                 this.iframe = iframe;
                 this.hideLoader();
                 this.bindLoadingTrigger();
@@ -175,55 +179,66 @@ define(function(require) {
                     this.startTrackUrlChanges();
                     url = iframe.location.pathname.split(this.frameUrlSegment).pop();
                     this.updateUrl(url);
+                    this.loadApplicationUrl();
 
                     if (this.updateFaviconPage) {
                         updateFavicon();
                     }
                     // add mobile scroll emulation if necessary
-                    if (iframe.document.querySelectorAll('.mobile-version').length) {
-                        if (iframe.require) {
-                            iframe.require(['bowerassets/jquery.nicescroll/dist/jquery.nicescroll.min'], function() {
-                                iframe.$('.mobile-version').first().niceScroll({
-                                    cursorcolor: 'rgba(0, 0, 0, 0.5)',
-                                    cursorborder: 'none',
-                                    touchbehavior: true,
-                                    zindex: 10000
-                                });
-                            });
+                    if (iframe.document.querySelector('.mobile-version')) {
+                        if (iframe.jQuery) {
+                            this.loadScriptInFrame(
+                                '/bundles/npmassets/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
+                                function(iframe) {
+                                    iframe.jQuery('.mobile-version').first().niceScroll({
+                                        cursorcolor: 'rgba(0, 0, 0, 0.5)',
+                                        cursorborder: 'none',
+                                        touchbehavior: true,
+                                        zindex: 10000
+                                    });
+                                }.bind(this, iframe)
+                            );
                         } else {
                             // In case when page has no other third-part libraries use OverlayScrollbars since it has no dependencies
-                            var script = iframe.document.createElement('script');
-                            var bodyElement = htmlElement.querySelector('body');
-                            htmlElement.querySelector('head').appendChild(script);
-                            script.addEventListener('load', _.bind(function() {
-                                new iframe.OverlayScrollbars(bodyElement, {
-                                    className: 'os-theme-dark',
-                                    resize: 'none',
-                                    scrollbars: {
-                                        autoHideDelay: 400,
-                                        autoHide: 'scroll'
-                                    },
-                                    overflowBehavior: {
-                                        x: 'hidden'
-                                    }
-                                });
-                            }, this));
-                            script.src = '/bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js';
+                            this.loadScriptInFrame(
+                                '/bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js',
+                                function(iframe, bodyElement) {
+                                    new iframe.OverlayScrollbars(bodyElement, {
+                                        className: 'os-theme-dark',
+                                        resize: 'none',
+                                        scrollbars: {
+                                            autoHideDelay: 400,
+                                            autoHide: 'scroll'
+                                        },
+                                        overflowBehavior: {
+                                            x: 'hidden'
+                                        }
+                                    });
+                                }.bind(this, iframe, htmlElement.querySelector('body'))
+                            );
                         }
                     }
                 }
             }, this), true);
             this.initLoadingView();
-            DeviceSwitcherView.__super__.initialize.apply(this, arguments);
+            DeviceSwitcherView.__super__.initialize.call(this, options);
+        },
+
+        loadScriptInFrame: function(url, callback) {
+            const iframe = this.getFrameWindow();
+            const script = iframe.document.createElement('script');
+
+            iframe.document.querySelector('head').appendChild(script);
+            script.addEventListener('load', _.debounce(callback, 0));
+            script.src = url;
         },
 
         /**
          * Creates regular expression for URL parsing and fetching viewName part
          */
         createUrlRegExp: function() {
-            var views;
-            var matcher;
-            views = _.map(this.state.items, function(item) {
+            let matcher;
+            const views = _.map(this.state.items, function(item) {
                 return item.name;
             });
             matcher = this.urlBase.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
@@ -258,11 +273,11 @@ define(function(require) {
          * @param {script} viewName
          */
         onViewSwitch: function(viewName) {
-            var pageView;
-            var frameWindow;
-            var url = this.getFrameWindow().location.pathname;
-            var stateItem = this.getStateItem(viewName);
-            var oldStateItem = this.getStateItem(this.getActiveView());
+            let pageView;
+            let frameWindow;
+            const url = this.getFrameWindow().location.pathname;
+            const stateItem = this.getStateItem(viewName);
+            const oldStateItem = this.getStateItem(this.getActiveView());
             this.updateUrl(url, viewName);
             this.updateCookie(viewName);
             if (stateItem.mobile !== oldStateItem.mobile) {
@@ -289,12 +304,12 @@ define(function(require) {
          * @returns {string}
          */
         getActiveView: function() {
-            var activeView;
+            let activeView;
             if (this.updateUrlDeviceFragment) {
-                var matches = location.pathname.match(this.urlRegExp);
+                const matches = location.pathname.match(this.urlRegExp);
                 activeView = matches && matches[1] ? matches[1] : this.state.items[0].name;
             } else {
-                var currentDeviceName = persistentStorage.getItem('currentDevice');
+                const currentDeviceName = persistentStorage.getItem('currentDevice');
 
                 activeView = currentDeviceName ? currentDeviceName : this.state.items[0].name;
             }
@@ -308,7 +323,7 @@ define(function(require) {
          * @returns {string}
          */
         getAppUrl: function() {
-            var url;
+            let url;
             if (location.pathname === '/') {
                 url = this.frameUrlSegment + '/';
             } else {
@@ -321,13 +336,14 @@ define(function(require) {
          * Listen to app navigation events and updates the url
          */
         startTrackUrlChanges: function() {
-            var frameWindow = this.getFrameWindow();
-            // requirejs can be absent on a page (e.i. login page)
-            if (frameWindow.require) {
-                frameWindow.require(['oroui/js/mediator'], function(appMediator) {
+            const frameWindow = this.getFrameWindow();
+
+            if (frameWindow.loadModules) {
+                frameWindow.loadModules(['oroui/js/mediator'], function(appMediator) {
                     this.listenTo(appMediator, 'page:afterChange route:change', function() {
                         this.updateUrl(appMediator.execute('currentUrl'));
                     });
+                    this.appMediator = appMediator;
                 }.bind(this));
             }
         },
@@ -336,9 +352,8 @@ define(function(require) {
          * Stops listening to app events
          */
         stopTrackingUrlChanges: function() {
-            var require = this.getFrameWindow().require;
-            if (require) {
-                this.stopListening(require('oroui/js/mediator'));
+            if (this.appMediator) {
+                this.stopListening(this.appMediator);
             }
         },
 
@@ -349,16 +364,13 @@ define(function(require) {
          * @param {string} activeView
          */
         updateUrl: function(url, activeView) {
-            var viewName;
-            var deviceFragment;
-            var title;
-            viewName = activeView ? activeView : this.getActiveView();
-
-            deviceFragment = this.updateUrlDeviceFragment ? this.urlBase + viewName : '';
+            const viewName = activeView ? activeView : this.getActiveView();
+            const deviceFragment = this.updateUrlDeviceFragment ? this.urlBase + viewName : '';
 
             url = this.urlBase + deviceFragment + url.replace(this.frameUrlSegment, '/').replace(/\/\//g, '/');
             url = url.replace(/\/\//g, '/');
-            title = this._isLoginPage(url) ? this._updateOriginalTitle(viewName) : this.getFrameWindow().document.title;
+            const title = this._isLoginPage(url)
+                ? this._updateOriginalTitle(viewName) : this.getFrameWindow().document.title;
             history.replaceState({}, title, url);
 
             document.title = title;
@@ -372,12 +384,11 @@ define(function(require) {
          * @param {string} viewName
          */
         updateCookie: function(viewName) {
-            var item;
-            var cookie;
-            var date;
+            let cookie;
+            let date;
             viewName = viewName || this.getActiveView();
             cookie = COOKIE_KEY + '=' + COOKIE_VALUE + '; path=/';
-            item = this.getStateItem(viewName);
+            const item = this.getStateItem(viewName);
             if (!item.mobile) {
                 // if not mobile -- remove cookie
                 date = new Date();
@@ -391,7 +402,7 @@ define(function(require) {
          * Updates favicon
          */
         updateFavicon: function() {
-            var frameIconLink = this.getFrameWindow().document.querySelector('link[rel$=icon]');
+            const frameIconLink = this.getFrameWindow().document.querySelector('link[rel$=icon]');
             if (frameIconLink === void 0) {
                 $('link[rel$=icon]').remove();
             } else {
@@ -421,8 +432,7 @@ define(function(require) {
          * @returns {Object}
          */
         getStateItem: function(viewName) {
-            var item;
-            item = _.find(this.state.items, function(item) {
+            const item = _.find(this.state.items, function(item) {
                 return item.name === viewName;
             });
             return item;
@@ -441,6 +451,10 @@ define(function(require) {
          * @private
          */
         _isLoginPage: function(url) {
+            if (this.applicationUrl && this.applicationUrl.indexOf(location.origin) === -1) {
+                return false;
+            }
+
             return /login/.test(url);
         },
 
@@ -465,7 +479,7 @@ define(function(require) {
          * Bind click event into iframe
          */
         bindLoadingTrigger: function() {
-            var iframe = this.getFrameWindow();
+            const iframe = this.getFrameWindow();
 
             // Bind click event across iframe
             $(iframe.frameElement).contents().find(this.loadingTrigger).one('click', _.bind(function() {
@@ -491,7 +505,7 @@ define(function(require) {
          * Updates user's state in page model
          */
         updateLoginState: function() {
-            var iframe = this.getFrameWindow();
+            const iframe = this.getFrameWindow();
 
             this.pageModel.set({
                 isLoggedIn: !this._isLoginPage(this.getAppUrl()),
@@ -503,7 +517,28 @@ define(function(require) {
          * User logout and back to login demo page
          */
         onLogout: function() {
-            this.iframe.location = this.logoutUrl;
+            if (this.applicationUrl && this.applicationUrl.indexOf(location.origin) === -1) {
+                location.href = this.applicationUrl;
+            } else {
+                this.iframe.location = this.logoutUrl;
+            }
+        },
+
+        loadApplicationUrl: function() {
+            const self = this;
+            const frameWindow = this.getFrameWindow();
+
+            if (null === this.applicationUrl && frameWindow.loadModules) {
+                frameWindow.loadModules(['routing'], function(routing) {
+                    if (this.pageModel.get('isAdminPanel')) {
+                        return;
+                    }
+
+                    $.get(routing.generate('oro_view_switcher_frontend_get_application_url'), function(response) {
+                        self.applicationUrl = response.applicationUrl;
+                    });
+                }.bind(this));
+            }
         }
     });
 

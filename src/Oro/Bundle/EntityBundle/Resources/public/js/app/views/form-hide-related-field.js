@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var HideRelatedFieldView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
 
-    HideRelatedFieldView = BaseView.extend({
+    const HideRelatedFieldView = BaseView.extend({
 
         /**
          * @property {Object}
@@ -18,8 +17,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function HideRelatedFieldView() {
-            HideRelatedFieldView.__super__.constructor.apply(this, arguments);
+        constructor: function HideRelatedFieldView(options) {
+            HideRelatedFieldView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -40,8 +39,8 @@ define(function(require) {
         },
 
         updateVisibility: function() {
-            var scalarValue = this.$trackedFieldScalarValue.val() === '1';
-            var useFallback = this.$trackedFieldUseFallback.is(':checked');
+            const scalarValue = this.$trackedFieldScalarValue.val() === '1';
+            const useFallback = this.$trackedFieldUseFallback.is(':checked');
 
             if (!useFallback && scalarValue) {
                 this.$hideField.show();

@@ -1,14 +1,6 @@
 parameters:
     oro_report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
     oro_report.calendar_date.entity.class:             Oro\Bundle\ReportBundle\Entity\CalendarDate
-    oro_report.datagrid.configuration.provider.class:  Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider
-    oro_report.listener.navigation_listener.class:     Oro\Bundle\ReportBundle\EventListener\NavigationListener
-    oro_report.report_manager.class:                   Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
-    oro_report.calendar_date_manager.class:            Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager
-    oro_report.grid.base_configuration_builder.class:  Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder
-    oro_report.listener.segment_subscriber.class:      Oro\Bundle\ReportBundle\EventListener\SegmentSubscriber
-
-    oro_report.grid.datagrid_configuration_builder.class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder
 
     # Cache keys
     oro_report.cache.report_grid_config_key: 'oro_report.report_grid_config_key'
@@ -19,7 +11,7 @@ services:
         public: true
 
     oro_report.datagrid.configuration.provider:
-        class: '%oro_report.datagrid.configuration.provider.class%'
+        class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider
         arguments:
             - '@oro_report.grid.datagrid_configuration_builder'
             - '@doctrine'
@@ -38,7 +30,7 @@ services:
               - [setNamespace, [ 'oro_report' ] ]
 
     oro_report.listener.navigation_listener:
-        class: '%oro_report.listener.navigation_listener.class%'
+        class: Oro\Bundle\ReportBundle\EventListener\NavigationListener
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.entity'
@@ -58,20 +50,20 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_report.report.entity.class%', event: postUpdate }
 
     oro_report.report_manager:
-        class: '%oro_report.report_manager.class%'
+        class: Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
 
     oro_report.grid.base_configuration_builder:
-        class: '%oro_report.grid.base_configuration_builder.class%'
+        class: Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder
         public: false
         parent: oro_query_designer.grid.datagrid_configuration_builder
         calls:
             - [setConfigManager, ['@oro_entity_config.config_manager']]
 
     oro_report.grid.datagrid_configuration_builder:
-        class: '%oro_report.grid.datagrid_configuration_builder.class%'
+        class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder
         public: false
         parent: oro_report.grid.base_configuration_builder
         calls:
@@ -84,7 +76,7 @@ services:
             - '@oro_datagrid.helper.date'
 
     oro_report.listener.segment_subscriber:
-        class: '%oro_report.listener.segment_subscriber.class%'
+        class: Oro\Bundle\ReportBundle\EventListener\SegmentSubscriber
         tags:
             - { name: kernel.event_subscriber }
 
@@ -108,8 +100,7 @@ services:
             - { name: oro_entity.name_provider, priority: 0 }
 
     oro_report.calendar_date_manager:
-        class: '%oro_report.calendar_date_manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager
         public: true
         arguments:
             - '@oro_entity.doctrine_helper'

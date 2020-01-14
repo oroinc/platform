@@ -26,10 +26,7 @@ class ProcessorsLoader
         $decoratedServices = self::getDecorators($container, $taggedServices);
         foreach ($taggedServices as $id => $taggedAttributes) {
             foreach ($taggedAttributes as $attributes) {
-                $action = '';
-                if (!empty($attributes['action'])) {
-                    $action = $attributes['action'];
-                }
+                $action = $attributes['action'] ?? '';
                 unset($attributes['action']);
 
                 $group = null;

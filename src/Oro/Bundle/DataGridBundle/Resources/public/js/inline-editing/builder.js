@@ -1,12 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var error = require('oroui/js/error');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const error = require('oroui/js/error');
 
-    var inlineEdititngBuilder = {
+    const inlineEdititngBuilder = {
         /**
          * This column type is used by default for editing
          */
@@ -29,10 +30,10 @@ define(function(require) {
                 deferred.resolve();
                 return;
             }
-            var promises = this.preparePlugin(options)
+            const promises = this.preparePlugin(options)
                 .concat(this.prepareColumns(options));
 
-            $.when.apply($, promises).done(function() {
+            $.when(...promises).done(function() {
                 if (!options.metadata.plugins) {
                     options.metadata.plugins = [];
                 }
@@ -70,8 +71,8 @@ define(function(require) {
         },
 
         preparePlugin: function(options) {
-            var promises = [];
-            var mainConfig = {};
+            const promises = [];
+            const mainConfig = {};
             $.extend(true, mainConfig, this.getDefaultOptions(), options.metadata.inline_editing);
             options.metadata.inline_editing = mainConfig;
             promises.push(tools.loadModuleAndReplace(mainConfig, 'plugin'));
@@ -84,12 +85,12 @@ define(function(require) {
         },
 
         prepareColumns: function(options) {
-            var promises = [];
-            var defaultOptions = this.getDefaultOptions();
+            const promises = [];
+            const defaultOptions = this.getDefaultOptions();
             // plugin
             // column views and components
-            var columnsMeta = options.metadata.columns;
-            var behaviour = options.metadata.inline_editing.behaviour;
+            const columnsMeta = options.metadata.columns;
+            const behaviour = options.metadata.inline_editing.behaviour;
             _.each(columnsMeta, function(columnMeta) {
                 switch (behaviour) {
                     case 'enable_all':
@@ -113,13 +114,13 @@ define(function(require) {
                 if (!columnMeta.inline_editing.editor) {
                     columnMeta.inline_editing.editor = {};
                 }
-                var editor = columnMeta.inline_editing.editor;
+                const editor = columnMeta.inline_editing.editor;
                 if (!editor.component) {
                     editor.component = defaultOptions.cell_editor.component;
                 }
                 if (!editor.view) {
                     promises.push(options.metadata.inline_editing.defaultEditorsLoadPromise.then(function(editors) {
-                        var editorView = editors[columnMeta.type || inlineEdititngBuilder.DEFAULT_COLUMN_TYPE];
+                        const editorView = editors[columnMeta.type || inlineEdititngBuilder.DEFAULT_COLUMN_TYPE];
                         editor.view = editorView;
                         if (editorView === void 0) {
                             columnMeta.inline_editing.enable = false;
@@ -139,7 +140,7 @@ define(function(require) {
                         return editorView;
                     }));
                 } else {
-                    promises.push(tools.loadModules(editor.view)
+                    promises.push(loadModules(editor.view)
                         .then(function(editorView) {
                             editor.view = editorView;
                             if (_.isFunction(editorView.processMetadata)) {
@@ -150,7 +151,7 @@ define(function(require) {
                 }
 
                 if (_.isString(editor.component)) {
-                    promises.push(tools.loadModules(editor.component)
+                    promises.push(loadModules(editor.component)
                         .then(function(editorComponent) {
                             editor.component = editorComponent;
                             if (_.isFunction(editorComponent.processMetadata)) {

@@ -1,46 +1,6 @@
-parameters:
-    oro_datagrid.datagrid.name_strategy.class:   Oro\Bundle\DashboardBundle\Datagrid\NameStrategy
-
-    oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
-    oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
-    oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
-    oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
-    oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
-    oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
-    oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
-    oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
-    oro_dashboard.event_listener.widget_sort_by.class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
-
-    oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
-    oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
-    oro_dashboard.widget_config_value.widget_items_choice.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
-    oro_dashboard.widget_config_value.widget_sort_by.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter
-
-    oro_dashboard.form.type.widget_date_range.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
-    oro_dashboard.form.type.date_range_value.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
-    oro_dashboard.form.type.widget_widget_title.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
-    oro_dashboard.form.type.widget_previous_date_rang.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType
-    oro_dashboard.form.type.widget_items_choice.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
-    oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
-    oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
-    oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
-    oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
-    oro_dashboard.form.type.widget_sort_by.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType
-
-    # BigNumber
-    oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
-    oro_dashboard.provider.big_number.formatter.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberFormatter
-    oro_dashboard.provider.big_number.date_helper.class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper
-
 services:
-    oro_datagrid.datagrid.name_strategy:
-        class: '%oro_datagrid.datagrid.name_strategy.class%'
-        arguments:
-            - '@request_stack'
-
     oro_dashboard.config_resolver:
-        class: '%oro_dashboard.config_resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
         arguments:
             - '@service_container'
 
@@ -69,7 +29,6 @@ services:
 
     oro_dashboard.manager:
         class: Oro\Bundle\DashboardBundle\Model\Manager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_dashboard.factory'
@@ -81,7 +40,7 @@ services:
         alias: oro_dashboard.manager
 
     oro_dashboard.factory:
-        class: '%oro_dashboard.factory.class%'
+        class: Oro\Bundle\DashboardBundle\Model\Factory
         lazy: true
         arguments:
             - '@oro_dashboard.config_provider'
@@ -109,7 +68,7 @@ services:
         alias: oro_dashboard.config_provider
 
     oro_dashboard.navigation_listener:
-        class: '%oro_dashboard.navigation_listener.class%'
+        class: Oro\Bundle\DashboardBundle\EventListener\NavigationListener
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_dashboard.manager'
@@ -117,12 +76,12 @@ services:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
     oro_dashboard.form.type.edit:
-        class: '%oro_dashboard.form.type.edit.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\DashboardType
         tags:
             - { name: form.type, alias: "oro_dashboard" }
 
     oro_dashboard.form.type.select:
-        class: '%oro_dashboard.form.type.select.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
         arguments:
             - '@oro_dashboard.manager'
         tags:
@@ -139,7 +98,6 @@ services:
 
     oro_dashboard.datetime.helper:
         class: Oro\Bundle\DashboardBundle\Helper\DateHelper
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_locale.settings'
@@ -150,7 +108,7 @@ services:
         alias: oro_dashboard.datetime.helper
 
     oro_dashboard.event_listener.widget_configuration_load:
-        class: '%oro_dashboard.event_listener.widget_configuration_load.class%'
+        class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.builder'
@@ -158,13 +116,13 @@ services:
             - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad, priority: 100 }
 
     oro_dashboard.event_listener.widget_items_load_data:
-        class: '%oro_dashboard.event_listener.widget_items_load_data.class%'
+        class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
         tags:
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
     oro_dashboard.event_listener.widget_sort_by:
-        class: '%oro_dashboard.event_listener.widget_sort_by.class%'
+        class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
         arguments:
             - '@oro_dashboard.widget_configs'
         abstract: true
@@ -180,7 +138,7 @@ services:
             - { name: form.type, alias: oro_widget_entity_jqueryselect2_hidden }
 
     oro_dashboard.form.type.widget_date_range:
-        class: '%oro_dashboard.form.type.widget_date_range.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
         arguments:
             - '@translator'
         tags:
@@ -192,22 +150,22 @@ services:
             - { name: form.type, alias: "oro_type_widget_datetime_range" }
 
     oro_dashboard.form.type.widget_date_range_value:
-        class: '%oro_dashboard.form.type.date_range_value.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range_value" }
 
     oro_dashboard.form.type.widget_previous_date_range:
-        class: '%oro_dashboard.form.type.widget_previous_date_rang.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType
         tags:
             - { name: form.type, alias: "oro_type_widget_previous_date_range" }
 
     oro_dashboard.form.type.widget_widget_title:
-        class: '%oro_dashboard.form.type.widget_widget_title.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
         tags:
             - { name: form.type, alias: "oro_type_widget_title" }
 
     oro_dashboard.form.type.widget_items_choice:
-        class: '%oro_dashboard.form.type.widget_items_choice.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
 
@@ -217,25 +175,27 @@ services:
             - { name: form.type, alias: "oro_type_widget_choice" }
 
     oro_dashboard.form.type.widget_item:
-        class: '%oro_dashboard.form.type.widget_item.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
         tags:
             - { name: form.type, alias: oro_type_widget_item }
 
     oro_dashboard.form.type.widget_items:
-        class: '%oro_dashboard.form.type.widget_items.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
         arguments:
             - '@oro_dashboard.event_listener.widget_items_form_subscriber'
         tags:
             - { name: form.type, alias: oro_type_widget_items }
 
     oro_dashboard.event_listener.widget_items_form_subscriber:
-        class: '%oro_dashboard.event_listener.widget_items_form_subscriber.class%'
+        class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
         arguments:
             - '@oro_dashboard.widget_configs'
             - '@translator'
 
     oro_dashboard.widget_config_value.provider:
-        class: '%oro_dashboard.widget_config_value.provider.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
+        arguments:
+            - ~ # service locator for value converters
 
     oro_dashboard.widget_config_value.date_range.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter
@@ -256,18 +216,18 @@ services:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateTimeRangeType }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
-          class: '%oro_dashboard.widget_config_value.previous_date_range.converter.class%'
+          class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
           parent: oro_dashboard.widget_config_value.date_range.converter
           tags:
               - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType }
 
     oro_dashboard.widget_config_value.widget_title.converter:
-        class: '%oro_dashboard.widget_config_value.widget_title.converter.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType }
 
     oro_dashboard.widget_config_value.widget_items_choice.converter:
-        class: '%oro_dashboard.widget_config_value.widget_items_choice.converter.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType }
 
@@ -277,7 +237,7 @@ services:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetChoiceType }
 
     oro_dashboard.widget_config_value.widget_sort_by.converter:
-        class: '%oro_dashboard.widget_config_value.widget_sort_by.converter.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@translator'
@@ -299,12 +259,12 @@ services:
         abstract: true
 
     oro_dashboard.form.type.widget_date:
-        class: '%oro_dashboard.form.type.widget_date.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
         tags:
             - { name: form.type, alias: "oro_type_widget_date" }
 
     oro_dashboard.form.type.widget_sort_by:
-        class: '%oro_dashboard.form.type.widget_sort_by.class%'
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType
         arguments:
             - '@oro_entity.entity_field_provider'
         tags:
@@ -312,19 +272,20 @@ services:
 
     # BigNumber
     oro_dashboard.provider.big_number.processor:
-        class: '%oro_dashboard.provider.big_number.processor.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
         public: true
         arguments:
+            - ~ # service locator for value providers
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
 
     oro_dashboard.provider.big_number.formatter:
-        class: '%oro_dashboard.provider.big_number.formatter.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberFormatter
         arguments:
             - '@oro_locale.formatter.number'
 
     oro_dashboard.provider.big_number.date_helper:
-        class: '%oro_dashboard.provider.big_number.date_helper.class%'
+        class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper
         arguments:
             - '@doctrine'
             - '@oro_security.acl_helper'
@@ -356,15 +317,17 @@ services:
             - { name: form.type, alias: oro_dashboard_query_filter }
 
     oro_dashboard.config_extension.feature:
-        class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }
 
     oro_dashboard.widget_provider.filter_manager:
-        class: 'Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager'
+        class: Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager
+        arguments:
+            - !tagged_iterator oro_dashboard.widget_provider.filter
 
     oro_dashboard.widget_provider.filter.owners:
-        class: 'Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter'
+        class: Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter
         arguments:
             - '@oro_user.dashboard.owner_helper'
         tags:

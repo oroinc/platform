@@ -85,15 +85,11 @@ class ConfigContext extends ApiContext
     /**
      * Sets the name of the action for which the configuration is built
      *
-     * @param string|null $action
+     * @param string $action
      */
     public function setTargetAction($action)
     {
-        if ($action) {
-            $this->set(self::TARGET_ACTION, $action);
-        } else {
-            $this->remove(self::TARGET_ACTION);
-        }
+        $this->set(self::TARGET_ACTION, $action);
     }
 
     /**

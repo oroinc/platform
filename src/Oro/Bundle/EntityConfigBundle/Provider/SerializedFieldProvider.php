@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+/**
+ * Responsible for specifying the types that can be represented as a serialized field
+ */
 class SerializedFieldProvider
 {
     /**
@@ -22,7 +25,7 @@ class SerializedFieldProvider
         'float',
         'money',
         'percent',
-        'html_escaped'
+        'wysiwyg'
     ];
 
     /**

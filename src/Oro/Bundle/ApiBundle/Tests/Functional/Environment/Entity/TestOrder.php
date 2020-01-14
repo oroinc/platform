@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity()
@@ -38,6 +40,14 @@ class TestOrder implements TestFrameworkEntityInterface
      * @ORM\OrderBy({"id" = "ASC"})
      */
     protected $lineItems;
+
+    /**
+     * @var TestTarget|null
+     *
+     * @ORM\ManyToOne(targetEntity="TestTarget")
+     * @ORM\JoinColumn(name="target_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $target;
 
     public function __construct()
     {
@@ -108,5 +118,46 @@ class TestOrder implements TestFrameworkEntityInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return TestTarget|null
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * @param TestTarget|null $target
+     */
+    public function setTarget(TestTarget $target = null)
+    {
+        $this->target = $target;
+    }
+
+    /**
+     * @Assert\Callback
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function validate(ExecutionContextInterface $context)
+    {
+        if (null !== $this->target && null !== $this->target->name) {
+            $targetNameLength = strlen($this->target->name);
+            if ($targetNameLength > 0 && $targetNameLength < 2) {
+                $context->buildViolation('The name must have at least 2 symbols.')
+                    ->atPath('target.name')
+                    ->addViolation();
+            }
+        }
+        foreach ($this->lineItems as $key => $lineItem) {
+            $quantity = $lineItem->getQuantity();
+            if (null !== $quantity && $quantity >= 1000) {
+                $context->buildViolation('The quantity must be less than 1000.')
+                    ->atPath('lineItems.' . $key . '.quantity')
+                    ->addViolation();
+            }
+        }
     }
 }

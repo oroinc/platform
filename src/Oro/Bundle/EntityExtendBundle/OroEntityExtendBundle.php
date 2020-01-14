@@ -68,7 +68,6 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityExtendValidationLoaderPass());
         $container->addCompilerPass(new Compiler\ConfigLoaderPass());
         $container->addCompilerPass(new Compiler\EntityManagerPass());
-        $container->addCompilerPass(new Compiler\EntityMetadataBuilderPass());
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
@@ -78,7 +77,6 @@ class OroEntityExtendBundle extends Bundle
                 ]
             )
         );
-        $container->addCompilerPass(new Compiler\ExtensionPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
@@ -192,6 +190,10 @@ class OroEntityExtendBundle extends Bundle
         $projectDir = $this->kernel->getProjectDir();
         $processArguments = [
             $this->getPhpExecutable(),
+            '-dxdebug.remote_enable=1',
+            '-dxdebug.remote_mode=req',
+            '-dxdebug.remote_port=9900',
+            '-dxdebug.remote_host=127.0.0.1',
             $projectDir . '/bin/console',
             $commandName,
             sprintf('%s=%s', '--env', $this->kernel->getEnvironment()),

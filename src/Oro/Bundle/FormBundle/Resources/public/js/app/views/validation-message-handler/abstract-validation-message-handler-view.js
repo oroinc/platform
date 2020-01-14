@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var AbstractValidationMessageHandlerView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Popper = require('popper');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var VALIDATOR_ERROR_CLASS = 'validation-failed';
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Popper = require('popper');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const VALIDATOR_ERROR_CLASS = 'validation-failed';
 
     function getScrollParent(element) {
         if (!element) {
@@ -21,7 +20,7 @@ define(function(require) {
                 return element.body;
         }
 
-        var needles = ['auto', 'scroll', 'overlay'];
+        const needles = ['auto', 'scroll', 'overlay'];
 
         if (needles.indexOf($(element).css('overflow-x')) > -1 || needles.indexOf($(element).css('overflow-y')) > -1) {
             return element;
@@ -30,7 +29,7 @@ define(function(require) {
         return getScrollParent(element.parentNode);
     }
 
-    AbstractValidationMessageHandlerView = BaseView.extend({
+    const AbstractValidationMessageHandlerView = BaseView.extend({
         autoRender: true,
 
         label: null,
@@ -41,13 +40,13 @@ define(function(require) {
 
         active: false,
 
-        template: require('tpl!oroform/templates/floating-error-message.html'),
+        template: require('tpl-loader!oroform/templates/floating-error-message.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function AbstractValidationMessageHandlerView() {
-            AbstractValidationMessageHandlerView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractValidationMessageHandlerView(options) {
+            AbstractValidationMessageHandlerView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -78,16 +77,16 @@ define(function(require) {
                 this.popper = null;
             }
 
-            var message = this.label.text();
+            const message = this.label.text();
 
             if (message.length) {
-                var messageEl = $(this.template({content: message}));
+                const messageEl = $(this.template({content: message}));
 
                 this.labelContainer.append(messageEl);
 
                 messageEl.css({'max-width': Math.ceil(this.label.width())});
 
-                var popperReference = this.getPopperReferenceElement();
+                const popperReference = this.getPopperReferenceElement();
 
                 this.scrollParent = getScrollParent(popperReference[0]);
 
@@ -128,7 +127,7 @@ define(function(require) {
         },
 
         hideModifier: function(data, options) {
-            var scrollRect = this.scrollParent.getBoundingClientRect();
+            const scrollRect = this.scrollParent.getBoundingClientRect();
 
             if (!this.active || data.offsets.reference.top < scrollRect.top ||
                 data.offsets.reference.top > scrollRect.bottom || data.offsets.left > scrollRect.right ||
@@ -145,7 +144,7 @@ define(function(require) {
 
         update: function() {
             if (this.active) {
-                var $lastLabel = this.label.nextAll('.' + VALIDATOR_ERROR_CLASS).last();
+                const $lastLabel = this.label.nextAll('.' + VALIDATOR_ERROR_CLASS).last();
 
                 if ($lastLabel.length) {
                     $lastLabel.after(this.label);

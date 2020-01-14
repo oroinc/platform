@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var FilterDialogWidget;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var DialogWidget = require('oro/dialog-widget');
-    var actionsTemplate = require('tpl!orofilter/templates/filters-dialog-actions.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const DialogWidget = require('oro/dialog-widget');
+    const actionsTemplate = require('tpl-loader!orofilter/templates/filters-dialog-actions.html');
 
     /**
      * @class FilterDialogWidget
      * @extends DialogWidget
      */
-    FilterDialogWidget = DialogWidget.extend({
+    const FilterDialogWidget = DialogWidget.extend({
         /**
          * @property {Function}
          */
@@ -36,8 +35,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FilterDialogWidget() {
-            FilterDialogWidget.__super__.constructor.apply(this, arguments);
+        constructor: function FilterDialogWidget(options) {
+            FilterDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
@@ -51,7 +50,7 @@ define(function(require) {
 
             options.dialogOptions = _.extend({}, this.dialogOptions, options.dialogOptions);
 
-            FilterDialogWidget.__super__.initialize.apply(this, arguments);
+            FilterDialogWidget.__super__.initialize.call(this, options);
         },
 
         /**

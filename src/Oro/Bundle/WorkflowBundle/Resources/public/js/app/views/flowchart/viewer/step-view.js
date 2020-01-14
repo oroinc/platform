@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartViewerStepView;
-    var FlowchartJsPlumbBoxView = require('../jsplumb/box-view');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var __ = require('orotranslation/js/translator');
+    const FlowchartJsPlumbBoxView = require('../jsplumb/box-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const __ = require('orotranslation/js/translator');
 
-    FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
+    const FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
+        template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/step.html'),
 
         jsPlumbSource: null,
 
         jsPlumbTarget: null,
 
         className: function() {
-            var classNames = [FlowchartViewerStepView.__super__.className.call(this)];
+            const classNames = [FlowchartViewerStepView.__super__.className.call(this)];
             classNames.push('workflow-step');
             if (this.model.get('_is_start')) {
                 classNames.push('start-step');
@@ -41,18 +40,18 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FlowchartViewerStepView() {
-            FlowchartViewerStepView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartViewerStepView(options) {
+            FlowchartViewerStepView.__super__.constructor.call(this, options);
         },
 
         updateStepMinWidth: function() {
-            var STEP_MAX_WIDTH = 180; // that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
-            var currentId = this.el.id;
-            var connections = this.jsPlumbSource.getConnections();
-            var count = _.countBy(connections, function(connection) {
+            const STEP_MAX_WIDTH = 180; // that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
+            const currentId = this.el.id;
+            const connections = this.jsPlumbSource.getConnections();
+            const count = _.countBy(connections, function(connection) {
                 return connection.sourceId === currentId ? 'out' : (connection.targetId === currentId ? 'in' : 'other');
             });
-            var newWidth = (Math.max(count.in ? count.in : 0, count.out ? count.out : 0) + 1) *
+            const newWidth = (Math.max(count.in ? count.in : 0, count.out ? count.out : 0) + 1) *
                 this.areaView.connectionWidth;
             this.$el.css({
                 minWidth: newWidth
@@ -69,7 +68,7 @@ define(function(require) {
         },
 
         connect: function() {
-            FlowchartViewerStepView.__super__.connect.apply(this, arguments);
+            FlowchartViewerStepView.__super__.connect.call(this);
             this.makeTarget();
             this.makeSource();
 
@@ -79,12 +78,12 @@ define(function(require) {
         },
 
         makeTarget: function() {
-            var instance = this.areaView.jsPlumbInstance;
+            const instance = this.areaView.jsPlumbInstance;
             this.jsPlumbTarget = instance.makeTarget(this.$el, $.extend(true, {}, _.result(this, 'targetDefaults')));
         },
 
         makeSource: function() {
-            var instance = this.areaView.jsPlumbInstance;
+            const instance = this.areaView.jsPlumbInstance;
             this.jsPlumbSource = instance.makeSource(this.$el, $.extend(true,
                 {},
                 _.result(this, 'sourceDefaults'),

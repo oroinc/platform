@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
@@ -206,7 +206,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedConstraints' => [new Constraints\NotBlank()],
                 'expectedAttributes' => [
                     'data-required'   => 1,
-                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","payload":null}}'
+                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null,"payload":null}}'
                 ]
             ],
             'set_similar_constrains' => [
@@ -234,9 +235,9 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
                         '"Regex":[{"message":"Value should start with a symbol and contain only alphabetic symbols",' .
-                        '"pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,"payload":null},' .
-                        '{"message":"Value cannot be used as a field name.",' .
-                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"payload":null}' .
+                        '"pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,"normalizer":null,' .
+                        '"payload":null},{"message":"Value cannot be used as a field name.",' .
+                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"normalizer":null,"payload":null}' .
                         ']}',
                 ]
             ],
@@ -256,7 +257,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
-                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
+                        '"NotBlank":{"message":"This value should not be blank.","allowNull":false,"normalizer":null,' .
+                        '"payload":null}' .
                         '}',
                     'data-required'   => 1
                 ]
@@ -275,7 +277,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
+                        '"NotBlank":{"message":"This value should not be blank.","allowNull":false,"normalizer":null,' .
+                        '"payload":null}' .
                         '}',
                     'data-required'   => 1
                 ]
@@ -294,7 +297,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectedAttributes' => [
                     'data-validation' =>
-                        '{"NotBlank":{"message":"This value should not be blank.","payload":null}}',
+                        '{"NotBlank":{"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null,"payload":null}}',
                     'data-required'   => 1
                 ]
             ],

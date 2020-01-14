@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowModel;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var StatefulModel = require('oroui/js/app/models/base/stateful-model');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
-    var StepCollection = require('./step-collection');
-    var TransitionCollection = require('./transition-collection');
-    var TransitionDefinitionCollection = require('./transition-definition-collection');
-    var AttributeCollection = require('./attribute-collection');
-    var StepModel = require('./step-model');
-    var TransitionModel = require('./transition-model');
-    var TransitionDefinitionModel = require('./transition-definition-model');
-    var AttributeModel = require('./attribute-model');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const StatefulModel = require('oroui/js/app/models/base/stateful-model');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
+    const StepCollection = require('./step-collection');
+    const TransitionCollection = require('./transition-collection');
+    const TransitionDefinitionCollection = require('./transition-definition-collection');
+    const AttributeCollection = require('./attribute-collection');
+    const StepModel = require('./step-model');
+    const TransitionModel = require('./transition-model');
+    const TransitionDefinitionModel = require('./transition-definition-model');
+    const AttributeModel = require('./attribute-model');
 
-    WorkflowModel = StatefulModel.extend({
+    const WorkflowModel = StatefulModel.extend({
         defaults: {
             name: '',
             label: '',
@@ -44,14 +43,14 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WorkflowModel() {
-            WorkflowModel.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowModel(attrs, options) {
+            WorkflowModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(attrs, options) {
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
             }
@@ -64,18 +63,18 @@ define(function(require) {
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
-            var steps = this.get('steps');
-            var transitions = this.get('transitions');
+            const steps = this.get('steps');
+            const transitions = this.get('transitions');
             this.setWorkflowToCollection(steps);
             this.setWorkflowToCollection(transitions);
             this.listenTo(steps, 'add', this.setWorkflow);
             this.listenTo(transitions, 'add', this.setWorkflow);
             this.listenTo(steps, 'reset', this.setWorkflowToCollection);
             this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
-            WorkflowModel.__super__.initialize.apply(this, arguments);
+            WorkflowModel.__super__.initialize.call(this, attrs, options);
 
             // Add an initial state to history for an already created workflow
-            var startStep = this.getStartStep();
+            const startStep = this.getStartStep();
             if (startStep.length) {
                 this.onStateChange();
             }
@@ -95,9 +94,9 @@ define(function(require) {
             if (_.isString(definition)) {
                 definition = this.getTransitionDefinitionByName(definition);
             }
-            var cloned = this._getClonedItem(definition);
+            const cloned = this._getClonedItem(definition);
 
-            var clonedModel = new TransitionDefinitionModel(cloned);
+            const clonedModel = new TransitionDefinitionModel(cloned);
             this.get('transition_definitions').add(clonedModel);
 
             return clonedModel;
@@ -108,9 +107,9 @@ define(function(require) {
                 transition = this.getTransitionByName(transition);
             }
 
-            var cloned = this._getClonedItem(transition);
+            const cloned = this._getClonedItem(transition);
             if (transition.get('transition_definition')) {
-                var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
+                const transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
                 cloned.transition_definition = transitionDefinition.get('name');
             }
 
@@ -121,7 +120,7 @@ define(function(require) {
                 cloned._is_clone = true;
             }
 
-            var clonedModel = new TransitionModel(cloned);
+            const clonedModel = new TransitionModel(cloned);
             clonedModel.setWorkflow(this);
 
             if (!doNotAddToCollection) {
@@ -136,10 +135,10 @@ define(function(require) {
                 step = this.getStepByName(step);
             }
 
-            var cloned = this._getClonedItem(step);
-            var clonedAllowedTransitions = [];
+            const cloned = this._getClonedItem(step);
+            const clonedAllowedTransitions = [];
             _.each(step.getAllowedTransitions(this).models, function(transition) {
-                var clonedTransition = this.cloneTransition(transition);
+                const clonedTransition = this.cloneTransition(transition);
                 clonedAllowedTransitions.push(clonedTransition.get('name'));
             }, this);
             cloned.allowed_transitions = clonedAllowedTransitions;
@@ -154,7 +153,7 @@ define(function(require) {
                 ];
             }
 
-            var clonedModel = new StepModel(cloned);
+            const clonedModel = new StepModel(cloned);
             clonedModel.setWorkflow(this);
 
             if (!doNotAddToCollection) {
@@ -165,7 +164,7 @@ define(function(require) {
         },
 
         _getClonedItem: function(item) {
-            var cloned = _.clone(item.toJSON());
+            const cloned = _.clone(item.toJSON());
             cloned.name += '_clone_' + helper.getRandomId();
 
             return cloned;
@@ -180,13 +179,13 @@ define(function(require) {
         },
 
         getAttributeByPropertyPath: function(propertyPath) {
-            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            const fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
             return this.get('attributes').findWhere({property_path: fullPropertyPath});
         },
 
         ensureAttributeByPropertyPath: function(propertyPath) {
-            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
-            var attribute = this.get('attributes').findWhere({property_path: fullPropertyPath});
+            const fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            let attribute = this.get('attributes').findWhere({property_path: fullPropertyPath});
             if (!attribute) {
                 attribute = new AttributeModel({
                     name: this.generateAttributeName(propertyPath),
@@ -197,7 +196,7 @@ define(function(require) {
         },
 
         generateAttributeName: function(propertyPath) {
-            var fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
+            const fullPropertyPath = this.get('entity_attribute') + '.' + propertyPath;
             return fullPropertyPath.replace(/\./g, '_');
         },
 

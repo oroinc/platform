@@ -1,51 +1,14 @@
 imports:
     - { resource: controllers.yml }
+
 parameters:
-    oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.permission.manager.api.class:        Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
-    oro_user.status.manager.class:                Oro\Bundle\UserBundle\Entity\Manager\StatusManager
     oro_user.entity.class:                        Oro\Bundle\UserBundle\Entity\User
     oro_user.group.entity.class:                  Oro\Bundle\UserBundle\Entity\Group
     oro_user.role.entity.class:                   Oro\Bundle\UserBundle\Entity\Role
-    oro_user.security.provider.class:             Oro\Bundle\UserBundle\Security\UserProvider
-    oro_user.security.login.class:                Oro\Bundle\UserBundle\EventListener\LoginSubscriber
-    oro_user.user_menu.builder.class:             Oro\Bundle\UserBundle\Menu\UserMenuBuilder
-    oro_user.role.listener.class:                 Oro\Bundle\UserBundle\EventListener\RoleListener
-    oro_user.role.manager.class:                  Oro\Bundle\UserBundle\Entity\Manager\RoleManager
-    oro_user.role.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
-    oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
-    oro_user.autocomplete.user.search_without_current_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
-    oro_user.autocomplete.user.organization_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
-    oro_user.autocomplete.role.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-    oro_user.autocomplete.role.authenticated_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\AuthenticatedRolesHandler
-    oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
-    oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
-    oro_user.email_recipients_provider.class:     Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider
-    oro_user.change_password.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
-    oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
-    oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
-    oro_user.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
-
-    oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
-    oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
-    oro_user.provider.role_privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
-    oro_user.datagrid.datasource.role_permission_datasource.class: Oro\Bundle\UserBundle\Datagrid\RolePermissionDatasource
-    oro_user.provider.role_privilege_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
-    oro_user.provider.privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
-
-    oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
-
-    # Validator
-    oro_user.validator.user_custom_grid_field_validator.class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
-
-    oro_user.imap_configuration.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber
 
 services:
     oro_user.manager:
         class: Oro\Bundle\UserBundle\Entity\UserManager
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_user.security.user_loader'
@@ -58,13 +21,11 @@ services:
         alias: oro_user.manager
 
     oro_user.manager.mailer_processor_link:
-        public: false
         tags:
             - { name: oro_service_link, service: oro_user.mailer.processor }
 
     oro_user.manager.api:
-        class: '%oro_user.manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -72,8 +33,7 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_user.permission_manager.api:
-        class: '%oro_user.permission.manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -92,21 +52,20 @@ services:
 
     oro_user.security.user_loader:
         class: Oro\Bundle\UserBundle\Security\UserLoader
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_config.manager'
 
     oro_user.security.provider:
-        class: '%oro_user.security.provider.class%'
-        public: false
+        class: Oro\Bundle\UserBundle\Security\UserProvider
         arguments:
             - '@oro_user.security.user_loader'
             - '@doctrine'
 
     oro_user.security.login:
-        class:                        '%oro_user.security.login.class%'
-        arguments:                    ["@oro_user.manager"]
+        class: Oro\Bundle\UserBundle\EventListener\LoginSubscriber
+        arguments:
+            - "@oro_user.manager"
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
@@ -120,20 +79,20 @@ services:
             - { name: kernel.event_subscriber }
 
     oro_user.user_menu:
-        class:                        '%oro_user.user_menu.builder.class%'
+        class: Oro\Bundle\UserBundle\Menu\UserMenuBuilder
         tags:
             - { name: oro_menu.builder, alias: usermenu }
 
     oro_user.role.listener:
-        class:                        '%oro_user.role.listener.class%'
-        arguments:                    ["@oro_security.link.sid_manager"]
+        class: Oro\Bundle\UserBundle\EventListener\RoleListener
+        arguments:
+            - "@oro_security.link.sid_manager"
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
             - { name: doctrine.event_listener, event: prePersist }
 
     oro_user.twig.user_extension:
         class: Oro\Bundle\UserBundle\Twig\OroUserExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -147,18 +106,19 @@ services:
             - { name: gos_web_socket.topic }
 
     oro_user.status_manager:
-        class:                        '%oro_user.status.manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\UserBundle\Entity\Manager\StatusManager
         public: true
-        arguments:                    ["@doctrine.orm.entity_manager", "@oro_user.manager"]
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "@oro_user.manager"
 
     oro_user.role_manager:
-        class:                        '%oro_user.role.manager.class%'
-        arguments:                    ["@doctrine.orm.entity_manager"]
+        class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
+        arguments:
+            - "@doctrine.orm.entity_manager"
 
     oro_user.role_manager.api:
-        class: '%oro_user.role.manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -166,12 +126,12 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_user.group_manager:
-        class:                        '%oro_user.group.manager.class%'
-        arguments:                    ["@doctrine.orm.entity_manager"]
+        class: Oro\Bundle\UserBundle\Entity\Manager\GroupManager
+        arguments:
+            - "@doctrine.orm.entity_manager"
 
     oro_user.group_manager.api:
-        class: '%oro_user.group.manager.api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
@@ -196,7 +156,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
 
-    # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:
         abstract: true
         class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
@@ -220,9 +179,8 @@ services:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users }
         lazy: true
 
-    # Autocomplete search handler
     oro_user.autocomplete.user.search_handler:
-        class: '%oro_user.autocomplete.user.search_handler%'
+        class: Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_attachment.manager'
@@ -243,7 +201,6 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: assigned_to_organization_users }
 
-    # Autocomplete search handler
     oro_user.autocomplete.widget_user.search_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\WidgetUserSearchHandler
         parent: oro_form.autocomplete.full_name.search_handler
@@ -258,9 +215,8 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_users, acl_resource: oro_user_user_view }
 
-    # Autocomplite search user handler limit by current organization
     oro_user.autocomplete.user.organization_search_handler:
-        class: '%oro_user.autocomplete.user.organization_search_handler.class%'
+        class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
         parent: oro_user.autocomplete.user.search_handler
         calls:
            - [setTokenAccessor,  ['@oro_security.token_accessor']]
@@ -273,7 +229,7 @@ services:
         public: true
 
     oro_user.autocomplete.user.search_without_current_handler:
-        class: '%oro_user.autocomplete.user.search_without_current_handler.class%'
+        class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_security.token_accessor'
@@ -283,9 +239,8 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
-    # Autocomplete role search handler
     oro_user.autocomplete.role.search_handler:
-        class: '%oro_user.autocomplete.role.search_handler.class%'
+        class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - '%oro_user.role.entity.class%'
@@ -302,9 +257,8 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
 
-    # Autocomplete role search handler for authenticated roles
     oro_user.autocomplete.role.authenticated_search_handler:
-        class: '%oro_user.autocomplete.role.authenticated_search_handler.class%'
+        class: Oro\Bundle\UserBundle\Autocomplete\AuthenticatedRolesHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
             - '%oro_user.role.entity.class%'
@@ -313,13 +267,13 @@ services:
             - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
 
     oro_user.gender_provider:
-        class: '%oro_user.gender_provider.class%'
+        class: Oro\Bundle\UserBundle\Provider\GenderProvider
         public: true
         arguments:
             - '@translator'
 
     oro_user.email_recipients_provider:
-        class: '%oro_user.email_recipients_provider.class%'
+        class: Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider
         arguments:
             - '@doctrine'
             - '@oro_email.provider.email_recipients.helper'
@@ -327,12 +281,12 @@ services:
             - { name: oro_email.recipients_provider, priority: 30 }
 
     oro_user.email.owner.provider:
-        class: '%oro_user.email.owner.provider.class%'
+        class: Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
         tags:
             - { name: oro_email.owner.provider, order: 1 }
 
     oro_user.change_password.subscriber:
-        class: '%oro_user.change_password.subscriber.class%'
+        class: Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
         arguments:
             - '@form.factory'
             - '@oro_security.token_accessor'
@@ -356,7 +310,6 @@ services:
 
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         lazy: true
         arguments:
@@ -376,7 +329,7 @@ services:
            - { name: oro_activity.activity_widget_provider, priority: -10 }
 
     oro_user.event_listener.owner_user_grid_listener:
-        class: '%oro_user.event_listener.owner_user_grid_listener.class%'
+        class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
@@ -388,19 +341,18 @@ services:
 
     oro_user.mailer.processor:
         class: Oro\Bundle\UserBundle\Mailer\Processor
-        public: false
         arguments:
             - '@oro_user.mailer.user_template_email_sender'
 
     oro_user.mailer.user_template_email_sender:
-        class: 'Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender'
+        class: Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender
         lazy: true
         arguments:
             - '@oro_notification.model.notification_settings'
             - '@oro_email.manager.template_email'
 
     oro_user.placeholder.filter:
-        class: '%oro_user.placeholder.filter.class%'
+        class: Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
         public: true
         arguments:
             - '@oro_security.token_accessor'
@@ -415,26 +367,25 @@ services:
             - { name: oro_ui.update_action_provider, group: activity, priority: 100 }
 
     security.user_checker:
-        class: '%oro_user.security.user_checker.class%'
+        class: Oro\Bundle\UserBundle\Security\UserChecker
         arguments:
             - '@security.token_storage'
             - '@session.flash_bag'
             - '@translator'
 
     oro_user.role.datagrid_helper:
-        class: '%oro_user.role.datagrid_helper.class%'
+        class: Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
         public: true
         arguments:
             - '@security.authorization_checker'
 
     oro_user.provider.role_entity_name:
         class: Oro\Bundle\UserBundle\Provider\RoleEntityNameProvider
-        public: false
         tags:
             - { name: oro_entity.name_provider, priority: 100 }
 
     oro_user.provider.filter.user_choice_tree:
-        class: '%oro_user.provider.filter.user_choice_tree.class%'
+        class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
         public: true
         arguments:
             - '@doctrine'
@@ -442,20 +393,18 @@ services:
             - '@oro_locale.dql.formatter.name'
 
     oro_user.provider.role_privilege_category_provider:
-        class: '%oro_user.provider.role_privilege_category_provider.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
         public: true
         arguments:
             - '@translator'
 
     oro_user.provider.privilege_category_provider:
-        class: '%oro_user.provider.privilege_category_provider.class%'
+        class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
         tags:
             - { name: oro_user.privilege_category}
 
     oro_user.provider.role_privilege_capability_provider:
-        class: '%oro_user.provider.role_privilege_capability_provider.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
         public: true
         arguments:
             - '@translator'
@@ -463,7 +412,7 @@ services:
             - '@oro_user.form.handler.abstract.acl_role'
 
     oro_user.datagrid.datasource.role_permission_datasource:
-        class: '%oro_user.datagrid.datasource.role_permission_datasource.class%'
+        class: Oro\Bundle\UserBundle\Datagrid\RolePermissionDatasource
         arguments:
             - '@translator'
             - '@oro_security.acl.permission_manager'
@@ -473,9 +422,8 @@ services:
         tags:
             - { name: oro_datagrid.datasource, type: role-permission-provider }
 
-    # Validator
     oro_user.validator.user_custom_grid_field_validator:
-        class: '%oro_user.validator.user_custom_grid_field_validator.class%'
+        class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
         arguments:
             - '@oro_security.token_accessor'
         tags:
@@ -521,7 +469,6 @@ services:
         tags:
             - { name: validator.constraint_validator,  alias: oro_user.validator.user_without_role }
 
-    # Dashboard
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper
         arguments:
@@ -533,7 +480,7 @@ services:
         alias: oro_user.dashboard.owner_helper
 
     oro_user.listener.choice_tree_filter_load_data_listener:
-        class: '%oro_user.listener.choice_tree_filter_load_data_listener.class%'
+        class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
         arguments:
             - '@doctrine'
         tags:
@@ -549,13 +496,12 @@ services:
 
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@request_stack'
 
     oro_user.imap_configuration.subscriber:
-        class: '%oro_user.imap_configuration.subscriber.class%'
+        class: Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
@@ -569,7 +515,6 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 120 }
 
-    # Datagrid
     oro_user.user.datagrid_view_list:
         class: Oro\Bundle\UserBundle\Datagrid\UserViewList
         public: true
@@ -580,12 +525,9 @@ services:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension
         calls:
             - [setRequestStack, ["@request_stack"]]
-        public: false
         shared: false
         tags:
             - { name: oro_datagrid.extension }
-
-    # Security and login
 
     oro_user.security.disabled_login_subscriber:
         class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
@@ -596,9 +538,16 @@ services:
 
     oro_user.scope_criteria_provider.user:
         class: Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider
-        public: false
         arguments:
             - "@security.token_storage"
+
+    oro_user.user_scope_cache_key_builder:
+        class: Oro\Bundle\UserBundle\Provider\UserScopeCacheKeyBuilder
+        decorates: oro_scope.scope_cache_key_builder
+        decoration_priority: 100
+        arguments:
+            - '@oro_user.user_scope_cache_key_builder.inner'
+            - '@security.token_storage'
 
     oro_user.datagrid.action_checker:
         class: Oro\Bundle\UserBundle\Datagrid\ActionChecker
@@ -613,14 +562,14 @@ services:
             - '@oro_entity.doctrine_helper'
 
     oro_user.event_listener.default_user_system_config:
-        class: 'Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener'
+        class: Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener
         abstract: true
         arguments:
             - '@oro_user.provider.default_user'
             - '@oro_entity.doctrine_helper'
 
     oro_user.event_listener.turn_off_caching:
-        class: 'Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener'
+        class: Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener
         arguments:
             - '@security.token_storage'
         tags:
@@ -634,11 +583,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
 
-    oro_user.provider.user_preferred_language_provider:
-        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
-        public: false
+    oro_user.provider.user_preferred_localization_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLocalizationProvider
         arguments:
             - '@oro_config.user'
-            - '@oro_locale.settings'
+            - '@oro_locale.manager.localization'
         tags:
-            - { name: oro_locale.preferred_language_provider }
+            - { name: oro_locale.preferred_localization_provider }
+

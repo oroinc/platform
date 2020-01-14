@@ -5,9 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,24 +34,30 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->registry = $this->container->setDefinition(
             'oro_api.resource_doc_parser_registry',
-            new Definition(ResourceDocParserRegistry::class, [[]])
+            new Definition(ResourceDocParserRegistry::class, [[], null])
         );
     }
 
     public function testProcessWhenNoResourceDocParsers()
     {
         $config = ['api_doc_views' => []];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $this->compiler->process($this->container);
 
         self::assertEquals([], $this->registry->getArgument(0));
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
     public function testProcessWithoutApiDocViews()
     {
         $config = ['api_doc_views' => []];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -70,6 +78,17 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['parser1', 'rest']
             ],
             $this->registry->getArgument(0)
+        );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'parser1' => new ServiceClosureArgument(new Reference('parser1'))
+            ],
+            $serviceLocatorDef->getArgument(0)
         );
     }
 
@@ -92,7 +111,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 'view5' => []
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -115,6 +134,20 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $this->registry->getArgument(0)
         );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'parser1'                                    =>
+                    new ServiceClosureArgument(new Reference('parser1')),
+                'oro_api.resource_doc_parser.template.view1' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
     }
 
     public function testProcessWithNotNormalizedRequestTypeInApiDocView()
@@ -129,7 +162,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -147,6 +180,20 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $this->registry->getArgument(0)
         );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'parser1'                                    =>
+                    new ServiceClosureArgument(new Reference('parser1')),
+                'oro_api.resource_doc_parser.template.view1' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
     }
 
     public function testProcessWithNotNormalizedRequestType()
@@ -161,7 +208,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -179,6 +226,20 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $this->registry->getArgument(0)
         );
+
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'parser1'                                    =>
+                    new ServiceClosureArgument(new Reference('parser1')),
+                'oro_api.resource_doc_parser.template.view1' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1'))
+            ],
+            $serviceLocatorDef->getArgument(0)
+        );
     }
 
     public function testProcessWithRequestTypeThatCannotBeNormalized()
@@ -193,7 +254,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
+        $this->container->setParameter('oro_api.bundle_config', $config);
 
         $parser1 = $this->container->setDefinition('parser1', new Definition());
         $parser1->setShared(false);
@@ -217,28 +278,21 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $this->registry->getArgument(0)
         );
-    }
 
-    public function testProcessWhenResourceDocParserIsNotPublic()
-    {
-        $config = ['api_doc_views' => []];
-        $this->container->setParameter(DependencyInjectionUtil::API_BUNDLE_CONFIG_PARAMETER_NAME, $config);
-
-        $parser1 = $this->container->setDefinition('parser1', new Definition());
-        $parser1->setPublic(false);
-        $parser1->addTag(
-            'oro.api.resource_doc_parser',
-            ['requestType' => 'rest']
-        );
-
-        $this->compiler->process($this->container);
-
+        $serviceLocatorReference = $this->registry->getArgument(1);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals(
             [
-                ['parser1', 'rest']
+                'parser1'                                    =>
+                    new ServiceClosureArgument(new Reference('parser1')),
+                'oro_api.resource_doc_parser.template.view1' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view1')),
+                'oro_api.resource_doc_parser.template.view2' =>
+                    new ServiceClosureArgument(new Reference('oro_api.resource_doc_parser.template.view2'))
             ],
-            $this->registry->getArgument(0)
+            $serviceLocatorDef->getArgument(0)
         );
-        self::assertTrue($parser1->isPublic());
     }
 }

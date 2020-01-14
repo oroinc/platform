@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var ZoomAreaView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
-    var ZoomControlsView = require('./zoom-controls-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
+    const ZoomControlsView = require('./zoom-controls-view');
 
     require('jquery.mousewheel');
 
-    ZoomAreaView = BaseView.extend({
+    const ZoomAreaView = BaseView.extend({
         autoRender: true,
 
         listen: {
@@ -31,15 +30,15 @@ define(function(require) {
 
         scrollHintLabel: 'oro.ui.zoom.scroll_hint',
 
-        scrollHintTemplate: require('tpl!../../../templates/zoom-scroll-hint.html'),
+        scrollHintTemplate: require('tpl-loader!../../../templates/zoom-scroll-hint.html'),
 
         scrollHintDelay: 1000,
 
         /**
          * @inheritDoc
          */
-        constructor: function ZoomAreaView() {
-            ZoomAreaView.__super__.constructor.apply(this, arguments);
+        constructor: function ZoomAreaView(options) {
+            ZoomAreaView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -48,10 +47,10 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, 'scrollHintContainerClass', 'scrollHintLabel', 'scrollHintDelay'));
 
-            ZoomAreaView.__super__.initialize.apply(this, arguments);
+            ZoomAreaView.__super__.initialize.call(this, options);
             this.$zoomedElement = this.$el.find('>*:first');
             if (!this.model) {
-                var initialValues = {
+                const initialValues = {
                     zoomLevel: 1,
                     dx: 0,
                     dy: 0
@@ -110,9 +109,9 @@ define(function(require) {
 
                 this.hideScrollHint();
 
-                var clientRect = this.el.getBoundingClientRect();
-                var dx = event.clientX - clientRect.left;
-                var dy = event.clientY - clientRect.top;
+                const clientRect = this.el.getBoundingClientRect();
+                const dx = event.clientX - clientRect.left;
+                const dy = event.clientY - clientRect.top;
 
                 if (deltaY > 0) {
                     this.model.zoomIn(dx, dy);
@@ -125,8 +124,8 @@ define(function(require) {
         },
 
         onMouseDown: function(event) {
-            var _this = this;
-            var currentPosition = {
+            const _this = this;
+            let currentPosition = {
                 x: event.originalEvent.screenX,
                 y: event.originalEvent.screenY
             };
@@ -170,7 +169,7 @@ define(function(require) {
 
         render: function() {
             if (this.controls !== false && !this.subview('controls')) {
-                var el = $('<div class="zoom-controls"></div>');
+                const el = $('<div class="zoom-controls"></div>');
                 this.subview('controls', new ZoomControlsView({
                     el: el,
                     model: this.model

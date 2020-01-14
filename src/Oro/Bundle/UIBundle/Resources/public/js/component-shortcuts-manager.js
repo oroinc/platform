@@ -1,17 +1,15 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ComponentShortcutsManager;
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-
-    var config = require('module').config();
+    let config = require('module-config').default(module.id);
     config = _.extend({
         reservedKeys: ['options']
     }, config);
 
-    ComponentShortcutsManager = {
+    const ComponentShortcutsManager = {
         reservedKeys: config.reservedKeys,
 
         shortcuts: {},
@@ -21,8 +19,6 @@ define(function(require) {
          * @param {Object} shortcut
          */
         add: function(key, shortcut) {
-            var capitalizeKey;
-
             if (this.reservedKeys.indexOf(key) !== -1) {
                 throw new Error('Component shortcut `' + key + '` is reserved!');
             }
@@ -31,7 +27,7 @@ define(function(require) {
                 throw new Error('Component shortcut `' + key + '` already exists!');
             }
 
-            capitalizeKey = _.map(key.split('-'), function(item) {
+            const capitalizeKey = _.map(key.split('-'), function(item) {
                 return _.capitalize(item);
             }).join('');
 
@@ -63,8 +59,8 @@ define(function(require) {
          * @return {Object}
          */
         getComponentData: function(shortcut, elemData) {
-            var dataOptions = elemData[shortcut.dataKey];
-            var module = shortcut.moduleName || dataOptions;
+            let dataOptions = elemData[shortcut.dataKey];
+            const module = shortcut.moduleName || dataOptions;
 
             if (!_.isObject(dataOptions)) {
                 dataOptions = {};
@@ -73,7 +69,7 @@ define(function(require) {
                 }
             }
 
-            var options = $.extend(
+            const options = $.extend(
                 true,
                 {},
                 shortcut.options,

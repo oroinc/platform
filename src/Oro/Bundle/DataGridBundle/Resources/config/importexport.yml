@@ -1,8 +1,3 @@
-parameters:
-    oro_datagrid.importexport.data_converter.class:             Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter
-    oro_datagrid.importexport.export_reader.class:              Oro\Bundle\DataGridBundle\ImportExport\DatagridExportReader
-    oro_datagrid.importexport.export_connector.class:           Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector
-
 services:
     oro_datagrid.importexport.processor.export:
         parent: oro_importexport.processor.export_abstract
@@ -12,7 +7,7 @@ services:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
     oro_datagrid.importexport.data_converter:
-        class: '%oro_datagrid.importexport.data_converter.class%'
+        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter
         lazy: true
         arguments:
             - '@oro_datagrid.importexport.datagrid_columns_from_context_provider'
@@ -20,7 +15,7 @@ services:
             - '@oro_importexport.formatter.formatter_provider'
 
     oro_datagrid.importexport.export_reader:
-        class: '%oro_datagrid.importexport.export_reader.class%'
+        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportReader
         arguments:
             - '@oro_importexport.context_registry'
             - '@oro_datagrid.importexport.export_connector'
@@ -31,9 +26,10 @@ services:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_security.acl_helper'
             - '@oro_importexport.reader.entity'
+            - '@event_dispatcher'
 
     oro_datagrid.importexport.export_connector:
-        class: '%oro_datagrid.importexport.export_connector.class%'
+        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector
         arguments:
             - '@oro_datagrid.datagrid.manager.link'
 
@@ -45,7 +41,7 @@ services:
             - '@oro_datagrid.orm.query_executor'
 
     oro_datagrid.importexport.datagrid_columns_from_context_provider:
-        class: 'Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider'
+        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider
         lazy: true
         arguments:
         - '@oro_datagrid.datagrid.manager'

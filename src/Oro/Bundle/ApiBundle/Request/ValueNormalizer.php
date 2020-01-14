@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\Request;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides a way to convert incoming value to concrete data-type.
  */
-class ValueNormalizer
+class ValueNormalizer implements ResetInterface
 {
     public const DEFAULT_REQUIREMENT = '.+';
 
@@ -39,7 +40,7 @@ class ValueNormalizer
      *
      * @param string $dataType
      */
-    public function enableCacheForDataType($dataType)
+    public function enableCacheForDataType(string $dataType)
     {
         $this->cachedData[$dataType] = [];
     }
@@ -69,7 +70,7 @@ class ValueNormalizer
         }
 
         $cacheKey = (string)$value . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
-        if (array_key_exists($cacheKey, $this->cachedData[$dataType])) {
+        if (\array_key_exists($cacheKey, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$cacheKey];
         }
 
@@ -97,13 +98,24 @@ class ValueNormalizer
         $isRangeAllowed = false
     ) {
         $requirementKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
-        if (!array_key_exists($requirementKey, $this->requirements)) {
+        if (!\array_key_exists($requirementKey, $this->requirements)) {
             $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed, $isRangeAllowed);
 
             $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
 
         return $this->requirements[$requirementKey];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->requirements = [];
+        foreach (array_keys($this->cachedData) as $dataType) {
+            $this->cachedData[$dataType] = [];
+        }
     }
 
     /**
@@ -127,6 +139,8 @@ class ValueNormalizer
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
         $context->getRequestType()->set($requestType);
+        $context->setFirstGroup($dataType);
+        $context->setLastGroup($dataType);
         $context->setDataType($dataType);
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);

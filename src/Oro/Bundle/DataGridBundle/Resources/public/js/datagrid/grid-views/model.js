@@ -1,21 +1,18 @@
-define([
-    'module',
-    'backbone',
-    'underscore',
-    'routing',
-    'orotranslation/js/translator',
-    'oroui/js/mediator'
-], function(module, Backbone, _, routing, __, mediator) {
+define(function(require, exports, module) {
     'use strict';
 
-    var GridViewsModel;
-    var config = module.config();
+    const Backbone = require('backbone');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         route: 'oro_datagrid_api_rest_gridview_post'
     }, config);
 
-    GridViewsModel = Backbone.Model.extend({
+    const GridViewsModel = Backbone.Model.extend({
         /** @property */
         route: config.route,
 
@@ -49,8 +46,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function GridViewsModel() {
-            GridViewsModel.__super__.constructor.apply(this, arguments);
+        constructor: function GridViewsModel(attrs, options) {
+            GridViewsModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -114,14 +111,14 @@ define([
          * @returns {string}
          */
         getLabel: function() {
-            var label = this.get('label');
-            var sharedBy = this.get('shared_by');
+            const label = this.get('label');
+            const sharedBy = this.get('shared_by');
             return null === sharedBy ? label : label + '(' + __(this.sharedByLabel, {name: sharedBy}) + ')';
         },
 
         validate: function(attrs, options) {
-            var freezeName = this.get('freezeName').replace(/\s+/g, ' ');
-            var errors = [];
+            const freezeName = this.get('freezeName').replace(/\s+/g, ' ');
+            const errors = [];
 
             if (_.trim(attrs.label) === '') {
                 errors.push(__('oro.datagrid.gridview.notBlank'));

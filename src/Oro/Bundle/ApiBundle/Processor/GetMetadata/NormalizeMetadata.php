@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -26,6 +27,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Updates overridden entity class names in the acceptable target class names for associations
  * that has the target class name equal to "Oro\Bundle\ApiBundle\Model\EntityIdentifier".
  * By performance reasons all these actions are done in one processor.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NormalizeMetadata implements ProcessorInterface
 {
@@ -113,6 +115,7 @@ class NormalizeMetadata implements ProcessorInterface
                             $fieldName,
                             $propertyPath,
                             $config,
+                            $field,
                             $context
                         );
                         if ($isPropertyAdded) {
@@ -167,11 +170,12 @@ class NormalizeMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityMetadata         $entityMetadata
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     * @param EntityDefinitionConfig $config
-     * @param MetadataContext        $context
+     * @param EntityMetadata              $entityMetadata
+     * @param string                      $fieldName
+     * @param string                      $propertyPath
+     * @param EntityDefinitionConfig      $config
+     * @param EntityDefinitionFieldConfig $field
+     * @param MetadataContext             $context
      *
      * @return bool
      */
@@ -180,6 +184,7 @@ class NormalizeMetadata implements ProcessorInterface
         string $fieldName,
         string $propertyPath,
         EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field,
         MetadataContext $context
     ): bool {
         $associationPath = ConfigUtil::explodePropertyPath($propertyPath);
@@ -193,12 +198,17 @@ class NormalizeMetadata implements ProcessorInterface
                 $context
             );
             if (null !== $targetEntityMetadata) {
-                return $this->copyLinkedProperty(
+                $result = $this->copyLinkedProperty(
                     $entityMetadata,
                     $linkedPropertyName,
                     $fieldName,
                     $targetEntityMetadata
                 );
+                if ($result && $field->hasDirection()) {
+                    $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+                }
+
+                return $result;
             }
         }
 
@@ -210,7 +220,7 @@ class NormalizeMetadata implements ProcessorInterface
             return false;
         }
 
-        return $this->addLinkedProperty(
+        $result = $this->addLinkedProperty(
             $entityMetadata,
             $linkedPropertyName,
             $fieldName,
@@ -219,6 +229,11 @@ class NormalizeMetadata implements ProcessorInterface
             $targetClassMetadata,
             $context
         );
+        if ($result && $field->hasDirection()) {
+            $this->setLinkedPropertyDirection($entityMetadata, $fieldName, $field);
+        }
+
+        return $result;
     }
 
     /**
@@ -307,6 +322,20 @@ class NormalizeMetadata implements ProcessorInterface
         }
 
         return $isPropertyAdded;
+    }
+
+    /**
+     * @param EntityMetadata              $entityMetadata
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    private function setLinkedPropertyDirection(
+        EntityMetadata $entityMetadata,
+        string $fieldName,
+        EntityDefinitionFieldConfig $field
+    ): void {
+        $entityMetadata->getProperty($fieldName)
+            ->setDirection($field->isInput(), $field->isOutput());
     }
 
     /**

@@ -68,7 +68,7 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
      */
     public function attributeNamePurify($string)
     {
-        return preg_replace('/[^a-z0-9_-]+/i', '', $string);
+        return preg_replace('/[^a-z0-9\_\-]+/i', '', $string);
     }
 
     /**

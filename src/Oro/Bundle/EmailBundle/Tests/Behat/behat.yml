@@ -13,6 +13,7 @@ oro_behat_extension:
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -38,9 +39,15 @@ oro_behat_extension:
           Subject:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+          Subject Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject-fallback"]'
           Content:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
+          Content Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content-fallback"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
@@ -70,12 +77,12 @@ oro_behat_extension:
     Red dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Red dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mP8z8AARBDAiJMDAIzoBf5Dp2P2AAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="red-dot"]'
 
     Blue dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Blue dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mNkYPj/nwEKGHFyAIbuBf4sIeHsAAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="blue-dot"]'
 
     Upload Email Attachment Link:
       selector: 'a.upload-new'
@@ -83,6 +90,9 @@ oro_behat_extension:
     Upload Email Attachment File:
       selector: '[name^="oro_email_email[attachments]"][type="file"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
+
+    Preview Email:
+      selector: 'iframe#preview-frame'
 
   pages:
     User Emails:

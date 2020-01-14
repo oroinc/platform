@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var DialogWidget = require('oro/dialog-widget');
-    var MassAction = require('./mass-action');
-    var EditMassAction;
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const DialogWidget = require('oro/dialog-widget');
+    const MassAction = require('./mass-action');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Edit mass action class.
@@ -14,7 +13,7 @@ define(function(require) {
      * @class   oro.datagrid.action.EditMassAction
      * @extends oro.datagrid.action.MassAction
      */
-    EditMassAction = MassAction.extend({
+    const EditMassAction = MassAction.extend({
         /** @property {Object} */
         defaultMessages: {
             success: 'Selected items were edited.',
@@ -25,13 +24,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EditMassAction() {
-            EditMassAction.__super__.constructor.apply(this, arguments);
+        constructor: function EditMassAction(options) {
+            EditMassAction.__super__.constructor.call(this, options);
         },
 
         /** @inheritdoc */
         initialize: function(options) {
-            EditMassAction.__super__.initialize.apply(this, arguments);
+            EditMassAction.__super__.initialize.call(this, options);
         },
 
         /** @inheritdoc */
@@ -62,7 +61,7 @@ define(function(require) {
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
 
-            var widget = new DialogWidget(this.frontend_options);
+            const widget = new DialogWidget(this.frontend_options);
             widget.render();
             widget.once('formSave', _.bind(function(data) {
                 widget.remove();

@@ -21,7 +21,11 @@ class TimePicker extends Element
         foreach ($timeSelect->findAll('css', 'li') as $li) {
             if ($time == $this->formatTime(new \DateTime($li->getText()))) {
                 $li->mouseOver();
-                $li->click();
+                $this->spin(function () use ($li) {
+                    $li->click();
+                    return true;
+                }, 5);
+
                 $mask = $this->getPage()->findVisible('css', '#oro-dropdown-mask');
                 if (!empty($mask)) {
                     $mask->click();

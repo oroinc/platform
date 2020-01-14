@@ -1,26 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var EmailVariableView;
-    var document = window.document;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var tinyMCE = require('tinymce/tinymce');
+    const document = window.document;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const tinyMCE = require('tinymce/tinymce');
     require('jquery-ui');
 
     /**
      * @export  oroemail/js/app/views/email-variable-view
      */
-    EmailVariableView = BaseView.extend({
+    const EmailVariableView = BaseView.extend({
         options: {
             templateSelector: null,
             sectionTemplateSelector: null,
             sectionContentSelector: null,
             sectionTabSelector: null,
-            fieldsSelectors: ['input[name*="subject"]', 'textarea[name*="content"]'],
+            fieldsSelectors: ['input[type="text"][name*="subject"]', 'textarea[name*="content"]'],
             defaultFieldIndex: 1 // index in fieldsSelectors
         },
 
@@ -42,8 +41,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailVariableView() {
-            EmailVariableView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailVariableView(options) {
+            EmailVariableView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -76,7 +75,7 @@ define(function(require) {
          * @returns {*}
          */
         render: function() {
-            var vars = {system: this._getSystemVariablesHtml(this.model.getSystemVariables())};
+            const vars = {system: this._getSystemVariablesHtml(this.model.getSystemVariables())};
 
             this.$el.empty();
             this.$el.html(this.template({variables: vars}));
@@ -92,7 +91,7 @@ define(function(require) {
          * @returns {boolean}
          */
         isEmpty: function() {
-            var result = true;
+            let result = true;
             _.each(this.fields, function(el) {
                 if (el.value) {
                     result = false;
@@ -106,7 +105,7 @@ define(function(require) {
          */
         clear: function() {
             _.each(this.fields, function(el) {
-                var editor = tinyMCE.get(el.id);
+                const editor = tinyMCE.get(el.id);
                 if (editor) {
                     editor.setContent('');
                 } else if (el.value) {
@@ -121,12 +120,12 @@ define(function(require) {
          * @private
          */
         _renderEntityVariables: function() {
-            var $el = this._getSectionContent(this.sections.entity);
-            var $tabEl = this._getSectionTab(this.sections.entity);
-            var entityVars = this.model.getEntityVariables();
-            var entityLabel = this.model.getEntityLabel();
-            var path = this.model.getPath();
-            var pathLabels = this.model.getPathLabels();
+            const $el = this._getSectionContent(this.sections.entity);
+            const $tabEl = this._getSectionTab(this.sections.entity);
+            const entityVars = this.model.getEntityVariables();
+            const entityLabel = this.model.getEntityLabel();
+            const path = this.model.getPath();
+            const pathLabels = this.model.getPathLabels();
 
             // remove old content
             $el.empty();
@@ -198,8 +197,8 @@ define(function(require) {
          * @private
          */
         _getEntityVariablesHtml: function(variables, entityLabel, path, pathLabels) {
-            var fields = {};
-            var relations = {};
+            const fields = {};
+            const relations = {};
             _.each(variables, function(variable, varName) {
                 if (_.has(variable, 'related_entity_name')) {
                     relations[varName] = variable;
@@ -224,9 +223,9 @@ define(function(require) {
          */
         _applyDraggable: function($el) {
             $el.find('a.variable').on('dragstart', function(e) {
-                var dt = e.originalEvent.dataTransfer;
-                for (var i = 0; i < dt.types.length; i++) {
-                    var type = dt.types[i];
+                const dt = e.originalEvent.dataTransfer;
+                for (let i = 0; i < dt.types.length; i++) {
+                    const type = dt.types[i];
                     dt.clearData(type);
                 }
                 dt.setData('text', $(e.currentTarget).text());
@@ -268,8 +267,8 @@ define(function(require) {
          * @param {Event} e
          */
         _handleVariableClick: function(e) {
-            var field = this.fields.filter(document.activeElement);
-            var variable = $(e.currentTarget).html();
+            let field = this.fields.filter(document.activeElement);
+            const variable = $(e.currentTarget).html();
 
             e.preventDefault();
             if (!field.length && this.lastElement && this.lastElement.is(':visible, [data-focusable]')) {
@@ -293,8 +292,8 @@ define(function(require) {
          * @private
          */
         _handleReferenceClick: function(e) {
-            var $el = $(e.currentTarget);
-            var path = $el.data('path');
+            const $el = $(e.currentTarget);
+            const path = $el.data('path');
 
             this.model.setPath(path);
         },

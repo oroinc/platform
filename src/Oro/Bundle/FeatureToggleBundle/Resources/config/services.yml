@@ -41,7 +41,6 @@ services:
 
     oro_featuretoggle.checker.feature_checker:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         arguments:
             - '@oro_featuretoggle.configuration.manager'
@@ -68,10 +67,10 @@ services:
     oro_featuretoggle.voter.dependency_voter:
         class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\DependencyVoter'
         arguments:
-        - '@oro_featuretoggle.checker.feature_checker'
-        - '@oro_featuretoggle.configuration.manager'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_featuretoggle.configuration.manager'
         tags:
-        - { name: oro_featuretogle.voter }
+            - { name: oro_featuretogle.voter }
 
     oro_featuretoggle.event_listener.request:
         class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'

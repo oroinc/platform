@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
     // define a constructor
-    var entityFieldUtil = function($el) {
+    const entityFieldUtil = function($el) {
         this.$el = $el;
     };
 
@@ -34,7 +34,7 @@ define(function(require) {
         },
 
         splitFieldId: function(fieldId) {
-            var result = [];
+            const result = [];
             if (fieldId !== '') {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
@@ -50,12 +50,12 @@ define(function(require) {
 
         changeEntity: function(entityName, fields) {
             this.$el.data('entity', entityName);
-            var emptyItem = this.$el.find('option[value=""]');
+            const emptyItem = this.$el.find('option[value=""]');
             this.$el.empty();
             if (emptyItem.length > 0) {
                 this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
             }
-            var content = this._buildSelectContent(fields);
+            const content = this._buildSelectContent(fields);
             if (content !== '') {
                 this.$el.append(content);
             }
@@ -95,8 +95,8 @@ define(function(require) {
         },
 
         _buildSelectContent: function(fields) {
-            var sFields = '';
-            var sRelations = '';
+            let sFields = '';
+            let sRelations = '';
             _.each(fields, _.bind(function(field) {
                 if (_.isUndefined(field.relation_type)) {
                     if (_.isUndefined(this.exclude) ||
@@ -111,7 +111,7 @@ define(function(require) {
             if (sRelations === '') {
                 return sFields;
             }
-            var result = '';
+            let result = '';
             if (sFields !== '') {
                 result += this.optGroupTemplate({
                     label: this.fieldsLabel,

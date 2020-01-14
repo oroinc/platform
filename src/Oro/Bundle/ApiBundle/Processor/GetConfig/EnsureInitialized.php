@@ -39,18 +39,20 @@ class EnsureInitialized implements ProcessorInterface
         }
 
         $extras = $context->getExtras();
-        if (!$context->getResult()->isSortingEnabled() && $context->hasExtra(SortersConfigExtra::NAME)) {
+        if ($context->hasExtra(SortersConfigExtra::NAME) && !$context->getResult()->isSortingEnabled()) {
             $context->removeExtra(SortersConfigExtra::NAME);
             $extras = $context->getExtras();
         }
 
         foreach ($extras as $extra) {
-            $sectionName = $extra->getName();
-            if ($extra instanceof ConfigExtraSectionInterface && !$context->has($sectionName)) {
-                $context->set(
-                    $sectionName,
-                    $this->configLoaderFactory->getLoader($extra->getConfigType())->load([])
-                );
+            if ($extra instanceof ConfigExtraSectionInterface) {
+                $sectionName = $extra->getName();
+                if (!$context->has($sectionName)) {
+                    $context->set(
+                        $sectionName,
+                        $this->configLoaderFactory->getLoader($extra->getConfigType())->load([])
+                    );
+                }
             }
         }
     }

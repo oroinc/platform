@@ -3,22 +3,16 @@ parameters:
     oro_embedded_form.session_id_field_name: ~
     oro_embedded_form.csrf_token_lifetime: ~
 
-    oro.embedded_form.form_type.available_form.class:        Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
-    oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
-    oro_embedded_form.form_type.class:                       Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
-    oro_embedded_form.embed_form_layout_manager.class:       Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
-
 services:
     oro_embedded_form.form_type.available_embedded_form:
-        class: '%oro.embedded_form.form_type.available_form.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
         arguments:
             - '@oro_embedded_form.manager'
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
 
     oro_embedded_form.manager:
-        class: '%oro_embedded_form.manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
         public: true
         arguments:
             - '@form.registry'
@@ -33,7 +27,7 @@ services:
             - { name: twig.extension }
 
     oro_embedded_form.form_type:
-        class: '%oro_embedded_form.form_type.class%'
+        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
         tags:
             - { name: form.type, alias: embedded_form }
 
@@ -44,8 +38,7 @@ services:
         synthetic: true
 
     oro_embedded_form.embed_form_layout_manager:
-        class: '%oro_embedded_form.embed_form_layout_manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
         public: true
         arguments:
             - '@oro_embedded_form.layout_manager'

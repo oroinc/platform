@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var routing = require('routing');
-    var DialogWidget = require('oro/dialog-widget');
-    var ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
-    var exportHandler = require('oroimportexport/js/export-handler');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const routing = require('routing');
+    const DialogWidget = require('oro/dialog-widget');
+    const ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
+    const exportHandler = require('oroimportexport/js/export-handler');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
-    var ImportExportManager = function(options) {
+    const ImportExportManager = function(options) {
         this.initialize(options);
     };
 
@@ -108,11 +108,12 @@ define(function(require) {
                 throw new TypeError('"exportProcessor" is required');
             }
 
-            var exportUrl;
+            let exportUrl;
 
             // Creates copy of route options which can be extended by event and used to create an url
             // original option remains same
-            var routeOptions = $.extend(true, {}, this.routeOptions);
+            const routeOptions = $.extend(true, {}, this.routeOptions);
+            routeOptions.options = $.extend(true, {}, routeOptions.options);
             mediator.trigger('import-export:handleExport', routeOptions.options);
 
             if (this.options.isExportPopupRequired) {
@@ -148,7 +149,7 @@ define(function(require) {
                 throw new TypeError('"exportTemplateProcessor" is required');
             }
 
-            var exportTemplateUrl;
+            let exportTemplateUrl;
 
             if (this.options.isExportTemplatePopupRequired) {
                 exportTemplateUrl = routing.generate(
@@ -182,10 +183,10 @@ define(function(require) {
          * @returns {DialogWidget}
          */
         _renderDialogWidget: function(options, Dialog) {
-            var Widget = Dialog ? Dialog : DialogWidget;
-            var opts = $.extend(true, {}, this.options.dialogOptions, options);
+            const Widget = Dialog ? Dialog : DialogWidget;
+            const opts = $.extend(true, {}, this.options.dialogOptions, options);
 
-            var widget = new Widget(opts);
+            const widget = new Widget(opts);
 
             widget.render();
 

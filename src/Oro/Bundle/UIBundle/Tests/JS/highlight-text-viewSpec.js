@@ -2,13 +2,13 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var HighlightTextView = require('oroui/js/app/views/highlight-text-view');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const HighlightTextView = require('oroui/js/app/views/highlight-text-view');
     // fixtures
-    var html = require('text!./Fixture/highlight-text-view.html');
+    const html = require('text-loader!./Fixture/highlight-text-view.html');
 
-    var createView = function(options) {
+    const createView = function(options) {
         if (createView.view) {
             createView.view.dispose();
         }

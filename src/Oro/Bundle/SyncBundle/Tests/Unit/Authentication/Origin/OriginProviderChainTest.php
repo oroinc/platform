@@ -7,51 +7,27 @@ use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface;
 
 class OriginProviderChainTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OriginProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $originProvider;
-
-    /** @var OriginProviderChain */
-    private $originProviderChain;
-
-    protected function setUp()
+    public function testGetOriginsWhenNoChildProviders()
     {
-        $this->originProvider = $this->createMock(OriginProviderInterface::class);
-
-        $this->originProviderChain = new OriginProviderChain();
+        $originProviderChain = new OriginProviderChain([]);
+        self::assertSame([], $originProviderChain->getOrigins());
     }
 
-    /**
-     * @dataProvider getOriginsDataProvider
-     *
-     * @param string[] $origins
-     * @param array $expectedOrigins
-     */
-    public function testGetOrigins(array $origins, array $expectedOrigins): void
+    public function testGetOrigins()
     {
-        $this->originProvider
-            ->expects(self::once())
+        $originProvider1 = $this->createMock(OriginProviderInterface::class);
+        $originProvider1->expects(self::once())
             ->method('getOrigins')
-            ->willReturn($origins);
+            ->willReturn(['sampleOrigin1', 'sampleOrigin2']);
+        $originProvider2 = $this->createMock(OriginProviderInterface::class);
+        $originProvider2->expects(self::once())
+            ->method('getOrigins')
+            ->willReturn(['sampleOrigin2', 'sampleOrigin3']);
 
-        self::assertEquals([], $this->originProviderChain->getOrigins());
-        $this->originProviderChain->addProvider($this->originProvider);
-        self::assertEquals($expectedOrigins, $this->originProviderChain->getOrigins());
-    }
-
-    /**
-     * @return array
-     */
-    public function getOriginsDataProvider(): array
-    {
-        return [
-            'normal origins' => [
-                'origins' => ['sampleOrigin1', 'sampleOrigin2'],
-                'expectedOrigins' => ['sampleOrigin1', 'sampleOrigin2'],
-            ],
-            'duplicated origin are removed' => [
-                'origins' => ['sampleOrigin1', 'sampleOrigin2', 'sampleOrigin2'],
-                'expectedOrigins' => ['sampleOrigin1', 'sampleOrigin2'],
-            ],
-        ];
+        $originProviderChain = new OriginProviderChain([$originProvider1, $originProvider2]);
+        self::assertEquals(
+            ['sampleOrigin1', 'sampleOrigin2', 'sampleOrigin3'],
+            $originProviderChain->getOrigins()
+        );
     }
 }

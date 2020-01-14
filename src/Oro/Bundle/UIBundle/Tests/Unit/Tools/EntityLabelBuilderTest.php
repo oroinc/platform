@@ -22,11 +22,30 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetEntityDescriptionTranslationKey()
+    {
+        $this->assertEquals(
+            'acme.product.entity_description',
+            EntityLabelBuilder::getEntityDescriptionTranslationKey('Acme\Bundle\ProductBundle\Entity\Product')
+        );
+    }
+
     public function testGetFieldLabelTranslationKey()
     {
         $this->assertEquals(
             'acme.product.sell_price.label',
             EntityLabelBuilder::getFieldLabelTranslationKey('Acme\Bundle\ProductBundle\Entity\Product', 'sellPrice')
+        );
+    }
+
+    public function testGetFieldDescriptionTranslationKey()
+    {
+        $this->assertEquals(
+            'acme.product.sell_price.description',
+            EntityLabelBuilder::getFieldDescriptionTranslationKey(
+                'Acme\Bundle\ProductBundle\Entity\Product',
+                'sellPrice'
+            )
         );
     }
 

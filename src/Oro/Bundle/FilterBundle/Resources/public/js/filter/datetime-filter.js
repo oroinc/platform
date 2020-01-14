@@ -1,16 +1,15 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var DatetimeFilter;
-    var _ = require('underscore');
-    var moment = require('moment');
-    var __ = require('orotranslation/js/translator');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
-    var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
-    var DateFilter = require('./date-filter');
-    var tools = require('oroui/js/tools');
-    var config = require('module').config();
+    const _ = require('underscore');
+    const moment = require('moment');
+    const __ = require('orotranslation/js/translator');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
+    const VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
+    const DateFilter = require('oro/filter/date-filter');
+    const tools = require('oroui/js/tools');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         inputClass: 'datetime-visual-element',
@@ -25,7 +24,7 @@ define(function(require) {
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      */
-    DatetimeFilter = DateFilter.extend({
+    const DatetimeFilter = DateFilter.extend({
         /**
          * CSS class for visual datetime input elements
          *
@@ -61,8 +60,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function DatetimeFilter() {
-            DatetimeFilter.__super__.constructor.apply(this, arguments);
+        constructor: function DatetimeFilter(options) {
+            DatetimeFilter.__super__.constructor.call(this, options);
         },
 
         _getPickerConstructor: function() {
@@ -71,9 +70,9 @@ define(function(require) {
         },
 
         _renderCriteria: function() {
-            DatetimeFilter.__super__._renderCriteria.apply(this, arguments);
+            DatetimeFilter.__super__._renderCriteria.call(this);
 
-            var value = this.getValue();
+            const value = this.getValue();
             if (value) {
                 this._updateTimeVisibility(value.part);
             }
@@ -89,7 +88,7 @@ define(function(require) {
             if (this._justPickedTime) {
                 this._justPickedTime = false;
             } else {
-                DatetimeFilter.__super__._onClickOutsideCriteria.apply(this, arguments);
+                DatetimeFilter.__super__._onClickOutsideCriteria.call(this, e);
             }
         },
 
@@ -125,7 +124,7 @@ define(function(require) {
          * @protected
          */
         _toDisplayValue: function(value, part) {
-            var momentInstance;
+            let momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
             } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
@@ -146,7 +145,7 @@ define(function(require) {
          * @protected
          */
         _toRawValue: function(value, part) {
-            var momentInstance;
+            let momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
             } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
@@ -165,18 +164,18 @@ define(function(require) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this._updateTimeVisibility(newValue.part);
             }
-            DatetimeFilter.__super__._triggerUpdate.apply(this, arguments);
+            DatetimeFilter.__super__._triggerUpdate.call(this, newValue, oldValue);
         },
 
         _renderSubViews: function() {
-            DatetimeFilter.__super__._renderSubViews.apply(this, arguments);
-            var value = this._readDOMValue();
+            DatetimeFilter.__super__._renderSubViews.call(this);
+            const value = this._readDOMValue();
             this._updateDateTimePickerSubView('start', value);
             this._updateDateTimePickerSubView('end', value);
         },
 
         _updateDateTimePickerSubView: function(subViewName, viewValue) {
-            var subView = this.subview(subViewName);
+            const subView = this.subview(subViewName);
             if (!subView || !subView.updateFront) {
                 return;
             }

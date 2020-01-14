@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var LoadingMaskView;
-    var BaseView = require('./base/view');
-    var template = require('tpl!oroui/templates/loading-mask-view.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseView = require('./base/view');
+    const template = require('tpl-loader!oroui/templates/loading-mask-view.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    LoadingMaskView = BaseView.extend({
+    const LoadingMaskView = BaseView.extend({
         autoRender: true,
 
         /** @property {string|Function} */
@@ -44,8 +43,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function LoadingMaskView() {
-            LoadingMaskView.__super__.constructor.apply(this, arguments);
+        constructor: function LoadingMaskView(options) {
+            LoadingMaskView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -59,14 +58,14 @@ define(function(require) {
                     this.hide();
                 }, this)
             );
-            LoadingMaskView.__super__.initialize.apply(this, arguments);
+            LoadingMaskView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
-            var data = {
+            const data = {
                 loadingHint: this.loadingHint
             };
             return data;
@@ -160,7 +159,7 @@ define(function(require) {
          * @param {string} newHint
          */
         setLoadingHint: function(newHint) {
-            var oldHint = this.loadingHint;
+            const oldHint = this.loadingHint;
             this.loadingHint = newHint;
             this.render();
             return oldHint;
@@ -175,7 +174,7 @@ define(function(require) {
             }
             $(window).off('pagehide' + this.eventNamespace());
             this.hide(true);
-            LoadingMaskView.__super__.dispose.apply(this, arguments);
+            LoadingMaskView.__super__.dispose.call(this);
         }
     });
 

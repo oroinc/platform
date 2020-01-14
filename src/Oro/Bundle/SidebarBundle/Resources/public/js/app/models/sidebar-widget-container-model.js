@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var SidebarWidgetContainerModel;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseModel = require('oroui/js/app/models/base/model');
-    var mediator = require('oroui/js/mediator');
-    var constants = require('orosidebar/js/sidebar-constants');
+    const _ = require('underscore');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const BaseModel = require('oroui/js/app/models/base/model');
+    const mediator = require('oroui/js/mediator');
+    const constants = require('orosidebar/js/sidebar-constants');
 
-    SidebarWidgetContainerModel = BaseModel.extend({
+    const SidebarWidgetContainerModel = BaseModel.extend({
         defaults: {
             icon: '',
             iconClass: '',
@@ -24,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SidebarWidgetContainerModel() {
-            SidebarWidgetContainerModel.__super__.constructor.apply(this, arguments);
+        constructor: function SidebarWidgetContainerModel(attrs, options) {
+            SidebarWidgetContainerModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
@@ -39,9 +38,9 @@ define(function(require) {
 
         loadModule: function() {
             if (!this.loadModulePromise) {
-                this.loadModulePromise = tools.loadModules([this.get('module')])
+                this.loadModulePromise = loadModules(this.get('module'))
                     .then(this.createController.bind(this))
-                    .fail(this.onWidgetLoadError.bind(this));
+                    .catch(this.onWidgetLoadError.bind(this));
             }
             return this.loadModulePromise;
         },
@@ -64,7 +63,7 @@ define(function(require) {
          * Toggles state of widget container between minimized and maximized
          */
         toggleState: function() {
-            var state = this.get('state');
+            let state = this.get('state');
 
             state = (state === constants.WIDGET_MINIMIZED) ? constants.WIDGET_MAXIMIZED : constants.WIDGET_MINIMIZED;
 
@@ -76,7 +75,7 @@ define(function(require) {
          * Toggles state of widget container from hover to previews and vise versa
          */
         toggleHoverState: function() {
-            var state = this.get('state');
+            let state = this.get('state');
 
             if (state === constants.WIDGET_MAXIMIZED_HOVER) {
                 state = this.stateSnapshot !== constants.WIDGET_MAXIMIZED_HOVER

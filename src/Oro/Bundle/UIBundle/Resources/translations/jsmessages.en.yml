@@ -72,10 +72,9 @@ oro:
             unexpected: "Unexpected content format"
             performing: "There was an error performing the requested operation. Please try again or contact us for assistance."
         request_too_large_error: >
-            The information you are submitting does not fit the doorway on the server side.
-            This may happen due to the extremely high-resolution images in your data.
-            Please replace the attached information to reduce the total data size,
-            or talk to your admin to extend the doorway by updating HTTP server configuration.
+            The data you are submitting is too large to be processed by the web server.
+            This can happen due to attachments such as high-resolution images. 
+            Please reduce the file size, or contact your admin to adjust the web server configuration.
         page_header:
             button:
                 more: "More"

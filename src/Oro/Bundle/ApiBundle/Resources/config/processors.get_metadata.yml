@@ -1,14 +1,12 @@
 services:
     oro_api.get_metadata.processor:
         class: Oro\Bundle\ApiBundle\Processor\MetadataProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - get_metadata
 
     oro_api.load_metadata.loader.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataLoader
-        public: false
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
@@ -20,7 +18,6 @@ services:
 
     oro_api.load_metadata.loader.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader
-        public: false
         arguments:
             - '@oro_api.load_metadata.factory.object'
             - '@oro_api.load_metadata.nested_object.factory.object'
@@ -28,69 +25,59 @@ services:
 
     oro_api.load_metadata.loader.association:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\AssociationMetadataLoader
-        public: false
         arguments:
             - '@oro_api.metadata_provider'
 
     oro_api.load_metadata.nested_object.factory.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedObjectMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.nested_object.helper'
             - '@oro_api.load_metadata.factory.entity'
 
     oro_api.load_metadata.nested_object.factory.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.nested_object.helper'
             - '@oro_api.load_metadata.factory.object'
 
     oro_api.load_metadata.nested_object.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper
-        public: false
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_api.load_metadata.factory.object'
 
     oro_api.load_metadata.nested_association.factory.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedAssociationMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.nested_association.helper'
             - '@oro_api.load_metadata.factory.entity'
 
     oro_api.load_metadata.nested_association.factory.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.nested_association.helper'
             - '@oro_api.load_metadata.factory.object'
 
     oro_api.load_metadata.nested_association.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataHelper
-        public: false
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_api.load_metadata.factory.object'
 
     oro_api.load_metadata.factory.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_api.entity_metadata_factory'
 
     oro_api.load_metadata.factory.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory
-        public: false
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_entity_extend.association_manager'
 
     oro_api.load_metadata.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper
-        public: false
 
     #
     # get_metadata
@@ -130,7 +117,7 @@ services:
             - '@oro_api.rest.routes_registry'
             - '@router'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -200 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -200 }
 
     oro_api.get_metadata.rest.add_hateoas_links_for_associations:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddHateoasLinksForAssociations
@@ -139,7 +126,7 @@ services:
             - '@router'
             - '@oro_api.subresources_provider'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -205 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -205 }
 
     oro_api.get_metadata.rest.add_pagination_links_for_associations:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddPaginationLinksForAssociations
@@ -149,4 +136,4 @@ services:
             - '@router'
             - '@oro_api.subresources_provider'
         tags:
-            - { name: oro.api.processor, action: get_metadata, requestType: rest&json_api, extra: hateoas, priority: -210 }
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -210 }

@@ -1,34 +1,25 @@
-parameters:
-    oro_attachment.form.type.class:                       Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType
-    oro_attachment.form.type.file_config.class:           Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
-    oro_attachment.form.type.file.class:                  Oro\Bundle\AttachmentBundle\Form\Type\FileType
-    oro_attachment.form.type.image.class:                 Oro\Bundle\AttachmentBundle\Form\Type\ImageType
-    oro_attachment.form.file_subscriber.class:            Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
-    oro_attachment.validator.file_config_validator.class: Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator
-    oro_attachment.form.handler.attachment.class:         Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler
-
 services:
     oro_attachment.form.type:
-        class: '%oro_attachment.form.type.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType
         tags:
             - { name: form.type, alias: oro_attachment }
 
     oro_attachment.form.type.file_config:
-        class: '%oro_attachment.form.type.file_config.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_attachment_file_config }
 
     oro_attachment.form.type.file:
-        class: '%oro_attachment.form.type.file.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\Type\FileType
         calls:
             - [setEventSubscriber,  ['@oro_attachment.form.file_subscriber']]
         tags:
             - { name: form.type, alias: oro_file }
 
     oro_attachment.form.type.image:
-        class: '%oro_attachment.form.type.image.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\Type\ImageType
         tags:
             - { name: form.type, alias: oro_image }
 
@@ -47,17 +38,35 @@ services:
             - { name: form.type, alias: oro_attachment_image_mime_type_config }
 
     oro_attachment.form.file_subscriber:
-        class: '%oro_attachment.form.file_subscriber.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
         arguments: ['@oro_attachment.validator.file_config_validator']
 
     oro_attachment.validator.file_config_validator:
-        class: '%oro_attachment.validator.file_config_validator.class%'
-        arguments: ['@validator', '@oro_entity_config.config_manager', '@oro_config.global']
+        class: Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator
+        arguments:
+            - '@validator'
+            - '@oro_attachment.provider.file_constraints'
 
     oro_attachment.form.handler.attachment:
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        class: '%oro_attachment.form.handler.attachment.class%'
+        class: Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler
         arguments:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
+
+    oro_attachment.form.multiple_file_subscriber:
+        class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\MultipleFileSubscriber
+        arguments: ['@oro_attachment.validator.multiple_file_config_validator']
+
+    oro_attachment.validator.multiple_file_config_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator
+        arguments:
+            - '@validator'
+
+    oro_attachment.form.type.multiple_file:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType
+        arguments:
+            - '@oro_attachment.form.multiple_file_subscriber'
+            - '@oro_attachment.provider.multiple_files_constraints'
+        tags:
+            - { name: form.type, alias: oro_attachment_multi_file }

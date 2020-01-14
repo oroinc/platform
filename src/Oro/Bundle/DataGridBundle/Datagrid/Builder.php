@@ -10,71 +10,48 @@ use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides a functionality to build datagrids.
+ */
 class Builder
 {
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_PATH
-     */
-    const DATASOURCE_PATH           = '[source]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_TYPE_PATH, DatagridConfiguration::getDatasourceType
-     */
-    const DATASOURCE_TYPE_PATH      = '[source][type]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::ACL_RESOURCE_PATH, DatagridConfiguration::getAclResource
-     */
-    const DATASOURCE_ACL_PATH       = '[source][acl_resource]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::BASE_DATAGRID_CLASS_PATH
-     */
-    const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_SKIP_ACL_APPLY_PATH, DatagridConfiguration::isDatasourceSkipAclApply
-     */
-    const DATASOURCE_SKIP_ACL_CHECK = '[options][skip_acl_check]';
-
-    /**
-     * @deprecated Since 1.9, will be removed after 1.11.
-     * @see DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH
-     */
-    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
+    /** @var string */
+    private $baseDatagridClass;
 
     /** @var string */
-    protected $baseDatagridClass;
-
-    /** @var string */
-    protected $acceptorClass;
+    private $acceptorClass;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
-    /** @var DatasourceInterface[] */
-    protected $dataSources = [];
+    /** @var ContainerInterface */
+    private $dataSources;
 
-    /** @var ExtensionVisitorInterface[] */
-    protected $extensions = [];
+    /** @var iterable|ExtensionVisitorInterface[] */
+    private $extensions;
 
     /**
-     * @param                          $baseDatagridClass
-     * @param                          $acceptorClass
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param string                               $baseDatagridClass
+     * @param string                               $acceptorClass
+     * @param EventDispatcherInterface             $eventDispatcher
+     * @param ContainerInterface                   $dataSources
+     * @param iterable|ExtensionVisitorInterface[] $extensions
      */
-    public function __construct($baseDatagridClass, $acceptorClass, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        string $baseDatagridClass,
+        string $acceptorClass,
+        EventDispatcherInterface $eventDispatcher,
+        ContainerInterface $dataSources,
+        iterable $extensions
+    ) {
         $this->baseDatagridClass = $baseDatagridClass;
-        $this->acceptorClass     = $acceptorClass;
-        $this->eventDispatcher   = $eventDispatcher;
+        $this->acceptorClass = $acceptorClass;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->dataSources = $dataSources;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -89,7 +66,7 @@ class Builder
     public function build(DatagridConfiguration $config, ParameterBag $parameters, array $additionalParameters = [])
     {
         /**
-         * @TODO: should be refactored in BAP-6849
+         * should be refactored in BAP-6849
          */
         $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
         if (is_array($minified) && array_key_exists('g', $minified) && is_array($minified['g'])) {
@@ -97,7 +74,7 @@ class Builder
         }
 
         /**
-         * @TODO: should be refactored in BAP-6826
+         * should be refactored in BAP-6826
          */
         $event = new PreBuild($config, $parameters);
         $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
@@ -125,43 +102,12 @@ class Builder
     }
 
     /**
-     * Register datasource type
-     * Automatically registered services tagged by oro_datagrid.datasource tag
-     *
-     * @param string              $type
-     * @param DatasourceInterface $dataSource
-     *
-     * @return $this
-     */
-    public function registerDatasource($type, DatasourceInterface $dataSource)
-    {
-        $this->dataSources[$type] = $dataSource;
-
-        return $this;
-    }
-
-    /**
-     * Register extension
-     * Automatically registered services tagged by oro_datagrid.extension tag
-     *
-     * @param ExtensionVisitorInterface $extension
-     *
-     * @return $this
-     */
-    public function registerExtension(ExtensionVisitorInterface $extension)
-    {
-        $this->extensions[] = $extension;
-
-        return $this;
-    }
-
-    /**
      * @param DatagridConfiguration $config
      * @param ParameterBag          $parameters
      *
      * @return Acceptor
      */
-    protected function createAcceptor(DatagridConfiguration $config, ParameterBag $parameters)
+    private function createAcceptor(DatagridConfiguration $config, ParameterBag $parameters)
     {
         /** @var Acceptor $acceptor */
         $acceptor = new $this->acceptorClass();
@@ -192,18 +138,20 @@ class Builder
      *
      * @throws RuntimeException
      */
-    protected function buildDataSource(DatagridInterface $grid, DatagridConfiguration $config)
+    private function buildDataSource(DatagridInterface $grid, DatagridConfiguration $config)
     {
         $sourceType = $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_TYPE_PATH, false);
         if (!$sourceType) {
             throw new RuntimeException('Datagrid source does not configured');
         }
 
-        if (!isset($this->dataSources[$sourceType])) {
+        if (!$this->dataSources->has($sourceType)) {
             throw new RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
         }
 
-        $this->dataSources[$sourceType]->process(
+        /** @var DatasourceInterface $dataSource */
+        $dataSource = $this->dataSources->get($sourceType);
+        $dataSource->process(
             $grid,
             $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_PATH, [])
         );

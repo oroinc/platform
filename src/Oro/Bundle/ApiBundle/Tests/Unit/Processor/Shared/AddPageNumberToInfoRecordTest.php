@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\AddPageNumberToInfoRecord;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
 {
@@ -26,7 +27,11 @@ class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
             ->willReturn('page[number]');
 
         $this->processor = new AddPageNumberToInfoRecord(
-            new FilterNamesRegistry([[$filterNames, null]], new RequestExpressionMatcher())
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            )
         );
     }
 

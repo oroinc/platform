@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var IntegrationSyncView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var messenger = require('oroui/js/messenger');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const messenger = require('oroui/js/messenger');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
 
-    IntegrationSyncView = BaseView.extend({
+    const IntegrationSyncView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['integrationName']),
 
         modalClass: 'modal oro-modal-danger',
@@ -21,15 +20,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function IntegrationSyncView() {
-            IntegrationSyncView.__super__.constructor.apply(this, arguments);
+        constructor: function IntegrationSyncView(options) {
+            IntegrationSyncView.__super__.constructor.call(this, options);
         },
 
         onSync: function(e) {
             e.preventDefault();
 
-            var $currentTarget = $(e.currentTarget);
-            var syncUrl = $currentTarget.data('url');
+            const $currentTarget = $(e.currentTarget);
+            const syncUrl = $currentTarget.data('url');
 
             if ($currentTarget.data('force')) {
                 this._showConfirmationModal(syncUrl);
@@ -39,7 +38,7 @@ define(function(require) {
         },
 
         _showConfirmationModal: function(url) {
-            var confirmation = new Modal({
+            const confirmation = new Modal({
                 title: __('oro.integration.force_sync.title'),
                 okText: __('oro.integration.force_sync.ok'),
                 cancelText: __('oro.integration.force_sync.cancel'),

@@ -5,21 +5,30 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Autocomplete;
 use Oro\Bundle\DataAuditBundle\Autocomplete\ImpersonationSearchHandler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImpersonationSearchHandler */
     private $searchHandler;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     protected function setUp()
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->searchHandler = new ImpersonationSearchHandler($this->doctrineHelper, new StubTranslator());
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                static function (string $key) {
+                    return sprintf('[trans]%s[/trans]', $key);
+                }
+            );
+
+        $this->searchHandler = new ImpersonationSearchHandler($this->doctrineHelper, $translator);
     }
 
     public function testGetEntityName()

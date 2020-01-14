@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Component\ChainProcessor\AbstractMatcher as Matcher;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
@@ -27,6 +29,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+
+    private const MAX_ELEMENTS_PER_LINE = 2;
 
     /** @var string */
     protected static $defaultName = 'oro:api:debug';
@@ -328,8 +332,14 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $specifiedAttributes = [];
         foreach ($attributes as $attribute) {
             list($name, $value) = explode(':', $attribute, 2);
-            $context->set($name, $this->getTypedValue($value));
-            $specifiedAttributes[] = $name;
+            $value = $this->getTypedValue($value);
+            if ('group' === $name) {
+                $context->setFirstGroup($value);
+                $context->setLastGroup($value);
+            } else {
+                $context->set($name, $value);
+                $specifiedAttributes[] = $name;
+            }
         }
         $processors = $this->processorBag->getProcessors($context);
 
@@ -401,10 +411,34 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 $rows[] = $this->formatProcessorAttribute('collection', 'collection' === $group, true);
             } elseif ('customize_form_data' === $action) {
                 $rows[] = $this->formatProcessorAttribute('event', $group, true);
+            } elseif ('normalize_value' === $action) {
+                $rows[] = $this->formatProcessorAttribute('dataType', $group, true);
             } else {
                 $rows[] = $this->formatProcessorAttribute('group', $group, true);
             }
             unset($attributes['group']);
+        }
+        if ('get_config' === $action && array_key_exists(FilterIdentifierFieldsConfigExtra::NAME, $attributes)) {
+            $identifierFieldsOnly = $attributes[FilterIdentifierFieldsConfigExtra::NAME];
+            if (array_key_exists('extra', $attributes)) {
+                $extra = $attributes['extra'];
+                if (is_string($extra) || key($extra) === Matcher::OPERATOR_NOT) {
+                    $extra = [Matcher::OPERATOR_AND => [$extra]];
+                }
+                if ($identifierFieldsOnly) {
+                    $extra[Matcher::OPERATOR_AND][] = FilterIdentifierFieldsConfigExtra::NAME;
+                } else {
+                    $extra[Matcher::OPERATOR_AND][] = [
+                        Matcher::OPERATOR_NOT => FilterIdentifierFieldsConfigExtra::NAME
+                    ];
+                }
+            } elseif ($identifierFieldsOnly) {
+                $extra = FilterIdentifierFieldsConfigExtra::NAME;
+            } else {
+                $extra = [Matcher::OPERATOR_NOT => FilterIdentifierFieldsConfigExtra::NAME];
+            }
+            $attributes = ['extra' => $extra] + $attributes;
+            unset($attributes[FilterIdentifierFieldsConfigExtra::NAME]);
         }
 
         foreach ($attributes as $key => $val) {
@@ -438,12 +472,20 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      */
     private function convertProcessorAttributeValueToString($value)
     {
+        if (null === $value) {
+            return '<comment>!exists</comment>';
+        }
+
         if (!is_array($value)) {
             return $this->convertValueToString($value);
         }
 
         $items = reset($value);
         if (!is_array($items)) {
+            if (null === $items && key($value) === Matcher::OPERATOR_NOT) {
+                return '<comment>exists</comment>';
+            }
+
             return sprintf('<comment>%s</comment>%s', key($value), $items);
         }
 
@@ -461,12 +503,12 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
             $items
         );
 
-        if ($items <= 3) {
+        if ($items <= self::MAX_ELEMENTS_PER_LINE) {
             return implode($delimiter, $items);
         }
 
         $result = '';
-        $chunks = array_chunk($items, 3);
+        $chunks = array_chunk($items, self::MAX_ELEMENTS_PER_LINE);
         foreach ($chunks as $chunk) {
             if ($result) {
                 $result .= "\n" . $delimiter;

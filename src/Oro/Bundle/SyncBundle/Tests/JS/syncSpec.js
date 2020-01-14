@@ -1,13 +1,26 @@
-define(['orosync/js/sync', 'requirejs-exposure'
-], function(sync, requirejsExposure) {
+define(function(require) {
     'use strict';
 
-    var exposure = requirejsExposure.disclose('orosync/js/sync');
+    const syncModuleInjector = require('inject-loader!orosync/js/sync');
+    const BackboneMock = {
+        Model: function(attrs = {}) {
+            const {id} = attrs;
+            if (id) {
+                this.id = id;
+            }
+            this.set = jasmine.createSpy('model.set').and.returnValue(this);
+            this.on = jasmine.createSpy('model.on').and.returnValue(this);
+            this.url = jasmine.createSpy('model.url').and.returnValue('some/model/1');
+        },
+        Collection: function() {
+            this.on = jasmine.createSpy('collection.on');
+            this.off = jasmine.createSpy('collection.off');
+        }
+    };
 
     describe('orosync/js/sync', function() {
-        var service;
-        var messenger;
-        exposure.backup('service');
+        let service;
+        let sync;
 
         beforeEach(function() {
             service = jasmine.createSpyObj('service', ['subscribe', 'unsubscribe', 'connect']);
@@ -15,163 +28,115 @@ define(['orosync/js/sync', 'requirejs-exposure'
             service.once = jasmine.createSpy('service.once').and.returnValue(service);
             service.off = jasmine.createSpy('service.off').and.returnValue(service);
 
-            messenger = jasmine.createSpyObj('messenger', ['notificationMessage', 'notificationFlashMessage']);
-
-            exposure.substitute('__').by(jasmine.createSpy('__'));
-            exposure.substitute('messenger').by(messenger);
-        });
-
-        afterEach(function() {
-            exposure.recover('__');
-            exposure.recover('messenger');
-            exposure.recover('service');
+            sync = syncModuleInjector({backbone: BackboneMock});
         });
 
         it('setup service', function() {
-            expect(function() {
-                sync({});
-            }).toThrow();
-            expect(exposure.retrieve('service')).toBeUndefined();
-            expect(function() {
-                sync(service);
-            }).not.toThrow();
-            expect(exposure.retrieve('service')).toBe(service);
-        });
-
-        describe('model changes subscription', function() {
-            var model;
-            var subscribeModel = exposure.retrieve('subscribeModel');
-            var unsubscribeModel = exposure.retrieve('unsubscribeModel');
-
-            beforeEach(function() {
-                exposure.substitute('service').by(service);
-                model = jasmine.createSpyObj('model', ['set']);
-                model.on = jasmine.createSpy('model.on').and.returnValue(model);
-                model.url = jasmine.createSpy('model.url').and.returnValue('some/model/1');
-            });
-
-            it('subscribe new model', function() {
-                subscribeModel(model);
-                expect(service.subscribe).not.toHaveBeenCalled();
-            });
-
-            it('subscribe existing model', function() {
-                var setModelAttrsCallback;
-                model.id = 1;
-                subscribeModel(model);
-                expect(service.subscribe).toHaveBeenCalledWith(model.url(), jasmine.any(Function));
-                expect(model.on).toHaveBeenCalledWith('remove', unsubscribeModel);
-                // same callback function event
-                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
-                subscribeModel(model);
-                expect(service.subscribe.calls.mostRecent().args[1]).toBe(setModelAttrsCallback);
-            });
-
-            it('unsubscribe new model', function() {
-                subscribeModel(model);
-                unsubscribeModel(model);
-                expect(service.unsubscribe).not.toHaveBeenCalled();
-            });
-
-            it('unsubscribe existing model', function() {
-                var setModelAttrsCallback;
-                model.id = 1;
-                subscribeModel(model);
-                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
-                unsubscribeModel(model);
-                expect(service.unsubscribe).toHaveBeenCalledWith(model.url(), setModelAttrsCallback);
-            });
+            expect(() => sync({})).toThrow();
+            expect(() => sync(service)).not.toThrow();
         });
 
         describe('check sync\'s methods', function() {
             beforeEach(function() {
-                exposure.substitute('service').by(service);
+                sync(service);
             });
 
             describe('tracking changes', function() {
-                var subscribeModel;
-                var unsubscribeModel;
-                var Backbone = {
-                    Model: function() {},
-                    Collection: function() {
-                        this.on = jasmine.createSpy('collection.on');
-                        this.off = jasmine.createSpy('collection.off');
-                    }
-                };
-                beforeEach(function() {
-                    exposure.substitute('subscribeModel')
-                        .by(subscribeModel = jasmine.createSpy('subscribeModel'));
-                    exposure.substitute('unsubscribeModel')
-                        .by(unsubscribeModel = jasmine.createSpy('subscribeModel'));
-                    exposure.substitute('Backbone').by(Backbone);
-                });
-                afterEach(function() {
-                    exposure.recover('subscribeModel');
-                    exposure.recover('unsubscribeModel');
-                    exposure.recover('Backbone');
-                });
-
                 it('of any object', function() {
-                    var obj = {};
+                    const obj = {};
                     sync.keepRelevant(obj);
-                    expect(subscribeModel).not.toHaveBeenCalled();
+                    expect(service.subscribe).not.toHaveBeenCalled();
                     sync.stopTracking(obj);
-                    expect(unsubscribeModel).not.toHaveBeenCalled();
+                    expect(service.unsubscribe).not.toHaveBeenCalled();
                 });
 
-                it('of Backbone.Model', function() {
-                    var model = new Backbone.Model();
+                it('subscribe new model', function() {
+                    const model = new BackboneMock.Model();
                     sync.keepRelevant(model);
-                    expect(subscribeModel.calls.count()).toEqual(1);
+                    expect(service.subscribe).not.toHaveBeenCalled();
+                });
+
+                it('unsubscribe new model', function() {
+                    const model = new BackboneMock.Model();
+                    sync.keepRelevant(model);
                     sync.stopTracking(model);
-                    expect(unsubscribeModel.calls.count()).toEqual(1);
+                    expect(service.unsubscribe).not.toHaveBeenCalled();
+                });
+
+                it('subscribe existing model', function() {
+                    const model = new BackboneMock.Model({id: 1});
+                    sync.keepRelevant(model);
+                    expect(service.subscribe).toHaveBeenCalledWith(model.url(), jasmine.any(Function));
+                    expect(model.on).toHaveBeenCalledWith('remove', jasmine.any(Function));
+                    // same callback function event
+                    const setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
+                    sync.keepRelevant(model);
+                    expect(service.subscribe.calls.mostRecent().args[1]).toBe(setModelAttrsCallback);
+                });
+
+                it('unsubscribe existing model', function() {
+                    const model = new BackboneMock.Model({id: 1});
+                    sync.keepRelevant(model);
+                    const setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
+                    sync.stopTracking(model);
+                    expect(service.unsubscribe).toHaveBeenCalledWith(model.url(), setModelAttrsCallback);
                 });
 
                 describe('of Backbone.Collection', function() {
-                    var collection;
+                    let collection;
                     beforeEach(function() {
-                        collection = new Backbone.Collection();
+                        collection = new BackboneMock.Collection();
                         collection.url = 'some/model';
-                        collection.models = [new Backbone.Model(), new Backbone.Model(), new Backbone.Model()];
+                        collection.models = [
+                            new BackboneMock.Model({id: 1}),
+                            new BackboneMock.Model({id: 2}),
+                            new BackboneMock.Model({id: 3})
+                        ];
                     });
 
                     it('tracking collection changes', function() {
                         sync.keepRelevant(collection);
-                        expect(subscribeModel.calls.count()).toEqual(collection.models.length);
+                        expect(service.subscribe.calls.count()).toEqual(collection.models.length);
                         expect(collection.on).toHaveBeenCalled();
                         sync.stopTracking(collection);
-                        expect(unsubscribeModel.calls.count()).toEqual(collection.models.length);
+                        expect(service.unsubscribe.calls.count()).toEqual(collection.models.length);
                         expect(collection.off).toHaveBeenCalledWith(collection.on.calls.mostRecent().args[0]);
                     });
 
                     describe('consistency of handling events', function() {
-                        var events;
+                        let events;
                         beforeEach(function() {
                             sync.keepRelevant(collection);
                             events = collection.on.calls.mostRecent().args[0];
                         });
 
                         it('collection "add" event', function() {
-                            expect(events.add).toEqual(exposure.original('subscribeModel'));
+                            expect(events.add).toEqual(jasmine.any(Function));
+                            expect(service.subscribe.calls.count()).toEqual(3);
+                            events.add(new BackboneMock.Model({id: 1}));
+                            expect(service.subscribe.calls.count()).toEqual(4);
                         });
 
                         it('collection "error" event', function() {
                             expect(events.error).toEqual(jasmine.any(Function));
                             events.error(collection);
                             // remove subscription for each models
-                            expect(unsubscribeModel.calls.count()).toEqual(collection.models.length);
+                            expect(service.unsubscribe.calls.count()).toEqual(collection.models.length);
                         });
 
                         it('collection "reset" event', function() {
-                            var options = {previousModels: collection.models};
-                            collection.models = [new Backbone.Model(), new Backbone.Model()];
-                            subscribeModel.calls.reset();
+                            const options = {previousModels: collection.models};
+                            collection.models = [
+                                new BackboneMock.Model({id: 4}),
+                                new BackboneMock.Model({id: 5})
+                            ];
+                            service.subscribe.calls.reset();
                             expect(events.reset).toEqual(jasmine.any(Function));
                             events.reset(collection, options);
                             // remove subscription for each previous models
-                            expect(unsubscribeModel.calls.count()).toEqual(options.previousModels.length);
+                            expect(service.unsubscribe.calls.count()).toEqual(options.previousModels.length);
                             // add subscription for each new models
-                            expect(subscribeModel.calls.count()).toEqual(collection.models.length);
+                            expect(service.subscribe.calls.count()).toEqual(collection.models.length);
                         });
                     });
                 });

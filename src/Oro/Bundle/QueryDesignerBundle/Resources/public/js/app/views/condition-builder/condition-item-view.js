@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var ConditionItemView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var AbstractConditionContainerView =
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const AbstractConditionContainerView =
         require('oroquerydesigner/js/app/views/condition-builder/abstract-condition-container-view');
-    var template = require('tpl!oroquerydesigner/templates/condition-builder/condition-item.html');
+    const template = require('tpl-loader!oroquerydesigner/templates/condition-builder/condition-item.html');
 
-    ConditionItemView = AbstractConditionContainerView.extend({
+    const ConditionItemView = AbstractConditionContainerView.extend({
         template: template,
 
         requiredOptions: AbstractConditionContainerView.prototype.requiredOptions.concat(['view', 'viewOptions']),
@@ -17,13 +16,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ConditionItemView() {
-            ConditionItemView.__super__.constructor.apply(this, arguments);
+        constructor: function ConditionItemView(options) {
+            ConditionItemView.__super__.constructor.call(this, options);
         },
 
         render: function() {
             ConditionItemView.__super__.render.call(this);
-            var view = this._createCriterionView();
+            const view = this._createCriterionView();
             this.subview('criterion', view);
             this.listenTo(view, {
                 close: this.closeCondition,
@@ -44,8 +43,8 @@ define(function(require) {
         },
 
         _createCriterionView: function() {
-            var CriterionView = this.view;
-            var options = _.extend({
+            const CriterionView = this.view;
+            const options = _.extend({
                 el: this.$content,
                 value: this.value
             }, this.viewOptions);
@@ -53,8 +52,8 @@ define(function(require) {
         },
 
         onConditionChange: function() {
-            var value = this.subview('criterion').getValue();
-            var isEmptyValue = _.isEmpty(_.omit(value, 'criteria'));
+            const value = this.subview('criterion').getValue();
+            const isEmptyValue = _.isEmpty(_.omit(value, 'criteria'));
             if (!tools.isEqualsLoosely(value, this.value)) {
                 this.value = !isEmptyValue ? value : {};
                 this.$('>input[name^=condition_item_]').prop('checked', !isEmptyValue);

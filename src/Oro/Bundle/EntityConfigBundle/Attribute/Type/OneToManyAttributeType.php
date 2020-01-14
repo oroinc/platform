@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 
+/**
+ * Provides metadata about one-to-many association attribute type.
+ */
 class OneToManyAttributeType implements AttributeTypeInterface
 {
     use ArrayOrTraversableGuardTrait;
@@ -20,14 +23,6 @@ class OneToManyAttributeType implements AttributeTypeInterface
     public function __construct(EntityNameResolver $entityNameResolver)
     {
         $this->entityNameResolver = $entityNameResolver;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'oneToMany';
     }
 
     /**

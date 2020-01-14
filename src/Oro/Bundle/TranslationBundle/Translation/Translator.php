@@ -7,7 +7,6 @@ use Doctrine\Common\Cache\ClearableCache;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -70,8 +69,8 @@ class Translator extends BaseTranslator
     /** @var array */
     protected $resourceFiles = [];
 
-    /** @var ServiceLink */
-    private $strategyProviderLink;
+    /** @var TranslationStrategyProvider */
+    private $strategyProvider;
 
     /** @var TranslationDomainProvider */
     private $translationDomainProvider;
@@ -81,6 +80,9 @@ class Translator extends BaseTranslator
 
     /** @var LoggerInterface */
     private $logger;
+
+    /** @var array */
+    private $cacheVary;
 
     /**
      * @param ContainerInterface $container
@@ -101,15 +103,16 @@ class Translator extends BaseTranslator
         $this->messageFormatter = $formatter;
         $this->originalOptions = $this->options;
         $this->resourceFiles = $this->options['resource_files'];
+        $this->cacheVary = $this->options['cache_vary'] ?? [];
         $this->logger = new NullLogger();
     }
 
     /**
-     * @param ServiceLink $strategyProviderLink
+     * @param TranslationStrategyProvider $strategyProvider
      */
-    public function setStrategyProviderLink(ServiceLink $strategyProviderLink)
+    public function setStrategyProvider(TranslationStrategyProvider $strategyProvider)
     {
-        $this->strategyProviderLink = $strategyProviderLink;
+        $this->strategyProvider = $strategyProvider;
     }
 
     /**
@@ -159,7 +162,7 @@ class Translator extends BaseTranslator
     public function getTranslations(array $domains = array(), $locale = null)
     {
         // if new strategy was selected
-        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+        if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
             $this->applyCurrentStrategy();
         }
 
@@ -285,7 +288,7 @@ class Translator extends BaseTranslator
     public function getCatalogue($locale = null)
     {
         // if new strategy was selected
-        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+        if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
             $this->applyCurrentStrategy();
         }
 
@@ -348,14 +351,12 @@ class Translator extends BaseTranslator
             ]
         );
 
-        $provider = $this->getStrategyProvider();
-
         // save current translation strategy
-        $currentStrategy = $provider->getStrategy();
+        $currentStrategy = $this->strategyProvider->getStrategy();
 
         // build translation cache for each translation strategy in tmp cache directory
-        foreach ($provider->getStrategies() as $strategy) {
-            $provider->setStrategy($strategy);
+        foreach ($this->strategyProvider->getStrategies() as $strategy) {
+            $this->strategyProvider->setStrategy($strategy);
 
             /* @var $translator Translator */
             $translator = new static(
@@ -366,7 +367,7 @@ class Translator extends BaseTranslator
                 $options
             );
 
-            $translator->setStrategyProviderLink($this->strategyProviderLink);
+            $translator->setStrategyProvider($this->strategyProvider);
             $translator->setTranslationDomainProvider($this->translationDomainProvider);
             $translator->setEventDispatcher($this->eventDispatcher);
             $translator->setInstalled($this->installed);
@@ -390,7 +391,7 @@ class Translator extends BaseTranslator
         $filesystem->remove($tmpDir);
 
         // restore translation strategy and apply it to make use of new cache
-        $provider->setStrategy($currentStrategy);
+        $this->strategyProvider->setStrategy($currentStrategy);
         $this->applyCurrentStrategy();
     }
 
@@ -416,17 +417,17 @@ class Translator extends BaseTranslator
 
     protected function applyCurrentStrategy()
     {
-        $strategyProvider = $this->getStrategyProvider();
-        $strategy = $strategyProvider->getStrategy();
+        $strategy = $this->strategyProvider->getStrategy();
 
         // store current strategy name to skip all following requests to it
         $this->strategyName = $strategy->getName();
 
         // use current set of fallback locales to build translation cache
-        $fallbackLocales = $strategyProvider->getAllFallbackLocales($strategy);
+        $fallbackLocales = $this->strategyProvider->getAllFallbackLocales($strategy);
 
         // set new fallback locales and clear catalogues to generate new ones for new strategy
         $this->setFallbackLocales($fallbackLocales);
+        $this->cacheVary['fallback_locales'] = $fallbackLocales;
     }
 
     /**
@@ -434,10 +435,7 @@ class Translator extends BaseTranslator
      */
     protected function computeFallbackLocales($locale)
     {
-        $strategyProvider = $this->getStrategyProvider();
-        $strategy = $strategyProvider->getStrategy();
-
-        return $strategyProvider->getFallbackLocales($strategy, $locale);
+        return $this->strategyProvider->getFallbackLocales($this->strategyProvider->getStrategy(), $locale);
     }
 
     /**
@@ -527,7 +525,7 @@ class Translator extends BaseTranslator
     private function getCatalogueCachePath(string $locale): string
     {
         return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(
-            substr(base64_encode(hash('sha256', serialize($this->getFallbackLocales()), true)), 0, 7),
+            substr(base64_encode(hash('sha256', serialize($this->cacheVary), true)), 0, 7),
             '/',
             '_'
         ).'.php';
@@ -584,17 +582,6 @@ class Translator extends BaseTranslator
                 }
             }
         }
-    }
-
-    /**
-     * @return TranslationStrategyProvider
-     */
-    protected function getStrategyProvider()
-    {
-        /** @var TranslationStrategyProvider $strategyProvider */
-        $strategyProvider = $this->strategyProviderLink->getService();
-
-        return $strategyProvider;
     }
 
     /**

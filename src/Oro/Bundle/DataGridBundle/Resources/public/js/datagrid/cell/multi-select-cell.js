@@ -5,14 +5,12 @@ define([
 ], function(Backgrid, _, __) {
     'use strict';
 
-    var MultiSelectCell;
-
     /**
      * Cell able to display multiselect values.
      *
      * Requires income data format:
      * ```javascript
-     * var cellValue = [<id-1>, <id-2>, ...];
+     * const cellValue = [<id-1>, <id-2>, ...];
      * ```
      *
      * Also please prepare and pass choices through cell configuration
@@ -21,7 +19,7 @@ define([
      * @class   oro.datagrid.cell.MultiSelectCell
      * @extends oro.datagrid.cell.StringCell
      */
-    MultiSelectCell = Backgrid.StringCell.extend({
+    const MultiSelectCell = Backgrid.StringCell.extend({
         /**
          * @property {string}
          */
@@ -40,16 +38,16 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function MultiSelectCell() {
-            MultiSelectCell.__super__.constructor.apply(this, arguments);
+        constructor: function MultiSelectCell(options) {
+            MultiSelectCell.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            var value = this.model.get(this.column.get('name'));
-            var choices = this.choices;
+            let value = this.model.get(this.column.get('name'));
+            const choices = this.choices;
 
             if (_.isString(value)) {
                 try {
@@ -65,7 +63,7 @@ define([
                 value = [];
             }
 
-            var html;
+            let html;
             try {
                 html = value.length > 0 ? (
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +

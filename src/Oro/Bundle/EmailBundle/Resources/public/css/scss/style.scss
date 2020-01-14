@@ -95,7 +95,7 @@
                 box-sizing: border-box;
             }
 
-            input {
+            input:not([type='checkbox']) {
                 height: 32px;
             }
         }
@@ -179,7 +179,7 @@
         }
 
         .form-horizontal {
-            width: 636px;
+            width: 756px;
             margin: auto;
 
             .control-group {

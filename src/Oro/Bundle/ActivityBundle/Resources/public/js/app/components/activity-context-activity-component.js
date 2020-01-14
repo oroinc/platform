@@ -1,21 +1,20 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextActivityComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ActivityContextActivityView = require('oroactivity/js/app/views/activity-context-activity-view');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ActivityContextActivityView = require('oroactivity/js/app/views/activity-context-activity-view');
 
     /**
      * @exports ActivityContextActivityComponent
      */
-    ActivityContextActivityComponent = BaseComponent.extend({
+    const ActivityContextActivityComponent = BaseComponent.extend({
         contextsView: null,
 
         /**
          * @inheritDoc
          */
-        constructor: function ActivityContextActivityComponent() {
-            ActivityContextActivityComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextActivityComponent(options) {
+            ActivityContextActivityComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -29,8 +28,8 @@ define(function(require) {
         },
 
         initView: function() {
-            var items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
-            var editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;
+            const items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
+            const editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;
             this.contextsView = new ActivityContextActivityView({
                 contextTargets: items,
                 entityId: this.options.entityId,

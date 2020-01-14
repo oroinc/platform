@@ -13,13 +13,13 @@ define([
             refreshNotOpened: true
         }),
 
-        _create: function() {
+        _create: function(...args) {
             this.outerTrigger = this.options.outerTrigger;
-            this._superApply(arguments);
+            this._superApply(args);
         },
 
         _bindEvents: function() {
-            var self = this;
+            const self = this;
 
             this._bindButtonEvents();
             this._bindMenuEvents();
@@ -45,16 +45,16 @@ define([
          * Bind update position method after menu is opened
          * @override
          */
-        open: function() {
+        open: function(...args) {
             if (!this.hasBeenOpened) {
                 this.hasBeenOpened = true;
                 this.refresh();
             }
-            this._superApply(arguments);
+            this._superApply(args);
             if (!this.options.appendTo) {
                 this.menu.css('zIndex', '');
-                var zIndex = Math.max.apply(Math, this.element.parents().add(this.menu).map(function() {
-                    var zIndex = Number($(this).css('zIndex'));
+                const zIndex = Math.max(...this.element.parents().add(this.menu).map(function() {
+                    const zIndex = Number($(this).css('zIndex'));
                     return isNaN(zIndex) ? 0 : zIndex;
                 }));
 
@@ -69,17 +69,17 @@ define([
          * Remove all handlers before closing menu
          * @override
          */
-        close: function() {
+        close: function(...args) {
             mask.hide();
-            this._superApply(arguments);
+            this._superApply(args);
         },
 
         /**
          * Process position update for menu element
          */
         updatePos: function(position) {
-            var menu = this.widget();
-            var isShown = menu.is(':visible');
+            const menu = this.widget();
+            const isShown = menu.is(':visible');
 
             menu.position(position);
             if (isShown) {
@@ -89,7 +89,7 @@ define([
 
         refresh: function(init) {
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
-                var scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
+                const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
                 this._super(init);
                 this.menu.find('.ui-multiselect-checkboxes').scrollTop(scrollTop);
             }
@@ -111,10 +111,10 @@ define([
         },
 
         _isExcluded: function(target) {
-            var $target = $(target);
-            var isMenu = !!$target.closest(this.menu).length;
-            var isButton = !!$target.closest(this.button).length;
-            var isOuterTrigger = false;
+            const $target = $(target);
+            const isMenu = !!$target.closest(this.menu).length;
+            const isButton = !!$target.closest(this.button).length;
+            let isOuterTrigger = false;
 
             if (this.outerTrigger && (this.outerTrigger instanceof $) && this.outerTrigger.length) {
                 isOuterTrigger = !!$target.closest(this.outerTrigger).length;

@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var Select2AclUserAutocompleteComponent;
-    var Select2Component = require('oro/select2-component');
-    var _ = require('underscore');
+    const Select2Component = require('oro/select2-component');
+    const _ = require('underscore');
 
-    Select2AclUserAutocompleteComponent = Select2Component.extend({
+    const Select2AclUserAutocompleteComponent = Select2Component.extend({
         /**
          * @inheritDoc
          */
-        constructor: function Select2AclUserAutocompleteComponent() {
-            Select2AclUserAutocompleteComponent.__super__.constructor.apply(this, arguments);
+        constructor: function Select2AclUserAutocompleteComponent(options) {
+            Select2AclUserAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var params = {
+            let params = {
                 permission: options.configs.permission,
                 entity: options.configs.entity_name,
                 entity_id: options.configs.entity_id
@@ -34,7 +33,7 @@ define(function(require) {
         },
 
         makeQuery: function(query, configs) {
-            var queryParts = [
+            const queryParts = [
                 query,
                 configs.entity_name,
                 configs.permission,

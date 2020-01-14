@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var SqlQueryView;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var ElementValueCopyToClipboardView = require('oroui/js/app/views/element-value-copy-to-clipboard-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const ElementValueCopyToClipboardView = require('oroui/js/app/views/element-value-copy-to-clipboard-view');
 
-    SqlQueryView = BaseView.extend({
+    const SqlQueryView = BaseView.extend({
         labels: {
             show_sql: 'oro.report.view_sql.show_sql_query',
             hide_sql: 'oro.report.view_sql.hide_sql_query'
@@ -19,13 +18,13 @@ define(function(require) {
             copy_not_successful: 'oro.datagrid.view_sql.messages.copy_not_successful'
         },
 
-        template: require('tpl!../../../../templates/sql-query-view.html'),
+        template: require('tpl-loader!../../../../templates/sql-query-view.html'),
 
         /**
          * @inheritDoc
          */
-        constructor: function SqlQueryView() {
-            SqlQueryView.__super__.constructor.apply(this, arguments);
+        constructor: function SqlQueryView(options) {
+            SqlQueryView.__super__.constructor.call(this, options);
         },
 
         /**

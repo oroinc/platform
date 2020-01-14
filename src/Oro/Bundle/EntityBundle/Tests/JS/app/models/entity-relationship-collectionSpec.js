@@ -1,27 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var Backbone = require('backbone');
-    var exposure = require('requirejs-exposure')
-        .disclose('oroentity/js/app/models/entity-relationship-collection');
-    var EntityModel = require('oroentity/js/app/models/entity-model');
-    var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
-    var EntityRelationshipCollection = require('oroentity/js/app/models/entity-relationship-collection');
+    const Backbone = require('backbone');
+    const entityRelationshipCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entity-relationship-collection');
+
+    const EntityModel = require('oroentity/js/app/models/entity-model');
+    const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
 
     describe('oroentity/js/app/models/entity-relationship-collection', function() {
-        var applicant1;
-        var applicant2;
-        var registryMock;
+        let applicant1;
+        let applicant2;
+        let registryMock;
+        let EntityRelationshipCollection;
 
         beforeEach(function() {
             applicant1 = Object.create(Backbone.Events);
             applicant2 = Object.create(Backbone.Events);
             registryMock = new RegistryMock();
-            exposure.substitute('registry').by(registryMock);
-        });
-
-        afterEach(function() {
-            exposure.recover('registry');
+            EntityRelationshipCollection = entityRelationshipCollectionModuleInjector({
+                'oroui/js/app/services/registry': registryMock
+            });
         });
 
         it('static method EntityRelationshipCollection.globalId', function() {
@@ -60,7 +58,7 @@ define(function(require) {
             });
 
             it('get synced collection with models', function() {
-                var collection = EntityRelationshipCollection.getEntityRelationshipCollection({
+                const collection = EntityRelationshipCollection.getEntityRelationshipCollection({
                     type: 'test',
                     id: '13',
                     association: 'users',
@@ -81,7 +79,7 @@ define(function(require) {
             });
 
             it('create new relationship collection', function() {
-                var collection = EntityRelationshipCollection
+                const collection = EntityRelationshipCollection
                     .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
                 expect(registryMock.fetch).toHaveBeenCalledWith('test::13::users', applicant1);
@@ -90,11 +88,11 @@ define(function(require) {
             });
 
             it('retrieve existing relationship collection', function() {
-                var collection1 = new EntityRelationshipCollection(
+                const collection1 = new EntityRelationshipCollection(
                     null, {type: 'test', id: '13', association: 'users'});
                 registryMock._entries[collection1.globalId] = {instance: collection1};
 
-                var collection2 = EntityRelationshipCollection
+                const collection2 = EntityRelationshipCollection
                     .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
                 expect(registryMock.fetch).toHaveBeenCalledWith('test::13::users', applicant1);
@@ -103,9 +101,9 @@ define(function(require) {
             });
 
             it('retrieve existing relationship collection with update', function() {
-                var collection1 = EntityRelationshipCollection
+                const collection1 = EntityRelationshipCollection
                     .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
-                var collection2 = EntityRelationshipCollection
+                const collection2 = EntityRelationshipCollection
                     .getEntityRelationshipCollection({
                         type: 'test',
                         id: '13',
@@ -118,13 +116,13 @@ define(function(require) {
             });
 
             it('retrieve existing relationship collection without update', function() {
-                var collection1 = EntityRelationshipCollection.getEntityRelationshipCollection({
+                const collection1 = EntityRelationshipCollection.getEntityRelationshipCollection({
                     type: 'test',
                     id: '13',
                     association: 'users',
                     data: [{type: 'users', id: '1'}, {type: 'users', id: '2'}]
                 }, applicant2);
-                var collection2 = EntityRelationshipCollection
+                const collection2 = EntityRelationshipCollection
                     .getEntityRelationshipCollection({type: 'test', id: '13', association: 'users'}, applicant1);
 
                 expect(collection1).toBe(collection2);
@@ -133,7 +131,7 @@ define(function(require) {
         });
 
         describe('collection manipulation', function() {
-            var collection;
+            let collection;
 
             beforeEach(function() {
                 collection = new EntityRelationshipCollection({data: [

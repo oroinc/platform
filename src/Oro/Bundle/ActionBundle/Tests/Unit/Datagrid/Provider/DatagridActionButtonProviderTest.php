@@ -23,7 +23,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -93,13 +93,22 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                static function ($key) {
+                    return sprintf('[trans]%s[/trans]', $key);
+                }
+            );
+
         $this->provider = new DatagridActionButtonProvider(
             $this->buttonProvider,
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
             $this->entityClassResolver,
-            new StubTranslator()
+            $translator
         );
     }
 

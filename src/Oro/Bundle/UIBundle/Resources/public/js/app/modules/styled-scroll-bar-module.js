@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var scrollBarName = 'styled-scrollbar';
+    const $ = require('jquery');
+    const scrollBarName = 'styled-scrollbar';
 
     require('styled-scroll-bar');
 
     $(document)
         .on('initLayout content:changed', function(e) {
             $(e.target).find('[data-' + scrollBarName + ']').each(function() {
-                var data = $(this).data(scrollBarName);
+                const data = $(this).data(scrollBarName);
 
                 $(this).styledScrollBar(typeof data === 'object' ? data : {});
             });

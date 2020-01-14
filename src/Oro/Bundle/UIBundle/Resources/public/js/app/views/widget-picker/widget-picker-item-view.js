@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerItemView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WidgetPickerItemView = BaseView.extend({
-        template: require('tpl!oroui/templates/widget-picker/widget-picker-item-view.html'),
+    const WidgetPickerItemView = BaseView.extend({
+        template: require('tpl-loader!oroui/templates/widget-picker/widget-picker-item-view.html'),
         tagName: 'div',
         className: 'widget-picker__item',
 
@@ -24,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function WidgetPickerItemView() {
-            WidgetPickerItemView.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerItemView(options) {
+            WidgetPickerItemView.__super__.constructor.call(this, options);
         },
 
         _blockAddBtn: function() {

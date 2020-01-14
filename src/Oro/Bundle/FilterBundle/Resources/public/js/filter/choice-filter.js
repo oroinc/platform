@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ChoiceFilter;
-    var template = require('tpl!orofilter/templates/filter/choice-filter.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var TextFilter = require('./text-filter');
+    const template = require('tpl-loader!orofilter/templates/filter/choice-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const TextFilter = require('oro/filter/text-filter');
 
     /**
      * Choice filter: filter type as option + filter value as string
@@ -15,7 +14,7 @@ define(function(require) {
      * @class   oro.filter.ChoiceFilter
      * @extends oro.filter.TextFilter
      */
-    ChoiceFilter = TextFilter.extend({
+    const ChoiceFilter = TextFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -57,8 +56,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ChoiceFilter() {
-            ChoiceFilter.__super__.constructor.apply(this, arguments);
+        constructor: function ChoiceFilter(options) {
+            ChoiceFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -67,7 +66,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'choices');
+            const opts = _.pick(options || {}, 'choices');
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -89,7 +88,7 @@ define(function(require) {
                 };
             }
 
-            ChoiceFilter.__super__.initialize.apply(this, arguments);
+            ChoiceFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -115,7 +114,7 @@ define(function(require) {
         },
 
         getType: function() {
-            var value = this._readDOMValue();
+            const value = this._readDOMValue();
             return value.type;
         },
 
@@ -123,11 +122,11 @@ define(function(require) {
          * @inheritDoc
          */
         getTemplateData: function() {
-            var value = _.extend({}, this.emptyValue, this.value);
-            var selectedChoiceLabel = '';
+            const value = _.extend({}, this.emptyValue, this.value);
+            let selectedChoiceLabel = '';
 
             if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
+                let foundChoice = _.find(this.choices, function(choice) {
                     return String(choice.value) === String(value.type);
                 });
                 foundChoice = foundChoice || _.first(this.choices);
@@ -148,7 +147,7 @@ define(function(require) {
          * @inheritDoc
          */
         _renderCriteria: function() {
-            var $filter = $(this.template(this.getTemplateData()));
+            const $filter = $(this.template(this.getTemplateData()));
             this._appendFilter($filter);
             this._updateDOMValue();
             this._updateValueField();
@@ -162,29 +161,27 @@ define(function(require) {
                 this._renderCriteria();
             }
             this._updateValueField();
-            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
+            ChoiceFilter.__super__._showCriteria.call(this);
         },
 
-        _onClickChoiceValue: function() {
-            ChoiceFilter.__super__._onClickChoiceValue.apply(this, arguments);
+        _onClickChoiceValue: function(e) {
+            ChoiceFilter.__super__._onClickChoiceValue.call(this, e);
             this._updateValueField();
         },
 
         reset: function() {
-            ChoiceFilter.__super__.reset.apply(this, arguments);
+            ChoiceFilter.__super__.reset.call(this);
             this._updateValueField();
         },
 
         _updateValueField: function() {
-            var type;
-            var isEmptyType;
-            var valueFrame = this.$('.value-field-frame');
+            const valueFrame = this.$('.value-field-frame');
             if (!valueFrame.length) {
                 return;
             }
             // update class of criteria dropdown
-            type = this.$(this.criteriaValueSelectors.type).val();
-            isEmptyType = this.isEmptyType(type);
+            const type = this.$(this.criteriaValueSelectors.type).val();
+            const isEmptyType = this.isEmptyType(type);
             this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
             if (!isEmptyType) {
                 this.$(this.criteriaValueSelectors.value).focus();
@@ -194,12 +191,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var option = null;
+        _getCriteriaHint: function(...args) {
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
+            let option = null;
 
             if (!_.isUndefined(value.type)) {
-                var type = value.type;
+                const type = value.type;
                 option = this._getChoiceOption(type);
 
                 if (this.isEmptyType(type)) {
@@ -211,7 +208,7 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+            const hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
 
             return (option ? option.label + ' ' : '') + hintValue;
         },
@@ -281,14 +278,14 @@ define(function(require) {
          */
         _onValueUpdated: function(newValue, oldValue) {
             this.$(this.choiceDropdownSelector).each(function() {
-                var $menu = $(this);
-                var name = $menu.data('name') || 'type';
+                const $menu = $(this);
+                const name = $menu.data('name') || 'type';
                 if (oldValue[name] === newValue[name]) {
                     return;
                 }
 
                 $menu.find('li a').each(function() {
-                    var item = $(this);
+                    const item = $(this);
                     if (item.data('value').toString() === oldValue[name] && item.parent().hasClass('active')) {
                         item.parent().removeClass('active');
                     } else if (item.data('value').toString() === newValue[name] && !item.parent().hasClass('active')) {
@@ -298,7 +295,7 @@ define(function(require) {
                 });
             });
 
-            ChoiceFilter.__super__._onValueUpdated.apply(this, arguments);
+            ChoiceFilter.__super__._onValueUpdated.call(this, newValue, oldValue);
         }
     });
 

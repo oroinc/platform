@@ -2,18 +2,16 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
-    './abstract-filter'
+    'oro/filter/abstract-filter'
 ], function($, _, tools, AbstractFilter) {
     'use strict';
-
-    var EmptyFilter;
 
     /**
      * @export  oro/filter/empty-filter
      * @class   oro.filter.EmptyFilter
      * @extends oro.filter.AbstractFilter
      */
-    EmptyFilter = AbstractFilter.extend({
+    const EmptyFilter = AbstractFilter.extend({
 
         /**
          * Template selector for filter criteria
@@ -61,18 +59,18 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function EmptyFilter() {
-            EmptyFilter.__super__.constructor.apply(this, arguments);
+        constructor: function EmptyFilter(options) {
+            EmptyFilter.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'caret');
+            const opts = _.pick(options || {}, 'caret');
             _.extend(this, opts);
 
-            EmptyFilter.__super__.initialize.apply(this, arguments);
+            EmptyFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -82,7 +80,7 @@ define([
          * @return {*}
          */
         setValue: function(value) {
-            var oldValue = this.value;
+            const oldValue = this.value;
             this.value = tools.deepClone(value);
             this._updateDOMValue();
             this._onValueUpdated(this.value, oldValue);
@@ -102,12 +100,12 @@ define([
             });
             $(e.currentTarget).parent().addClass('active');
 
-            var parentDiv = $(e.currentTarget).parent().parent().parent();
-            var choiceName = $(e.currentTarget).html();
+            const parentDiv = $(e.currentTarget).parent().parent().parent();
+            let choiceName = $(e.currentTarget).html();
             choiceName += this.caret;
             parentDiv.find('[data-toggle="dropdown"]').html(choiceName);
 
-            var type = $(e.currentTarget).attr('data-value');
+            const type = $(e.currentTarget).attr('data-value');
             this._onClickChoiceValueSetType(type);
 
             this._alignCriteria();
@@ -115,9 +113,9 @@ define([
         },
 
         _onClickChoiceValueSetType: function(type) {
-            var $typeInput = this.$(this.criteriaValueSelectors.type);
+            const $typeInput = this.$(this.criteriaValueSelectors.type);
             $typeInput.each(function() {
-                var $input = $(this);
+                const $input = $(this);
 
                 if ($input.is(':not(select)')) {
                     $input.val(type);
@@ -156,7 +154,7 @@ define([
          */
         fixSelects: function() {
             this.$('select').each(function() {
-                var $select = $(this);
+                const $select = $(this);
                 if ($select.val()) {
                     return true;
                 }
@@ -189,11 +187,11 @@ define([
          * @protected
          */
         _handleEmptyFilter: function() {
-            var container = this.$(this.criteriaSelector);
-            var item = container.find(this.criteriaValueSelectors.value);
-            var type = container.find(this.criteriaValueSelectors.type).val();
-            var button = container.find(this.updateSelector);
-            var query = item.val();
+            const container = this.$(this.criteriaSelector);
+            const item = container.find(this.criteriaValueSelectors.value);
+            const type = container.find(this.criteriaValueSelectors.type).val();
+            const button = container.find(this.updateSelector);
+            const query = item.val();
 
             if (this.isEmptyType(type)) {
                 if (query !== '') {
@@ -224,13 +222,13 @@ define([
         },
 
         _updateDOMValue: function() {
-            EmptyFilter.__super__._updateDOMValue.apply(this, arguments);
+            EmptyFilter.__super__._updateDOMValue.call(this);
             this._updateValueFieldVisibility();
         },
 
         _updateValueFieldVisibility: function() {
-            var type = this.$(this.criteriaValueSelectors.type).val();
-            var $field = this.$(this.criteriaValueSelectors.value);
+            const type = this.$(this.criteriaValueSelectors.type).val();
+            const $field = this.$(this.criteriaValueSelectors.value);
 
             if (this.isEmptyType(type)) {
                 $field.hide();

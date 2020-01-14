@@ -1,20 +1,19 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var SidebarRecentEmailsComponent;
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var module = require('module');
-    var mediator = require('oroui/js/mediator');
-    var sync = require('orosync/js/sync');
-    var channel = module.config().wsChannel;
-    var countCache = require('oroemail/js/util/unread-email-count-cache');
-    var EmailNotificationCollection =
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const config = require('module-config').default(module.id);
+    const mediator = require('oroui/js/mediator');
+    const sync = require('orosync/js/sync');
+    const channel = config.wsChannel;
+    const countCache = require('oroemail/js/util/unread-email-count-cache');
+    const EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
-    var EmailNotificationCountModel =
+    const EmailNotificationCountModel =
         require('oroemail/js/app/models/email-notification/email-notification-count-model');
 
-    SidebarRecentEmailsComponent = BaseComponent.extend({
+    const SidebarRecentEmailsComponent = BaseComponent.extend({
         /**
          * @type {Function}
          */
@@ -36,8 +35,8 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var settings = this.model.get('settings');
-            var count = countCache.get(settings.folderId);
+            const settings = this.model.get('settings');
+            const count = countCache.get(settings.folderId);
             this.model.emailNotificationCountModel = new EmailNotificationCountModel({unreadEmailsCount: count});
             this.listenTo(this.model.emailNotificationCountModel, 'change:unreadEmailsCount', this.updateSidebarCount);
             this.updateSidebarCount();
@@ -54,7 +53,7 @@ define(function(require) {
         },
 
         updateSidebarCount: function() {
-            var itemsCounter = Number(this.model.emailNotificationCountModel.get('unreadEmailsCount'));
+            const itemsCounter = Number(this.model.emailNotificationCountModel.get('unreadEmailsCount'));
             this.model.set({
                 itemsCounter: itemsCounter,
                 highlighted: Boolean(itemsCounter)
@@ -68,7 +67,7 @@ define(function(require) {
         },
 
         updateModelFromCollection: function(collection) {
-            var id = Number(_.result(this.model.get('settings'), 'folderId') || 0);
+            const id = Number(_.result(this.model.get('settings'), 'folderId') || 0);
             countCache.set(id, collection.unreadEmailsCount);
             this.model.trigger('end-loading');
             this.model.emailNotificationCountModel.set('unreadEmailsCount', collection.unreadEmailsCount);

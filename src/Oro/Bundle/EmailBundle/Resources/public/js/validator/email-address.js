@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var emailRegExp = require('oroui/js/tools/patterns').email;
-    var emailUtil = require('oroemail/js/util/email');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const emailRegExp = require('oroui/js/tools/patterns').email;
+    const emailUtil = require('oroemail/js/util/email');
     require('jquery.validate');
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'This value is not a valid email address.'
     };
 
@@ -18,7 +18,7 @@ define(function(require) {
     return [
         'Oro\\Bundle\\EmailBundle\\Validator\\Constraints\\EmailAddress',
         function(value, element) {
-            var $el = $(element);
+            const $el = $(element);
 
             if ($el.parent().is(':hidden')) {
                 return true;
@@ -32,10 +32,10 @@ define(function(require) {
             // original email validator is too slow for some values
             // return $.validator.methods.email.apply(this, arguments);
 
-            var values = null;
+            let values = null;
             if ($el.data('select2')) {
-                var data = $el.inputWidget('data');
-                var arrayData = _.isArray(data) ? data : [data];
+                const data = $el.inputWidget('data');
+                const arrayData = _.isArray(data) ? data : [data];
                 values = _.map(arrayData, _.partial(_.result, _, 'text'));
             } else {
                 values = [value];
@@ -46,8 +46,8 @@ define(function(require) {
             });
         },
         function(param, element) {
-            var value = this.elementValue(element);
-            var placeholders = {};
+            const value = this.elementValue(element);
+            const placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);

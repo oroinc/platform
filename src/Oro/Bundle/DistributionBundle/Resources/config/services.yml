@@ -1,27 +1,13 @@
 imports:
     - { resource: controllers.yml }
+
 parameters:
-    oro_distribution.routing_loader.class:                    Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
-    oro_distribution.expose_routing_loader.class:             Oro\Bundle\DistributionBundle\Routing\OroExposeLoader
-    oro_distribution.package_manager.class:                   Oro\Bundle\DistributionBundle\Manager\PackageManager
-    oro_distribution.script_runner.class:                     Oro\Bundle\DistributionBundle\Script\Runner
-    oro_distribution.composer.class:                          Composer\Composer
-    oro_distribution.composer.io.class:                       Composer\IO\BufferIO
-    oro_distribution.composer.installer.class:                Composer\Installer
-    oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
-    oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
     oro_distribution.composer_json:                           '%kernel.project_dir%/composer.json'
 
     #
     # BAP-10865: Hide "Package Manager" from menu
     #
-    #oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
     #oro_distribution.entry_point:                             ~
-
-    oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
-
-    oro_distribution.form.type.composer_config.class:         Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
-    oro_distribution.form.type.composer_repository.class:     Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
 
     oro_distribution.package_manager.system_paths:
         - vendor
@@ -32,7 +18,7 @@ parameters:
 
 services:
     oro_distribution.routing_loader:
-        class: '%oro_distribution.routing_loader.class%'
+        class: Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
         arguments:
             - '@kernel'
             - '@oro_distribution.routing_options_resolver'
@@ -44,7 +30,7 @@ services:
             - { name: routing.loader }
 
     oro_distribution.expose_routing_loader:
-        class: '%oro_distribution.expose_routing_loader.class%'
+        class: Oro\Bundle\DistributionBundle\Routing\OroExposeLoader
         arguments:
             - '@kernel'
             - '@oro_distribution.routing_options_resolver'
@@ -62,10 +48,11 @@ services:
     oro_distribution.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
         public: false
+        arguments:
+            - !tagged_iterator routing.options_resolver
 
     oro_distribution.package_manager:
-        class: '%oro_distribution.package_manager.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\DistributionBundle\Manager\PackageManager
         public: true
         arguments:
           - '@oro_distribution.composer'
@@ -80,7 +67,7 @@ services:
         lazy: true
 
     oro_distribution.script_runner:
-        class: '%oro_distribution.script_runner.class%'
+        class: Oro\Bundle\DistributionBundle\Script\Runner
         public: false
         arguments:
             - '@oro_distribution.composer.installation_manager'
@@ -91,41 +78,39 @@ services:
             - { name: monolog.logger, channel: oro_distribution }
 
     oro_distribution.composer.io:
-        class: '%oro_distribution.composer.io.class%'
+        class: Composer\IO\BufferIO
         public: false
         lazy: true
 
     oro_distribution.composer.installer:
-        class: '%oro_distribution.composer.installer.class%'
+        class: Composer\Installer
         public: false
         factory: ['Composer\Installer', create]
         arguments: ['@oro_distribution.composer.io', '@oro_distribution.composer']
         lazy: true
 
     oro_distribution.composer:
-        class: '%oro_distribution.composer.class%'
+        class: Composer\Composer
         factory: ['Composer\Factory', create]
         arguments: ['@oro_distribution.composer.io', '%oro_distribution.composer_json%']
         lazy: true
 
     oro_distribution.composer.installation_manager:
-        class: '%oro_distribution.composer.installation_manager.class%'
+        class: Composer\Installer\InstallationManager
         public: true
         factory: ['@oro_distribution.composer', getInstallationManager]
         lazy: true
 
     oro_distribution.composer.json_file:
-        class: '%oro_distribution.composer.json_file.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Composer\Json\JsonFile
         public: true
         arguments:
           - '%oro_distribution.composer_json%'
     #
     # BAP-10865: Hide "Package Manager" from menu
     #
-    ### Menu
     #oro_distribution.listener.navigation_listener:
-    #    class: '%oro_distribution.listener.navigation_listener.class%'
+    #    class: Oro\Bundle\DistributionBundle\EventListener\NavigationListener
     #    arguments:
     #        - '@security.authorization_checker'
     #        - '@security.token_storage'
@@ -135,29 +120,25 @@ services:
     #    calls:
     #        - [setRequest, ["@?request"]]
 
-    ### Form
     oro_distribution.form.type.composer_config:
-        class: '%oro_distribution.form.type.composer_config.class%'
+        class: Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
         tags:
             - { name: form.type, alias: oro_composer_config }
 
     oro_distribution.form.type.composer_repository:
-        class: '%oro_distribution.form.type.composer_repository.class%'
+        class: Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
         tags:
             - { name: form.type, alias: oro_composer_repository }
 
-    # Translations
-    # event listeners
     oro_distribution.locale_listener:
-        class: 'Oro\Bundle\DistributionBundle\EventListener\LocaleListener'
+        class: Oro\Bundle\DistributionBundle\EventListener\LocaleListener
         arguments:
             - '@service_container'
         tags:
             - { name: kernel.event_subscriber }
 
-    # DBAL Loader
     oro_distribution.database_translation.loader:
-        class: 'Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader'
+        class: Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader
         arguments:
             - '@doctrine'
         tags:

@@ -1,10 +1,9 @@
 parameters:
     oro_cron.entity.schedule.class:   Oro\Bundle\CronBundle\Entity\Schedule
-    oro_cron.schedule_manager.class:  Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
 
 services:
     oro_cron.schedule_manager:
-        class: '%oro_cron.schedule_manager.class%'
+        class: Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
         arguments:
             - '@doctrine'
             - '@oro_cron.filter.schedules_by_arguments'
@@ -19,18 +18,18 @@ services:
             - '%oro_cron.entity.schedule.class%'
 
     oro_cron.command_args_tokenizer:
-        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer'
+        class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer
         public: false
         calls:
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.default' ] ]
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.pgsql92' ] ]
 
     oro_cron.command_args_normalizer.default:
-        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer'
+        class: Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer
         public: false
 
     oro_cron.command_args_normalizer.pgsql92:
-        class: 'Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer'
+        class: Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer
         public: false
 
     oro_cron.command_with_args_string_filter:
@@ -44,7 +43,7 @@ services:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
     oro_cron.helper.cron:
-        class: 'Oro\Bundle\CronBundle\Helper\CronHelper'
+        class: Oro\Bundle\CronBundle\Helper\CronHelper
 
 
     oro_cron.engine.command_runner:
@@ -91,17 +90,17 @@ services:
         class: 'Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilter'
 
     oro_cron.validator.schedule_intervals_intersection:
-        class: 'Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator'
+        class: Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator
         tags:
             - { name: validator.constraint_validator, alias: oro_cron_schedule_intervals_intersection_validator }
 
     oro_cron.form.type.schedule_interval:
-        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType'
+        class: Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType
         tags:
             - { name: form.type, alias: oro_cron_schedule_interval }
 
     oro_cron.form.type.schedule_intervals_collection:
-        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType'
+        class: Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType
         tags:
             - { name: form.type, alias: oro_cron_schedule_intervals_collection }
 

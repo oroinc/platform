@@ -11,7 +11,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: '%oro_test.entity.item.class%', alias: item }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
         columns:
             id:
                 label: id
@@ -27,7 +27,7 @@ datagrids:
                 select:
                     - itemValue.id
                 from:
-                    - { table: '%oro_test.entity.item_value.class%', alias: itemValue }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue, alias: itemValue }
         columns:
             id:
                 label: id
@@ -76,7 +76,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: '%oro_test.entity.item.class%', alias: item }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
         columns:
             id:
                 label: id

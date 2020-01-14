@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var CommentItemView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!orocomment/templates/comment/comment-item-view.html');
-    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!orocomment/templates/comment/comment-item-view.html');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
-    CommentItemView = BaseView.extend({
+    const CommentItemView = BaseView.extend({
         template: template,
         tagName: 'li',
         className: 'comment-item',
@@ -32,12 +31,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function CommentItemView() {
-            CommentItemView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentItemView(options) {
+            CommentItemView.__super__.constructor.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = CommentItemView.__super__.getTemplateData.apply(this, arguments);
+            const data = CommentItemView.__super__.getTemplateData.call(this);
             if (data.createdAt) {
                 data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
             }

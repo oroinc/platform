@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -55,7 +55,8 @@ class FallbackValueType extends AbstractType
             'fallback_type_parent_localization' => null,
             'enabled_fallbacks' => [],
             'group_fallback_fields' => null,
-            'exclude_parent_localization' => false
+            'exclude_parent_localization' => false,
+            'use_tabs' => false,
         ]);
 
         $resolver->setNormalizer('group_fallback_fields', function (Options $options, $value) {
@@ -89,10 +90,13 @@ class FallbackValueType extends AbstractType
                 'fallback',
                 $options['fallback_type'],
                 [
+                    'label' => 'oro.locale.fallback.form.label',
+                    'tooltip' => 'oro.locale.fallback.form.tooltip',
                     'enabled_fallbacks' => $options['enabled_fallbacks'],
                     'localization' => $options['fallback_type_localization'],
                     'parent_localization' => $options['fallback_type_parent_localization'],
-                    'required' => false
+                    'required' => false,
+                    'use_tabs' => $options['use_tabs'],
                 ]
             );
 
@@ -116,5 +120,9 @@ class FallbackValueType extends AbstractType
     {
         $view->vars['group_fallback_fields'] = $options['group_fallback_fields'];
         $view->vars['exclude_parent_localization'] = $options['exclude_parent_localization'];
+
+        if ($options['use_tabs']) {
+            array_splice($view->vars['block_prefixes'], -1, 0, [$this->getBlockPrefix() . '_tabs']);
+        }
     }
 }

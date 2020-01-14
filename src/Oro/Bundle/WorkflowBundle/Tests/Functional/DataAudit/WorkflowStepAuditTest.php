@@ -120,7 +120,7 @@ class WorkflowStepAuditTest extends WebTestCase
         $em->flush();
 
         $expectedChanges = [
-            [
+            spl_object_hash($entity) => [
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id'    => $entityId,
                 'change_set'   => [
@@ -159,7 +159,7 @@ class WorkflowStepAuditTest extends WebTestCase
         $em->flush();
 
         $expectedChanges = [
-            [
+            spl_object_hash($entity) => [
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id'    => $entityId,
                 'change_set'   => [
@@ -202,7 +202,7 @@ class WorkflowStepAuditTest extends WebTestCase
         $em->flush();
 
         $expectedChanges = [
-            [
+            spl_object_hash($entity) => [
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id'    => $entityId,
                 'change_set'   => [

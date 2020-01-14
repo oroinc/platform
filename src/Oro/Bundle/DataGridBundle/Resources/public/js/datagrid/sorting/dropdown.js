@@ -1,12 +1,11 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var SortingDropdown;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var Select2View = require('oroform/js/app/views/select2-view');
-    var module = require('module');
-    var config = _.defaults(module.config(), {
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Select2View = require('oroform/js/app/views/select2-view');
+    let config = require('module-config').default(module.id);
+    config = _.defaults({}, config, {
         hasSortingOrderButton: true,
         inlineSortingLabel: false, // Draws inline label for sorter if soring order button (previous option) is not enabled
         disableNotSelectedOption: false,
@@ -21,7 +20,7 @@ define(function(require) {
      * @class   orodatagrid.datagrid.SortingDropdown
      * @extends Backbone.View
      */
-    SortingDropdown = BaseView.extend({
+    const SortingDropdown = BaseView.extend({
         SEARCH_CAPABILITY_GATE: 8,
 
         VALUE_SEPARATOR: '-sep-',
@@ -29,7 +28,7 @@ define(function(require) {
         DIRECTIONS: ['ascending', 'descending'],
 
         /** @property */
-        template: require('tpl!orodatagrid/templates/datagrid/sorting-dropdown.html'),
+        template: require('tpl-loader!orodatagrid/templates/datagrid/sorting-dropdown.html'),
 
         /** @property */
         events: {
@@ -59,8 +58,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SortingDropdown() {
-            SortingDropdown.__super__.constructor.apply(this, arguments);
+        constructor: function SortingDropdown(options) {
+            SortingDropdown.__super__.constructor.call(this, options);
         },
 
         /**
@@ -94,11 +93,11 @@ define(function(require) {
         },
 
         _initCurrentSortableColumn: function() {
-            var keys = Object.keys(this.collection.state.sorters);
+            const keys = Object.keys(this.collection.state.sorters);
             if (keys.length) {
-                var columnName = keys[0];
-                var direction;
-                var column = this.columns.find(function(column) {
+                const columnName = keys[0];
+                let direction;
+                const column = this.columns.find(function(column) {
                     return column.get('name') === columnName;
                 });
                 switch (parseInt(this.collection.state.sorters[columnName], 10)) {
@@ -209,10 +208,9 @@ define(function(require) {
         },
 
         onChangeSorting: function() {
-            var column;
-            var columnName;
-            var newDirection;
-            var value = this.$('select').val();
+            let columnName;
+            let newDirection;
+            let value = this.$('select').val();
             if (this.hasSortingOrderButton) {
                 columnName = value;
             } else {
@@ -220,7 +218,7 @@ define(function(require) {
                 columnName = value[0];
                 newDirection = value[1];
             }
-            column = this.columns.findWhere({name: columnName});
+            const column = this.columns.findWhere({name: columnName});
 
             if (column) {
                 if (newDirection) {
@@ -241,7 +239,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = SortingDropdown.__super__.getTemplateData.apply(this, arguments);
+            let data = SortingDropdown.__super__.getTemplateData.call(this);
             data = _.extend(data, {
                 columns: this._getSelectOptionsData(),
                 selectedValue: this._getCurrentValue(),
@@ -254,7 +252,7 @@ define(function(require) {
         },
 
         _getSelectOptionsData: function() {
-            var options = [];
+            const options = [];
             _.each(_.where(this.columns.toJSON(), {sortable: true, renderable: true}), _.bind(function(column) {
                 if (this.hasSortingOrderButton) {
                     options.push({
@@ -300,7 +298,7 @@ define(function(require) {
                 dropdownCssClass: _.result(this, 'dropdownClassName'),
                 dropdownAutoWidth: true
             };
-            var searchCapabilityGate = this.SEARCH_CAPABILITY_GATE;
+            let searchCapabilityGate = this.SEARCH_CAPABILITY_GATE;
             if (!this.hasSortingOrderButton) {
                 searchCapabilityGate = Math.floor(searchCapabilityGate / this.DIRECTIONS.length);
             }

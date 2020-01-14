@@ -17,8 +17,8 @@ class AddressFormatConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root(self::ROOT_NODE)
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
+        $treeBuilder->getRootNode()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()

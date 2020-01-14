@@ -3,14 +3,20 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * URL generator for attachments. Adds filterMd5 to parameters when filter is present.
+ * URL generator for files. Adds filterMd5 to parameters when filter is present.
  */
-class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
+class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var UrlGeneratorInterface
      */
@@ -29,25 +35,42 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
     {
         $this->urlGenerator = $urlGenerator;
         $this->filterConfiguration = $filterConfiguration;
+        $this->logger = new NullLogger();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
         if (!empty($parameters['filter'])) {
             $filterConfig = $this->filterConfiguration->get($parameters['filter']);
             $parameters['filterMd5'] = md5(json_encode($filterConfig));
         }
 
-        return $this->urlGenerator->generate($name, $parameters, $referenceType);
+        try {
+            $url = (string) $this->urlGenerator->generate($name, $parameters, $referenceType);
+            // Catches only InvalidParameterException because it is the only one that can be caused during normal
+            // runtime, other exceptions should lead to direct fix.
+        } catch (InvalidParameterException $e) {
+            $url = '';
+            $this->logger->warning(
+                sprintf(
+                    'Failed to generate file url by route "%s" with parameters: %s',
+                    $name,
+                    json_encode($parameters)
+                ),
+                ['e' => $e]
+            );
+        }
+
+        return $url;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->urlGenerator->setContext($context);
     }
@@ -55,7 +78,7 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->urlGenerator->getContext();
     }

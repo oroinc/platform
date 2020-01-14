@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
@@ -37,7 +36,7 @@ class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
             $result
         );
         self::assertEquals(
-            [new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY)],
+            [new Parameter($parameterName, $value)],
             $expressionVisitor->getParameters()
         );
     }

@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-notification-model
      */
-    EmailNotificationModel = BaseModel.extend({
+    const EmailNotificationModel = BaseModel.extend({
         replyRoute: '',
 
         replyAllRoute: '',
@@ -29,8 +28,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailNotificationModel() {
-            EmailNotificationModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationModel(...args) {
+            EmailNotificationModel.__super__.constructor.apply(this, args);
         }
     });
 

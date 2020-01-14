@@ -16,6 +16,10 @@
     box-shadow: $dialog-mobile-box-shadow;
     overflow: $dialog-mobile-overflow;
 
+    .widget-content {
+        margin: 0;
+    }
+
     .form-dialog {
         min-width: $dialog-form-mobile-min-width;
     }

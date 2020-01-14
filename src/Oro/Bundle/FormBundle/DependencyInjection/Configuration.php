@@ -6,6 +6,9 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Purifier configuration tree
+ */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -13,8 +16,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_form');
+        $treeBuilder = new TreeBuilder('oro_form');
+        $rootNode = $treeBuilder->getRootNode();
 
         SettingsBuilder::append(
             $rootNode,
@@ -23,43 +26,53 @@ class Configuration implements ConfigurationInterface
             ]
         );
 
-        $rootNode->children()
-            ->arrayNode('wysiwyg')->children()
-                ->enumNode('html_purifier_mode')
-                    ->values(['strict', 'extended', 'disabled'])
-                    ->defaultValue('strict')
-                    ->info(
-                        "strict - filter html elements and attributes by white list. " .
-                        "Style and iframe elements are not allowed\n" .
-                        "extended - same as strict but style and iframe elements are allowed\n" .
-                        "disabled - HTML Purifier is disabled completely"
-                    )
-                ->end()
-                ->arrayNode('html_purifier_iframe_domains')
-                    ->prototype('scalar')->end()
-                    ->info(
-                        'only these domains will be allowed in iframes ' .
-                        '(in case iframes are enabled in extended mode)'
-                    )
-                ->end()
-                ->arrayNode('html_purifier_uri_schemes')
-                    ->prototype('scalar')->end()
-                    ->info(
-                        'allowed URI schemes for HTMLPurifier'
-                    )
-                ->end()
-                ->arrayNode('html_allowed_elements')
-                    ->useAttributeAsKey('name')
-                    ->prototype('array')
+        $rootNode
+            ->children()
+                ->arrayNode('html_purifier_modes')
+                    ->info('Describes scopes and scope rules for HTMLPurifier')
+                    ->useAttributeAsKey('default')
+                    ->arrayPrototype()
+                        ->info('Collection of scopes that defines the rules for HTMLPurifier')
                         ->children()
-                            ->arrayNode('attributes')
-                                ->prototype('scalar')->end()
+                            ->scalarNode('extends')
+                                ->info('Extends configuration from selected scope')
+                                ->example('default')
+                                ->defaultNull()
                             ->end()
-                            ->booleanNode('hasClosingTag')->defaultTrue()->end()
+                            ->arrayNode('allowed_iframe_domains')
+                                ->info(
+                                    'Only these domains will be allowed in iframes ' .
+                                    '(in case iframes are enabled in allowed elements)'
+                                )
+                                ->example(['youtube.com/embed/', 'player.vimeo.com/video/'])
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->arrayNode('allowed_uri_schemes')
+                                ->info('Allowed URI schemes for HTMLPurifier')
+                                ->example(['http', 'https', 'mailto', 'ftp', 'data', 'tel'])
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->arrayNode('allowed_html_elements')
+                                ->info('Allowed elements and attributes for HTMLPurifier')
+                                ->arrayPrototype()
+                                    ->info('Collection of allowed HTML elements for HTMLPurifier')
+                                    ->children()
+                                        ->arrayNode('attributes')
+                                            ->info('Collection of allowed attributes for described HTML tag')
+                                            ->example(['cellspacing', 'cellpadding', 'border', 'align', 'width'])
+                                            ->scalarPrototype()->end()
+                                        ->end()
+                                        ->booleanNode('hasClosingTag')
+                                            ->info('Is HTML tag has closing end tag or not')
+                                            ->defaultTrue()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end()->end();
+            ->end();
 
         return $treeBuilder;
     }

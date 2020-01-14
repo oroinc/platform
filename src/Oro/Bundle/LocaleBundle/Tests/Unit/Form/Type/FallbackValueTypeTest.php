@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
@@ -9,8 +12,9 @@ use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,7 +24,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Validator\Validation;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {
@@ -29,8 +32,11 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface $translator */
-        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
+        $configProvider = $this->createMock(ConfigProvider::class);
+
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
+        $translator = $this->createMock(Translator::class);
 
         return [
             new PreloadedExtension(
@@ -39,7 +45,9 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
                     TextType::class => new TextTypeStub(),
                     OroRichTextType::class => new OroRichTextTypeStub()
                 ],
-                []
+                [
+                    FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                ]
             ),
             new ValidatorExtension(Validation::createValidator())
         ];
@@ -177,7 +185,10 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
                     'enabled_fallbacks' => [],
                     'localization' => $fallbackTypeLocalization,
                     'parent_localization' => $fallbackTypeParentLocalization,
-                    'required' => false
+                    'required' => false,
+                    'label' => 'oro.locale.fallback.form.label',
+                    'tooltip' => 'oro.locale.fallback.form.tooltip',
+                    'use_tabs' => true,
                 ]
             )->willReturnSelf();
         $builder->expects($this->at(3))
@@ -196,6 +207,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
                 'enabled_fallbacks' => [],
                 'fallback_type_localization' => $fallbackTypeLocalization,
                 'fallback_type_parent_localization' => $fallbackTypeParentLocalization,
+                'use_tabs' => true
             ]
         );
     }
@@ -209,13 +221,16 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
+        $formView->vars['block_prefixes'] = ['form', '_custom_block_prefix'];
+
         $formType = new FallbackValueType();
         $formType->finishView(
             $formView,
             $formMock,
             [
                 'group_fallback_fields' => $groupFallbackFields,
-                'exclude_parent_localization' => $excludeParentLocalization
+                'exclude_parent_localization' => $excludeParentLocalization,
+                'use_tabs' => true
             ]
         );
 
@@ -223,6 +238,10 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $this->assertEquals($groupFallbackFields, $formView->vars['group_fallback_fields']);
         $this->assertArrayHasKey('exclude_parent_localization', $formView->vars);
         $this->assertEquals($excludeParentLocalization, $formView->vars['exclude_parent_localization']);
+        $this->assertEquals(
+            ['form', 'oro_locale_fallback_value_tabs', '_custom_block_prefix'],
+            $formView->vars['block_prefixes']
+        );
     }
 
     public function testGetName()

@@ -1,16 +1,6 @@
-parameters:
-    oro_filter.extension.orm_filter.class:      Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
-    oro_filter.datagrid.column_options_guesser.class: Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser
-    oro_filter.provider.datevarsprovider.class: Oro\Bundle\FilterBundle\Provider\DateModifierProvider
-    oro_filter.expression.date.compiler.class:  Oro\Bundle\FilterBundle\Expression\Date\Compiler
-    oro_filter.expression.date.lexer.class:     Oro\Bundle\FilterBundle\Expression\Date\Lexer
-    oro_filter.expression.date.parser.class:    Oro\Bundle\FilterBundle\Expression\Date\Parser
-    oro_filter.builder.many_relation.class:     Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder
-    oro_filter.builder.many_relation.orm.class: Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder
-
 services:
     oro_filter.extension.orm_filter:
-        class: '%oro_filter.extension.orm_filter.class%'
+        class: Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
         arguments:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_filter.extension.orm_filter_bag'
@@ -19,43 +9,45 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    # this service is initialized by Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass
     oro_filter.extension.orm_filter_bag:
         class: Oro\Bundle\FilterBundle\Filter\FilterBag
         public: true
+        arguments:
+            - [] # filter names
+            - ~ # service locator
 
     oro_filter.datagrid.column_options_guesser:
-        class: '%oro_filter.datagrid.column_options_guesser.class%'
+        class: Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser
         tags:
             - { name: oro_datagrid.column_options_guesser }
 
     oro_filter.provider.datemodifierprovider:
-        class: '%oro_filter.provider.datevarsprovider.class%'
+        class: Oro\Bundle\FilterBundle\Provider\DateModifierProvider
 
     oro_filter.expression.date.parser:
+        class: Oro\Bundle\FilterBundle\Expression\Date\Parser
         arguments:
             - '@oro_locale.settings'
-        class: '%oro_filter.expression.date.parser.class%'
 
     oro_filter.expression.date.lexer:
-        class: '%oro_filter.expression.date.lexer.class%'
+        class: Oro\Bundle\FilterBundle\Expression\Date\Lexer
         arguments:
             - '@translator'
             - '@oro_filter.provider.datemodifierprovider'
 
     oro_filter.expression.date.compiler:
-        class: '%oro_filter.expression.date.compiler.class%'
+        class: Oro\Bundle\FilterBundle\Expression\Date\Compiler
         arguments:
             - '@oro_filter.expression.date.lexer'
             - '@oro_filter.expression.date.parser'
 
     oro_filter.builder.many_relation:
-        class: '%oro_filter.builder.many_relation.class%'
+        class: Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder
         calls:
             - [addBuilder, ['@oro_filter.builder.many_relation.orm']]
 
     oro_filter.builder.many_relation.orm:
-        class: '%oro_filter.builder.many_relation.orm.class%'
+        class: Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder
         arguments:
             - '@doctrine'
 
@@ -65,16 +57,15 @@ services:
             - '@oro_filter.expression.date.compiler'
 
     oro_filter.provider.state.filters:
-        class: 'Oro\Bundle\FilterBundle\Provider\State\FiltersStateProvider'
+        class: Oro\Bundle\FilterBundle\Provider\State\FiltersStateProvider
         parent: oro_datagrid.provider.state.abtract
         lazy: true
         arguments:
             - '@oro_datagrid.tools.parameters_helper'
 
     oro_datagrid.provider.selected_fields.filters:
-        class: 'Oro\Bundle\FilterBundle\Provider\SelectedFields\SelectedFieldsFromFiltersProvider'
+        class: Oro\Bundle\FilterBundle\Provider\SelectedFields\SelectedFieldsFromFiltersProvider
         public: false
-        lazy: true
         arguments:
             - '@oro_filter.provider.state.filters'
         tags:

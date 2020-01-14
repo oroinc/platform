@@ -1,7 +1,7 @@
 define(['underscore', 'orotranslation/js/translator'], function(_, __) {
     'use strict';
 
-    var defaultParam = {
+    const defaultParam = {
         message: 'This value is not valid.',
         callback: null
     };
@@ -18,8 +18,8 @@ define(['underscore', 'orotranslation/js/translator'], function(_, __) {
             return param.callback(value, element, param);
         },
         function(param, element) {
-            var value = this.elementValue(element);
-            var placeholders = {};
+            const value = this.elementValue(element);
+            const placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);

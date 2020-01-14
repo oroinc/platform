@@ -1,10 +1,6 @@
-parameters:
-    oro_comment.api.form.type.comment.class:   Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
-    oro_comment.api.form.handler.class:        Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler
-
 services:
     oro_comment.form.type.comment_api:
-        class: '%oro_comment.api.form.type.comment.class%'
+        class: Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -12,7 +8,6 @@ services:
 
     oro_comment.form.comment.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -20,8 +15,7 @@ services:
             - Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
 
     oro_comment.api.form.handler:
-        class: '%oro_comment.api.form.handler.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler
         public: true
         arguments:
             - '@oro_comment.form.comment.api'

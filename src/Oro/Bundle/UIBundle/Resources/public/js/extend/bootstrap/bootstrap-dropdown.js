@@ -1,27 +1,27 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var config = require('module').config();
+    const $ = require('jquery');
+    const _ = require('underscore');
+    let config = require('module-config').default(module.id);
 
-    var Popper = require('popper');
+    const Popper = require('popper');
     require('bootstrap-dropdown');
 
-    var Dropdown = $.fn.dropdown.Constructor;
-    var original = _.clone(Dropdown.prototype);
-    var _clearMenus = Dropdown._clearMenus;
+    const Dropdown = $.fn.dropdown.Constructor;
+    const original = _.clone(Dropdown.prototype);
+    const _clearMenus = Dropdown._clearMenus;
 
-    var DATA_KEY = 'bs.dropdown';
-    var EVENT_KEY = '.' + DATA_KEY;
-    var DATA_API_KEY = '.data-api';
-    var HIDE_EVENT = 'hide' + EVENT_KEY;
-    var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
-    var HIDING_EVENT = 'hiding' + EVENT_KEY;
-    var HIDDEN_EVENT = 'hidden' + EVENT_KEY;
-    var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
-    var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
-    var SCROLLABLE_CONTAINER = [
+    const DATA_KEY = 'bs.dropdown';
+    const EVENT_KEY = '.' + DATA_KEY;
+    const DATA_API_KEY = '.data-api';
+    const HIDE_EVENT = 'hide' + EVENT_KEY;
+    const TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
+    const HIDING_EVENT = 'hiding' + EVENT_KEY;
+    const HIDDEN_EVENT = 'hidden' + EVENT_KEY;
+    const GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
+    const DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
+    const SCROLLABLE_CONTAINER = [
         DIALOG_SCROLLABLE_CONTAINER,
         GRID_SCROLLABLE_CONTAINER
     ].join(',');
@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         dispose: function() {
-            var parent = Dropdown._getParentFromElement(this._element);
+            const parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
 
             if (this._dialog) {
@@ -62,8 +62,8 @@ define(function(require) {
         },
 
         _getConfig: function() {
-            var config = original._getConfig.call(this);
-            var placement = config.placement;
+            const config = original._getConfig.call(this);
+            let placement = config.placement;
 
             if (
                 placement && _.isRTL() &&
@@ -100,8 +100,8 @@ define(function(require) {
 
             original._addEventListeners.call(this);
 
-            var parent = Dropdown._getParentFromElement(this._element);
-            var dialogContent = $(this._element).closest(DIALOG_SCROLLABLE_CONTAINER);
+            const parent = Dropdown._getParentFromElement(this._element);
+            const dialogContent = $(this._element).closest(DIALOG_SCROLLABLE_CONTAINER);
 
             this._dialog = dialogContent.length && dialogContent.parent() || null;
 
@@ -150,7 +150,7 @@ define(function(require) {
                 event.preventDefault();
             }
 
-            var $clickTarget;
+            let $clickTarget;
 
             if (
                 Dropdown._clickEvent &&
@@ -182,7 +182,7 @@ define(function(require) {
         },
 
         _getPopperConfig: function() {
-            var config = original._getPopperConfig.call(this);
+            const config = original._getPopperConfig.call(this);
 
             if (!config.positionFixed && $(this._element).closest(SCROLLABLE_CONTAINER).length) {
                 // dropdowns are shown with position fixed inside scrollable container, to fix overflow
@@ -190,12 +190,12 @@ define(function(require) {
             }
 
             if (this._config.inheritParentWidth) {
-                var inheritParentWidth = this._config.inheritParentWidth;
+                const inheritParentWidth = this._config.inheritParentWidth;
                 config.positionFixed = true;
                 config.modifiers.offset = {
                     fn: function(data, options) {
-                        var popper = data.instance.popper;
-                        var offset = data.offsets.popper;
+                        const popper = data.instance.popper;
+                        const offset = data.offsets.popper;
 
                         if (
                             offset.width &&
@@ -228,8 +228,8 @@ define(function(require) {
             }
 
             if (this._displayArrow()) {
-                var menu = this._getMenuElement();
-                var arrow = $(menu).children('.arrow')[0];
+                const menu = this._getMenuElement();
+                let arrow = $(menu).children('.arrow')[0];
 
                 if (!arrow) {
                     arrow = document.createElement(menu.tagName.toLowerCase() === 'ul' ? 'li' : 'span');
@@ -253,7 +253,7 @@ define(function(require) {
             }
 
             if (_.result(config.modifiers, 'preventOverflow')) {
-                var boundariesElement = config.modifiers.preventOverflow.boundariesElement;
+                const boundariesElement = config.modifiers.preventOverflow.boundariesElement;
 
                 if (boundariesElement && ['scrollParent', 'window', 'viewport'].indexOf(boundariesElement) === -1) {
                     config.modifiers.preventOverflow.boundariesElement = $(this._element).closest(boundariesElement)[0];
@@ -288,7 +288,7 @@ define(function(require) {
 
     Dropdown._clearMenus = function(event) {
         if (event && event.type === 'click') {
-            var $target = $(event.target);
+            const $target = $(event.target);
             if ($target.closest('[data-toggle]').length && $target.closest('.dropdown-menu.show').length) {
                 // click on toggle element inside active dropdown-menu
                 return;
@@ -321,7 +321,7 @@ define(function(require) {
         .off(_events(['click']), '.dropdown form')
         .on(_events(['disposeLayout']), function(event) {
             $('[data-toggle="dropdown"]', event.target).each(function() {
-                var $toogler = $(this);
+                const $toogler = $(this);
                 if ($toogler.data('bs.dropdown')) {
                     $toogler.dropdown('dispose');
                 }

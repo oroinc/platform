@@ -2,47 +2,35 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\EventListener\ContentProviderListener;
-use Psr\Container\ContainerInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
 
-    /**
-     * @var ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
     private $contentProviderManager;
 
-    /**
-     * @var ContentProviderListener
-     */
+    /** @var ContentProviderListener */
     private $listener;
 
     protected function setUp()
     {
         $this->event = $this->createMock(GetResponseEvent::class);
         $this->event->expects($this->any())
-            ->method('getRequestType')
-            ->willReturn(HttpKernelInterface::MASTER_REQUEST);
+            ->method('isMasterRequest')
+            ->willReturn(true);
 
         $this->contentProviderManager = $this->createMock(ContentProviderManager::class);
 
-        /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerInterface::class);
-
-        $container->expects($this->any())
-            ->method('get')
-            ->with(ContentProviderManager::class)
-            ->willReturn($this->contentProviderManager);
+        $container = TestContainerBuilder::create()
+            ->add('oro_ui.content_provider.manager', $this->contentProviderManager)
+            ->getContainer($this);
 
         $this->listener = new ContentProviderListener($container);
     }
@@ -73,11 +61,9 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 
         $request->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['_enableContentProviders', null, 'test1,test2']
-                ]
-            );
+            ->willReturnMap([
+                ['_enableContentProviders', null, 'test1,test2']
+            ]);
         $this->event->expects($this->any())
             ->method('getRequest')
             ->willReturn($request);
@@ -87,44 +73,20 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelViewToDisplay()
     {
-        $testContentProviderOne = $this
-            ->getMockBuilder(ContentProviderInterface::class)
-            ->setMethods(array('setEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->once())
-            ->method('setEnabled')
-            ->with(false);
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('test1');
-
-        $testContentProviderTwo = $this
-            ->getMockBuilder(ContentProviderInterface::class)
-            ->setMethods(array('setEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderTwo->expects($this->never())
-            ->method('setEnabled');
-        $testContentProviderTwo->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('test2');
-
-        $providers = array(
-            $testContentProviderOne,
-            $testContentProviderTwo
-        );
+        $this->contentProviderManager->expects($this->once())
+            ->method('disableContentProvider')
+            ->with('test1');
 
         $this->contentProviderManager->expects($this->once())
-            ->method('getContentProviders')
-            ->willReturn($providers);
+            ->method('getContentProviderNames')
+            ->willReturn(['test1', 'test2']);
 
         $request = $this->createMock(Request::class);
         $request->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['_displayContentProviders', null, 'test2']
-                ]
-            );
+            ->willReturnMap([
+                ['_displayContentProviders', null, 'test2']
+            ]);
         $this->event->expects($this->any())
             ->method('getRequest')
             ->willReturn($request);

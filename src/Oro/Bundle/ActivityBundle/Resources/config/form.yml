@@ -1,6 +1,3 @@
-parameters:
-    oro_activity.type.multiple_association_choice.class: Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType
-
 services:
     oro_activity.form.type.contexts_select:
         class: Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType
@@ -18,16 +15,17 @@ services:
         class: Oro\Bundle\ActivityBundle\Form\Extension\ContextsExtension
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_activity.manager'
-            - '@oro_entity.entity_alias_resolver'
-            - '@oro_entity.routing_helper'
             - '@request_stack'
             - '@security.authorization_checker'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: container.service_subscriber, id: oro_activity.manager }
+            - { name: container.service_subscriber, id: oro_entity.entity_alias_resolver }
+            - { name: container.service_subscriber, id: oro_entity.routing_helper }
 
     oro_activity.type.multiple_association_choice:
-        class: '%oro_activity.type.multiple_association_choice.class%'
+        class: Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'

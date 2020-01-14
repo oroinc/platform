@@ -1,23 +1,22 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ChangeOrganizationComponent;
-    var module = require('module');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var toolsRouting = require('oronavigation/js/tools/routing');
-    var modalContentTemplate = require('tpl!orosecurity/templates/organization-modal-content.html');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var Modal = require('oroui/js/modal');
-    var interWindowMediator = require('oroui/js/app/services/inter-window-mediator');
-    var pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
-    var HighlighterFavicon = require('oroui/js/tools/highlighter/highlighter-favicon');
-    var HighlighterTitle = require('oroui/js/tools/highlighter/highlighter-title');
+    const config = require('module-config').default(module.id);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const toolsRouting = require('oronavigation/js/tools/routing');
+    const modalContentTemplate = require('tpl-loader!orosecurity/templates/organization-modal-content.html');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const Modal = require('oroui/js/modal');
+    const interWindowMediator = require('oroui/js/app/services/inter-window-mediator');
+    const pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
+    const HighlighterFavicon = require('oroui/js/tools/highlighter/highlighter-favicon');
+    const HighlighterTitle = require('oroui/js/tools/highlighter/highlighter-title');
 
-    var STATES = {
+    const STATES = {
         INITIAL: 0,
         LOCAL_CHANGES: 1,
         REMOTE_CHANGES: 2,
@@ -26,7 +25,7 @@ define(function(require) {
         DO_CHANGE: 5
     };
 
-    var defaults = {
+    const defaults = {
         switchOrganizationRoute: 'oro_security_switch_organization',
         modalTitle: __('orosecurity.switch_organization_modal.title'),
         modalRemoteChangesText: __('orosecurity.switch_organization_modal.unsaved_data_text'),
@@ -37,7 +36,7 @@ define(function(require) {
         removeWindowDelay: 100
     };
 
-    ChangeOrganizationComponent = BaseComponent.extend({
+    const ChangeOrganizationComponent = BaseComponent.extend({
         state: null,
 
         pollingIntervalId: null,
@@ -49,8 +48,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ChangeOrganizationComponent() {
-            ChangeOrganizationComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ChangeOrganizationComponent(options) {
+            ChangeOrganizationComponent.__super__.constructor.call(this, options);
         },
 
         delegateListeners: function() {
@@ -65,8 +64,8 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var names = _.keys(defaults);
-            _.extend(this, defaults, _.pick(module.config(), names),
+            const names = _.keys(defaults);
+            _.extend(this, defaults, _.pick(config, names),
                 _.pick(options, names), _.pick(options, 'currentOrganizationId'));
 
             ChangeOrganizationComponent.__super__.initialize.call(this, options);
@@ -91,9 +90,9 @@ define(function(require) {
         onRemoteDoOrganizationChange: function(newOrganizationId) {
             pageStateChecker.ignoreChanges();
 
-            var redirectTo = function() {
-                var pathDef = {url: routing.generate('oro_default')};
-                var options = {redirect: true, fullRedirect: true};
+            const redirectTo = function() {
+                const pathDef = {url: routing.generate('oro_default')};
+                const options = {redirect: true, fullRedirect: true};
                 mediator.execute('showLoading');
                 mediator.execute('redirectTo', pathDef, options);
             };
@@ -121,7 +120,7 @@ define(function(require) {
                 this.modal = null;
             }
 
-            var modalOptions;
+            let modalOptions;
 
             switch (state) {
                 case STATES.LOCAL_CHANGES:
@@ -176,20 +175,20 @@ define(function(require) {
          * @param event
          */
         beforeOpenLink: function(event) {
-            var url = event.target.href;
-            var matches;
+            const url = event.target.href;
+            let matches;
 
             if (this.matchingRouteRxp === void 0 ||
                 (matches = url.match(this.matchingRouteRxp)) === null) {
                 return;
             }
 
-            var routeVariables = routing.getRoute(this.switchOrganizationRoute).tokens
+            const routeVariables = routing.getRoute(this.switchOrganizationRoute).tokens
                 .filter(function(token) {
                     return token[0] === 'variable';
                 })
                 .reverse();
-            var idIndex = _.findIndex(routeVariables, function(token) {
+            const idIndex = _.findIndex(routeVariables, function(token) {
                 return token[3] === 'id';
             });
 
@@ -210,12 +209,12 @@ define(function(require) {
                 this.unhighlight();
             }
 
-            var timeoutId = _.delay(function() {
+            const timeoutId = _.delay(function() {
                 interWindowMediator.off('organization:prevent-change', onRemoteChanges);
                 this.onNoRemoteChanges();
             }.bind(this), this.removeWindowDelay);
 
-            var onRemoteChanges = this.onRemoteChanges.bind(this, timeoutId);
+            const onRemoteChanges = this.onRemoteChanges.bind(this, timeoutId);
 
             interWindowMediator.once('organization:prevent-change', onRemoteChanges);
 
@@ -266,14 +265,14 @@ define(function(require) {
             pageStateChecker.ignoreChanges();
             mediator.execute('showLoading');
 
-            var headerId = mediator.execute('retrieveOption', 'headerId');
-            var newOrganizationId = this.organizationId;
+            const headerId = mediator.execute('retrieveOption', 'headerId');
+            const newOrganizationId = this.organizationId;
 
             $.get({
                 url: this.organizationUrl,
                 success: function(data) {
-                    var pathDesc = {url: data.location};
-                    var options = _.omit(data, 'location');
+                    const pathDesc = {url: data.location};
+                    const options = _.omit(data, 'location');
                     interWindowMediator.trigger('organization:do-change', newOrganizationId);
                     mediator.execute('redirectTo', pathDesc, options);
                 },

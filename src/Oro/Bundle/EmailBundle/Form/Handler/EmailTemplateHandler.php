@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The form handler for EmailTemplate entity.
+ */
 class EmailTemplateHandler
 {
     use RequestHandlerTrait;
@@ -26,13 +29,10 @@ class EmailTemplateHandler
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var string */
-    protected $defaultLocale = 'en';
-
     /**
-     * @param FormInterface       $form
-     * @param RequestStack        $requestStack
-     * @param ObjectManager       $manager
+     * @param FormInterface $form
+     * @param RequestStack $requestStack
+     * @param ObjectManager $manager
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -41,23 +41,21 @@ class EmailTemplateHandler
         ObjectManager $manager,
         TranslatorInterface $translator
     ) {
-        $this->form       = $form;
+        $this->form = $form;
         $this->requestStack = $requestStack;
-        $this->manager    = $manager;
+        $this->manager = $manager;
         $this->translator = $translator;
     }
 
     /**
      * Process form
      *
-     * @param  EmailTemplate $entity
+     * @param EmailTemplate $entity
      *
      * @return bool True on successful processing, false otherwise
      */
     public function process(EmailTemplate $entity)
     {
-        // always use default locale during template edit in order to allow update of default locale
-        $entity->setLocale($this->defaultLocale);
         if ($entity->getId()) {
             // refresh translations
             $this->manager->refresh($entity);
@@ -91,13 +89,5 @@ class EmailTemplateHandler
         }
 
         return false;
-    }
-
-    /**
-     * @param string $locale
-     */
-    public function setDefaultLocale($locale)
-    {
-        $this->defaultLocale = $locale;
     }
 }

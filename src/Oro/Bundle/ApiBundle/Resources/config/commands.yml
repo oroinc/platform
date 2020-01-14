@@ -1,7 +1,4 @@
 services:
-    _defaults:
-        public: false
-
     Oro\Bundle\ApiBundle\Command\CacheClearCommand:
         arguments:
             - '@oro_api.cache_manager'
@@ -30,7 +27,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - '@doctrine'
+            - '@oro_entity.entity_class_provider.orm'
         tags:
             - { name: console.command }
 
@@ -58,3 +55,15 @@ services:
             - '@oro_api.config_provider'
         tags:
             - { name: console.command }
+
+    Nelmio\ApiDocBundle\Command\DumpCommand:
+        calls:
+            - [setContainer, ['@service_container']]
+        tags:
+            - { name: console.command, command: 'api:doc:dump' }
+
+    Nelmio\ApiDocBundle\Command\SwaggerDumpCommand:
+        calls:
+            - [setContainer, ['@service_container']]
+        tags:
+            - { name: console.command, command: 'api:swagger:dump' }

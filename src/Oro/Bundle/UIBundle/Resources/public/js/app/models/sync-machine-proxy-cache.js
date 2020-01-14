@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var SyncMachineProxyCache;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var Chaplin = require('chaplin');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var errorHandler = require('oroui/js/error');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Chaplin = require('chaplin');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const errorHandler = require('oroui/js/error');
 
-    SyncMachineProxyCache = _.extend({}, Chaplin.SyncMachine);
+    const SyncMachineProxyCache = Object.assign({}, Chaplin.SyncMachine);
     SyncMachineProxyCache.__super__ = Chaplin.SyncMachine;
 
     /**
@@ -25,11 +24,11 @@ define(function(require) {
      * and they different from restored once
      */
     SyncMachineProxyCache.ensureSync = function() {
-        var storageKey = this.SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY;
-        var expireTime = this.SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME;
-        var observer;
-        var cache;
-        var isModified = false;
+        const storageKey = this.SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY;
+        const expireTime = this.SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME;
+        let observer;
+        let cache;
+        let isModified = false;
         if (!storageKey || !expireTime) {
             errorHandler.showErrorInConsole(new Error('Improperly implemented SyncMachineProxyCache'));
         }

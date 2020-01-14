@@ -1,12 +1,12 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var template = require('tpl!orofilter/templates/filter/filter-hint.html');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var FilterTemplate = require('orofilter/js/filter-template');
-    var config = module.config();
+    const template = require('tpl-loader!orofilter/templates/filter/filter-hint.html');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    let config = require('module-config').default(module.id);
+    const FilterTemplate = require('orofilter/js/filter-template');
+
     config = _.extend({
         inline: true,
         selectors: {
@@ -18,9 +18,7 @@ define(function(require) {
         }
     }, config);
 
-    var FilterHint;
-
-    FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
+    const FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
          * @property
          */
@@ -61,15 +59,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function FilterHint() {
-            FilterHint.__super__.constructor.apply(this, arguments);
+        constructor: function FilterHint(options) {
+            FilterHint.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'filter');
+            const opts = _.pick(options || {}, 'filter');
             _.extend(this, opts);
 
             this.templateTheme = this.filter.templateTheme;
@@ -78,7 +76,7 @@ define(function(require) {
 
             this._defineTemplate();
 
-            FilterHint.__super__.initialize.apply(this, arguments);
+            FilterHint.__super__.initialize.call(this, options);
         },
 
         render: function() {

@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var EmailTemplateEditorView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DialogWidget = require('oro/dialog-widget');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DialogWidget = require('oro/dialog-widget');
 
-    EmailTemplateEditorView = BaseView.extend({
+    const EmailTemplateEditorView = BaseView.extend({
         options: {
             typeSwitcher: 'input[name*="type"]', // type (Html or Plain) switcher selector
             hasWysiwyg: false, // is wysiwyg editor enabled in System->Configuration
@@ -28,15 +27,15 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailTemplateEditorView() {
-            EmailTemplateEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailTemplateEditorView(options) {
+            EmailTemplateEditorView.__super__.constructor.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            EmailTemplateEditorView.__super__.initialize.apply(this, arguments);
+            EmailTemplateEditorView.__super__.initialize.call(this, options);
 
             this.options = _.defaults(options || {}, this.options);
 
@@ -63,10 +62,10 @@ define(function(require) {
 
         _onPreview: function(event) {
             event.preventDefault();
-            var $currentView = this.$el;
+            const $currentView = this.$el;
 
-            var iframeId = 'preview-frame';
-            var iframe = $('<iframe />', {
+            const iframeId = 'preview-frame';
+            const iframe = $('<iframe />', {
                 name: iframeId,
                 id: iframeId,
                 frameborder: 0,
@@ -75,13 +74,13 @@ define(function(require) {
                 allowfullscreen: true
             });
 
-            var formAction = $currentView.attr('action');
+            const formAction = $currentView.attr('action');
 
             $currentView.one('submit', function(e) {
                 if (!e.result) {
                     return;
                 }
-                var confirmModal = new DialogWidget({
+                const confirmModal = new DialogWidget({
                     title: __('Preview'),
                     dialogOptions: {
                         modal: true,
@@ -129,7 +128,7 @@ define(function(require) {
                     if (_.result(component.view, 'tinymceConnected') === true &&
                         !_.isNull(this.options.emailVariableView)
                     ) {
-                        var tinymceInstance = component.view.tinymceInstance;
+                        const tinymceInstance = component.view.tinymceInstance;
                         $(tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
@@ -146,7 +145,7 @@ define(function(require) {
 
         _onTypeChange: function(e) {
             if (this.options.hasWysiwyg) {
-                var target = $(e.target);
+                const target = $(e.target);
                 if (!target.is(':checked')) {
                     return;
                 }
@@ -163,10 +162,10 @@ define(function(require) {
         _switchWysiwygEditor: function(enabled) {
             this.options.isWysiwygEnabled = enabled;
             this.forEachComponent(function(component) {
-                var view = component.view;
+                const view = component.view;
 
                 if (!_.isUndefined(view) && !_.isUndefined(view.tinymceConnected)) {
-                    view.setEnabled(enabled);
+                    view.setIsHtml(enabled);
                     this.listenToOnce(view, 'TinyMCE:initialized', this._onEditorBlur.bind(this));
                 }
             });

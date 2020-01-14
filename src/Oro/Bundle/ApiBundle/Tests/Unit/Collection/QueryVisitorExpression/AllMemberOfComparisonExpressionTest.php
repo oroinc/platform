@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -59,8 +58,8 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY),
-                new Parameter($expectedNumberOfRecordsParameterName, count($value), 'integer')
+                new Parameter($parameterName, $value),
+                new Parameter($expectedNumberOfRecordsParameterName, count($value))
             ],
             $expressionVisitor->getParameters()
         );
@@ -112,8 +111,8 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY),
-                new Parameter($expectedNumberOfRecordsParameterName, count($value), 'integer')
+                new Parameter($parameterName, $value),
+                new Parameter($expectedNumberOfRecordsParameterName, count($value))
             ],
             $expressionVisitor->getParameters()
         );
@@ -165,8 +164,8 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter($parameterName, $value, 'integer'),
-                new Parameter($expectedNumberOfRecordsParameterName, 1, 'integer')
+                new Parameter($parameterName, $value),
+                new Parameter($expectedNumberOfRecordsParameterName, 1)
             ],
             $expressionVisitor->getParameters()
         );
@@ -218,8 +217,8 @@ class AllMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter($parameterName, $value, 'integer'),
-                new Parameter($expectedNumberOfRecordsParameterName, 1, 'integer')
+                new Parameter($parameterName, $value),
+                new Parameter($expectedNumberOfRecordsParameterName, 1)
             ],
             $expressionVisitor->getParameters()
         );

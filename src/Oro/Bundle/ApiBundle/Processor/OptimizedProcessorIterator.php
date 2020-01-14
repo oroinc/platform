@@ -45,6 +45,18 @@ class OptimizedProcessorIterator extends ProcessorIterator
     /**
      * {@inheritdoc}
      */
+    public function getGroup()
+    {
+        if (-1 === $this->index || !$this->valid()) {
+            return null;
+        }
+
+        return $this->processorGroups[$this->index];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProcessorAttributes()
     {
         $attributes = parent::getProcessorAttributes();

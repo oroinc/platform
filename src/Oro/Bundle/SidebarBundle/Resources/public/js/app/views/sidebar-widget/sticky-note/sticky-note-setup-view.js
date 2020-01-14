@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var StickyNoteSetupView;
-    var __ = require('orotranslation/js/translator');
-    var BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
+    const __ = require('orotranslation/js/translator');
+    const BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
 
-    StickyNoteSetupView = BaseWidgetSetupView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget/sticky-note/sticky-note-setup-view.html'),
+    const StickyNoteSetupView = BaseWidgetSetupView.extend({
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget/sticky-note/sticky-note-setup-view.html'),
 
         validation: {
             content: {
@@ -17,8 +16,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function StickyNoteSetupView() {
-            StickyNoteSetupView.__super__.constructor.apply(this, arguments);
+        constructor: function StickyNoteSetupView(options) {
+            StickyNoteSetupView.__super__.constructor.call(this, options);
         },
 
         widgetTitle: function() {

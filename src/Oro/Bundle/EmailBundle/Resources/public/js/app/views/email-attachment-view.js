@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentView;
-    var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailAttachmentView = BaseView.extend({
+    const EmailAttachmentView = BaseView.extend({
         model: EmailAttachmentModel,
 
         inputName: '',
@@ -23,20 +22,20 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function EmailAttachmentView() {
-            EmailAttachmentView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentView(options) {
+            EmailAttachmentView.__super__.constructor.call(this, options);
         },
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-item.html');
+                this.template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-item.html');
             }
 
             return EmailAttachmentView.__super__.getTemplateFunction.call(this);
         },
 
         getTemplateData: function() {
-            var data = EmailAttachmentView.__super__.getTemplateData.call(this);
+            const data = EmailAttachmentView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
             data.inputName = this.inputName;
 
@@ -48,18 +47,18 @@ define(function(require) {
         },
 
         fileSelect: function() {
-            var self = this;
-            var $fileInput = this.$('input[type="file"]');
+            const self = this;
+            const $fileInput = this.$('input[type="file"]');
             this.$el.hide();
 
             $fileInput.on('change', function() {
-                var value = $fileInput.val().replace(/^.*[\\\/]/, '');
+                const value = $fileInput.val().replace(/^.*[\\\/]/, '');
 
                 if (value) {
                     self.model.set('fileName', value);
                     self.model.set('type', 3);
-                    var extension = value.substr(value.lastIndexOf('.') + 1);
-                    var icon = self.fileIcons['default'];
+                    const extension = value.substr(value.lastIndexOf('.') + 1);
+                    let icon = self.fileIcons['default'];
                     if (extension && self.fileIcons[extension]) {
                         icon = self.fileIcons[extension];
                     }

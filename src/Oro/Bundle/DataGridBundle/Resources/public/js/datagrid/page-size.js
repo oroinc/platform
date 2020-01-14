@@ -1,12 +1,10 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/page-size.html',
+    'tpl-loader!orodatagrid/templates/datagrid/page-size.html',
     'jquery',
     'underscore',
     'backbone'
 ], function(template, $, _, Backbone) {
     'use strict';
-
-    var PageSize;
 
     /**
      * Datagrid page size widget
@@ -15,7 +13,7 @@ define([
      * @class   orodatagrid.datagrid.PageSize
      * @extends Backbone.View
      */
-    PageSize = Backbone.View.extend({
+    const PageSize = Backbone.View.extend({
         /** @property */
         template: template,
 
@@ -40,8 +38,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function PageSize() {
-            PageSize.__super__.constructor.apply(this, arguments);
+        constructor: function PageSize(options) {
+            PageSize.__super__.constructor.call(this, options);
         },
 
         /**
@@ -106,7 +104,7 @@ define([
          */
         onChangePageSize: function(e) {
             e.preventDefault();
-            var pageSize = parseInt($(e.target).data('size') || $(e.target).val(), 10);
+            const pageSize = parseInt($(e.target).data('size') || $(e.target).val(), 10);
             if (pageSize !== this.collection.state.pageSize) {
                 this.changePageSize(pageSize);
             }
@@ -120,7 +118,7 @@ define([
         render: function() {
             this.$el.empty();
 
-            var currentSizeLabel = _.filter(
+            let currentSizeLabel = _.filter(
                 this.items,
                 _.bind(
                     function(item) {

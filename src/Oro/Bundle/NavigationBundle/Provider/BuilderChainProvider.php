@@ -9,57 +9,54 @@ use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Psr\Container\ContainerInterface;
 
+/**
+ * This provider uses configured builders to build menus.
+ */
 class BuilderChainProvider implements MenuProviderInterface
 {
-    const COMMON_BUILDER_ALIAS = '_common_builder';
-    const MENU_LOCAL_CACHE_PREFIX = 'menuLocalCachePrefix';
-    const IGNORE_CACHE_OPTION = 'ignoreCache';
+    public const COMMON_BUILDER_ALIAS = '_common_builder';
+    public const MENU_LOCAL_CACHE_PREFIX = 'menuLocalCachePrefix';
+    public const IGNORE_CACHE_OPTION = 'ignoreCache';
 
-    /**
-     * Collection of builders grouped by alias.
-     *
-     * @var array[]
-     */
-    protected $builders = [];
+    /** @var array [alias => [builder id, ...], ...] */
+    private $builders;
 
-    /**
-     * Collection of menus.
-     *
-     * @var ItemInterface[]
-     */
-    protected $menus = [];
+    /** @var ContainerInterface */
+    private $builderContainer;
 
-    /**
-     * @var FactoryInterface
-     */
+    /** @var ItemInterface[] */
+    private $menus = [];
+
+    /** @var FactoryInterface */
     private $factory;
 
-    /**
-     * @var ArrayLoader
-     */
+    /** @var ArrayLoader */
     private $loader;
 
-    /**
-     * @var MenuManipulator
-     */
+    /** @var MenuManipulator */
     private $manipulator;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     private $cache;
 
     /**
+     * @param array $builders
+     * @param ContainerInterface $builderContainer
      * @param FactoryInterface $factory
      * @param ArrayLoader $loader
      * @param MenuManipulator $manipulator
      */
     public function __construct(
+        array $builders,
+        ContainerInterface $builderContainer,
         FactoryInterface $factory,
         ArrayLoader $loader,
         MenuManipulator $manipulator
     ) {
+        $this->builders = $builders;
+        $this->builderContainer = $builderContainer;
         $this->factory = $factory;
         $this->loader = $loader;
         $this->manipulator = $manipulator;
@@ -74,23 +71,6 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         $this->cache = $cache;
         $this->cache->setNamespace('oro_menu_instance');
-    }
-
-    /**
-     * Add builder to chain.
-     *
-     * @param BuilderInterface $builder
-     * @param string           $alias
-     */
-    public function addBuilder(BuilderInterface $builder, $alias = self::COMMON_BUILDER_ALIAS)
-    {
-        $this->assertAlias($alias);
-
-        if (!array_key_exists($alias, $this->builders)) {
-            $this->builders[$alias] = [];
-        }
-
-        $this->builders[$alias][] = $builder;
     }
 
     /**
@@ -128,14 +108,14 @@ class BuilderChainProvider implements MenuProviderInterface
      *
      * @param ItemInterface $menu
      */
-    protected function sort(ItemInterface $menu)
+    private function sort(ItemInterface $menu)
     {
         if ($menu->hasChildren() && $menu->getDisplayChildren()) {
             $orderedChildren = [];
             $unorderedChildren = [];
             $hasOrdering = false;
             $children = $menu->getChildren();
-            foreach ($children as &$child) {
+            foreach ($children as $child) {
                 if ($child->hasChildren() && $child->getDisplayChildren()) {
                     $this->sort($child);
                 }
@@ -180,7 +160,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param string $alias
      * @throws \InvalidArgumentException
      */
-    protected function assertAlias($alias)
+    private function assertAlias($alias)
     {
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
@@ -192,21 +172,24 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param array $options
      * @return ItemInterface
      */
-    protected function buildMenu($alias, array $options)
+    private function buildMenu($alias, array $options)
     {
         $menu = $this->factory->createItem($alias, $options);
 
-        /** @var BuilderInterface $builder */
         // try to find builder for the specified menu alias
         if (array_key_exists($alias, $this->builders)) {
-            foreach ($this->builders[$alias] as $builder) {
+            foreach ($this->builders[$alias] as $builderId) {
+                /** @var BuilderInterface $builder */
+                $builder = $this->builderContainer->get($builderId);
                 $builder->build($menu, $options, $alias);
             }
         }
 
-        // In any case we must run common builder
+        // in any case we must run common builder
         if (array_key_exists(self::COMMON_BUILDER_ALIAS, $this->builders)) {
-            foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builder) {
+            foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builderId) {
+                /** @var BuilderInterface $builder */
+                $builder = $this->builderContainer->get($builderId);
                 $builder->build($menu, $options, $alias);
             }
         }

@@ -5,9 +5,7 @@ define([
 ], function(_, BaseView, mediator) {
     'use strict';
 
-    var PageRegionView;
-
-    PageRegionView = BaseView.extend({
+    const PageRegionView = BaseView.extend({
         listen: {
             'page:update mediator': 'onPageUpdate'
         },
@@ -25,8 +23,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function PageRegionView() {
-            PageRegionView.__super__.constructor.apply(this, arguments);
+        constructor: function PageRegionView(options) {
+            PageRegionView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -62,7 +60,7 @@ define([
          * @override
          */
         render: function() {
-            var data = this.getTemplateData();
+            const data = this.getTemplateData();
 
             if (!data) {
                 // no data, it is initial auto render, skip rendering

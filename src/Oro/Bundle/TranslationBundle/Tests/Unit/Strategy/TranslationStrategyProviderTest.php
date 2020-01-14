@@ -7,6 +7,7 @@ use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 
 class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,9 +28,13 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         $this->defaultStrategy = $this->getStrategy('default');
         $this->customStrategy = $this->getStrategy('custom');
 
-        $this->provider = new TranslationStrategyProvider();
-        $this->provider->addStrategy($this->defaultStrategy);
-        $this->provider->addStrategy($this->customStrategy);
+        $this->provider = new TranslationStrategyProvider(new RewindableGenerator(
+            function () {
+                yield $this->defaultStrategy;
+                yield $this->customStrategy;
+            },
+            2
+        ));
     }
 
     public function testGetStrategy()
@@ -77,7 +82,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider = new TranslationStrategyProvider([$defaultStrategy]);
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
         $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
@@ -206,7 +211,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
         $defaultStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider = new TranslationStrategyProvider([$defaultStrategy]);
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $defaultStrategy */
         $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');

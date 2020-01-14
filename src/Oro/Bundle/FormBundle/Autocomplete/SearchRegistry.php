@@ -2,42 +2,47 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
+use Psr\Container\ContainerInterface;
+
+/**
+ * The registry of autocomplete search handlers.
+ */
 class SearchRegistry
 {
-    /**
-     * @var SearchHandler
-     */
-    protected $searchHandlers = array();
+    /** @var ContainerInterface */
+    private $searchHandlers;
 
     /**
-     * @param string $name
-     * @param SearchHandlerInterface $searchHandler
+     * @param ContainerInterface $searchHandlers
      */
-    public function addSearchHandler($name, SearchHandlerInterface $searchHandler)
+    public function __construct(ContainerInterface $searchHandlers)
     {
-        $this->searchHandlers[$name] = $searchHandler;
+        $this->searchHandlers = $searchHandlers;
     }
 
     /**
      * @param string $name
+     *
      * @return SearchHandlerInterface
-     * @throws \RuntimeException
+     *
+     * @throws \RuntimeException if a handler with the given name does not exist
      */
-    public function getSearchHandler($name)
+    public function getSearchHandler(string $name): SearchHandlerInterface
     {
-        if (!isset($this->searchHandlers[$name])) {
+        if (!$this->searchHandlers->has($name)) {
             throw new \RuntimeException(sprintf('Search handler "%s" is not registered', $name));
         }
 
-        return $this->searchHandlers[$name];
+        return $this->searchHandlers->get($name);
     }
 
     /**
      * @param string $name
-     * @return boolean
+     *
+     * @return bool
      */
-    public function hasSearchHandler($name)
+    public function hasSearchHandler(string $name): bool
     {
-        return isset($this->searchHandlers[$name]);
+        return $this->searchHandlers->has($name);
     }
 }

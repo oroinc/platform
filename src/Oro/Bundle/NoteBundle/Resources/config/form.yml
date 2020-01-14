@@ -1,17 +1,11 @@
-parameters:
-    oro_note.form.type.note.class:                 Oro\Bundle\NoteBundle\Form\Type\NoteType
-    oro_note.form.type.note_api.class:             Oro\Bundle\NoteBundle\Form\Type\NoteApiType
-    oro_note.form.handler.note.class:              Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
-    oro_note.form.handler.note_api.class:          Oro\Bundle\NoteBundle\Form\Handler\NoteApiHandler
-
 services:
     oro_note.form.type.note:
-        class: '%oro_note.form.type.note.class%'
+        class: Oro\Bundle\NoteBundle\Form\Type\NoteType
         tags:
             - { name: form.type, alias: oro_note }
 
     oro_note.form.type.note_api:
-        class: '%oro_note.form.type.note_api.class%'
+        class: Oro\Bundle\NoteBundle\Form\Type\NoteApiType
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -19,7 +13,6 @@ services:
 
     oro_note.form.note:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -28,7 +21,6 @@ services:
 
     oro_note.form.note.api:
         class: Symfony\Component\Form\Form
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
@@ -36,8 +28,7 @@ services:
             - Oro\Bundle\NoteBundle\Form\Type\NoteApiType
 
     oro_note.form.handler.note:
-        class: '%oro_note.form.handler.note.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
         public: true
         arguments:
             - '@oro_note.form.note'
@@ -46,8 +37,7 @@ services:
             - '@oro_activity.manager'
 
     oro_note.form.handler.note_api:
-        class: '%oro_note.form.handler.note_api.class%'
-        # This service marked as public for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
+        class: Oro\Bundle\NoteBundle\Form\Handler\NoteApiHandler
         public: true
         arguments:
             - '@oro_note.form.note.api'

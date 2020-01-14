@@ -162,7 +162,7 @@ Tagging merge strategy:
 ```
 services:
     oro_entity_merge.strategy.replace:
-        class: %oro_entity_merge.strategy.replace.class%
+        class: Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy
         arguments:
             - @oro_entity_merge.accessor.delegate
         tags:
@@ -176,7 +176,7 @@ Tagging merge step:
 ```
 services:
     oro_entity_merge.step.validate:
-        class: %oro_entity_merge.step.validate.class%
+        class: Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep
         arguments:
             - @validator
         tags:
@@ -188,7 +188,7 @@ Tagging accessor:
 ```
 services:
 	oro_entity_merge.accessor.inverse_association:
-        class: %oro_entity_merge.accessor.inverse_association.class%
+        class: Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor
         arguments:
             - @oro_entity_merge.doctrine_helper
         tags:

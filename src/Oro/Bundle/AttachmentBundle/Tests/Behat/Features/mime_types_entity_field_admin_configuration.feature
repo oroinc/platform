@@ -27,7 +27,7 @@ Feature: Mime types entity field admin configuration
       | image/jpeg               |
       | image/png                |
     And I fill form with:
-      | File size          | 10                           |
-      | Allowed MIME types | [application/pdf, image/png] |
+      | File Size (MB)        | 10                           |
+      | Allowed MIME types    | [application/pdf, image/png] |
     And I save form
     Then I should see "Field saved" flash message
