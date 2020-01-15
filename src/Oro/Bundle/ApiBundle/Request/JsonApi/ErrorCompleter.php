@@ -162,15 +162,21 @@ class ErrorCompleter extends AbstractErrorCompleter
         $pointer = [];
         if (\in_array($normalizedPropertyPath, $metadata->getIdentifierFieldNames(), true)) {
             $pointer[] = JsonApiDoc::ID;
-        } elseif (\array_key_exists($normalizedPropertyPath, $metadata->getFields())) {
+        } elseif ($metadata->hasField($normalizedPropertyPath)) {
             if ($metadata->hasIdentifierFields()) {
                 $pointer = [JsonApiDoc::ATTRIBUTES, $normalizedPropertyPath];
             } else {
                 $pointer = [$normalizedPropertyPath];
             }
-        } elseif (\array_key_exists($path[0], $metadata->getAssociations())) {
+        } elseif ($metadata->hasAssociation($path[0])) {
             if ($metadata->hasIdentifierFields()) {
                 $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
+            } else {
+                $pointer = [$normalizedPropertyPath];
+            }
+        } elseif ($metadata->hasMetaProperty($normalizedPropertyPath)) {
+            if ($metadata->hasIdentifierFields()) {
+                $pointer = [JsonApiDoc::META, $normalizedPropertyPath];
             } else {
                 $pointer = [$normalizedPropertyPath];
             }

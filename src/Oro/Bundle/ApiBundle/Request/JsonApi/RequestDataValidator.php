@@ -34,6 +34,9 @@ class RequestDataValidator extends AbstractRequestDataValidator
             $allowIncludedResources,
             $requirePrimaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
@@ -69,6 +72,9 @@ class RequestDataValidator extends AbstractRequestDataValidator
             $allowIncludedResources,
             $requirePrimaryResourceId
         ) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestDataCollection($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);

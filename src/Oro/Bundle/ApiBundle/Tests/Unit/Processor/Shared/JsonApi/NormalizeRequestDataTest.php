@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -79,6 +80,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     {
         $inputData = [
             'data' => [
+                'meta'          => [
+                    'meta1' => 'val1'
+                ],
                 'attributes'    => [
                     'name' => 'John'
                 ],
@@ -106,6 +110,10 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     {
         $inputData = [
             'data' => [
+                'meta'          => [
+                    'meta1' => 'val1',
+                    'meta2' => 'val2'
+                ],
                 'attributes'    => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe'
@@ -141,6 +149,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $metadata = new EntityMetadata();
         $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addMetaProperty(new MetaPropertyMetadata('meta1'));
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
         );
@@ -170,6 +179,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         $expectedData = [
+            'meta1'               => 'val1',
             'firstName'           => 'John',
             'lastName'            => 'Doe',
             'toOneRelation'       => [

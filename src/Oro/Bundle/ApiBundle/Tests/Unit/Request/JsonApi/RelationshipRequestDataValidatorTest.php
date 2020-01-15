@@ -37,6 +37,24 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => null]
+            ],
+            [
+                ['data' => null, 'jsonapi' => []]
+            ],
+            [
+                ['data' => null, 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => null, 'meta' => []]
+            ],
+            [
+                ['data' => null, 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => null, 'links' => []]
+            ],
+            [
+                ['data' => null, 'links' => ['test' => null]]
             ]
         ];
     }
@@ -59,6 +77,24 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => []]
+            ],
+            [
+                ['data' => [], 'jsonapi' => []]
+            ],
+            [
+                ['data' => [], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => [], 'meta' => []]
+            ],
+            [
+                ['data' => [], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => [], 'links' => []]
+            ],
+            [
+                ['data' => [], 'links' => ['test' => null]]
             ]
         ];
     }
@@ -78,6 +114,9 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedErrorObjects, $errors);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function invalidResourceIdentifierObjectProvider()
     {
         return [
@@ -145,6 +184,42 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                     ['The \'type\' property should be a string', '/data/type'],
                     ['The \'id\' property should be a string', '/data/id']
                 ]
+            ],
+            [
+                ['data' => null, 'jsonapi' => null],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'jsonapi' => 'test'],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'jsonapi' => ['test']],
+                [['The \'jsonapi\' property should be an associative array', '/jsonapi']]
+            ],
+            [
+                ['data' => null, 'meta' => null],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => null, 'meta' => 'test'],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => null, 'meta' => ['test']],
+                [['The \'meta\' property should be an associative array', '/meta']]
+            ],
+            [
+                ['data' => null, 'links' => null],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => null, 'links' => 'test'],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => null, 'links' => ['test']],
+                [['The \'links\' property should be an associative array', '/links']]
             ]
         ];
     }
@@ -164,6 +239,9 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedErrorObjects, $errors);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function invalidResourceIdentifierObjectCollectionProvider()
     {
         return [
@@ -237,6 +315,42 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                     ['The \'type\' property should be a string', '/data/0/type'],
                     ['The \'id\' property should be a string', '/data/0/id']
                 ]
+            ],
+            [
+                ['data' => [], 'jsonapi' => null],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'jsonapi' => 'test'],
+                [['The \'jsonapi\' property should be an array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'jsonapi' => ['test']],
+                [['The \'jsonapi\' property should be an associative array', '/jsonapi']]
+            ],
+            [
+                ['data' => [], 'meta' => null],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => [], 'meta' => 'test'],
+                [['The \'meta\' property should be an array', '/meta']]
+            ],
+            [
+                ['data' => [], 'meta' => ['test']],
+                [['The \'meta\' property should be an associative array', '/meta']]
+            ],
+            [
+                ['data' => [], 'links' => null],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => [], 'links' => 'test'],
+                [['The \'links\' property should be an array', '/links']]
+            ],
+            [
+                ['data' => [], 'links' => ['test']],
+                [['The \'links\' property should be an associative array', '/links']]
             ]
         ];
     }
