@@ -121,19 +121,17 @@ define(function(require) {
         _applyStateOnEl: function(isOpen) {
             this.$el.toggleClass(this.options.openClass, isOpen);
             this.$el.toggleClass(this.options.closeClass, !isOpen);
-            if (isOpen) {
-                this.$el.attr("aria-expanded", "true");
-            } else {
-                this.$el.attr("aria-expanded", "false");
-            }
+            this.$el.attr("aria-expanded", isOpen)
         },
 
         _applyStateOnContainer: function(isOpen) {
             if (this.options.animationSpeed) {
                 if (isOpen) {
                     this.$container.slideDown(this.options.animationSpeed);
+                    this.$container.attr("aria-hidden", "false");
                 } else {
                     this.$container.slideUp(this.options.animationSpeed);
+                    this.$container.attr("aria-hidden", "true");
                 }
             }
         },
