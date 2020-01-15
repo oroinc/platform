@@ -106,6 +106,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessWithMetadata()
     {
         $inputData = [
