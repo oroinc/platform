@@ -14,11 +14,14 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $gridViewRepository;
 
@@ -70,7 +73,8 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testListenerShouldAddViewsIntoEvent()
     {
-        $currentUser = new User();
+        /** @var User $currentUser */
+        $currentUser = $this->getEntity(User::class, ['id' => 42]);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')

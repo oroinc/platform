@@ -5,10 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider\State;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class ColumnsStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var ColumnsStateProvider */
     private $provider;
 
@@ -489,10 +492,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
+        $user  = $this->getEntity(User::class, ['id' => 42]);
+
         $this->tokenAccessor
             ->expects(self::once())
             ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+            ->willReturn($user);
 
         $this->gridViewManager
             ->expects(self::once())
