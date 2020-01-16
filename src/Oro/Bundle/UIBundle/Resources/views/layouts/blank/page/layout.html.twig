@@ -34,11 +34,6 @@
         }) }}></div>
         <div id="container" data-layout="separate"
              {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
-            <button class="skip-to-content"
-                    id="skip-to-content"
-                    onclick="document.getElementById('page-main').focus();">
-                <span class="btn btn--info">{{ 'oro.ui.button.skip_to_content'|trans }}</span>
-            </button>
             {{ block_widget(block) }}
         </div>
     </body>
@@ -67,9 +62,9 @@
 {% block _page_main_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' page-main',
-        '~id': 'page-main',
-        '~tabindex': '-1'
+        'data-role': 'page-main-container'
     }) %}
+
     <main{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </main>
@@ -79,6 +74,7 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' page-main__content'
     }) %}
+
     <div{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </div>
@@ -125,4 +121,16 @@
             {{ block_widget(block) }}
         </aside>
     {% endif %}
+{% endblock %}
+
+{% block _skip_to_content_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': 'btn btn--info skip-to-content__btn',
+        'data-page-component-proxy-focus': '[data-role="page-main-container"]'
+    }) %}
+
+    <div class="skip-to-content">
+        <button {{ block('block_attributes') }}>{{ 'oro.ui.button.skip_to_content'|trans }}</button>
+        <div class="skip-to-content__decorator" aria-hidden="true"></div>
+    </div>
 {% endblock %}
