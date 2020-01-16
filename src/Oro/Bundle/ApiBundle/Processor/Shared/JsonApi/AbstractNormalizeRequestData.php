@@ -61,9 +61,19 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             ? $this->normalizeRelationships($path, $pointer, $data[JsonApiDoc::RELATIONSHIPS], $metadata)
             : [];
 
-        return !empty($data[JsonApiDoc::ATTRIBUTES])
+        $result = !empty($data[JsonApiDoc::ATTRIBUTES])
             ? \array_merge($data[JsonApiDoc::ATTRIBUTES], $relations)
             : $relations;
+
+        if (null !== $metadata && !empty($data[JsonApiDoc::META])) {
+            foreach ($data[JsonApiDoc::META] as $name => $value) {
+                if ($metadata->hasMetaProperty($name)) {
+                    $result[$name] = $value;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
