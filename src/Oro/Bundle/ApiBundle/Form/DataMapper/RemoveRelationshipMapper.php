@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -30,16 +31,21 @@ class RemoveRelationshipMapper extends AbstractRelationshipMapper
         FormInterface $formField,
         PropertyPathInterface $propertyPath
     ) {
+        /** @var Collection $dataValue */
+        $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
+        // initialize collection to avoid real deletion before validation on extra lazy collections.
+        if ($dataValue instanceof AbstractLazyCollection && !$dataValue->isInitialized()) {
+            $dataValue->getValues();
+        }
+
+        $formData = $formField->getData();
+
         $methods = $this->findAdderAndRemover($data, (string)$propertyPath);
         if ($methods) {
-            $formData = $formField->getData();
             foreach ($formData as $value) {
                 $data->{$methods[1]}($this->resolveEntity($value));
             }
         } else {
-            /** @var Collection $dataValue */
-            $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
-            $formData = $formField->getData();
             foreach ($formData as $value) {
                 $dataValue->removeElement($this->resolveEntity($value));
             }
