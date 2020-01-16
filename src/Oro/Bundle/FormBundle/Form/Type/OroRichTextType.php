@@ -50,11 +50,11 @@ class OroRichTextType extends AbstractType
         self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
         self::TOOLBAR_DEFAULT => [
             'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
-            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
+            '| code | alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ],
         self::TOOLBAR_LARGE => [
             'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
-            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
+            '| code | alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ],
     ];
 
