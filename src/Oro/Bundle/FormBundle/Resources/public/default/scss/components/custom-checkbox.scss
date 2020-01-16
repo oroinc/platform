@@ -8,9 +8,9 @@
             }
         }
 
-        @include element-state('focus') {
+        &.focus-visible {
             & ~ .custom-checkbox__icon {
-                box-shadow: $checkbox-icon-box-shadow-focus-state;
+                box-shadow: $focused-element-shadow;
             }
         }
 

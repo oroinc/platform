@@ -33,6 +33,14 @@
         }
     }
 
+    &.focus-visible {
+        ~ .custom-radio__text {
+            &:before {
+                box-shadow: $custom-radio-icon-checked-box-shadow, $focused-element-shadow;
+            }
+        }
+    }
+
     &__text {
         display: inline-block;
 

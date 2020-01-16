@@ -15,13 +15,9 @@
                             );
 
     @include element-state('hover') {
-        text-decoration: none;
-
-        border-color: $textarea-border-color-hover-state;
-    }
-
-    @include element-state('focus') {
-        border-color: $textarea-border-color-focus-state;
+        &:not(.focus-visible){
+            border-color: $textarea-border-color-hover-state;
+        }
     }
 
     @include element-state('error') {

@@ -1,0 +1,41 @@
+/* @theme: blank; */
+
+@mixin focus-visible(
+    $focus-highlighted-element: none,
+    $focus-inner-border: true,
+    $focus-border-position: outset,
+    $border-color-inner: $focused-element-inner-border-color,
+    $border-width-inner: $focused-element-inner-border-width,
+    $border-width-outer: $focused-element-outer-border-width,
+    $border-color-outer: $focused-element-outer-border-color,
+    $blur: $focused-element-outer-shadow-blur){
+
+    &.focus-visible {
+        &:not(.page-main){
+            @if $focus-inner-border == true {
+                @if $focus-highlighted-element == none {
+                    &:not(.custom-focus){
+                        box-shadow: 0 0 0 $border-width-inner $border-color-inner, 0 0 0 ($border-width-outer + $border-width-inner) $border-color-outer, 0 0 $blur $border-color-outer !important;
+                    }
+                }
+                @else {
+                    .#{$focus-highlighted-element}{
+                        box-shadow: 0 0 0 $border-width-inner $border-color-inner, 0 0 0 ($border-width-outer + $border-width-inner) $border-color-outer, 0 0 $blur $border-color-outer !important;
+                    }
+                }
+            }
+            @else {
+                @if $focus-highlighted-element == none {
+                    &:not(.custom-focus){
+                        box-shadow: 0 0 0 $border-width-outer $border-color-outer, 0 0 $blur $border-color-outer !important;
+                    }
+                }
+                @else {
+                    .#{$focus-highlighted-element}{
+                        box-shadow: 0 0 0 $border-width-outer $border-color-outer, 0 0 $blur $border-color-outer !important;
+                    }
+                }
+            }
+        }
+    }
+}

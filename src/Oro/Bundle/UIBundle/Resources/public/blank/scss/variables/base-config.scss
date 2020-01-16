@@ -7,3 +7,11 @@ $body-bg-color: get-color('additional', 'ultra') !default;
 $body-color: get-color('additional', 'darker') !default;
 $body-min-width: 320px !default;
 
+$focused-element-outer-border-color: get-color('ui', 'normal') !default;
+$focused-element-inner-border-color: get-color('additional', 'ultra') !default;
+$focused-element-inner-border-width: 1px !default;
+$focused-element-outer-border-width: 2px !default;
+$focused-element-outer-shadow-blur:  8px !default;
+$focused-element-shadow: 0 0 0 $focused-element-inner-border-width $focused-element-inner-border-color, 0 0 0 ($focused-element-outer-border-width + $focused-element-inner-border-width) $focused-element-outer-border-color, 0 0 $focused-element-outer-shadow-blur $focused-element-outer-border-color !default;
+$focused-element-border-radius: 2px !default;
+$base-padding-bottom-for-shadow: $focused-element-outer-shadow-blur !default;

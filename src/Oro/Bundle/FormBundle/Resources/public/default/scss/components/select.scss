@@ -19,14 +19,6 @@
         padding: $select-padding--s;
     }
 
-    @include element-state('hover') {
-        box-shadow: $select-box-shadow-hover-state;
-    }
-
-    @include element-state('focus') {
-        box-shadow: $select-box-shadow-focus-state;
-    }
-
     @include element-state('error') {
         box-shadow: $select-box-shadow-error-state;
     }

@@ -19,11 +19,9 @@
     }
 
     @include element-state('hover') {
-        border-color: $input-border-color-hover-state;
-    }
-
-    @include element-state('focus') {
-        border-color: $input-border-color-focus-state;
+        &:not(.focus-visible){
+            border-color: $input-border-color-hover-state;
+        }
     }
 
     @include element-state('error') {
