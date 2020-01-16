@@ -22,6 +22,8 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
     public function validateMetaObject(array $requestData): array
     {
         return $this->doValidation(function () use ($requestData) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::META)) {
                 $this->validateSectionNotExist($requestData, JsonApiDoc::DATA);
                 $this->validateSectionNotExist($requestData, JsonApiDoc::INCLUDED);
@@ -76,6 +78,8 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
                 }
                 $isValid = false;
             }
+            $this->validateMetaSection($data, $pointer);
+            $this->validateLinksSection($data, $pointer);
         }
 
         return $isValid;
