@@ -1,13 +1,74 @@
 Field ACL
 =========
 
-Field ACL allows to check an access to an entity field.
+Field ACL allows checking access to an entity field and supports the following permissions: VIEW, CREATE, EDIT. 
 
-Field ACL supports next permissions: VIEW, CREATE, EDIT. 
+Prepare the System for Field ACL
+--------------------------------
 
-By default, entity fields are not protected by ACL. To be able to manage field ACL you should add the `field_acl_supported` attribute to 'security' scope of entity config.
+By default, entity fields are not protected by ACL. The templates, datagrids and other parts of the system that use the entity
+that should be Field ACL protected do not have such checks.
 
-If you need to allow manage ACL for field of your entity you can set `field_acl_supported` in entity config:
+Before enabling the support of the Field ACL for an entity, prepare the system parts that use the entity to use Field ACL.
+
+Check Field ACL in PHP Code
+---------------------------
+
+In PHP code, access to the field is provided by the `isGranted` method of the `security.authorization_checker` service.
+The second parameter of this method should be an instance of [FieldVote](https://github.com/symfony/security-acl/blob/master/Voter/FieldVote.php): 
+
+``` php
+<?php
+....
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+...
+ 
+$isGranted = $this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, 'fieldName'));
+
+```
+
+As a result, $isGranted variable contains the *true* value if access is granted and the *false* value if it does not.
+
+$entity parameter should contain an instance of the entity that you want to check.
+
+If you have no entity instance but you know a class name, ID of the record, the
+owner and the organization IDs of this record, the [DomainObjectReference](../../Acl/Domain/DomainObjectReference.php) 
+can be used as the domain object:
+ 
+``` php
+<?php
+....
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+...
+
+$entityReference = new DomainObjectReference($entityClassName, $entityId, $ownerId, $organizationId);
+$isGranted = $this->authorizationChecker->isGranted('VIEW', new FieldVote($entityReference, 'fieldName'));
+
+``` 
+
+Check Field ACL in TWIG Templates
+---------------------------------
+
+Use the `is_granted` twig function to check grants in twig templates. 
+To check the field, use the the field name as the third parameter of the function:
+ 
+``` php
+{% if is_granted('VIEW', entity, 'fieldName') %}
+    {# do some job #}
+{% endif %}
+```
+
+Enable Support of Field ACL for an Entity
+-----------------------------------------
+
+To be able to manage field ACL, add the `field_acl_supported` attribute to the 'security' scope of the entity config.
+Enabling this attribute means that the system is prepared to check access to the entity fields.
+
+You can achieve this with the Config annotation if you have access to both the entity and the process `oro:platform:update` command.
+The following example is an illustration of the entity configuration:
 
 ``` php
 
@@ -40,7 +101,7 @@ If you need to allow manage ACL for field of your entity you can set `field_acl_
  
  ```
  
-If you need to allow manage ACL for field of an entity for which you cannot modify @Config annotation you can set `field_acl_supported` with migration:
+If you have no access to the entity to modify the Config annotation, set the `field_acl_supported` parameter with the migration:
  
 ``` php
  
@@ -75,14 +136,24 @@ class TurnFieldAclSupportForEntity implements Migration
 
 ```
 
-After that, in entity config page of this entity will be two additional parameters: `Field Level ACL` and `Show Restricted`.
+Enable Field ACL 
+----------------
 
-WIth `Field Level ACL` parameter, system manager will be able to turn on Field ACL for given entity. 
+Once the configuration is changed, the entity config page has two additional parameters: `Field Level ACL` and `Show Restricted`.
 
-When both Show Restricted and Field ACL options are enabled and an user does not have an access to a field this field will be read-only on create and edit pages.
+**NOTE: Please do not enable these parameters from the code without enabling the `field_acl_supported` attribute for the entity.**
 
-Developer can limit the list of available permissions for the field. This can be done with `permissions` parameter in Security scope for the field.
-The permissions should be listed as the string with `;` delimiter. 
+With the `Field Level ACL` parameter, the system manager can enable or disable Field ACL for the entity. 
+
+When both *Show Restricted* and *Field ACL* options are enabled, but a user does not have access to the field, then
+this field is displayed in a read-only format on the create and edit pages.
+
+Limit Permissions List
+----------------------
+
+A developer can limit the list of available permissions for the field with the `permissions` parameter in the Security scope.
+
+The permissions should be listed as the string with the `;` delimiter. 
 
 For example:
 
@@ -114,50 +185,3 @@ For example:
  }
  
  ```
-
-Check Field ACL in php code
----------------------------
-
-You can check access to some field with `security.authorization_checker` service. To do this, you should create an instance of `FieldVote` class and pass it as the second parameter of `isGranted` method:
-
-
-``` php
-<?php
-....
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-...
- 
-$isGranted = $this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, 'fieldName'));
-
-```
-
-As result, $isGranted variable will contain true value if access is granted and false otherwise.
-
-$entity parameter should contain an instance of entity you want to check.
-
-In case if you does not have entity instance but have the class name, id of record, owner and organization ids of this record, you can use `DomainObjectReference` class:
- 
-``` php
-<?php
-....
-use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-...
-
-$entityReference = new DomainObjectReference($entityClassName, $entityId, $ownerId, $organizationId);
-$isGranted = $this->authorizationChecker->isGranted('VIEW', new FieldVote($entityReference, 'fieldName'));
-
-``` 
-
-Check Field ACL in twig templates
----------------------------------
-
-In twig templates you can use `is_granted` twig function with the field name as the third parameter:
- 
-``` php
-{% if is_granted('VIEW', entity, 'fieldName') %}
-    {# do some job #}
-{% endif %}
-```
