@@ -126,13 +126,12 @@ define(function(require) {
 
         _applyStateOnContainer: function(isOpen) {
             if (this.options.animationSpeed) {
-                if (isOpen) {
-                    this.$container.slideDown(this.options.animationSpeed);
-                    this.$container.attr("aria-hidden", "false");
-                } else {
-                    this.$container.slideUp(this.options.animationSpeed);
-                    this.$container.attr("aria-hidden", "true");
-                }
+                this.$container[isOpen ? 'slideDown' : 'slideUp'](
+                    this.options.animationSpeed,
+                    () => this.$container.attr("aria-hidden", !isOpen)
+                );
+            } else {
+                this.$container.attr("aria-hidden", !isOpen);
             }
         },
 
