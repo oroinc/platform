@@ -908,6 +908,8 @@ i.mce-i-checkbox {
     }
 
     .mce-multiline {
+        white-space: normal;
+
         @extend %base-input;
 
         &:last-child {
