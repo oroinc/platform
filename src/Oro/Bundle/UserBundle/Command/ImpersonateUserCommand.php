@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Generates one-time impersonation link for a given user.
@@ -63,26 +64,47 @@ class ImpersonateUserCommand extends Command
         $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Generates one-time impersonation link for a given user.' . PHP_EOL .
-                'Unused tokens expire after the specified time.'
-            )
-            ->addArgument('username', InputArgument::REQUIRED, 'The username of the user.')
+            ->setDescription('Generates one-time link to impersonate a given user.')
+            ->addArgument('username', InputArgument::REQUIRED, 'Username of the impersonated user')
             ->addOption(
                 'lifetime',
                 't',
                 InputOption::VALUE_REQUIRED,
-                'Token lifetime (seconds or strtotime format)',
+                'Token lifetime (number of seconds or strtotime format)',
                 '1 day'
             )
-            ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'The route of generated URL', 'oro_default')
-            ->addOption('silent', 'S', InputOption::VALUE_NONE, 'Do not send email to the impersonated user')
+            ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'The route of the generated URL', 'oro_default')
+            ->addOption(
+                'silent',
+                'S',
+                InputOption::VALUE_NONE,
+                'Do not send email notification to the impersonated user'
+            )
+            ->setHelp(
+                <<<'EOF'
+The <info>%command.name%</info> command generates a one-time impersonation link for a given user:
+
+  <info>%command.full_name% <username></info>
+
+Unused tokens expire in 1 day, unless overridden with the <info>--lifetime</info> option:
+
+  <info>%command.full_name% --lifetime=600 <username></info>
+  <info>%command.full_name% --lifetime="10 minutes" <username></info>
+
+The impersonated user will be notified by email when the impersonation link is used to log in.
+Use the <info>--silent</info> option to avoid it:
+
+  <info>%command.full_name% --silent <username></info>
+
+Specify a custom target URL route via the <info>--route</info> option:
+
+  <info>%command.full_name% --route=oro_user_profile_view <username></info>
+
+EOF
+            )
         ;
     }
 
@@ -91,54 +113,58 @@ class ImpersonateUserCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $username = $input->getArgument('username');
-        $user = $this->userManager->findUserByUsername($username);
+        $io = new SymfonyStyle($input, $output);
 
-        if (!$user) {
-            throw new \InvalidArgumentException(sprintf('User with username "%s" does not exists', $username));
-        }
+        try {
+            $username = $input->getArgument('username');
+            $user = $this->userManager->findUserByUsername($username);
 
-        if (!$user instanceof User) {
-            // not a CRM user
-            return 0;
-        }
+            if (!$user) {
+                throw new \RuntimeException(\sprintf('User with username "%s" does not exist.', $username));
+            }
 
-        $impersonation = $this->createImpersonation(
-            $user,
-            $input->getOption('lifetime'),
-            !$input->getOption('silent')
-        );
-        $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
+            if (!$user instanceof User) {
+                throw new \RuntimeException(
+                    \sprintf('Unsupported user type, the user "%s" cannot be impersonated.', $username)
+                );
+            }
 
-        $output->writeln(
-            sprintf(
-                '<info>To login as user <comment>%s</comment> open the following URL ' .
-                '(expires <comment>%s</comment>):</info>',
-                $user->getUsername(),
-                $this->dateTimeFormatter->format(
-                    $impersonation->getExpireAt(),
-                    \IntlDateFormatter::MEDIUM,
-                    \IntlDateFormatter::FULL
-                )
-            )
-        );
-        $output->writeln($url);
-
-        if (!$user->isEnabled()) {
-            $output->writeln(
-                '<comment>Warning: User is Disabled.' .
-                ' You cannot impersonate them until enabled!</comment>'
+            $impersonation = $this->createImpersonation(
+                $user,
+                $input->getOption('lifetime'),
+                !$input->getOption('silent')
             );
-        }
+            $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
 
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
-            $output->writeln(
-                sprintf(
-                    '<comment>Warning: Auth status is \'%s\'.' .
-                    ' You cannot impersonate them until it is set to \'Available\'!</comment>',
-                    $user->getAuthStatus()->getName()
-                )
-            );
+            $io->text([
+                \sprintf(
+                    'To login as <info>%s</info> open the following URL (expires <info>%s</info>):',
+                    $user->getUsername(),
+                    $this->dateTimeFormatter->format(
+                        $impersonation->getExpireAt(),
+                        \IntlDateFormatter::MEDIUM,
+                        \IntlDateFormatter::FULL
+                    )
+                ),
+                $url
+            ]);
+            // Unfortunately we cannot use console hyperlinks because some terminal emulators don't support this syntax
+            $io->newLine();
+
+            if (!$user->isEnabled()) {
+                $io->warning('User account is disabled. You will not be able to login as this user.');
+            }
+
+            if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
+                $io->warning([
+                    \sprintf('The user\'s auth status is "%s".', $user->getAuthStatus()->getName()),
+                    'You will not be able to login as this user until the auth status is changed to "Active".',
+                ]);
+            }
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+
+            return $e->getCode() ? $e->getCode() : 1;
         }
 
         return 0;
