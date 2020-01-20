@@ -241,6 +241,10 @@ services:
             - ['setAttribute', ['area', 'tabindex', 'Text']]
             # video attributes
             - ['setAttribute', ['video', 'allowfullscreen', 'Bool']]
+            - ['setAttribute', ['video', 'autoplay', 'Bool']]
+            - ['setAttribute', ['video', 'controls', 'Bool']]
+            - ['setAttribute', ['video', 'loop', 'Bool']]
+            - ['setAttribute', ['video', 'poster', 'URI']]
             # Set Custom Elements
             - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]

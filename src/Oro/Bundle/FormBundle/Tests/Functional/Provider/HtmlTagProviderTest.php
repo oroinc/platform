@@ -86,7 +86,7 @@ class HtmlTagProviderTest extends WebTestCase
         'time',
         'tfoot',
         'var',
-        'video[allowfullscreen|src|controls]',
+        'video[allowfullscreen|autoplay|loop|poster|src|controls]',
         'aside',
     ];
 

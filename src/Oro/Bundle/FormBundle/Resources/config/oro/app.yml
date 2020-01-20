@@ -138,6 +138,9 @@ oro_form:
                 video:
                     attributes:
                         - allowfullscreen
+                        - autoplay
+                        - loop
+                        - poster
                         - src
                         - controls
                 aside: ~
