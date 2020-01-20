@@ -17,7 +17,8 @@ $select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additi
 
 // Focus
 $select-border-color-focus-state: get-color('ui', 'normal');
-$select-box-shadow-focus-state: $select-box-shadow-hover-state;
+$select-box-shadow-focus-state: 0 0 0 1px get-color('ui', 'normal'),
+                                0 0 7px get-color('ui', 'normal') !default;
 
 // Error
 $select-border-color-error-state: get-color('ui', 'error-dark');

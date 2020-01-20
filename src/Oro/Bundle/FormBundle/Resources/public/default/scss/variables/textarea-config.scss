@@ -11,7 +11,8 @@ $textarea-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('addi
 
 // Focus
 $textarea-border-color-focus-state: get-color('ui', 'normal');
-$textarea-box-shadow-focus-state: $textarea-box-shadow-hover-state;
+$textarea-box-shadow-focus-state: 0 0 0 1px get-color('ui', 'normal'),
+                                  0 0 7px get-color('ui', 'normal') !default;
 
 // Error
 $textarea-border-color-error-state: get-color('ui', 'error-dark');

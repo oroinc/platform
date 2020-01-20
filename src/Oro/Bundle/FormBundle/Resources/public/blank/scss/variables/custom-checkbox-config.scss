@@ -15,4 +15,6 @@ $checkbox-icon-bg-color-indeterminate-state: get-color('ui', 'focus') !default;
 
 // Hover
 $checkbox-icon-border-hover-state: 1px solid get-color('primary', 'light') !default;
-$checkbox-icon-border-focus-state: 1px solid get-color('primary', 'light') !default;
+$checkbox-icon-border-focus-state: 1px solid get-color('ui', 'normal') !default;
+$checkbox-icon-box-shadow-focus-state: 0 0 0 1px get-color('ui', 'normal'),
+                                       0 0 7px get-color('ui', 'normal') !default;

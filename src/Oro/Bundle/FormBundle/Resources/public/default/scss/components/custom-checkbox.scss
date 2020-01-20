@@ -2,18 +2,6 @@
 
 .custom-checkbox {
     &__input {
-        @include element-state('hover') {
-            & ~ .custom-checkbox__icon {
-                box-shadow: $checkbox-icon-box-shadow-hover-state;
-            }
-        }
-
-        &.focus-visible {
-            & ~ .custom-checkbox__icon {
-                box-shadow: $focused-element-shadow;
-            }
-        }
-
         &:checked {
             ~ .custom-checkbox__icon {
                 @include fa-icon($checkbox-icon-checked);

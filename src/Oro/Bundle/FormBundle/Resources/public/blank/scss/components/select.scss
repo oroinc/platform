@@ -30,6 +30,7 @@
 
     @include element-state('focus') {
         border-color: $select-border-color-focus-state;
+        box-shadow: $select-box-shadow-focus-state;
     }
 
     @include element-state('error') {

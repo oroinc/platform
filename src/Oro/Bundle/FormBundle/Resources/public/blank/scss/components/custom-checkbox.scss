@@ -6,6 +6,12 @@
     display: inline-block;
     vertical-align: middle;
 
+    &:hover {
+        .custom-checkbox__icon {
+            border: $checkbox-icon-border-hover-state;
+        }
+    }
+
     &__input {
         position: absolute;
         z-index: -1;
@@ -13,15 +19,10 @@
 
         opacity: 0;
 
-        &:hover {
-            ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-hover-state;
-            }
-        }
-
         &:focus {
             ~ .custom-checkbox__icon {
                 border: $checkbox-icon-border-focus-state;
+                box-shadow: $checkbox-icon-box-shadow-focus-state;
             }
         }
 

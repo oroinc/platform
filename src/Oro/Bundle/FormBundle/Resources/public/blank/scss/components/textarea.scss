@@ -19,6 +19,10 @@
             border-color: $textarea-border-color-hover-state;
         }
     }
+    @include element-state('focus') {
+        border-color: $textarea-border-color-focus-state;
+        box-shadow: $textarea-box-shadow-focus-state;
+    }
 
     @include element-state('error') {
         border-color: $textarea-border-color-error-state;

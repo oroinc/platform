@@ -13,7 +13,8 @@ $input-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additio
 
 // Focus
 $input-border-color-focus-state: get-color('ui', 'normal');
-$input-box-shadow-focus-state: $input-box-shadow-hover-state;
+$input-box-shadow-focus-state: 0 0 0 1px get-color('ui', 'normal'),
+                               0 0 7px get-color('ui', 'normal');
 
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark');

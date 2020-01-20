@@ -17,3 +17,12 @@ $custom-radio-absolute-icon-offset: 0 0 0 25px;
 // Checked
 $custom-radio-icon-checked-bg: get-color('ui', 'focus');
 $custom-radio-icon-checked-box-shadow: inset 0 0 0 2px get-color('additional', 'light');
+
+// Hover
+$custom-radio-icon-border-hover-state: 1px solid get-color('additional', 'dark');
+
+// Focus
+$custom-radio-icon-border-focus-state: 1px solid get-color('ui', 'normal');
+$custom-radio-icon-box-shadow-focus-state: inset 0 0 0 2px get-color('additional', 'light'),
+                                           0 0 0 1px get-color('ui', 'normal'),
+                                           0 0 7px get-color('ui', 'normal');

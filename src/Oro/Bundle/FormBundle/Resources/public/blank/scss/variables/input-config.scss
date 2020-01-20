@@ -19,7 +19,9 @@ $input-color: $base-ui-element-color !default;
 $input-border-color-hover-state: get-color('additional', 'dark') !default;
 
 // Focus
-$input-border-color-focus-state: $input-border-color-hover-state !default;
+$input-border-color-focus-state: get-color('ui', 'normal') !default;
+$input-box-shadow-focus-state: 0 0 0 1px get-color('ui', 'normal'),
+                               0 0 7px get-color('ui', 'normal') !default;
 
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark') !default;
