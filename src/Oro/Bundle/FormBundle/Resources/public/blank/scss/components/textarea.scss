@@ -15,7 +15,7 @@
                             );
 
     @include element-state('hover') {
-        &:not(.focus-visible){
+        &:not(:focus){
             border-color: $textarea-border-color-hover-state;
         }
     }
