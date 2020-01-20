@@ -106,6 +106,7 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools
         - oroui/js/tools/api-accessor
+        - oroui/js/tools/manage-focus
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
 map:
