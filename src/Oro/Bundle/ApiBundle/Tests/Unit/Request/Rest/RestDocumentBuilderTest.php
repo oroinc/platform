@@ -868,6 +868,27 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testMetaPropertyThatNotMappedToAnyField()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id' => '123'
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetDataObjectForEntityWithoutIdentifier()
     {
         $object = [

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 
 /**
  * A filter that can be used to specify the maximum number of records on one page.
+ * @see \Oro\Bundle\ApiBundle\Filter\FilterNames::getPageSizeFilterName
  */
 class PageSizeFilter extends StandaloneFilterWithDefaultValue
 {

@@ -63,6 +63,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenConfigHasOrderByOption()
@@ -82,6 +83,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['label' => 'DESC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessForEntityWithoutIdentifier()
@@ -97,6 +99,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals([], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenSortFilterIsAlreadyAdded()
@@ -106,10 +109,11 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
-        $this->context->getFilters()->add('sort', $sortFilter);
+        $this->context->getFilters()->add('sort', $sortFilter, false);
         $this->processor->process($this->context);
 
         self::assertSame($sortFilter, $this->context->getFilters()->get('sort'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenSortingIsDisabled()

@@ -17,7 +17,6 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
@@ -60,7 +59,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', '1'));
         $filterValues->set('label', new FilterValue('label', 'test'));
 
@@ -92,7 +91,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $idFilter->setField('idField');
         $filters->add('id', $idFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', 'predefinedId'));
 
         $metadata = new EntityMetadata();
@@ -132,7 +131,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setField('associationField');
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
         $metadata = new EntityMetadata();
@@ -174,7 +173,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setArrayAllowed(true);
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1,predefinedId2'));
 
         $metadata = new EntityMetadata();
@@ -218,7 +217,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setRangeAllowed(true);
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
         $metadata = new EntityMetadata();
@@ -266,7 +265,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $exception = new \UnexpectedValueException('invalid data type');
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', 'invalid'));
 
         $this->valueNormalizer->expects(self::once())
@@ -297,7 +296,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $integerFilter = new ComparisonFilter('string');
         $filters->add('label', $integerFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', '1'));
         $filterValues->set('label', new FilterValue('label', 'test'));
 
@@ -327,7 +326,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setField('associationField');
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
         $metadata = new EntityMetadata();
@@ -378,7 +377,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setField('associationField');
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
         $metadata = new EntityMetadata();
@@ -429,7 +428,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setField('associationField');
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
         $metadata = new EntityMetadata();
@@ -482,7 +481,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setArrayAllowed(true);
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1,predefinedId2'));
 
         $metadata = new EntityMetadata();
@@ -536,7 +535,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setRangeAllowed(true);
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
         $metadata = new EntityMetadata();
@@ -594,7 +593,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $associationFilter->setRangeAllowed(true);
         $filters->add('association', $associationFilter);
 
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
         $metadata = new EntityMetadata();
