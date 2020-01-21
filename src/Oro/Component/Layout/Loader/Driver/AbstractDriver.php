@@ -8,6 +8,10 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
+/**
+ * Abstract implementation of DriverInterface based on a filesystem cache storage,
+ * to load layout update instance  based on given file resource.
+ */
 abstract class AbstractDriver implements DriverInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
@@ -198,8 +202,11 @@ abstract class AbstractDriver implements DriverInterface
     {
         $dir = dirname($file);
         if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new \RuntimeException(sprintf('Unable to create the cache directory (%s).', $dir));
+            if (false === @mkdir($dir, 0777, true)) {
+                clearstatcache(true, $dir);
+                if (!is_dir($dir)) {
+                    throw new \RuntimeException(sprintf('Unable to create the cache directory (%s).', $dir));
+                }
             }
         } elseif (!is_writable($dir)) {
             throw new \RuntimeException(sprintf('Unable to write in the cache directory (%s).', $dir));
