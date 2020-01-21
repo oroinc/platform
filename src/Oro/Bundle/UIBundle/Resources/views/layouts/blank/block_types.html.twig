@@ -37,7 +37,9 @@
     <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">
         <ul {{ block('block_attributes') }}>
             {% if breadcrumbs is not iterable %}
-                {{ breadcrumbs }}
+                <li class="breadcrumbs__item">
+                    {{ breadcrumbs }}
+                </li>
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
                     <li class="breadcrumbs__item">
@@ -63,8 +65,8 @@
                     </li>
                 {% endfor %}
             {% endif %}
-            {{ block('container_widget') }}
         </ul>
+        {{ block('container_widget') }}
     </nav>
 {% endblock %}
 
