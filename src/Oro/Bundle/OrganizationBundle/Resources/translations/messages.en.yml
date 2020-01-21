@@ -28,6 +28,7 @@ oro:
     organization:
         entity_label:         Organization
         entity_plural_label:  Organizations
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:   The highest level of the system permissions grouping.
         id:
             label:            Id
@@ -56,6 +57,7 @@ oro:
         businessunit:
             entity_label:        Business Unit
             entity_plural_label: Business Units
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Business units represent a group of users with similar business or administrative tasks/roles.
             email:
                 label:           Email

@@ -16,6 +16,7 @@ oro:
         description.label:   Description
         entity_label:        Segment
         entity_plural_label: Segments
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         last_run.label:      Last run
         name.label:          Name

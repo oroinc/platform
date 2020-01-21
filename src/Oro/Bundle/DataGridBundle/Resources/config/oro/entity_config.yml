@@ -6,3 +6,16 @@ entity_config:
                 default: # string
                     options:
                         auditable:          false
+
+    entity:
+        entity:
+            items:
+                grid_all_view_label:
+                    options:
+                        translatable:       true
+                        priority:           40
+                    constraints:
+                        - NotBlank:         ~
+                        - Length:
+                            min:            2
+                            max:            60
