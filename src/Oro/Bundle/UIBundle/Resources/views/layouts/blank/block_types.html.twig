@@ -41,25 +41,25 @@
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
                     <li class="breadcrumbs__item">
-                    {% if breadcrumb.label is defined %}
-                        {% if breadcrumb.uri is defined %}
-                            {% set url = breadcrumb.uri %}
-                        {% else %}
-                            {% set url = breadcrumb.url %}
-                        {% endif %}
+                        {% if breadcrumb.label is defined %}
+                            {% if breadcrumb.uri is defined %}
+                                {% set url = breadcrumb.uri %}
+                            {% else %}
+                                {% set url = breadcrumb.url %}
+                            {% endif %}
 
-                        {% if url and not loop.last %}
-                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
-                            <span aria-hidden="true">/</span>
-                        {% else %}
-                            <span aria-current="page">{{ breadcrumb.label|trans }}</span>
-                        {% endif %}
-                    {%  else %}
-                        {% if not loop.first %}
-                            <span aria-hidden="true">/</span>
-                        {% endif %}
-                        {{ breadcrumb }}
-                    {%  endif %}
+                            {% if url and not loop.last %}
+                                <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                                <span aria-hidden="true">/</span>
+                            {% else %}
+                                <span aria-current="page">{{ breadcrumb.label|trans }}</span>
+                            {% endif %}
+                        {%  else %}
+                            {% if not loop.first %}
+                                <span aria-hidden="true">/</span>
+                            {% endif %}
+                            {{ breadcrumb }}
+                        {%  endif %}
                     </li>
                 {% endfor %}
             {% endif %}
