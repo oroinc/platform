@@ -11,14 +11,12 @@ services:
     oro_workflow.datagrid.action.workflow_activate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
     oro_workflow.datagrid.action.workflow_deactivate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
@@ -239,9 +237,11 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
         arguments:
-            - '@oro_workflow.permission_registry'
-            - '@oro_workflow.restriction.manager'
-            - '@oro_workflow.database_checker'
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: container.service_subscriber, id: oro_workflow.database_checker }
+            - { name: container.service_subscriber, id: oro_workflow.permission_registry }
+            - { name: container.service_subscriber, id: oro_workflow.restriction.manager }
 
     oro_workflow.restriction.manager:
         class: 'Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager'
@@ -418,7 +418,7 @@ services:
         arguments:
             - '@oro_workflow.helper.translation'
         tags:
-            - { name: oro.workflow.configuration.handler, priority: 150 }
+            - { name: oro.workflow.configuration.handler, priority: -150 }
             - { name: oro.workflow.definition_builder.extension }
 
     Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor:

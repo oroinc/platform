@@ -2,26 +2,35 @@
 
 namespace Oro\Bundle\ActionBundle\Datagrid\Provider;
 
+use Psr\Container\ContainerInterface;
+
+/**
+ * The registry of mass action providers.
+ */
 class MassActionProviderRegistry
 {
-    /** @var array|MassActionProviderInterface[] */
-    protected $providers = [];
+    /** @var ContainerInterface */
+    private $providers;
 
     /**
-     * @param string $name
-     * @param MassActionProviderInterface $provider
+     * @param ContainerInterface $providers
      */
-    public function addProvider($name, MassActionProviderInterface $provider)
+    public function __construct(ContainerInterface $providers)
     {
-        $this->providers[$name] = $provider;
+        $this->providers = $providers;
     }
 
     /**
      * @param string $name
-     * @return null|MassActionProviderInterface
+     *
+     * @return MassActionProviderInterface|null
      */
-    public function getProvider($name)
+    public function getProvider(string $name): ?MassActionProviderInterface
     {
-        return array_key_exists($name, $this->providers) ? $this->providers[$name] : null;
+        if (!$this->providers->has($name)) {
+            return null;
+        }
+
+        return $this->providers->get($name);
     }
 }

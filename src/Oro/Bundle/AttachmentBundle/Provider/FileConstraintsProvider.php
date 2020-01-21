@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration as AttachmentConfiguration;
+use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as SystemConfigManager;
 
@@ -106,7 +107,7 @@ class FileConstraintsProvider
         }
 
         if (empty($mimeTypes)) {
-            if ($entityFieldConfig && $entityFieldConfig->getId()->getFieldType() === 'image') {
+            if ($entityFieldConfig && FieldConfigHelper::isImageField($entityFieldConfig->getId())) {
                 $mimeTypes = $this->getImageMimeTypes();
             } else {
                 $mimeTypes = $this->getFileMimeTypes();

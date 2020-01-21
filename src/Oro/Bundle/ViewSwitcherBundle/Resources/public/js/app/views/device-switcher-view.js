@@ -188,7 +188,7 @@ define(function(require, exports, module) {
                     if (iframe.document.querySelector('.mobile-version')) {
                         if (iframe.jQuery) {
                             this.loadScriptInFrame(
-                                '/bundles/bowerassets/jquery.nicescroll/jquery.nicescroll.min.js',
+                                '/bundles/npmassets/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
                                 function(iframe) {
                                     iframe.jQuery('.mobile-version').first().niceScroll({
                                         cursorcolor: 'rgba(0, 0, 0, 0.5)',

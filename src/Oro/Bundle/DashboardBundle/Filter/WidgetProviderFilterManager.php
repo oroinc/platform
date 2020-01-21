@@ -5,22 +5,25 @@ namespace Oro\Bundle\DashboardBundle\Filter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
+/**
+ * Provides a way to filter widget options using all registered filters.
+ */
 class WidgetProviderFilterManager
 {
-    /** @var WidgetProviderFilterInterface[] */
-    protected $filters = [];
+    /** @var iterable|WidgetProviderFilterInterface[] */
+    private $filters;
 
     /**
-     * @param WidgetProviderFilterInterface $filter
+     * @param iterable|WidgetProviderFilterInterface[] $filters
      */
-    public function addFilter(WidgetProviderFilterInterface $filter)
+    public function __construct(iterable $filters)
     {
-        $this->filters[] = $filter;
+        $this->filters = $filters;
     }
 
     /**
-     * @param  QueryBuilder    $queryBuilder
-     * @param  WidgetOptionBag $widgetOptions
+     * @param QueryBuilder    $queryBuilder
+     * @param WidgetOptionBag $widgetOptions
      */
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {

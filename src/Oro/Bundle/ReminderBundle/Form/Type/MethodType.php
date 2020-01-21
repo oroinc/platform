@@ -7,12 +7,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to select reminder send method.
+ */
 class MethodType extends AbstractType
 {
-    /**
-     * @var SendProcessorRegistry
-     */
-    protected $sendProcessorRegistry;
+    /** @var SendProcessorRegistry */
+    private $sendProcessorRegistry;
 
     /**
      * @param SendProcessorRegistry $sendProcessorRegistry
@@ -27,13 +28,11 @@ class MethodType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'choices'  => $this->sendProcessorRegistry->getProcessorLabels(),
-                'expanded' => false,
-                'multiple' => false
-            ]
-        );
+        $resolver->setDefaults([
+            'choices'  => $this->getChoices(),
+            'expanded' => false,
+            'multiple' => false
+        ]);
     }
 
     /**
@@ -58,5 +57,18 @@ class MethodType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_reminder_method';
+    }
+
+    /**
+     * @return array [label => method, ...]
+     */
+    private function getChoices(): array
+    {
+        $result = [];
+        foreach ($this->sendProcessorRegistry->getProcessors() as $method => $processor) {
+            $result[$processor->getLabel()] = $method;
+        }
+
+        return $result;
     }
 }

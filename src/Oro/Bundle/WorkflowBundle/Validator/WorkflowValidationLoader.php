@@ -5,33 +5,38 @@ namespace Oro\Bundle\WorkflowBundle\Validator;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\WorkflowBundle\Validator\Constraints\WorkflowEntity;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class WorkflowValidationLoader extends AbstractLoader
+/**
+ * Adds WorkflowEntity validation constraint to workflow related entities.
+ */
+class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscriberInterface
 {
-    /** @var WorkflowPermissionRegistry */
-    protected $permissionRegistry;
-
-    /** @var RestrictionManager */
-    protected $restrictionManager;
-
-    /** @var DatabaseChecker */
-    protected $databaseChecker;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param WorkflowPermissionRegistry $permissionRegistry
-     * @param RestrictionManager         $restrictionManager
-     * @param DatabaseChecker            $databaseChecker
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        WorkflowPermissionRegistry $permissionRegistry,
-        RestrictionManager $restrictionManager,
-        DatabaseChecker $databaseChecker
-    ) {
-        $this->permissionRegistry = $permissionRegistry;
-        $this->restrictionManager = $restrictionManager;
-        $this->databaseChecker = $databaseChecker;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_workflow.database_checker'    => DatabaseChecker::class,
+            'oro_workflow.permission_registry' => WorkflowPermissionRegistry::class,
+            'oro_workflow.restriction.manager' => RestrictionManager::class
+        ];
     }
 
     /**
@@ -39,22 +44,52 @@ class WorkflowValidationLoader extends AbstractLoader
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
-        if (!$this->databaseChecker->checkDatabase()) {
+        if (!$this->getDatabaseChecker()->checkDatabase()) {
             return false;
         }
 
-        $class = $metadata->getClassName();
-
-        if ($this->permissionRegistry->supportsClass($class, false) ||
-            $this->restrictionManager->hasEntityClassRestrictions($class, false)
-        ) {
-            $metadata->addConstraint(
-                $this->newConstraint('Oro\Bundle\WorkflowBundle\Validator\Constraints\WorkflowEntity')
-            );
-
-            return true;
+        if (!$this->isWorkflowEntityConstraintRequired($metadata->getClassName())) {
+            return false;
         }
 
-        return false;
+        $metadata->addConstraint($this->newConstraint(WorkflowEntity::class));
+
+        return true;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return bool
+     */
+    private function isWorkflowEntityConstraintRequired(string $className): bool
+    {
+        return
+            $this->getPermissionRegistry()->supportsClass($className, false)
+            || $this->getRestrictionManager()->hasEntityClassRestrictions($className, false);
+    }
+
+    /**
+     * @return DatabaseChecker
+     */
+    private function getDatabaseChecker(): DatabaseChecker
+    {
+        return $this->container->get('oro_workflow.database_checker');
+    }
+
+    /**
+     * @return WorkflowPermissionRegistry
+     */
+    private function getPermissionRegistry(): WorkflowPermissionRegistry
+    {
+        return $this->container->get('oro_workflow.permission_registry');
+    }
+
+    /**
+     * @return RestrictionManager
+     */
+    private function getRestrictionManager(): RestrictionManager
+    {
+        return $this->container->get('oro_workflow.restriction.manager');
     }
 }

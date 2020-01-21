@@ -14,11 +14,6 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         return new BooleanAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('boolean', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

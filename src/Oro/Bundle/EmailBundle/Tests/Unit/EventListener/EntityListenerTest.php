@@ -18,7 +18,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
 class EntityListenerTest extends \PHPUnit\Framework\TestCase
@@ -99,13 +99,17 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getEmailAddressRepository')
             ->willReturn($this->entityRepository);
 
+        $container = TestContainerBuilder::create()
+            ->add('oro_email.email.owner.manager', $this->emailOwnerManager)
+            ->add('oro_email.email.thread.manager', $this->emailThreadManager)
+            ->add('oro_email.email.activity.manager', $this->emailActivityManager)
+            ->add('oro_email.model.email_activity_updates', $this->emailActivityUpdates)
+            ->add('oro_email.email.address.manager', $this->emailAddressManager)
+            ->getContainer($this);
+
         $this->listener = new EntityListener(
-            $this->emailOwnerManager,
-            new ServiceLink($this->emailActivityManager),
-            new ServiceLink($this->emailThreadManager),
-            $this->emailActivityUpdates,
             $this->producer,
-            $this->emailAddressManager
+            $container
         );
     }
 

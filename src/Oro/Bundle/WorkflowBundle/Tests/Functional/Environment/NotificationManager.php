@@ -1,40 +1,33 @@
 <?php
 
-
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Environment;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager as BaseNotificationManager;
-use Psr\Container\ContainerInterface;
 
 class NotificationManager extends BaseNotificationManager
 {
-    /** @var string[] */
-    private $handlerIds;
+    /** @var iterable|EventHandlerInterface[] */
+    private $handlers;
 
     /**
-     * @param string[] $handlerIds
-     * @param ContainerInterface $handlerLocator
-     * @param Cache $cache
-     * @param ManagerRegistry $doctrine
+     * @param iterable|EventHandlerInterface[] $handlers
+     * @param Cache                            $cache
+     * @param ManagerRegistry                  $doctrine
      */
-    public function __construct(
-        array $handlerIds,
-        ContainerInterface $handlerLocator,
-        Cache $cache,
-        ManagerRegistry $doctrine
-    ) {
-        parent::__construct($handlerIds, $handlerLocator, $cache, $doctrine);
-
-        $this->handlerIds = $handlerIds;
+    public function __construct(iterable $handlers, Cache $cache, ManagerRegistry $doctrine)
+    {
+        parent::__construct($handlers, $cache, $doctrine);
+        $this->handlers = $handlers;
     }
 
     /**
-     * @return string[]
+     * @return EventHandlerInterface[]
      */
-    public function getHandlerIds(): array
+    public function getHandlers(): array
     {
-        return $this->handlerIds;
+        return iterator_to_array($this->handlers);
     }
 }

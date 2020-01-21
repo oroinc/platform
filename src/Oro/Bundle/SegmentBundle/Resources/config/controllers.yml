@@ -7,4 +7,4 @@ services:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: 'oro_entity_config.provider.entity' }
+            - { name: container.service_subscriber, id: oro_segment.entity_provider }

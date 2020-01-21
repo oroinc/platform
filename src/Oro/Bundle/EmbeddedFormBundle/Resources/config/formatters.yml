@@ -5,4 +5,4 @@ services:
             - '@oro_embedded_form.manager'
             - '@translator'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: embedded_form_type }
+            - { name: oro_datagrid.extension.formatter.property, type: embedded_form_type }

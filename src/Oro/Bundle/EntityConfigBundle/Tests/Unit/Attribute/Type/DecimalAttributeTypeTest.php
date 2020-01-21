@@ -11,12 +11,7 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        return new DecimalAttributeType('decimal');
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('decimal', $this->getAttributeType()->getType());
+        return new DecimalAttributeType();
     }
 
     /**

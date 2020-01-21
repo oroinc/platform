@@ -1,0 +1,7 @@
+features:
+    web_api:
+        label: oro.api.system_configuration.fields.web_api.label
+        toggle: oro_api.web_api
+        routes:
+            - nelmio_api_doc_index
+            - oro_rest_api_doc_resource

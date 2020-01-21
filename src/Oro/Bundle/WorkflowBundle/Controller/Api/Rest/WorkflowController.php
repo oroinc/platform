@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -49,6 +51,8 @@ class WorkflowController extends FOSRestController
      */
     public function startAction($workflowName, $transitionName, Request $request)
     {
+        $errors = new ArrayCollection();
+
         try {
             /** @var WorkflowManager $workflowManager */
             $workflowManager = $this->get('oro_workflow.manager');
@@ -80,19 +84,26 @@ class WorkflowController extends FOSRestController
             }
 
             $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
-            $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
+            $workflowItem = $workflowManager->startWorkflow(
+                $workflowName,
+                $entity,
+                $transitionName,
+                $dataArray,
+                true,
+                $errors
+            );
         } catch (HttpException $e) {
-            return $this->handleError($e->getMessage(), $e->getStatusCode());
+            return $this->handleError($this->buildMessageString($errors, $e), $e->getStatusCode());
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_NOT_FOUND);
         } catch (UnknownAttributeException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_FORBIDDEN);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->handleView(
@@ -103,6 +114,28 @@ class WorkflowController extends FOSRestController
                 Response::HTTP_OK
             )
         );
+    }
+
+    /**
+     * @param Collection $errors
+     * @param \Exception $e
+     * @return string
+     */
+    private function buildMessageString(Collection $errors, \Exception $e): string
+    {
+        $translator = $this->get('translator');
+
+        $messages = $errors->map(
+            static function ($error) use ($translator) {
+                if (!isset($error['message'])) {
+                    return null;
+                }
+
+                return $translator->trans($error['message'], $error['parameters'] ?? []);
+            }
+        );
+
+        return implode(' ', array_filter($messages->toArray())) ?: $e->getMessage();
     }
 
     /**
@@ -152,16 +185,18 @@ class WorkflowController extends FOSRestController
      */
     public function transitAction(WorkflowItem $workflowItem, $transitionName)
     {
+        $errors = new ArrayCollection();
+
         try {
-            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
+            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName, $errors);
         } catch (WorkflowNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_NOT_FOUND);
         } catch (InvalidTransitionException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_BAD_REQUEST);
         } catch (ForbiddenTransitionException $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_FORBIDDEN);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->handleView(

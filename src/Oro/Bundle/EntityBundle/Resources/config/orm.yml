@@ -39,17 +39,32 @@ services:
 
     oro_entity.query_hint_resolver:
         class: Oro\Component\DoctrineUtils\ORM\QueryHintResolver
+        arguments:
+            - [] # walkers
+            - ~ # service container for providers of the walker parameters
+            - [] # aliases
 
     oro_entity.orm.native_query_executor_helper:
         class: Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
         arguments:
             - '@doctrine'
 
-    oro_entity.orm.insert_from_select_query_executor:
-        class: Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
-        public: true
+    oro_entity.orm.abstract.insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\AbstractInsertQueryExecutor
+        abstract: true
         arguments:
             - '@oro_entity.orm.native_query_executor_helper'
+
+    oro_entity.orm.insert_from_select_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
+        parent: oro_entity.orm.abstract.insert_query_executor
+        public: true
+
+    oro_entity.orm.multi_insert_query_executor:
+        class: Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor
+        parent: oro_entity.orm.abstract.insert_query_executor
+        public: true
+        shared: false
 
     oro_entity.repository.factory:
         class: Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory

@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider;
 
+use Psr\Container\ContainerInterface;
+
+/**
+ * Provides a way to get configuration values for dashboard widgets.
+ */
 class ConfigValueProvider
 {
-    /** @var ConfigValueConverterAbstract[] */
-    protected $converters;
+    /** @var ContainerInterface */
+    private $converters;
 
     /**
-     * @param string                       $formType
-     * @param ConfigValueConverterAbstract $converter
+     * @param ContainerInterface $converters
      */
-    public function addConverter($formType, ConfigValueConverterAbstract $converter)
+    public function __construct(ContainerInterface $converters)
     {
-        $this->converters[$formType] = $converter;
+        $this->converters = $converters;
     }
 
     /**
@@ -27,41 +31,58 @@ class ConfigValueProvider
      */
     public function getConvertedValue($widgetConfig, $formType, $value = null, $config = [], $options = [])
     {
-        if (in_array($formType, array_keys($this->converters))) {
-            return $this->converters[$formType]->getConvertedValue($widgetConfig, $value, $config, $options);
+        $converter = $this->getConverter($formType);
+        if (null !== $converter) {
+            return $converter->getConvertedValue($widgetConfig, $value, $config, $options);
         }
 
         return $value;
     }
 
     /**
-     * @param $formType
-     * @param $value
+     * @param string $formType
+     * @param mixed  $value
      *
      * @return string
      */
     public function getViewValue($formType, $value)
     {
-        if (in_array($formType, array_keys($this->converters))) {
-            return $this->converters[$formType]->getViewValue($value);
+        $converter = $this->getConverter($formType);
+        if (null !== $converter) {
+            return $converter->getViewValue($value);
         }
 
         return $value;
     }
 
     /**
-     * @param $formType
-     * @param $config
-     * @param $value
+     * @param string $formType
+     * @param array  $config
+     * @param mixed  $value
      *
      * @return mixed
      */
     public function getFormValue($formType, $config, $value)
     {
-        if (in_array($formType, array_keys($this->converters))) {
-            return $this->converters[$formType]->getFormValue($config, $value);
+        $converter = $this->getConverter($formType);
+        if (null !== $converter) {
+            return $converter->getFormValue($config, $value);
         }
 
         return $value;
+    }
+
+    /**
+     * @param string $formType
+     *
+     * @return ConfigValueConverterAbstract|null
+     */
+    private function getConverter(string $formType): ?ConfigValueConverterAbstract
+    {
+        if (!$this->converters->has($formType)) {
+            return null;
+        }
+
+        return $this->converters->get($formType);
     }
 }

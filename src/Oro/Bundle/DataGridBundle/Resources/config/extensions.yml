@@ -2,6 +2,8 @@ services:
     oro_datagrid.extension.formatter:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\FormatterExtension
         arguments:
+            - [] # property formatter types
+            - ~ # service locator for property formatters
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
@@ -21,7 +23,6 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.pager.orm.pager:
-        public: false
         class: Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager
         arguments:
             - '@oro_security.acl_helper'
@@ -30,7 +31,6 @@ services:
             - '@oro_datagrid.orm.query_executor'
 
     oro_datagrid.extension.pager.array.pager:
-        public: false
         class: Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager
 
     oro_datagrid.extension.sorter.abstract:
@@ -64,6 +64,7 @@ services:
     oro_datagrid.extension.action:
         class: Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension
         arguments:
+            - !tagged_iterator oro_datagrid.extension.action.provider
             - '@oro_datagrid.extension.action.factory'
             - '@oro_datagrid.extension.action.metadata_factory'
             - '@security.authorization_checker'
@@ -74,7 +75,7 @@ services:
     oro_datagrid.action.callback_provider:
         class: Oro\Bundle\DataGridBundle\Extension\Action\DatagridCallbackActionProvider
         tags:
-            - { name: oro_datagrid.extension.action.provider, priority: 255 }
+            - { name: oro_datagrid.extension.action.provider, priority: -255 }
 
     oro_datagrid.extension.mass_delete_action:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension
@@ -179,14 +180,14 @@ services:
     oro_datagrid.extension.board:
         class: Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension
         arguments:
+            - ~ # service locator for processors
             - '@security.authorization_checker'
+            - '@request_stack'
             - '@translator'
             - '@oro_datagrid.datagrid.board.restriction_manager'
             - '@oro_datagrid.datagrid.board.configuration'
             - '@oro_entity.entity_class_name_helper'
             - '@oro_entity.orm.entity_class_resolver'
-        calls:
-            - [setRequestStack, ["@request_stack"]]
         tags:
             - { name: oro_datagrid.extension }
 

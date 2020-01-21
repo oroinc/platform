@@ -3,65 +3,73 @@
 namespace Oro\Bundle\ReminderBundle\Model;
 
 use Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Sends processor registry
+ * The registry of reminder send processors.
  */
-class SendProcessorRegistry
+class SendProcessorRegistry implements ResetInterface
 {
-    /**
-     * @var SendProcessorInterface[]
-     */
-    protected $processors;
+    /** @var string[] */
+    private $sendMethods;
+
+    /** @var ContainerInterface */
+    private $processorContainer;
+
+    /** @var SendProcessorInterface[]|null [method => processor, ...] */
+    private $processors;
 
     /**
-     * @param SendProcessorInterface[] $processors
+     * @param string[]           $sendMethods
+     * @param ContainerInterface $processorContainer
      */
-    public function __construct(array $processors)
+    public function __construct(array $sendMethods, ContainerInterface $processorContainer)
     {
-        $this->processors = array();
-        foreach ($processors as $processor) {
-            $this->processors[$processor->getName()] = $processor;
-        }
+        $this->sendMethods = $sendMethods;
+        $this->processorContainer = $processorContainer;
     }
 
     /**
-     * Get all processors
+     * Gets all processors.
      *
-     * @return SendProcessorInterface[]
+     * @return SendProcessorInterface[] [method => processor, ...]
      */
-    public function getProcessors()
+    public function getProcessors(): array
     {
+        if (null === $this->processors) {
+            $this->processors = [];
+            foreach ($this->sendMethods as $method) {
+                $this->processors[$method] = $this->processorContainer->get($method);
+            }
+        }
+
         return $this->processors;
     }
 
     /**
-     * Get processor by method
+     * Gets a processor for the given send method.
      *
      * @param string $method
+     *
      * @return SendProcessorInterface
-     * @throws MethodNotSupportedException If processor is not supported
+     *
+     * @throws MethodNotSupportedException if the given send method is not supported
      */
-    public function getProcessor($method)
+    public function getProcessor(string $method): SendProcessorInterface
     {
-        if (!isset($this->processors[$method])) {
+        if (!\in_array($method, $this->sendMethods, true)) {
             throw new MethodNotSupportedException(sprintf('Reminder method "%s" is not supported.', $method));
         }
 
-        return $this->processors[$method];
+        return $this->processorContainer->get($method);
     }
 
     /**
-     * Get associative array of processor labels.
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function getProcessorLabels()
+    public function reset()
     {
-        $result = array();
-        foreach ($this->processors as $name => $processor) {
-            $result[$processor->getLabel()] = $name;
-        }
-        return $result;
+        $this->processors = null;
     }
 }

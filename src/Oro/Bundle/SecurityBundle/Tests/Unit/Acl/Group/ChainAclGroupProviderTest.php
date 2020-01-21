@@ -7,43 +7,9 @@ use Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider;
 
 class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructionWithoutProviders()
-    {
-        $chain = new ChainAclGroupProvider();
-
-        $this->assertAttributeCount(0, 'providers', $chain);
-    }
-
-    public function testAddProvider()
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider1 */
-        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider2 */
-        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
-
-        $chain = new ChainAclGroupProvider();
-        $chain->addProvider('alias1', $provider1);
-
-        $this->assertAttributeCount(1, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
-
-        $chain->addProvider('alias2', $provider2);
-
-        $this->assertAttributeCount(2, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
-        $this->assertAttributeContains($provider2, 'providers', $chain);
-
-        $chain->addProvider('alias2', $provider1);
-
-        $this->assertAttributeCount(2, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
-        $this->assertAttributeNotContains($provider2, 'providers', $chain);
-    }
-
     public function testSupports()
     {
-        $chain = new ChainAclGroupProvider();
+        $chain = new ChainAclGroupProvider([]);
         $this->assertTrue($chain->supports());
     }
 
@@ -52,25 +18,33 @@ class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
         $group1 = 'group1';
         $group2 = 'group2';
 
-        $chain = new ChainAclGroupProvider();
-        $chain->addProvider('alias1', $this->getAclGroupProviderMock(false, $group1));
-        $chain->addProvider('alias2', $this->getAclGroupProviderMock(true, $group2));
+        $chain = new ChainAclGroupProvider([
+            $this->getAclGroupProviderMock(false, $group1),
+            $this->getAclGroupProviderMock(true, $group2)
+        ]);
 
-        $result = $chain->getGroup();
+        $this->assertSame($group2, $chain->getGroup());
+    }
 
-        $this->assertInternalType('string', $result);
-        $this->assertEquals($group2, $result);
+    public function testGetGroupForDefaultGroup()
+    {
+        $chain = new ChainAclGroupProvider([
+            $this->getAclGroupProviderMock(false, 'group1'),
+            $this->getAclGroupProviderMock(false, 'group2')
+        ]);
+
+        $this->assertSame(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP, $chain->getGroup());
     }
 
     /**
-     * @param bool $isSupports
+     * @param bool   $isSupports
      * @param string $group
+     *
      * @return \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface
      */
-    protected function getAclGroupProviderMock($isSupports = true, $group = '')
+    private function getAclGroupProviderMock(bool $isSupports, string $group)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $provider */
-        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $provider = $this->createMock(AclGroupProviderInterface::class);
         $provider->expects($this->any())
             ->method('supports')
             ->willReturn($isSupports);

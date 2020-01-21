@@ -27,6 +27,7 @@ Feature: User search with business unit permissions
     And save and close form
     Then I should see "Role saved" flash message
 
+  @skip
   Scenario: Search admin user with role permissions 'View:Business Unit'
     and with business that equals to owner of searching entity
     Given I login as "charlie" user

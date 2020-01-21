@@ -1,0 +1,73 @@
+services:
+    oro_draft.duplicator_extension.draft_uuid_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: DeepCopy\Matcher\PropertyNameMatcher
+                arguments: ['draftUuid']
+            - !service
+                class: Oro\Bundle\DraftBundle\Duplicator\Filter\UuidFilter
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 0 }
+
+    oro_draft.duplicator_extension.localization_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: DeepCopy\Matcher\PropertyTypeMatcher
+                arguments: ['Oro\Bundle\LocaleBundle\Entity\Localization']
+            - !service
+                class: DeepCopy\Filter\KeepFilter
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 0 }
+
+    oro_draft.duplicator_extension.doctrine_collection_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: DeepCopy\Matcher\PropertyTypeMatcher
+                arguments: ['Doctrine\Common\Collections\Collection']
+            - !service
+                class: DeepCopy\Filter\KeepFilter
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 0 }
+
+    oro_draft.duplicator_extension.keep_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: Oro\Bundle\DraftBundle\Duplicator\Matcher\GeneralMatcher
+            - !service
+                class: DeepCopy\Filter\KeepFilter
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: -255 }
+
+    oro_draft.duplicator_extension.date_time_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DateTimeExtension
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.draft_source_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.owner_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\DuplicatorExtension
+        arguments:
+            - !service
+                class: DeepCopy\Matcher\PropertyNameMatcher
+                arguments: ['draftOwner']
+            - !service
+                class: Oro\Bundle\DraftBundle\Duplicator\Filter\OwnerFilter
+                arguments: ['@security.token_storage']
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+
+    oro_draft.duplicator_extension.ownership_extension:
+        class: Oro\Bundle\DraftBundle\Duplicator\Extension\OwnershipExtension
+        arguments:
+            - '@oro_security.owner.ownership_metadata_provider'
+        tags:
+            - { name: oro_draft.duplicator.extension, priority: 255 }
+

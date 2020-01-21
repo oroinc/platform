@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -124,7 +124,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
             new ActionMetadataExtra($action)
         ];
         if ($hateoas) {
-            $metadataExtras[] = new HateoasMetadataExtra(new NullFilterValueAccessor());
+            $metadataExtras[] = new HateoasMetadataExtra(new FilterValueAccessor());
         }
 
         $config   = $this->configProvider->getConfig($entityClass, $version, $requestType, $configExtras);

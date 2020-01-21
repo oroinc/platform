@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle;
 
-use Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -34,9 +34,10 @@ class OroSearchBundle extends Bundle
             ->add(Topics::INDEX_ENTITY, 'Index single entity by id')
         ;
         $container->addCompilerPass($addTopicPass);
-        $container->addCompilerPass(new FilterTypesPass(
+        $container->addCompilerPass(new PriorityNamedTaggedServiceCompilerPass(
             'oro_search.extension.search_filter_bag',
-            'oro_search.extension.search_filter.filter'
+            'oro_search.extension.search_filter.filter',
+            'type'
         ));
     }
 }

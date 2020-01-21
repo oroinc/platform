@@ -9,11 +9,11 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
+/**
+ * Provides a way to use TestActivity entity in an activity list.
+ */
 class TestActivityActivityListProvider implements ActivityListProviderInterface
 {
-    const ACTIVITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
-    const ACL_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -39,7 +39,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
             $entityClass,
-            self::ACTIVITY_CLASS,
+            TestActivity::class,
             $accessible
         );
     }
@@ -110,22 +110,6 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getActivityClass()
-    {
-        return self::ACTIVITY_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAclClass()
-    {
-        return self::ACL_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
@@ -136,11 +120,11 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicable($entity)
     {
-        if (is_object($entity)) {
-            $entity = $this->doctrineHelper->getEntityClass($entity);
+        if (\is_object($entity)) {
+            return $entity instanceof TestActivity;
         }
 
-        return $entity === self::ACTIVITY_CLASS;
+        return $entity === TestActivity::class;
     }
 
     /**

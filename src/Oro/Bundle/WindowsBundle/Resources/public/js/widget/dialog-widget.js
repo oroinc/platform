@@ -90,7 +90,8 @@ define(function(require, exports, module) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: this.options.limitTo,
-                minWidth: 320,
+                // minimal width is adjusted to dialog shows typical form without horizontal scroll
+                minWidth: tools.isMobile() ? 320 : 604,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -107,12 +108,22 @@ define(function(require, exports, module) {
                 this._initModel();
             }
 
-            dialogOptions.beforeClose = _.bind(this.closeHandler, this, dialogOptions.close);
-            dialogOptions.close = undefined;
+            dialogOptions.dragStop = this.onDragStop.bind(this);
+            dialogOptions.beforeClose = this.closeHandler.bind(this, dialogOptions.close);
+            delete dialogOptions.close;
 
             dialogManager.add(this);
 
             this.initializeWidget(options);
+        },
+
+        onDragStop: function(event, ui) {
+            const {left, top} = $(this.getLimitToContainer()).offset();
+
+            this.dndPosition = {
+                left: ui.position.left - left,
+                top: ui.position.top - top
+            };
         },
 
         onWidgetRender: function(content) {
@@ -346,15 +357,15 @@ define(function(require, exports, module) {
         },
 
         getLimitToContainer: function() {
-            const limitTo = this.options.dialogOptions.limitTo;
+            let limitTo = this.options.dialogOptions.limitTo;
 
             if (limitTo === 'viewport') {
                 return document.documentElement;
             } else if (limitTo) {
-                return $(this.options.dialogOptions.limitTo)[0];
-            } else {
-                return document.body;
+                limitTo = $(limitTo)[0];
             }
+
+            return limitTo || document.body;
         },
 
         _clearActionsContainer: function() {
@@ -419,6 +430,7 @@ define(function(require, exports, module) {
             const keepAliveOnClose = this.keepAliveOnClose;
             this.keepAliveOnClose = true;
             this.widget.dialog('close');
+            delete this.dndPosition;
             this.keepAliveOnClose = keepAliveOnClose;
         },
 
@@ -464,17 +476,30 @@ define(function(require, exports, module) {
             }
         },
 
-        _fixScrollableHeight: function() {
-            const widget = this.widget;
+        _clearScrollableHeight: function() {
             if (!tools.isMobile()) {
                 // on mobile devices without setting these properties modal dialogs cannot be scrolled
-                widget.find('.scrollable-container').each(_.bind(function(i, el) {
-                    const $el = $(el);
-                    const height = widget.height() - $el.position().top;
+                this.widget.find('.scrollable-container').each(function() {
+                    $(this).css('max-height', '');
+                });
+            }
+        },
+
+        _fixScrollableHeight: function() {
+            if (!tools.isMobile()) {
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
+                const widget = this.widget;
+                const content = widget.find('.widget-content:first');
+                const contentHeight = Math.ceil(widget.height() - content.outerHeight(true) + content.height());
+
+                widget.find('.scrollable-container').each(function() {
+                    const $el = $(this);
+                    const height = contentHeight - $el.position().top;
+
                     if (height) {
-                        $el.outerHeight(height);
+                        $el.css('max-height', height);
                     }
-                }, this));
+                });
             }
 
             mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
@@ -488,24 +513,36 @@ define(function(require, exports, module) {
                 // widget is not initialized -- where's nothing to position yet
                 return;
             }
+            this._clearScrollableHeight();
+
             if (this.options.position) {
                 this.setPosition(_.extend(this.options.position, {
                     of: this.getLimitToContainer(),
                     collision: 'fit'
                 }));
             }
-            if (!this.options.incrementalPosition) {
+
+            if (this.dndPosition && this.getState() !== 'maximized') {
+                const {left, top} = this.dndPosition;
+
+                this.setPosition({
+                    my: 'left top',
+                    at: `left+${left} top+${top}`,
+                    of: this.getLimitToContainer(),
+                    collision: 'fit'
+                });
+            } else if (this.options.incrementalPosition) {
+                dialogManager.updateIncrementalPosition(this);
+            } else {
                 this.setPosition({
                     my: 'center center',
                     at: this.defaultPos,
                     of: this.getLimitToContainer(),
                     collision: 'fit'
                 });
-            } else {
-                dialogManager.updateIncrementalPosition(this);
             }
 
-            mediator.execute({name: 'responsive-layout:update', silent: true}, this.el);
+            this._fixScrollableHeight();
         },
 
         internalSetDialogPosition: function(position, leftShift, topShift) {
@@ -536,7 +573,7 @@ define(function(require, exports, module) {
             const initialDialogPosition = dialog.css('position');
             const initialScrollTop = $(window).scrollTop();
             if (tools.isIOS() && initialDialogPosition === 'fixed') {
-                // Manipulating with position to fix stupid iOS bug,
+                // Manipulating with position to fix iOS bug,
                 // when orientation is changed
                 $('html, body').scrollTop(0);
                 dialog.css({
@@ -553,7 +590,7 @@ define(function(require, exports, module) {
             this.widget.trigger('dialogreposition');
 
             if (tools.isIOS() && initialDialogPosition === 'fixed') {
-                // Manipulating with position to fix stupid iOS bug,
+                // Manipulating with position to fix iOS bug,
                 // when orientation is changed
                 dialog.css({
                     position: initialDialogPosition
@@ -657,22 +694,24 @@ define(function(require, exports, module) {
          * @protected
          */
         _bindDialogEvents: function() {
-            const self = this;
-            this.widget.on('dialogbeforeclose', function() {
-                mediator.trigger('widget_dialog:close', self);
+            this.widget.on('dialogbeforeclose', () => {
+                mediator.trigger('widget_dialog:close', this);
+                this.trigger('close');
             });
-            this.widget.on('dialogopen', function() {
-                mediator.trigger('widget_dialog:open', self);
+            this.widget.on('dialogopen', () => {
+                mediator.trigger('widget_dialog:open', this);
+                this.trigger('open');
             });
-            this.widget.on('dialogstatechange', function(event, data) {
+            this.widget.on('dialogstatechange', (event, data) => {
                 if (data.state !== data.oldState) {
-                    mediator.trigger('widget_dialog:stateChange', self, data);
+                    mediator.trigger('widget_dialog:stateChange', this, data);
+                    this.trigger('stateChange', data);
                 }
             });
             this.widget.on({
-                'dialogresizestart': _.bind(this.onResizeStart, this),
-                'dialogresize dialogmaximize dialogrestore': _.bind(this.onResize, this),
-                'dialogresizestop': _.bind(this.onResizeStop, this)
+                'dialogresizestart': this.onResizeStart.bind(this),
+                'dialogresize dialogmaximize dialogrestore': this.onResize.bind(this),
+                'dialogresizestop': this.onResizeStop.bind(this)
             });
         },
 

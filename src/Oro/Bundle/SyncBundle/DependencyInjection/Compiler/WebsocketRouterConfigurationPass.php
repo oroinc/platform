@@ -4,7 +4,7 @@ namespace Oro\Bundle\SyncBundle\DependencyInjection\Compiler;
 
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\NullCumulativeFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -30,7 +30,7 @@ class WebsocketRouterConfigurationPass implements CompilerPassInterface
 
         $configLoader = new CumulativeConfigLoader(
             'oro_sync_websocket_resources',
-            new YamlCumulativeFileLoader(self::WEBSOCKET_ROUTING_CONFIG_PATH)
+            new NullCumulativeFileLoader(self::WEBSOCKET_ROUTING_CONFIG_PATH)
         );
         $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {

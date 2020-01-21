@@ -6,6 +6,7 @@ use Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -22,27 +23,28 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessNoProviders()
     {
         $container = new ContainerBuilder();
-        $managerDef = $container->register(
+        $managerDef = $container->setDefinition(
             'oro_scope.scope_manager',
-            ScopeManager::class
+            new Definition(ScopeManager::class, [[], null])
         );
 
         $this->compiler->process($container);
 
-        $managerServiceLocatorRef = $managerDef->getArgument(0);
+        self::assertEquals([], $managerDef->getArgument(0));
+
+        $managerServiceLocatorRef = $managerDef->getArgument(1);
         self::assertInstanceOf(Reference::class, $managerServiceLocatorRef);
         $managerServiceLocatorDef = $container->getDefinition((string)$managerServiceLocatorRef);
         self::assertEquals(ServiceLocator::class, $managerServiceLocatorDef->getClass());
         self::assertEquals([], $managerServiceLocatorDef->getArgument(0));
-        self::assertEquals([], $managerDef->getArgument(1));
     }
 
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $managerDef = $container->register(
+        $managerDef = $container->setDefinition(
             'oro_scope.scope_manager',
-            ScopeManager::class
+            new Definition(ScopeManager::class, [[], null])
         );
 
         $container->register('service.name.1')
@@ -56,7 +58,15 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($container);
 
-        $managerServiceLocatorRef = $managerDef->getArgument(0);
+        self::assertEquals(
+            [
+                'scope'  => ['service.name.3', 'service.name.1', 'service.name.2'],
+                'scope2' => ['service.name.2', 'service.name.1']
+            ],
+            $managerDef->getArgument(0)
+        );
+
+        $managerServiceLocatorRef = $managerDef->getArgument(1);
         self::assertInstanceOf(Reference::class, $managerServiceLocatorRef);
         $managerServiceLocatorDef = $container->getDefinition((string)$managerServiceLocatorRef);
         self::assertEquals(ServiceLocator::class, $managerServiceLocatorDef->getClass());
@@ -67,13 +77,6 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
                 'service.name.3' => new ServiceClosureArgument(new Reference('service.name.3'))
             ],
             $managerServiceLocatorDef->getArgument(0)
-        );
-        self::assertEquals(
-            [
-                'scope'  => ['service.name.3', 'service.name.1', 'service.name.2'],
-                'scope2' => ['service.name.2', 'service.name.1']
-            ],
-            $managerDef->getArgument(1)
         );
     }
 }

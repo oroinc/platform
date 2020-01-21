@@ -187,7 +187,7 @@ class MainMenu extends Element
         $class = $menuTitle->getAttribute('class');
 
         $matches = [];
-        if (!preg_match('/title-level-(\d)/', $class, $matches)) {
+        if (!preg_match('/title\-level\-(\d)/', $class, $matches)) {
             throw new \LogicException(sprintf('Cannot determine "%s" menu level', $menuTitle->getText()));
         }
 

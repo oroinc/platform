@@ -241,9 +241,10 @@ services:
     oro_form.extension.strip_tags:
         class: Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension
         arguments:
-            - '@oro_ui.html_tag_helper'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_ui.html_tag_helper }
 
     oro_form.type.encoded_placeholder_password:
         class: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
@@ -346,3 +347,8 @@ services:
             - '@oro_locale.formatter.number'
         tags:
             - { name: form.type, alias: oro_hidden_number }
+
+    oro_form.type.checkbox:
+        class: Oro\Bundle\FormBundle\Form\Type\CheckboxType
+        tags:
+            - { name: form.type, alias: oro_checkbox }

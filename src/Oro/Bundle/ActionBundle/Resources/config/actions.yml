@@ -3,7 +3,7 @@ services:
         class: Symfony\Component\DependencyInjection\ServiceLocator
         public: false
         arguments:
-            - [] # actions. Will be set in Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionLocatorPass
+            - [] # actions
         tags:
             - { name: container.service_locator }
 
@@ -296,3 +296,11 @@ services:
             - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro_action.action, alias: substring }
+
+    oro_action.action.render_template:
+        class: Oro\Component\Action\Action\RenderTemplate
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@twig'
+        tags:
+            - { name: oro_action.action, alias: render_template }

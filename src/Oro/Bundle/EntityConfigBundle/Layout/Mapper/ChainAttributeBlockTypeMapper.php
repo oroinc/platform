@@ -2,26 +2,28 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Layout\Mapper;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+/**
+ * Uses configured mappers to find a layout block type for an attribute.
+ */
 class ChainAttributeBlockTypeMapper extends AbstractAttributeBlockTypeMapper
 {
     /** @var string */
     private $defaultBlockType;
 
-    /** @var AttributeBlockTypeMapperInterface[] */
-    private $mappers = [];
+    /** @var iterable|AttributeBlockTypeMapperInterface[] */
+    private $mappers;
 
     /**
-     * @param AttributeBlockTypeMapperInterface $mapper
-     *
-     * @return ChainAttributeBlockTypeMapper
+     * @param ManagerRegistry $registry
+     * @param iterable|AttributeBlockTypeMapperInterface[] $mappers
      */
-    public function addMapper(AttributeBlockTypeMapperInterface $mapper)
+    public function __construct(ManagerRegistry $registry, iterable $mappers)
     {
-        $this->mappers[] = $mapper;
-
-        return $this;
+        parent::__construct($registry);
+        $this->mappers = $mappers;
     }
 
     /**

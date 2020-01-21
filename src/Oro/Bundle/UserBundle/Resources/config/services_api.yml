@@ -13,7 +13,7 @@ services:
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create, class: Oro\Bundle\UserBundle\Entity\User }
 
-    oro_user.api.customize_form_data.disable_user:
+    oro_user.api.disable_user:
         class: Oro\Bundle\UserBundle\Api\Processor\DisableUserByDefault
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: pre_validate, parentAction: create, class: Oro\Bundle\UserBundle\Entity\User }

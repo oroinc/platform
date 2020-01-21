@@ -68,7 +68,6 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\EntityExtendValidationLoaderPass());
         $container->addCompilerPass(new Compiler\ConfigLoaderPass());
         $container->addCompilerPass(new Compiler\EntityManagerPass());
-        $container->addCompilerPass(new Compiler\EntityMetadataBuilderPass());
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
@@ -78,7 +77,6 @@ class OroEntityExtendBundle extends Bundle
                 ]
             )
         );
-        $container->addCompilerPass(new Compiler\ExtensionPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 

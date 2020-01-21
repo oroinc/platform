@@ -15,7 +15,7 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
         $container = new ContainerBuilder();
         $container->register('oro_translation.database_translation.metadata.cache');
         $container->register('oro_translation.resource.cache');
-        $container->register('oro_translation.strategy.provider_link');
+        $container->register('oro_translation.strategy.provider');
         $container->register('oro_translation.provider.translation_domain');
         $container->register('event_dispatcher');
         $container->register('logger');
@@ -36,7 +36,7 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
             [
                 ['setDatabaseMetadataCache', [new Reference('oro_translation.database_translation.metadata.cache')]],
                 ['setResourceCache', [new Reference('oro_translation.resource.cache')]],
-                ['setStrategyProviderLink', [new Reference('oro_translation.strategy.provider_link')]],
+                ['setStrategyProvider', [new Reference('oro_translation.strategy.provider')]],
                 ['setTranslationDomainProvider', [new Reference('oro_translation.provider.translation_domain')]],
                 ['setEventDispatcher', [new Reference('event_dispatcher')]],
                 ['setLogger', [new Reference('logger')]],

@@ -7,15 +7,15 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityList;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestFeatureAwareActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestOrganization;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestUser;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -124,7 +124,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->willReturn(null);
-        $entityProvider = $this->createMock(FeatureToggleableInterface::class);
+        $entityProvider = $this->createMock(TestFeatureAwareActivityProvider::class);
         $entityProvider->expects(self::once())
             ->method('isFeaturesEnabled')
             ->willReturn(true);
@@ -209,16 +209,5 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
             ],
             $this->activityListManager->getItem(105)
         );
-    }
-
-    protected function mockEmailActivityListProvider()
-    {
-        $emailActivityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-        ->disableOriginalConstructor()->getMock();
-
-        $emailActivityListProvider->expects($this->once())->method('getActivityClass')->willReturn('ActivityClass');
-        $emailActivityListProvider->expects($this->once())->method('getAclClass')->willReturn('AclClass');
-
-        return $emailActivityListProvider;
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -12,6 +14,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EmailTemplateVariablesPass implements CompilerPassInterface
 {
+    use TaggedServiceTrait;
+
     private const CHAIN_PROVIDER_SERVICE = 'oro_email.emailtemplate.variable_provider';
     private const PROVIDER_TAG           = 'oro_email.emailtemplate.variable_provider';
 
@@ -31,22 +35,14 @@ class EmailTemplateVariablesPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $serviceId => $tags) {
             $attributes = $tags[0];
-            if (empty($attributes[self::SCOPE_ATTR])) {
-                throw new \InvalidArgumentException(sprintf(
-                    'The tag attribute "%s" is required for service "%s".',
-                    self::SCOPE_ATTR,
-                    $serviceId
-                ));
-            }
-
-            $priority = $attributes[self::PRIORITY_ATTR] ?? 0;
-            $scope = $attributes[self::SCOPE_ATTR];
+            $scope = $this->getRequiredAttribute($attributes, self::SCOPE_ATTR, $serviceId, self::PROVIDER_TAG);
+            $priority = $this->getPriorityAttribute($attributes);
             if (self::SCOPE_SYSTEM === $scope) {
                 $systemProviders[$priority][] = $serviceId;
             } elseif (self::SCOPE_ENTITY === $scope) {
                 $entityProviders[$priority][] = $serviceId;
             } else {
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'The value "%s" is invalid for the tag attribute "%s" for service "%s", expected "%s" or "%s".',
                     $scope,
                     self::SCOPE_ATTR,
@@ -63,20 +59,5 @@ class EmailTemplateVariablesPass implements CompilerPassInterface
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $providers))
             ->replaceArgument(1, $this->sortByPriorityAndFlatten($systemProviders))
             ->replaceArgument(2, $this->sortByPriorityAndFlatten($entityProviders));
-    }
-
-    /**
-     * @param array $items [priority => item, ...]
-     *
-     * @return array [item, ...]
-     */
-    private function sortByPriorityAndFlatten(array $items): array
-    {
-        if ($items) {
-            krsort($items);
-            $items = array_merge(...$items);
-        }
-
-        return $items;
     }
 }

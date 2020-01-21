@@ -83,19 +83,6 @@
         {% set value = value ? value | oro_format_date : null %}
     {% elseif type == 'datetime' %}
         {% set value = value ? value | oro_format_datetime : null %}
-    {% elseif type == 'file' %}
-        {% set value %}
-            {{ oro_file_view(value) }}
-        {% endset %}
-    {% elseif type == 'image' %}
-        {% if entity_class is null %}
-            {% set entityInfo = entity %}
-        {% else %}
-            {% set entityInfo = entity_class %}
-        {% endif %}
-        {% set value %}
-            {{ oro_image_view(value) }}
-        {% endset %}
     {% endif %}
 
     {% if type == 'wysiwyg' %}

@@ -8,6 +8,7 @@ use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -72,9 +73,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $this->batchJobRepository->expects(self::any())
             ->method('getJobManager')
             ->will(self::returnValue($this->batchJobManager));
-        $this->contextAggregatorRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry')
-            ->getMock();
+        $this->contextAggregatorRegistry = $this->createMock(ContextAggregatorRegistry::class);
 
         $this->executor = new JobExecutor(
             $this->batchJobRegistry,

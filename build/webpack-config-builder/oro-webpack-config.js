@@ -134,7 +134,7 @@ class ConfigBuilder {
                     aggregateTimeout: 200,
                     ignored: [
                         /[\/\\]node_modules[\/\\].*\.js$/,
-                        /[\/\\]bundles[\/\\](npmassets|bowerassets|components)[\/\\].*\.js$/
+                        /[\/\\]bundles[\/\\](npmassets|components)[\/\\].*\.js$/
                     ]
                 },
                 stats: stats,
@@ -184,7 +184,7 @@ class ConfigBuilder {
                 },
                 module: {
                     noParse: [
-                        /[\/\\]bundles[\/\\](npmassets|bowerassets|components)[\/\\](?!jquery|asap)[\/\\].*\.js$/,
+                        /[\/\\]bundles[\/\\](npmassets|components)[\/\\](?!jquery|asap)[\/\\].*\.js$/,
                         /[\/\\]bundles[\/\\]\.*[\/\\]lib[\/\\](?!chaplin|bootstrap|jquery\.dialog).*\.js$/
                     ],
                     rules: [
@@ -272,7 +272,7 @@ class ConfigBuilder {
                     test: /\.js$/,
                     exclude: [
                         /[\/\\]platform[\/\\]build[\/\\]/,
-                        /[\/\\]bundles[\/\\](?:bowerassets|npmassets|components)[\/\\]/,
+                        /[\/\\]bundles[\/\\](?:npmassets|components)[\/\\]/,
                         /[\/\\]bundles[\/\\].+[\/\\]lib[\/\\]?/
                     ],
                     use: 'happypack/loader?id=babel'

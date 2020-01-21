@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WindowsBundle\Tests\Manager;
+namespace Oro\Bundle\WindowsBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,16 +9,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WindowsStateRequestManager */
-    protected $manager;
+    private $manager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     protected function setUp()
     {
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->manager = new WindowsStateRequestManager($this->requestStack);
     }

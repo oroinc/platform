@@ -9,9 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper;
 
 class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ChainAttributeBlockTypeMapper */
-    private $chainMapper;
-
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
@@ -20,16 +17,24 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+    }
 
-        $this->chainMapper = new ChainAttributeBlockTypeMapper($this->registry);
-        $this->chainMapper->setDefaultBlockType('default_block_type');
+    /**
+     * @param AttributeBlockTypeMapperInterface[] $mappers
+     *
+     * @return ChainAttributeBlockTypeMapper
+     */
+    private function getChainMapper(array $mappers = [])
+    {
+        $chainMapper = new ChainAttributeBlockTypeMapper($this->registry, $mappers);
+        $chainMapper->setDefaultBlockType('default_block_type');
+
+        return $chainMapper;
     }
 
     public function testGetBlockTypeFromProvider()
     {
-        $this->chainMapper->addBlockType('int', 'attribute_int');
-
         $attribute = new FieldConfigModel();
         $attribute->setType('string');
 
@@ -39,15 +44,14 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
             ->with($attribute)
             ->willReturn('attribute_string');
 
-        $this->chainMapper->addMapper($mapper);
+        $chainMapper = $this->getChainMapper([$mapper]);
+        $chainMapper->addBlockType('int', 'attribute_int');
 
-        $this->assertEquals('attribute_string', $this->chainMapper->getBlockType($attribute));
+        $this->assertEquals('attribute_string', $chainMapper->getBlockType($attribute));
     }
 
     public function testGetBlockTypeDefault()
     {
-        $this->chainMapper->addBlockType('string', 'attribute_string');
-
         $attribute = new FieldConfigModel();
         $attribute->setType('percent');
 
@@ -57,8 +61,9 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
             ->with($attribute)
             ->willReturn(null);
 
-        $this->chainMapper->addMapper($mapper);
+        $chainMapper = $this->getChainMapper([$mapper]);
+        $chainMapper->addBlockType('string', 'attribute_string');
 
-        $this->assertEquals('default_block_type', $this->chainMapper->getBlockType($attribute));
+        $this->assertEquals('default_block_type', $chainMapper->getBlockType($attribute));
     }
 }

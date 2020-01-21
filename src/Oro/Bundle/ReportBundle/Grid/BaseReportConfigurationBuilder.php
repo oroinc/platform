@@ -6,6 +6,12 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Entity\Report;
 
+/**
+ * Adds the following configuration parts to DatagridConfiguration by extending DatagridConfigurationBuilder:
+ * - properties
+ * - actions
+ * - translation hint
+ */
 class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
 {
     /**
@@ -50,7 +56,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $primaryKey = array_shift($identifiers);
         $entityAlias = $configuration->getOrmQuery()->findRootAlias($className);
 
-        if (!$entityAlias || !$primaryKey || count($identifiers) > 1 || !$this->isActionSupported($primaryKey)) {
+        if (!$entityAlias || !$primaryKey || count($identifiers) > 0 || !$this->isActionSupported($primaryKey)) {
             return $configuration;
         }
 
@@ -77,6 +83,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $configuration->getOrmQuery()->addSelect("{$entityAlias}.{$primaryKey}");
         $configuration->offsetAddToArrayByPath('[properties]', $properties);
         $configuration->offsetAddToArrayByPath('[actions]', $viewAction);
+        $configuration->offsetAddToArrayByPath('[source][hints]', ['HINT_TRANSLATABLE']);
 
         return $configuration;
     }

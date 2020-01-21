@@ -5,6 +5,9 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Responsible for resolving query configuration
+ */
 class ConfigurationResolver
 {
     /**
@@ -57,7 +60,7 @@ class ConfigurationResolver
     {
         switch (true) {
             // static call class::method or class::const
-            case preg_match('/^([^\'"%:\s]+)::([\w\._]+)$/', $val, $match):
+            case preg_match('/^([^\'\"\%\:\s]+)::([\w\.\_]+)$/', $val, $match):
                 $class  = $match[1];
                 $method = $match[2];
                 if (is_callable([$class, $method])) {
@@ -68,13 +71,13 @@ class ConfigurationResolver
                 }
                 break;
             // service method call @service->method
-            case preg_match('/^@([\w\._]+)->([\w\._]+)$/', $val, $match):
+            case preg_match('/^@([\w\.\_]+)->([\w\.\_]+)$/', $val, $match):
                 $service = $match[1];
                 $method  = $match[2];
                 $val     = $this->container->get($service)->$method();
                 break;
             // service pass @service
-            case preg_match('/^@([\w\._]+)$/', $val, $match):
+            case preg_match('/^@([\w\.\_]+)$/', $val, $match):
                 $val = $this->container->get($match[1]);
                 break;
         }

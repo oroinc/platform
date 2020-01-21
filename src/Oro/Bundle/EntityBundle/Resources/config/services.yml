@@ -142,9 +142,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\EntityProvider
         public: true
         parent: oro_entity.entity_provider.abstract
-
-    Oro\Bundle\EntityBundle\Provider\EntityProvider:
-        alias: oro_entity.entity_provider
+        lazy: true
 
     oro_entity.entity_field_provider.abstract:
         abstract: true
@@ -177,9 +175,8 @@ services:
 
     oro_entity.virtual_field_provider.chain:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
-        lazy: true
         arguments:
-            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass
+            - [] # providers
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_field_provider:
@@ -219,9 +216,8 @@ services:
 
     oro_entity.virtual_relation_provider.chain:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
-        lazy: true
         arguments:
-            - [] # providers. Set by Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass
+            - [] # providers
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_relation_provider.config:
@@ -252,13 +248,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
         public: true
         parent: oro_entity.entity_field_provider.abstract
-
-    Oro\Bundle\EntityBundle\Provider\EntityFieldProvider:
-        alias: oro_entity.entity_field_provider
-
-    oro_entity.entity_field_provider.link:
-        tags:
-            - { name: oro_service_link,  service: oro_entity.entity_field_provider }
+        lazy: true
 
     oro_entity.entity_field_list_provider:
         class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
@@ -266,7 +256,7 @@ services:
         arguments:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'
 
     oro_entity.format.simple_array:
         class: Oro\Bundle\EntityBundle\Formatter\SimpleArrayFormatter
@@ -394,7 +384,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameResolver
         public: true
         arguments:
-            - !tagged oro_entity.name_provider
+            - !tagged_iterator oro_entity.name_provider
             - '%oro_entity.entity_name_format.default%'
             - '@oro_entity.entity_configuration.provider'
 
@@ -461,7 +451,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
         public: false
         arguments:
-            - !tagged oro_entity.dictionary_value_list_provider
+            - !tagged_iterator oro_entity.dictionary_value_list_provider
 
     oro_entity.routing.options_resolver.dictionary_entity:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand;
-use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection;
 use Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter;
+use Oro\Bundle\TranslationBundle\Provider\TranslationAdaptersCollection;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
@@ -35,7 +35,7 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
         $this->translationDumper = $this->createMock(TranslationPackDumper::class);
         $this->translationServiceProvider = $this->createMock(TranslationServiceProvider::class);
         $this->translationPackageProvider = $this->createMock(TranslationPackageProvider::class);
-        $this->translationAdaptersCollection = new TranslationAdaptersCollection();
+        $this->translationAdaptersCollection = $this->createMock(TranslationAdaptersCollection::class);
     }
 
     public function testConfigure()

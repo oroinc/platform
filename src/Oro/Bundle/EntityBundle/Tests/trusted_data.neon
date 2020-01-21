@@ -6,6 +6,9 @@ trusted_data:
                 entityClass: true
                 alias: true
                 indexBy: true
+        Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor:
+            execute:
+                columnNamesWithNonNamedParameters: true
     properties:
         Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
             searchEntities:

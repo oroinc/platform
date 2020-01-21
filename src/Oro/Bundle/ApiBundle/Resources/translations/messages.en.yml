@@ -1,0 +1,9 @@
+oro:
+    api:
+        system_configuration:
+            groups:
+                web_api_settings:
+                    label: Web API
+            fields:
+                web_api:
+                    label: Enable API

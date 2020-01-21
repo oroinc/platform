@@ -2,6 +2,7 @@ oro:
     digitalasset:
         entity_label: Digital Asset
         entity_plural_label: Digital Assets
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description: Digital Asset represents a file asset which can be used as upload file for other entities.
 
         id.label: Id

@@ -69,10 +69,12 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The tag attribute "entity" is required for service "handler2".
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The attribute "entity" is required for "oro_entity.delete_handler" tag. Service: "handler2".
      */
+    // @codingStandardsIgnoreEnd
     public function testProcessWhenHandlerDoesNotHaveEntityTagAttribute()
     {
         $container = new ContainerBuilder();
@@ -93,10 +95,12 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The tag attribute "entity" is required for service "extension2".
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The attribute "entity" is required for "oro_entity.delete_handler_extension" tag. Service: "extension2".
      */
+    // @codingStandardsIgnoreEnd
     public function testProcessWhenExtensionDoesNotHaveEntityTagAttribute()
     {
         $container = new ContainerBuilder();
@@ -119,7 +123,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The service "handler2" must not have the tag "oro_entity.delete_handler" and the entity "Test\Entity1" because there is another service ("handler1") with this tag and entity. Use a decoration of "handler1" service to extend it or create a compiler pass for the dependency injection container to override "handler1" service completely.
      */
     // @codingStandardsIgnoreEnd
@@ -145,7 +149,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The service "extension2" must not have the tag "oro_entity.delete_handler_extension" and the entity "Test\Entity1" because there is another service ("extension1") with this tag and entity. Use a decoration of "extension1" service to extend it or create a compiler pass for the dependency injection container to override "extension1" service completely.
      */
     // @codingStandardsIgnoreEnd

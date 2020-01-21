@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\AccessRule;
 
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
@@ -66,12 +65,10 @@ class ActivityListAccessRule implements AccessRuleInterface
         $activityOwnerAlias = $criteria->getOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
         $expressions = [];
 
-        $providers = $this->activityListProvider->getProviders();
-        /** @var ActivityListProviderInterface $provider */
-        foreach ($providers as $provider) {
+        $activityClasses = $this->activityListProvider->getSupportedActivities();
+        foreach ($activityClasses as $activityClass) {
             $providerExpressions = [];
-            $activityClass = $provider->getActivityClass();
-            $aclClass = $provider->getAclClass();
+            $aclClass = $this->activityListProvider->getSupportedOwnerActivity($activityClass);
             $conditionData = $this->builder->getAclConditionData($aclClass, $criteria->getPermission());
 
             if (!empty($conditionData)) {

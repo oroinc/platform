@@ -47,10 +47,9 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         $serializer = $this->createMock(WorkflowAwareSerializer::class);
 
         $this->variableNormalizer = $this->getMockBuilder(WorkflowVariableNormalizer::class)
-            ->setConstructorArgs([$this->createMock(ManagerRegistry::class)])
+            ->setConstructorArgs([[$attributeNormalizer], $this->createMock(ManagerRegistry::class)])
             ->setMethods(['denormalizeVariable'])
             ->getMock();
-        $this->variableNormalizer->addAttributeNormalizer($attributeNormalizer);
         $this->variableNormalizer->setSerializer($serializer);
 
         $this->variableGuesser = $this->createMock(VariableGuesser::class);

@@ -4,11 +4,12 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonManagedTarget;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestNonActiveTarget;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestNonManagedTarget;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -18,41 +19,30 @@ use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActivityListChainProvider */
-    protected $activityListProvider;
+    private $activityListProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
-
-    /** @var PlaceholderFilter */
-    protected $filter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
-
-    /** @var array */
-    protected $entities = [];
+    private $doctrine;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    private $configManager;
+
+    /** @var PlaceholderFilter */
+    private $filter;
 
     public function setUp()
     {
-        $this->activityListProvider = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrine = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->activityListProvider = $this->createMock(ActivityListChainProvider::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->activityListProvider->expects($this->any())
             ->method('getTargetEntityClasses')
-            ->will($this->returnValue(['Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget']));
+            ->will($this->returnValue([TestTarget::class]));
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('\Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->setMethods(['isNewEntity', 'isManageableEntity'])
             ->setConstructorArgs([$this->doctrine])
             ->getMock();
@@ -66,16 +56,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
                 throw new \RuntimeException('Something wrong');
             }));
-
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
             ->willReturnCallback(function ($entity) {
                 return !$entity instanceof TestNonManagedTarget;
             });
 
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->filter = new PlaceholderFilter(
             $this->activityListProvider,
@@ -215,16 +202,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicableOnEmptyActivityList()
     {
-        $repo = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrine->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repo));
         $repo->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
-            ->with('Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget', 123)
+            ->with(TestNonActiveTarget::class, 123)
             ->willReturn(0);
 
         $entity = new TestNonActiveTarget(123);
@@ -261,16 +245,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicable()
     {
-        $repo = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrine->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repo));
         $repo->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
-            ->with('Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget', 123)
+            ->with(TestNonActiveTarget::class, 123)
             ->willReturn(10);
 
         $entity = new TestNonActiveTarget(123);

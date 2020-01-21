@@ -11,12 +11,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        return new DateAttributeType('date');
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('date', $this->getAttributeType()->getType());
+        return new DateAttributeType();
     }
 
     /**

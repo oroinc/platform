@@ -10,7 +10,6 @@ use Oro\Bundle\AddressBundle\Form\Type\CountryType;
 use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -55,7 +54,7 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
                 [
                     FormType::class => [
                         new AdditionalAttrExtension(),
-                        new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class)),
+                        new StripTagsExtensionStub($this),
                     ],
                 ]
             )

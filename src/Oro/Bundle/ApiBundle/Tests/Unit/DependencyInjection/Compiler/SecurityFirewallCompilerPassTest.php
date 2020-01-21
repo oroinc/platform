@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SecurityFirewallCompilerPass;
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
-use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
+use Oro\Bundle\ApiBundle\Security\FeatureDependedFirewallMap;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener as BaseExceptionListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,6 +28,42 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new SecurityFirewallCompilerPass();
+
+        $this->container->register('security.firewall.map', FirewallMap::class)
+            ->addArgument(new Reference('service_container'))
+            ->addArgument([]);
+        DependencyInjectionUtil::setConfig(
+            $this->container,
+            [
+                'api_firewalls' => [
+                    'testFirewall' => [
+                        'feature_name' => 'web_api'
+                    ]
+                ]
+            ]
+        );
+    }
+
+    private function assertFirewallMap()
+    {
+        $firewallMap = $this->container->getDefinition('security.firewall.map');
+        self::assertEquals(FeatureDependedFirewallMap::class, $firewallMap->getClass());
+        self::assertEquals(
+            new Reference('oro_featuretoggle.checker.feature_checker'),
+            $firewallMap->getArgument(2)
+        );
+        self::assertEquals(
+            new Reference('oro_api.security.firewall.feature_access_listener'),
+            $firewallMap->getArgument(3)
+        );
+        self::assertEquals(
+            [
+                'testFirewall' => [
+                    'feature_name' => 'web_api'
+                ]
+            ],
+            $firewallMap->getArgument(4)
+        );
     }
 
     public function testProcessOnEmptySecurityConfig()
@@ -32,6 +71,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->container->prependExtensionConfig('security', []);
 
         $this->compiler->process($this->container);
+        $this->assertFirewallMap();
     }
 
     public function testProcessOnEmptySecurityFirewallsConfig()
@@ -39,6 +79,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->container->prependExtensionConfig('security', ['firewalls' => []]);
 
         $this->compiler->process($this->container);
+        $this->assertFirewallMap();
     }
 
     public function testProcessOnNonStatelessFirewall()
@@ -49,6 +90,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->compiler->process($this->container);
+        $this->assertFirewallMap();
     }
 
     public function testProcessOnStatelessButWithoutContextFirewall()
@@ -59,6 +101,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->compiler->process($this->container);
+        $this->assertFirewallMap();
     }
 
     public function testProcessOnStatelessButWithoutMapContext()
@@ -69,6 +112,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->compiler->process($this->container);
+        $this->assertFirewallMap();
     }
 
     public function testProcess()
@@ -78,7 +122,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             ['firewalls' => ['testFirewall' => ['stateless' => true, 'context' => 'main']]]
         );
         $exceptionListener = new Reference('exceptionListener');
-        $exceptionListenerDefinition = new Definition(ExceptionListener::class, []);
+        $exceptionListenerDefinition = new Definition(BaseExceptionListener::class, []);
         $this->container->setDefinition(
             'exceptionListener',
             $exceptionListenerDefinition
@@ -98,11 +142,13 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($this->container);
 
+        $this->assertFirewallMap();
+
         $contextListener = $this->container->getDefinition('oro_security.context_listener.main');
         self::assertEquals('security.context_listener', $contextListener->getParent());
         self::assertEquals('main', $contextListener->getArgument(2));
         $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
-        self::assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
+        self::assertEquals(ContextListener::class, $contextFirewallListener->getClass());
         self::assertEquals(
             [
                 new Reference('oro_security.context_listener.main'),
@@ -112,7 +158,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             $contextFirewallListener->getArguments()
         );
         self::assertTrue($contextFirewallListener->hasMethodCall('setCsrfRequestManager'));
-        self::assertEquals(SecurityFirewallExceptionListener::class, $exceptionListenerDefinition->getClass());
+        self::assertEquals(ExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);
         self::assertCount(2, $listeners);

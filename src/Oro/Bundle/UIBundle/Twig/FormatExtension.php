@@ -103,7 +103,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         $router = $this->container->get('router');
 
         $prevBaseUrl = $router->getContext()->getBaseUrl();
-        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
+        $baseUrlWithoutFrontController = preg_replace('/\/[\w\_]+\.php$/', '', $prevBaseUrl);
         $router->getContext()->setBaseUrl($baseUrlWithoutFrontController);
 
         $url = $router->generate($name, $parameters);

@@ -2,59 +2,22 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Delegates a receiving breadcrumb information to child managers.
+ */
 class ChainBreadcrumbManager implements BreadcrumbManagerInterface
 {
-    /**
-     * @var ArrayCollection|BreadcrumbManager[]
-     */
-    protected $managers;
+    /** @var iterable|BreadcrumbManagerInterface[] */
+    private $managers;
 
     /**
-     * @var BreadcrumbManager
+     * @param iterable|BreadcrumbManagerInterface[] $managers
      */
-    protected $defaultManager;
-
-    public function __construct()
+    public function __construct(iterable $managers)
     {
-        $this->managers = new ArrayCollection();
-    }
-
-    /**
-     * @param BreadcrumbManagerInterface $manager
-     */
-    public function addManager(BreadcrumbManagerInterface $manager)
-    {
-        if ($this->managers->contains($manager)) {
-            return;
-        }
-
-        $this->managers->add($manager);
-    }
-
-    /**
-     * @param BreadcrumbManagerInterface $defaultManager
-     */
-    public function setDefaultManager(BreadcrumbManagerInterface $defaultManager)
-    {
-        $this->defaultManager = $defaultManager;
-    }
-
-    /**
-     * @param Route|string $route
-     * @return BreadcrumbManager
-     */
-    public function getSupportedManager($route = null)
-    {
-        foreach ($this->managers as $manager) {
-            if ($manager->supports($route)) {
-                return $manager;
-            }
-        }
-
-        return $this->defaultManager;
+        $this->managers = $managers;
     }
 
     /** {@inheritdoc} */
@@ -90,6 +53,28 @@ class ChainBreadcrumbManager implements BreadcrumbManagerInterface
     /** {@inheritdoc} */
     public function supports($route = null)
     {
-        return (bool)$this->getSupportedManager($route);
+        foreach ($this->managers as $manager) {
+            if ($manager->supports($route)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Route|string $route
+     *
+     * @return BreadcrumbManagerInterface
+     */
+    private function getSupportedManager($route = null): BreadcrumbManagerInterface
+    {
+        foreach ($this->managers as $manager) {
+            if ($manager->supports($route)) {
+                return $manager;
+            }
+        }
+
+        throw new \LogicException('A breadcrumb manager was not found.');
     }
 }

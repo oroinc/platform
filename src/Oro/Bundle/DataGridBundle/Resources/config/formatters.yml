@@ -4,14 +4,14 @@ services:
         arguments:
             - '@translator'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: field }
+            - { name: oro_datagrid.extension.formatter.property, type: field }
 
     oro_datagrid.extension.formatter.property.url_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\UrlProperty
         arguments:
             - '@router'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: url }
+            - { name: oro_datagrid.extension.formatter.property, type: url }
 
     oro_datagrid.extension.formatter.property.link_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty
@@ -19,27 +19,27 @@ services:
             - '@router'
             - '@twig'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: link }
+            - { name: oro_datagrid.extension.formatter.property, type: link }
 
     oro_datagrid.extension.formatter.property.twig_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty
         arguments:
             - '@twig'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: twig }
+            - { name: oro_datagrid.extension.formatter.property, type: twig }
 
     oro_datagrid.extension.formatter.property.translatable_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TranslatableProperty
         arguments:
             - '@translator'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: translatable }
+            - { name: oro_datagrid.extension.formatter.property, type: translatable }
 
     oro_datagrid.extension.formatter.property.callback_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty
         arguments: []
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: callback }
+            - { name: oro_datagrid.extension.formatter.property, type: callback }
 
     oro_datagrid.extension.formatter.property.localized_number_property:
         class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LocalizedNumberProperty
@@ -47,4 +47,4 @@ services:
             - '@translator'
             - '@oro_locale.formatter.number'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: localized_number }
+            - { name: oro_datagrid.extension.formatter.property, type: localized_number }

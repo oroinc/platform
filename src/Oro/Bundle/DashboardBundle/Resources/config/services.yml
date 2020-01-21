@@ -194,6 +194,8 @@ services:
 
     oro_dashboard.widget_config_value.provider:
         class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
+        arguments:
+            - ~ # service locator for value converters
 
     oro_dashboard.widget_config_value.date_range.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter
@@ -273,6 +275,7 @@ services:
         class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
         public: true
         arguments:
+            - ~ # service locator for value providers
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
 
@@ -314,15 +317,17 @@ services:
             - { name: form.type, alias: oro_dashboard_query_filter }
 
     oro_dashboard.config_extension.feature:
-        class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }
 
     oro_dashboard.widget_provider.filter_manager:
-        class: 'Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager'
+        class: Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager
+        arguments:
+            - !tagged_iterator oro_dashboard.widget_provider.filter
 
     oro_dashboard.widget_provider.filter.owners:
-        class: 'Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter'
+        class: Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter
         arguments:
             - '@oro_user.dashboard.owner_helper'
         tags:

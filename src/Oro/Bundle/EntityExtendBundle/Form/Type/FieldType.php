@@ -86,7 +86,11 @@ class FieldType extends AbstractType
             Select2ChoiceType::class,
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
-                'choice_attr' => function ($choiceKey) {
+                'choice_attr' => function ($choiceKey) use ($options) {
+                    if (in_array($choiceKey, $options['excludeTypes'])) {
+                        return ['disabled' => 'disabled'];
+                    }
+
                     $parts = explode('||', $choiceKey);
 
                     return count($parts) === 2 && ExtendHelper::getRelationType($parts[0])
@@ -113,6 +117,7 @@ class FieldType extends AbstractType
             ->setRequired(['class_name'])
             ->setDefaults(
                 [
+                    'excludeTypes' => [],
                     'jsmodules'   => [],
                     'block_config' => [
                         'general' => [
@@ -137,6 +142,7 @@ class FieldType extends AbstractType
         $validation[FieldNameLength::class]['max'] = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
 
         $fieldName->vars['attr']['data-validation'] = \json_encode($validation);
+        $view->vars['excludeTypes'] = $options['excludeTypes'];
     }
 
     /**

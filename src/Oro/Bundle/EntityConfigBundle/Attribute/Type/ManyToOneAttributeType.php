@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about many-to-one association attribute type.
+ */
 class ManyToOneAttributeType implements AttributeTypeInterface
 {
     /** @var EntityNameResolver */
@@ -23,14 +26,6 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     {
         $this->entityNameResolver = $entityNameResolver;
         $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'manyToOne';
     }
 
     /**

@@ -1,0 +1,8 @@
+{% if draftableFields|length > 0 %}
+    {{ 'oro.draft.operations.create.confirmation.body_title'|trans }}
+    <ul>
+        {%- for field in draftableFields -%}
+                <li>{{ field  }}</li>
+        {%- endfor -%}
+    </ul>
+{% endif %}

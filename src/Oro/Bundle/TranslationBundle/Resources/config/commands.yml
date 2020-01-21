@@ -29,10 +29,10 @@ services:
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand:
         arguments:
-            - '@Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper'
+            - '@oro_translation.translation_pack_dumper'
             - '@oro_translation.service_provider'
             - '@oro_translation.packages_provider.translation'
-            - '@Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection'
+            - '@oro_translation.translation_adapters_collection'
             - '%kernel.project_dir%'
         tags:
             - { name: console.command }

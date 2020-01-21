@@ -3,35 +3,27 @@
 namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 
-class MenuContentProvider extends AbstractContentProvider
+/**
+ * Renders a specific menu item.
+ */
+class MenuContentProvider implements ContentProviderInterface
 {
-    /**
-     * @var MenuExtension
-     */
-    protected $menuExtension;
+    /** @var MenuExtension */
+    private $menuExtension;
 
-    /**
-     * @var string
-     */
-    protected $menu;
-
-    /**
-     * @var string
-     */
-    protected $name;
+    /** @var string */
+    private $menu;
 
     /**
      * @param MenuExtension $menuExtension
-     * @param string $menu
-     * @param string $name
+     * @param string        $menu
      */
-    public function __construct(MenuExtension $menuExtension, $menu, $name)
+    public function __construct(MenuExtension $menuExtension, string $menu)
     {
         $this->menuExtension = $menuExtension;
         $this->menu = $menu;
-        $this->name = $name;
     }
 
     /**
@@ -40,13 +32,5 @@ class MenuContentProvider extends AbstractContentProvider
     public function getContent()
     {
         return $this->menuExtension->render($this->menu);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 }

@@ -4,32 +4,29 @@ namespace Oro\Component\Routing\Resolver;
 
 use Symfony\Component\Routing\Route;
 
+/**
+ * Delegates the resolving of route options to child resolvers.
+ */
 class ChainRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    /** @var RouteOptionsResolverInterface[] */
-    protected $resolvers = [];
+    /** @var iterable|RouteOptionsResolverInterface[] */
+    private $resolvers;
+
+    /**
+     * @param iterable|RouteOptionsResolverInterface[] $resolvers
+     */
+    public function __construct(iterable $resolvers)
+    {
+        $this->resolvers = $resolvers;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (empty($this->resolvers)) {
-            return;
-        }
-
         foreach ($this->resolvers as $resolver) {
             $resolver->resolve($route, $routes);
         }
-    }
-
-    /**
-     * Adds a route option resolver to the chain
-     *
-     * @param RouteOptionsResolverInterface $resolver The route option resolver
-     */
-    public function addResolver(RouteOptionsResolverInterface $resolver)
-    {
-        $this->resolvers[] = $resolver;
     }
 }

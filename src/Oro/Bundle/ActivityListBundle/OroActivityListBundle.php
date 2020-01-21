@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle;
 
-use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvidersPass;
+use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * The ActivityListBundle bundle class.
+ */
 class OroActivityListBundle extends Bundle
 {
     /**
@@ -15,6 +18,6 @@ class OroActivityListBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ActivityListProvidersPass());
+        $container->addCompilerPass(new ActivityListProviderPass());
     }
 }
