@@ -82,7 +82,7 @@ class SetDefaultValueForFieldsFilter implements ProcessorInterface
                     sprintf(AddFieldsFilter::FILTER_DESCRIPTION_TEMPLATE, $entityType)
                 );
                 $filter->setArrayAllowed(true);
-                $filters->add($filterKey, $filter);
+                $filters->add($filterKey, $filter, false);
             }
         }
 
@@ -90,7 +90,7 @@ class SetDefaultValueForFieldsFilter implements ProcessorInterface
         if ($includeFilterName && !$filters->has($includeFilterName)) {
             $filter = new IncludeFilter(DataType::STRING, AddIncludeFilter::FILTER_DESCRIPTION);
             $filter->setArrayAllowed(true);
-            $filters->add($includeFilterName, $filter);
+            $filters->add($includeFilterName, $filter, false);
         }
     }
 }

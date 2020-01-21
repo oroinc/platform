@@ -11,8 +11,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether the "include" filter exists and if so,
- * adds the corresponding configuration extra into the context.
+ * Checks whether the "include" filter exists,
+ * and if so, adds the corresponding configuration extra into the context.
  * This filter is used to specify which related entities should be returned.
  */
 class HandleIncludeFilter implements ProcessorInterface

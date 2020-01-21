@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -63,13 +65,6 @@ class BuildFormBuilder implements ProcessorInterface
         $parentConfig = $context->getParentConfig();
         $associationName = $context->getAssociationName();
 
-        $formOptions = $parentConfig->getFormOptions();
-        if (null === $formOptions) {
-            $formOptions = [];
-        }
-        if (!\array_key_exists('data_class', $formOptions)) {
-            $formOptions['data_class'] = $context->getParentClassName();
-        }
         $formEventSubscribers = null;
         if (!$parentConfig->getFormType()) {
             $formEventSubscribers = $parentConfig->getFormEventSubscribers();
@@ -77,7 +72,7 @@ class BuildFormBuilder implements ProcessorInterface
         $formBuilder = $this->formHelper->createFormBuilder(
             FormType::class,
             $context->getParentEntity(),
-            $formOptions,
+            $this->getFormOptions($context, $parentConfig),
             $formEventSubscribers
         );
         $this->formHelper->addFormField(
@@ -88,5 +83,25 @@ class BuildFormBuilder implements ProcessorInterface
         );
 
         return $formBuilder;
+    }
+
+    /**
+     * @param ChangeRelationshipContext $context
+     * @param EntityDefinitionConfig    $parentConfig
+     *
+     * @return array
+     */
+    protected function getFormOptions(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig)
+    {
+        $options = $parentConfig->getFormOptions();
+        if (null === $options) {
+            $options = [];
+        }
+        if (!\array_key_exists('data_class', $options)) {
+            $options['data_class'] = $context->getParentClassName();
+        }
+        $options[CustomizeFormDataHandler::API_CONTEXT] = $context;
+
+        return $options;
     }
 }

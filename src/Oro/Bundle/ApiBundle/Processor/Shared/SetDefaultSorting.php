@@ -73,7 +73,8 @@ class SetDefaultSorting implements ProcessorInterface
                     function ($value) {
                         return $this->convertDefaultValueToString($value);
                     }
-                )
+                ),
+                false
             );
         }
     }
