@@ -13,7 +13,12 @@ use Symfony\Component\Process\Process;
  */
 class MessageQueueProcessor implements MessageQueueProcessorInterface
 {
-    const CONSUMERS_AMOUNT = 1;
+    private const CONSUMERS_AMOUNT = 1;
+
+    /**
+     * Maximum number of retries to start consuming after a failure.
+     */
+    private const MAX_RETRIES = 10;
 
     /** @var KernelInterface */
     private $kernel;
@@ -23,6 +28,9 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
 
     /** @var \DateTime */
     private $lastCacheStateChangeDate;
+
+    /** @var int */
+    private $retries = 0;
 
     /**
      * @param KernelInterface $kernel
@@ -96,11 +104,16 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
             $cacheChangeDate = $cacheState->getChangeDate();
             if (null === $cacheChangeDate || $cacheChangeDate > $this->lastCacheStateChangeDate) {
                 $this->lastCacheStateChangeDate = $cacheChangeDate;
-                $this->stopMessageQueue();
-                $this->startMessageQueue();
             } else {
+                ++$this->retries;
+            }
+
+            if ($this->retries >= self::MAX_RETRIES) {
                 throw new \RuntimeException('Message Queue is not running');
             }
+
+            $this->stopMessageQueue();
+            $this->startMessageQueue();
         }
     }
 
