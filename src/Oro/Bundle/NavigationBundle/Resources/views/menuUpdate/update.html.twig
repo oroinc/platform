@@ -115,25 +115,27 @@
 {% block content_data %}
     {% set id = 'menu-update-edit' %}
 
-    {% set dataBlocks = [] %}
-    {% if entity.isDivider == false %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'General Information'|trans,
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_row(form.titles),
-                        form.uri is defined ? form_row(form.uri) : null,
-                        form.aclResourceId is defined ? form_row(form.aclResourceId) : null,
-                        form_row(form.icon),
-                        form_row(form.descriptions)
+    {% set content %}
+        {% block content_column %}
+            {% set dataBlocks = [] %}
+            {% if entity.isDivider == false %}
+                {% set dataBlocks = dataBlocks|merge([{
+                    'title': 'General Information'|trans,
+                    'class': 'active',
+                    'subblocks': [
+                        {
+                            'title': '',
+                            'data': [
+                            form_row(form.titles),
+                            form.uri is defined ? form_row(form.uri) : null,
+                            form.aclResourceId is defined ? form_row(form.aclResourceId) : null,
+                            form_row(form.icon),
+                            form_row(form.descriptions)
+                        ]
+                        }
                     ]
-                }
-            ]
-        }]) %}
-    {% endif %}
+                }]) %}
+            {% endif %}
 
     {% set additionalData = [] %}
     {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
@@ -150,12 +152,14 @@
         }] ) %}
     {% endif %}
 
-    {% set data = {
-        'formErrors': form_errors(form)? form_errors(form) : null,
-        'dataBlocks': dataBlocks,
-    } %}
+            {% set data = {
+                'formErrors': form_errors(form)? form_errors(form) : null,
+                'dataBlocks': dataBlocks,
+            } %}
 
-    {% set twoColumnContent = parent() %}
+            {{ block('content_data', 'OroUIBundle:actions:update.html.twig') }}
+        {% endblock content_column %}
+    {% endset %}
 
     {% set treeOptions = {
         'view' : 'oronavigation/js/app/views/tree-manage-view',
@@ -193,7 +197,7 @@
             {% block content %}
                 {% autoescape %}
                     <div class="category-data">
-                        {{ twoColumnContent|raw}}
+                        {{ content|raw}}
                     </div>
                 {% endautoescape %}
             {% endblock content %}
