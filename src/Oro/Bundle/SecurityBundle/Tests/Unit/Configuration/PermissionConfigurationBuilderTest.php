@@ -3,13 +3,19 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\StubEntity;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\StubInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
@@ -20,6 +26,11 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     protected $validator;
 
     /**
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $entityManager;
+
+    /**
      * @var PermissionConfigurationBuilder
      */
     protected $builder;
@@ -27,20 +38,15 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository $repository */
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
-            ->with('OroSecurityBundle:PermissionEntity')
+            ->with(PermissionEntity::class)
             ->willReturn($repository);
-
         $doctrineHelper->expects($this->any())
             ->method('isManageableEntityClass')
             ->willReturnMap([
@@ -49,9 +55,10 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ['EntityNotManageable', false],
             ]);
 
-        $this->validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
 
-        $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator);
+        $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator, $this->entityManager);
     }
 
     protected function tearDown()
@@ -63,7 +70,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      * @param array $expected
      * @param Permission $definition
      */
-    protected function assertDefinitionConfiguration(array $expected, Permission $definition)
+    protected function assertDefinitionConfiguration(array $expected, Permission $definition): void
     {
         $this->assertSame($expected['label'], $definition->getLabel());
         $this->assertSame($expected['apply_to_all'], $definition->isApplyToAll());
@@ -78,28 +85,32 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      * @param array $expected
      * @dataProvider buildPermissionsDataProvider
      */
-    public function testBuildPermissions(array $configuration, array $expected)
+    public function testBuildPermissions(array $configuration, array $expected): void
     {
+        $this->mockEntityManager(['Entity1', 'Entity2', StubEntity::class]);
+
         $this->validator->expects($this->any())
             ->method('validate')
-            ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))
+            ->with($this->isInstanceOf(Permission::class))
             ->willReturn(new ConstraintViolationList());
 
         $permissions = $this->builder->buildPermissions($configuration);
 
         $this->assertSameSize($expected, $permissions);
         foreach ($permissions as $permission) {
-            $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission', $permission);
+            $this->assertInstanceOf(Permission::class, $permission);
             $this->assertArrayHasKey($permission->getName(), $expected);
             $this->assertDefinitionConfiguration($expected[$permission->getName()], $permission);
         }
     }
 
-    public function testBuildPermissionsException()
+    public function testBuildPermissionsException(): void
     {
+        $this->mockEntityManager([]);
+
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))
+            ->with($this->isInstanceOf(Permission::class))
             ->willReturn(
                 new ConstraintViolationList(
                     [
@@ -108,7 +119,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $this->expectException('\Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectException(ValidatorException::class);
         $this->expectExceptionMessage(
             sprintf('Configuration of permission test_permission is invalid:%s    Test message', PHP_EOL)
         );
@@ -126,10 +137,11 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function buildPermissionsDataProvider()
+    public function buildPermissionsDataProvider(): array
     {
         $permissionEntity1 = (new PermissionEntity())->setName('Entity1');
         $permissionEntity2 = (new PermissionEntity())->setName('Entity2');
+        $permissionEntityByInterface = (new PermissionEntity())->setName(StubEntity::class);
 
         return [
             [
@@ -145,6 +157,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                         'group_names' => ['frontend', 'default'],
                         'exclude_entities' => [$permissionEntity1->getName(), $permissionEntity1->getName()],
                         'apply_to_entities' => [$permissionEntity2->getName(), $permissionEntity2->getName()],
+                        'apply_to_interfaces' => [StubInterface::class],
                         'description' => 'Test description',
                     ],
                 ],
@@ -164,11 +177,33 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                         'apply_to_all' => false,
                         'group_names' => ['frontend', 'default'],
                         'exclude_entities' => new ArrayCollection([$permissionEntity1]),
-                        'apply_to_entities' => new ArrayCollection([$permissionEntity2]),
+                        'apply_to_entities' => new ArrayCollection(
+                            [$permissionEntity2, $permissionEntityByInterface]
+                        ),
                         'description' => 'Test description',
                     ],
                 ]
             ]
         ];
+    }
+
+    /**
+     * @param string[] $expectedClassNames
+     */
+    private function mockEntityManager(array $expectedClassNames): void
+    {
+        $mappingDriver = $this->createMock(MappingDriver::class);
+        $mappingDriver->expects($this->once())
+            ->method('getAllClassNames')
+            ->willReturn($expectedClassNames);
+
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects($this->once())
+            ->method('getMetadataDriverImpl')
+            ->willReturn($mappingDriver);
+
+        $this->entityManager->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn($configuration);
     }
 }

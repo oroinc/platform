@@ -1,7 +1,7 @@
 aliases:
-    Fuse$: bowerassets/fuse/dist/fuse
+    Fuse$: npmassets/fuse.js/dist/fuse
     asap$: npmassets/asap/asap
-    autolinker$: bowerassets/autolinker.js/dist/Autolinker
+    autolinker$: npmassets/autolinker/dist/Autolinker
     backbone$: npmassets/backbone/backbone
     base64$: oroui/js/extend/base64
     bootstrap$: oroui/js/bootstrap
@@ -17,31 +17,31 @@ aliases:
     bootstrap-util$: npmassets/bootstrap/js/dist/util
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
-    cryptojs/core$: bowerassets/crypto-js/core
-    cryptojs/enc-base64$: bowerassets/crypto-js/enc-base64
-    cryptojs/hmac$: bowerassets/crypto-js/hmac
-    cryptojs/hmac-sha256$: bowerassets/crypto-js/hmac-sha256
-    cryptojs/pbkdf2$: bowerassets/crypto-js/pbkdf2
-    cryptojs/sha1$: bowerassets/crypto-js/sha1
-    cryptojs/sha256$: bowerassets/crypto-js/sha256
+    cryptojs/core$: npmassets/crypto-js/core
+    cryptojs/enc-base64$: npmassets/crypto-js/enc-base64
+    cryptojs/hmac$: npmassets/crypto-js/hmac
+    cryptojs/hmac-sha256$: npmassets/crypto-js/hmac-sha256
+    cryptojs/pbkdf2$: npmassets/crypto-js/pbkdf2
+    cryptojs/sha1$: npmassets/crypto-js/sha1
+    cryptojs/sha256$: npmassets/crypto-js/sha256
     css-vars-ponyfill$: npmassets/css-vars-ponyfill/dist/css-vars-ponyfill
-    datepair$: bowerassets/datepair/dist/datepair
+    datepair$: npmassets/datepair.js/dist/datepair
     extend-popper$: oroui/js/extend/popper
     jquery$: npmassets/jquery/dist/jquery
     jquery-ui$: oroui/js/jquery-ui
-    jquery.cookie$: bowerassets/jquery-cookie/jquery.cookie
-    jquery.form$: bowerassets/jquery-form/src/jquery.form
-    jquery.jstree$: bowerassets/jstree/dist/jstree
+    jquery.cookie$: npmassets/jquery.cookie/jquery.cookie
+    jquery.form$: npmassets/jquery-form/src/jquery.form
+    jquery.jstree$: npmassets/jstree/dist/jstree
     jquery.minicolors$: oroui/lib/minicolors/jquery.minicolors
-    jquery.mousewheel$: bowerassets/jquery-mousewheel/jquery.mousewheel
-    jquery.multiselect$: bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.min
-    jquery.multiselect.filter$: bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
-    jquery.numeric$: bowerassets/jquery.numeric/jquery.numeric
-    jquery.select2$: bowerassets/select2/select2
+    jquery.mousewheel$: npmassets/jquery-mousewheel/jquery.mousewheel
+    jquery.multiselect$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.min
+    jquery.multiselect.filter$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
+    jquery.numeric$: npmassets/jquery-numeric/jquery.numeric
+    jquery.select2$: npmassets/@oroinc/select2/select2
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
-    jquery.timepicker$: bowerassets/timepicker/jquery.timepicker
+    jquery.timepicker$: npmassets/timepicker/jquery.timepicker
     jquery.uniform$: npmassets/jquery.uniform/src/js/jquery.uniform
-    lightgallery$: bowerassets/lightgallery/dist/js/lightgallery
+    lightgallery$: npmassets/lightgallery/dist/js/lightgallery
     lightgallery.print$: oroui/js/lightgallery/lg-print
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
@@ -149,6 +149,7 @@ dynamic-imports:
         - oroui/js/modal
         - oroui/js/standart-confirmation
         - oroui/js/tools/api-accessor
+        - oroui/js/tools/manage-focus
         - oroui/js/tools/search-api-accessor
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget

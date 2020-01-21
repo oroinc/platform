@@ -219,14 +219,6 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            WebSocketSendProcessor::NAME,
-            $this->processor->getName()
-        );
-    }
-
     public function testGetLabel()
     {
         $this->assertEquals(

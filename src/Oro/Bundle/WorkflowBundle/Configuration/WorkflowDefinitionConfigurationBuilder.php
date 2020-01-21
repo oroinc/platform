@@ -7,27 +7,34 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
-class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
+/**
+ * The builder for workflow definitions.
+ */
+class WorkflowDefinitionConfigurationBuilder
 {
     /** @var WorkflowAssembler */
-    protected $workflowAssembler;
+    private $workflowAssembler;
 
-    /** @var WorkflowDefinitionBuilderExtensionInterface[] */
-    protected $extensions = [];
+    /** @var iterable|WorkflowDefinitionBuilderExtensionInterface[] */
+    private $extensions;
 
     /**
-     * @param WorkflowAssembler $workflowAssembler
+     * @param WorkflowAssembler                                      $workflowAssembler
+     * @param iterable|WorkflowDefinitionBuilderExtensionInterface[] $extensions
      */
-    public function __construct(WorkflowAssembler $workflowAssembler)
+    public function __construct(WorkflowAssembler $workflowAssembler, iterable $extensions)
     {
         $this->workflowAssembler = $workflowAssembler;
+        $this->extensions = $extensions;
     }
 
     /**
      * @param array $configurationData
+     *
      * @return WorkflowDefinition[]
      */
     public function buildFromConfiguration(array $configurationData)
@@ -42,7 +49,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
     /**
      * @param string $name
-     * @param array $configuration
+     * @param array  $configuration
+     *
      * @return WorkflowDefinition
      */
     public function buildOneFromConfiguration($name, array $configuration)
@@ -51,35 +59,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             $configuration = $extension->prepare($name, $configuration);
         }
 
-        $this->assertConfigurationOptions($configuration, ['entity']);
+        if (!isset($configuration['entity'])) {
+            throw new MissedRequiredOptionException('The "entity" configuration option is required.');
+        }
 
-        $system = $this->getConfigurationOption($configuration, 'is_system', false);
-        $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
-        $entityAttributeName = $this->getConfigurationOption(
-            $configuration,
-            'entity_attribute',
-            WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
-        );
-        $stepsDisplayOrdered = $this->getConfigurationOption(
-            $configuration,
-            'steps_display_ordered',
-            false
-        );
-        $activeGroups = $this->getConfigurationOption(
-            $configuration,
-            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-            []
-        );
-        $recordGroups = $this->getConfigurationOption(
-            $configuration,
-            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
-            []
-        );
-        $applications = $this->getConfigurationOption(
-            $configuration,
-            WorkflowConfiguration::NODE_APPLICATIONS,
-            [CurrentApplicationProviderInterface::DEFAULT_APPLICATION]
-        );
+        $system = $configuration['is_system'] ?? false;
+        $startStepName = $configuration['start_step'] ?? null;
+        $entityAttributeName = $configuration['entity_attribute'] ?? WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE;
+        $stepsDisplayOrdered = $configuration['steps_display_ordered'] ?? false;
+        $activeGroups = $configuration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS] ?? [];
+        $recordGroups = $configuration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS] ?? [];
+        $applications = $configuration[WorkflowConfiguration::NODE_APPLICATIONS]
+            ?? [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -111,9 +102,9 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow $workflow
+     * @param Workflow           $workflow
      */
-    protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    private function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $workflowSteps = [];
         foreach ($workflow->getStepManager()->getSteps() as $step) {
@@ -132,9 +123,9 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow $workflow
+     * @param Workflow           $workflow
      */
-    protected function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    private function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $entityAcls = [];
         foreach ($workflow->getAttributeManager()->getEntityAttributes() as $attribute) {
@@ -164,7 +155,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      * @param WorkflowDefinition $workflowDefinition
      * @param Workflow           $workflow
      */
-    protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    private function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $restrictions = $workflow->getRestrictions();
         $workflowRestrictions = [];
@@ -184,12 +175,12 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     }
 
     /**
-     * Collect init context of all start transitions
+     * Collects init context of all start transitions.
      *
-     * @param Workflow $workflow
+     * @param Workflow           $workflow
      * @param WorkflowDefinition $definition
      */
-    protected function processInitContext(Workflow $workflow, WorkflowDefinition $definition)
+    private function processInitContext(Workflow $workflow, WorkflowDefinition $definition)
     {
         $initData = [];
         foreach ($workflow->getTransitionManager()->getStartTransitions() as $startTransition) {
@@ -208,9 +199,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
     /**
      * @param array $configuration
+     *
      * @return array
      */
-    protected function filterConfiguration(array $configuration)
+    private function filterConfiguration(array $configuration)
     {
         $configurationKeys = [
             WorkflowDefinition::CONFIG_SCOPES,
@@ -230,13 +222,5 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
-    }
-
-    /**
-     * @param WorkflowDefinitionBuilderExtensionInterface $extension
-     */
-    public function addExtension(WorkflowDefinitionBuilderExtensionInterface $extension)
-    {
-        $this->extensions[] = $extension;
     }
 }

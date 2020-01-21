@@ -2,40 +2,28 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
-use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
-use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var Config
-     */
-    protected $entityConfig;
+    /** @var ConfigProvider */
+    private $configProvider;
 
-    /**
-     * @var Config
-     */
-    protected $fieldConfig;
+    /** @var Config */
+    private $entityConfig;
 
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
+    /** @var Config */
+    private $fieldConfig;
 
     protected function setUp()
     {
@@ -44,9 +32,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('testScope', DemoEntity::ENTITY_NAME, 'testField', 'string')
         );
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->configManager->expects($this->any())->method('getConfig')->will($this->returnValue($this->entityConfig));
         $this->configManager->expects($this->any())
@@ -72,6 +58,15 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
+    public function getIdProvider()
+    {
+        return [
+            [null, null, null, new EntityConfigId('testScope')],
+            ['TestCls', null, null, new EntityConfigId('testScope', 'TestCls')],
+            ['TestCls', 'fieldName', 'int', new FieldConfigId('testScope', 'TestCls', 'fieldName', 'int')],
+        ];
+    }
+
     public function testConfig()
     {
         $this->assertEquals($this->configManager, $this->configProvider->getConfigManager());
@@ -93,40 +88,15 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfigById($entityConfigIdWithOtherScope));
     }
 
-    public function testGetClassName()
-    {
-        $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName(DemoEntity::ENTITY_NAME));
-
-        $className  = DemoEntity::ENTITY_NAME;
-        $demoEntity = new $className();
-        $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName($demoEntity));
-
-        $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName(array($demoEntity)));
-
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetadata->expects($this->once())->method('getName')->will($this->returnValue(DemoEntity::ENTITY_NAME));
-
-        $connectionMock       = new ConnectionMock(array(), new DriverMock());
-        $emMock               = EntityManagerMock::create($connectionMock);
-        $persistentCollection = new PersistentCollection($emMock, $classMetadata, new ArrayCollection);
-
-        $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName($persistentCollection));
-
-        $this->expectException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
-        $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName(array()));
-    }
-
     public function testGetIds()
     {
         $this->configManager->expects($this->once())
             ->method('getIds')
             ->with('testScope', DemoEntity::ENTITY_NAME, false)
-            ->will($this->returnValue(array($this->entityConfig->getId())));
+            ->will($this->returnValue([$this->entityConfig->getId()]));
 
         $this->assertEquals(
-            array($this->entityConfig->getId()),
+            [$this->entityConfig->getId()],
             $this->configProvider->getIds(DemoEntity::ENTITY_NAME)
         );
     }
@@ -136,10 +106,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getIds')
             ->with('testScope', DemoEntity::ENTITY_NAME, true)
-            ->will($this->returnValue(array($this->entityConfig->getId())));
+            ->will($this->returnValue([$this->entityConfig->getId()]));
 
         $this->assertEquals(
-            array($this->entityConfig->getId()),
+            [$this->entityConfig->getId()],
             $this->configProvider->getIds(DemoEntity::ENTITY_NAME, true)
         );
     }
@@ -149,10 +119,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getConfigs')
             ->with('testScope', DemoEntity::ENTITY_NAME, false)
-            ->will($this->returnValue(array($this->entityConfig)));
+            ->will($this->returnValue([$this->entityConfig]));
 
         $this->assertEquals(
-            array($this->entityConfig),
+            [$this->entityConfig],
             $this->configProvider->getConfigs(DemoEntity::ENTITY_NAME)
         );
     }
@@ -162,10 +132,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getConfigs')
             ->with('testScope', DemoEntity::ENTITY_NAME, true)
-            ->will($this->returnValue(array($this->entityConfig)));
+            ->will($this->returnValue([$this->entityConfig]));
 
         $this->assertEquals(
-            array($this->entityConfig),
+            [$this->entityConfig],
             $this->configProvider->getConfigs(DemoEntity::ENTITY_NAME, true)
         );
     }
@@ -175,12 +145,12 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getConfigs')
             ->with('testScope', DemoEntity::ENTITY_NAME, false)
-            ->will($this->returnValue(array($this->entityConfig)));
+            ->will($this->returnValue([$this->entityConfig]));
 
         $entityConfig = new Config(new EntityConfigId('testScope', DemoEntity::ENTITY_NAME));
         $entityConfig->set('key', 'value');
         $this->assertEquals(
-            array($entityConfig),
+            [$entityConfig],
             $this->configProvider->map(
                 function (ConfigInterface $config) {
                     return $config->set('key', 'value');
@@ -195,10 +165,10 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getConfigs')
             ->with('testScope', DemoEntity::ENTITY_NAME, false)
-            ->will($this->returnValue(array($this->entityConfig)));
+            ->will($this->returnValue([$this->entityConfig]));
 
         $this->assertEquals(
-            array(),
+            [],
             $this->configProvider->filter(
                 function (ConfigInterface $config) {
                     return $config->getId()->getScope() == 'wrongScope';
@@ -206,14 +176,5 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
                 DemoEntity::ENTITY_NAME
             )
         );
-    }
-
-    public function getIdProvider()
-    {
-        return [
-            [null, null, null, new EntityConfigId('testScope')],
-            ['TestCls', null, null, new EntityConfigId('testScope', 'TestCls')],
-            ['TestCls', 'fieldName', 'int', new FieldConfigId('testScope', 'TestCls', 'fieldName', 'int')],
-        ];
     }
 }

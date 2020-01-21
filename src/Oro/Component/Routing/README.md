@@ -28,85 +28,16 @@ services:
             - [setResolver, [@routing.resolver]]
         tags:
             - { name: routing.loader }
+```
 
+Here we also have registered the chain route options resolver service which allows to add resolvers from any bundle. There are several ways how to allow a bundle to register own route options resolver in the chain resolver, but most common way is to use DI container tags. The following example shows how to register tagged resolvers:
+
+``` yaml
+services:
     acme.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
-        public: false
-```
-
-Here we also have registered the chain route options resolver service which allows to add resolvers from any bundle. There are several ways how to allow a bundle to register own route options resolver in the chain resolver, but most common way is to use DI container tags. The following example shows implementation a compiler pass for DI container to load tagged resolvers:
-
-``` php
-<?php
-
-namespace Acme\Bundle\AppBundle\DependencyInjection\Compiler;
-
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-
-class RoutingOptionsResolverPass implements CompilerPassInterface
-{
-    const CHAIN_RESOLVER_SERVICE = 'acme.routing_options_resolver';
-    const RESOLVER_TAG_NAME = 'routing.options_resolver';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition(self::CHAIN_RESOLVER_SERVICE)) {
-            return;
-        }
-
-        // find resolvers
-        $resolvers      = [];
-        $taggedServices = $container->findTaggedServiceIds(self::RESOLVER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $resolvers[$priority][] = new Reference($id);
-        }
-        if (empty($resolvers)) {
-            return;
-        }
-
-        // sort by priority and flatten
-        ksort($resolvers);
-        $resolvers = call_user_func_array('array_merge', $resolvers);
-
-        // register
-        $chainResolverDef = $container->getDefinition(self::CHAIN_RESOLVER_SERVICE);
-        foreach ($resolvers as $resolver) {
-            $chainResolverDef->addMethodCall('addResolver', [$resolver]);
-        }
-    }
-}
-```
-
-Now you need to register this compiler pass:
-
-``` php
-<?php
-
-namespace Acme\Bundle\AppBundle;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Acme\Bundle\AppBundle\DependencyInjection\Compiler\RoutingOptionsResolverPass;
-
-class AcmeAppBundle extends Bundle
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new RoutingOptionsResolverPass());
-    }
-}
+        arguments:
+            - !tagged_iterator routing.options_resolver
 ```
 
 The last thing you need to do is to register a root routing resource for your application in `config/routing.yml`:

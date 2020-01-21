@@ -75,8 +75,6 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             LocalizedFallbackValueCollectionType::FIELD_IDS => [],
         ];
 
-        $propertyAccessor = $this->getPropertyAccessor();
-
         foreach ($value as $localizedFallbackValue) {
             /* @var $localizedFallbackValue LocalizedFallbackValue */
             $localization = $localizedFallbackValue->getLocalization();
@@ -86,25 +84,40 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
                 $key = 0;
             }
 
-            $fallback = $localizedFallbackValue->getFallback();
-            if ($fallback) {
-                $value = new FallbackType($fallback);
-            } elseif (\is_array($this->field)) {
-                $value = [];
-                foreach ($this->field as $field) {
-                    $value[$field] = $propertyAccessor->getValue($localizedFallbackValue, $field);
-                }
-            } else {
-                $value = $propertyAccessor->getValue($localizedFallbackValue, $this->field);
-            }
+            $result[LocalizedFallbackValueCollectionType::FIELD_VALUES][$key ?: null]
+                = $this->getResultValue($localizedFallbackValue);
 
-            $result[LocalizedFallbackValueCollectionType::FIELD_VALUES][$key ?: null] = $value;
             if ($localizedFallbackValue->getId()) {
                 $result[LocalizedFallbackValueCollectionType::FIELD_IDS][$key] = $localizedFallbackValue->getId();
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $localizedFallbackValue
+     *
+     * @return string|FallbackType
+     */
+    private function getResultValue(LocalizedFallbackValue $localizedFallbackValue)
+    {
+        $localization = $localizedFallbackValue->getLocalization();
+        $propertyAccessor = $this->getPropertyAccessor();
+        $fallback = $localizedFallbackValue->getFallback();
+
+        if ($fallback && $localization) {
+            $value = new FallbackType($fallback);
+        } elseif (\is_array($this->field)) {
+            $value = [];
+            foreach ($this->field as $field) {
+                $value[$field] = $propertyAccessor->getValue($localizedFallbackValue, $field);
+            }
+        } else {
+            $value = $propertyAccessor->getValue($localizedFallbackValue, $this->field);
+        }
+
+        return $value;
     }
 
     /**

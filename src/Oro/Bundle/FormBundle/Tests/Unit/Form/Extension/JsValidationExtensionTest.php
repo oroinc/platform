@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;

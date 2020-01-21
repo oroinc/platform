@@ -9,7 +9,6 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadStrategyLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\Strategy\TranslationStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Yaml\Yaml;
@@ -43,18 +42,8 @@ class TranslatorTest extends WebTestCase
 
         $this->createStrategies();
 
-        $this->provider = new TranslationStrategyProvider();
-        self::getContainer()->set('oro_translation.strategy.provider.test', $this->provider);
-        // Update translation strategy provider's service link for translator
-        // to ensure that old strategy provider is not in local cache
-        $this->translator->setStrategyProviderLink(new ServiceLink(
-            self::getContainer(),
-            'oro_translation.strategy.provider'
-        ));
-
-        foreach ($this->strategies as $strategy) {
-            $this->provider->addStrategy($strategy);
-        }
+        $this->provider = new TranslationStrategyProvider($this->strategies);
+        $this->translator->setStrategyProvider($this->provider);
 
         $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'translations';
         $this->resources['lang1'] = $cacheDir . DIRECTORY_SEPARATOR . 'messages.lang1.yml';

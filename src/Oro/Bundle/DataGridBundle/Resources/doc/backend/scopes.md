@@ -60,5 +60,5 @@ will delegate resolving of grid name and grid scope to name strategy.
 
 In other places when you are dealing with grid name it's assumed that it not contains scope.
 
-Correct grid full name with scope should match this pattern: /([\w-]+\):([\w-]+)/
+Correct grid full name with scope should match this pattern: /([\w\-]+\):([\w\-]+)/
 Where first group is pure grid name and second group is scope, for example: "acme-demo-datagrid:some-scope".

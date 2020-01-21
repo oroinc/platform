@@ -4,6 +4,9 @@ namespace Oro\Bundle\InstallerBundle;
 
 use Symfony\Component\HttpKernel\Kernel;
 
+/**
+ * Manage cli scripts while installing from package manager
+ */
 class ScriptManager
 {
     const ORO_INSTALLER_SCRIPT_FILE_NAME = 'install.php';
@@ -195,7 +198,7 @@ class ScriptManager
     {
         $tokens = [];
         if (preg_match(
-            '/@' . ScriptExecutor::ORO_SCRIPT_ANNOTATION . '\("([\w -]+)"\)/i',
+            '/@' . ScriptExecutor::ORO_SCRIPT_ANNOTATION . '\("([\w \-]+)"\)/i',
             file_get_contents($fileName),
             $tokens
         )

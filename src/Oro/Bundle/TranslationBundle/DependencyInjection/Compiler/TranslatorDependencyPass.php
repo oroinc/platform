@@ -30,8 +30,8 @@ class TranslatorDependencyPass implements CompilerPassInterface
         );
 
         $translatorDef->addMethodCall(
-            'setStrategyProviderLink',
-            [new Reference('oro_translation.strategy.provider_link')]
+            'setStrategyProvider',
+            [new Reference('oro_translation.strategy.provider')]
         );
 
         $translatorDef->addMethodCall(

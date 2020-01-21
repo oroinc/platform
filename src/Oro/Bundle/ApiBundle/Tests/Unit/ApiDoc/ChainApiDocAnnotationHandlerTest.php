@@ -9,20 +9,13 @@ use Symfony\Component\Routing\Route;
 
 class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ChainApiDocAnnotationHandler */
-    private $chainHandler;
-
-    protected function setUp()
-    {
-        $this->chainHandler = new ChainApiDocAnnotationHandler();
-    }
-
     public function testEmptyChainHandler()
     {
         $annotation = $this->createMock(ApiDoc::class);
         $route = $this->createMock(Route::class);
 
-        $this->chainHandler->handle($annotation, $route);
+        $chainHandler = new ChainApiDocAnnotationHandler([]);
+        $chainHandler->handle($annotation, $route);
     }
 
     public function testChainHandler()
@@ -33,9 +26,6 @@ class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
         $handler1 = $this->createMock(ApiDocAnnotationHandlerInterface::class);
         $handler2 = $this->createMock(ApiDocAnnotationHandlerInterface::class);
 
-        $this->chainHandler->addHandler($handler1);
-        $this->chainHandler->addHandler($handler2);
-
         $handler1->expects(self::once())
             ->method('handle')
             ->with(self::identicalTo($annotation), self::identicalTo($route));
@@ -43,6 +33,7 @@ class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('handle')
             ->with(self::identicalTo($annotation), self::identicalTo($route));
 
-        $this->chainHandler->handle($annotation, $route);
+        $chainHandler = new ChainApiDocAnnotationHandler([$handler1, $handler2]);
+        $chainHandler->handle($annotation, $route);
     }
 }

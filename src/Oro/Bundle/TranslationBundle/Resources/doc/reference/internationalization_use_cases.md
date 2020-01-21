@@ -305,7 +305,6 @@ inside the bundle class:
 
 namespace Oro\Bundle\AcmeBundle;
 
-use Oro\Bundle\AcmeBundle\Entity\Acme;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -319,15 +318,11 @@ class OroAcmeBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(
-            new DefaultFallbackExtensionPass(
-                [
-                    Acme::class => [
-                        'name' => 'names',
-                    ]
-                ]
-            )
-        );
+        $container->addCompilerPass(new DefaultFallbackExtensionPass([
+            'Oro\Bundle\AcmeBundle\Entity\Acme' => [
+                'name' => 'names'
+            ]
+        ]));
     }
 }
 ```

@@ -16,6 +16,8 @@ services:
 
     oro_workflow.serializer.data.normalizer:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer
+        arguments:
+            - !tagged_iterator oro_workflow.attribute_normalizer
 
     oro_workflow.serializer.variable.normalizer:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer

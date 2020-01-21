@@ -2,35 +2,27 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all owner metadata providers.
+ */
 class OwnerMetadataProvidersPass implements CompilerPassInterface
 {
-    const TAG_NAME = 'oro_security.owner.metadata_provider';
-    const CHAIN_SERVICE_ID = 'oro_security.owner.metadata_provider.chain';
+    use PriorityTaggedLocatorTrait;
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(self::CHAIN_SERVICE_ID)) {
-            return;
-        }
+        $services = $this->findAndSortTaggedServices('oro_security.owner.metadata_provider', 'alias', $container);
 
-        $chainServiceDefinition = $container->getDefinition(self::CHAIN_SERVICE_ID);
-        $taggedServices = $container->findTaggedServiceIds(self::TAG_NAME);
-
-        foreach ($taggedServices as $id => $attributes) {
-            if (empty($attributes[0]['alias'])) {
-                throw new \InvalidArgumentException(
-                    sprintf('Tag %s alias is missing for %s service', self::TAG_NAME, $id)
-                );
-            }
-
-            $chainServiceDefinition->addMethodCall('addProvider', [$attributes[0]['alias'], new Reference($id)]);
+        $chainProviderDef = $container->getDefinition('oro_security.owner.metadata_provider.chain');
+        foreach ($services as $alias => $reference) {
+            $chainProviderDef->addMethodCall('addProvider', [$alias, $reference]);
         }
     }
 }

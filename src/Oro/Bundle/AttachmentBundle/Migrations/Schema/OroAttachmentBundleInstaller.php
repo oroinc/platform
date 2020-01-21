@@ -18,7 +18,7 @@ class OroAttachmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -32,6 +32,12 @@ class OroAttachmentBundleInstaller implements Installation
         OroAttachmentBundle1::createAttachmentTable($schema);
         OroAttachmentOrganization::addOrganizationFields($schema);
         AddOriginalFilenameIndex::addOriginalFilenameIndex($schema);
+
+        /** Tables generation **/
+        $this->createOroAttachmentFileItemTable($schema);
+
+        /** Foreign keys generation **/
+        $this->addOroAttachmentFileItemForeignKeys($schema);
     }
 
     /**
@@ -43,5 +49,36 @@ class OroAttachmentBundleInstaller implements Installation
         $table->addColumn('parent_entity_class', 'string', ['notnull' => false, 'length' => 512]);
         $table->addColumn('parent_entity_id', 'integer', ['notnull' => false]);
         $table->addColumn('parent_entity_field_name', 'string', ['notnull' => false, 'length' => 50]);
+    }
+
+    /**
+     * Create oro_attachment_file_item table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroAttachmentFileItemTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_attachment_file_item');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('file_id', 'integer', ['notnull' => false]);
+        $table->addColumn('sort_order', 'integer', ['default' => '0']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['file_id']);
+    }
+
+    /**
+     * Add oro_attachment_file_item foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroAttachmentFileItemForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_attachment_file_item');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_attachment_file'),
+            ['file_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
     }
 }

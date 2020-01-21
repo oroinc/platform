@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;

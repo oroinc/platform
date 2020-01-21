@@ -12,29 +12,21 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS_NAME = 'stdClass';
-    const FAMILY_ID = 777;
+    private const ENTITY_CLASS_NAME = 'stdClass';
+    private const FAMILY_ID = 777;
 
     use EntityTrait;
 
-    /**
-     * @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $token;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var AttributeFamilyManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AttributeFamilyManager|\PHPUnit\Framework\MockObject\MockObject */
     private $familyManager;
 
-    /**
-     * @var AttributeFamilyVoter
-     */
+    /** @var AttributeFamilyVoter */
     private $voter;
 
     protected function setUp()
@@ -49,24 +41,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->voter = new AttributeFamilyVoter($this->doctrineHelper, $this->familyManager);
-    }
-
-    /**
-     * @param AttributeFamily $attributeFamily
-     */
-    private function configureDocrineHelperExpectations(AttributeFamily $attributeFamily)
-    {
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->with($attributeFamily, false)
-            ->willReturn(self::FAMILY_ID);
-
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityClass')
-            ->with($attributeFamily)
-            ->willReturn(AttributeFamily::class);
+        $this->voter->setClassName(AttributeFamily::class);
     }
 
     public function testVoteWithNotSupportedClass()
@@ -92,10 +67,12 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
             'entityClass' => self::ENTITY_CLASS_NAME
         ]);
 
-        $this->configureDocrineHelperExpectations($attributeFamily);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($attributeFamily, false)
+            ->willReturn(self::FAMILY_ID);
 
-        $this->familyManager
-            ->expects($this->once())
+        $this->familyManager->expects($this->once())
             ->method('isAttributeFamilyDeletable')
             ->with(self::FAMILY_ID)
             ->willReturn(false);
@@ -113,9 +90,12 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
             'entityClass' => self::ENTITY_CLASS_NAME
         ]);
 
-        $this->configureDocrineHelperExpectations($attributeFamily);
-        $this->familyManager
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($attributeFamily, false)
+            ->willReturn(self::FAMILY_ID);
+
+        $this->familyManager->expects($this->once())
             ->method('isAttributeFamilyDeletable')
             ->with(self::FAMILY_ID)
             ->willReturn(true);

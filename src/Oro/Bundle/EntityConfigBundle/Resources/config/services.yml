@@ -283,10 +283,11 @@ services:
 
     oro_entity_config.voter.attribute_family_voter:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
-        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.manager.attribute_family_manager'
+        calls:
+            - [setClassName, ['Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily']]
         tags:
             - { name: security.voter }
 
@@ -314,11 +315,12 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.manager.attribute_manager'
-            - '@oro_entity_config.config.attributes_config_helper'
-            - '@oro_entity_extend.form.extension.dynamic_fields_helper'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_entity_config.manager.attribute_manager }
+            - { name: container.service_subscriber, id: oro_entity_config.config.attributes_config_helper }
+            - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper }
 
     oro_entity_config.provider.extend_entity_config_provider:
         class: Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider
@@ -371,6 +373,7 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper
         arguments:
             - '@doctrine'
+            - !tagged_iterator oro_entity_config.layout.attribute_block_type_mapper
         calls:
             - [setDefaultBlockType, ['attribute_text']]
             - [addBlockType, ['percent', 'attribute_percent']]
@@ -383,6 +386,8 @@ services:
             - [addBlockType, ['image', 'attribute_image']]
             - [addBlockType, ['boolean', 'attribute_boolean']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
+            - [addBlockType, ['multiFile', 'attribute_multifiles']]
+            - [addBlockType, ['multiImage', 'attribute_multiimages']]
             - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
 
     oro_entity_config.layout.data_provider.attribute_config_provider:

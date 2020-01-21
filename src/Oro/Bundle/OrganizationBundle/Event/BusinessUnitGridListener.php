@@ -5,11 +5,14 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Filter results in grid by access level
+ */
 class BusinessUnitGridListener
 {
     /** @var AuthorizationCheckerInterface */
@@ -18,7 +21,7 @@ class BusinessUnitGridListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var OwnerTreeProvider */
@@ -28,13 +31,13 @@ class BusinessUnitGridListener
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoter|null                 $aclVoter
+     * @param AclVoterInterface|null                 $aclVoter
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
-        AclVoter $aclVoter = null
+        AclVoterInterface $aclVoter = null
     ) {
         $this->aclVoter = $aclVoter;
         $this->authorizationChecker = $authorizationChecker;

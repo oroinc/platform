@@ -38,7 +38,7 @@ You can get List of predefined templates or create one from  System > Emails > T
 
 `Additional Associations` and `Contact Emails` depends on selected `Entity Name`. 
 `Contact Emails` allows to check recepients stored in entity fields marked as `Contact Information` > `Email`.
-More info about configuring such fields [here](https://oroinc.com/doc/orocrm/current/admin-guide/entities/entity-field-properties#other).
+More info about configuring such fields [here](https://doc.oroinc.com/user/back-office/system/entities/entity-fields/).
 
 **Please note:**
 After rule was created, after firing specified in it events will be created jobs for consumer to submit emails chosen in `Recipient list` group.

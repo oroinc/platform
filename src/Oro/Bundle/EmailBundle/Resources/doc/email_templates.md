@@ -59,7 +59,7 @@ It means that in email templates allowed only the limited set of variables:
 
 The list of these variables is provided on the Email Template edit page of the admin UI (on the System > Emails > Templates menu item).
 
-Also there are additional Twig functions, filters, and tags, that registered and allowed to be used in Email Templates. The full list of these functions, filters, and tags you can find by searching for mentions of the 'oro_email.twig.email_security_policy' service in Oro Application CompillerPass Classes or see on the [Email Templates](https://oroinc.com/b2b-ecommerce/doc/current/admin-guide/email/email-templates) section of the Admin Guide.
+Also there are additional Twig functions, filters, and tags, that registered and allowed to be used in Email Templates. The full list of these functions, filters, and tags you can find by searching for mentions of the 'oro_email.twig.email_security_policy' service in Oro Application CompillerPass Classes or see on the [Email Templates](https://doc.oroinc.com/user/back-office/system/emails/email-templates/) section of the Admin Guide.
 
 Extend available data in email templates
 ----------------------------------------

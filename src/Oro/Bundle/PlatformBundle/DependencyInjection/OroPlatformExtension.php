@@ -149,5 +149,9 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader->load('session.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 }

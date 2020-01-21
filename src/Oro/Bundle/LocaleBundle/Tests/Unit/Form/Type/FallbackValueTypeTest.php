@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
@@ -13,7 +14,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;

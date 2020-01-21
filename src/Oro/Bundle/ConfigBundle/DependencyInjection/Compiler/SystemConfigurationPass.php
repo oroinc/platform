@@ -7,11 +7,12 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDec
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorTrait;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -21,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SystemConfigurationPass implements CompilerPassInterface
 {
+    use PriorityTaggedLocatorTrait;
+
     private const CONFIG_FILE = 'Resources/config/oro/system_configuration.yml';
 
     private const CONFIG_BAG_SERVICE            = 'oro_config.config_bag';
@@ -48,40 +51,19 @@ class SystemConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    private function processManagers(ContainerBuilder $container)
+    private function processManagers(ContainerBuilder $container): void
     {
-        // find managers
-        $managers = [];
-        $taggedServices = $container->findTaggedServiceIds(self::SCOPE_MANAGER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $priority = $attributes[0]['priority'] ?? 0;
-            if (!array_key_exists('scope', $attributes[0])) {
-                throw new LogicException(sprintf(
-                    'Tag "%s" for service "%s" must have attribute "scope".',
-                    self::SCOPE_MANAGER_TAG_NAME,
-                    $id
-                ));
-            }
-            $scope = $attributes[0]['scope'];
-
-            $managers[$priority][$scope] = new Reference($id);
+        $managers = $this->findAndSortTaggedServices(self::SCOPE_MANAGER_TAG_NAME, 'scope', $container);
+        if ($managers) {
+            $this->registerManagers($container, $managers);
         }
-        if (!$managers) {
-            return;
-        }
-
-        // sort by priority and flatten
-        ksort($managers);
-        $managers = array_reverse(array_merge(...$managers));
-
-        $this->registerManagers($container, $managers);
     }
 
     /**
      * @param ContainerBuilder $container
-     * @param array            $managers
+     * @param Reference[]      $managers [scope => manager reference, ...]
      */
-    private function registerManagers(ContainerBuilder $container, $managers)
+    private function registerManagers(ContainerBuilder $container, array $managers): void
     {
         $scopes = array_keys($managers);
         $mainScope = reset($scopes);
@@ -118,10 +100,8 @@ class SystemConfigurationPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @return array
-     *
-     * @throws \LogicException
      */
-    private function loadSettings(ContainerBuilder $container)
+    private function loadSettings(ContainerBuilder $container): array
     {
         $settings = [];
 
@@ -137,7 +117,7 @@ class SystemConfigurationPass implements CompilerPassInterface
 
             if (isset($config['settings'])) {
                 if (empty($config['settings'][SettingsBuilder::RESOLVED_KEY])) {
-                    throw new \LogicException('Direct passed "settings" are not allowed');
+                    throw new InvalidArgumentException('Direct passed "settings" are not allowed');
                 }
 
                 $settings[$name] = $this->replaceServiceIdsWithDefinitions($container, $config['settings']);
@@ -153,7 +133,7 @@ class SystemConfigurationPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings)
+    private function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings): array
     {
         foreach ($configSettings as &$configSetting) {
             if (isset($configSetting['value'])
@@ -176,7 +156,7 @@ class SystemConfigurationPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function processConfig(ContainerBuilder $container, array $settings)
+    private function processConfig(ContainerBuilder $container, array $settings): array
     {
         $processor = new ProcessorDecorator(
             new Processor(),
@@ -194,7 +174,7 @@ class SystemConfigurationPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor)
+    private function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor): array
     {
         $config = [];
 
@@ -215,7 +195,7 @@ class SystemConfigurationPass implements CompilerPassInterface
      *
      * @return string[]
      */
-    private function getDeclaredVariableNames($settings)
+    private function getDeclaredVariableNames(array $settings): array
     {
         $variables = [];
         foreach ($settings as $alias => $items) {

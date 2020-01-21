@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ApiDocCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
     private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE     = 'oro_api.rest.request_type_provider';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.chain_routing_options_resolver';
@@ -26,7 +28,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
     private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
     private const API_DOC_MARKDOWN_FORMATTER_SERVICE        = 'nelmio_api_doc.formatter.markdown_formatter';
     private const API_DOC_SWAGGER_FORMATTER_SERVICE         = 'nelmio_api_doc.formatter.swagger_formatter';
@@ -36,6 +37,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
+    private const API_SOURCE_LISTENER_SERVICE               = 'oro_api.listener.api_source';
 
     /**
      * {@inheritdoc}
@@ -47,12 +49,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         $this->configureUnderlyingViews($container);
-        $this->configureApiDocAnnotationHandler($container);
         $this->configureApiDocExtractor($container);
         $this->configureApiDocFormatters($container);
         $this->registerRoutingOptionsResolvers($container);
-        $this->registerRequestTypeProviders($container);
         $this->configureRequestTypeProvider($container);
+        $this->configureApiSourceListener($container);
     }
 
     /**
@@ -153,19 +154,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    private function configureApiDocAnnotationHandler(ContainerBuilder $container)
-    {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::API_DOC_ANNOTATION_HANDLER_SERVICE,
-            self::API_DOC_ANNOTATION_HANDLER_TAG_NAME,
-            'addHandler'
-        );
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureApiDocExtractor(ContainerBuilder $container)
     {
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
@@ -204,6 +192,13 @@ class ApiDocCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
+    private function configureApiSourceListener(ContainerBuilder $container)
+    {
+        $config = DependencyInjectionUtil::getConfig($container);
+        $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
+            ->setArgument(1, $config['api_doc_cache']['excluded_features']);
+    }
+
     private function configureApiDocFormatters(ContainerBuilder $container)
     {
         // rename default HTML formatter service
@@ -261,10 +256,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $services = [];
         $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
         $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            foreach ($attributes as $attribute) {
-                $view = DependencyInjectionUtil::getRequiredAttribute(
-                    $attribute,
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $view = $this->getRequiredAttribute(
+                    $attributes,
                     'view',
                     $id,
                     self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
@@ -279,30 +274,17 @@ class ApiDocCompilerPass implements CompilerPassInterface
                         implode(', ', $views)
                     ));
                 }
-                $services[DependencyInjectionUtil::getPriority($attribute)][] = [new Reference($id), $view];
+                $services[$this->getPriorityAttribute($attributes)][] = [new Reference($id), $view];
             }
         }
         if (empty($services)) {
             return;
         }
 
-        $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
+        $services = $this->sortByPriorityAndFlatten($services);
         $container
             ->getDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)
             ->replaceArgument(0, $services);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function registerRequestTypeProviders(ContainerBuilder $container)
-    {
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::REST_DOC_VIEW_DETECTOR_SERVICE,
-            self::REQUEST_TYPE_PROVIDER_TAG,
-            'addRequestTypeProvider'
-        );
     }
 
     /**

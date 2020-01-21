@@ -29,7 +29,7 @@ class SegmentSnapshot
      * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="integer", name="id")
+     * @ORM\Column(type="bigint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;

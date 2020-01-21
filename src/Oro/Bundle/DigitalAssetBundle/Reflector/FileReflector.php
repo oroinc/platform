@@ -37,6 +37,7 @@ class FileReflector implements LoggerAwareInterface
      * - extension
      * - mimeType
      * - fileSize
+     * - owner
      *
      * @param File $file
      * @param DigitalAsset $digitalAsset
@@ -68,13 +69,14 @@ class FileReflector implements LoggerAwareInterface
      * - extension
      * - mimeType
      * - fileSize
+     * - owner
      *
      * @param File $file
      * @param File $sourceFile
      */
     public function reflectFromFile(File $file, File $sourceFile): void
     {
-        $propertiesToUpdate = ['filename', 'extension', 'originalFilename', 'mimeType', 'fileSize'];
+        $propertiesToUpdate = ['filename', 'extension', 'originalFilename', 'mimeType', 'fileSize', 'owner'];
         foreach ($propertiesToUpdate as $property) {
             $this->propertyAccessor->setValue(
                 $file,

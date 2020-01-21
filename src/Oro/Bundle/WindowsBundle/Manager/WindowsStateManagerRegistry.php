@@ -2,41 +2,70 @@
 
 namespace Oro\Bundle\WindowsBundle\Manager;
 
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
+/**
+ * The registry of windows state managers.
+ */
 class WindowsStateManagerRegistry
 {
-    /**  @var WindowsStateManager[] */
-    protected $managers = [];
+    /** @var string[] */
+    private $userClasses;
 
-    /** @var WindowsStateManager */
-    private $defaultManager;
+    /** @var ContainerInterface */
+    private $managerContainer;
+
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
 
     /**
-     * @param WindowsStateManager $defaultManager
+     * @param string[]              $userClasses
+     * @param ContainerInterface    $managerContainer
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(WindowsStateManager $defaultManager)
-    {
-        $this->defaultManager = $defaultManager;
+    public function __construct(
+        array $userClasses,
+        ContainerInterface $managerContainer,
+        TokenStorageInterface $tokenStorage
+    ) {
+        $this->userClasses = $userClasses;
+        $this->managerContainer = $managerContainer;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
-     * @param WindowsStateManager $manager
+     * @return WindowsStateManager|null
      */
-    public function addManager(WindowsStateManager $manager)
+    public function getManager(): ?WindowsStateManager
     {
-        $this->managers[] = $manager;
-    }
-
-    /**
-     * @return WindowsStateManager
-     */
-    public function getManager()
-    {
-        foreach ($this->managers as $manager) {
-            if ($manager->isApplicable()) {
-                return $manager;
+        $userClass = $this->getUserClass();
+        if ($userClass) {
+            foreach ($this->userClasses as $managerUserClass) {
+                if (is_a($userClass, $managerUserClass, true)) {
+                    return $this->managerContainer->get($managerUserClass);
+                }
             }
         }
 
-        return $this->defaultManager;
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getUserClass(): ?string
+    {
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
+            return null;
+        }
+
+        $user = $token->getUser();
+        if (!is_object($user)) {
+            return null;
+        }
+
+        return get_class($user);
     }
 }

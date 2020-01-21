@@ -132,7 +132,7 @@ class ConfigTranslationTest extends WebTestCase
             ));
         }
 
-        foreach (['label', 'plural_label'] as $key) {
+        foreach (['label', 'plural_label', 'grid_all_view_label'] as $key) {
             $transKey = $config->get($key);
             if (!$this->hasTrans($transKey)) {
                 $missingTranslationKeys[] = $transKey . sprintf(' [Entity: %s]', $configId->getClassName());

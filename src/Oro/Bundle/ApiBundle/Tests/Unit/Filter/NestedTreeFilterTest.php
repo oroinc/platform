@@ -48,7 +48,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter($filterValue, $expectation)
+    public function testFilter($filterValue, $expectation, $field = null)
     {
         $supportedOperators = [
             ComparisonFilter::GT,
@@ -57,6 +57,9 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
 
         $filter = new NestedTreeFilter(DataType::INTEGER);
         $filter->setSupportedOperators($supportedOperators);
+        if ($field) {
+            $filter->setField($field);
+        }
 
         $criteria = new Criteria();
         $filter->apply($criteria, $filterValue);
@@ -67,13 +70,23 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     public function filterDataProvider()
     {
         return [
-            'GT filter'  => [
+            'GT filter'               => [
                 new FilterValue('path', 'value', ComparisonFilter::GT),
-                new Comparison('path', 'NESTED_TREE', new Value('value'))
+                new Comparison('', 'NESTED_TREE', new Value('value'))
             ],
-            'GTE filter' => [
+            'GTE filter'              => [
                 new FilterValue('path', 'value', ComparisonFilter::GTE),
-                new Comparison('path', 'NESTED_TREE_WITH_ROOT', new Value('value'))
+                new Comparison('', 'NESTED_TREE_WITH_ROOT', new Value('value'))
+            ],
+            'GT filter (with field)'  => [
+                new FilterValue('path', 'value', ComparisonFilter::GT),
+                new Comparison('someField', 'NESTED_TREE', new Value('value')),
+                'someField'
+            ],
+            'GTE filter (with field)' => [
+                new FilterValue('path', 'value', ComparisonFilter::GTE),
+                new Comparison('someField', 'NESTED_TREE_WITH_ROOT', new Value('value')),
+                'someField'
             ]
         ];
     }

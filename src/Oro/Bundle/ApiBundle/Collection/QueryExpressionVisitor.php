@@ -325,7 +325,11 @@ class QueryExpressionVisitor extends ExpressionVisitor
             }
         }
 
-        return $this->getRootAlias() . '.' . $field;
+        if ($field) {
+            $field = $this->getRootAlias() . '.' . $field;
+        }
+
+        return $field;
     }
 
     /**
@@ -335,7 +339,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
      */
     private function getParameterName(string $field): string
     {
-        $result = \str_replace('.', '_', $field);
+        $result = $field
+            ? \str_replace('.', '_', $field)
+            : $this->getRootAlias();
         foreach ($this->parameters as $parameter) {
             if ($parameter->getName() === $result) {
                 $result .= '_' . \count($this->parameters);

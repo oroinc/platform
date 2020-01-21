@@ -48,6 +48,8 @@ services:
     oro_distribution.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
         public: false
+        arguments:
+            - !tagged_iterator routing.options_resolver
 
     oro_distribution.package_manager:
         class: Oro\Bundle\DistributionBundle\Manager\PackageManager

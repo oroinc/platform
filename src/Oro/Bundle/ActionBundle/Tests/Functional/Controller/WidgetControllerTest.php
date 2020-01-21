@@ -40,6 +40,8 @@ class WidgetControllerTest extends WebTestCase
 
     protected function tearDown()
     {
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(null);
         $this->configModifier->resetCache();
     }
 
@@ -55,7 +57,8 @@ class WidgetControllerTest extends WebTestCase
     public function testButtonsOperation(array $config, $route, $entityId, $entityClass, array $expected)
     {
         $this->setOperationsConfig($config);
-        $this->getContainer()->get('oro_action.provider.button')->addExtension(new ButtonProviderExtensionStub());
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(new ButtonProviderExtensionStub());
 
         if ($entityId) {
             $entityId = $this->entityId;

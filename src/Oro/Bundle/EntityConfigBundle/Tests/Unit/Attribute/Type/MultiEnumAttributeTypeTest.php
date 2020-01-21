@@ -15,11 +15,6 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         return new MultiEnumAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('multiEnum', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

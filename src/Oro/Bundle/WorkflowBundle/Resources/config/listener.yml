@@ -48,6 +48,8 @@ services:
 
     oro_workflow.listener.event_trigger_collector:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener'
+        arguments:
+            - !tagged_iterator oro_workflow.listener.event_trigger_collector.extension
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }

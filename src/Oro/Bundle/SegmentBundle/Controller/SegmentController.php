@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Controller;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -62,8 +62,8 @@ class SegmentController extends AbstractController
 
         $this->get(EntityNameProvider::class)->setCurrentItem($entity);
 
-        $segmentGroup = $this->get('oro_entity_config.provider.entity')
-            ->getConfig($entity->getEntity())
+        $segmentGroup = $this->get(ConfigManager::class)
+            ->getEntityConfig('entity', $entity->getEntity())
             ->get('plural_label');
 
         $gridName = $entity::GRID_PREFIX . $entity->getId();
@@ -185,7 +185,7 @@ class SegmentController extends AbstractController
         return [
             'entity'   => $entity,
             'form'     => $form->createView(),
-            'entities' => $this->get(EntityProvider::class)->getEntities(),
+            'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
             'metadata' => $this->get(Manager::class)->getMetadata('segment')
         ];
     }
@@ -218,16 +218,16 @@ class SegmentController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
+                'oro_segment.entity_provider' => EntityProvider::class,
+                ConfigManager::class,
                 FeatureChecker::class,
                 ConfigurationProvider::class,
                 TranslatorInterface::class,
                 Router::class,
                 StaticSegmentManager::class,
-                EntityProvider::class,
                 SegmentHandler::class,
                 Manager::class,
                 EntityNameProvider::class,
-                'oro_entity_config.provider.entity' => ConfigProvider::class,
             ]
         );
     }

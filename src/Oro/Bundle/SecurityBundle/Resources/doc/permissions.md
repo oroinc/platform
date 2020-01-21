@@ -40,6 +40,8 @@ oro_permissions:
         apply_to_entities:                                          # (optional) the list of entities to apply permission
             - 'AcmeDemoBundle:MyEntity1'                            # entity class
             - 'Acme\Bundle\DemoBundle\Entity\MyEntity2'
+        apply_to_interfaces:                                        # (optional) the list of interfaces to apply permission to the entities that implement these interfaces
+            - 'Acme\Bundle\DemoBundle\Entity\MyEntity2Interface'    # entity interface
         group_names:                                                # (by default = ['default]) the list of Groups
             - default                                               # group name
             - frontend

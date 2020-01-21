@@ -3,71 +3,50 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {
-        $attributes = array(
-            'testId1' => array(
-                array('alias' => 'tag1'), array('alias' => 'tag2')
-            ),
-            'testId2' => array(
-                array('alias' => 'tag1', 'acl_resource' => 'test_acl_resource')
-            ),
-            'testId3' => array(
-                array('name' => 'not_matched')
-            )
+        $container = new ContainerBuilder();
+        $registry = $container->setDefinition('oro_form.autocomplete.search_registry', new Definition());
+        $security = $container->setDefinition('oro_form.autocomplete.security', new Definition());
+
+        $container->setDefinition('handler_1', new Definition())
+            ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag1'])
+            ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag2']);
+        $container->setDefinition('handler_2', new Definition())
+            ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag1', 'acl_resource' => 'acl_resource_2']);
+        $container->setDefinition('handler_3', new Definition())
+            ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag3', 'acl_resource' => 'acl_resource_3']);
+
+        $compiler = new AutocompleteCompilerPass();
+        $compiler->process($container);
+
+        $serviceLocatorReference = $registry->getArgument(0);
+        self::assertInstanceOf(Reference::class, $serviceLocatorReference);
+        $serviceLocatorDef = $container->getDefinition((string)$serviceLocatorReference);
+        self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
+        self::assertEquals(
+            [
+                'tag1' => new ServiceClosureArgument(new Reference('handler_2')),
+                'tag2' => new ServiceClosureArgument(new Reference('handler_1')),
+                'tag3' => new ServiceClosureArgument(new Reference('handler_3'))
+            ],
+            $serviceLocatorDef->getArgument(0)
         );
 
-        $searchRegistryDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $searchRegistryDefinition->expects($this->exactly(4))
-            ->method('addMethodCall');
-        $searchRegistryDefinition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('addSearchHandler', array('tag1', new Reference('testId1')));
-        $searchRegistryDefinition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addSearchHandler', array('tag2', new Reference('testId1')));
-        $searchRegistryDefinition->expects($this->at(2))
-            ->method('addMethodCall')
-            ->with('addSearchHandler', array('tag1', new Reference('testId2')));
-        $searchRegistryDefinition->expects($this->at(3))
-            ->method('addMethodCall')
-            ->with('addSearchHandler', array('testId3', new Reference('testId3')));
-
-        $securityDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityDefinition->expects($this->exactly(1))
-            ->method('addMethodCall');
-        $securityDefinition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('setAutocompleteAclResource', array('tag1', 'test_acl_resource'));
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $container->expects($this->at(0))
-            ->method('getDefinition')
-            ->with('oro_form.autocomplete.search_registry')
-            ->will($this->returnValue($searchRegistryDefinition));
-
-        $container->expects($this->at(1))
-            ->method('getDefinition')
-            ->with('oro_form.autocomplete.security')
-            ->will($this->returnValue($securityDefinition));
-
-        $container->expects($this->at(2))
-            ->method('findTaggedServiceIds')
-            ->with('oro_form.autocomplete.search_handler')
-            ->will($this->returnValue($attributes));
-
-        $pass = new AutocompleteCompilerPass();
-        $pass->process($container);
+        $this->assertEquals(
+            [
+                'tag1' => 'acl_resource_2',
+                'tag3' => 'acl_resource_3'
+            ],
+            $security->getArgument(0)
+        );
     }
 }

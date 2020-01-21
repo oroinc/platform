@@ -188,7 +188,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         }
 
         if ($impersonation->getLoginAt()) {
-            throw new CustomUserMessageAuthenticationException('Impersonation token is already used.');
+            throw new CustomUserMessageAuthenticationException('Impersonation token has already been used.');
         }
 
         $now = new \DateTime('now', new \DateTimeZone('UTC'));

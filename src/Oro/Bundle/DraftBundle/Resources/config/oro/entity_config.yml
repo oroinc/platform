@@ -1,0 +1,14 @@
+entity_config:
+    draft:
+        entity:
+            items:
+                draftable:
+                    options:
+                        default_value: false
+                        indexed: true
+        field:
+            items:
+                draftable:
+                    options:
+                        value_type: boolean
+                        default_value: false

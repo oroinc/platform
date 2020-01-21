@@ -115,7 +115,9 @@ class AutoResponseRuleController extends AbstractController
             $this->clearAutoResponses();
         }
 
-        $entity = $this->get(AutoResponseManager::class)->createEmailEntity();
+        /** @var AutoResponseManager $autoResponseManager */
+        $autoResponseManager = $this->get('oro_email.autoresponserule_manager');
+        $entity = $autoResponseManager->createEmailEntity();
 
         return [
             'form'  => $form->createView(),
@@ -149,7 +151,7 @@ class AutoResponseRuleController extends AbstractController
      */
     protected function getAutoResponseRuleRepository()
     {
-        return $this->getDoctrine()->getRepository('OroEmailBundle:AutoResponseRule');
+        return $this->getDoctrine()->getRepository(AutoResponseRule::class);
     }
 
     /**
@@ -157,7 +159,7 @@ class AutoResponseRuleController extends AbstractController
      */
     protected function getAutoResponseRuleManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroEmailBundle:AutoResponseRule');
+        return $this->getDoctrine()->getManagerForClass(AutoResponseRule::class);
     }
 
     /**
@@ -168,7 +170,7 @@ class AutoResponseRuleController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                AutoResponseManager::class,
+                'oro_email.autoresponserule_manager' => AutoResponseManager::class,
                 Manager::class,
                 EventDispatcherInterface::class,
             ]

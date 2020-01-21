@@ -8,54 +8,50 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeNormalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $attributeNormalizer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $attributeManager;
 
-    /**
-     * @var WorkflowVariableNormalizer
-     */
-    protected $normalizer;
+    /** @var WorkflowVariableNormalizer */
+    private $normalizer;
 
     /**
      * Tests setup
      */
     protected function setUp()
     {
-        $this->attributeNormalizer = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer'
-        );
-        $this->serializer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
-        $this->attributeManager = $this->createMock('Oro\Bundle\ActionBundle\Model\AttributeManager');
-
-        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
-        $aclManager = $this->createMock('Oro\Bundle\WorkflowBundle\Acl\AclManager');
-        $restrictionManager = $this->createMock('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager');
-        $variableManager = $this->createMock('Oro\Bundle\WorkflowBundle\Model\VariableManager');
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        $this->attributeNormalizer = $this->createMock(AttributeNormalizer::class);
+        $this->serializer = $this->createMock(WorkflowAwareSerializer::class);
+        $this->attributeManager = $this->createMock(AttributeManager::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $aclManager = $this->createMock(AclManager::class);
+        $restrictionManager = $this->createMock(RestrictionManager::class);
+        $variableManager = $this->createMock(VariableManager::class);
+        $this->workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getName', 'getVariables', 'getDefinition'])
             ->setConstructorArgs([
                 $doctrineHelper,
@@ -67,7 +63,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
                 $variableManager
             ])->getMock();
 
-        $workflowDefinition = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition');
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([]);
@@ -95,7 +91,6 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $data = new WorkflowData();
         $data->set($variableName, $denormalizedValue);
 
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
         $this->normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->any())->method('getWorkflow')
@@ -132,7 +127,6 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedData->set($variableName, $expected);
 
         $normalizer = $this->getMockNormalizer($variable, $options);
-        $normalizer->addAttributeNormalizer($this->attributeNormalizer);
         $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->any())->method('getWorkflow')
@@ -247,7 +241,6 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedData->set($variableName, $expected);
 
         $normalizer = $this->getMockNormalizer($variable, $options);
-        $normalizer->addAttributeNormalizer($this->attributeNormalizer);
         $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->any())->method('getWorkflow')
@@ -345,7 +338,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
             ['scalar', false],
             [new \DateTime(), false],
             [new WorkflowData(), true],
-            [$this->createMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), true],
+            [$this->createMock(WorkflowData::class), true],
         ];
     }
 
@@ -366,8 +359,8 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
             [null, false],
             ['string', false],
             ['DateTime', false],
-            ['Oro\Bundle\WorkflowBundle\Model\WorkflowData', true],
-            [$this->getMockClass('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), true],
+            [WorkflowData::class, true],
+            [$this->getMockClass(WorkflowData::class), true],
         ];
     }
 
@@ -391,7 +384,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
      *
      * @return Variable
      */
-    protected function createVariable($name, $type, $value = null, array $options = [], $propertyPath = null)
+    private function createVariable($name, $type, $value = null, array $options = [], $propertyPath = null)
     {
         $variable = new Variable();
         $variable
@@ -414,12 +407,12 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     private function getMockNormalizer(Variable $expected = null, array $options = [])
     {
         if (!$expected instanceof Variable || 'entity' !== $expected->getType()) {
-            $managerRegistry = $this->createMock(ManagerRegistry::class);
-            $managerRegistry->expects($this->any())
+            $doctrine = $this->createMock(ManagerRegistry::class);
+            $doctrine->expects($this->any())
                 ->method('getManagerForClass')
                 ->willReturn($this->createMock(ObjectManager::class));
 
-            return new WorkflowVariableNormalizer($managerRegistry);
+            return new WorkflowVariableNormalizer([$this->attributeNormalizer], $doctrine);
         }
 
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
@@ -447,14 +440,14 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($fakeRepository);
 
-        $getManagerForClass = isset($options['getManagerForClass']) ? $options['getManagerForClass'] : true;
+        $getManagerForClass = $options['getManagerForClass'] ?? true;
         $managerForClass = $getManagerForClass ? $entityManager : null;
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($managerForClass);
 
-        return new WorkflowVariableNormalizer($managerRegistry);
+        return new WorkflowVariableNormalizer([$this->attributeNormalizer], $doctrine);
     }
 }

@@ -1,0 +1,10 @@
+services:
+    oro_scope.tests.scope_criteria_provider.organization:
+        parent: oro_organization.scope_criteria_provider.organization
+        tags:
+            - { name: oro_scope.provider, scopeType: test_scope, priority: 10 }
+
+    oro_scope.tests.scope_criteria_provider.user:
+        parent: oro_user.scope_criteria_provider.user
+        tags:
+            - { name: oro_scope.provider, scopeType: test_scope }

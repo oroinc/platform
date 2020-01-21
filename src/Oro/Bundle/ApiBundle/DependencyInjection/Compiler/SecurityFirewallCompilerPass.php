@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
-use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
+use Oro\Bundle\ApiBundle\Security\FeatureDependedFirewallMap;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
+use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -12,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
+ * Changes the class for "security.firewall.map" service to be able to disable API firewall listeners.
  * Configures API security firewalls to be able to work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
@@ -25,6 +28,14 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        // configure the firewall map service to be able to disable listeners if API feature is disabled
+        $config = DependencyInjectionUtil::getConfig($container);
+        $container->getDefinition('security.firewall.map')
+            ->setClass(FeatureDependedFirewallMap::class)
+            ->addArgument(new Reference('oro_featuretoggle.checker.feature_checker'))
+            ->addArgument(new Reference('oro_api.security.firewall.feature_access_listener'))
+            ->addArgument($config['api_firewalls']);
+
         $securityConfigs = $container->getExtensionConfig('security');
         if (empty($securityConfigs[0]['firewalls'])) {
             return;
@@ -75,7 +86,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         $listenerId = $this->createContextListener($container, $contextKey);
         $apiContextListenerId = $listenerId . '.' . $firewallName;
         $container
-            ->register($apiContextListenerId, SecurityFirewallContextListener::class)
+            ->register($apiContextListenerId, ContextListener::class)
             ->setArguments([
                 new Reference($listenerId),
                 new Reference('security.token_storage'),
@@ -97,7 +108,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
 
         // replace the exception listener class
         $exceptionListenerDef = $container->getDefinition($contextDef->getArgument(1));
-        $exceptionListenerDef->setClass(SecurityFirewallExceptionListener::class);
+        $exceptionListenerDef->setClass(ExceptionListener::class);
     }
 
     /**

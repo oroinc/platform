@@ -101,6 +101,8 @@ services:
     oro_importexport.job.context.aggregator_registry:
         class: Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry
         public: false
+        arguments:
+            - !tagged_iterator oro_importexport.job.context.aggregator
 
     oro_importexport.job.context.aggregator.selective:
         class: Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator

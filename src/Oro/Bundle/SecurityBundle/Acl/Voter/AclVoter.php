@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
@@ -17,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
  */
-class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContextInterface
+class AclVoter extends BaseAclVoter implements AclVoterInterface
 {
     /**
      * @var AclExtensionSelector
@@ -78,7 +77,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      *
      * @param OneShotIsGrantedObserver $observer
      */
-    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer)
+    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {
         if (null !== $this->oneShotIsGrantedObserver) {
             if (!is_array($this->oneShotIsGrantedObserver)) {

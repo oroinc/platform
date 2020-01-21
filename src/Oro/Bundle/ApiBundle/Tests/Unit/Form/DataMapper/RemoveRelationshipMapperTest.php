@@ -350,7 +350,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $user->addGroup($group2);
         $propertyPath = new PropertyPath('groups');
 
-        $this->propertyAccessor->expects(self::once())
+        $this->propertyAccessor->expects(self::exactly(2))
             ->method('getValue')
             ->with($user, $propertyPath)
             ->willReturn($user->getGroups());

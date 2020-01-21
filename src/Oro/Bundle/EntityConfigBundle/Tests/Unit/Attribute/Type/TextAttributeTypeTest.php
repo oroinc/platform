@@ -15,11 +15,6 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         return new TextAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('text', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -9,9 +9,10 @@ services:
         class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.permission_registry'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter, priority: 500 }
+            - { name: container.service_subscriber, id: oro_workflow.permission_registry }
 
     oro_workflow.acl.voter.workflow_edit_voter:
         class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter

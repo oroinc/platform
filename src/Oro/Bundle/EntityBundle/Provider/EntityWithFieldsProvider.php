@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 /**
  * Provides detailed information about entities and fields.
@@ -10,27 +10,27 @@ use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 class EntityWithFieldsProvider
 {
     /** @var EntityFieldProvider */
-    protected $fieldProvider;
+    private $fieldProvider;
 
     /** @var EntityProvider */
-    protected $entityProvider;
+    private $entityProvider;
 
-    /** @var EntityConfigHelper */
-    protected $configHelper;
+    /** @var ConfigManager */
+    private $configManager;
 
     /**
      * @param EntityFieldProvider $fieldProvider
      * @param EntityProvider      $entityProvider
-     * @param EntityConfigHelper  $configHelper
+     * @param ConfigManager       $configManager
      */
     public function __construct(
         EntityFieldProvider $fieldProvider,
         EntityProvider $entityProvider,
-        EntityConfigHelper $configHelper
+        ConfigManager $configManager
     ) {
         $this->fieldProvider = $fieldProvider;
         $this->entityProvider = $entityProvider;
-        $this->configHelper = $configHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -139,9 +139,21 @@ class EntityWithFieldsProvider
             $translate
         );
         if ($withRoutes) {
-            $entity['routes'] = $this->configHelper->getAvailableRoutes($currentClassName);
+            $entity['routes'] = $this->getAvailableRoutes($currentClassName);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array
+     */
+    private function getAvailableRoutes($className)
+    {
+        $metadata = $this->configManager->getEntityMetadata($className);
+
+        return null !== $metadata ? $metadata->getRoutes() : [];
     }
 }

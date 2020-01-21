@@ -5,31 +5,26 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Psr\Container\ContainerInterface;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailVoter */
-    protected $emailVoter;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
+
+    /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $mailboxManager;
+
+    /** @var EmailVoter */
+    private $emailVoter;
 
     protected function setUp()
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->mailboxManager = $this->createMock(MailboxManager::class);
 
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->with(AuthorizationCheckerInterface::class)
-            ->willReturn($this->authorizationChecker);
-
-        $this->emailVoter = new EmailVoter($this->container);
+        $this->emailVoter = new EmailVoter($this->authorizationChecker, $this->mailboxManager);
     }
 
     /**

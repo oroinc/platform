@@ -144,11 +144,19 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_attachment.listener.multi_file_block_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\MultiFileBlockListener
+        arguments:
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: onBeforeFormRender, priority: -260 }
+            - { name: kernel.event_listener, event: entity_view.render.before, method: onBeforeViewRender, priority: -260 }
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: onBeforeValueRender, priority: -260 }
+
     oro_attachment.entity_config_dumper.extension.file:
         class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-        arguments:
-            - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.relation_builder'
+        parent: oro_entity_extend.entity_config_dumper.extension.relation
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -193,6 +201,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-files-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-files-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-images-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-images-grid, method: onBuildBefore }
 
     oro_attachment.listener.merge_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\MergeListener
@@ -204,7 +216,6 @@ services:
     oro_attachment.datagrid.action.dialog:
         class: Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 
@@ -280,8 +291,10 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\EventListener\SetsParentEntityOnFlushListener'
         arguments:
             - '@property_accessor'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: onFlushCollections, connection: default }
             - { name: doctrine.event_listener, event: prePersist, connection: default }
             - { name: doctrine.event_listener, event: postPersist, connection: default }
 
@@ -314,10 +327,17 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider:
+        alias: oro_attachment.provider.attachment_file_name_provider
+
+    oro_attachment.provider.attachment_file_name_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
+
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
+            - '@oro_attachment.provider.attachment_file_name_provider'
 
     Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
         alias: 'oro_attachment.provider.file_url'
@@ -369,6 +389,9 @@ services:
             - '@liip_imagine.filter.configuration'
         calls:
             - [setLogger, ['@logger']]
+
+    Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager:
+        alias: oro_attachment.manager.image_resize
 
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
@@ -422,6 +445,14 @@ services:
     Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider:
         alias: oro_attachment.provider.file_constraints
 
+    oro_attachment.provider.multiple_files_constraints:
+        class: Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider:
+        alias: oro_attachment.provider.multiple_files_constraints
+
     oro_attachment.validator.constraints.file:
         class: Symfony\Component\Validator\Constraints\FileValidator
 
@@ -436,6 +467,18 @@ services:
         arguments:
             - '@oro_attachment.validator.constraints.file'
             - '@oro_attachment.provider.file_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleImageConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
         tags:
             - { name: validator.constraint_validator }
 

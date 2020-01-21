@@ -44,6 +44,8 @@ services:
         class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
         public: true
         arguments:
+            - [] # builders
+            - ~ # service locator
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'
             - '@oro_menu.manipulator'
@@ -123,6 +125,8 @@ services:
     oro_navigation.item.factory:
         class: Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
         public: true
+        arguments:
+            - ~ # service locator for builders
 
     oro_navigation.item.pinbar.post_persist_listener:
         class: Oro\Bundle\NavigationBundle\Entity\Listener\PinbarPostPersist
@@ -220,7 +224,7 @@ services:
           - '@oro_navigation.title_reader.registry'
           - '@oro_navigation.title_translator'
           - '@oro_config.user'
-          - '@oro_navigation.chain_breadcrumb_manager.link'
+          - '@oro_navigation.chain_breadcrumb_manager'
         lazy: true
 
     Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface:
@@ -241,7 +245,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
         public: false
         arguments:
-          - !tagged oro_navigation.title_reader
+          - !tagged_iterator oro_navigation.title_reader
 
     oro_navigation.title_annotations_reader:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
@@ -331,21 +335,19 @@ services:
             - { name: twig.extension }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
-    oro_navigation.breadcrumb_manager:
+    oro_navigation.breadcrumb_manager.default:
         class: Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
         arguments:
             - '@oro_menu.builder_chain'
             - '@knp_menu.matcher'
             - '@router'
-
-    oro_navigation.chain_breadcrumb_manager.link:
         tags:
-            - { name: oro_service_link,  service: oro_navigation.chain_breadcrumb_manager }
+            - { name: oro_breadcrumbs.provider, priority: -255 }
 
     oro_navigation.chain_breadcrumb_manager:
         class: Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
-        calls:
-          - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
+        arguments:
+            - !tagged_iterator oro_breadcrumbs.provider
 
     Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface:
         alias: oro_navigation.chain_breadcrumb_manager

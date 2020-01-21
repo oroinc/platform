@@ -11,12 +11,7 @@ class FileAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        return new FileAttributeType('file');
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('file', $this->getAttributeType()->getType());
+        return new FileAttributeType();
     }
 
     /**

@@ -10,17 +10,15 @@ use Symfony\Component\Routing\Route;
  */
 class ChainApiDocAnnotationHandler implements ApiDocAnnotationHandlerInterface
 {
-    /** @var ApiDocAnnotationHandlerInterface[] */
-    private $handlers = [];
+    /** @var iterable|ApiDocAnnotationHandlerInterface[] */
+    private $handlers;
 
     /**
-     * Adds a handler to the chain.
-     *
-     * @param ApiDocAnnotationHandlerInterface $handler
+     * @param iterable|ApiDocAnnotationHandlerInterface[] $handlers
      */
-    public function addHandler(ApiDocAnnotationHandlerInterface $handler)
+    public function __construct(iterable $handlers)
     {
-        $this->handlers[] = $handler;
+        $this->handlers = $handlers;
     }
 
     /**
