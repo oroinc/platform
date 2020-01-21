@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
     const persistentStorage = require('oroui/js/persistent-storage');
@@ -61,6 +62,12 @@ define(function(require) {
             }
             this.$el.removeClass('init');
             this._off(this.$trigger, 'click');
+
+            this.$trigger.removeAttr('aria-expanded');
+            if (!this.elementHasLabel(this.$trigger)) {
+                this.$trigger.removeAttr('aria-label');
+            }
+
             mediator.off(null, null, this);
             this._super();
         },
@@ -140,12 +147,22 @@ define(function(require) {
         },
 
         _applyStateOnTrigger: function(isOpen) {
-            this.$trigger.trigger('collapse:toggle', {
-                isOpen: isOpen,
-                $el: this.$el,
-                $trigger: this.$trigger,
-                $container: this.$container
-            });
+            this.$trigger
+                .attr('aria-expanded', isOpen)
+                .trigger('collapse:toggle', {
+                    isOpen: isOpen,
+                    $el: this.$el,
+                    $trigger: this.$trigger,
+                    $container: this.$container
+                });
+
+            if (!this.elementHasLabel(this.$trigger)) {
+                this.$trigger.attr('aria-label', __(isOpen ? 'oro.ui.collapse.less': 'oro.ui.collapse.more'));
+            }
+        },
+
+        elementHasLabel: function($el) {
+            return $el.text().trim().length > 0;
         },
 
         _applyStateOnGroup: function(isOpen) {
