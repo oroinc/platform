@@ -9,8 +9,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether a search aggregation filter exists and if so,
- * applies it to a search query from the context.
+ * Checks whether a search aggregation filter exists,
+ * and if so, applies it to a search query from the context.
  */
 class HandleSearchAggregationFilter implements ProcessorInterface
 {

@@ -154,4 +154,22 @@ class ConfigurationTest extends RestJsonApiTestCase
             );
         }
     }
+
+    public function testTryToGetTitle()
+    {
+        $response = $this->cget(
+            ['entity' => 'configuration'],
+            ['meta' => 'title'],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
 }

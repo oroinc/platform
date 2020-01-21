@@ -59,6 +59,6 @@ class AddIncludeFilter implements ProcessorInterface
 
         $filter = new IncludeFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
-        $filters->add($filterName, $filter);
+        $filters->add($filterName, $filter, false);
     }
 }

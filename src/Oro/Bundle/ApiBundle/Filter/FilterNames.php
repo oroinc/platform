@@ -89,7 +89,9 @@ class FilterNames
     }
 
     /**
-     * Gets the name of a filter that can be used to add entity meta properties to the result.
+     * Gets the name of a filter that can be used
+     * to request to add entity meta properties to the result
+     * or to request to perform some additional operations.
      * @see \Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter

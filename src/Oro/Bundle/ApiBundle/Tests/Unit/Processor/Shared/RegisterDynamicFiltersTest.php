@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
@@ -175,6 +176,8 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filter = new ComparisonFilter('string');
         $filter->setField('name');
         $this->context->getFilters()->add('name', $filter);
+        $ungroupedFilter = new ComparisonFilter('string');
+        $this->context->getFilters()->add('ungrouped', $ungroupedFilter, false);
 
         $this->configProvider->expects(self::never())
             ->method('getConfig');
@@ -190,12 +193,49 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('name');
+        $expectedUngroupedFilter = new ComparisonFilter('string');
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[name]', $expectedFilter);
+        $expectedFilters->add('ungrouped', $expectedUngroupedFilter, false);
 
         self::assertEquals($expectedFilters, $this->context->getFilters());
         self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessForExistingNotGroupedFilter()
+    {
+        $request = $this->getRequest('filter1=val1');
+        $filter = $this->createMock(FilterInterface::class);
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter1', $filter, false);
+        $this->processor->process($this->context);
+
+        self::assertSame($filter, $this->context->getFilters()->get('filter1'));
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessForExistingNotGroupedFilterAndDefaultGroupIsSet()
+    {
+        $request = $this->getRequest('filter1=val1');
+        $filter = $this->createMock(FilterInterface::class);
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter1', $filter, false);
+        $this->context->getFilterValues()->setDefaultGroupName('filter');
+        $this->context->getFilters()->setDefaultGroupName('filter');
+        $this->processor->process($this->context);
+
+        self::assertSame($filter, $this->context->getFilters()->get('filter1'));
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
         self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
     }
 
@@ -229,6 +269,43 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals($expectedFilters, $this->context->getFilters());
         self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessForPrimaryEntityFieldsAndDefaultGroupIsSet()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $request = $this->getRequest('filter[name]=val1');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($this->getComparisonFilter('string'));
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilterValues()->setDefaultGroupName('filter');
+        $this->context->getFilters()->setDefaultGroupName('filter');
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setField('name');
+        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
         self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
     }
 
@@ -259,6 +336,43 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilters->add('filter[name]', $filter);
 
         self::assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessForPrimaryEntityFieldsWhenFilterExistsInFilterCollectionAndDefaultGroupIsSet()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $filter = $this->getComparisonFilter('string');
+
+        $request = $this->getRequest('filter[name]=val1');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('name', $filter);
+        $this->context->getFilterValues()->setDefaultGroupName('filter');
+        $this->context->getFilters()->setDefaultGroupName('filter');
+        $this->processor->process($this->context);
+
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $filter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertEquals('filter', $this->context->getFilters()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
     }
 
     public function testShouldRemoveNotUsedFiltersForPrimaryEntityFieldsFromFilterCollection()
