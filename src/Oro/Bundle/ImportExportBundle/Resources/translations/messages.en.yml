@@ -2,7 +2,8 @@ oro:
     importexport:
         importexportresult:
             entity_label: Import/Export result
-            entity_plural_label: Import/Export result
+            entity_plural_label: Import/Export results
+            entity_grid_all_view_label: All %entity_plural_label%
             organization.label: Organization
             id.label: ID
             expired.label: Expired

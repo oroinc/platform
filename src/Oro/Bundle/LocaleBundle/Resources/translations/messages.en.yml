@@ -8,6 +8,7 @@ oro.locale:
     localization:
         entity_label:               'Localization'
         entity_plural_label:        'Localizations'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
         entity_description:         "Localization item stores locale-specific configuration: the language code of the locale's main language, a formatting code that is used for the locale, and a parent localization that is used by default whenever the translation for the main language is missing."
         id.label:                   'Id'
         name:
@@ -48,6 +49,7 @@ oro.locale:
     localizedfallbackvalue:
         entity_label:         'Localized fallback value'
         entity_plural_label:  'Localized fallback values'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
         entity_description:   Localizedfallbackvalue stores relationships between the text values (content like name, description, etc.) and their translation data.
         id.label:             'ID'
         fallback:

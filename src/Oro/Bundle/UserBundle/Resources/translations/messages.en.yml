@@ -82,6 +82,7 @@ oro:
         entity_description:                 People or third party systems with a specific set of credentials (login and password) that can be used to access the application.
         entity_label:                       User
         entity_plural_label:                Users
+        entity_grid_all_view_label: All %entity_plural_label%
         configure.label:                    Configure
         api_keys.label:                     API keys
         api.label:                          API key
@@ -221,6 +222,7 @@ oro:
         email:
             entity_label:            User Email Address
             entity_plural_label:     User Email Addresses
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:      Represent user emails
             id.label:                Id
             user.label:              User
@@ -232,6 +234,7 @@ oro:
         impersonation:
             entity_label: Impersonation
             entity_plural_label: Impersonations
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label: Id
             expire_at.label: Expire At
             login_at.label: Login At
@@ -251,6 +254,7 @@ oro:
         group:
             entity_label:        Group
             entity_plural_label: Groups
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  A set of users consolidated by one or more parameters. Instead of specifying each user one by one, you can specify a user group in filters and notification rules.
             id:
                 label:           Id
@@ -270,6 +274,7 @@ oro:
         role:
             entity_label:        Role
             entity_plural_label: Roles
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  A user role defines permissions for users to perform certain activity.
             id:
                 label:           Id

@@ -2,6 +2,7 @@ oro:
     activitylist:
         entity_label:        Activity list
         entity_plural_label: Activity list
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:  Represent activities list
 
         id.label:            Id
