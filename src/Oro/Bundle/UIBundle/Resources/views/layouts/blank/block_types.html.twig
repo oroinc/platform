@@ -36,32 +36,33 @@
     }) %}
     <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">
         <ul {{ block('block_attributes') }}>
-            <li class="breadcrumbs__item">
-                {% if breadcrumbs is not iterable %}
-                    {{ breadcrumbs }}
-                {% else %}
-                    {% for breadcrumb in breadcrumbs %}
+            {% if breadcrumbs is not iterable %}
+                {{ breadcrumbs }}
+            {% else %}
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumbs__item">
+                    {% if breadcrumb.label is defined %}
+                        {% if breadcrumb.uri is defined %}
+                            {% set url = breadcrumb.uri %}
+                        {% else %}
+                            {% set url = breadcrumb.url %}
+                        {% endif %}
+
+                        {% if url and not loop.last %}
+                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                            <span aria-hidden="true">/</span>
+                        {% else %}
+                            <span aria-current="page">{{ breadcrumb.label|trans }}</span>
+                        {% endif %}
+                    {%  else %}
                         {% if not loop.first %}
                             <span aria-hidden="true">/</span>
                         {% endif %}
-                        {% if breadcrumb.label is defined %}
-                            {% if breadcrumb.uri is defined %}
-                                {% set url = breadcrumb.uri %}
-                            {% else %}
-                                {% set url = breadcrumb.url %}
-                            {% endif %}
-
-                            {% if url and not loop.last %}
-                                <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
-                            {% else %}
-                                <span aria-current="page">{{ breadcrumb.label|trans }}</span>
-                            {% endif %}
-                        {%  else %}
-                            {{ breadcrumb }}
-                        {%  endif %}
-                    {% endfor %}
-                {% endif %}
-            </li>
+                        {{ breadcrumb }}
+                    {%  endif %}
+                    </li>
+                {% endfor %}
+            {% endif %}
             {{ block('container_widget') }}
         </ul>
     </nav>
