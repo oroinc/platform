@@ -34,35 +34,37 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' breadcrumbs'
     }) %}
-    <ul {{ block('block_attributes') }} role="navigation" aria-label="breadcrumb">
-        <li class="breadcrumbs__item">
-            {% if breadcrumbs is not iterable %}
-                {{ breadcrumbs }}
-            {% else %}
-                {% for breadcrumb in breadcrumbs %}
-                    {% if not loop.first %}
-                        <span aria-hidden="true">/</span>
-                    {% endif %}
-                    {% if breadcrumb.label is defined %}
-                        {% if breadcrumb.uri is defined %}
-                            {% set url = breadcrumb.uri %}
-                        {% else %}
-                            {% set url = breadcrumb.url %}
+    <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">
+        <ul {{ block('block_attributes') }}>
+            <li class="breadcrumbs__item">
+                {% if breadcrumbs is not iterable %}
+                    {{ breadcrumbs }}
+                {% else %}
+                    {% for breadcrumb in breadcrumbs %}
+                        {% if not loop.first %}
+                            <span aria-hidden="true">/</span>
                         {% endif %}
+                        {% if breadcrumb.label is defined %}
+                            {% if breadcrumb.uri is defined %}
+                                {% set url = breadcrumb.uri %}
+                            {% else %}
+                                {% set url = breadcrumb.url %}
+                            {% endif %}
 
-                        {% if url and not loop.last %}
-                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
-                        {% else %}
-                            <span aria-current="page">{{ breadcrumb.label|trans }}</span>
-                        {% endif %}
-                    {%  else %}
-                        {{ breadcrumb }}
-                    {%  endif %}
-                {% endfor %}
-            {% endif %}
-        </li>
-        {{ block('container_widget') }}
-    </ul>
+                            {% if url and not loop.last %}
+                                <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                            {% else %}
+                                <span aria-current="page">{{ breadcrumb.label|trans }}</span>
+                            {% endif %}
+                        {%  else %}
+                            {{ breadcrumb }}
+                        {%  endif %}
+                    {% endfor %}
+                {% endif %}
+            </li>
+            {{ block('container_widget') }}
+        </ul>
+    </nav>
 {% endblock %}
 
 {% block logo_widget %}

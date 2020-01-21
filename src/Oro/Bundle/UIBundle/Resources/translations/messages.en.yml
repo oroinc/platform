@@ -143,6 +143,7 @@ oro:
         page_loading: 'Page loading...'
         button:
             copy_to_clipboard.label: 'Copy to Clipboard'
+        breadcrumb.aria_label: Breadcrumb
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'
