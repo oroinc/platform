@@ -61,8 +61,10 @@
 
 {% block _page_main_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-main'
+        '~class': ' page-main',
+        'data-role': 'page-main-container'
     }) %}
+
     <main{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </main>
@@ -72,6 +74,7 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' page-main__content'
     }) %}
+
     <div{{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </div>
@@ -118,4 +121,16 @@
             {{ block_widget(block) }}
         </aside>
     {% endif %}
+{% endblock %}
+
+{% block _skip_to_content_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': 'btn btn--info skip-to-content__btn',
+        'data-page-component-proxy-focus': '[data-role="page-main-container"]'
+    }) %}
+
+    <div class="skip-to-content">
+        <button {{ block('block_attributes') }}>{{ 'oro.ui.button.skip_to_content'|trans }}</button>
+        <div class="skip-to-content__decorator" aria-hidden="true"></div>
+    </div>
 {% endblock %}
