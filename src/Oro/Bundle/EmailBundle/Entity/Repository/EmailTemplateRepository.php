@@ -121,6 +121,7 @@ class EmailTemplateRepository extends EntityRepository
     {
         return $this->createQueryBuilder('e')
             ->select('e.entityName')
+            ->where('e.entityName IS NOT NULL')
             ->distinct();
     }
 

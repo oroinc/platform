@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The class that helps get the name of the current ApiDoc view, API version and the request type.
  */
-class RestDocViewDetector
+class RestDocViewDetector implements ResetInterface
 {
     /** @var RequestStack */
     private $requestStack;
@@ -23,28 +24,20 @@ class RestDocViewDetector
     /** @var RequestType|null */
     private $requestType;
 
-    /** @var RequestTypeProviderInterface[] */
-    private $requestTypeProviders = [];
+    /** @var iterable|RequestTypeProviderInterface[] */
+    private $requestTypeProviders;
+
+    /** @var array [request type provider hash => bool, ...] */
+    private $initializedRequestTypeProviders = [];
 
     /**
-     * @param RequestStack $requestStack
+     * @param RequestStack                            $requestStack
+     * @param iterable|RequestTypeProviderInterface[] $requestTypeProviders
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, iterable $requestTypeProviders)
     {
         $this->requestStack = $requestStack;
-    }
-
-    /**
-     * Registers a API request type provider to the chain.
-     *
-     * @param RequestTypeProviderInterface $requestTypeProvider
-     */
-    public function addRequestTypeProvider(RequestTypeProviderInterface $requestTypeProvider)
-    {
-        if ($requestTypeProvider instanceof RestDocViewDetectorAwareInterface) {
-            $requestTypeProvider->setRestDocViewDetector($this);
-        }
-        $this->requestTypeProviders[] = $requestTypeProvider;
+        $this->requestTypeProviders = $requestTypeProviders;
     }
 
     /**
@@ -104,6 +97,13 @@ class RestDocViewDetector
     {
         if (null === $this->requestType) {
             foreach ($this->requestTypeProviders as $provider) {
+                $providerHash = spl_object_hash($provider);
+                if (!isset($this->initializedRequestTypeProviders[$providerHash])) {
+                    if ($provider instanceof RestDocViewDetectorAwareInterface) {
+                        $provider->setRestDocViewDetector($this);
+                    }
+                    $this->initializedRequestTypeProviders[$providerHash] = true;
+                }
                 $this->requestType = $provider->getRequestType();
                 if (null !== $this->requestType) {
                     break;
@@ -115,5 +115,14 @@ class RestDocViewDetector
         }
 
         return $this->requestType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->setView();
+        $this->initializedRequestTypeProviders = [];
     }
 }

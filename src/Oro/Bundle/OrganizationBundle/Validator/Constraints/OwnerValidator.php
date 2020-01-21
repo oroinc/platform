@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -26,7 +27,7 @@ class OwnerValidator extends AbstractOwnerValidator
      * @param AuthorizationCheckerInterface      $authorizationChecker
      * @param TokenAccessorInterface             $tokenAccessor
      * @param OwnerTreeProviderInterface         $ownerTreeProvider
-     * @param AclVoter                           $aclVoter
+     * @param AclVoterInterface                  $aclVoter
      * @param AclGroupProviderInterface          $aclGroupProvider
      * @param BusinessUnitManager                $businessUnitManager
      */
@@ -36,7 +37,7 @@ class OwnerValidator extends AbstractOwnerValidator
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProviderInterface $ownerTreeProvider,
-        AclVoter $aclVoter,
+        AclVoterInterface $aclVoter,
         AclGroupProviderInterface $aclGroupProvider,
         BusinessUnitManager $businessUnitManager
     ) {

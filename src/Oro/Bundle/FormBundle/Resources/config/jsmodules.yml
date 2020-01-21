@@ -1,6 +1,6 @@
 aliases:
-    jquery.validate$: bowerassets/jquery-validate/dist/jquery.validate
-    jquery.validate-additional-methods$: bowerassets/jquery-validate/dist/additional-methods
+    jquery.validate$: npmassets/jquery-validation/dist/jquery.validate
+    jquery.validate-additional-methods$: npmassets/jquery-validation/dist/additional-methods
     oro/autocomplete-component$: oroform/js/app/components/autocomplete-component
     oro/select2-autocomplete-component$: oroform/js/app/components/select2-autocomplete-component
     oro/select2-autocomplete-entity-parent-component$: oroform/js/app/components/select2-autocomplete-entity-parent-component
@@ -42,6 +42,7 @@ dynamic-imports:
         - oroform/js/app/views/fields-groups-collection-view
         - oroform/js/app/views/form-loading-view
         - oroform/js/app/views/form-validate-view
+        - oroform/js/app/views/checkbox-view
         - oroform/js/app/views/simple-color-choice-view
         - oroform/js/app/views/simple-color-picker-view
         - oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view

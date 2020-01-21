@@ -135,5 +135,9 @@ oro_form:
                 time: ~
                 tfoot: ~
                 var: ~
-                video: ~
+                video:
+                    attributes:
+                        - allowfullscreen
+                        - src
+                        - controls
                 aside: ~

@@ -1,7 +1,7 @@
 aliases:
-    autobahn$: bowerassets/autobahnjs/autobahn/autobahn
+    autobahn$: npmassets/@oroinc/autobahnjs/autobahn/autobahn
     vertx$: orosync/js/extend/vertx
-    when$: bowerassets/when/when
+    when$: npmassets/when/when
 app-modules:
     - orosync/js/app/modules/content-manager-module
 dynamic-imports:

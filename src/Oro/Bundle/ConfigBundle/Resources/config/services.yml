@@ -162,6 +162,8 @@ services:
     oro_config.configuration_search_provider.chain:
         class: Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider
         public: false
+        arguments:
+            - !tagged_iterator oro_config.configuration_search_provider
 
     oro_config.configuration_search_provider.group:
         class: Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider
@@ -170,7 +172,7 @@ services:
             - '@oro_config.config_bag'
             - '@translator'
         tags:
-            - { name: oro_config.configuration_search_provider, priority: 0 }
+            - { name: oro_config.configuration_search_provider }
 
     oro_config.configuration_search_provider.field:
         class: Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider
@@ -180,4 +182,4 @@ services:
             - '@translator'
             - '@oro_config.manager'
         tags:
-            - { name: oro_config.configuration_search_provider, priority: 10 }
+            - { name: oro_config.configuration_search_provider, priority: -10 }

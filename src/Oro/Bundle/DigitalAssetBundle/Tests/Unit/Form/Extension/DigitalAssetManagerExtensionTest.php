@@ -3,17 +3,24 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
+use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\Entity\EntityWithMultiFile;
+use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\EventSubscriberStub;
+use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\MultiFileFormTypeStub;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
@@ -21,13 +28,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
+class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 {
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
@@ -53,8 +61,13 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
+        parent::setUp();
+
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
         $this->previewMetadataProvider = $this->createMock(PreviewMetadataProvider::class);
@@ -70,6 +83,22 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->form = $this->createMock(FormInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensions()
+    {
+        $fileType = new FileType();
+        $fileType->setEventSubscriber(new EventSubscriberStub());
+
+        $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
+        $multiFileType = new MultiFileType(new EventSubscriberStub(), $multipleFileConstraintsProvider);
+
+        return [
+            new PreloadedExtension([$fileType, $multiFileType], [])
+        ];
     }
 
     public function testGetExtendedTypes(): void
@@ -624,7 +653,7 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file = $this->createMock(File::class));
 
         $file
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getId')
             ->willReturn(1);
 
@@ -731,7 +760,67 @@ class DigitalAssetManagerExtensionTest extends \PHPUnit\Framework\TestCase
                 'fieldType' => 'image',
                 'isImageType' => true,
             ],
+            [
+                'fieldType' => 'multiImage',
+                'isImageType' => true,
+            ],
         ];
+    }
+
+    public function testBuildViewWhenParentIsLineItem(): void
+    {
+        $fileItem = (new FileItem())
+            ->setFile(new File());
+
+        $entity = new EntityWithMultiFile();
+        $entity->multiFileField->add($fileItem);
+
+        $form = $this->factory->create(MultiFileFormTypeStub::class, $entity);
+
+        $fileForm = $form->get('multiFileField')->get(0)->get('file');
+
+        $this->attachmentEntityConfigProvider->expects($this->once())
+            ->method('getFieldConfig')
+            ->with(EntityWithMultiFile::class, 'multiFileField')
+            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
+
+        $entityFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
+
+        $fieldConfigId->expects($this->once())
+            ->method('getFieldType')
+            ->willReturn('image');
+
+        $formView = new FormView();
+        $formView->vars['block_prefixes'] = ['sample1', 'sample2'];
+        $this->extension->buildView(
+            $formView,
+            $fileForm,
+            $options = [
+                'dam_widget_enabled' => true,
+                'dam_widget_route' => 'sample_route',
+                'dam_widget_parameters' => ['sample_params'],
+            ]
+        );
+
+        $this->assertArrayHasKey('dam_widget', $formView->vars);
+        $this->assertEquals(
+            [
+                'preview_metadata' => [],
+                'is_image_type' => true,
+                'route' => $options['dam_widget_route'],
+                'parameters' => $options['dam_widget_parameters'],
+                'is_valid_digital_asset' => true,
+            ],
+            $formView->vars['dam_widget']
+        );
+        $this->assertEquals(['sample1', 'oro_file_with_digital_asset', 'sample2'], $formView->vars['block_prefixes']);
     }
 
     public function testBuildViewDefaultRouteParameters(): void

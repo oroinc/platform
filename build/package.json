@@ -11,20 +11,20 @@
     "test-codestyle": "./node_modules/.bin/eslint ../../ -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
     "autoprefixer": "9.6.1",
     "babel-loader": "^8.0.6",
-    "css-loader": "^3.1.0",
+    "css-loader": "^3.4.0",
     "deepmerge": "3.3.0",
     "eslint": "6.5.1",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-oro": "https://api.github.com/repos/laboro/eslint-plugin-oro/tarball/0.0.1",
+    "eslint-plugin-oro": "https://api.github.com/repos/laboro/eslint-plugin-oro/tarball/0.0.2",
     "exports-loader": "^0.7.0",
     "expose-loader": "^0.7.5",
     "extract-loader": "3.1.0",
-    "file-loader": "^4.1.0",
+    "file-loader": "^4.3.0",
     "file-system": "2.2.2",
     "font-awesome": "4.7.0",
     "glob": "7.1.5",
@@ -54,14 +54,14 @@
     "text-loader": "0.0.1",
     "underscore": "^1.9.1",
     "url-loader": "2.0.1",
-    "webpack": "^4.38.0",
-    "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.7.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1",
     "webpack-merge": "4.2.1"
   },
   "dependencies": {
-    "@babel/runtime": "^7.6.3",
-    "core-js": "^3.3.3",
+    "@babel/runtime": "^7.7.7",
+    "core-js": "^3.6.1",
     "whatwg-fetch": "^3.0.0"
   }
 }

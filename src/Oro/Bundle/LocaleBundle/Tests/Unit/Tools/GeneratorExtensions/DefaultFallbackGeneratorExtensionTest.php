@@ -10,47 +10,24 @@ use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorEx
 
 class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DefaultFallbackGeneratorExtension */
-    protected $extension;
-
-    public function setUp()
-    {
-        $this->extension = new DefaultFallbackGeneratorExtension();
-    }
-
     public function testSupports()
     {
-        $this->extension->addDefaultMethodFields('testClass', []);
-
-        $this->assertTrue($this->extension->supports(['class' => 'testClass']));
+        $extension = new DefaultFallbackGeneratorExtension([
+            'testClass' => []
+        ]);
+        $this->assertTrue($extension->supports(['class' => 'testClass']));
     }
 
     public function testSupportsWithoutClass()
     {
-        $this->assertFalse($this->extension->supports([]));
+        $extension = new DefaultFallbackGeneratorExtension([]);
+        $this->assertFalse($extension->supports([]));
     }
 
     public function testSupportsWithoutExtension()
     {
-        $this->assertFalse($this->extension->supports(['class' => 'testClass']));
-    }
-
-    public function testAddDefaultMethodFields()
-    {
-        $this->assertAttributeEquals([], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', []);
-        $this->assertAttributeEquals(['testClass' => []], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', ['test1' => 'data1']);
-        $this->assertAttributeEquals(['testClass' => ['test1' => 'data1']], 'methodExtensions', $this->extension);
-
-        $this->extension->addDefaultMethodFields('testClass', ['test2' => 'data2']);
-        $this->assertAttributeEquals(
-            ['testClass' => ['test1' => 'data1', 'test2' => 'data2']],
-            'methodExtensions',
-            $this->extension
-        );
+        $extension = new DefaultFallbackGeneratorExtension([]);
+        $this->assertFalse($extension->supports(['class' => 'testClass']));
     }
 
     /**
@@ -63,7 +40,8 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->generate($schema, $class);
+        $extension = new DefaultFallbackGeneratorExtension([]);
+        $extension->generate($schema, $class);
 
         $class->getMethod('defaultTestGetter');
     }
@@ -78,11 +56,10 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addDefaultMethodFields('Test\Entity', [
-            'testField'
+        $extension = new DefaultFallbackGeneratorExtension([
+            'Test\Entity' => ['testField']
         ]);
-
-        $this->extension->generate($schema, $class);
+        $extension->generate($schema, $class);
 
         $class->getMethod('getDefaultTestField');
     }
@@ -92,8 +69,10 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $class = PhpClass::create('Test\Entity');
         $clonedClass = clone $class;
 
-        $this->extension->addDefaultMethodFields('Test\Entity', []);
-        $this->extension->generate(['class' => 'Test\Entity'], $class);
+        $extension = new DefaultFallbackGeneratorExtension([
+            'Test\Entity' => []
+        ]);
+        $extension->generate(['class' => 'Test\Entity'], $class);
 
         $this->assertEquals($class, $clonedClass);
         $this->assertEmpty($class->getMethods());
@@ -106,11 +85,10 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addDefaultMethodFields('Test\Entity', [
-            'name'=> 'names',
+        $extension = new DefaultFallbackGeneratorExtension([
+            'Test\Entity' => ['name'=> 'names']
         ]);
-
-        $this->extension->generate($schema, $class);
+        $extension->generate($schema, $class);
 
         $this->assertMethod(
             $class,

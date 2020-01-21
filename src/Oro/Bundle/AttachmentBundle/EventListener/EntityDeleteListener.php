@@ -29,7 +29,7 @@ class EntityDeleteListener
 
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
-            if (!$id) {
+            if (!$id || !\is_numeric($id)) {
                 continue;
             }
 

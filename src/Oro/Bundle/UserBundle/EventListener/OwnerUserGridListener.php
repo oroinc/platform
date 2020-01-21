@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -28,7 +28,7 @@ class OwnerUserGridListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var OwnerTreeProvider */
@@ -39,14 +39,14 @@ class OwnerUserGridListener
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoter                      $aclVoter
+     * @param AclVoterInterface             $aclVoter
      */
     public function __construct(
         EntityManager $em,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
-        AclVoter $aclVoter = null
+        AclVoterInterface $aclVoter = null
     ) {
         $this->em = $em;
         $this->aclVoter = $aclVoter;
@@ -101,7 +101,6 @@ class OwnerUserGridListener
     protected function applyACL(DatagridConfiguration $config, $accessLevel, User $user, Organization $organization)
     {
         $query = $config->getOrmQuery();
-        /** todo: refactor this check usages */
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $query->addAndWhere('u.id = ' . $user->getId());
         } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {

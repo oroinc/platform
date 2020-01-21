@@ -14,7 +14,7 @@ services:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
         public: false
         arguments:
-            - '@service_container'
+            - [] # clearers. They are set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 250, persistent: true }
 

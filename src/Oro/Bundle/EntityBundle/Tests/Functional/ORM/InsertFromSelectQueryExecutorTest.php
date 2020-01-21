@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
-use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -22,22 +21,14 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
      */
     protected $queryExecutor;
 
-    /**
-     * @var NativeQueryExecutorHelper
-     */
-    protected $helper;
-
     public function setUp()
     {
         $this->initClient();
-
         $this->registry = $this->getContainer()->get('doctrine');
-        $this->helper = $this->getContainer()->get('oro_entity.orm.native_query_executor_helper');
-
-        $this->queryExecutor = new InsertFromSelectQueryExecutor($this->helper);
+        $this->queryExecutor = $this->getContainer()->get('oro_entity.orm.insert_from_select_query_executor');
     }
 
-    public function testExecute()
+    public function testInsert()
     {
         $decimalValue = 12345678.29;
 

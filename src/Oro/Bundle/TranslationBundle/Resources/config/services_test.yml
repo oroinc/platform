@@ -1,9 +1,4 @@
 services:
-    oro_translation.strategy.provider.test:
-        decorates: 'oro_translation.strategy.provider'
-        parent: 'oro_translation.strategy.provider'
-        public: true
-
     translator.default.stub:
         class: 'Oro\Bundle\TranslationBundle\Tests\Functional\Stub\TranslatorStub'
         decorates: 'translator.default'

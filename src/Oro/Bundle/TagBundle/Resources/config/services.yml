@@ -157,7 +157,7 @@ services:
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: tag-search-result }
+            - { name: oro_datagrid.extension.formatter.property, type: tag-search-result }
 
     oro_tag.provider.statistic:
         class: Oro\Bundle\TagBundle\Provider\StatisticProvider

@@ -31,8 +31,6 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider unsupportedAttributesDataProvider
-     *
-     * @param array $attributes
      */
     public function testAbstainOnUnsupportedAttribute(array $attributes)
     {
@@ -40,17 +38,10 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityClass')
-            ->with($template)
-            ->will($this->returnValue(EmailTemplate::class));
-
-        $this->doctrineHelper
-            ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -69,17 +60,10 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityClass')
-            ->with($object)
-            ->will($this->returnValue(\stdClass::class));
-
-        $this->doctrineHelper
-            ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($object, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -99,17 +83,10 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityClass')
-            ->with($template)
-            ->will($this->returnValue(EmailTemplate::class));
-
-        $this->doctrineHelper
-            ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -129,17 +106,10 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityClass')
-            ->with($template)
-            ->will($this->returnValue(EmailTemplate::class));
-
-        $this->doctrineHelper
-            ->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(2);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_DENIED,

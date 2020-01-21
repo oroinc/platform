@@ -10,19 +10,28 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
 
+/**
+ * Generates getters and setters for default fallback fields.
+ */
 class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
 {
+    /** @var array [class name => [singular field name => field name, ...], ...] */
+    private $fieldMap;
+
     /**
-     * @var array Array contains classes and fields which are configured to be extended with default getter
+     * @param array $fieldMap [class name => [singular field name => field name, ...], ...]
      */
-    protected $methodExtensions = [];
+    public function __construct(array $fieldMap)
+    {
+        $this->fieldMap = $fieldMap;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function supports(array $schema)
     {
-        return isset($schema['class'], $this->methodExtensions[$schema['class']]);
+        return isset($schema['class'], $this->fieldMap[$schema['class']]);
     }
 
     /**
@@ -34,8 +43,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             return;
         }
 
-        $fields = $this->methodExtensions[$schema['class']];
-
+        $fields = $this->fieldMap[$schema['class']];
         if (empty($fields)) {
             return;
         }
@@ -48,22 +56,6 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             $this->generateGetter($singularName, $fieldName, $class);
             $this->generateDefaultGetter($singularName, $fieldName, $class);
             $this->generateDefaultSetter($singularName, $fieldName, $class);
-        }
-    }
-
-    /**
-     * Add class name and fields to data structure which contains the name of the classes and their fields,
-     * which will be extended
-     *
-     * @param string $className
-     * @param array $fields
-     */
-    public function addDefaultMethodFields($className, array $fields)
-    {
-        if (isset($this->methodExtensions[$className])) {
-            $this->methodExtensions[$className] = array_merge($this->methodExtensions[$className], $fields);
-        } else {
-            $this->methodExtensions[$className] = $fields;
         }
     }
 

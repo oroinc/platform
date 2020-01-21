@@ -5,7 +5,6 @@ services:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkread }
 
@@ -15,7 +14,6 @@ services:
             - '@oro_entity_merge.metadata.registry'
             - '@translator'
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: emailmarkunread }
 

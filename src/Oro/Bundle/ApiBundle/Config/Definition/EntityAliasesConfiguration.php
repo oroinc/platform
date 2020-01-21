@@ -24,7 +24,7 @@ class EntityAliasesConfiguration
                 ->validate()
                     ->ifTrue(
                         function ($v) {
-                            return !\preg_match('/^[a-z][a-z0-9_]*$/D', $v);
+                            return !\preg_match('/^[a-z][a-z0-9\_]*$/D', $v);
                         }
                     )
                     ->thenInvalid(
@@ -42,7 +42,7 @@ class EntityAliasesConfiguration
                 ->validate()
                     ->ifTrue(
                         function ($v) {
-                            return !\preg_match('/^[a-z][a-z0-9_]*$/D', $v);
+                            return !\preg_match('/^[a-z][a-z0-9\_]*$/D', $v);
                         }
                     )
                     ->thenInvalid(

@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\WindowsBundle\Tests\Entity;
+namespace Oro\Bundle\WindowsBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WindowsState
-     */
-    protected $windowState;
+    /** @var WindowsState */
+    private $windowState;
 
     protected function setUp()
     {
@@ -43,9 +42,8 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
      */
     public function propertiesDataProvider()
     {
-        $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userMock = $this->createMock(UserInterface::class);
+
         return [
             'user' => ['user', $userMock],
             'data' => ['data', ['test' => true]],

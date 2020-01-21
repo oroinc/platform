@@ -9,23 +9,22 @@ services:
 
     oro_reminder.reminder_entity_listener:
         class: Oro\Bundle\ReminderBundle\EventListener\ReminderListener
-        public: false
         arguments:
-            - '@oro_reminder.entity.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: doctrine.event_listener, event: postLoad, lazy: false }
-            - { name: doctrine.event_listener, event: postPersist, lazy: false }
+            - { name: doctrine.event_subscriber }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     oro_reminder.sender:
         class: Oro\Bundle\ReminderBundle\Model\ReminderSender
         arguments:
             - '@oro_reminder.send_processor_registry'
-        lazy: true
 
     oro_reminder.send_processor_registry:
         class: Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
         arguments:
-            - []
+            - [] # send methods
+            - ~ # service locator for processors
 
     oro_reminder.send_processor.email:
         class: Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
@@ -34,7 +33,7 @@ services:
             - '@oro_reminder.model.template_email_notification'
             - '@event_dispatcher'
         tags:
-            - { name: oro_reminder.send_processor }
+            - { name: oro_reminder.send_processor, method: email }
 
     oro_reminder.send_processor.web_socket:
         class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
@@ -43,7 +42,7 @@ services:
             - '@oro_sync.client.connection_checker'
             - '@oro_reminder.web_socket.message_params_provider'
         tags:
-            - { name: oro_reminder.send_processor }
+            - { name: oro_reminder.send_processor, method: web_socket }
 
     #Message params providers
     oro_reminder.web_socket.message_params_provider:

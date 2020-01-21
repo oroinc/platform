@@ -17,6 +17,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class LocalizationTypeTest extends FormIntegrationTestCase
@@ -176,7 +177,15 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                         LocalizationParentSelectType::NAME
                     ),
                 ],
-                [FormType::class => [new StripTagsExtension($helper)]]
+                [
+                    FormType::class => [
+                        new StripTagsExtension(
+                            TestContainerBuilder::create()
+                                ->add('oro_ui.html_tag_helper', $helper)
+                                ->getContainer($this)
+                        )
+                    ]
+                ]
             )
         ];
     }

@@ -1,0 +1,6 @@
+doctrine:
+    orm:
+        filters:
+            draftable:
+                class: Oro\Bundle\DraftBundle\Doctrine\DraftableFilter
+                enabled: true

@@ -23,63 +23,67 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
+    private const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManagerBag;
+    private $entityManagerBag;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var ConfigProviderMock */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $generator;
+    private $generator;
 
     /** @var string */
-    protected $cacheDir;
+    private $cacheDir;
 
     /** @var ExtendConfigDumper */
-    protected $dumper;
+    private $dumper;
 
     /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendEntityConfigProvider;
+    private $extendEntityConfigProvider;
 
     public function setUp()
     {
         $this->entityManagerBag = $this->createMock(EntityManagerBag::class);
-
         $this->configManager = $this->createMock(ConfigManager::class);
-
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $this->generator = $this->createMock(EntityGenerator::class);
+        $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
+        $this->cacheDir = $this->getTempDir('ExtendConfigDumperTest', false);
+
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->with('extend')
             ->willReturn($this->configProvider);
+    }
 
-        $this->generator = $this->createMock(EntityGenerator::class);
-
-        $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
-
-        $this->cacheDir = $this->getTempDir('ExtendConfigDumperTest', false);
-
+    /**
+     * @param array $extensions
+     *
+     * @return ExtendConfigDumper
+     */
+    private function getExtendConfigDumper($extensions = [])
+    {
         $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
         $entityExtendConfigurationProvider->expects(self::any())
             ->method('getUnderlyingTypes')
             ->willReturn([]);
 
-        $this->dumper = new ExtendConfigDumper(
+        return new ExtendConfigDumper(
             $this->entityManagerBag,
             $this->configManager,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper($entityExtendConfigurationProvider),
             $this->generator,
             $this->extendEntityConfigProvider,
-            $this->cacheDir
+            $this->cacheDir,
+            $extensions
         );
     }
-
     public function testCheckConfigWhenAliasesExists()
     {
         $fs = new Filesystem();
@@ -100,7 +104,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('flush');
 
-        $this->dumper->checkConfig();
+        $dumper = $this->getExtendConfigDumper();
+        $dumper->checkConfig();
 
         $fs->remove(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
     }
@@ -139,8 +144,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('flush');
 
-        $this->dumper->setCacheDir($this->cacheDir . '_other');
-        $this->dumper->checkConfig();
+        $dumper = $this->getExtendConfigDumper();
+        $dumper->setCacheDir($this->cacheDir . '_other');
+        $dumper->checkConfig();
 
         self::assertEquals(
             [
@@ -199,8 +205,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('flush');
 
-        $this->dumper->setCacheDir($this->cacheDir . '_other');
-        $this->dumper->checkConfig();
+        $dumper = $this->getExtendConfigDumper();
+        $dumper->setCacheDir($this->cacheDir . '_other');
+        $dumper->checkConfig();
     }
 
     public function testUpdateConfig()
@@ -234,8 +241,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->dumper->addExtension($extension);
-        $this->dumper->updateConfig();
+        $dumper = $this->getExtendConfigDumper([$extension]);
+        $dumper->updateConfig();
 
         self::assertEquals(
             new Config(
@@ -293,7 +300,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManagers')
             ->willReturn([]);
 
-        $this->dumper->clear();
+        $dumper = $this->getExtendConfigDumper();
+        $dumper->clear();
 
         self::assertFalse($fs->exists($aliasDataFile));
         self::assertTrue($fs->exists($entityCacheDir));

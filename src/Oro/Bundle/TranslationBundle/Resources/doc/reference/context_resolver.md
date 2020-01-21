@@ -55,5 +55,5 @@ Context resolver should be registered with tag `oro_translation.extension.transl
         arguments:
             - '@translator'
         tags:
-            - { name: oro_translation.extension.translation_context_resolver, priority: 100 }
+            - { name: oro_translation.extension.translation_context_resolver, priority: -100 }
 ```

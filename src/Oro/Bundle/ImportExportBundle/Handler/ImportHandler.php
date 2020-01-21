@@ -162,15 +162,17 @@ class ImportHandler extends AbstractHandler
             $message = $this->translator->trans('oro.importexport.import.error');
         }
 
+        $context = $jobResult->getContext();
+
         return [
             'success' => $isSuccessful,
             'message' => $message,
             'importInfo' => $importInfo,
             'errors'  => $errors,
             'counts'  => $counts,
-            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
-            'postponedDelay' => $jobResult->getContext()->getValue('postponedRowsDelay'),
-            'deadlockDetected' => $jobResult->getContext()->getValue('deadlockDetected')
+            'postponedRows' => $context->getPostponedRows(),
+            'postponedDelay' => $context->getValue('postponedRowsDelay'),
+            'deadlockDetected' => $context->getValue('deadlockDetected')
         ];
     }
 

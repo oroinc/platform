@@ -22,6 +22,9 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
     public function validateResourceIdentifierObject(array $requestData): array
     {
         return $this->doValidation(function () use ($requestData) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
@@ -40,6 +43,9 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
     public function validateResourceIdentifierObjectCollection(array $requestData): array
     {
         return $this->doValidation(function () use ($requestData) {
+            $this->validateJsonApiSection($requestData);
+            $this->validateMetaSection($requestData);
+            $this->validateLinksSection($requestData);
             if ($this->validateRequestData($requestData, JsonApiDoc::DATA)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);

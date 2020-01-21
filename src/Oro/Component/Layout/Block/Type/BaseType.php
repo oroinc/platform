@@ -7,6 +7,9 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Base block type
+ */
 class BaseType extends AbstractType
 {
     const NAME = 'block';
@@ -67,7 +70,7 @@ class BaseType extends AbstractType
         $view->vars['id']                   = $block->getId();
         $view->vars['block_type_widget_id'] = $block->getTypeName() . '_widget';
         $view->vars['block_type']           = $block->getTypeName();
-        $view->vars['unique_block_prefix']  = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $block->getId());
+        $view->vars['unique_block_prefix']  = '_' . preg_replace('/[^a-z0-9\_]+/i', '_', $block->getId());
         $view->vars['cache_key']            = sprintf('_%s_%s', $block->getId(), $block->getTypeName());
     }
 

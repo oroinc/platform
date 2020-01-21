@@ -6,6 +6,9 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsRes
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Context for rendering layout blocks
+ */
 class LayoutContext implements ContextInterface
 {
     /** @var array */
@@ -231,6 +234,24 @@ class LayoutContext implements ContextInterface
             }
         }
 
-        return md5(serialize($items));
+        $dataItems = [];
+        foreach ($this->dataCollection->getKnownValues() as $key) {
+            if (!$this->dataCollection->has($key)) {
+                continue;
+            }
+
+            $dataItem = $this->dataCollection->get($key);
+            if ($dataItem instanceof ContextItemInterface) {
+                $dataItems[$key] = $dataItem->getHash();
+            } elseif (\is_scalar($dataItem) || \is_array($dataItem)) {
+                try {
+                    $dataItems[$key] = serialize($dataItem);
+                } catch (\Exception $e) {
+                    // Serialization of current data is not allowed
+                }
+            }
+        }
+
+        return md5(serialize($items) . serialize($dataItems));
     }
 }

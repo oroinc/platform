@@ -283,5 +283,5 @@ acme_demo.configuration_search_provider.demo:
     arguments:
         - '@oro_config.config_bag'
     tags:
-        - { name: oro_config.configuration_search_provider, priority: 20 }
+        - { name: oro_config.configuration_search_provider, priority: -20 }
 ```

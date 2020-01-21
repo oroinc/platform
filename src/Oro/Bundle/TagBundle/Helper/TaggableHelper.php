@@ -112,6 +112,10 @@ class TaggableHelper
      */
     private function isEntityOptionEnabled($entity, $optionName)
     {
+        if (\is_object($entity)) {
+            $entity = \get_class($entity);
+        }
+
         return
             $this->tagConfigProvider->hasConfig($entity)
             && $this->tagConfigProvider->getConfig($entity)->is($optionName);

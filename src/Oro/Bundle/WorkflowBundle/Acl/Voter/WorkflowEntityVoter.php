@@ -5,26 +5,38 @@ namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class WorkflowEntityVoter extends AbstractEntityVoter
+/**
+ * Checks whether a workflow related entity can be deleted.
+ */
+class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var array */
     protected $supportedAttributes = ['DELETE'];
 
-    /** @var WorkflowPermissionRegistry */
-    protected $permissionRegistry;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * {@inheritdoc}
-     * @param WorkflowPermissionRegistry $permissionRegistry
+     * @param DoctrineHelper     $doctrineHelper
+     * @param ContainerInterface $container
      */
-    public function __construct(DoctrineHelper $doctrineHelper, WorkflowPermissionRegistry $permissionRegistry)
+    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
     {
         parent::__construct($doctrineHelper);
+        $this->container = $container;
+    }
 
-        $this->permissionRegistry = $permissionRegistry;
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_workflow.permission_registry' => WorkflowPermissionRegistry::class
+        ];
     }
 
     /**
@@ -32,7 +44,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
      */
     protected function supportsClass($class)
     {
-        return $this->permissionRegistry->supportsClass($class);
+        return $this->getPermissionRegistry()->supportsClass($class);
     }
 
     /**
@@ -40,16 +52,18 @@ class WorkflowEntityVoter extends AbstractEntityVoter
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        $permissions = $this->permissionRegistry->getPermissionByClassAndIdentifier($class, $identifier);
+        $permissions = $this->getPermissionRegistry()->getPermissionByClassAndIdentifier($class, $identifier);
 
-        switch ($attribute) {
-            case 'DELETE':
-                return $permissions[$attribute]
-                    ? self::ACCESS_GRANTED
-                    : self::ACCESS_DENIED;
+        return $permissions[$attribute]
+            ? self::ACCESS_GRANTED
+            : self::ACCESS_DENIED;
+    }
 
-            default:
-                return self::ACCESS_ABSTAIN;
-        }
+    /**
+     * @return WorkflowPermissionRegistry
+     */
+    private function getPermissionRegistry(): WorkflowPermissionRegistry
+    {
+        return $this->container->get('oro_workflow.permission_registry');
     }
 }

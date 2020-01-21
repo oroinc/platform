@@ -154,3 +154,18 @@
         max-width: $attachment-item-dialog-max-width;
     }
 }
+
+.attachment-fileitems {
+    th.sort-order {
+        width: 10%;
+    }
+    th.remove {
+        width: 2%;
+    }
+    td.sort-order input {
+        width: 40%;
+    }
+    td.file .control-group .controls {
+        margin-left: 0px;
+    }
+}

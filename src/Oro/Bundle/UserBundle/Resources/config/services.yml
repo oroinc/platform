@@ -142,7 +142,7 @@ services:
         class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
         arguments:
             - '@doctrine'
-            - '@oro_security.token.factory.username_password_organization'
+            - '@oro_user.security.factory.impersonation_username_password_organization'
             - '@oro_security.authentication.organization_guesser'
             - '@event_dispatcher'
             - '@router'
@@ -541,6 +541,14 @@ services:
         arguments:
             - "@security.token_storage"
 
+    oro_user.user_scope_cache_key_builder:
+        class: Oro\Bundle\UserBundle\Provider\UserScopeCacheKeyBuilder
+        decorates: oro_scope.scope_cache_key_builder
+        decoration_priority: 100
+        arguments:
+            - '@oro_user.user_scope_cache_key_builder.inner'
+            - '@security.token_storage'
+
     oro_user.datagrid.action_checker:
         class: Oro\Bundle\UserBundle\Datagrid\ActionChecker
         public: true
@@ -583,3 +591,6 @@ services:
         tags:
             - { name: oro_locale.preferred_localization_provider }
 
+    oro_user.security.factory.impersonation_username_password_organization:
+        class: Oro\Bundle\UserBundle\Security\ImpersonationUsernamePasswordOrganizationTokenFactory
+        public: true

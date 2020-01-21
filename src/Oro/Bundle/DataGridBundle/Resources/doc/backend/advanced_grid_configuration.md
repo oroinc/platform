@@ -128,7 +128,7 @@ datagrids:
             bind_parameters:
                 - groupId
         options:
-            entityHint: oro.user.plural_label
+            entityHint: oro.user.entity_plural_label
         properties:
             id: ~
         columns:
@@ -360,7 +360,7 @@ There are several ways to configure these messages.
                     from:
                         { table: AcmeDemoBundle:User, alias:u }
             options:
-                entityHint: oro.user.plural_label
+                entityHint: oro.user.entity_plural_label
        ...
     ```
     

@@ -30,6 +30,8 @@ services:
             - 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid'
             - 'Oro\Bundle\DataGridBundle\Extension\Acceptor'
             - '@oro_datagrid.event.dispatcher'
+            - ~ # service locator for data sources
+            - [] # extensions
         lazy: true
 
     oro_datagrid.datagrid.request_parameters_factory:
@@ -44,7 +46,7 @@ services:
     oro_datagrid.datagrid.guesser:
         class: Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser
         arguments:
-            - [] # a list of service ids of column options guessers
+            - !tagged_iterator oro_datagrid.column_options_guesser
 
     oro_datagrid.datagrid.primary_key_column_options_guesser:
         class: Oro\Bundle\DataGridBundle\Datagrid\PrimaryKeyColumnOptionsGuesser
@@ -84,6 +86,8 @@ services:
 
     oro_datagrid.configuration.provider.chain:
         class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
+        arguments:
+            - !tagged_iterator oro_datagrid.configuration.provider
 
     Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface:
         alias: oro_datagrid.configuration.provider.chain
@@ -198,6 +202,7 @@ services:
     oro_datagrid.datagrid.inline_edit_column_options_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
         arguments:
+            - !tagged_iterator oro_datagrid.inline_edit_column_options_guesser
             - '@validator'
 
     oro_datagrid.datagrid.inline_edit_column_options.text_guesser:
@@ -205,7 +210,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 100 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_datagrid.datagrid.inline_edit_column_options.choices_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\ChoicesGuesser
@@ -213,7 +218,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.choice.helper'
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 90 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser
@@ -221,17 +226,17 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.choice.helper'
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 92 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_datagrid.datagrid.inline_edit_column_options.relation_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\RelationGuesser
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 95 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_datagrid.datagrid.inline_edit_column_options.multi_relation_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 97 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_datagrid.handler.export:
         class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
@@ -253,11 +258,11 @@ services:
     oro_datagrid.datagrid.board.processor.default:
         class: Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_datagrid.choice.helper'
         tags:
-          - { name: oro_datagrid.board_processor }
+            - { name: oro_datagrid.board_processor, alias: default }
 
     oro_datagrid.datagrid.board.restriction_manager:
         class: Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager
@@ -331,3 +336,13 @@ services:
         public: false
         arguments:
             - '@router'
+
+    oro_datagrid.event_listener.default_grid_view_load:
+        class: Oro\Bundle\DataGridBundle\EventListener\DefaultGridViewLoadListener
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_search.provider.search_mapping'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }

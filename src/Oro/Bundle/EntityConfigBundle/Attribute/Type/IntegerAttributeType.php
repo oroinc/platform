@@ -6,29 +6,10 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
- * Integer field type
+ * Provides metadata about integer attribute type.
  */
 class IntegerAttributeType implements AttributeTypeInterface
 {
-    /** @var string */
-    protected $type;
-
-    /**
-     * @param string $type
-     */
-    public function __construct($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -8,6 +8,7 @@ oro_permissions:
         description: Permission 2 description
         apply_to_entities: ['OroTestFrameworkBundle:TestActivityTarget']
         exclude_entities: ['OroTestFrameworkBundle:WorkflowAwareEntity']
+        apply_to_interfaces: ['OroTestFrameworkBundle:TestActivityTargetInterface']
         group_names: ['new_group']
         apply_to_all: false
 

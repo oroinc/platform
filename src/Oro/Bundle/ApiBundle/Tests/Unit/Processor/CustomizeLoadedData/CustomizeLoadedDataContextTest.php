@@ -133,7 +133,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $propertyPath = 'test';
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        self::assertNull($this->context->getResultFieldName($propertyPath));
+        self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
     }
 
     public function testGetResultFieldNameForNotRenamedField()
@@ -177,7 +177,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $data = [$propertyName => 'test value'];
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        self::assertNull($this->context->getResultFieldValue($propertyName, $data));
+        self::assertEquals($data[$propertyName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
     public function testGetResultFieldValueForNotRenamedField()

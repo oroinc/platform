@@ -2,21 +2,49 @@
 
 namespace Oro\Bundle\ReminderBundle\EventListener;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Events;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ReminderListener
+/**
+ * Handles entities that implements RemindableInterface.
+ */
+class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
 {
-    /** @var ReminderManager */
-    protected $reminderManager;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param ReminderManager $reminderManager
+     * @param ContainerInterface $container
      */
-    public function __construct(ReminderManager $reminderManager)
+    public function __construct(ContainerInterface $container)
     {
-        $this->reminderManager = $reminderManager;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_reminder.entity.manager' => ReminderManager::class
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSubscribedEvents()
+    {
+        return [
+            Events::postLoad,
+            Events::postPersist
+        ];
     }
 
     /**
@@ -28,7 +56,7 @@ class ReminderListener
     {
         $entity = $args->getEntity();
         if ($entity instanceof RemindableInterface) {
-            $this->reminderManager->loadReminders($entity);
+            $this->getReminderManager()->loadReminders($entity);
         }
     }
 
@@ -41,7 +69,15 @@ class ReminderListener
     {
         $entity = $event->getEntity();
         if ($entity instanceof RemindableInterface) {
-            $this->reminderManager->saveReminders($entity);
+            $this->getReminderManager()->saveReminders($entity);
         }
+    }
+
+    /**
+     * @return ReminderManager
+     */
+    private function getReminderManager(): ReminderManager
+    {
+        return $this->container->get('oro_reminder.entity.manager');
     }
 }

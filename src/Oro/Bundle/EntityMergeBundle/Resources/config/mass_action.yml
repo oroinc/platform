@@ -9,15 +9,13 @@ services:
             - '@oro_entity_config.provider.merge'
             - '@translator'
         shared: false
-        public: true
         tags:
-            - { name:  oro_datagrid.extension.mass_action.type, type: merge }
+            - { name: oro_datagrid.extension.mass_action.type, type: merge }
 
     oro_entity_merge.mass_action.iterable_result_factory_registry:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry
-        public: false
-        calls:
-            - ['addFactory', ['@oro_entity_merge.mass_action.iterable_result_factory']]
+        arguments:
+            - ['@oro_entity_merge.mass_action.iterable_result_factory']
 
     oro_entity_merge.mass_action.dispatcher:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher

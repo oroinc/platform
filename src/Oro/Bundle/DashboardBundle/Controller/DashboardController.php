@@ -219,7 +219,7 @@ class DashboardController extends AbstractController
      * @Route(
      *      "/widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      *
      * @param string $widget
@@ -239,7 +239,7 @@ class DashboardController extends AbstractController
      * @Route(
      *      "/itemized_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      *
      * @param string $widget
@@ -269,7 +269,7 @@ class DashboardController extends AbstractController
      * @Route(
      *      "/itemized_data_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_data_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      * @param Request $request
      * @param string $widget

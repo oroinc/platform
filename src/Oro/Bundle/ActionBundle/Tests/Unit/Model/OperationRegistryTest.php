@@ -43,9 +43,6 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
 
-    /** @var OperationRegistry */
-    protected $registry;
-
     /** @var ContextHelper */
     private $contextHelper;
 
@@ -100,13 +97,6 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             $this->attributeAssembler,
             $this->formOptionsAssembler
         );
-
-        $this->registry = new OperationRegistry(
-            $this->configurationProvider,
-            $this->assembler,
-            $this->applicationProvider,
-            $this->doctrineHelper
-        );
     }
 
     /**
@@ -124,12 +114,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($this->getConfiguration());
 
-        $this->assertEquals($expected, array_keys($this->registry->find(
+        $registry = $this->getOperationRegistry();
+
+        $this->assertEquals($expected, array_keys($registry->find(
             new OperationFindCriteria($entityClass, $route, $datagrid, $group)
         )));
 
         // get operations from local cache
-        $this->assertEquals($expected, array_keys($this->registry->find(
+        $this->assertEquals($expected, array_keys($registry->find(
             new OperationFindCriteria($entityClass, $route, $datagrid, $group)
         )));
     }
@@ -308,9 +300,9 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             ->with($this->isType('array'), $criteria)
             ->willReturn($filterResult);
 
-        $this->registry->addFilter($filter);
+        $registry = $this->getOperationRegistry([$filter]);
 
-        $operation = $this->registry->findByName($operationName, $criteria);
+        $operation = $registry->findByName($operationName, $criteria);
 
         $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
@@ -537,13 +529,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             ),
             $criteria3
         );
-        $this->registry->addFilter($filter);
-        $this->registry->find($criteria3);
+
+        $registry = $this->getOperationRegistry([$filter]);
+        $registry->find($criteria3);
     }
 
     public function testOuterFiltering()
     {
-        $this->configurationProvider->expects($this->once())
+        $this->configurationProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn(
                 [
@@ -562,12 +555,13 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $registry = $this->getOperationRegistry();
         $this->assertEquals(
             ['operation1', 'operation2', 'operation3'],
-            array_keys($this->registry->find(new OperationFindCriteria('e1', 'r1', 'd1')))
+            array_keys($registry->find(new OperationFindCriteria('e1', 'r1', 'd1')))
         );
 
-        $this->registry->addFilter($this->createFilter(
+        $filter1 = $this->createFilter(
             function (Operation $operation, OperationFindCriteria $criteria) {
                 if ($criteria->getEntityClass() === 'e1') {
                     return $operation->getName() !== 'operation1';
@@ -575,9 +569,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
                 return true;
             }
-        ));
-
-        $this->registry->addFilter($this->createFilter(
+        );
+        $filter2 = $this->createFilter(
             function (Operation $operation, OperationFindCriteria $criteria) {
                 if ($criteria->getEntityClass() === 'e2') {
                     return $operation->getName() !== 'operation2';
@@ -585,9 +578,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
                 return true;
             }
-        ));
-
-        $this->registry->addFilter($this->createFilter(
+        );
+        $filter3 = $this->createFilter(
             function (Operation $operation, OperationFindCriteria $criteria) {
                 if ($criteria->getEntityClass() === 'e3') {
                     return $operation->getName() !== 'operation3';
@@ -595,24 +587,42 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
                 return true;
             }
-        ));
+        );
+
+        $registry = $this->getOperationRegistry([$filter1, $filter2, $filter3]);
 
         $this->assertEquals(
             ['operation2', 'operation3'],
-            array_keys($this->registry->find(new OperationFindCriteria('e1', null, null))),
+            array_keys($registry->find(new OperationFindCriteria('e1', null, null))),
             'first filter should be applied'
         );
 
         $this->assertEquals(
             ['operation1', 'operation3'],
-            array_keys($this->registry->find(new OperationFindCriteria('e2', null, null))),
+            array_keys($registry->find(new OperationFindCriteria('e2', null, null))),
             'second filter should be applied'
         );
 
         $this->assertEquals(
             ['operation1', 'operation2'],
-            array_keys($this->registry->find(new OperationFindCriteria('e3', null, null))),
+            array_keys($registry->find(new OperationFindCriteria('e3', null, null))),
             'third filter should be applied'
+        );
+    }
+
+    /**
+     * @param OperationRegistryFilterInterface[] $filters
+     *
+     * @return OperationRegistry
+     */
+    private function getOperationRegistry(array $filters = [])
+    {
+        return new OperationRegistry(
+            $filters,
+            $this->configurationProvider,
+            $this->assembler,
+            $this->applicationProvider,
+            $this->doctrineHelper
         );
     }
 

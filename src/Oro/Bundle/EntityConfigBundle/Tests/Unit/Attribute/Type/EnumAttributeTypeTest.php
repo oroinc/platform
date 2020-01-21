@@ -15,11 +15,6 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         return new EnumAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('enum', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

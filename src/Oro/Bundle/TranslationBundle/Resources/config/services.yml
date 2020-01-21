@@ -167,6 +167,8 @@ services:
 
     oro_translation.packages_provider.translation:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider
+        arguments:
+            - !tagged_iterator oro_translation.extension.packages_provider
 
     # this instance of the composer does not require the full initialization
     # and can work without Phar and Zip PHP extensions
@@ -233,10 +235,12 @@ services:
             - '@oro_translation.provider.language'
             - '%installed%'
         tags:
-            - { name: oro_translation.extension.translation_strategy, priority: 0 }
+            - { name: oro_translation.extension.translation_strategy }
 
     oro_translation.strategy.provider:
         class: Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider
+        arguments:
+            - !tagged_iterator oro_translation.extension.translation_strategy
 
     oro_translation.listener.datagrid.language:
         class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener
@@ -268,13 +272,15 @@ services:
     oro_translation.provider.translation_context:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider
         public: true
+        arguments:
+            - !tagged_iterator oro_translation.extension.translation_context_resolver
 
     oro_translation.extension.translation_context_resolver:
         class: Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver
         arguments:
             - '@translator'
         tags:
-            - { name: oro_translation.extension.translation_context_resolver, priority: 100 }
+            - { name: oro_translation.extension.translation_context_resolver, priority: -100 }
 
     oro_translation.provider.language:
         class: Oro\Bundle\TranslationBundle\Provider\LanguageProvider
@@ -342,7 +348,6 @@ services:
     oro_translation.mass_action.reset_translation:
         class: Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
 
@@ -362,10 +367,6 @@ services:
            - '@oro_translation.helper.language'
            - '@oro_entity.doctrine_helper'
 
-    oro_translation.strategy.provider_link:
-        tags:
-            - { name: oro_service_link, service: oro_translation.strategy.provider }
-
     oro_translation.migration.demo_data_fixtures_listener.js_translation_dump:
         class: Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener
         arguments:
@@ -375,7 +376,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
 
-    Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper:
+    oro_translation.translation_pack_dumper:
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper
         arguments:
             - '@translation.writer'
             - '@translation.extractor'
@@ -384,7 +386,10 @@ services:
             - '@oro_translation.packages_provider.translation'
             - "@=service('kernel').getBundles()"
 
-    Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection: ~
+    oro_translation.translation_adapters_collection:
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationAdaptersCollection
+        arguments:
+            - ~ # adapters
 
     oro_translation.async.message_processor.dump_js_translations:
         class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor

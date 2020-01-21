@@ -4,6 +4,8 @@ services:
         class: Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand
         arguments:
             - '@oro_security.acl.permission_manager'
+            - '@oro_security.configuration.provider.permission_configuration'
+            - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: console.command }

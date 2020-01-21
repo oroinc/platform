@@ -1,0 +1,5 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    entity1:
+        name: 'Entity 1'
+        organization: '@organization'
+        owner: '@business_unit'

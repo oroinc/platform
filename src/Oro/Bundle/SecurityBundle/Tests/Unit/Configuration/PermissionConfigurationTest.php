@@ -12,7 +12,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    private function processConfiguration(array $configs)
+    private function processConfiguration(array $configs): array
     {
         $processor = new Processor();
 
@@ -24,7 +24,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
      * @param array $expected
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $input, array $expected)
+    public function testProcess(array $input, array $expected): void
     {
         $this->assertEquals($expected, $this->processConfiguration([$input]));
     }
@@ -32,7 +32,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             'permissions list 1' => [
@@ -48,6 +48,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
                         'group_names' => 'frontend',
                         'exclude_entities' => ['Entity1'],
                         'apply_to_entities' => ['Entity2'],
+                        'apply_to_interfaces' => ['Interface1'],
                         'description' => 'Test Description',
                     ],
                 ],
@@ -58,6 +59,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
                         'group_names' => ['default'],
                         'exclude_entities' => [],
                         'apply_to_entities' => [],
+                        'apply_to_interfaces' => [],
                     ],
                     'permission2' => [
                         'label' => 'My Label',
@@ -65,6 +67,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
                         'group_names' => ['default', 'frontend'],
                         'exclude_entities' => [],
                         'apply_to_entities' => [],
+                        'apply_to_interfaces' => [],
                     ],
                     'permission3' => [
                         'label' => 'Test Label',
@@ -73,6 +76,7 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
                         'exclude_entities' => ['Entity1'],
                         'apply_to_entities' => ['Entity2'],
                         'description' => 'Test Description',
+                        'apply_to_interfaces' => ['Interface1'],
                     ],
                 ],
             ]
