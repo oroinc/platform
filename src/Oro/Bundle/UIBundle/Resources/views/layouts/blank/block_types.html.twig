@@ -20,7 +20,11 @@
 {% block page_subtitle_widget %}
     {% set attr = layout_attr_defaults(attr, {'~class': ' page-subtitle'}) %}
     <h2 {{ block('block_attributes') }}>
-        {% if icon %}<span class="badge {{ badge ? 'badge--' ~ badge }}"><i class="fa-{{ icon }}"></i></span>{% endif %}
+        {% if icon %}
+            <span class="badge {{ badge ? 'badge--' ~ badge }}">
+                <span class="fa-{{ icon }}" aria-hidden="true"></span>
+            </span>
+        {% endif %}
         <span class="page-subtitle__text">{{ text|block_text(translation_domain) }}</span>
         {{ block('container_widget') }}
     </h2>
