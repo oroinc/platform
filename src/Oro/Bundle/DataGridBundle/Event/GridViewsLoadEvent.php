@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Class representing event data for `oro_datagrid.grid_views_load` event
+ */
 class GridViewsLoadEvent extends Event
 {
     const EVENT_NAME = 'oro_datagrid.grid_views_load';
@@ -14,6 +18,9 @@ class GridViewsLoadEvent extends Event
 
     /** @var GridView[] */
     protected $gridViews = [];
+
+    /** @var DatagridConfiguration */
+    private $gridConfiguration;
 
     /**
      * @param string $gridName
@@ -47,5 +54,21 @@ class GridViewsLoadEvent extends Event
     public function setGridViews(array $gridViews = [])
     {
         $this->gridViews = $gridViews;
+    }
+
+    /**
+     * @return DatagridConfiguration
+     */
+    public function getGridConfiguration(): DatagridConfiguration
+    {
+        return $this->gridConfiguration;
+    }
+
+    /**
+     * @param DatagridConfiguration $gridConfiguration
+     */
+    public function setGridConfiguration(DatagridConfiguration $gridConfiguration): void
+    {
+        $this->gridConfiguration = $gridConfiguration;
     }
 }

@@ -25,6 +25,7 @@ oro:
         integration:
             entity_label:        Integration
             entity_plural_label: Integrations
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Represent integration
             id.label:         Id
             type.label:       Type
@@ -58,6 +59,7 @@ oro:
         channel:
             entity_label:                   Integration
             entity_plural_label:            Integrations
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:             Represent integration
             id.label:                       Id
             type:
