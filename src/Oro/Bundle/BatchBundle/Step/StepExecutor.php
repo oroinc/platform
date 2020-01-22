@@ -259,7 +259,9 @@ class StepExecutor
             $item = $e instanceof InvalidItemException
                 ? $e->getItem()
                 : null;
-            $messageParameters = $e instanceof RuntimeErrorException ? $e->getMessageParameters() : [];
+            $messageParameters = $e instanceof RuntimeErrorException
+                ? $e->getMessageParameters()
+                : [];
             $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $messageParameters, $item);
         }
     }
