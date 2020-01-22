@@ -13,10 +13,6 @@
         &:not(:disabled):not(.disabled).active {
             background-color: $catalog-switcher-btn-background-active;
             color: $catalog-switcher-btn-color-active;
-
-            &.focus-visible {
-                @include focus-visible();
-            }
         }
 
         &.focus-visible {

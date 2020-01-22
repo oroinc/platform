@@ -11,3 +11,9 @@ $base-ui-element-color: get-color('additional', 'darker');
 
 $base-ui-element-height-size-m: 38px !default;
 
+$base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
+                              0 0 6px lighten(get-color('ui', 'normal'), 1%);
+$base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
+                          0 0 0 3px get-color('ui', 'focus'),
+                          0 0 6px lighten(get-color('ui', 'normal'), 1%);
+

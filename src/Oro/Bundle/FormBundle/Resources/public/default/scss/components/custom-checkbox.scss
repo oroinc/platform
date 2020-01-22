@@ -23,6 +23,7 @@
 
                 @include base-disabled-style(.55);
             }
+
             & ~ .custom-checkbox__text {
                 @include base-disabled-style(.35);
             }
@@ -46,6 +47,7 @@
 
         &--circle {
             border-radius: 50%;
+
             @include fa-icon($checkbox-icon-circle-unchecked);
         }
 

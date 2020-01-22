@@ -61,7 +61,8 @@
 
 {% block _page_main_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-main'
+        '~class': ' page-main',
+        'data-skip-focus-decoration': ''
     }) %}
     <main{{ block('block_attributes') }}>
         {{ block_widget(block) }}
