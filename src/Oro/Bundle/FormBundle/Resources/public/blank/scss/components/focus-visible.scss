@@ -2,7 +2,7 @@
 
 @if $focus-visible-style {
     .focus-visible {
-        box-shadow: $base-ui-element-focus-style;
+        box-shadow: $focus-visible-style;
 
         &[data-skip-focus-decoration] {
             box-shadow: none;
