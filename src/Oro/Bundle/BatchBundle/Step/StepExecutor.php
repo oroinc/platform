@@ -7,6 +7,7 @@ use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Job\RuntimeErrorException;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class StepExecutor
@@ -258,8 +259,8 @@ class StepExecutor
             $item = $e instanceof InvalidItemException
                 ? $e->getItem()
                 : null;
-
-            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $e->getMessageParameters(), $item);
+            $messageParameters = $e instanceof RuntimeErrorException ? $e->getMessageParameters() : [];
+            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $messageParameters, $item);
         }
     }
 }
