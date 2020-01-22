@@ -260,7 +260,8 @@ div.mce-tinymce-inline {
     height: 100%;
     top: 2px;
     right: 2px;
-    opacity: .4}
+    opacity: .4;
+}
 
 .mce-scrollbar-h {
     top: auto;
@@ -898,12 +899,22 @@ i.mce-i-checkbox {
     display: inline-block;
 }
 
-.mce-container-body input:not([type="file"]) {
-    @extend %base-input;
+.mce-container-body {
+    input:not([type="file"]) {
+        @extend %base-input;
 
-    &:not(textarea) {
         min-height: $field-size;
         margin-bottom: 0;
+    }
+
+    .mce-multiline {
+        white-space: normal;
+
+        @extend %base-input;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 

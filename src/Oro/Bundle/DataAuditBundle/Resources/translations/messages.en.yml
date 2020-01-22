@@ -12,6 +12,7 @@ oro:
         auditfield:
             entity_label:         Audit Field
             entity_plural_label:  Audit Fields
+            entity_grid_all_view_label: All %entity_plural_label%
             data_type.label:      Data Type
             field.label:          Field
             id.label:             Id
@@ -79,6 +80,7 @@ oro:
         abstractaudit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at
@@ -98,6 +100,7 @@ oro:
         audit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at

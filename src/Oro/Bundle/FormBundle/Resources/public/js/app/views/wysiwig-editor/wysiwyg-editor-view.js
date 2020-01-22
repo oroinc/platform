@@ -31,7 +31,7 @@ define(function(require) {
             },
             menubar: false,
             toolbar: ['undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist' +
-            '| alignleft aligncenter alignright alignjustify | bdesk_photo'],
+            '| code | alignleft aligncenter alignright alignjustify | bdesk_photo'],
             statusbar: false,
             browser_spellcheck: true,
             images_dataimg_filter: function() {

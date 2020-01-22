@@ -17,6 +17,7 @@ oro:
 
         entity_label:        Reminder
         entity_plural_label: Reminders
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:  Represent reminder
 
         interval:

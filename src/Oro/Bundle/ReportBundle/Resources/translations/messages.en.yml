@@ -1,6 +1,7 @@
 oro:
     calendardate:
         entity_plural_label: Calendar Dates
+        entity_grid_all_view_label: All %entity_plural_label%
     query_designer:
         aggregates:
             identifier:
@@ -86,6 +87,7 @@ oro:
         entity_label:        Report
         entity_description:  Represent Report
         entity_plural_label: Reports
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         name.label:          Name
         owner.label:         Owner
@@ -95,6 +97,7 @@ oro:
         reporttype:
             entity_label:        Report Type
             entity_plural_label: Report Types
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Represent Report Type
             name.label:          Name
             label.label:         Label

@@ -2,6 +2,7 @@ oro:
     attachment:
         entity_label:        Attachment
         entity_plural_label: Attachments
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:  Attachment represents an uploaded file added to a record.
 
         id.label:            Id
@@ -31,6 +32,7 @@ oro:
             file.label:              File
             entity_label:            File
             entity_plural_label:     Files
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:      Files attached to emails, comments, notes or other entity records.
             id.label:                Id
             filename.label:          File name

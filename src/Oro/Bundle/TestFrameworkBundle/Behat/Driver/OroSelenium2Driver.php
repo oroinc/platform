@@ -220,6 +220,10 @@ JS;
             if (document.body.classList.contains('loading')) {
                 return false;
             }
+            
+            if (document.body.classList.contains('img-loading')) {
+                return false;
+            }
 
             if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;

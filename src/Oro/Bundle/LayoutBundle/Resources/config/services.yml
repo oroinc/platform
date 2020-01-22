@@ -133,6 +133,14 @@ services:
     oro_layout.layout_context_holder:
         class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
 
+    oro_layout.cache_warmer.layout_updates:
+        class: Oro\Bundle\LayoutBundle\Cache\LayoutUpdatesCacheWarmer
+        arguments:
+            - '@oro_layout.loader'
+            - '@kernel'
+        tags:
+            - { name: 'kernel.cache_warmer' }
+
     oro_layout.expression_language.cache:
         public: false
         parent: oro.cache.abstract
