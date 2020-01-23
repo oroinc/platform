@@ -15,7 +15,6 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
@@ -438,7 +437,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      */
     private function prepareFilters($sortBy = '-id')
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer

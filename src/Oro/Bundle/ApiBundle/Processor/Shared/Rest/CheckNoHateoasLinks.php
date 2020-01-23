@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks if it was requested to exclude HATEOAS links from REST API response
- * via "X-Include: noHateoas" request header and if so, disables HATEOAS for the current request.
+ * via "X-Include: noHateoas" request header, and if so, disables HATEOAS for the current request.
  */
 class CheckNoHateoasLinks implements ProcessorInterface
 {

@@ -28,8 +28,10 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
             ]
         ];
         $configExtra = new MetaPropertiesConfigExtra();
-        $configExtra->addMetaProperty('prop2');
+        $configExtra->addMetaProperty('prop1', 'integer');
+        $configExtra->addMetaProperty('prop2', 'string');
         $configExtra->addMetaProperty('prop3', 'integer');
+        $configExtra->addMetaProperty('prop4', null);
 
         $this->context->setExtras([$configExtra]);
         $this->context->setResult($this->createConfigObject($config));
