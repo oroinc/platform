@@ -1,6 +1,6 @@
 <% if (!_.isEmpty(filters)) { %>
     <% if (renderMode === 'toggle-mode') { %>
-        <div class="filter-box toggle-mode" <%- attributes %>>
+        <div class="filter-box toggle-mode" <%= attributes %>>
             <div class="filter-container">
                 <div data-filters-items>
                     <div class="filter-items-hint">
@@ -23,7 +23,7 @@
             </div>
         </div>
     <% } else { %>
-        <div class="filter-box dropdown-mode" <%- attributes %> >
+        <div class="filter-box dropdown-mode" <%= attributes %> >
             <div class="filter-container">
                 <select data-action="add-filter-select"
                         data-skip-input-widgets
