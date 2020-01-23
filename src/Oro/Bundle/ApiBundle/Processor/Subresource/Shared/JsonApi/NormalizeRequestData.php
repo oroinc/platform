@@ -95,7 +95,19 @@ class NormalizeRequestData implements ProcessorInterface
             $associationData = null;
         }
 
-        return [$associationName => $associationData];
+        $result = [$associationName => $associationData];
+        if (!empty($data[JsonApiDoc::META])) {
+            $parentMetadata = $this->context->getParentMetadata();
+            if (null !== $parentMetadata) {
+                foreach ($data[JsonApiDoc::META] as $name => $value) {
+                    if ($parentMetadata->hasMetaProperty($name)) {
+                        $result[$name] = $value;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

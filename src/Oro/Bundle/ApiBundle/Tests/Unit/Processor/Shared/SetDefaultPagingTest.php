@@ -61,9 +61,11 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         /** @var PageSizeFilter $pageSizeFilter */
         $pageSizeFilter = $filters->get('page[size]');
         self::assertEquals(10, $pageSizeFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('page[size]'));
         /** @var PageNumberFilter $pageNumberFilter */
         $pageNumberFilter = $filters->get('page[number]');
         self::assertEquals(1, $pageNumberFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('page[number]'));
 
         // check that filters are added in correct order
         self::assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
@@ -83,9 +85,11 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         /** @var PageSizeFilter $pageSizeFilter */
         $pageSizeFilter = $filters->get('page[size]');
         self::assertEquals(123, $pageSizeFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('page[size]'));
         /** @var PageNumberFilter $pageNumberFilter */
         $pageNumberFilter = $filters->get('page[number]');
         self::assertEquals(1, $pageNumberFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('page[number]'));
 
         // check that filters are added in correct order
         self::assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));

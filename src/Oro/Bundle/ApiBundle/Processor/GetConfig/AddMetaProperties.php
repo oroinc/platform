@@ -9,7 +9,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds configuration for all meta properties requested via "meta" filter.
+ * Adds the configuration for all meta properties requested via "meta" filter.
+ * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
  */
 class AddMetaProperties implements ProcessorInterface
 {
@@ -26,13 +27,19 @@ class AddMetaProperties implements ProcessorInterface
         $configExtra = $context->getExtra(MetaPropertiesConfigExtra::NAME);
         $names = $configExtra->getMetaPropertyNames();
         foreach ($names as $name) {
-            $metaPropertyName = ConfigUtil::buildMetaPropertyName($name);
-            if (!$config->hasField($metaPropertyName)) {
-                $field = $config->addField($metaPropertyName);
-                $field->setMetaProperty(true);
-                $field->setDataType($configExtra->getTypeOfMetaProperty($name));
-                $field->setMetaPropertyResultName($name);
+            $dataType = $configExtra->getTypeOfMetaProperty($name);
+            if (!$dataType) {
+                continue;
             }
+            $metaPropertyName = ConfigUtil::buildMetaPropertyName($name);
+            if ($config->hasField($metaPropertyName)) {
+                continue;
+            }
+
+            $field = $config->addField($metaPropertyName);
+            $field->setMetaProperty(true);
+            $field->setDataType($dataType);
+            $field->setMetaPropertyResultName($name);
         }
     }
 }
