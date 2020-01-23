@@ -78,6 +78,8 @@ class RegisterDynamicFilters extends RegisterFilters
         $filterGroup = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getDataFilterGroupName();
+        $filterCollection->setDefaultGroupName(null);
+        $allFilterValues->setDefaultGroupName(null);
         if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
             $this->prepareFiltersForDocumentation($filterCollection, $filterGroup);
         } else {
@@ -105,7 +107,7 @@ class RegisterDynamicFilters extends RegisterFilters
                         $renameMap[$filterKey] = null;
                         $context->addError($this->createInvalidFilterValueKeyError($actualFilterKey, $e));
                     }
-                } elseif ($filterGroup) {
+                } elseif ($filterGroup && $filterCollection->isIncludeInDefaultGroup($filterKey)) {
                     $groupedFilterKey = $filterCollection->getGroupedFilterKey($filterGroup, $filterKey);
                     if ($filter instanceof StandaloneFilterWithDefaultValue
                         || $allFilterValues->has($groupedFilterKey)
@@ -141,6 +143,9 @@ class RegisterDynamicFilters extends RegisterFilters
 
         $filters = $filterCollection->all();
         foreach ($filters as $filterKey => $filter) {
+            if (!$filterCollection->isIncludeInDefaultGroup($filterKey)) {
+                continue;
+            }
             $filterCollection->remove($filterKey);
             $filterCollection->add(
                 $filterCollection->getGroupedFilterKey($filterGroup, $filterKey),

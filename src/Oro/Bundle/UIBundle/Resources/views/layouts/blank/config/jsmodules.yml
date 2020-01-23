@@ -95,6 +95,8 @@ dynamic-imports:
         - oroui/js/app/views/layout-subtree-view
         - oroui/js/app/views/page/content-view
         - oroui/js/app/views/page/messages-view
+        - oroui/js/app/views/show-more/inline-show-more-view
+        - oroui/js/app/views/show-more/table-show-more-view
         - oroui/js/app/views/swipeable-view
         - oroui/js/content-processor/pinned-dropdown-button
         - oroui/js/delete-confirmation

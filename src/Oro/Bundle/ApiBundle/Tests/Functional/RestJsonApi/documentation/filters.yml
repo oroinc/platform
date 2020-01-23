@@ -3,6 +3,10 @@ filters:
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
         operators: 'eq,neq,lt,lte,gt,gte'
+    'filter[title]':
+        requirement: '.+'
+        type: 'string'
+        operators: 'eq,neq,exists,neq_or_null'
     'filter[owner]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
@@ -14,4 +18,15 @@ filters:
     'fields[businessunits]':
         requirement: '.+'
     'include':
+        requirement: '.+'
+    'page[number]':
+        requirement: '\d+'
+        default: '1'
+    'page[size]':
+        requirement: '-?\d+'
+        default: '10'
+    'sort':
+        requirement: '-?[\w\.]+(,-?[\w\.]+)*'
+        default: 'id'
+    'meta':
         requirement: '.+'

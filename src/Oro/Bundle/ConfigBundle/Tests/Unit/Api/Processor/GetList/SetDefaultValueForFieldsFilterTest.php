@@ -112,6 +112,8 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             ],
             iterator_to_array($this->context->getFilters()->getIterator())
         );
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('fields[configurationoptions]'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('include'));
     }
 
     public function testProcessWhenConfigurationSectionFieldsFilterExist()
@@ -149,7 +151,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             );
 
         $this->context->setClassName($entityClass);
-        $this->context->getFilters()->add('fields[configuration]', $configurationSectionFieldsFilter);
+        $this->context->getFilters()->add('fields[configuration]', $configurationSectionFieldsFilter, false);
         $this->processor->process($this->context);
 
         $expectedConfigurationSectionFieldsFilter = new FieldsFilter(
@@ -177,6 +179,9 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             ],
             iterator_to_array($this->context->getFilters()->getIterator())
         );
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('fields[configuration]'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('fields[configurationoptions]'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('include'));
     }
 
     public function testProcessWhenConfigurationOptionsFieldsAndIncludeFiltersAlreadyExist()
@@ -217,8 +222,8 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             );
 
         $this->context->setClassName($entityClass);
-        $this->context->getFilters()->add('fields[configurationoptions]', $configurationOptionsFieldsFilter);
-        $this->context->getFilters()->add('include', $includeFilter);
+        $this->context->getFilters()->add('fields[configurationoptions]', $configurationOptionsFieldsFilter, false);
+        $this->context->getFilters()->add('include', $includeFilter, false);
         $this->processor->process($this->context);
 
         $this->assertEquals(
@@ -228,6 +233,8 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             ],
             iterator_to_array($this->context->getFilters()->getIterator())
         );
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('fields[configurationoptions]'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('include'));
     }
 
     public function testProcessWhenFieldsAndIncludeFiltersAreNotSupported()

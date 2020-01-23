@@ -161,6 +161,7 @@ oro:
         processdefinition:
             entity_label:                 Process
             entity_plural_label:          Processes
+            entity_grid_all_view_label: All %entity_plural_label%
             actions_configuration.label:  Actions configuration
             enabled.label:                Enabled
             execution_order.label:        Execution order
@@ -174,6 +175,7 @@ oro:
         processtrigger:
             entity_label:         Process Trigger
             entity_plural_label:  Process Triggers
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:             ID
             definition.label:     Process definition
             event.label:          Event
@@ -196,6 +198,7 @@ oro:
         workflowdefinition:
             entity_label:                 Workflow
             entity_plural_label:          Workflows
+            entity_grid_all_view_label: All %entity_plural_label%
             label.label:                  Name # this translation has been chosen because it doesn't confuse users
             system.label:                 System
             configuration.label:          Configuration
@@ -263,6 +266,7 @@ oro:
         workflowitem:
             entity_label:             Workflow Item
             entity_plural_label:      Workflow Items
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:       Represents workflow item
             id.label:                 ID
             acl_identities.label:     ACL identities
@@ -282,6 +286,7 @@ oro:
         workflowstep:
             entity_label:         Workflow Step
             entity_plural_label:  Workflow Steps
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:   Represents workflow step
             id.label:             ID
             definition.label:     Workflow definition
@@ -297,6 +302,7 @@ oro:
         basetransitiontrigger:
             entity_label:              Base Transition Trigger
             entity_plural_label:       Base Transition Triggers
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:                  ID
             workflow_definition.label: Workflow Definition
             transition_name.label:     Transition Name
@@ -305,6 +311,7 @@ oro:
         transitioncrontrigger:
             entity_label:              Transition Cron Trigger
             entity_plural_label:       Transition Cron Triggers
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:                  ID
             workflow_definition.label: Workflow Definition
             transition_name.label:     Transition Name
@@ -315,6 +322,7 @@ oro:
         transitioneventtrigger:
             entity_label:              Transition Event Trigger
             entity_plural_label:       Transition Event Triggers
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:                  ID
             workflow_definition.label: Workflow Definition
             transition_name.label:     Transition Name
