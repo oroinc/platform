@@ -38,7 +38,7 @@
         <ol {{ block('block_attributes') }}>
             {% if breadcrumbs is not iterable %}
                 <li class="breadcrumbs__item">
-                    {{ breadcrumbs }}
+                    <a href="#" class="breadcrumbs__link" aria-current="location">{{ breadcrumbs }}</a>
                 </li>
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
