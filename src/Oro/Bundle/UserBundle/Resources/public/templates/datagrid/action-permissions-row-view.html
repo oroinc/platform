@@ -4,6 +4,9 @@
     <div class="entity-permission-container <% if (fields.length === 0) {%> field-less<% } %>">
         <div class="collapse-expand-action-container">
             <a href="#" class="collapse-action collapsed" role="button" title="<%- _.__('Expand') %>"
+                <% if (!fields.length) { %>
+                    tabindex="-1"
+                <% } %>
                 data-collapsed-title="<%- _.__('Expand') %>" data-expanded-title="<%- _.__('Collapse') %>"
                 data-toggle="collapse" data-target="#<%- regionId %>"
                 aria-controls="<%- regionId %>" aria-expanded="false"
