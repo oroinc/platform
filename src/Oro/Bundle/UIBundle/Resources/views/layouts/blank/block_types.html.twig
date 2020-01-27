@@ -38,7 +38,7 @@
         <ol {{ block('block_attributes') }}>
             {% if breadcrumbs is not iterable %}
                 <li class="breadcrumbs__item">
-                    <a href="#" class="breadcrumbs__link" aria-current="location">{{ breadcrumbs }}</a>
+                    <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumbs }}</a>
                 </li>
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
@@ -60,7 +60,7 @@
                             {% if not loop.first %}
                                 <span aria-hidden="true">/</span>
                             {% endif %}
-                            <a href="#" class="breadcrumbs__link" aria-current="location">{{ breadcrumb }}</a>
+                            <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumb }}</a>
                         {%  endif %}
                     </li>
                 {% endfor %}
