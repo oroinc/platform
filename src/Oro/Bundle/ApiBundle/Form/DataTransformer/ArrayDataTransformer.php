@@ -19,7 +19,7 @@ class ArrayDataTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 

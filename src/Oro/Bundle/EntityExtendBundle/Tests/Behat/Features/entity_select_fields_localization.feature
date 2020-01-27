@@ -46,7 +46,7 @@ Feature: Entity select fields localization
       | Option First | ACME_Zulu |
 
   Scenario: Check field`s options for default language
-    Given I enable "English" localization
+    Given I enable "English (United States)" localization
     When I reload the page
     Then "Entity Config Form" must contains values:
       | Option First | ACME_Eng |

@@ -9,6 +9,7 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,6 +38,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtension')
@@ -51,22 +53,15 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 
 
         $consoleErrorHandler = $this->createMock(Definition::class);
-        $nestedHandlerDefinition = $this->createMock(Definition::class);
-        $container->expects($this->exactly(2))
+        $container->expects($this->once())
             ->method('getDefinition')
-            ->withConsecutive(
-                [$handler['id']],
-                ['monolog.handler.' . $handler['handler']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $consoleErrorHandler,
-                $nestedHandlerDefinition
-            );
+            ->with($handler['id'])
+            ->willReturn($consoleErrorHandler);
 
         $consoleErrorHandler->expects($this->exactly(2))
             ->method('setArgument')
             ->withConsecutive(
-                [1, $nestedHandlerDefinition],
+                [1, new Reference('monolog.handler.' . $handler['handler'])],
                 [2, $level]
             );
 
@@ -87,6 +82,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtension')
@@ -101,22 +97,15 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 
 
         $consoleErrorHandler = $this->createMock(Definition::class);
-        $nestedHandlerDefinition = $this->createMock(Definition::class);
-        $container->expects($this->exactly(2))
+        $container->expects($this->once())
             ->method('getDefinition')
-            ->withConsecutive(
-                [$handler['id']],
-                ['monolog.handler.' . $handler['handler']]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $consoleErrorHandler,
-                $nestedHandlerDefinition
-            );
+            ->with($handler['id'])
+            ->willReturn($consoleErrorHandler);
 
         $consoleErrorHandler->expects($this->exactly(2))
             ->method('setArgument')
             ->withConsecutive(
-                [1, $nestedHandlerDefinition],
+                [1, new Reference('monolog.handler.' . $handler['handler'])],
                 [2, $verbosityLevels]
             );
 
@@ -131,6 +120,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtension')
@@ -155,6 +145,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtension')
@@ -175,6 +166,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithInvalidHandler()
     {
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtension')

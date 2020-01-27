@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -40,6 +41,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->normalizer = new ConfigurableEntityNormalizer($this->fieldHelper);
+        $this->normalizer->setScalarFieldDenormalizer(new ScalarFieldDenormalizer());
     }
 
     /**
@@ -445,7 +447,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     public function denormalizeDataProvider()
     {
         $expected = new Stub\DenormalizationStub();
-        $expected->id = 1;
+        $expected->id = 100;
         $expected->name = 'test';
         $expected->created = 'dDateTime';
         $expected->birthday = 'dDate';
@@ -456,7 +458,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [
-                    'id' => 1,
+                    'id' => '1e2',
                     'name' => 'test',
                     'created' => new \DateTime('2011-11-11'),
                     'birthday' => new \DateTime('2011-11-11'),
@@ -469,10 +471,12 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 DenormalizationStub::class,
                 [
                     [
-                        'name' => 'id'
+                        'name' => 'id',
+                        'type' => 'integer'
                     ],
                     [
-                        'name' => 'name'
+                        'name' => 'name',
+                        'type' => 'string'
                     ],
                     [
                         'name' => 'created',
@@ -503,21 +507,24 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',
-                        'expectedEntityClass' => 'stdClass'
+                        'expectedEntityClass' => 'stdClass',
+                        'type' => 'object'
                     ],
                     [
                         'name' => 'obj2',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',
-                        'expectedEntityClass' => 'stdClass'
+                        'expectedEntityClass' => 'stdClass',
+                        'type' => 'object'
                     ],
                     [
                         'name' => 'collection',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-many',
                         'denormalizedValue' => 'dCollection',
-                        'expectedEntityClass' => 'ArrayCollection<stdClass>'
+                        'expectedEntityClass' => 'ArrayCollection<stdClass>',
+                        'type' => 'object'
                     ],
                 ],
                 $expected

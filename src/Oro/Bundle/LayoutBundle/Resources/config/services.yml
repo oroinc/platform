@@ -125,8 +125,6 @@ services:
         public: true
         arguments:
             - '@request_stack'
-        tags:
-            - { name: container.hot_path }
 
     oro_layout.imports_storage:
         class: Doctrine\Common\Collections\ArrayCollection
