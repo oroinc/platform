@@ -33,5 +33,9 @@ services:
             - '@oro_entity.helper.field_helper'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
+            - [setScalarFieldDenormalizer, ['@oro_importexport.serializer.scalar_field_denormalizer']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
+
+    oro_importexport.serializer.scalar_field_denormalizer:
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer

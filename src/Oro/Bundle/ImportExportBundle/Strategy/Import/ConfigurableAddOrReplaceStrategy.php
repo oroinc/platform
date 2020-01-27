@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
+use Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -103,6 +104,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->cachedEntities = [];
         $this->processingEntity = null;
         $this->relatedEntityStateHelper->clear();
+
+        if (!$entity = $this->validateBeforeProcess($entity)) {
+            return null;
+        }
 
         if (!$entity = $this->beforeProcessEntity($entity)) {
             return null;
@@ -326,6 +331,27 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 }
             }
         }
+    }
+
+    /**
+     * @param object     $entity
+     * @return object|null
+     */
+    protected function validateBeforeProcess($entity)
+    {
+        // validate entity
+        $validationErrors = $this->strategyHelper->validateEntity($entity, null, [
+            IdentityValidationLoader::IMPORT_IDENTITY_FIELDS_VALIDATION_GROUP
+        ]);
+
+        if ($validationErrors) {
+            $this->context->incrementErrorEntriesCount();
+            $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+            return null;
+        }
+
+        return $entity;
     }
 
     /**

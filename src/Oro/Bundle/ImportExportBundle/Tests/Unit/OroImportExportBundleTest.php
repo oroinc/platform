@@ -2,7 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit;
 
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ContextAggregatorCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\IdentityValidationLoaderPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ReaderCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
 use Oro\Bundle\ImportExportBundle\OroImportExportBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroImportExportBundleTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,19 +29,18 @@ class OroImportExportBundleTest extends \PHPUnit\Framework\TestCase
     public function testBuild()
     {
         $expectedCompilerPasses = [
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ReaderCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ContextAggregatorCompilerPass',
-            'Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass',
+            IdentityValidationLoaderPass::class,
+            AddNormalizerCompilerPass::class,
+            ProcessorRegistryCompilerPass::class,
+            TemplateEntityRepositoryCompilerPass::class,
+            FormatterProviderPass::class,
+            WriterCompilerPass::class,
+            ReaderCompilerPass::class,
+            ContextAggregatorCompilerPass::class,
+            ImportExportConfigurationRegistryCompilerPass::class
         ];
 
-        $containerBuilderMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('addCompilerPass'))
-            ->getMock();
+        $containerBuilderMock = $this->createMock(ContainerBuilder::class);
         for ($i = 0; $i < count($expectedCompilerPasses); $i++) {
             $containerBuilderMock->expects($this->at($i))
                 ->method('addCompilerPass')
