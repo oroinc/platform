@@ -250,12 +250,8 @@ interface MyExtensionAwareInterface
  - Register an extension in dependency container. For example
  
 ``` yaml
-parameters:
-    acme_test.migration.extension.my.class: Acme\Bundle\TestBundle\Migration\Extension\MyExtension
-
 services:
-    acme_test.migration.extension.my:
-        class: %acme_test.migration.extension.my.class%
+    Acme\Bundle\TestBundle\Migration\Extension\MyExtension:
         tags:
             - { name: oro_migration.extension, extension_name: test /*, priority: -10 - priority attribute is optional an can be helpful if you need to override existing extension */ }
 ```

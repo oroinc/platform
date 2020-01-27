@@ -144,12 +144,6 @@ abstract class ActionTestCase extends WebTestCase
         array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
         $expectedCode = Response::HTTP_OK
     ) {
-        $container = $this->getContainer();
-
-        if ($container->hasParameter($entityClass)) {
-            $entityClass = $container->getParameter($entityClass);
-        }
-
         $this->assertExecuteOperation('DELETE', $entityId, $entityClass, [], $server, $expectedCode);
 
         $this->assertEquals(

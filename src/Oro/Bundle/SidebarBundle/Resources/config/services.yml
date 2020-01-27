@@ -1,7 +1,3 @@
-parameters:
-    oro_sidebar.entity.sidebar_state.class: Oro\Bundle\SidebarBundle\Entity\SidebarState
-    oro_sidebar.entity.widget.class: Oro\Bundle\SidebarBundle\Entity\Widget
-
 services:
     oro_sidebar.widget_definition_provider:
         class: Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider

@@ -1,7 +1,4 @@
 parameters:
-    oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
-    oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
-
     oro_attachment.filesystem_dir.attachments:                   attachment
     oro_attachment.filesystem_name.attachments:                  attachments
 
@@ -92,7 +89,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.manager'
@@ -103,7 +100,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.file.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\File'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
@@ -114,10 +111,10 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
 
     oro_attachment.listener.file_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener
@@ -126,8 +123,8 @@ services:
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postRemove }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
 
     oro_attachment.listener.entity_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
@@ -309,7 +306,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
         calls:
-            - [setClassName, ['%oro_attachment.file.entity.class%']]
+            - [setClassName, ['Oro\Bundle\AttachmentBundle\Entity\File']]
         tags:
             - { name: security.voter }
 

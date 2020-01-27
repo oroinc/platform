@@ -44,8 +44,8 @@ services:
              - [setDataConverter, ['@oro_entity_config.importexport.data_converter.entity_field']]
              - [setStrategy, ['@oro_entity_config.importexport.strategy.entity_field.add_or_replace']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
-            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.add_or_replace }
+            - { name: oro_importexport.processor, type: import, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.add_or_replace }
 
     oro_entity_config.importexport.processor.import.attribute:
         parent: oro_importexport.processor.import_abstract
@@ -60,14 +60,14 @@ services:
         calls:
             - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.entity_field']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.export_template }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_entity_field.export_template }
 
     oro_entity_config.importexport.processor.export_template.attribute:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.attribute']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_attribute.export_template }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', alias: oro_entity_config_attribute.export_template }
 
     oro_entity_config.importexport.normalizer.entityfield:
         class: Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer

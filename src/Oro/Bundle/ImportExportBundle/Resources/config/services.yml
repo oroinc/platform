@@ -1,6 +1,4 @@
 parameters:
-    oro_importexport.entity.import_export_result.class: Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
-
     oro_importexport.import.size_of_batch: 100
     oro_importexport.export.size_of_batch: 5000
     oro_importexport.importexport_dir: import_export

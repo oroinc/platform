@@ -33,12 +33,8 @@ to support empty array as data source.
 ### Configuration
 
 ```
-parameters:
-    oro_form.type.translatable_entity.class:  Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
-
 services:
-    oro_form.type.translatable_entity:
-        class: %oro_form.type.translatable_entity.class%
+    Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType:
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: translatable_entity }
