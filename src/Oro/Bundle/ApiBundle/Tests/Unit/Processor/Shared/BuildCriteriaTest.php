@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
@@ -62,7 +61,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcess()
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[label]',
             FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
@@ -94,7 +93,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessShouldApplyFiltersInCorrectOrder()
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[label]',
             FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
@@ -126,7 +125,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessForUnknownFilter()
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[name]',
             FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
@@ -143,7 +142,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenApplyFilterFailed()
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[name]',
             FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
@@ -176,7 +175,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenApplyPredefinedFilterFailed()
     {
-        $filterValues = new TestFilterValueAccessor();
+        $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'someFilter',
             new FilterValue('someFilter', 'val', ComparisonFilter::EQ)
@@ -213,7 +212,6 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filers = $this->context->getFilters();
         $filers->add('pageSize', $filter);
 
-        $this->context->setFilterValues(new TestFilterValueAccessor());
         $this->context->setCriteria(new Criteria());
         $this->processor->process($this->context);
 

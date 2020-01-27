@@ -19,7 +19,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (!is_bool($value)) {
+        if (!\is_bool($value)) {
             throw new TransformationFailedException('Expected a boolean.');
         }
 
@@ -31,7 +31,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 

@@ -12,6 +12,9 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /** @var FilterInterface[] */
     private $filters = [];
 
+    /** @var array [filter key => true, ...] */
+    private $excludeFromDefaultGroup = [];
+
     /** @var string|null */
     private $defaultGroupName;
 
@@ -49,6 +52,33 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
+     * Checks if a filter with the specified key can be included in the default group.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function isIncludeInDefaultGroup(string $key): bool
+    {
+        return !isset($this->excludeFromDefaultGroup[$key]);
+    }
+
+    /**
+     * Sets a flag indicates whether a filter with the specified key should be included or not in the default group.
+     *
+     * @param string $key
+     * @param bool   $includeInDefaultGroup FALSE if the filter should not be included in the default group
+     */
+    public function setIncludeInDefaultGroup(string $key, bool $includeInDefaultGroup = true): void
+    {
+        if (!$includeInDefaultGroup) {
+            $this->excludeFromDefaultGroup[$key] = true;
+        } elseif (isset($this->excludeFromDefaultGroup[$key])) {
+            unset($this->excludeFromDefaultGroup[$key]);
+        }
+    }
+
+    /**
      * Checks whether the collection contains a filter with the specified key.
      * In additional finds the filter in the default filter's group if it is set.
      *
@@ -61,7 +91,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
         if (isset($this->filters[$key])) {
             return true;
         }
-        if ($this->defaultGroupName) {
+        if ($this->defaultGroupName && $this->isIncludeInDefaultGroup($key)) {
             return isset($this->filters[$this->getGroupedFilterKey($this->defaultGroupName, $key)]);
         }
 
@@ -81,7 +111,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
         if (isset($this->filters[$key])) {
             return $this->filters[$key];
         }
-        if ($this->defaultGroupName) {
+        if ($this->defaultGroupName && $this->isIncludeInDefaultGroup($key)) {
             $groupedKey = $this->getGroupedFilterKey($this->defaultGroupName, $key);
             if (isset($this->filters[$groupedKey])) {
                 return $this->filters[$groupedKey];
@@ -107,10 +137,12 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @param string          $key
      * @param FilterInterface $filter
+     * @param bool            $includeInDefaultGroup FALSE if the filter should not be included in the default group
      */
-    public function add(string $key, FilterInterface $filter): void
+    public function add(string $key, FilterInterface $filter, bool $includeInDefaultGroup = true): void
     {
         $this->filters[$key] = $filter;
+        $this->setIncludeInDefaultGroup($key, $includeInDefaultGroup);
     }
 
     /**
@@ -120,7 +152,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function remove(string $key): void
     {
-        unset($this->filters[$key]);
+        unset($this->filters[$key], $this->excludeFromDefaultGroup[$key]);
     }
 
     /**
