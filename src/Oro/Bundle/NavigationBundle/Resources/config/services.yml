@@ -187,22 +187,28 @@ services:
         tags:
             - { name: knp_menu.voter, request: true }
 
+    oro_navigation.navigation_history_logger:
+        class: Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger
+        public: true
+        arguments:
+            - '@doctrine'
+            - 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'
+            - '@oro_security.token_accessor'
+            - '@oro_navigation.title_service'
+
     oro_navigation.event_listener.navigation_history:
         class: Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
         arguments:
-            - '@oro_navigation.item.factory'
-            - '@security.token_storage'
-            - '@doctrine'
-            - '@oro_navigation.title_service'
+            - '@oro_security.token_accessor'
+            - 'Oro\Bundle\UserBundle\Entity\User'
+            - '@Psr\Container\ContainerInterface'
         calls:
-            - [ setHistoryItemEntityFQCN, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
-            - [ setUserEntityFQCN, [ '%oro_user.entity.class%' ]]
-            - [ setNavigationHistoryItemType, ['history']]
             - [ addExcludedRoute, ['oro_default']]
             - [ addExcludedRoute, ['nelmio_api_doc_index']]
             - [ addExcludedRoute, ['oro_rest_api_doc_resource']]
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
+            - { name: container.service_subscriber, id: oro_navigation.navigation_history_logger }
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
@@ -225,14 +231,6 @@ services:
           - '@oro_navigation.title_translator'
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager'
-        lazy: true
-
-    Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface:
-        alias: oro_navigation.title_service
-
-    oro_navigation.title_service.link:
-        tags:
-            - { name: oro_service_link, service: oro_navigation.title_service }
 
     oro_navigation.title_translator:
         class: Oro\Bundle\NavigationBundle\Provider\TitleTranslator
@@ -306,7 +304,7 @@ services:
             - '@router.default'
             - '@oro_navigation.title_reader.registry'
             - '@oro_navigation.title_translator'
-            - '@oro_navigation.title_service.link'
+            - '@oro_navigation.title_service'
             - '@oro_navigation.route_collection.cache'
         tags:
             - { name: form.type, alias: oro_route_choice }
