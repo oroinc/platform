@@ -1,10 +1,3 @@
-parameters:
-    oro_navigation.entity.navigation_item.class:               Oro\Bundle\NavigationBundle\Entity\NavigationItem
-    oro_navigation.entity.navigation_history_item.class:       Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem
-    oro_navigation.entity.pinbar_tab.class:                    Oro\Bundle\NavigationBundle\Entity\PinbarTab
-    oro_navigation.entity.page_state.class:                    Oro\Bundle\NavigationBundle\Entity\PageState
-    oro_navigation.entity.menu_update.class:                   Oro\Bundle\NavigationBundle\Entity\MenuUpdate
-
 services:
     Knp\Menu\Twig\Helper:
         alias: knp_menu.helper
@@ -90,8 +83,8 @@ services:
             - '@oro_navigation.utils.pinbar_tab_url_normalizer'
             - '@oro_navigation.provider.pinbar_tab_title'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.pinbar_tab.class%' ]]
-            - [ setNavigationItemClassName, [ '%oro_navigation.entity.navigation_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\PinbarTab' ]]
+            - [ setNavigationItemClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: pinbar }
 
@@ -100,7 +93,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: favorite }
 
@@ -109,7 +102,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: history }
 
@@ -118,7 +111,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: mostviewed }
 
@@ -187,22 +180,28 @@ services:
         tags:
             - { name: knp_menu.voter, request: true }
 
+    oro_navigation.navigation_history_logger:
+        class: Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger
+        public: true
+        arguments:
+            - '@doctrine'
+            - 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'
+            - '@oro_security.token_accessor'
+            - '@oro_navigation.title_service'
+
     oro_navigation.event_listener.navigation_history:
         class: Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
         arguments:
-            - '@oro_navigation.item.factory'
-            - '@security.token_storage'
-            - '@doctrine'
-            - '@oro_navigation.title_service'
+            - '@oro_security.token_accessor'
+            - 'Oro\Bundle\UserBundle\Entity\User'
+            - '@Psr\Container\ContainerInterface'
         calls:
-            - [ setHistoryItemEntityFQCN, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
-            - [ setUserEntityFQCN, [ '%oro_user.entity.class%' ]]
-            - [ setNavigationHistoryItemType, ['history']]
             - [ addExcludedRoute, ['oro_default']]
             - [ addExcludedRoute, ['nelmio_api_doc_index']]
             - [ addExcludedRoute, ['oro_rest_api_doc_resource']]
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
+            - { name: container.service_subscriber, id: oro_navigation.navigation_history_logger }
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
@@ -225,14 +224,6 @@ services:
           - '@oro_navigation.title_translator'
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager'
-        lazy: true
-
-    Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface:
-        alias: oro_navigation.title_service
-
-    oro_navigation.title_service.link:
-        tags:
-            - { name: oro_service_link, service: oro_navigation.title_service }
 
     oro_navigation.title_translator:
         class: Oro\Bundle\NavigationBundle\Provider\TitleTranslator
@@ -306,7 +297,7 @@ services:
             - '@router.default'
             - '@oro_navigation.title_reader.registry'
             - '@oro_navigation.title_translator'
-            - '@oro_navigation.title_service.link'
+            - '@oro_navigation.title_service'
             - '@oro_navigation.route_collection.cache'
         tags:
             - { name: form.type, alias: oro_route_choice }
@@ -366,7 +357,7 @@ services:
         arguments:
             - "@doctrine"
             - "@oro_navigation.menu_helper.menu_update"
-            - '%oro_navigation.entity.menu_update.class%'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
             - 'menu_default_visibility'
 
     oro_navigation.menu_manipulator:
@@ -451,7 +442,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_navigation.entity.menu_update.class%'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
         calls:
             - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
 

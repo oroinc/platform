@@ -25,13 +25,13 @@ services:
         parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.process_trigger' ] ]
-            - [ setTriggerClassName, [ '%oro_workflow.entity.process_trigger.class%' ] ]
+            - [ setTriggerClassName, [ 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger' ] ]
 
     oro_workflow.cache.transition_trigger_event:
         parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.transition_trigger_event' ] ]
-            - [ setTriggerClassName, [ '%oro_workflow.entity.transition_trigger_event.class%' ] ]
+            - [ setTriggerClassName, [ 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger' ] ]
 
     oro_workflow.cache:
         public: false

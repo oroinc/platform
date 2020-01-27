@@ -13,6 +13,9 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Abstract fixture to load users with their roles. Implement getUsersData() and getRolesData() in descendants.
+ */
 abstract class AbstractLoadMultipleUserData extends AbstractFixture implements ContainerAwareInterface
 {
     const ACL_PERMISSION = 'permission';
@@ -64,7 +67,7 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
             $manager->persist($role);
 
             foreach ($items as $acls) {
-                $className = $this->container->getParameter($acls['class']);
+                $className = $acls['class'];
 
                 $this->setRolePermissions($aclManager, $role, $className, $acls['acls']);
             }

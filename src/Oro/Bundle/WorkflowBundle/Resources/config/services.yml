@@ -1,12 +1,3 @@
-parameters:
-    oro_workflow.entity.process_definition.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
-    oro_workflow.entity.process_trigger.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
-    oro_workflow.entity.workflow_definition.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
-    oro_workflow.entity.workflow_item.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
-    oro_workflow.entity.workflow_transition_record.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord
-    oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
-    oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
-
 services:
     oro_workflow.datagrid.action.workflow_activate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
@@ -281,7 +272,7 @@ services:
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
-            - '%oro_workflow.entity.process_definition.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition'
 
     oro_workflow.process.triggers_configurator:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator'
@@ -289,7 +280,7 @@ services:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@oro_workflow.process.cron_scheduler'
             - '@doctrine'
-            - '%oro_workflow.entity.process_trigger.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger'
 
     oro_workflow.process.configurator:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator'
@@ -298,25 +289,25 @@ services:
             - '@doctrine'
             - '@oro_workflow.process.definitions_configurator'
             - '@oro_workflow.process.triggers_configurator'
-            - '%oro_workflow.entity.process_definition.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition'
 
     oro_workflow.repository.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_workflow.entity.workflow_item.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'
 
     oro_workflow.repository.process_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_workflow.entity.process_trigger.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger'
 
     oro_workflow.repository.transition_event_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_workflow.entity.transition_trigger_event.class%'
+            - 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger'
 
     oro_workflow.helper.workflow_aware_entity_fetcher:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher'
@@ -669,7 +660,7 @@ services:
         arguments:
             - '@oro_dataaudit.model.additional_entity_changes_to_audit_storage'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_transition_record.class%', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord', event: postPersist }
 
     oro_workflow.migration.demo_data_fixtures_listener.send_workflow_step_changes_to_audit:
         parent: oro_platform.event_listener.demo_data_fixtures_listener.abstract

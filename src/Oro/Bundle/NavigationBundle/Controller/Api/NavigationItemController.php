@@ -8,9 +8,11 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
+use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider;
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -269,7 +271,7 @@ class NavigationItemController extends FOSRestController
      */
     protected function getPinbarTabClass()
     {
-        return $this->getParameter('oro_navigation.entity.pinbar_tab.class');
+        return PinbarTab::class;
     }
 
     /**
@@ -277,6 +279,6 @@ class NavigationItemController extends FOSRestController
      */
     protected function getUserClass()
     {
-        return $this->getParameter('oro_user.entity.class');
+        return User::class;
     }
 }

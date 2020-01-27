@@ -33,11 +33,6 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
         $this->assertSearchResult(
             $result,
             [
-                self::getContainer()
-                    ->get('doctrine')
-                    ->getManagerForClass(Localization::class)
-                    ->getRepository(Localization::class)
-                    ->findOneBy([], ['id' => 'ASC'])->getId(),
                 $this->getReference('en_US')->getId(),
                 $this->getReference('en_CA')->getId(),
                 $this->getReference('es')->getId(),

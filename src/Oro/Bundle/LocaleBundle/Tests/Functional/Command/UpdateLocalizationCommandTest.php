@@ -39,7 +39,7 @@ class UpdateLocalizationCommandTest extends WebTestCase
     public function testRun(): void
     {
         // Assert default localization is present
-        $this->assertLocalizationExists('en', 'en', 'English');
+        $this->assertLocalizationExists('en', 'en_US', 'English (United States)');
         $this->assertEnglishLanguageExists(); // And English language is not present
 
         $this->runCommand(

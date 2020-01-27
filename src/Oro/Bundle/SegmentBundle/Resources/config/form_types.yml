@@ -16,7 +16,7 @@ services:
         class: 'Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType'
         arguments:
             - '@doctrine'
-            - '%oro_segment.segment.entity.class%'
+            - 'Oro\Bundle\SegmentBundle\Entity\Segment'
         tags:
             - { name: form.type}
 

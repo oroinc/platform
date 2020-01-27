@@ -14,9 +14,7 @@ class OroNavigationExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        // process configurations to validate and merge
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -24,6 +22,10 @@ class OroNavigationExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
         $container->setParameter('oro_navigation.js_routing_filename_prefix', $config['js_routing_filename_prefix']);
