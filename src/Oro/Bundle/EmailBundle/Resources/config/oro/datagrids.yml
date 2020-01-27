@@ -294,13 +294,13 @@ datagrids:
         mass_actions:
             emailmarkread:
                 type: emailmarkread
-                entity_name: '%oro_email.email_user.entity.class%'
+                entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailUser'
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_read
                 icon: check-square-o
             emailmarkunread:
                 type: emailmarkunread
-                entity_name: '%oro_email.email_user.entity.class%'
+                entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailUser'
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
@@ -395,7 +395,7 @@ datagrids:
                         - { join: e.fromEmailAddress, alias: a }
                 where:
                     and:
-                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.type IN ('Oro\Bundle\EmailBundle\Model\FolderType::INBOX', 'Oro\Bundle\EmailBundle\Model\FolderType::OTHER')
                         - f.id > 0
         columns:
             receivedAt:
@@ -430,7 +430,7 @@ datagrids:
                         - { join: eu.folders, alias: f }
                 where:
                     and:
-                        - f.type = '%oro_email.email_folder.model.class%::SENT'
+                        - f.type = 'Oro\Bundle\EmailBundle\Model\FolderType::SENT'
                         - f.id > 0
         columns:
             sentAt:
@@ -504,7 +504,7 @@ datagrids:
                     - t.type
                     - t.isSystem
                 from:
-                    - { table: '%oro_email.emailtemplate.entity.class%', alias: t }
+                    - { table: 'Oro\Bundle\EmailBundle\Entity\EmailTemplate', alias: t }
                 where:
                     and:
                         - t.visible = true

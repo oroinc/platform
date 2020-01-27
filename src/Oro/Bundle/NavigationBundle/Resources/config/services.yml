@@ -1,10 +1,3 @@
-parameters:
-    oro_navigation.entity.navigation_item.class:               Oro\Bundle\NavigationBundle\Entity\NavigationItem
-    oro_navigation.entity.navigation_history_item.class:       Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem
-    oro_navigation.entity.pinbar_tab.class:                    Oro\Bundle\NavigationBundle\Entity\PinbarTab
-    oro_navigation.entity.page_state.class:                    Oro\Bundle\NavigationBundle\Entity\PageState
-    oro_navigation.entity.menu_update.class:                   Oro\Bundle\NavigationBundle\Entity\MenuUpdate
-
 services:
     Knp\Menu\Twig\Helper:
         alias: knp_menu.helper
@@ -90,8 +83,8 @@ services:
             - '@oro_navigation.utils.pinbar_tab_url_normalizer'
             - '@oro_navigation.provider.pinbar_tab_title'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.pinbar_tab.class%' ]]
-            - [ setNavigationItemClassName, [ '%oro_navigation.entity.navigation_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\PinbarTab' ]]
+            - [ setNavigationItemClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: pinbar }
 
@@ -100,7 +93,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: favorite }
 
@@ -109,7 +102,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: history }
 
@@ -118,7 +111,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
-            - [ setClassName, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
+            - [ setClassName, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem' ]]
         tags:
             - { name: oro_navigation.item.builder, alias: mostviewed }
 
@@ -195,8 +188,8 @@ services:
             - '@doctrine'
             - '@oro_navigation.title_service'
         calls:
-            - [ setHistoryItemEntityFQCN, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
-            - [ setUserEntityFQCN, [ '%oro_user.entity.class%' ]]
+            - [ setHistoryItemEntityFQCN, [ 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem' ]]
+            - [ setUserEntityFQCN, [ 'Oro\Bundle\UserBundle\Entity\User' ]]
             - [ setNavigationHistoryItemType, ['history']]
             - [ addExcludedRoute, ['oro_default']]
             - [ addExcludedRoute, ['nelmio_api_doc_index']]
@@ -366,7 +359,7 @@ services:
         arguments:
             - "@doctrine"
             - "@oro_navigation.menu_helper.menu_update"
-            - '%oro_navigation.entity.menu_update.class%'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
             - 'menu_default_visibility'
 
     oro_navigation.menu_manipulator:
@@ -451,7 +444,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_navigation.entity.menu_update.class%'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
         calls:
             - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
 

@@ -1,6 +1,6 @@
 datagrids:
     users-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         views_list: "@oro_user.user.datagrid_view_list"
         options:
             entityHint: oro.user.entity_plural_label
@@ -23,7 +23,7 @@ datagrids:
                     - u.enabled
                     - au.id as auth_status
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 join:
                     left:
                         - { join: u.auth_status, alias: au }
@@ -166,7 +166,7 @@ datagrids:
         action_configuration: ['@oro_user.datagrid.action_checker', checkActions]
 
     groups-grid:
-        extended_entity_name: '%oro_user.group.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\Group'
         options:
             entityHint: oro.user.group.entity_plural_label
             entity_pagination: true
@@ -178,7 +178,7 @@ datagrids:
                     - g.id
                     - g.name
                 from:
-                    - { table: '%oro_user.group.entity.class%', alias: g }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\Group', alias: g }
         columns:
             name:
                 label: oro.user.group.name.label
@@ -226,7 +226,7 @@ datagrids:
                     data_name: g.name
 
     roles-grid:
-        extended_entity_name: '%oro_user.role.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\Role'
         options:
             entityHint: oro.user.role.entity_plural_label
             entity_pagination: true
@@ -241,10 +241,10 @@ datagrids:
                     - r.role
                     - r.label
                 from:
-                    - { table: '%oro_user.role.entity.class%', alias: r }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\Role', alias: r }
                 where:
                     and:
-                        - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'
+                        - r.role <> 'Oro\Bundle\UserBundle\Entity\User::ROLE_ANONYMOUS'
         columns:
             label:
                 label: oro.user.role.label.label
@@ -586,7 +586,7 @@ datagrids:
                     excluded: '#groupRemoveUsers'
 
     users-select-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
             entityHint: oro.user.entity_plural_label
         acl_resource: oro_user_user_view
@@ -601,7 +601,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
         columns:
             firstName:
                 label: oro.user.first_name.label
@@ -658,7 +658,7 @@ datagrids:
                                 oro.user.datagrid.user.filters.enabled: 1
 
     owner-users-select-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
             entityHint: oro.user.entity_plural_label
         source:
@@ -673,7 +673,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 where:
                     and:
                         - u.enabled=true
@@ -725,7 +725,7 @@ datagrids:
                         - u.id != @oro_security.token_accessor->getUserId
 
     users-for-context-grid:
-        extended_entity_name: '%oro_user.entity.class%'
+        extended_entity_name: 'Oro\Bundle\UserBundle\Entity\User'
         options:
             entityHint: oro.user.entity_plural_label
             entity_pagination: true
@@ -745,7 +745,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: '%oro_user.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 where:
                     and:
                         - u.id != @oro_security.token_accessor->getUserId

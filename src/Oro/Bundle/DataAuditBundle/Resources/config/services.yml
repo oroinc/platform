@@ -1,7 +1,3 @@
-parameters:
-    oro_dataaudit.loggable.entity.class:            'Oro\Bundle\DataAuditBundle\Entity\Audit'
-    oro_dataaudit.loggable.entity_field.class:      'Oro\Bundle\DataAuditBundle\Entity\AuditField'
-
 services:
     oro_dataaudit.filter.audit:
         class: 'Oro\Bundle\DataAuditBundle\Filter\AuditFilter'
@@ -20,9 +16,9 @@ services:
             -
                 - 'addAuditEntryClasses'
                 -
-                    - '%oro_user.entity.class%'
-                    - '%oro_dataaudit.loggable.entity.class%'
-                    - '%oro_dataaudit.loggable.entity_field.class%'
+                    - 'Oro\Bundle\UserBundle\Entity\User'
+                    - 'Oro\Bundle\DataAuditBundle\Entity\Audit'
+                    - 'Oro\Bundle\DataAuditBundle\Entity\AuditField'
 
     oro_dataaudit.converter.entity_to_entity_change_array:
         class: 'Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter'
@@ -123,7 +119,7 @@ services:
         public: true
         parent: 'oro_soap.manager.entity_manager.abstract'
         arguments:
-            - '%oro_dataaudit.loggable.entity.class%'
+            - 'Oro\Bundle\DataAuditBundle\Entity\Audit'
             - '@doctrine.orm.entity_manager'
 
     oro_dataaudit.migration.extension.audit_field:

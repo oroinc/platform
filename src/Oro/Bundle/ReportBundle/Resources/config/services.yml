@@ -1,7 +1,4 @@
 parameters:
-    oro_report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
-    oro_report.calendar_date.entity.class:             Oro\Bundle\ReportBundle\Entity\CalendarDate
-
     # Cache keys
     oro_report.cache.report_grid_config_key: 'oro_report.report_grid_config_key'
 
@@ -47,7 +44,7 @@ services:
             - '@oro_report.cache'
             - '%oro_report.cache.report_grid_config_key%'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_report.report.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\ReportBundle\Entity\Report', event: postUpdate }
 
     oro_report.report_manager:
         class: Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
@@ -72,7 +69,7 @@ services:
     oro_report.grid.date_grouping_builder:
         class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
         arguments:
-            - '%oro_report.calendar_date.entity.class%'
+            - 'Oro\Bundle\ReportBundle\Entity\CalendarDate'
             - '@oro_datagrid.helper.date'
 
     oro_report.listener.segment_subscriber:
@@ -124,7 +121,7 @@ services:
     oro_report.datagrid.extension.empty_link_remover:
         class: Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension
         arguments:
-            - "%oro_report.calendar_date.entity.class%"
+            - 'Oro\Bundle\ReportBundle\Entity\CalendarDate'
         tags:
             - { name: oro_datagrid.extension }
 

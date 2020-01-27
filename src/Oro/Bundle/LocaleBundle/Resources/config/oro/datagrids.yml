@@ -14,7 +14,7 @@ datagrids:
                     - l.createdAt
                     - l.updatedAt
                 from:
-                    - { table: '%oro_locale.entity.localization.class%', alias: l }
+                    - { table: 'Oro\Bundle\LocaleBundle\Entity\Localization', alias: l }
                 join:
                     inner:
                         - { join: l.language, alias: lng }
