@@ -5,13 +5,12 @@ $textarea-padding--m: 10px 9px;
 $textarea-padding--s: 8px 9px;
 
 // Hover
-$textarea-border-color-hover-state: get-color('ui', 'normal');
 $textarea-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-0 0 8px transparentize(get-color('ui', 'focus'), .6);
+                                        0 0 8px transparentize(get-color('ui', 'focus'), .6);
 
 // Focus
-$textarea-border-color-focus-state: get-color('ui', 'normal');
-$textarea-box-shadow-focus-state: $textarea-box-shadow-hover-state;
+$textarea-border-color-focus-state: $base-ui-element-border-color-focus;
+$textarea-box-shadow-focus-state: $base-ui-element-focus-style;
 
 // Error
 $textarea-border-color-error-state: get-color('ui', 'error-dark');

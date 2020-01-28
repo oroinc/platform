@@ -69,6 +69,7 @@ define(function (require) {
 
             // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
             this.uiDialog.wrapInner('<div class="ui-dialog-inner-wrapper"></div>');
+            this.uiDialog.attr('data-skip-focus-decoration', '');
 
             this._onBackspacePress = this._onBackspacePress.bind(this);
             this._windowResizeHandler = this._windowResizeHandler.bind(this);
