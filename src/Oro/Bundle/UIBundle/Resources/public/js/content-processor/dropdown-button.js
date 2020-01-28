@@ -168,7 +168,7 @@ define([
                 // set text value string
                 $main.contents().each(function() {
                     if (this.nodeType === Node.TEXT_NODE) {
-                        this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
+                        this.nodeValue = _.trunc(this.nodeValue.trim(), self.options.truncateLength, false, '...');
                     }
                 });
             }
