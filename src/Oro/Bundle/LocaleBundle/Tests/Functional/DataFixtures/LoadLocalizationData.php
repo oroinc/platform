@@ -13,25 +13,24 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Adds test localization
+ */
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
+    const DEFAULT_LOCALIZATION_CODE = 'en_US';
+
     use ContainerAwareTrait;
 
     /** @var array */
-    protected static $languages = ['en', 'en_CA', 'en_US', 'es', 'es_ES', 'es_MX'];
+    protected static $languages = ['en', 'en_CA', 'es', 'es_ES', 'es_MX'];
 
     /** @var array */
     protected static $localizations = [
         [
-            'language' => 'en_US',
-            'formatting' => 'en_US',
-            'parent' => null,
-            'title' => 'English (United States)',
-        ],
-        [
             'language' => 'en_CA',
             'formatting' => 'en_CA',
-            'parent' => 'en_US',
+            'parent' => self::DEFAULT_LOCALIZATION_CODE,
             'title' => 'English (Canada)',
         ],
         [
@@ -54,8 +53,14 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
 
         /* @var $repository LocalizationRepository */
         $repository = $manager->getRepository(Localization::class);
+        $defaultEnUsLocalization = $repository->findOneBy(['formattingCode' => self::DEFAULT_LOCALIZATION_CODE]);
+        if (!$defaultEnUsLocalization) {
+            throw new \LogicException('No default localization found in the system with formatting code - '
+                . self::DEFAULT_LOCALIZATION_CODE);
+        }
+        $this->addReference(self::DEFAULT_LOCALIZATION_CODE, $defaultEnUsLocalization);
 
-        $registry = [];
+        $registry[self::DEFAULT_LOCALIZATION_CODE] = $defaultEnUsLocalization;
 
         foreach (self::$localizations as $item) {
             $code = $item['language'];

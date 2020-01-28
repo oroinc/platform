@@ -76,7 +76,7 @@ class LocalizationManagerTest extends WebTestCase
         $this->assertSame([], $manager->getLocalizationData(0, false));
 
         $this->assertSame([
-            'languageCode' => 'en_US',
+            'languageCode' => 'en',
             'formattingCode' => 'en_US',
         ], $manager->getLocalizationData($this->getReference('en_US')->getId()));
 

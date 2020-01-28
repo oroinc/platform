@@ -516,7 +516,7 @@ class ImportExportContext extends OroFeatureContext implements
             foreach ($headers as $header) {
                 $value = '';
                 foreach ($row as $rowHeader => $rowValue) {
-                    if (preg_match(sprintf('/^%s$/i', $rowHeader), $header)) {
+                    if ($rowHeader === $header || preg_match(sprintf('/^%s$/i', $rowHeader), $header)) {
                         $value = $rowValue;
                     }
                 }
