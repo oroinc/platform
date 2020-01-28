@@ -12,6 +12,12 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Normalized data based on entity fields config
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
     const FULL_MODE  = 'full';
@@ -22,6 +28,9 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
 
     /** @var FieldHelper */
     protected $fieldHelper;
+
+    /** @var DenormalizerInterface */
+    protected $scalarFieldDenormalizer;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
@@ -34,6 +43,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $this->fieldHelper = $fieldHelper;
 
         parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
+    }
+
+    /**
+     * @param DenormalizerInterface $scalarFieldDenormalizer
+     */
+    public function setScalarFieldDenormalizer(DenormalizerInterface $scalarFieldDenormalizer)
+    {
+        $this->scalarFieldDenormalizer = $scalarFieldDenormalizer;
     }
 
     /**
@@ -58,11 +75,15 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if (array_key_exists($fieldName, $data)) {
-                $value = $data[$fieldName];
-                if ($value !== null
-                    && ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field))
-                ) {
+            if (!\array_key_exists($fieldName, $data)) {
+                continue;
+            }
+
+            $value = $data[$fieldName];
+            $fieldContext = $context;
+            if ($value !== null) {
+                $fieldContext['fieldName'] = $fieldName;
+                if ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field)) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {
@@ -73,17 +94,48 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                         $entityClass = $field['related_entity_name'];
                     } else {
                         $entityClass = 'DateTime';
-                        $context = array_merge($context, ['type' => $field['type']]);
+                        $fieldContext['type'] = $field['type'];
                     }
-                    $context = array_merge($context, ['fieldName' => $fieldName]);
-                    $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
+                    $value = $this->serializer->denormalize($value, $entityClass, $format, $fieldContext);
+                } else {
+                    $fieldContext['className'] = $class;
+                    $value = $this->tryDenormalizesValueAsScalar($field, $fieldContext, $value, $format);
                 }
-
-                $this->setObjectValue($result, $fieldName, $value);
             }
+
+            $this->setObjectValue($result, $fieldName, $value);
         }
 
         return $this->dispatchDenormalizeEvent($data, $result, Events::AFTER_DENORMALIZE_ENTITY);
+    }
+
+    /**
+     * Try denormalizes data back into internal representation of datatype in php
+     *
+     * @param array  $fieldConfig Field configuration
+     * @param array  $context     Options available to the denormalizer
+     * @param mixed  $value       Value to convert
+     * @param string $format      Format the given data was extracted from
+     *
+     * @return mixed
+     */
+    protected function tryDenormalizesValueAsScalar(array $fieldConfig, array $context, $value, $format)
+    {
+        $fieldType = $fieldConfig['type'] ?? false;
+        if (false === $fieldType) {
+            return $value;
+        }
+
+        $fieldContext = \array_merge(
+            $context,
+            [ScalarFieldDenormalizer::CONTEXT_OPTION_SKIP_INVALID_VALUE => true]
+        );
+
+        if (!$this->scalarFieldDenormalizer->supportsDenormalization($value, $fieldType, $format, $fieldContext)) {
+            return $value;
+        }
+
+        return $this->scalarFieldDenormalizer->denormalize($value, $fieldType, $format, $fieldContext);
     }
 
     /**
@@ -113,6 +165,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * {@inheritdoc}
      */
     public function normalize($object, $format = null, array $context = [])
