@@ -6,10 +6,8 @@ use Doctrine\ORM\EntityManager;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class LocalizationRepositoryTest extends WebTestCase
 {
@@ -33,7 +31,10 @@ class LocalizationRepositoryTest extends WebTestCase
 
     public function testFindRootsWithChildren()
     {
-        $localizations = [$this->getCurrentLocalization(), $this->getReference('en_US'), $this->getReference('es')];
+        $localizations = [
+            $this->getReference(LoadLocalizationData::DEFAULT_LOCALIZATION_CODE),
+            $this->getReference('es')
+        ];
         $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());
 
         $prevLogger = $this->em->getConnection()->getConfiguration()->getSQLLogger();
@@ -66,27 +67,12 @@ class LocalizationRepositoryTest extends WebTestCase
         }
     }
 
-    /**
-     * @return object|Localization
-     */
-    protected function getCurrentLocalization()
-    {
-        /* @var $localeSettings LocaleSettings */
-        $localeSettings = $this->getContainer()->get('oro_locale.settings');
-
-        /* @var Language $language */
-        $language = $this->getReference('language.' . $localeSettings->getLocale());
-        $this->assertInstanceOf(Language::class, $language);
-
-        return $this->repository->findOneBy(['language' => $language]);
-    }
-
     public function testGetLocalizationsCount()
     {
         $result = $this->repository->getLocalizationsCount();
 
         $this->assertInternalType('int', $result);
-        $this->assertEquals(4, $result);
+        $this->assertEquals(3, $result);
     }
 
     public function testGetBatchIterator()

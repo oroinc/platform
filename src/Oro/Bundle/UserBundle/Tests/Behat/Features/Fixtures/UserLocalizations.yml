@@ -3,7 +3,7 @@ include:
 
 Oro\Bundle\TranslationBundle\Entity\Language:
     french_language:
-        code: 'fr'
+        code: 'fr_FR'
         enabled: true
         organization: '@organization'
         owner: '@admin'
@@ -16,5 +16,5 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
     french_localization:
         name: 'French Localization'
         language: '@french_language'
-        formattingCode: 'fr'
+        formattingCode: 'fr_FR'
         titles: ['@title_french_localization']
