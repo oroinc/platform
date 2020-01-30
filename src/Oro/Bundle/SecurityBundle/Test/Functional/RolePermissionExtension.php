@@ -206,14 +206,14 @@ trait RolePermissionExtension
     {
         $mask = $maskBuilder->reset()->get();
         foreach ($permissions as $permission => $accessLevel) {
-            $maskName = null;
+            $permissionName = null;
             if (is_int($accessLevel)) {
-                $maskName = sprintf('%s_%s', $permission, AccessLevel::getAccessLevelName($accessLevel));
+                $permissionName = sprintf('%s_%s', $permission, AccessLevel::getAccessLevelName($accessLevel));
             } elseif (true === $accessLevel) {
-                $maskName = $permission;
+                $permissionName = $permission;
             }
-            if (null !== $maskName && $maskBuilder->hasMask('MASK_' . $maskName)) {
-                $mask = $maskBuilder->add($maskName)->get();
+            if (null !== $permissionName && $maskBuilder->hasMaskForPermission($permissionName)) {
+                $mask = $maskBuilder->add($permissionName)->get();
             }
         }
 
