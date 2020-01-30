@@ -1,3 +1,4 @@
+{% set linkTitle = params.frontendOptions.title|default('')|trans %}
 {% set linkLabel = params.label|trans %}
 {% set isAjax = false %}
 
@@ -12,6 +13,7 @@
                 {% for name,value in options.data %}
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
+                title="{{ linkTitle }}"
                 data-operation-url="{{ buttonOptions.url }}"
                 data-options="{{ buttonOptions|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
