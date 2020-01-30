@@ -25,11 +25,6 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         return new ManyToOneAttributeType($this->entityNameResolver, $this->doctrineHelper);
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('manyToOne', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

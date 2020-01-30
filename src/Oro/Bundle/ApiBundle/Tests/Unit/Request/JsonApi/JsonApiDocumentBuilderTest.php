@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -1350,6 +1351,30 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'meta' => [
                         'resultMeta1' => 'Meta1'
                     ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testMetaPropertyThatNotMappedToAnyField()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data' => [
+                    'type' => 'test_entity',
+                    'id'   => 'Test\Entity::123'
                 ]
             ],
             $this->documentBuilder->getDocument()

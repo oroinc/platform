@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Controller;
 
+use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
@@ -9,8 +10,6 @@ use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetInDialogType;
 use Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetType;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Psr\Log\LoggerInterface;
@@ -112,7 +111,7 @@ class DigitalAssetController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $isImageType = $this->isImageType($attachmentEntityFieldConfig);
+        $isImageType = FieldConfigHelper::isImageField($attachmentEntityFieldConfig->getId());
         $mimeTypes = $this->get(FileConstraintsProvider::class)
             ->getAllowedMimeTypesForEntityField($resolvedParentEntityClass, $parentEntityFieldName);
         $maxFileSize = $this->get(FileConstraintsProvider::class)
@@ -160,19 +159,6 @@ class DigitalAssetController extends AbstractController
                     ];
                 }
             );
-    }
-
-    /**
-     * @param ConfigInterface $entityFieldConfig
-     *
-     * @return bool
-     */
-    protected function isImageType(ConfigInterface $entityFieldConfig): bool
-    {
-        /** @var FieldConfigId $fieldConfigId */
-        $fieldConfigId = $entityFieldConfig->getId();
-
-        return $fieldConfigId->getFieldType() === 'image';
     }
 
     /**

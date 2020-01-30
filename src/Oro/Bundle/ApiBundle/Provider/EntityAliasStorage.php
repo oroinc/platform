@@ -54,7 +54,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
      */
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {
-        if (!preg_match('/^[a-z][a-z0-9-_]*$/D', $value)) {
+        if (!preg_match('/^[a-z][a-z0-9\-\_]*$/D', $value)) {
             throw new InvalidEntityAliasException(sprintf(
                 'The string "%s" cannot be used as %s for the "%s" entity '
                 . 'because it contains illegal characters. '

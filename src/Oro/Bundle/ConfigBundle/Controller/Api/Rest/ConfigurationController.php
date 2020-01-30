@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * REST API Configuration controller
+ *
  * @RouteResource("configuration")
  * @NamePrefix("oro_api_")
  */
@@ -48,7 +50,7 @@ class ConfigurationController extends FOSRestController
      * @param string $path The configuration section path. For example: look-and-feel/grid
      *
      * @Get("/configuration/{path}",
-     *      requirements={"path"="[\w-]+[\w-\/]*"}
+     *      requirements={"path"="[\w\-]+[\w\-\/]*"}
      * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",

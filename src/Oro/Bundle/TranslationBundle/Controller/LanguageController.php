@@ -3,10 +3,14 @@
 namespace Oro\Bundle\TranslationBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Displays the datagrid with languages.
+ */
 class LanguageController extends BaseController
 {
     /**
@@ -19,7 +23,7 @@ class LanguageController extends BaseController
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_translation.entity.language.class')
+            'entity_class' => Language::class
         ];
     }
 }

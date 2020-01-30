@@ -11,7 +11,7 @@ datagrids:
                     - c.editMode
                     - CASE WHEN c.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
                 from:
-                    - { table: '%oro_integration.entity.class%', alias: c }
+                    - { table: 'Oro\Bundle\IntegrationBundle\Entity\Channel', alias: c }
         columns:
             name:
                 label:          oro.integration.integration.name.label

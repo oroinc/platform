@@ -1,0 +1,130 @@
+services:
+    oro_draft.event_listener_orm.draft_source_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\ORM\DraftSourceListener
+        public: false
+        arguments:
+            - '%database_driver%'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+
+    oro_draft.duplicator.extension_provider:
+        class: Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider
+        arguments:
+            - !tagged oro_draft.duplicator.extension
+
+    oro_draft.expression.context_accessor:
+        class: 'Oro\Component\ConfigExpression\ContextAccessor'
+
+    oro_draft.publisher.publisher:
+        class: Oro\Bundle\DraftBundle\Manager\Publisher
+        arguments:
+            - '@oro_draft.helper.draft_helper'
+
+    oro_draft.form_extension.draft_localized_fallback_value_extension:
+        class: Oro\Bundle\DraftBundle\Form\Extension\DraftLocalizedFallbackValueExtension
+        arguments:
+            - '@oro_draft.helper.draft_helper'
+        tags:
+            - { name: form.type_extension }
+
+    oro_draft.event_listener.draft_controller_arguments_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\DraftKernelListener
+        arguments:
+            - '@oro_draft.manager.draft_manager'
+            - '@oro_draft.helper.draft_helper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller_arguments, method: onKernelControllerArguments, priority: -255 }
+
+    oro_draft.manager.draft_manager:
+        class: Oro\Bundle\DraftBundle\Manager\DraftManager
+        arguments:
+            - '@oro_draft.duplicator.extension_provider'
+            - '@oro_action.expression.context_accessor'
+            - '@oro_draft.publisher.publisher'
+
+    oro_draft.helper.draft_permission_helper:
+        class: Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper
+        arguments:
+            - '@oro_security.token_accessor'
+
+    oro_draft.helper.draft_helper:
+        class: Oro\Bundle\DraftBundle\Helper\DraftHelper
+        arguments:
+            - '@request_stack'
+            - '@=service("oro_entity_config.config_manager").getProvider("draft")'
+
+    oro_draft.voter.basic_permissions_draft_voter:
+        class: Oro\Bundle\DraftBundle\Voter\BasicPermissionsDraftVoter
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_draft.helper.draft_permission_helper'
+            - '@security.authorization_checker'
+        tags:
+            - { name: security.voter }
+
+    oro_draft.voter.acl_voter:
+        class: Oro\Bundle\DraftBundle\Voter\AclVoter
+        decorates: oro_security.acl.voter.basic_permissions
+        arguments:
+            - '@oro_draft.voter.acl_voter.inner'
+
+    oro_draft.listener.search_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\SearchListener
+        tags:
+            - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
+
+    oro_draft.event_listener.draftable_filter_listener:
+        class: Oro\Bundle\DraftBundle\EventListener\DraftableFilterListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    oro_draft.consumption.draftable_filter_extension:
+        class: Oro\Bundle\DraftBundle\Consumption\Extension\DraftableFilterExtension
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: 249, persistent: false }
+
+    oro_draft.datagrid.extension.draftable_filter:
+        class: Oro\Bundle\DraftBundle\Datagrid\DraftableFilterExtension
+        arguments:
+            - '@oro_draft.manager.draftable_filter'
+            - '@oro_draft.access_rule.draft_access_rule'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_draft.manager.draftable_filter:
+        class: Oro\Bundle\DraftBundle\Manager\DraftableFilterManager
+        arguments:
+            - '@doctrine'
+
+    oro_draft.placeholder.filter:
+        class: Oro\Bundle\DraftBundle\Placeholder\PlaceholderFilter
+        public: true
+        arguments:
+            - '@security.authorization_checker'
+
+    oro_draft.form.extension.extend_field_type_extension:
+        class: Oro\Bundle\DraftBundle\Form\Extension\ExtendFieldTypeExtension
+        arguments:
+            - ['oneToMany']
+        tags:
+            - { name: form.type_extension }
+
+    oro_draft.access_rule.draft_access_rule:
+        class: Oro\Bundle\DraftBundle\Acl\AccessRule\DraftAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_draft.helper.draft_permission_helper'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro_security.access_rule }
+
+    oro_draft.provider.chain_draftable_fields_exclusion:
+        class: Oro\Bundle\DraftBundle\Provider\ChainDraftableFieldsExclusionProvider
+        public: false
+        arguments:
+            - !tagged oro_draft.provider.draftable_fields_exclusion

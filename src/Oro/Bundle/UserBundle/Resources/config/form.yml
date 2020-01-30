@@ -119,7 +119,7 @@ services:
     oro_user.form.type.reset:
         class: Oro\Bundle\UserBundle\Form\Type\ResetType
         arguments:
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_reset }

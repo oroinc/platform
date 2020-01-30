@@ -379,7 +379,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      * @param mixed $id
      *
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage "id" element is expected to be integer, non-empty string or non-empty array.
+     * @expectedExceptionMessage The "id" element is expected to be an integer, non-empty string or non-empty array.
      */
     public function testReverseTransformWhenIdIsNotAcceptable($id)
     {

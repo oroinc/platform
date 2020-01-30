@@ -128,7 +128,7 @@ class DocumentationTest extends RestJsonApiTestCase
     /**
      * @depends testWarmUpCache
      */
-    public function testAssociationsInFilters()
+    public function testFilters()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
@@ -136,7 +136,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
         $resourceData = reset($resourceData);
-        $expectedData = $this->loadYamlData('associations_filters.yml', 'documentation');
+        $expectedData = $this->loadYamlData('filters.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
 

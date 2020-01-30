@@ -1985,7 +1985,7 @@ JS;
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s-]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s\-]+)"$/
      *
      * @param string $pageTitle
      */
@@ -2158,6 +2158,38 @@ JS;
         self::assertTrue($childElement->isVisible(), sprintf(
             'Element "%s" found inside iframe, but it\'s not visible',
             $childElementName,
+            $iframeName
+        ));
+
+        $driver->switchToWindow();
+    }
+
+    /**
+     * Example: Then I should see "sample text" inside "Default Addresses" iframe
+     *
+     * @Then /^(?:|I )should see "(?P<text>[^\"]+)" inside "(?P<iframeName>(?:[^"]|\\")*)" iframe$/
+     *
+     * @param string $text
+     * @param string $iframeName
+     */
+    public function iShouldSeeTextInsideIframe(string $text, string $iframeName)
+    {
+        $iframeElement = $this->createElement($iframeName);
+        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
+            'Iframe element "%s" not found on page',
+            $iframeName
+        ));
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $driver->switchToIFrameByElement($iframeElement);
+
+        $iframeBody = $this->getSession()->getPage()->find('css', 'body');
+        $element = $iframeBody->find('named', ['content', $text]);
+        self::assertNotNull($element, sprintf('Text "%s" not found inside iframe "%s"', $text, $iframeName));
+        self::assertTrue($element->isVisible(), sprintf(
+            'Text "%s" found inside iframe "%s", but it\'s not visible',
+            $text,
             $iframeName
         ));
 

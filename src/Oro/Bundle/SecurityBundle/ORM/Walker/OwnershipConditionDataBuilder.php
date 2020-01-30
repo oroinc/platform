@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
@@ -46,7 +47,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
      * @param EntitySecurityMetadataProvider     $entityMetadataProvider
      * @param OwnershipMetadataProviderInterface $metadataProvider
      * @param OwnerTreeProviderInterface         $treeProvider
-     * @param AclVoter                           $aclVoter
+     * @param AclVoterInterface                  $aclVoter
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -55,7 +56,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         EntitySecurityMetadataProvider $entityMetadataProvider,
         OwnershipMetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
-        AclVoter $aclVoter = null
+        AclVoterInterface $aclVoter = null
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;

@@ -1,14 +1,10 @@
-parameters:
-    oro_organization.business_unit.entity.class:               Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
-    oro_organization.organization.entity.class:                Oro\Bundle\OrganizationBundle\Entity\Organization
-
 services:
     oro_organization.business_unit.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_organization.business_unit.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.business_unit_manager:
@@ -32,7 +28,7 @@ services:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_organization.organization.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\Organization'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.ownership_type:
@@ -130,7 +126,7 @@ services:
     oro_organization.autocomplete.organization_search_handler:
         class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
         arguments:
-            - '%oro_organization.organization.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\Organization'
             - ["id", "name"]
             - ["name"]
             - '@doctrine'
@@ -142,7 +138,7 @@ services:
     oro_organization.provider.phone.business_unit:
         class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
         tags:
-            - { name: oro_address.phone_provider, class: '%oro_organization.business_unit.entity.class%' }
+            - { name: oro_address.phone_provider, class: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit' }
 
     oro_organization.orm.validator.organization_unique:
         class: Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
@@ -165,7 +161,7 @@ services:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_organization.business_unit.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }
@@ -175,7 +171,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - '@translator'
-            - '%oro_organization.business_unit.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_business_units, acl_resource: oro_business_unit_view }
@@ -222,7 +218,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_organization.business_unit.entity.class%'
+            - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
             - ["name"]
             - '@doctrine'
         tags:

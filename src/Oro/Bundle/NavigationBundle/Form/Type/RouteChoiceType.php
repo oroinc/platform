@@ -4,10 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
-use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -38,9 +37,9 @@ class RouteChoiceType extends AbstractType
     private $readerRegistry;
 
     /**
-     * @var ServiceLink
+     * @var TitleServiceInterface
      */
-    private $titleServiceLink;
+    private $titleService;
 
     /**
      * @var RouteCollection
@@ -56,20 +55,20 @@ class RouteChoiceType extends AbstractType
      * @param RouterInterface $router
      * @param TitleReaderRegistry $readerRegistry
      * @param TitleTranslator $titleTranslator
-     * @param ServiceLink $titleServiceLink
+     * @param TitleServiceInterface $titleService
      * @param Cache $cache
      */
     public function __construct(
         RouterInterface $router,
         TitleReaderRegistry $readerRegistry,
         TitleTranslator $titleTranslator,
-        ServiceLink $titleServiceLink,
+        TitleServiceInterface $titleService,
         Cache $cache
     ) {
         $this->router = $router;
         $this->readerRegistry = $readerRegistry;
         $this->titleTranslator = $titleTranslator;
-        $this->titleServiceLink = $titleServiceLink;
+        $this->titleService = $titleService;
         $this->cache = $cache;
     }
 
@@ -248,15 +247,12 @@ class RouteChoiceType extends AbstractType
      */
     private function loadRouteTitles(array $routes, $menuName)
     {
-        /** @var TitleService $titleService */
-        $titleService = $this->titleServiceLink->getService();
-
         $titles = [];
         foreach ($routes as $routeName) {
             $title = $this->readerRegistry->getTitleByRoute($routeName);
             if ($title) {
                 $titles[$routeName] = $this->titleTranslator
-                    ->trans($titleService->createTitle($routeName, $title, $menuName));
+                    ->trans($this->titleService->createTitle($routeName, $title, $menuName));
             }
         }
 

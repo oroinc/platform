@@ -2,6 +2,5 @@ services:
     oro_integration.action.schedule_sync:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ScheduleSyncAction
         shared: false
-        public: true
         tags:
-            - { name:  oro_datagrid.extension.action.type, type: schedule-sync }
+            - { name: oro_datagrid.extension.action.type, type: schedule-sync }

@@ -16,7 +16,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postLoad }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem', event: postLoad }
 
     oro_workflow.listener.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener'
@@ -26,7 +26,7 @@ services:
             - '@oro_workflow.entity_connector'
             - '@oro_workflow.cache.entity_aware'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_item.class%', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem', event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
 
     oro_workflow.listener.workflow_transition_record:
@@ -48,6 +48,8 @@ services:
 
     oro_workflow.listener.event_trigger_collector:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener'
+        arguments:
+            - !tagged_iterator oro_workflow.listener.event_trigger_collector.extension
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
@@ -85,18 +87,18 @@ services:
             - '@oro_workflow.cache.entities_with_workflow'
             - '@oro_workflow.registry.system'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: preRemove }
 
     oro_workflow.event_listener.workflow_definition_repository_cache_invalidator:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionRepositoryCacheInvalidationListener
         arguments:
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postPersist, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postUpdate, method: invalidateCache }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postRemove, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: postPersist, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: postUpdate, method: invalidateCache }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', event: postRemove, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.activated, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.deactivated, method: invalidateCache }
 

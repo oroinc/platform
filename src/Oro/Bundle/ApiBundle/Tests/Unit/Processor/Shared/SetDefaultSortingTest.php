@@ -64,6 +64,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessForEntityWithIdentifierNotNamedId()
@@ -82,6 +83,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['name' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessForEntityWithCompositeIdentifier()
@@ -101,6 +103,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC', 'title' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenNoIdentifierFieldInConfig()
@@ -118,6 +121,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenConfigHasOrderByOption()
@@ -136,6 +140,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['name' => 'DESC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessForEntityWithoutIdentifier()
@@ -152,6 +157,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals([], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessForEntityWithRenamedIdentifierField()
@@ -170,6 +176,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenSortFilterIsAlreadyAdded()
@@ -178,10 +185,11 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
 
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
-        $this->context->getFilters()->add('sort', $sortFilter);
+        $this->context->getFilters()->add('sort', $sortFilter, false);
         $this->processor->process($this->context);
 
         self::assertSame($sortFilter, $this->context->getFilters()->get('sort'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenSortingIsDisabled()

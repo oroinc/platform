@@ -24,7 +24,8 @@ $select-bg: url('#{$global-url}/oroform/blank/images/icons/arrow-down--gray.png'
 $select-border-color-hover-state: get-color('additional', 'dark') !default;
 
 // Focus State
-$select-border-color-focus-state: $select-border-color-hover-state !default;
+$select-border-color-focus-state: $base-ui-element-border-color-focus !default;
+$select-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error State
 $select-border-color-error-state: get-color('ui', 'error-dark') !default;

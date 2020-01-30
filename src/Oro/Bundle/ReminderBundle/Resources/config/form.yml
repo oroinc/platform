@@ -3,9 +3,10 @@ services:
     oro_reminder.form.extension.reminder:
         class: Oro\Bundle\ReminderBundle\Form\Extension\ReminderExtension
         arguments:
-            - '@oro_reminder.entity.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     # Form types
     oro_reminder.form.type.reminder:

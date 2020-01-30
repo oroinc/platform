@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
@@ -19,18 +23,18 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
-    protected $optionsResolver;
+    private $optionsResolver;
 
     /** @var Transition */
-    protected $transition;
+    private $transition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
         $this->transition = new Transition($this->optionsResolver);
     }
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $this->assertPropertyAccessors(
             $this->transition,
@@ -64,7 +68,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->transition->setName('test_transition');
 
@@ -74,31 +78,40 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAllowedDataProvider
      *
-     * @param bool $isAllowed
+     * @param bool|null $isAllowed
      * @param bool $expected
      */
-    public function testIsAllowed($isAllowed, $expected)
+    public function testIsAllowed(?bool $isAllowed, bool $expected): void
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $errors = new ArrayCollection();
+        $expectedError = ['message' => 'test message', 'parameters' => ['param' => 'value']];
 
         if (null !== $isAllowed) {
-            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock(ExpressionInterface::class);
             $condition->expects($this->once())
                 ->method('evaluate')
                 ->with($workflowItem)
-                ->will($this->returnValue($isAllowed));
+                ->willReturnCallback(
+                    static function (WorkflowItem $workflowItem, Collection $errors) use ($isAllowed, $expectedError) {
+                        if ($isAllowed === false) {
+                            $errors->add($expectedError);
+                        }
+
+                        return $isAllowed;
+                    }
+                );
             $this->transition->setCondition($condition);
         }
 
-        $this->assertEquals($expected, $this->transition->isAllowed($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAllowed($workflowItem, $errors));
+        $this->assertEquals($isAllowed === false ? [$expectedError] : [], $errors->toArray());
     }
 
     /**
      * @return array
      */
-    public function isAllowedDataProvider()
+    public function isAllowedDataProvider(): array
     {
         return [
             'allowed' => [
@@ -116,9 +129,10 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsPreConditionAllowedWithPreActions()
+    public function testIsPreConditionAllowedWithPreActions(): void
     {
-        $workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $errors = new ArrayCollection();
 
         $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())->method('execute')->with($workflowItem);
@@ -128,34 +142,46 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $condition->expects($this->once())->method('evaluate')->with($workflowItem)->willReturn(true);
         $this->transition->setCondition($condition);
 
-        $this->assertTrue($this->transition->isAllowed($workflowItem));
+        $this->assertTrue($this->transition->isAllowed($workflowItem, $errors));
+        $this->assertEmpty($errors->toArray());
     }
 
     /**
      * @dataProvider isAllowedDataProvider
      *
-     * @param bool $isAllowed
+     * @param bool|null $isAllowed
      * @param bool $expected
      */
-    public function testIsAvailableWithForm($isAllowed, $expected)
+    public function testIsAvailableWithForm(?bool $isAllowed, bool $expected): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
+        $errors = new ArrayCollection();
+        $expectedError = ['message' => 'test message', 'parameters' => ['param' => 'value']];
 
         $this->transition->setFormOptions(['key' => 'value']);
 
         if (null !== $isAllowed) {
-            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock(ExpressionInterface::class);
             $condition->expects($this->once())
                 ->method('evaluate')
                 ->with($workflowItem)
-                ->will($this->returnValue($isAllowed));
+                ->willReturnCallback(
+                    static function (WorkflowItem $workflowItem, Collection $errors) use ($isAllowed, $expectedError) {
+                        if ($isAllowed === false) {
+                            $errors->add($expectedError);
+                        }
+
+                        return $isAllowed;
+                    }
+                );
             $this->transition->setPreCondition($condition);
         }
         $this->optionsResolver->expects($this->once())
             ->method('resolveTransitionOptions')
             ->with($this->transition, $workflowItem);
 
-        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem, $errors));
+        $this->assertEquals($isAllowed === false ? [$expectedError] : [], $errors->toArray());
     }
 
     /**
@@ -165,36 +191,60 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      * @param bool $isAvailable
      * @param bool $expected
      */
-    public function testIsAvailableWithoutForm($isAllowed, $isAvailable, $expected)
+    public function testIsAvailableWithoutForm($isAllowed, $isAvailable, $expected): void
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $errors = new ArrayCollection();
+        $error1 = ['message' => 'test message 1', 'parameters' => ['param1' => 'value1']];
+        $error2 = ['message' => 'test message 2', 'parameters' => ['param2' => 'value2']];
 
         if (null !== $isAvailable) {
-            $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $preCondition = $this->createMock(ExpressionInterface::class);
             $preCondition->expects($this->any())
                 ->method('evaluate')
                 ->with($workflowItem)
-                ->will($this->returnValue($isAvailable));
+                ->willReturnCallback(
+                    static function (WorkflowItem $workflowItem, Collection $errors) use ($isAvailable, $error1) {
+                        if ($isAvailable === false) {
+                            $errors->add($error1);
+                        }
+
+                        return $isAvailable;
+                    }
+                );
             $this->transition->setPreCondition($preCondition);
         }
         if (null !== $isAllowed) {
-            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock(ExpressionInterface::class);
             $condition->expects($this->any())
                 ->method('evaluate')
                 ->with($workflowItem)
-                ->will($this->returnValue($isAllowed));
+                ->willReturnCallback(
+                    static function (WorkflowItem $workflowItem, Collection $errors) use ($isAllowed, $error2) {
+                        if ($isAllowed === false) {
+                            $errors->add($error2);
+                        }
+
+                        return $isAllowed;
+                    }
+                );
             $this->transition->setCondition($condition);
         }
 
-        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem, $errors));
+        $this->assertEquals(
+            array_merge(
+                $isAvailable === false ? [$error1] : [],
+                $isAvailable === true && $isAllowed === false ? [$error2] : []
+            ),
+            $errors->toArray()
+        );
     }
 
     /**
      * @return array
      */
-    public function isAvailableDataProvider()
+    public function isAvailableDataProvider(): array
     {
         return [
             'allowed' => [
@@ -234,27 +284,27 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException
      * @expectedExceptionMessage Transition "test" is not allowed.
      */
-    public function testTransitNotAllowed($preConditionAllowed, $conditionAllowed)
+    public function testTransitNotAllowed(bool $preConditionAllowed, bool $conditionAllowed)
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $errors = new ArrayCollection();
+
         $workflowItem->expects($this->never())
             ->method('setCurrentStep');
 
-        $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $preCondition = $this->createMock(ExpressionInterface::class);
         $preCondition->expects($this->any())
             ->method('evaluate')
-            ->with($workflowItem)
-            ->will($this->returnValue($preConditionAllowed));
+            ->with($workflowItem, $errors)
+            ->willReturn($preConditionAllowed);
 
-        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $condition = $this->createMock(ExpressionInterface::class);
         $condition->expects($this->any())
             ->method('evaluate')
-            ->with($workflowItem)
-            ->will($this->returnValue($conditionAllowed));
+            ->with($workflowItem, $errors)
+            ->willReturn($conditionAllowed);
 
-        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->never())
             ->method('execute');
 
@@ -262,13 +312,13 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             ->setPreCondition($preCondition)
             ->setCondition($condition)
             ->setAction($action)
-            ->transit($workflowItem);
+            ->transit($workflowItem, $errors);
     }
 
     /**
      * @return array
      */
-    public function transitDisallowedDataProvider()
+    public function transitDisallowedDataProvider(): array
     {
         return [
             [false, false],
@@ -280,48 +330,42 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transitDataProvider
      *
-     * @param boolean $isFinal
-     * @param boolean $hasAllowedTransition
+     * @param bool $isFinal
+     * @param bool $hasAllowedTransition
      */
-    public function testTransit($isFinal, $hasAllowedTransition)
+    public function testTransit(bool $isFinal, bool $hasAllowedTransition): void
     {
-        $currentStepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $currentStepEntity = $this->createMock(WorkflowStep::class);
 
         $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition, $currentStepEntity);
 
-        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())
             ->method('getStepByName')
             ->with($step->getName())
-            ->will($this->returnValue($currentStepEntity));
+            ->willReturn($currentStepEntity);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())
             ->method('getDefinition')
-            ->will($this->returnValue($workflowDefinition));
+            ->willReturn($workflowDefinition);
         $workflowItem->expects($this->once())
             ->method('setCurrentStep')
             ->with($currentStepEntity);
 
-        $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $preCondition = $this->createMock(ExpressionInterface::class);
         $preCondition->expects($this->once())
             ->method('evaluate')
             ->with($workflowItem)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $condition = $this->createMock(ExpressionInterface::class);
         $condition->expects($this->once())
             ->method('evaluate')
             ->with($workflowItem)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())
             ->method('execute')
             ->with($workflowItem);
@@ -337,7 +381,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function transitDataProvider()
+    public function transitDataProvider(): array
     {
         return [
             [true, true],
@@ -353,7 +397,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject|Step
      */
-    protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true)
+    protected function getStepMock(string $name, bool $isFinal = false, bool $hasAllowedTransitions = true): Step
     {
         $step = $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
         $step->expects($this->any())->method('getName')->willReturn($name);
@@ -363,7 +407,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         return $step;
     }
 
-    public function testHasForm()
+    public function testHasForm(): void
     {
         $this->assertFalse($this->transition->hasForm()); // by default transition has form
 
@@ -377,7 +421,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->transition->hasForm());
     }
 
-    public function testHasFormWithFormConfiguration()
+    public function testHasFormWithFormConfiguration(): void
     {
         $this->assertFalse($this->transition->hasForm()); // by default transition has form
 
@@ -391,7 +435,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->transition->hasForm());
     }
 
-    public function testHasFormForPage()
+    public function testHasFormForPage(): void
     {
         $this->assertFalse($this->transition->hasForm()); // by default transition has form
 
@@ -407,7 +451,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      * @param array $datagrids
      * @param bool $result
      */
-    public function testIsNotEmptyInitContext(array $entities, array $routes, array $datagrids, $result)
+    public function testIsNotEmptyInitContext(array $entities, array $routes, array $datagrids, bool $result): void
     {
         $this->transition->setInitEntities($entities)
             ->setInitRoutes($routes)
@@ -418,7 +462,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function initContextProvider()
+    public function initContextProvider(): array
     {
         return [
             'empty' => [
@@ -460,7 +504,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFormOptionsConfiguration()
+    public function testFormOptionsConfiguration(): void
     {
         $this->assertEquals([], $this->transition->getFormOptions());
         $this->assertFalse($this->transition->hasFormConfiguration());

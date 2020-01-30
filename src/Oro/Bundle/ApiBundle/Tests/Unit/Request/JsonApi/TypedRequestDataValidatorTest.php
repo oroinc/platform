@@ -113,6 +113,36 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => []]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => []]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => []]
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => ['test' => null]]
             ]
         ];
     }
@@ -200,6 +230,36 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => [['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => []]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => ['test' => null]]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => []]]]
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => ['test' => null]]]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => ['test' => null]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => ['test' => null]]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => []]
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => ['test' => null]]
             ]
         ];
     }
@@ -441,6 +501,81 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'The \'id\' property should be a string',
                 '/data/relationships/test/data/0/id'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => null]],
+                'The \'meta\' property should be an array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => 'test']],
+                'The \'meta\' property should be an array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'meta' => ['test']]],
+                'The \'meta\' property should be an associative array',
+                '/data/meta'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => null]],
+                'The \'links\' property should be an array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => 'test']],
+                'The \'links\' property should be an array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products', 'links' => ['test']]],
+                'The \'links\' property should be an associative array',
+                '/data/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => null],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => 'test'],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'jsonapi' => ['test']],
+                'The \'jsonapi\' property should be an associative array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => null],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => 'test'],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'meta' => ['test']],
+                'The \'meta\' property should be an associative array',
+                '/meta'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => null],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => 'test'],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'links' => ['test']],
+                'The \'links\' property should be an associative array',
+                '/links'
             ]
         ];
     }
@@ -795,6 +930,81 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
                 ],
                 'The \'id\' property should be a string',
                 '/data/0/relationships/test/data/0/id'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => null]]],
+                'The \'meta\' property should be an array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => 'test']]],
+                'The \'meta\' property should be an array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'meta' => ['test']]]],
+                'The \'meta\' property should be an associative array',
+                '/data/0/meta'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => null]]],
+                'The \'links\' property should be an array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => 'test']]],
+                'The \'links\' property should be an array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products', 'links' => ['test']]]],
+                'The \'links\' property should be an associative array',
+                '/data/0/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => null],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => 'test'],
+                'The \'jsonapi\' property should be an array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'jsonapi' => ['test']],
+                'The \'jsonapi\' property should be an associative array',
+                '/jsonapi'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => null],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => 'test'],
+                'The \'meta\' property should be an array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'meta' => ['test']],
+                'The \'meta\' property should be an associative array',
+                '/meta'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => null],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => 'test'],
+                'The \'links\' property should be an array',
+                '/links'
+            ],
+            [
+                ['data' => [['type' => 'products']], 'links' => ['test']],
+                'The \'links\' property should be an associative array',
+                '/links'
             ]
         ];
     }

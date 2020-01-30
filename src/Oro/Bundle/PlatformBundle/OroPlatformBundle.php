@@ -8,6 +8,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DebugSecurityVoterCom
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\MergeServiceLocatorsCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerStorageCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass;
@@ -68,5 +69,24 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new TwigServiceLocatorPass());
         $container->addCompilerPass(new DebugSecurityVoterCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new ProfilerStorageCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'form.type_extension',
+            'oro_platform.form.type_extension.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'doctrine.event_listener',
+            'oro_platform.doctrine.event_listener.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+            'doctrine.orm.entity_listener',
+            'oro_platform.doctrine.event_listener.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
+                'oro_platform.tests.merge_service_locators',
+                'oro_platform.tests.merge_service_locators.service_locator'
+            ), PassConfig::TYPE_BEFORE_REMOVING);
+        }
     }
 }

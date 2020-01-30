@@ -30,17 +30,18 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
 
-        $this->selector = new AclExtensionSelector($this->objectIdAccessor);
-
         $this->entityExtension = $this->getMockExtension('entity');
         $this->actionExtension = $this->getMockExtension('action');
         $this->fieldExtension = $this->getMockExtension('entity', false);
 
-        $this->selector->addAclExtension($this->entityExtension);
-        $this->selector->addAclExtension($this->actionExtension);
         $this->entityExtension->expects($this->any())
             ->method('getFieldExtension')
             ->willReturn($this->fieldExtension);
+
+        $this->selector = new AclExtensionSelector(
+            [$this->entityExtension, $this->actionExtension],
+            $this->objectIdAccessor
+        );
     }
 
     public function testSelectByExtensionKeyForExistingExtension()

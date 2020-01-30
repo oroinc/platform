@@ -1,6 +1,6 @@
 datagrids:
     business-unit-grid:
-        extended_entity_name: '%oro_organization.business_unit.entity.class%'
+        extended_entity_name: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         options:
             entityHint: oro.organization.businessunit.entity_plural_label
             entity_pagination: true
@@ -19,7 +19,7 @@ datagrids:
                     - u.createdAt
                     - owner.name as ownerName
                 from:
-                    - { table: '%oro_organization.business_unit.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit', alias: u }
                 join:
                     left:
                         owner:

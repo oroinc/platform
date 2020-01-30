@@ -3,38 +3,46 @@
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Psr\Container\ContainerInterface;
 
+/**
+ * Provides a way to process big numbers.
+ */
 class BigNumberProcessor
 {
+    /** @var ContainerInterface */
+    private $valueProviders;
+
     /** @var BigNumberFormatter */
-    protected $bigNumberFormatter;
+    private $bigNumberFormatter;
 
     /** @var BigNumberDateHelper */
-    protected $dateHelper;
-
-    /** @var object[] */
-    protected $valueProviders = [];
+    private $dateHelper;
 
     /**
+     * @param ContainerInterface  $valueProviders
      * @param BigNumberFormatter  $bigNumberFormatter
      * @param BigNumberDateHelper $dateHelper
      */
     public function __construct(
+        ContainerInterface $valueProviders,
         BigNumberFormatter $bigNumberFormatter,
         BigNumberDateHelper $dateHelper
     ) {
+        $this->valueProviders = $valueProviders;
         $this->bigNumberFormatter = $bigNumberFormatter;
-        $this->dateHelper         = $dateHelper;
+        $this->dateHelper = $dateHelper;
     }
 
     /**
      * @param WidgetOptionBag $widgetOptions
-     * @param                 $providerAlias
-     * @param                 $getterName
-     * @param                 $dataType
-     * @param bool   $lessIsBetter
-     * @param bool   $lastWeek
-     * @param string $comparable
+     * @param string          $providerAlias
+     * @param string          $getterName
+     * @param string          $dataType
+     * @param bool            $lessIsBetter
+     * @param bool            $lastWeek
+     * @param string          $comparable
+     *
      * @return array
      */
     public function getBigNumberValues(
@@ -76,15 +84,14 @@ class BigNumberProcessor
      * @param string $getterName
      *
      * @return callable
-     * @throws \LogicException
      */
-    protected function getGetter($providerAlias, $getterName)
+    private function getGetter($providerAlias, $getterName)
     {
-        if (!isset($this->valueProviders[$providerAlias])) {
+        if (!$this->valueProviders->has($providerAlias)) {
             throw new \LogicException(sprintf('BigNumber provider "%s" was not found', $providerAlias));
         }
 
-        $callback = [$this->valueProviders[$providerAlias], $getterName];
+        $callback = [$this->valueProviders->get($providerAlias), $getterName];
 
         if (is_callable($callback)) {
             return $callback;
@@ -93,14 +100,5 @@ class BigNumberProcessor
         throw new \LogicException(
             sprintf('Getter "%s" for BigNumber provider "%s" was not found', $getterName, $providerAlias)
         );
-    }
-
-    /**
-     * @param object $provider
-     * @param string $alias
-     */
-    public function addValueProvider($provider, $alias)
-    {
-        $this->valueProviders[$alias] = $provider;
     }
 }

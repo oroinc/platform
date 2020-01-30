@@ -12,7 +12,7 @@ use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
- * Registry that returns the Registry.
+ * The registry of action operations.
  */
 class OperationRegistry
 {
@@ -40,21 +40,24 @@ class OperationRegistry
     /** @var array */
     private $entityNames = [];
 
-    /** @var OperationRegistryFilterInterface[] */
-    private $filters = [];
+    /** @var iterable|OperationRegistryFilterInterface[] */
+    private $filters;
 
     /**
+     * @param iterable|OperationRegistryFilterInterface[] $filters
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
      * @param CurrentApplicationProviderInterface $applicationProvider
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
+        iterable $filters,
         ConfigurationProviderInterface $configurationProvider,
         OperationAssembler $assembler,
         CurrentApplicationProviderInterface $applicationProvider,
         DoctrineHelper $doctrineHelper
     ) {
+        $this->filters = $filters;
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationProvider = $applicationProvider;
@@ -282,24 +285,12 @@ class OperationRegistry
     }
 
     /**
-     * @param OperationRegistryFilterInterface $operationRegistryFilter
-     */
-    public function addFilter(OperationRegistryFilterInterface $operationRegistryFilter)
-    {
-        $this->filters[] = $operationRegistryFilter;
-    }
-
-    /**
      * @param Operation[] $operations
      * @param OperationFindCriteria $findCriteria
      * @return Operation[]
      */
     private function filter($operations, OperationFindCriteria $findCriteria)
     {
-        if (count($this->filters) === 0) {
-            return $operations;
-        }
-
         foreach ($this->filters as $filter) {
             $operations = $filter->filter($operations, $findCriteria);
         }

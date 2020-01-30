@@ -50,7 +50,7 @@ datagrids:
                     - l.id
                     - l.name
                 from:
-                    - { table: %oro_locale.entity.localization.class%, alias: l }
+                    - { table: Oro\Bundle\LocaleBundle\Entity\Localization, alias: l }
         properties:
             title:
                 type: localized_value # property type

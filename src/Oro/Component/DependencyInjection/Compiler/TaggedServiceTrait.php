@@ -2,7 +2,6 @@
 
 namespace Oro\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -74,19 +73,14 @@ trait TaggedServiceTrait
      * (the higher the priority number, the earlier the service is added to the result list)
      * and returns flatten array of sorted services.
      *
-     * @param array $services        [priority => item, ...]
-     * @param bool  $inversePriority if TRUE, ksort() will be used instead of krsort() to sort be priority
+     * @param array $services [priority => item, ...]
      *
      * @return array [item, ...]
      */
-    private function sortByPriorityAndFlatten(array $services, bool $inversePriority = false): array
+    private function sortByPriorityAndFlatten(array $services): array
     {
         if ($services) {
-            if ($inversePriority) {
-                ksort($services);
-            } else {
-                krsort($services);
-            }
+            krsort($services);
             $services = array_merge(...$services);
         }
 
@@ -94,27 +88,23 @@ trait TaggedServiceTrait
     }
 
     /**
-     * Iterates over the given tagged services and adds each tagged service to the definition
-     * of the given service via the given method name.
+     * Sorts tagged services by the priority using ksort() function
+     * (the higher the priority number, the later the service is added to the result list)
+     * and returns flatten array of sorted services.
      *
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     * @param string           $addMethodName
-     * @param array            $taggedServices
+     * @param array $services [priority => item, ...]
+     *
+     * @return array [item, ...]
+     *
+     * @deprecated use {@see sortByPriorityAndFlatten} for new tags
      */
-    private function registerTaggedServicesViaAddMethod(
-        ContainerBuilder $container,
-        string $serviceId,
-        string $addMethodName,
-        array $taggedServices
-    ): void {
-        if (!$taggedServices) {
-            return;
+    private function inverseSortByPriorityAndFlatten(array $services): array
+    {
+        if ($services) {
+            ksort($services);
+            $services = array_merge(...$services);
         }
 
-        $chainProviderDef = $container->getDefinition($serviceId);
-        foreach ($taggedServices as $service) {
-            $chainProviderDef->addMethodCall($addMethodName, [$service]);
-        }
+        return $services;
     }
 }

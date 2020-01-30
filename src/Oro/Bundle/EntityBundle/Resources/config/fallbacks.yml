@@ -2,6 +2,7 @@ services:
     oro_entity.fallback.resolver.entity_fallback_resolver:
         class: Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver
         arguments:
+            - ~ # service locator for fallback providers
             - "@oro_entity_config.provider.fallback"
             - "@oro_config.provider.system_configuration.form_provider"
             - "@oro_config.manager"

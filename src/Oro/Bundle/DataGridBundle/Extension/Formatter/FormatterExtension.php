@@ -5,21 +5,39 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides a way to format a datagrid column value depends on its data-type.
+ */
 class FormatterExtension extends AbstractExtension
 {
-    /** @var PropertyInterface[] */
-    protected $properties = [];
+    /** @var string[] */
+    private $propertyTypes;
+
+    /** @var ContainerInterface */
+    private $propertyContainer = [];
 
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
-    public function __construct(TranslatorInterface $translator)
-    {
+    /**
+     * @param string[]            $propertyTypes
+     * @param ContainerInterface  $propertyContainer
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        array $propertyTypes,
+        ContainerInterface $propertyContainer,
+        TranslatorInterface $translator
+    ) {
+        $this->propertyTypes = $propertyTypes;
+        $this->propertyContainer = $propertyContainer;
         $this->translator = $translator;
     }
 
@@ -51,7 +69,7 @@ class FormatterExtension extends AbstractExtension
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
 
         // validate extension configuration and normalize by setting default values
-        $columnsNormalized    = $this->validateConfigurationByType($columns, Configuration::COLUMNS_KEY);
+        $columnsNormalized = $this->validateConfigurationByType($columns, Configuration::COLUMNS_KEY);
         $propertiesNormalized = $this->validateConfigurationByType($properties, Configuration::PROPERTIES_KEY);
 
         // replace config values by normalized, extra keys passed directly
@@ -71,10 +89,8 @@ class FormatterExtension extends AbstractExtension
 
         foreach ($rows as $key => $row) {
             $currentRow = [];
-
-            foreach ($toProcess as $name => $config) {
-                $config            = PropertyConfiguration::createNamed($name, $config);
-                $property          = $this->getPropertyObject($config);
+            foreach ($toProcess as $name => $propertyConfig) {
+                $property = $this->getPropertyObject(PropertyConfiguration::createNamed($name, $propertyConfig));
                 $currentRow[$name] = $property->getValue($row);
             }
             $rows[$key] = $currentRow;
@@ -94,10 +110,10 @@ class FormatterExtension extends AbstractExtension
         $propertiesMetadata = [];
         foreach ($columns as $name => $fieldConfig) {
             $fieldConfig = PropertyConfiguration::createNamed($name, $fieldConfig);
-            $metadata    = $this->getPropertyObject($fieldConfig)->getMetadata();
+            $metadata = $this->getPropertyObject($fieldConfig)->getMetadata();
 
             // translate label on backend
-            $metadata['label']    = $metadata[PropertyInterface::TRANSLATABLE_KEY]
+            $metadata['label'] = $metadata[PropertyInterface::TRANSLATABLE_KEY]
                 ? $this->translator->trans($metadata['label'])
                 : $metadata['label'];
             $propertiesMetadata[] = $metadata;
@@ -107,26 +123,22 @@ class FormatterExtension extends AbstractExtension
     }
 
     /**
-     * Add property to array of available properties, usually called by DIC
-     *
-     * @param string            $name
-     * @param PropertyInterface $property
-     */
-    public function registerProperty($name, PropertyInterface $property)
-    {
-        $this->properties[$name] = $property;
-    }
-
-    /**
      * Returns prepared property object
      *
      * @param PropertyConfiguration $config
      *
      * @return PropertyInterface
      */
-    protected function getPropertyObject(PropertyConfiguration $config)
+    private function getPropertyObject(PropertyConfiguration $config): PropertyInterface
     {
-        $property = $this->properties[$config->offsetGet(Configuration::TYPE_KEY)]->init($config);
+        $type = $config->offsetGet(Configuration::TYPE_KEY);
+        if (!$this->propertyContainer->has($type)) {
+            throw new RuntimeException(sprintf('The "%s" formatter not found.', $type));
+        }
+
+        /** @var PropertyInterface $property */
+        $property = $this->propertyContainer->get($type);
+        $property->init($config);
 
         return $property;
     }
@@ -139,11 +151,11 @@ class FormatterExtension extends AbstractExtension
      *
      * @return array
      */
-    protected function validateConfigurationByType($config, $type)
+    private function validateConfigurationByType($config, $type)
     {
-        $registeredTypes = array_keys($this->properties);
-        $configuration   = new Configuration($registeredTypes, $type);
-
-        return parent::validateConfiguration($configuration, [$type => $config]);
+        return $this->validateConfiguration(
+            new Configuration($this->propertyTypes, $type),
+            [$type => $config]
+        );
     }
 }

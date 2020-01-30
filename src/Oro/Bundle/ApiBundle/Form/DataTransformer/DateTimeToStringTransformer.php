@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -108,7 +109,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         }
 
         if (!preg_match(self::DATETIME_PATTERN, $value, $matches)) {
-            throw new TransformationFailedException(sprintf('The value "%s" is not a valid datetime.', $value));
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The value "%s" is not a valid datetime.', $value),
+                'oro.api.form.invalid_datetime',
+                ['{{ value }}' => $value]
+            );
         }
         if (array_key_exists(3, $matches) && '' !== $matches[3]) {
             $this->assertValidDate($matches[1], $matches[2], $matches[3]);
@@ -141,7 +146,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     private function reverseTransformDateValue(string $value): \DateTimeInterface
     {
         if (!preg_match(self::DATE_PATTERN, $value, $matches)) {
-            throw new TransformationFailedException(sprintf('The value "%s" is not a valid date.', $value));
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The value "%s" is not a valid date.', $value),
+                'oro.api.form.invalid_date',
+                ['{{ value }}' => $value]
+            );
         }
         if (array_key_exists(3, $matches)) {
             $this->assertValidDate($matches[1], $matches[2], $matches[3]);
@@ -164,7 +173,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     private function reverseTransformTimeValue(string $value): \DateTimeInterface
     {
         if (!preg_match(self::TIME_PATTERN, $value, $matches)) {
-            throw new TransformationFailedException(sprintf('The value "%s" is not a valid time.', $value));
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The value "%s" is not a valid time.', $value),
+                'oro.api.form.invalid_time',
+                ['{{ value }}' => $value]
+            );
         }
         if (array_key_exists(3, $matches)) {
             $this->assertValidTime($matches[1], $matches[2], $matches[3]);
@@ -186,7 +199,13 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         try {
             $result = new \DateTime($value);
         } catch (\Exception $e) {
-            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+            throw new TransformationFailedException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e,
+                'oro.api.form.invalid_datetime',
+                ['{{ value }}' => $value]
+            );
         }
 
         if ($result->getTimezone()->getName() !== 'UTC') {
@@ -204,12 +223,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     private function assertValidDate($year, $month, $day): void
     {
         if (!checkdate($month, $day, $year)) {
-            throw new TransformationFailedException(sprintf(
-                'The date "%s-%s-%s" is not a valid date.',
-                $year,
-                $month,
-                $day
-            ));
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The date "%s-%s-%s" is not a valid date.', $year, $month, $day),
+                'oro.api.form.invalid_date',
+                ['{{ value }}' => sprintf('%s-%s-%s', $year, $month, $day)]
+            );
         }
     }
 
@@ -221,12 +239,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     private function assertValidTime($hours, $minutes, $seconds): void
     {
         if ($hours > 23 || $minutes > 59 || $seconds > 59) {
-            throw new TransformationFailedException(sprintf(
-                'The time "%s:%s:%s" is not a valid time.',
-                $hours,
-                $minutes,
-                $seconds
-            ));
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The time "%s:%s:%s" is not a valid time.', $hours, $minutes, $seconds),
+                'oro.api.form.invalid_time',
+                ['{{ value }}' => sprintf('%s:%s:%s', $hours, $minutes, $seconds)]
+            );
         }
     }
 }

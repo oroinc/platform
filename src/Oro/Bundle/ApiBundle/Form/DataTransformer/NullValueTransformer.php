@@ -61,7 +61,7 @@ class NullValueTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        $result = $this->transformer->reverseTransform(null !== $value ? $value : '');
+        $result = $this->transformer->reverseTransform($value ?? '');
         if (null === $result && '' === $value) {
             $result = $value;
         }

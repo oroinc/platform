@@ -9,7 +9,6 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPas
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\DecorateAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SessionPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetFirewallExceptionListenerPass;
@@ -19,7 +18,6 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationH
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
@@ -40,14 +38,8 @@ class OroSecurityBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new AclConfigurationPass());
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_security.acl.annotation_provider',
-            'oro_security.acl.config_loader',
-            'addLoader'
-        ));
         $container->addCompilerPass(new OwnershipDecisionMakerPass());
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
-        $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
         $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(

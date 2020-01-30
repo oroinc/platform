@@ -24,6 +24,7 @@ oro:
         entity_description:  Show records tagged by this tag
         entity_label:        Tag
         entity_plural_label: Tags
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         name.label:          Name
         owner.label:         Owner
@@ -40,6 +41,7 @@ oro:
             entity_label:        Tagging
             entity_name.label:   Entity name
             entity_plural_label: Taggings
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:            Id
             owner.label:         Owner
             record_id.label:     Record
@@ -58,6 +60,7 @@ oro:
             label:                  Taxonomy
             entity_label:           Taxonomy
             entity_plural_label:    Taxonomies
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:     Units that tags can be grouped into.
             owner.label:            Owner
             background_color:
@@ -104,6 +107,7 @@ oro:
         created_by.label:    Created By
         entity_label:        Taxonomy
         entity_plural_label: Taxonomies
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         name.label:          Name
         owner.label:         Owner

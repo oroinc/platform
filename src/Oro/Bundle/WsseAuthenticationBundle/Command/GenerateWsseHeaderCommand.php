@@ -45,13 +45,13 @@ class GenerateWsseHeaderCommand extends Command
     {
         $this->setDescription('Generate X-WSSE HTTP header for a given API key');
         $this->setDefinition([
-            new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
+            new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key.'),
             new InputOption(
                 'firewall',
                 null,
                 InputArgument::OPTIONAL,
-                'Firewall name. Default: wsse_secured',
-                'wsse_secured'
+                'Firewall name.',
+                $this->getDefaultSecurityFirewall()
             ),
         ]);
     }
@@ -67,7 +67,7 @@ class GenerateWsseHeaderCommand extends Command
     {
         $apiKey = $input->getArgument('apiKey');
         /** @var UserApi $userApi */
-        $userApi = $this->registry->getRepository('OroUserBundle:UserApi')->findOneBy(
+        $userApi = $this->registry->getRepository($this->getApiKeyEntityClass())->findOneBy(
             ['apiKey' => $apiKey]
         );
         if (!$userApi) {
@@ -137,5 +137,21 @@ class GenerateWsseHeaderCommand extends Command
         }
 
         return $this->container->get($serviceId);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getApiKeyEntityClass(): string
+    {
+        return UserApi::class;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultSecurityFirewall(): string
+    {
+        return 'wsse_secured';
     }
 }

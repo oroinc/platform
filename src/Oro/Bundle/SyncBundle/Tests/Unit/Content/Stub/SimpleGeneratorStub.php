@@ -30,9 +30,9 @@ class SimpleGeneratorStub implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
-        $tags = [$data . $this->suffix];
+        $tags = [$data . '_' . $this->suffix];
         if ($includeCollectionTag) {
-            $tags[] = $data . $this->suffix . self::COLLECTION_SUFFIX;
+            $tags[] = $data . '_' . $this->suffix . self::COLLECTION_SUFFIX;
         }
 
         return $tags;

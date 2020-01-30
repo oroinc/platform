@@ -13,14 +13,14 @@ datagrids:
                     - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
                     - languageOwner.id as owner
                 from:
-                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                    - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     left:
                         - { join: language.owner, alias: languageOwner }
         inline_editing:
             enable: true
             behaviour: enable_selected
-            entity_name: '%oro_translation.entity.language.class%'
+            entity_name: 'Oro\Bundle\TranslationBundle\Entity\Language'
         columns:
             language:
                 label: oro.translation.language.entity_label
@@ -97,7 +97,7 @@ datagrids:
 
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
-        extended_entity_name: '%oro_translation.entity.translation.class%'
+        extended_entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
         source:
             type: orm
             query:
@@ -111,22 +111,22 @@ datagrids:
                     - (CASE WHEN translation.value IS NULL THEN false ELSE true END) as status
                     - translationEn.value as englishValue
                 from:
-                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                    - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     inner:
                         -
-                            join: '%oro_translation.entity.translation_key.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\TranslationKey'
                             alias: translationKey
                             conditionType: WITH
                             condition: 1 = 1 # always true (required for DQLBuilder due require conditionType when joining on Entity class)
                     left:
                         -
-                            join: '%oro_translation.entity.translation.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
                         -
-                            join: '%oro_translation.entity.translation.class%'
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                             alias: translationEn
                             conditionType: WITH
                             condition: 'translationEn.translationKey = translationKey AND translationEn.language = :en_language'
@@ -136,7 +136,7 @@ datagrids:
         inline_editing:
             enable: true
             behaviour: enable_selected
-            entity_name: '%oro_translation.entity.translation.class%'
+            entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
             acl_resource: oro_translation_language_translate
         columns:
             id:

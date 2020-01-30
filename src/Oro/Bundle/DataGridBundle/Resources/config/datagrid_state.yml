@@ -28,12 +28,12 @@ services:
     oro_datagrid.provider.selected_fields:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProvider'
         public: false
-        lazy: true
+        arguments:
+            - !tagged_iterator oro_datagrid.selected_fields_provider
 
     oro_datagrid.provider.selected_fields.columns:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromColumnsProvider'
         public: false
-        lazy: true
         arguments:
             - '@oro_datagrid.provider.state.columns'
         tags:
@@ -42,7 +42,6 @@ services:
     oro_datagrid.provider.selected_fields.sorters:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromSortersProvider'
         public: false
-        lazy: true
         arguments:
             - '@oro_datagrid.provider.state.sorters'
         tags:

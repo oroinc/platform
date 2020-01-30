@@ -44,6 +44,6 @@ trait ShortFileNameGeneratorTrait
      */
     protected function removeSpecialChars($str)
     {
-        return preg_replace('@[\\\/:"*?<>|]+@', '', $str);
+        return preg_replace('@[\\\/\:\"\*\?\<\>\|]+@', '', $str);
     }
 }

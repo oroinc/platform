@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Query\QueryException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
@@ -26,7 +26,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
  */
 class SqlQueryBuilder
 {
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /** @var DbalQueryBuilder */
@@ -39,14 +39,14 @@ class SqlQueryBuilder
     protected $connection;
 
     /**
-     * @param EntityManager    $em
-     * @param ResultSetMapping $rsm
+     * @param EntityManagerInterface $em
+     * @param ResultSetMapping       $rsm
      */
-    public function __construct(EntityManager $em, ResultSetMapping $rsm)
+    public function __construct(EntityManagerInterface $em, ResultSetMapping $rsm)
     {
-        $this->em  = $em;
+        $this->em = $em;
         $this->connection = $em->getConnection();
-        $this->qb  = $this->connection->createQueryBuilder();
+        $this->qb = $this->connection->createQueryBuilder();
         $this->rsm = $rsm;
     }
 
@@ -408,12 +408,12 @@ class SqlQueryBuilder
      * Creates and adds a query root corresponding to the table identified by the
      * given alias, forming a cartesian product with any existing query roots.
      *
-     * @param string $from  The table.
-     * @param string $alias The alias of the table.
+     * @param string      $from  The table.
+     * @param string|null $alias The alias of the table.
      *
      * @return self
      */
-    public function from($from, $alias)
+    public function from($from, $alias = null)
     {
         $this->qb->from($from, $alias);
 

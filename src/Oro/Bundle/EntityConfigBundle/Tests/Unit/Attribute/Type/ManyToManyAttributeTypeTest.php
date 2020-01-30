@@ -38,11 +38,6 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         return new ManyToManyAttributeType($this->entityNameResolver, $doctrineHelper);
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('manyToMany', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

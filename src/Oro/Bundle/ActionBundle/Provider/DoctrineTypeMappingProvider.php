@@ -4,17 +4,20 @@ namespace Oro\Bundle\ActionBundle\Provider;
 
 use Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface;
 
+/**
+ * Provides Doctrine type mapping.
+ */
 class DoctrineTypeMappingProvider
 {
-    /** @var DoctrineTypeMappingExtensionInterface[] */
-    protected $extensions = [];
+    /** @var iterable|DoctrineTypeMappingExtensionInterface[] */
+    private $extensions;
 
     /**
-     * @param DoctrineTypeMappingExtensionInterface $extension
+     * @param iterable|DoctrineTypeMappingExtensionInterface[] $extensions
      */
-    public function addExtension(DoctrineTypeMappingExtensionInterface $extension)
+    public function __construct(iterable $extensions)
     {
-        $this->extensions[] = $extension;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -22,13 +25,14 @@ class DoctrineTypeMappingProvider
      */
     public function getDoctrineTypeMappings()
     {
-        $types = array_map(
-            function (DoctrineTypeMappingExtensionInterface $extension) {
-                return $extension->getDoctrineTypeMappings();
-            },
-            $this->extensions
-        );
+        $types = [];
+        foreach ($this->extensions as $extension) {
+            $types[] = $extension->getDoctrineTypeMappings();
+        }
+        if ($types) {
+            $types = array_merge(...$types);
+        }
 
-        return $types ? call_user_func_array('array_merge', $types) : [];
+        return $types;
     }
 }

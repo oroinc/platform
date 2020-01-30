@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     const template = require('tpl-loader!oroui/templates/modal-dialog.html');
     const mediator = require('oroui/js/mediator');
     const tools = require('oroui/js/tools');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
     let config = require('module-config').default(module.id);
 
     const SUSPEND_MODE_CLASS = 'suspend-mode';
@@ -24,6 +25,7 @@ define(function(require, exports, module) {
         SHOWN: 'shown',
         HIDDEN: 'hidden',
         RESIZE: 'resize',
+        KEYDOWN: 'keydown',
         KEYUP_DISMISS: 'keydown.dismiss',
         FOCUSIN: 'focusin'
     };
@@ -78,7 +80,7 @@ define(function(require, exports, module) {
             events[EVENTS.HIDDEN + EVENT_KEY] = 'onModalHidden';
             events[EVENTS.SHOWN + EVENT_KEY] = 'onModalShown';
             events[EVENTS.FOCUSIN + EVENT_KEY] = 'onModalFocusin';
-
+            events[EVENTS.KEYDOWN + EVENT_KEY] = event => manageFocus.preventTabOutOfContainer(event, this.$el);
             return events;
         },
 

@@ -621,7 +621,7 @@ class RawLayout
      */
     protected function isValidId($id)
     {
-        return preg_match('/^[a-z][a-z0-9_\-:]*$/iD', $id);
+        return preg_match('/^[a-z][a-z0-9\_\-\:]*$/iD', $id);
     }
 
     /**

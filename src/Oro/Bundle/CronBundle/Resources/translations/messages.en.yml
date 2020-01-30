@@ -65,6 +65,7 @@ oro:
         schedule:
             entity_label: 'Schedule'
             entity_plural_label: 'Schedules'
+            entity_grid_all_view_label: 'All %entity_plural_label%'
 
             id.label: 'Id'
             command.label: 'Command'

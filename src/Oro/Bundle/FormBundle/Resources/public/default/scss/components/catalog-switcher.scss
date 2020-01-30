@@ -14,5 +14,9 @@
             background-color: $catalog-switcher-btn-background-active;
             color: $catalog-switcher-btn-color-active;
         }
+
+        &.focus-visible {
+            z-index: z('base') + 1;
+        }
     }
 }

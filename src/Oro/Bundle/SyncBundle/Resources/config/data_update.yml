@@ -19,6 +19,8 @@ services:
     oro_sync.content.tag_generator:
         class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
         public: true
+        arguments:
+            - !tagged_iterator oro_sync.tag_generator
 
     Oro\Bundle\SyncBundle\Content\TagGeneratorInterface:
         alias: oro_sync.content.tag_generator

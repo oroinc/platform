@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
+use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
@@ -9,33 +12,31 @@ class WorkflowDefinitionHandleBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildFromRawConfiguration()
     {
-        $rawConfiguration = array('name' => 'test_workflow');
-        $handledConfiguration = array('name' => 'test_workflow', 'label' => 'Test Workflow');
-        $processedConfiguration = array('name' => 'test_workflow', 'label' => 'Test Workflow', 'is_system' => false);
+        $rawConfiguration = ['name' => 'test_workflow'];
+        $handledConfiguration = ['name' => 'test_workflow', 'label' => 'Test Workflow'];
+        $processedConfiguration = ['name' => 'test_workflow', 'label' => 'Test Workflow', 'is_system' => false];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($processedConfiguration['name']);
 
-        $handler = $this->createMock('Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface');
+        $handler = $this->createMock(ConfigurationHandlerInterface::class);
         $handler->expects($this->once())->method('handle')->with($rawConfiguration)
             ->will($this->returnValue($handledConfiguration));
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(WorkflowConfiguration::class);
         $configuration->expects($this->once())->method('processConfiguration')->with($handledConfiguration)
             ->will($this->returnValue($processedConfiguration));
 
-        $configurationBuilder
-            = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $configurationBuilder = $this->createMock(WorkflowDefinitionConfigurationBuilder::class);
         $configurationBuilder->expects($this->once())->method('buildOneFromConfiguration')
             ->with($processedConfiguration['name'], $processedConfiguration)
             ->will($this->returnValue($workflowDefinition));
 
-        $handleBuilder = new WorkflowDefinitionHandleBuilder($configuration, $configurationBuilder);
-        $handleBuilder->addHandler($handler);
+        $handleBuilder = new WorkflowDefinitionHandleBuilder(
+            $configuration,
+            $configurationBuilder,
+            [$handler]
+        );
         $this->assertEquals($workflowDefinition, $handleBuilder->buildFromRawConfiguration($rawConfiguration));
     }
 }

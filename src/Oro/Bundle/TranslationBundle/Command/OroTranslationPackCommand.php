@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationAdaptersCollection;
 use Oro\Bundle\TranslationBundle\Provider\APIAdapterInterface;
+use Oro\Bundle\TranslationBundle\Provider\TranslationAdaptersCollection;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;

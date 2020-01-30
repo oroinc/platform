@@ -8,33 +8,35 @@
 
     &__input {
         position: absolute;
-        z-index: -1;
+        z-index: z('hidden');
         margin: 0;
 
         opacity: 0;
 
         &:hover {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-hover-state;
+                border-color: $checkbox-icon-border-color-hover-state;
             }
         }
 
+        &.focus-visible,
         &:focus {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-focus-state;
+                border-color: $checkbox-icon-border-color-focus-state;
+                box-shadow: $checkbox-icon-box-shadow-focus-state;
             }
         }
 
         &:checked {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-focus-state;
+                border-color: $checkbox-icon-border-color-focus-state;
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
         }
 
         &:indeterminate {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-focus-state;
+                border-color: $checkbox-icon-border-color-focus-state;
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
         }

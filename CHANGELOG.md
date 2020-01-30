@@ -2,6 +2,74 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.1.0 (2020-01-31)
+[Show detailed list of changes](incompatibilities-4-1.md)
+
+### Changed
+
+#### ConfigBundle
+* The handling of `priority` attribute for `oro_config.configuration_search_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_config.configuration_search_provider, priority: 100 }` should be changed to
+  `{ name: oro_config.configuration_search_provider, priority: -100 }`
+
+#### DataGridBundle
+* The handling of `priority` attribute for `oro_datagrid.extension.action.provider` and
+  `oro_datagrid.extension.mass_action.iterable_result_factory` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_datagrid.extension.action.provider, priority: 100 }` should be changed to
+  `{ name: oro_datagrid.extension.action.provider, priority: -100 }`
+
+#### TranslationBundle
+* The handling of `priority` attribute for `oro_translation.extension.translation_context_resolver` and
+  `oro_translation.extension.translation_strategy` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro_translation.extension.translation_context_resolver, priority: 100 }` should be changed to
+  `{ name: oro_translation.extension.translation_context_resolver, priority: -100 }`
+
+#### WorkflowBundle
+* The handling of `priority` attribute for `oro.workflow.configuration.handler` and
+  `oro.workflow.definition_builder.extension` DIC tags was changed to correspond Symfony recommendations.
+  If you have services with these tags, change the sign of the priority value for them.
+  E.g. `{ name: oro.workflow.configuration.handler, priority: 100 }` should be changed to
+  `{ name: oro.workflow.configuration.handler, priority: -100 }`
+
+### Added
+
+#### AttachmentBundle
+* Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](./src/Oro/Bundle/AttachmentBundle/README.md).
+
+### Removed
+* `*.class` parameters for all entities were removed from the dependency injection container.
+The entity class names should be used directly, e.g. `'Oro\Bundle\EmailBundle\Entity\Email'`
+instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid config files, placeholders, etc.), and
+`\Oro\Bundle\EmailBundle\Entity\Email::class` instead of `$container->getParameter('oro_email.email.entity.class')`
+(in PHP code).
+
+#### ActivityListBundle
+* The `getActivityClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `class` attribute of the `oro_activity_list.provider` DIC tag instead.
+* The `getAclClass()` method was removed from `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface`.
+  Use the `acl_class` attribute of the `oro_activity_list.provider` DIC tag instead.
+
+#### DataGridBundle
+* The `getName()` method was removed from `Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface`.
+  Use the `alias` attribute of the `oro_datagrid.board_processor` DIC tag instead.
+
+#### EntityConfigBundle
+* The `getType()` method was removed from `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface`.
+  Use the `type` attribute of the `oro_entity_config.attribute_type` DIC tag instead.
+
+#### ReminderBundle
+* The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
+  Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
+
+#### UIBundle
+* The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+  Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
+* Unneeded `isEnabled()` and `setEnabled()` methods were removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
+
 ## 4.1.0-rc (2019-12-10)
 [Show detailed list of changes](incompatibilities-4-1-rc.md)
 
@@ -120,7 +188,7 @@ The current file describes significant changes in the code that may affect the u
 ### Removed
 
 #### All Bundles
-* All `*.class` parameters were removed from the dependency injection container.
+* All `*.class` parameters for service definitions were removed from the dependency injection container.
 
 #### Math component
 * The deprecated method `Oro\Component\Math\BigDecimal::withScale()` was removed. Use `toScale()` method instead.  

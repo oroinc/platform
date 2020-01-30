@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -10,24 +9,31 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\EventTriggerExtensionInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class EventTriggerCollectorListener implements OptionalListenerInterface
+/**
+ * Collects event triggers when any entity is created, updated or removed.
+ */
+class EventTriggerCollectorListener implements OptionalListenerInterface, ResetInterface
 {
     /** @var bool */
-    protected $enabled = true;
+    private $enabled = true;
 
     /** @var bool */
-    protected $forceQueued = false;
+    private $forceQueued = false;
 
-    /** @var ArrayCollection|EventTriggerExtensionInterface[] */
-    protected $extensions;
+    /** @var iterable|EventTriggerExtensionInterface[] */
+    private $extensions;
+
+    /** @var EventTriggerExtensionInterface[] */
+    private $initializedExtensions;
 
     /**
-     * @param array|EventTriggerExtensionInterface[] $extensions
+     * @param iterable|EventTriggerExtensionInterface[] $extensions
      */
-    public function __construct(array $extensions = [])
+    public function __construct(iterable $extensions)
     {
-        $this->extensions = new ArrayCollection();
+        $this->extensions = $extensions;
     }
 
     /**
@@ -41,25 +47,18 @@ class EventTriggerCollectorListener implements OptionalListenerInterface
     /**
      * @param bool $forceQueued
      */
-    public function setForceQueued($forceQueued = false)
+    public function setForceQueued(bool $forceQueued = false)
     {
-        $this->forceQueued = (bool)$forceQueued;
-
-        foreach ($this->extensions as $extension) {
-            $extension->setForceQueued($this->forceQueued);
-        }
+        $this->forceQueued = $forceQueued;
+        $this->reset();
     }
 
     /**
-     * @param EventTriggerExtensionInterface $extension
+     * {@inheritDoc}
      */
-    public function addExtension(EventTriggerExtensionInterface $extension)
+    public function reset()
     {
-        if (!$this->extensions->contains($extension)) {
-            $extension->setForceQueued($this->forceQueued);
-
-            $this->extensions->add($extension);
-        }
+        $this->initializedExtensions = null;
     }
 
     /**
@@ -85,7 +84,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface
 
         $changeSet = $args->getEntityChangeSet();
         $fields = array_keys($changeSet);
-
         foreach ($fields as $field) {
             $changeSet[$field] = ['old' => $args->getOldValue($field), 'new' => $args->getNewValue($field)];
         }
@@ -111,7 +109,8 @@ class EventTriggerCollectorListener implements OptionalListenerInterface
     public function onClear(OnClearEventArgs $args)
     {
         $entityClass = $args->clearsAllEntities() ? null : $args->getEntityClass();
-        foreach ($this->extensions as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->clear($entityClass);
         }
     }
@@ -125,7 +124,8 @@ class EventTriggerCollectorListener implements OptionalListenerInterface
             return;
         }
 
-        foreach ($this->extensions as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->process($args->getEntityManager());
         }
     }
@@ -135,12 +135,29 @@ class EventTriggerCollectorListener implements OptionalListenerInterface
      * @param string $event
      * @param array|null $changeSet
      */
-    protected function schedule($entity, $event, array $changeSet = null)
+    private function schedule($entity, $event, array $changeSet = null)
     {
-        foreach ($this->extensions as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasTriggers($entity, $event)) {
                 $extension->schedule($entity, $event, $changeSet);
             }
         }
+    }
+
+    /**
+     * @return EventTriggerExtensionInterface[]
+     */
+    private function getExtensions(): array
+    {
+        if (null === $this->initializedExtensions) {
+            $this->initializedExtensions = [];
+            foreach ($this->extensions as $extension) {
+                $extension->setForceQueued($this->forceQueued);
+                $this->initializedExtensions[] = $extension;
+            }
+        }
+
+        return $this->initializedExtensions;
     }
 }

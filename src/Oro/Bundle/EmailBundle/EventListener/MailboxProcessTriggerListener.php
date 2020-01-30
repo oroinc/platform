@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -14,38 +13,40 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
+/**
+ * Used to process email bodies using processes provided in mailbox process providers.
+ */
 class MailboxProcessTriggerListener extends MailboxEmailListener implements
-    LoggerAwareInterface,
-    FeatureToggleableInterface
+    FeatureToggleableInterface,
+    ServiceSubscriberInterface
 {
-    use LoggerAwareTrait, FeatureCheckerHolderTrait;
+    use FeatureCheckerHolderTrait;
 
-    /** @var ProcessHandler */
-    protected $handler;
-
-    /** @var ServiceLink */
-    protected $processStorage;
-
-    /** @var Registry */
-    protected $doctrine;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param ProcessHandler $handler
-     * @param ServiceLink    $processStorage
-     * @param Registry       $doctrine
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        ProcessHandler $handler,
-        ServiceLink $processStorage,
-        Registry $doctrine
-    ) {
-        $this->handler = $handler;
-        $this->processStorage = $processStorage;
-        $this->doctrine = $doctrine;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,
+            'oro_workflow.process.process_handler' => ProcessHandler::class,
+            LoggerInterface::class
+        ];
     }
 
     /**
@@ -78,28 +79,38 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
         $emailBodies = $this->emailBodies;
         $this->emailBodies = [];
 
+        $em = $args->getEntityManager();
+        $processRepository = $em->getRepository(ProcessDefinition::class);
+        $processStorage = $this->container->get('oro_email.mailbox.process_storage');
+        $handler = $this->container->get('oro_workflow.process.process_handler');
+
         foreach ($emailBodies as $emailBody) {
-            $this->scheduleProcess($emailBody);
+            $this->scheduleProcess($emailBody, $processRepository, $processStorage, $handler);
         }
 
-        $this->doctrine->getManager()->flush();
+        $em->flush();
     }
 
     /**
      * Schedules EmailBody for processing.
      *
-     * @param EmailBody $emailBody
+     * @param EmailBody             $emailBody
+     * @param EntityRepository      $processRepository
+     * @param MailboxProcessStorage $processStorage
+     * @param ProcessHandler        $handler
      */
-    protected function scheduleProcess(EmailBody $emailBody)
-    {
+    protected function scheduleProcess(
+        EmailBody $emailBody,
+        EntityRepository $processRepository,
+        MailboxProcessStorage $processStorage,
+        ProcessHandler $handler
+    ) {
         /*
          * Retrieve all process definitions to trigger
          */
-        /** @var MailboxProcessStorage $processStorage */
-        $processStorage = $this->processStorage->getService();
         $definitions = $processStorage->getProcessDefinitionNames();
         /** @var ProcessDefinition[] $definitions */
-        $definitions = $this->getDefinitionRepository()->findBy(['name' => $definitions]);
+        $definitions = $processRepository->findBy(['name' => $definitions]);
 
         /*
          * Trigger process definitions with provided data
@@ -115,9 +126,11 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
                 $data = new ProcessData();
                 $data->set('data', $emailBody);
 
-                $this->handler->handleTrigger($trigger, $data);
+                $handler->handleTrigger($trigger, $data);
             } catch (\Exception $ex) {
-                $this->logger->warning(
+                /** @var LoggerInterface $logger */
+                $logger = $this->container->get(LoggerInterface::class);
+                $logger->warning(
                     sprintf(
                         'Process failed and skipped: %s. Error: %s.',
                         $definition->getName(),
@@ -127,13 +140,5 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
                 );
             }
         }
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getDefinitionRepository()
-    {
-        return $this->doctrine->getRepository('OroWorkflowBundle:ProcessDefinition');
     }
 }

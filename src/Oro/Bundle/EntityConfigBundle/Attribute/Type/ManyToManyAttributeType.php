@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 
+/**
+ * Provides metadata about many-to-many association attribute type.
+ */
 class ManyToManyAttributeType implements AttributeTypeInterface
 {
     use AttributeLocalizableTrait;
@@ -26,14 +29,6 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     {
         $this->entityNameResolver = $entityNameResolver;
         $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'manyToMany';
     }
 
     /**

@@ -4,6 +4,7 @@ $use-base-style-for-textarea: true !default;
 
 // Default
 $textarea-padding: 8px 9px !default;
+$textarea-min-height: 36px !default;
 $textarea-font-size: $base-ui-element-font-size !default;
 $textarea-font-family: $base-ui-element-font-family !default;
 $textarea-line-height: $base-ui-element-line-height !default;
@@ -16,7 +17,8 @@ $textarea-color: $base-ui-element-color !default;
 $textarea-border-color-hover-state: get-color('additional', 'dark') !default;
 
 // Focus
-$textarea-border-color-focus-state: $textarea-border-color-hover-state !default;
+$textarea-border-color-focus-state: $base-ui-element-border-color-focus !default;
+$textarea-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error
 $textarea-border-color-error-state: get-color('ui', 'error-dark') !default;

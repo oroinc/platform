@@ -2,7 +2,6 @@ services:
     oro_datagrid.mass_action.forced_password_reset:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\Actions\ResetPasswordMassAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: resetpassword }
 
@@ -17,14 +16,12 @@ services:
     oro_datagrid.mass_action.disable_users:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: disableusers }
 
     oro_datagrid.mass_action.enable_users:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: enableusers }
 
