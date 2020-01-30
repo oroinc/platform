@@ -10,6 +10,9 @@ use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
+/**
+ * Applies menu updates to the menu item
+ */
 class MenuUpdateBuilder implements BuilderInterface
 {
     /**
