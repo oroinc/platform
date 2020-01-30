@@ -16,6 +16,8 @@ class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
+    const NO_CHILDREN_IN_CONFIG = 'no_children_in_config';
+
     /** @var ResolverInterface */
     protected $resolver;
 
@@ -125,8 +127,12 @@ class ConfigurationBuilder implements BuilderInterface
             $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
         }
 
-        if ($menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
+        //If flag isAllowed is False because no one child exist or allowed
+        //And current menu isAllowed option is True as well as displayChildren
+        //We set isAllowed to False to not show menu in the UI
+        if (!$isAllowed && $menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
             $menu->setExtra('isAllowed', $isAllowed);
+            $menu->setExtra(self::NO_CHILDREN_IN_CONFIG, true);
         }
     }
 

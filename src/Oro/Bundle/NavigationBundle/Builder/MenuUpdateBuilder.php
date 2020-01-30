@@ -6,6 +6,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -44,9 +45,15 @@ class MenuUpdateBuilder implements BuilderInterface
 
         $this->applyDivider($menu);
 
+        $hasAllowedChild = false;
+
         /** @var ItemInterface $item */
         foreach ($menu->getChildren() as $item) {
+            if (!$hasAllowedChild && $item->getExtra('isAllowed')) {
+                $hasAllowedChild = true;
+            }
             $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
+
             if ($item) {
                 throw new MaxNestingLevelExceededException(
                     sprintf(
@@ -56,6 +63,10 @@ class MenuUpdateBuilder implements BuilderInterface
                     )
                 );
             }
+        }
+
+        if ($menu->getExtra(ConfigurationBuilder::NO_CHILDREN_IN_CONFIG) && $hasAllowedChild) {
+            $menu->setExtra('isAllowed', true);
         }
     }
 
