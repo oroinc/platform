@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * and adds them to the definition of the given service via the given method name.
  * NOTE: prefer injecting tagged services in the constructor via "!tagged_iterator tag_name" in services.yml,
  * because in this case an iterator that supports lazy initialization of services is injected.
+ *
+ * @deprecated use "!tagged_iterator tag_name" for new tags
  */
 class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInterface
 {
@@ -56,11 +58,11 @@ class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInter
             return;
         }
 
-        $this->registerTaggedServicesViaAddMethod(
-            $container,
-            $this->serviceId,
-            $this->addMethodName,
-            $this->findAndSortTaggedServices($this->tagName, $container)
-        );
+        $taggedServices = $this->findAndSortTaggedServices($this->tagName, $container);
+
+        $serviceDef = $container->getDefinition($this->serviceId);
+        foreach ($taggedServices as $taggedService) {
+            $serviceDef->addMethodCall($this->addMethodName, [$taggedService]);
+        }
     }
 }

@@ -1,6 +1,6 @@
 /* @theme: default; */
 
-// Update styles in /default/scss/components/shopping-list-dropdown/shopping-list-dropdown.scss
+// Updated styles in /default/scss/components/shopping-list-dropdown/shopping-list-dropdown.scss
 
 .custom-radio {
     display: inline-block;
@@ -23,11 +23,40 @@
 
     &__input,
     &__control {
+        &:hover {
+            ~ .custom-radio__text {
+                &:before {
+                    border-color: $custom-radio-icon-border-color-hover-state;
+                }
+            }
+        }
+
+        &.focus-visible,
+        &:focus {
+            ~ .custom-radio__text {
+                &:before {
+                    border-color: $custom-radio-icon-border-color-focus-state;
+                    box-shadow: $custom-radio-icon-box-shadow-focus-state;
+                }
+            }
+        }
+
         &:checked {
             ~ .custom-radio__text {
                 &:before {
                     background: $custom-radio-icon-checked-bg;
                     box-shadow: $custom-radio-icon-checked-box-shadow;
+                }
+            }
+
+            @if ($custom-radio-icon-checked-box-shadow and $custom-radio-icon-box-shadow-focus-state) {
+                &.focus-visible,
+                &:focus {
+                    ~ .custom-radio__text {
+                        &:before {
+                            box-shadow: $custom-radio-icon-checked-box-shadow, $custom-radio-icon-box-shadow-focus-state;
+                        }
+                    }
                 }
             }
         }
@@ -56,17 +85,6 @@
 
         &:not(:empty)::before {
             margin: $custom-radio-icon-offset;
-        }
-    }
-
-    &--large {
-        line-height: $custom-radio-large-line-height;
-
-        .custom-radio__text {
-            &:before {
-                width: $custom-radio-large-icon-size;
-                height: $custom-radio-large-icon-size;;
-            }
         }
     }
 

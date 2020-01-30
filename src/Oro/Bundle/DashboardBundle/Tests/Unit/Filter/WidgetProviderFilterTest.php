@@ -3,29 +3,26 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Filter;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestFilter;
 
 class WidgetProviderFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WidgetProviderFilterManager */
-    protected $widgetProviderFilter;
-
-    public function setUp()
-    {
-        $this->widgetProviderFilter = new WidgetProviderFilterManager();
-        $this->widgetProviderFilter->addFilter(new TestFilter());
-    }
-
     public function testFilter()
     {
-        $qb = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filter = $this->createMock(WidgetProviderFilterInterface::class);
+        $filter->expects($this->once())
+            ->method('filter')
+            ->willReturnCallback(function (QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions) {
+                $queryBuilder->addSelect();
+            });
+
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('addSelect');
 
-        $this->widgetProviderFilter->filter($qb, new WidgetOptionBag());
+        $manager = new WidgetProviderFilterManager([$filter]);
+        $manager->filter($qb, new WidgetOptionBag());
     }
 }

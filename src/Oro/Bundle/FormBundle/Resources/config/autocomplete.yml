@@ -3,11 +3,14 @@ services:
         class: Oro\Bundle\FormBundle\Autocomplete\Security
         public: true
         arguments:
+            - [] # autocomplete ACL resources
             - '@security.authorization_checker'
 
     oro_form.autocomplete.search_registry:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchRegistry
         public: true
+        arguments:
+            - ~ # service locator for autocomplete search handlers
 
     oro_form.autocomplete.search_handler:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler

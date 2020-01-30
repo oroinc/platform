@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Exception\Fallback;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
-
+/**
+ * Thrown when entity fallback provider was not found.
+ */
 class FallbackProviderNotFoundException extends \Exception
 {
     /**
@@ -13,9 +14,8 @@ class FallbackProviderNotFoundException extends \Exception
     {
         $message = sprintf(
             'Fallback provider for fallback with identification key "%s" not found. 
-            Please make sure to register a provider with tag: name:"%s" and id:"%s"',
+            Please make sure to register a provider with tag: name:"oro_entity.fallback_provider" and id:"%s"',
             $fallbackKey,
-            EntityFallbackCompilerPass::PROVIDER_TAG,
             $fallbackKey
         );
         parent::__construct($message);

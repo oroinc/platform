@@ -27,12 +27,8 @@ alias attribute should be added as well and will be used as menu identifier.
 
 ```yaml
 # services.yml
-parameters:
-  acme.main_menu.builder.class: Acme\Bundle\DemoBundle\Menu\MainMenuBuilder
-
 services:
-  acme.menu.main:
-    class: %acme.main_menu.builder.class%
+  Acme\Bundle\DemoBundle\Menu\MainMenuBuilder:
     tags:
        - { name: oro_menu.builder, alias: main }
 ```

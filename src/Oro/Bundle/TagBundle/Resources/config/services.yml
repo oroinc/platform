@@ -1,16 +1,11 @@
-parameters:
-    oro_tag.tag.entity.class: Oro\Bundle\TagBundle\Entity\Tag
-    oro_tag.taxonomy.entity.class: Oro\Bundle\TagBundle\Entity\Taxonomy
-    oro_tag.tagging.entity.class: Oro\Bundle\TagBundle\Entity\Tagging
-
 services:
     oro_tag.tag.manager:
         class: Oro\Bundle\TagBundle\Entity\TagManager
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '%oro_tag.tag.entity.class%'
-            - '%oro_tag.tagging.entity.class%'
+            - 'Oro\Bundle\TagBundle\Entity\Tag'
+            - 'Oro\Bundle\TagBundle\Entity\Tagging'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@router'
@@ -40,7 +35,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_tag.tag.entity.class%'
+            - 'Oro\Bundle\TagBundle\Entity\Tag'
             - '@doctrine.orm.entity_manager'
 
     oro_tag.taxonomy.manager.api:
@@ -48,9 +43,9 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_tag.taxonomy.entity.class%'
+            - 'Oro\Bundle\TagBundle\Entity\Taxonomy'
             - '@doctrine.orm.entity_manager'
- 
+
     oro_tag.twig.tag.extension:
         class: Oro\Bundle\TagBundle\Twig\TagExtension
         public: false
@@ -157,7 +152,7 @@ services:
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: tag-search-result }
+            - { name: oro_datagrid.extension.formatter.property, type: tag-search-result }
 
     oro_tag.provider.statistic:
         class: Oro\Bundle\TagBundle\Provider\StatisticProvider
@@ -260,7 +255,7 @@ services:
     oro_tag.form.autocomplete.taxonomy.search_handler:
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_tag.taxonomy.entity.class%'
+            - 'Oro\Bundle\TagBundle\Entity\Taxonomy'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }

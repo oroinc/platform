@@ -641,7 +641,7 @@
 {% endmacro %}
 
 {#
-    A button with javascript handler
+    A link with a Javascript handler
 
     Parameters - array:
         [
@@ -650,79 +650,156 @@
             'iCss' - additional css class for 'i' tag
             'dataId' - data-id parameter
             'dataUrl' - data-url parameter
-            'dataRedirect' - url to redirect after an operation finished
-            'successMessage' - a message which will be shown after an operation finished
+            'dataRedirect' - url to redirect to after the operation is finished
+            'successMessage' - message to display after the operation is finished
             'title' - button title
             'label' - button label
-            'labelInIcon' - determine whether the label is include in icon or not. Defaults to true
-            'visible' - determined whether the button is visible or not. Defaults to true,
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+            'visible' - defines whether the button is visible (true by default)
             'dataAttributes' - additional data attributes
         ]
 #}
 {% macro clientLink(parameters) %}
     {% import _self as UIMacro %}
-
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ (parameters.aCss is defined ? ' ' ~ parameters.aCss : '')
+    })%}
     {% spaceless %}
-        <a href="#" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+        <a href="#"
             title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {%- if (parameters.dataId is defined) -%}
-                data-id ="{{ parameters.dataId }}"
-            {%- endif -%}
             {%- if (parameters.dataUrlRaw is defined) -%}
                 data-url="{{ parameters.dataUrlRaw|raw }}"
             {% elseif (parameters.dataUrl is defined) %}
                 data-url="{{ parameters.dataUrl }}"
             {%- endif -%}
-            {%- if (parameters.successMessage is defined) -%}
-                data-success-message="{{ parameters.successMessage }}"
-            {%- endif -%}
-            {%- if parameters.dataRedirect is defined -%}
-                data-redirect="{{ parameters.dataRedirect }}"
-            {%- endif -%}
-            {%- if parameters.role is defined -%}
-                role="{{ parameters.role }}"
-            {%- endif -%}
-            {%- if parameters.ariaSelected is defined -%}
-                aria-selected="{{ parameters.ariaSelected }}"
-            {%- endif -%}
-            {%- if parameters.ariaControls is defined -%}
-                aria-controls="{{ parameters.ariaControls }}"
-            {%- endif -%}
-            {%- if (parameters.visible is defined and not parameters.visible) -%}
-                style="display: none"
-            {%- endif -%}
-            {%- if parameters.widget is defined and parameters.widget|length -%}
-                {% set options = parameters.widget %}
-                {%- if (options.createOnEvent is not defined) -%}
-                    {% set options = options|merge({
-                        'createOnEvent' : options.event|default('click')
-                    }) %}
-                {%- endif -%}
-                {{ UIMacro.renderWidgetAttributes(options) }}
-            {%- endif -%}
-            {%- if parameters.pageComponent is defined -%}
-                {{ UIMacro.renderPageComponentAttributes(parameters.pageComponent) }}
-            {%- endif -%}
-            {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
-                {{ UIMacro.renderAttributes(parameters.dataAttributes) }}
-            {%- endif -%}>
-            {%- if (parameters.labelInIcon is defined) -%}
-                {%- set labelInIcon = parameters.labelInIcon -%}
-            {%- else -%}
-                {%- set labelInIcon = true -%}
-            {%- endif %}
-            {%- if (parameters.iCss is defined) -%}
-                <span class="{{ parameters.iCss }}" aria-hidden="true">
-                    {%- if (parameters.label is defined and labelInIcon) -%}
-                        <span class="sr-only">{{- parameters.label -}}</span>
-                    {%- endif -%}
-                </span>
-            {%- endif %}
+            {{- UIMacro.clientControlAttrs(parameters) -}}>
+            {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>
+    {% endspaceless %}
+{% endmacro %}
+
+{#
+    Attributes for a control with a Javascript handler
+
+    Parameters - array:
+        [
+            'class' - default class
+            'id' - HTML attribute id
+            'dataId' - HTML attribute data-id
+            'successMessage' - message to display after the operation is finished
+            'dataRedirect' - url to redirect to after the operation is finished
+            'role' - HTML attribute role
+            'ariaSelected' - HTML attribute aria-selected
+            'ariaControls' - HTML attribute aria-controls
+            'ariaLabel' - HTML attribute aria-label
+            'visible' - defines whether the label is included in the icon (true by default)
+            'widget' - options to define a widget on the control
+            'pageComponent' - options to define a page-component on the control
+            'dataAttributes' - additional HTML data attributes
+        ]
+#}
+{% macro clientControlAttrs(parameters) %}
+    {% import _self as UIMacro %}
+    {%- if (parameters.class is defined) -%}
+        class="{{ parameters.class }}"
+    {%- endif -%}
+    {%- if (parameters.id is defined) -%}
+        id="{{ parameters.id }}"
+    {%- endif -%}
+    {%- if (parameters.dataId is defined) -%}
+        data-id="{{ parameters.dataId }}"
+    {%- endif -%}
+    {%- if (parameters.successMessage is defined) -%}
+        data-success-message="{{ parameters.successMessage }}"
+    {%- endif -%}
+    {%- if parameters.dataRedirect is defined -%}
+        data-redirect="{{ parameters.dataRedirect }}"
+    {%- endif -%}
+    {%- if parameters.role is defined -%}
+        role="{{ parameters.role }}"
+    {%- endif -%}
+    {%- if parameters.ariaSelected is defined -%}
+        aria-selected="{{ parameters.ariaSelected }}"
+    {%- endif -%}
+    {%- if parameters.ariaControls is defined -%}
+        aria-controls="{{ parameters.ariaControls }}"
+    {%- endif -%}
+    {% if (parameters.ariaLabel is defined) %}
+        aria-label="{{ parameters.ariaLabel }}"
+    {% endif %}
+    {%- if (parameters.visible is defined and not parameters.visible) -%}
+        style="display: none"
+    {%- endif -%}
+    {%- if parameters.widget is defined and parameters.widget|length -%}
+        {% set options = parameters.widget %}
+        {%- if (options.createOnEvent is not defined) -%}
+            {% set options = options|merge({
+                'createOnEvent' : options.event|default('click')
+            }) %}
+        {%- endif -%}
+        {{ UIMacro.renderWidgetAttributes(options) }}
+    {%- endif -%}
+    {%- if parameters.pageComponent is defined -%}
+        {{ UIMacro.renderPageComponentAttributes(parameters.pageComponent) }}
+    {%- endif -%}
+    {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
+        {{ UIMacro.renderAttributes(parameters.dataAttributes) }}
+    {%- endif -%}
+{% endmacro %}
+
+{#
+    An icon for a link/button control with a Javascript handler
+
+    Parameters - array:
+        [
+            'iCss' - additional css class for 'span' tag
+            'label' - control label
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+        ]
+#}
+{% macro clientControlIcon(parameters) %}
+    {% import _self as UIMacro %}
+    {% spaceless %}
+    {%- set labelInIcon = parameters.labelInIcon is defined ? parameters.labelInIcon : true -%}
+    {%- if (parameters.iCss is defined) -%}
+        <span class="{{ parameters.iCss }}" aria-hidden="true">
+            {%- if (parameters.label is defined and labelInIcon) -%}
+                <span class="sr-only">{{- parameters.label -}}</span>
+            {%- endif -%}
+        </span>
+    {%- endif -%}
+    {% endspaceless %}
+{% endmacro %}
+
+{#
+    A button with a Javascript handler
+
+    Parameters - array:
+        [
+            'class' - default class
+            'btnCss' - additional css class for 'button' tag
+            'iCss' - additional css class for 'span' tag
+            'ariaLabel' - aria-label text for button
+            'dataId' - data-id parameter
+            'dataRedirect' - url to redirect to after the operation is finished
+            'successMessage' - message to display after the operation is finished
+            'label' - button label
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+            'visible' - defines whether the button is visible (true by default)
+            'dataAttributes' - additional HTML data attributes
+        ]
+#}
+{% macro clientBtn(parameters) %}
+    {% import _self as UIMacro %}
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
+    })%}
+    {% spaceless %}
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}>
+            {{- UIMacro.clientControlIcon(parameters) -}}
+            {{- parameters.label is defined ? parameters.label : '' -}}
+        </button>
     {% endspaceless %}
 {% endmacro %}
 

@@ -25,6 +25,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'apply_to_all' => true,
             'apply_to_entities' => [],
             'exclude_entities' => [],
+            'apply_to_interfaces' => [],
         ],
         self::PERMISSION2 => [
             'label' => 'Label for Permission 2',
@@ -41,6 +42,10 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'OroTestFrameworkBundle:WorkflowAwareEntity',
             ],
             'description' => 'Permission 2 description',
+            'apply_to_interfaces' => [
+                'OroTestFrameworkBundle:TestActivityInterface',
+                'OroTestFrameworkBundle:TestActivityTargetInterface',
+            ],
         ],
         self::PERMISSION3 => [
             'label' => 'Label for Permission 3',
@@ -48,6 +53,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'apply_to_all' => true,
             'apply_to_entities' => ['NotManageableEntity'],
             'exclude_entities' => [],
+            'apply_to_interfaces' => [],
         ],
     ];
 

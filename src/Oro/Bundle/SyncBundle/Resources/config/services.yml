@@ -61,6 +61,8 @@ services:
     oro_sync.authentication.origin.origin_provider_chain:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
         public: false
+        arguments:
+            - !tagged_iterator oro_sync.origin_provider
 
     oro_sync.authentication.origin.application_origin_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider

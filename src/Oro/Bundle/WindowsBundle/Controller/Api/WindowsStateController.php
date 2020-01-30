@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
+ * The controller for windows state API.
+ *
  * @RouteResource("windows")
  * @NamePrefix("oro_api_")
  */
@@ -27,11 +29,15 @@ class WindowsStateController extends FOSRestController
      */
     public function cgetAction()
     {
-        $items = $this->getWindowsStatesManager()->getWindowsStates();
+        $manager = $this->getWindowsStateManager();
+        if (null !== $manager) {
+            $items = $manager->getWindowsStates();
+            if ($items) {
+                return $this->handleView($this->view($items, Response::HTTP_OK));
+            }
+        }
 
-        return $this->handleView(
-            $this->view($items, $items ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+        return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
     }
 
     /**
@@ -45,15 +51,18 @@ class WindowsStateController extends FOSRestController
      */
     public function postAction()
     {
+        $manager = $this->getWindowsStateManager();
+        if (null === $manager) {
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+        }
+
         try {
-            $id = $this->getWindowsStatesManager()->createWindowsState();
+            $id = $manager->createWindowsState();
         } catch (\InvalidArgumentException $e) {
             throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
         }
 
-        return $this->handleView(
-            $this->view(['id' => $id], Response::HTTP_CREATED)
-        );
+        return $this->handleView($this->view(['id' => $id], Response::HTTP_CREATED));
     }
 
     /**
@@ -68,8 +77,13 @@ class WindowsStateController extends FOSRestController
      */
     public function putAction($windowId)
     {
+        $manager = $this->getWindowsStateManager();
+        if (null === $manager) {
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+        }
+
         try {
-            if (!$this->getWindowsStatesManager()->updateWindowsState($windowId)) {
+            if (!$manager->updateWindowsState($windowId)) {
                 return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
             }
         } catch (\InvalidArgumentException $e) {
@@ -92,8 +106,13 @@ class WindowsStateController extends FOSRestController
      */
     public function deleteAction($windowId)
     {
+        $manager = $this->getWindowsStateManager();
+        if (null === $manager) {
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+        }
+
         try {
-            if (!$this->getWindowsStatesManager()->deleteWindowsState($windowId)) {
+            if (!$manager->deleteWindowsState($windowId)) {
                 return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
             }
         } catch (\InvalidArgumentException $e) {
@@ -104,10 +123,10 @@ class WindowsStateController extends FOSRestController
     }
 
     /**
-     * @return WindowsStateManager
+     * @return WindowsStateManager|null
      */
-    protected function getWindowsStatesManager()
+    private function getWindowsStateManager(): ?WindowsStateManager
     {
-        return $this->get('oro_windows.manager.windows_state');
+        return $this->get('oro_windows.manager.windows_state_registry')->getManager();
     }
 }

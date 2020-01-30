@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter\Stub\WorkflowEntity;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -41,7 +42,11 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowRegistry);
 
-        $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $this->permissionRegistry);
+        $container = TestContainerBuilder::create()
+            ->add('oro_workflow.permission_registry', $this->permissionRegistry)
+            ->getContainer($this);
+
+        $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $container);
     }
 
     /**

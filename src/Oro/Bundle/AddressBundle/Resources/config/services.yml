@@ -1,12 +1,9 @@
-parameters:
-    oro_address.country.entity.class:       Oro\Bundle\AddressBundle\Entity\Country
-    oro_address.region.entity.class:        Oro\Bundle\AddressBundle\Entity\Region
-    oro_address.address.type.entity.class:  Oro\Bundle\AddressBundle\Entity\AddressType
-
 services:
     oro_address.provider.phone:
         class: Oro\Bundle\AddressBundle\Provider\PhoneProvider
         arguments:
+            - [] # phone providers map
+            - ~ # service locator for phone providers
             - '@oro_entity_config.provider.extend'
 
     oro_address.provider.country:
@@ -19,12 +16,11 @@ services:
         class: Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_address.country.entity.class%'
+            - 'Oro\Bundle\AddressBundle\Entity\Country'
 
     oro_address.extension.action.type.map:
         class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
 

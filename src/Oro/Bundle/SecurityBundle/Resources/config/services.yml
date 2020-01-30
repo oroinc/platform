@@ -85,6 +85,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
         arguments:
+            - [] # extensions
             - '@oro_security.acl.object_id_accessor'
 
     oro_security.acl.extension.entity:
@@ -162,8 +163,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.configuration.provider.permission_configuration'
-            - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
 
     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager:
@@ -210,6 +209,8 @@ services:
 
     oro_security.acl.group_provider.chain:
         class: Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
+        arguments:
+            - [] # providers
 
     oro_security.owner.decision_maker:
         public: false
@@ -280,6 +281,7 @@ services:
             - '%kernel.cache_dir%/oro/acl_annotations.php'
             - '%kernel.debug%'
             - '@oro_entity.orm.entity_class_resolver'
+            - !tagged_iterator oro_security.acl.config_loader
 
     oro_security.acl.config_loader:
         class: Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
@@ -377,8 +379,8 @@ services:
 
     oro_security.ownership_tree_provider.chain:
         class: Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider
-        calls:
-            - [setDefaultProvider, ['@oro_security.ownership_tree_provider']]
+        arguments:
+            - !tagged_iterator oro_security.ownership.tree_provider
 
     oro_security.ownership_tree_provider:
         public: false
@@ -423,9 +425,9 @@ services:
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
         calls:
-            - ['addSupportedClass', ['%oro_user.entity.class%', [owner, organization], [businessUnits, organizations]]]
-            - ['addSupportedClass', ['%oro_organization.business_unit.entity.class%', [owner, organization], [users]]]
-            - ['addSupportedClass', ['%oro_organization.organization.entity.class%']]
+            - ['addSupportedClass', ['Oro\Bundle\UserBundle\Entity\User', [owner, organization], [businessUnits, organizations]]]
+            - ['addSupportedClass', ['Oro\Bundle\OrganizationBundle\Entity\BusinessUnit', [owner, organization], [users]]]
+            - ['addSupportedClass', ['Oro\Bundle\OrganizationBundle\Entity\Organization']]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
@@ -559,6 +561,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+            - '@doctrine.orm.entity_manager'
 
     oro_security.layout.data_provider.acl:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider

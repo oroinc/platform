@@ -5,27 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about file attribute type.
+ */
 class FileAttributeType implements AttributeTypeInterface
 {
-    /** @var string */
-    protected $type;
-
-    /**
-     * @param string $type
-     */
-    public function __construct($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
     /**
      * {@inheritdoc}
      */

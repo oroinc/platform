@@ -144,11 +144,7 @@ class AddFieldsFilter implements ProcessorInterface
             sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
         );
         $filter->setArrayAllowed(true);
-
-        $filters->add(
-            sprintf($filterTemplate, $entityType),
-            $filter
-        );
+        $filters->add(sprintf($filterTemplate, $entityType), $filter, false);
     }
 
     /**

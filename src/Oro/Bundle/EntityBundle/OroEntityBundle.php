@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityBundle;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
+use Oro\Component\DependencyInjection\Compiler\InverseTaggedIteratorCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
@@ -67,14 +69,24 @@ class OroEntityBundle extends Bundle
             'oro_entity.exclusion_provider.default',
             'addProvider'
         ));
-        $container->addCompilerPass(new Compiler\VirtualFieldProvidersCompilerPass());
-        $container->addCompilerPass(new Compiler\VirtualRelationProvidersCompilerPass());
+        $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
+            'oro_entity.virtual_field_provider.chain',
+            'oro_entity.virtual_field_provider'
+        ));
+        $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
+            'oro_entity.virtual_relation_provider.chain',
+            'oro_entity.virtual_relation_provider'
+        ));
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());
         $container->addCompilerPass(new Compiler\CustomGridFieldValidatorCompilerPass());
         $container->addCompilerPass(new Compiler\ManagerRegistryCompilerPass());
         $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
-        $container->addCompilerPass(new Compiler\EntityFallbackCompilerPass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_entity.fallback.resolver.entity_fallback_resolver',
+            'oro_entity.fallback_provider',
+            'id'
+        ));
         $container->addCompilerPass(new Compiler\SqlWalkerPass());
         $container->addCompilerPass(new Compiler\EntityRepositoryCompilerPass());
         $container->addCompilerPass(new Compiler\EntityDeleteHandlerCompilerPass());

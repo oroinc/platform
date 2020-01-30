@@ -10,6 +10,7 @@ oro:
         gridview:
             entity_label: Grid view
             entity_plural_label: Grid views
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description: Represent grid views
             filters_data.label: Filters
             grid_name.label: Grid name

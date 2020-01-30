@@ -8,8 +8,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether no any "fields" filter is not specified and if so,
- * adds a configuration extra determines that only "id" field
+ * Checks whether no any "fields" filter is not specified,
+ * and if so, adds a configuration extra determines that only "id" field
  * should be returned for the primary entity.
  */
 class HandleDefaultValueForFieldsFilter implements ProcessorInterface

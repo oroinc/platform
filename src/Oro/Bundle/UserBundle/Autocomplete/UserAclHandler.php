@@ -12,7 +12,7 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -43,7 +43,7 @@ class UserAclHandler implements SearchHandlerInterface
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var AclVoter|null */
+    /** @var AclVoterInterface|null */
     protected $aclVoter;
 
     /** @var OwnershipConditionDataBuilder */
@@ -66,7 +66,7 @@ class UserAclHandler implements SearchHandlerInterface
      * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnerTreeProvider             $treeProvider
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param AclVoter|null                 $aclVoter
+     * @param AclVoterInterface|null        $aclVoter
      */
     public function __construct(
         EntityManager $em,
@@ -76,7 +76,7 @@ class UserAclHandler implements SearchHandlerInterface
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
         EntityRoutingHelper $entityRoutingHelper,
-        AclVoter $aclVoter = null
+        AclVoterInterface $aclVoter = null
     ) {
         $this->em = $em;
         $this->attachmentManager = $attachmentManager;

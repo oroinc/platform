@@ -1,6 +1,3 @@
-parameters:
-    oro_windows.entity.windows_state.class: Oro\Bundle\WindowsBundle\Entity\WindowsState
-
 services:
     oro_windows.twig.extension:
         class: Oro\Bundle\WindowsBundle\Twig\WindowsExtension
@@ -12,23 +9,21 @@ services:
 
     oro_windows.manager.windows_state_registry:
         class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry
-        arguments:
-            - '@oro_windows.manager.windows_state'
-
-    oro_windows.manager.windows_state.abstract:
-        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
-        abstract: true
-        arguments:
-            - '@security.token_storage'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_windows.manager.windows_state_request'
-
-    oro_windows.manager.windows_state:
-        parent: oro_windows.manager.windows_state.abstract
         public: true
         arguments:
-            - '%oro_windows.entity.windows_state.class%'
-            - '%oro_user.entity.class%'
+            - [] # user classes that have an assigned windows state manager
+            - ~ # service locator for windows state managers
+            - '@security.token_storage'
+
+    oro_windows.manager.windows_state:
+        class: Oro\Bundle\WindowsBundle\Manager\WindowsStateManager
+        arguments:
+            - '@security.token_storage'
+            - '@doctrine'
+            - '@oro_windows.manager.windows_state_request'
+            - 'Oro\Bundle\WindowsBundle\Entity\WindowsState'
+        tags:
+            - { name: oro_windows.windows_state_manager, user_class: Oro\Bundle\UserBundle\Entity\User }
 
     oro_windows.manager.windows_state_request:
         class: Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager

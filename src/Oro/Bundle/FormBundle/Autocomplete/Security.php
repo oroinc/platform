@@ -4,53 +4,49 @@ namespace Oro\Bundle\FormBundle\Autocomplete;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a way to check whether an access to an autocomplete search handler is granted.
+ */
 class Security
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    /** @var string[] [autocomplete search handler id => acl resource, ...] */
+    private $autocompleteAclResources;
 
-    /** @var array */
-    protected $autocompleteAclResources;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     /**
+     * @param array                         $autocompleteAclResources
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(array $autocompleteAclResources, AuthorizationCheckerInterface $authorizationChecker)
     {
+        $this->autocompleteAclResources = $autocompleteAclResources;
         $this->authorizationChecker = $authorizationChecker;
-        $this->autocompleteAclResources = [];
     }
 
     /**
      * @param string $name
-     * @param string $aclResource
-     */
-    public function setAutocompleteAclResource($name, $aclResource)
-    {
-        $this->autocompleteAclResources[$name] = $aclResource;
-    }
-
-    /**
-     * @param string $name
+     *
      * @return string|null
      */
-    public function getAutocompleteAclResource($name)
+    public function getAutocompleteAclResource(string $name): ?string
     {
-        return isset($this->autocompleteAclResources[$name]) ? $this->autocompleteAclResources[$name] : null;
+        return $this->autocompleteAclResources[$name] ?? null;
     }
 
     /**
-     * @param $name
-     * @return boolean
+     * @param string $name
+     *
+     * @return bool
      */
-    public function isAutocompleteGranted($name)
+    public function isAutocompleteGranted(string $name): bool
     {
         $aclResource = $this->getAutocompleteAclResource($name);
-
-        if ($aclResource) {
-            return $this->authorizationChecker->isGranted($aclResource);
+        if (!$aclResource) {
+            return true;
         }
 
-        return true;
+        return $this->authorizationChecker->isGranted($aclResource);
     }
 }

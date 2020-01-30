@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+/**
+ * The registry of translation packages.
+ */
 class TranslationPackageProvider implements PackageProviderInterface
 {
-    /** @var array|TranslationPackagesProviderExtensionInterface[] */
-    protected $extensions = [];
+    /** @var iterable|TranslationPackagesProviderExtensionInterface[] */
+    private $extensions;
 
     /**
-     * @param TranslationPackagesProviderExtensionInterface $extension
+     * @param iterable|TranslationPackagesProviderExtensionInterface[] $extensions
      */
-    public function addExtension(TranslationPackagesProviderExtensionInterface $extension)
+    public function __construct(iterable $extensions)
     {
-        $this->extensions[] = $extension;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -21,12 +24,14 @@ class TranslationPackageProvider implements PackageProviderInterface
     public function getInstalledPackages()
     {
         $packages = [];
-
         foreach ($this->extensions as $extension) {
-            $packages = array_merge($packages, $extension->getPackageNames());
+            $packages[] = $extension->getPackageNames();
+        }
+        if ($packages) {
+            $packages = array_unique(array_merge(...$packages));
         }
 
-        return array_unique($packages);
+        return $packages;
     }
 
     /**

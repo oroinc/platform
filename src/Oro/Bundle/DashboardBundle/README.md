@@ -122,7 +122,7 @@ datagrids:
                     - call.callDateTime as dateTime
                     - directionType.name as callDirection
                 from:
-                    - { table: %oro_call.call.entity.class%, alias: call }
+                    - { table: 'Oro\Bundle\CallBundle\Entity\Call', alias: call }
                 join:
                     left:
                         - { join: call.direction, alias: directionType }

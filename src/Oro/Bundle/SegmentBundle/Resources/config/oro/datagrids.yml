@@ -1,6 +1,6 @@
 datagrids:
     oro_segments-grid:
-        extended_entity_name: '%oro_segment.segment.entity.class%'
+        extended_entity_name: 'Oro\Bundle\SegmentBundle\Entity\Segment'
         acl_resource: oro_segment_view
         features:
             entity_class_name_path: s.entity
@@ -14,7 +14,7 @@ datagrids:
                     - s.lastRun
                     - type.label as segmentType
                 from:
-                    - { table: '%oro_segment.segment.entity.class%', alias: s }
+                    - { table: 'Oro\Bundle\SegmentBundle\Entity\Segment', alias: s }
                 join:
                     left:
                         - { join: s.type, alias: type }

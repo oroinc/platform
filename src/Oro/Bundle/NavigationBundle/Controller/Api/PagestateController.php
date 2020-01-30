@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
+use Oro\Bundle\NavigationBundle\Entity\PageState;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -184,7 +185,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     protected function getPageStateClass()
     {
-        return $this->getParameter('oro_navigation.entity.page_state.class');
+        return PageState::class;
     }
 
     /**

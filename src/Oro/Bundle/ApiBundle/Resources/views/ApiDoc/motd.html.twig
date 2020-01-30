@@ -7,8 +7,9 @@
     div.heading ul.options li { text-transform: capitalize; }
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
-    div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
-    div.motd div.documentation p { padding: 10px 0; }
+    div.motd div.documentation a { text-decoration: none; }
+    div.motd div.documentation a.main { font-size: 1.2em; }
+    div.motd div.documentation p { padding: 10px 0 0 0; }
     div.motd div.documentation ul { padding-left: 10px; list-style-type: disc; list-style-position: inside; }
     #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
     #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
@@ -229,7 +230,8 @@
         {% endif -%}
         {%- endfor -%}
         if (documentationUrl) {
-            documentation = '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' + documentation;
+            documentation = '<a href="' + documentationUrl + '" class="main"'
+                + ' target="_blank">The documentation</a>' + documentation;
         }
         if (documentation) {
             $motd.append('<div class="documentation">' + documentation + '</div>');

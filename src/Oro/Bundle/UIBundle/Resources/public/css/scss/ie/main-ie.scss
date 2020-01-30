@@ -12,3 +12,28 @@
     #{$end}: 100%;
     transform: none;
 }
+
+.desktop-version {
+    form {
+        & > .layout-content {
+            .scrollspy-main-container > .scrollable-container {
+                margin-right: -10px;
+                padding-right: 10px;
+            }
+        }
+    }
+}
+
+.gjs- {
+    &editor-cont {
+        .ui-dialog & {
+            padding: 24px 0 24px 24px;
+        }
+    }
+}
+
+.page-content-editor {
+    .ui-dialog & {
+        margin: -24px 0 -24px -24px;
+    }
+}

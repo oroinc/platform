@@ -8,6 +8,9 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadRolesData;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityDepartment;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPerson;
 
+/**
+ * @dbIsolationPerTest
+ */
 class QueryWithJoinsTest extends AclTestCase
 {
     /**

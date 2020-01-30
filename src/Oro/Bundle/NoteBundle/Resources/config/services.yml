@@ -1,6 +1,3 @@
-parameters:
-    oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
-
 services:
     oro_note.manager:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
@@ -18,7 +15,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_note.entity.class%'
+            - 'Oro\Bundle\NoteBundle\Entity\Note'
             - '@doctrine.orm.entity_manager'
 
     oro_note.activity_list.provider:
@@ -29,7 +26,7 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - {name: oro_activity_list.provider, priority: 40}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\NoteBundle\Entity\Note, priority: 40 }
 
     oro_note.activity_entity_delete_handler_extension:
         class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension

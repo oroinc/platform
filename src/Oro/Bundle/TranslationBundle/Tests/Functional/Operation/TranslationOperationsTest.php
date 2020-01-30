@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\TranslatorStub;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -47,7 +48,7 @@ class TranslationOperationsTest extends ActionTestCase
     public function testRemoveTranslationOperation($translation)
     {
         $translation = $this->getReference($translation);
-        $translationClass = $this->getContainer()->getParameter('oro_translation.entity.translation.class');
+        $translationClass = Translation::class;
 
         $entityId = $translation->getId();
         $this->assertExecuteOperation(

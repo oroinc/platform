@@ -14,16 +14,6 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry
 
 class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var IterableResultFactoryRegistry
-     */
-    protected $iterableResultFactoryRegistry;
-
-    protected function setUp()
-    {
-        $this->iterableResultFactoryRegistry = new IterableResultFactoryRegistry();
-    }
-
     public function testCreateIterableResultWhenNoApplicableFactory()
     {
         /** @var ActionConfiguration|\PHPUnit\Framework\MockObject\MockObject $actionConfiguration **/
@@ -52,16 +42,14 @@ class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
             ->with($dataSource)
             ->willReturn(false);
 
-        $this->iterableResultFactoryRegistry->addFactory($firstFactory);
-        $this->iterableResultFactoryRegistry->addFactory($secondFactory);
+        $registry = new IterableResultFactoryRegistry([$firstFactory, $secondFactory]);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             sprintf('No IterableResultFactory found for "%s" datasource type', ArrayDatasource::class)
         );
 
-        $this->iterableResultFactoryRegistry
-            ->createIterableResult($dataSource, $actionConfiguration, $gridConfiguration, $selectedItems);
+        $registry->createIterableResult($dataSource, $actionConfiguration, $gridConfiguration, $selectedItems);
     }
 
     public function testCreateIterableResult()
@@ -102,13 +90,11 @@ class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($iterableResult);
 
-        $this->iterableResultFactoryRegistry->addFactory($firstFactory);
-        $this->iterableResultFactoryRegistry->addFactory($secondFactory);
+        $registry = new IterableResultFactoryRegistry([$firstFactory, $secondFactory]);
 
         $this->assertSame(
             $iterableResult,
-            $this->iterableResultFactoryRegistry
-                ->createIterableResult($dataSource, $actionConfiguration, $gridConfiguration, $selectedItems)
+            $registry->createIterableResult($dataSource, $actionConfiguration, $gridConfiguration, $selectedItems)
         );
     }
 }

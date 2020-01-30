@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -33,13 +34,11 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class WorkflowTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
     }
 
     /**
@@ -47,7 +46,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed $value
      */
-    public function testGettersAndSetters($property, $value)
+    public function testGettersAndSetters(string $property, $value): void
     {
         $getter = 'get' . ucfirst($property);
         $setter = 'set' . ucfirst($property);
@@ -62,12 +61,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return array(
             'definition' => array(
                 'definition',
-                $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+                $this->createMock(WorkflowDefinition::class)
             )
         );
     }
@@ -76,11 +75,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected transition argument type is string or Transition
      */
-    public function testIsTransitionAllowedArgumentException()
+    public function testIsTransitionAllowedArgumentException(): void
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
 
         $workflow = $this->createWorkflow();
         $workflow->isTransitionAllowed($workflowItem, 1);
@@ -90,11 +87,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected transition argument type is string or Transition
      */
-    public function testTransitAllowedArgumentException()
+    public function testTransitAllowedArgumentException(): void
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
 
         $workflow = $this->createWorkflow();
         $workflow->transit($workflowItem, 1);
@@ -106,26 +101,24 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @expectedExceptionMessage Step "test_step" of workflow "test_workflow" doesn't have allowed transition "test_transition".
      */
     // @codingStandardsIgnoreEnd
-    public function testIsTransitionAllowedStepHasNoAllowedTransitionException()
+    public function testIsTransitionAllowedStepHasNoAllowedTransitionException(): void
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
-            ->will($this->returnValue($workflowStep));
+            ->willReturn($workflowStep);
         $workflowItem->expects($this->once())
             ->method('getWorkflowName')
-            ->will($this->returnValue('test_workflow'));
+            ->willReturn('test_workflow');
 
         $step = $this->getStepMock($workflowStep->getName());
         $step->expects($this->any())
             ->method('isAllowedTransition')
             ->with('test_transition')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $transition = $this->getTransitionMock('test_transition', false);
 
@@ -148,36 +141,34 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsTransitionAllowed(
         $expectedResult,
-        $transitionExist,
-        $transitionAllowed,
-        $isTransitionStart,
-        $hasCurrentStep,
-        $stepAllowTransition,
-        $fireExceptions = true
-    ) {
+        bool $transitionExist,
+        bool $transitionAllowed,
+        bool $isTransitionStart,
+        bool $hasCurrentStep,
+        bool $stepAllowTransition,
+        bool $fireExceptions = true
+    ): void {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');
 
         $entity = new EntityWithWorkflow();
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
             ->method('getWorkflowName')
-            ->will($this->returnValue('test_workflow'));
+            ->willReturn('test_workflow');
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
-            ->will($this->returnValue($hasCurrentStep ? $workflowStep : null));
+            ->willReturn($hasCurrentStep ? $workflowStep : null);
         $workflowItem->expects($this->any())
             ->method('getEntity')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
 
         $step = $this->getStepMock('test_step');
         $step->expects($this->any())
             ->method('isAllowedTransition')
             ->with('test_transition')
-            ->will($this->returnValue($stepAllowTransition));
+            ->willReturn($stepAllowTransition);
 
         $errors = new ArrayCollection();
 
@@ -185,7 +176,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $transition->expects($this->any())
             ->method('isAllowed')
             ->with($workflowItem, $errors)
-            ->will($this->returnValue($transitionAllowed));
+            ->willReturn($transitionAllowed);
 
         $workflow = $this->createWorkflow('test_workflow');
         if ($transitionExist) {
@@ -210,7 +201,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function isTransitionAllowedDataProvider()
+    public function isTransitionAllowedDataProvider(): array
     {
         return array(
             'not_allowed_transition' => array(
@@ -310,23 +301,21 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException
      * @expectedTransitionMessage Step "stepOne" of workflow "test" doesn't have allowed transition "transition".
      */
-    public function testTransitNotAllowedTransition()
+    public function testTransitNotAllowedTransition(): void
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('stepOne');
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
-            ->will($this->returnValue($workflowStep));
+            ->willReturn($workflowStep);
 
         $step = $this->getStepMock($workflowStep->getName());
         $step->expects($this->once())
             ->method('isAllowedTransition')
             ->with('transition')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $transition = $this->getTransitionMock('transition');
 
@@ -336,7 +325,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->transit($workflowItem, 'transition');
     }
 
-    public function testTransit()
+    public function testTransit(): void
     {
         $workflowStepOne = new WorkflowStep();
         $workflowStepOne->setName('stepOne');
@@ -346,52 +335,46 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $entity = new EntityWithWorkflow();
 
-        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())
             ->method('getStepByName')
             ->with($workflowStepTwo->getName())
-            ->will($this->returnValue($workflowStepTwo));
+            ->willReturn($workflowStepTwo);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
             ->method('getEntity')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
-            ->will($this->returnValue($workflowStepOne));
+            ->willReturn($workflowStepOne);
         $workflowItem->expects($this->once())
             ->method('addTransitionRecord')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord'))
-            ->will(
-                $this->returnCallback(
-                    function (WorkflowTransitionRecord $transitionRecord) {
-                        self::assertEquals('transition', $transitionRecord->getTransitionName());
-                        self::assertEquals('stepOne', $transitionRecord->getStepFrom()->getName());
-                        self::assertEquals('stepTwo', $transitionRecord->getStepTo()->getName());
-                    }
-                )
+            ->with($this->isInstanceOf(WorkflowTransitionRecord::class))
+            ->willReturnCallback(
+                static function (WorkflowTransitionRecord $transitionRecord) {
+                    self::assertEquals('transition', $transitionRecord->getTransitionName());
+                    self::assertEquals('stepOne', $transitionRecord->getStepFrom()->getName());
+                    self::assertEquals('stepTwo', $transitionRecord->getStepTo()->getName());
+                }
             );
 
         $stepOne = $this->getStepMock($workflowStepOne->getName());
         $stepOne->expects($this->once())
             ->method('isAllowedTransition')
             ->with('transition')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stepTwo = $this->getStepMock('stepTwo');
+
+        $errors = new ArrayCollection();
 
         $transition = $this->getTransitionMock('transition', false, $stepTwo);
         $transition->expects($this->once())
             ->method('transit')
-            ->with($workflowItem);
+            ->with($workflowItem, $errors);
 
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclManager = $this->createMock(AclManager::class);
         $aclManager->expects($this->once())
             ->method('updateAclIdentities')
             ->with($workflowItem);
@@ -400,34 +383,30 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->setDefinition($workflowDefinition);
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getStepManager()->setSteps(array($stepOne, $stepTwo));
-        $workflow->transit($workflowItem, 'transition');
+        $workflow->transit($workflowItem, 'transition', $errors);
     }
 
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage Workflow "test" does not have step entity "stepTwo"
      */
-    public function testTransitException()
+    public function testTransitException(): void
     {
         $workflowStepOne = new WorkflowStep();
         $workflowStepOne->setName('stepOne');
 
-        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
-            ->will($this->returnValue($workflowStepOne));
+            ->willReturn($workflowStepOne);
 
         $stepOne = $this->getStepMock($workflowStepOne->getName());
         $stepOne->expects($this->once())
             ->method('isAllowedTransition')
             ->with('transition')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stepTwo = $this->getStepMock('stepTwo');
 
@@ -444,9 +423,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider startDataProvider
      * @param array $data
-     * @param string $transitionName
+     * @param string|null $transitionName
      */
-    public function testStart($data, $transitionName)
+    public function testStart(array $data, ?string $transitionName): void
     {
         if (!$transitionName) {
             $expectedTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
@@ -457,9 +436,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('step_name');
 
-        $transition = $this->assertTransitionCalled($workflowStep, $expectedTransitionName);
+        $errors = new ArrayCollection();
 
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $transition = $this->assertTransitionCalled($workflowStep, $expectedTransitionName, $errors);
+
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())
             ->method('getStepByName')
             ->with($workflowStep->getName())
@@ -478,9 +459,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->getAttributeManager()->setAttributes([$entityAttribute]);
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
 
-        $item = $workflow->start($entity, $data, $transitionName);
+        $item = $workflow->start($entity, $data, $transitionName, $errors);
 
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem', $item);
+        $this->assertInstanceOf(WorkflowItem::class, $item);
         $this->assertEquals($entity, $item->getEntity());
         $this->assertEquals(array_merge($data, ['entity' => $entity]), $item->getData()->getValues());
     }
@@ -488,7 +469,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function startDataProvider()
+    public function startDataProvider(): array
     {
         return [
             [[], null],
@@ -496,13 +477,13 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testStartWithNotRelatedEntity()
+    public function testStartWithNotRelatedEntity(): void
     {
         $entityClass = 'stdClass';
         $entityId = 42;
         $entityAttributeName = 'test_entity';
 
-        $repository = $this->getMockBuilder(WorkflowItemRepository::class)->disableOriginalConstructor()->getMock();
+        $repository = $this->createMock(WorkflowItemRepository::class);
 
         $this->doctrineHelper->expects($this->any())->method('getEntityRepositoryForClass')->willReturn($repository);
         $this->doctrineHelper->expects($this->any())
@@ -511,7 +492,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->willReturnCallback(
-                function ($actual) use ($entityClass, $entityId) {
+                static function ($actual) use ($entityClass, $entityId) {
                     return $actual instanceof $entityClass ? $entityId : null;
                 }
             );
@@ -519,7 +500,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflowStep = (new WorkflowStep())->setName('step_name');
         $transition = $this->assertTransitionCalled($workflowStep, TransitionManager::DEFAULT_START_TRANSITION_NAME);
 
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())
             ->method('getStepByName')
             ->with($workflowStep->getName())
@@ -545,23 +526,18 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariables()
+    public function testGetVariables(): void
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
         /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
-        $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
-            ->setMethods(['assemble'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $variableAssembler = $this->createMock(VariableAssembler::class);
         $variableAssembler->expects($this->any())
             ->method('assemble')
             ->willReturn($variables);
 
         /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
-        $variableManager = $this->getMockBuilder(VariableManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $variableManager = $this->createMock(VariableManager::class);
         $variableManager->expects($this->any())
             ->method('getVariableAssembler')
             ->willReturn($variableAssembler);
@@ -571,23 +547,18 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($variables, $workflow->getVariables());
     }
 
-    public function testGetCachedVariables()
+    public function testGetCachedVariables(): void
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
         /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
-        $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
-            ->setMethods(['assemble'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $variableAssembler = $this->createMock(VariableAssembler::class);
         $variableAssembler->expects($this->once())
             ->method('assemble')
             ->willReturn($variables);
 
         /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
-        $variableManager = $this->getMockBuilder(VariableManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $variableManager = $this->createMock(VariableManager::class);
         $variableManager->expects($this->any())
             ->method('getVariableAssembler')
             ->willReturn($variableAssembler);
@@ -602,16 +573,21 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @param WorkflowStep $step
      * @param string $expectedTransitionName
+     * @param Collection|null $errors
+     *
      * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function assertTransitionCalled(WorkflowStep $step, $expectedTransitionName)
-    {
+    protected function assertTransitionCalled(
+        WorkflowStep $step,
+        string $expectedTransitionName,
+        ?Collection $errors = null
+    ): Transition {
         $transition = $this->getTransitionMock($expectedTransitionName, true, $this->getStepMock($step->getName()));
         $transition->expects($this->once())
             ->method('transit')
-            ->with($this->isInstanceOf(WorkflowItem::class))
+            ->with($this->isInstanceOf(WorkflowItem::class), $errors)
             ->willReturnCallback(
-                function (WorkflowItem $workflowItem) use ($step) {
+                static function (WorkflowItem $workflowItem) use ($step) {
                     $workflowItem->setCurrentStep($step);
                 }
             );
@@ -623,14 +599,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param string $name
      * @return Step|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getStepMock($name)
+    protected function getStepMock(string $name): Step
     {
-        $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $step = $this->createMock(Step::class);
         $step->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $step;
     }
@@ -638,32 +612,30 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $name
      * @param bool $isStart
-     * @param null $step
+     * @param Step|null $step
      * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionMock($name, $isStart = false, $step = null)
+    protected function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition
     {
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         if ($isStart) {
             $transition->expects($this->any())
                 ->method('isStart')
-                ->will($this->returnValue($isStart));
+                ->willReturn($isStart);
         }
         if ($step) {
             $transition->expects($this->any())
                 ->method('getStepTo')
-                ->will($this->returnValue($step));
+                ->willReturn($step);
         }
 
         return $transition;
     }
 
-    public function testGetAllowedTransitions()
+    public function testGetAllowedTransitions(): void
     {
         $firstTransition = $this->getTransitionMock('first_transition');
         $secondTransition = $this->getTransitionMock('second_transition');
@@ -690,7 +662,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\UnknownStepException
      * @expectedExceptionMessage Step "unknown_step" not found
      */
-    public function testGetAllowedTransitionsUnknownStepException()
+    public function testGetAllowedTransitionsUnknownStepException(): void
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('unknown_step');
@@ -702,54 +674,46 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->getTransitionsByWorkflowItem($workflowItem);
     }
 
-    public function testIsTransitionAvailable()
+    public function testIsTransitionAvailable(): void
     {
         /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $errors = new ArrayCollection();
         $transitionName = 'test_transition';
         $transition = $this->getTransitionMock($transitionName);
         $transition->expects($this->once())
             ->method('isAvailable')
             ->with($workflowItem, $errors)
-            ->will($this->returnValue(true));
-        $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn(true);
+        $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->once())
             ->method('extractTransition')
             ->with($transition)
-            ->will($this->returnValue($transition));
+            ->willReturn($transition);
 
         $workflow = $this->createWorkflow(null, null, null, $transitionManager);
 
         $this->assertTrue($workflow->isTransitionAvailable($workflowItem, $transition, $errors));
     }
 
-    public function testIsStartTransitionAvailable()
+    public function testIsStartTransitionAvailable(): void
     {
         $data = array();
         $errors = new ArrayCollection();
         $transitionName = 'test_transition';
 
-        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
 
         $transition = $this->getTransitionMock($transitionName);
         $transition->expects($this->once())
             ->method('isAvailable')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'), $errors)
-            ->will($this->returnValue(true));
-        $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn(true);
+        $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->once())
             ->method('extractTransition')
             ->with($transition)
-            ->will($this->returnValue($transition));
+            ->willReturn($transition);
         $entity = new EntityWithWorkflow();
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
@@ -770,27 +734,25 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param array $records
      * @param array $expected
      */
-    public function testGetPassedStepsByWorkflowItem($records, $expected)
+    public function testGetPassedStepsByWorkflowItem(array $records, array $expected): void
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())
             ->method('getTransitionRecords')
-            ->will($this->returnValue($records));
+            ->willReturn($records);
 
         $stepsOne = $this->getStepMock('step1');
         $stepsOne->expects($this->any())
             ->method('getOrder')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
         $stepsTwo = $this->getStepMock('step2');
         $stepsTwo->expects($this->any())
             ->method('getOrder')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
         $stepsThree = $this->getStepMock('step3');
         $stepsThree->expects($this->any())
             ->method('getOrder')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
 
         $workflow = $this->createWorkflow();
         $workflow->getStepManager()->setSteps(array($stepsOne, $stepsTwo, $stepsThree));
@@ -808,7 +770,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function passedStepsDataProvider()
+    public function passedStepsDataProvider(): array
     {
         return array(
             array(
@@ -889,61 +851,50 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param string $stepToName
      * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionRecordMock($stepToName)
+    protected function getTransitionRecordMock($stepToName): WorkflowTransitionRecord
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepToName);
 
-        $record = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $record = $this->createMock(WorkflowTransitionRecord::class);
         $record->expects($this->any())
             ->method('getStepTo')
-            ->will($this->returnValue($workflowStep));
+            ->willReturn($workflowStep);
 
         return $record;
     }
 
     /**
      * @param string $workflowName
-     * @param AclManager|\PHPUnit\Framework\MockObject\MockObject $aclManager
+     * @param AclManager $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
-     * @param $variableManager $variableManager
+     * @param VariableManager $variableManager
      * @return Workflow
      */
     protected function createWorkflow(
-        $workflowName = null,
-        $aclManager = null,
-        $attributeManager = null,
-        $transitionManager = null,
-        $variableManager = null
-    ) {
+        string $workflowName = null,
+        AclManager $aclManager = null,
+        AttributeManager $attributeManager = null,
+        TransitionManager $transitionManager = null,
+        VariableManager $variableManager = null
+    ): Workflow {
         if (!$aclManager) {
-            $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $aclManager = $this->createMock(AclManager::class);
         }
 
         /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject $restrictionManager */
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $restrictionManager = $this->createMock(RestrictionManager::class);
 
         if (!$variableManager) {
             /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
-            $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
-                ->setMethods(['assemble'])
-                ->disableOriginalConstructor()
-                ->getMock();
+            $variableAssembler = $this->createMock(VariableAssembler::class);
             $variableAssembler->expects($this->any())
                 ->method('assemble')
                 ->willReturn(new ArrayCollection());
 
             /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
-            $variableManager = $this->getMockBuilder(VariableManager::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            $variableManager = $this->createMock(VariableManager::class);
             $variableManager->expects($this->any())
                 ->method('getVariableAssembler')
                 ->willReturn($variableAssembler);
@@ -966,30 +917,26 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         return $workflow;
     }
 
-    public function testGetAttributesMapping()
+    public function testGetAttributesMapping(): void
     {
-        $attributeOne = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->getMock();
+        $attributeOne = $this->createMock(Attribute::class);
         $attributeOne->expects($this->once())
             ->method('getPropertyPath');
         $attributeOne->expects($this->never())
             ->method('getName');
-        $attributeTwo = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->getMock();
+        $attributeTwo = $this->createMock(Attribute::class);
         $attributeTwo->expects($this->atLeastOnce())
             ->method('getPropertyPath')
-            ->will($this->returnValue('path'));
+            ->willReturn('path');
         $attributeTwo->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('name'));
+            ->willReturn('name');
 
         $attributes = array($attributeOne, $attributeTwo);
-        $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManager = $this->createMock(AttributeManager::class);
         $attributeManager->expects($this->once())
             ->method('getAttributes')
-            ->will($this->returnValue($attributes));
+            ->willReturn($attributes);
 
         $workflow = $this->createWorkflow(null, null, $attributeManager);
         $expected = array('name' => 'path');
@@ -1003,7 +950,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param string $node
      */
-    public function testGetConfigurationOption($data, $property, $node)
+    public function testGetConfigurationOption(array $data, string $property, string $node): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $workflow = $this->createWorkflow();
@@ -1016,7 +963,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \Generator
      */
-    public function configurationOptionProvider()
+    public function configurationOptionProvider(): \Generator
     {
         yield [
             'data' => ['route1' => ['trans1']],
@@ -1031,7 +978,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetInitDatagrids()
+    public function testGetInitDatagrids(): void
     {
         $workflow = $this->createWorkflow();
         $data = ['datagrid1' => ['trans1']];
@@ -1041,16 +988,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $workflow->getInitDatagrids());
     }
 
-    public function testGetWorkflowItemByEntityId()
+    public function testGetWorkflowItemByEntityId(): void
     {
         $workflow = $this->createWorkflow('test_workflow');
         $definition = $workflow->getDefinition();
         $definition->setRelatedEntity('entity');
         $entity = new \stdClass();
 
-        $repository = $this->getMockBuilder(WorkflowItemRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(WorkflowItemRepository::class);
         $repository->expects($this->once())
             ->method('findOneByEntityMetadata')
             ->with('entity', 10, 'test_workflow')
@@ -1065,16 +1010,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param object $entity
-     * @param string $workflowName
+     * @param null|string $workflowName
      */
-    protected function assertDoctrineHelperCalled($entity, $workflowName)
+    protected function assertDoctrineHelperCalled(object $entity, ?string $workflowName): void
     {
         $entityClass = 'stdClass';
         $entityId = 42;
 
-        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(WorkflowItemRepository::class);
         $repository->expects($this->once())
             ->method('findOneByEntityMetadata')
             ->with($entityClass, $entityId, $workflowName)

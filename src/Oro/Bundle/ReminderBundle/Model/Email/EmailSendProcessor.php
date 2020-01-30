@@ -11,12 +11,10 @@ use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Sends reminde notification emails.
+ * Sends reminder notification emails.
  */
 class EmailSendProcessor implements SendProcessorInterface
 {
-    const NAME = 'email';
-
     /**
      * @var EmailNotificationManager
      */
@@ -98,14 +96,6 @@ class EmailSendProcessor implements SendProcessorInterface
             $reminder->setState(Reminder::STATE_FAIL);
             $reminder->setFailureException($exception);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

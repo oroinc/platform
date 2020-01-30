@@ -3,63 +3,48 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 
 class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeNormalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $attributeNormalizer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attribute;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $attribute;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeManager;
-
-    /**
-     * @var WorkflowDataNormalizer
-     */
-    protected $normalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $attributeManager;
 
     protected function setUp()
     {
-        $this->attributeNormalizer = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer'
-        );
-        $this->serializer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
-        $this->attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $variableManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\VariableManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        $this->attributeNormalizer = $this->createMock(AttributeNormalizer::class);
+        $this->serializer = $this->createMock(WorkflowAwareSerializer::class);
+        $this->attributeManager = $this->createMock(AttributeManager::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $aclManager = $this->createMock(AclManager::class);
+        $restrictionManager = $this->createMock(RestrictionManager::class);
+        $variableManager = $this->createMock(VariableManager::class);
+        $this->workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getName', 'getVariables', 'getDefinition'])
             ->setConstructorArgs([
                 $doctrineHelper,
@@ -71,7 +56,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
                 $variableManager
             ])->getMock();
 
-        $workflowDefinition = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition');
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->any())
             ->method('getConfiguration')
             ->willReturn([]);
@@ -83,17 +68,17 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->will($this->returnValue($workflowDefinition));
 
-        $this->attribute = $this->createMock('Oro\Bundle\ActionBundle\Model\Attribute');
-        $this->normalizer = new WorkflowDataNormalizer();
+        $this->attribute = $this->createMock(Attribute::class);
     }
 
-    public function testAttributeNormalizersAttribute()
+    /**
+     * @param AttributeNormalizer[] $attributeNormalizers
+     *
+     * @return WorkflowDataNormalizer
+     */
+    private function getWorkflowDataNormalizer(array $attributeNormalizers = [])
     {
-        $this->assertAttributeEmpty('attributeNormalizers', $this->normalizer);
-
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
-
-        $this->assertAttributeEquals(array($this->attributeNormalizer), 'attributeNormalizers', $this->normalizer);
+        return new WorkflowDataNormalizer($attributeNormalizers);
     }
 
     // @codingStandardsIgnoreStart
@@ -106,10 +91,11 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testNormalizeExceptionCantGetWorkflow($direction)
     {
         $data = new WorkflowData();
+        $normalizer = $this->getWorkflowDataNormalizer();
         if ($direction == 'normalization') {
-            $this->normalizer->normalize($data);
+            $normalizer->normalize($data);
         } else {
-            $this->normalizer->denormalize($data, get_class($data));
+            $normalizer->denormalize($data, get_class($data));
         }
     }
 
@@ -118,10 +104,11 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testNormalizeExceptionNoAttribute($direction)
     {
-        $data = new WorkflowData(array('foo' => 'bar'));
+        $data = new WorkflowData(['foo' => 'bar']);
         $workflowName = 'test_workflow';
 
-        $this->normalizer->setSerializer($this->serializer);
+        $normalizer = $this->getWorkflowDataNormalizer();
+        $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->once())->method('getWorkflow')->will($this->returnValue($this->workflow));
 
@@ -130,14 +117,14 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         if ($direction == 'normalization') {
             $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
             $this->attribute->expects($this->any())->method('getName')->will($this->returnValue('foo'));
-            $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
+            $this->expectException(SerializerException::class);
             $this->expectExceptionMessage('Workflow "test_workflow" has no attribute "foo"');
-            $this->normalizer->normalize($data);
+            $normalizer->normalize($data);
         } else {
             $this->attributeManager->expects($this->any())->method('getAttributes')->will(
-                $this->returnValue(new ArrayCollection(array('for' => $this->attribute)))
+                $this->returnValue(new ArrayCollection(['for' => $this->attribute]))
             );
-            $this->normalizer->denormalize($data, get_class($data));
+            $normalizer->denormalize($data, get_class($data));
         }
     }
 
@@ -149,10 +136,10 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
 
-        $data = new WorkflowData(array($attributeName => 'bar'));
+        $data = new WorkflowData([$attributeName => 'bar']);
 
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
-        $this->normalizer->setSerializer($this->serializer);
+        $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
+        $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->once())->method('getWorkflow')->will($this->returnValue($this->workflow));
 
@@ -165,28 +152,28 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->attribute->expects($this->once())->method('getName')->will($this->returnValue($attributeName));
 
-        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
+        $this->expectException(SerializerException::class);
         $this->expectExceptionMessage(
             sprintf('Cannot handle "%s" of attribute "test_attribute" of workflow "test_workflow"', $direction)
         );
 
         if ($direction == 'normalization') {
-            $this->normalizer->normalize($data);
+            $normalizer->normalize($data);
         } else {
-            $this->normalizer->denormalize($data, get_class($data));
+            $normalizer->denormalize($data, get_class($data));
         }
     }
 
     public function testNormalize()
     {
-        $denormalizedValue = array('denormalized_value');
-        $normalizedValue = array('normalized_value');
+        $denormalizedValue = ['denormalized_value'];
+        $normalizedValue = ['normalized_value'];
         $attributeName = 'test_attribute';
 
-        $data = new WorkflowData(array($attributeName => $denormalizedValue));
+        $data = new WorkflowData([$attributeName => $denormalizedValue]);
 
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
-        $this->normalizer->setSerializer($this->serializer);
+        $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
+        $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->once())->method('getWorkflow')
             ->will($this->returnValue($this->workflow));
@@ -204,27 +191,27 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($normalizedValue));
 
         $this->assertEquals(
-            array($attributeName => $normalizedValue),
-            $this->normalizer->normalize($data)
+            [$attributeName => $normalizedValue],
+            $normalizer->normalize($data)
         );
     }
 
     public function testNormalizeTriggersSerializer()
     {
         $denormalizedValue = 'denormalized_value';
-        $normalizedValue = array('normalized_value');
-        $processedNormalizedValue = array('processed_normalized_value');
+        $normalizedValue = ['normalized_value'];
+        $processedNormalizedValue = ['processed_normalized_value'];
         $attributeName = 'test_attribute';
 
-        $data = new WorkflowData(array($attributeName => $denormalizedValue));
+        $data = new WorkflowData([$attributeName => $denormalizedValue]);
 
-        $serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer')
+        $serializer = $this->getMockBuilder(WorkflowDataSerializer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('normalize', 'getWorkflow'))
+            ->setMethods(['normalize', 'getWorkflow'])
             ->getMock();
 
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
-        $this->normalizer->setSerializer($serializer);
+        $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
+        $normalizer->setSerializer($serializer);
 
         $serializer->expects($this->once())->method('getWorkflow')
             ->will($this->returnValue($this->workflow));
@@ -246,22 +233,23 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($processedNormalizedValue));
 
         $this->assertEquals(
-            array($attributeName => $processedNormalizedValue),
-            $this->normalizer->normalize($data)
+            [$attributeName => $processedNormalizedValue],
+            $normalizer->normalize($data)
         );
     }
 
     public function testDenormalize()
     {
         $attributeName = 'test_attribute';
-        $data = array($attributeName => 'normalized_value');
-        $expectedData = new WorkflowData(array($attributeName => 'denormalized_value'));
+        $data = [$attributeName => 'normalized_value'];
+        $expectedData = new WorkflowData([$attributeName => 'denormalized_value']);
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributes')
-            ->will($this->returnValue(new ArrayCollection(array($attributeName => $this->attribute))));
-        $this->normalizer->addAttributeNormalizer($this->attributeNormalizer);
-        $this->normalizer->setSerializer($this->serializer);
+            ->will($this->returnValue(new ArrayCollection([$attributeName => $this->attribute])));
+
+        $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
+        $normalizer->setSerializer($this->serializer);
 
         $this->serializer->expects($this->once())->method('getWorkflow')
             ->will($this->returnValue($this->workflow));
@@ -280,7 +268,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $expectedData,
-            $this->normalizer->denormalize($data, 'Oro\Bundle\WorkflowBundle\Model\WorkflowData')
+            $normalizer->denormalize($data, WorkflowData::class)
         );
     }
 
@@ -289,18 +277,19 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsNormalization($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data, 'any_value'));
+        $normalizer = $this->getWorkflowDataNormalizer();
+        $this->assertEquals($expected, $normalizer->supportsNormalization($data, 'any_value'));
     }
 
     public function supportsNormalizationDataProvider()
     {
-        return array(
-            array(null, false),
-            array('scalar', false),
-            array(new \DateTime(), false),
-            array(new WorkflowData(), true),
-            array($this->createMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), true),
-        );
+        return [
+            [null, false],
+            ['scalar', false],
+            [new \DateTime(), false],
+            [new WorkflowData(), true],
+            [$this->createMock(WorkflowData::class), true],
+        ];
     }
 
     /**
@@ -308,25 +297,26 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsDenormalization($type, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization('any_value', $type));
+        $normalizer = $this->getWorkflowDataNormalizer();
+        $this->assertEquals($expected, $normalizer->supportsDenormalization('any_value', $type));
     }
 
     public function supportsDenormalizationDataProvider()
     {
-        return array(
-            array(null, false),
-            array('string', false),
-            array('DateTime', false),
-            array('Oro\Bundle\WorkflowBundle\Model\WorkflowData', true),
-            array($this->getMockClass('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), true),
-        );
+        return [
+            [null, false],
+            ['string', false],
+            ['DateTime', false],
+            [WorkflowData::class, true],
+            [$this->getMockClass(WorkflowData::class), true],
+        ];
     }
 
     public function normalizeDirectionDataProvider()
     {
-        return array(
-            array('normalization'),
-            array('denormalization'),
-        );
+        return [
+            ['normalization'],
+            ['denormalization'],
+        ];
     }
 }

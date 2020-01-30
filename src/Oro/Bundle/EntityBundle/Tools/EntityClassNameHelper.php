@@ -5,10 +5,14 @@ namespace Oro\Bundle\EntityBundle\Tools;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * The utility class to resolve a class name by url-safe class name, alias or plural alias of the entity
+ * and convert a class name to url-safe class name.
+ */
 class EntityClassNameHelper
 {
     /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    private $entityAliasResolver;
 
     /**
      * @param EntityAliasResolver $entityAliasResolver

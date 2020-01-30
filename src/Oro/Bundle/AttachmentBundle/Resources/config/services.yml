@@ -1,7 +1,4 @@
 parameters:
-    oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
-    oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
-
     oro_attachment.filesystem_dir.attachments:                   attachment
     oro_attachment.filesystem_name.attachments:                  attachments
 
@@ -92,7 +89,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.manager'
@@ -103,7 +100,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.file.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\File'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
@@ -114,10 +111,10 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
 
     oro_attachment.listener.file_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener
@@ -126,8 +123,8 @@ services:
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postRemove }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
 
     oro_attachment.listener.entity_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
@@ -144,11 +141,19 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_attachment.listener.multi_file_block_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\MultiFileBlockListener
+        arguments:
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: onBeforeFormRender, priority: -260 }
+            - { name: kernel.event_listener, event: entity_view.render.before, method: onBeforeViewRender, priority: -260 }
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: onBeforeValueRender, priority: -260 }
+
     oro_attachment.entity_config_dumper.extension.file:
         class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-        arguments:
-            - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.relation_builder'
+        parent: oro_entity_extend.entity_config_dumper.extension.relation
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -193,6 +198,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-files-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-files-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-images-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-images-grid, method: onBuildBefore }
 
     oro_attachment.listener.merge_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\MergeListener
@@ -204,7 +213,6 @@ services:
     oro_attachment.datagrid.action.dialog:
         class: Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 
@@ -280,8 +288,10 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\EventListener\SetsParentEntityOnFlushListener'
         arguments:
             - '@property_accessor'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: onFlushCollections, connection: default }
             - { name: doctrine.event_listener, event: prePersist, connection: default }
             - { name: doctrine.event_listener, event: postPersist, connection: default }
 
@@ -296,7 +306,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
         calls:
-            - [setClassName, ['%oro_attachment.file.entity.class%']]
+            - [setClassName, ['Oro\Bundle\AttachmentBundle\Entity\File']]
         tags:
             - { name: security.voter }
 
@@ -432,6 +442,14 @@ services:
     Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider:
         alias: oro_attachment.provider.file_constraints
 
+    oro_attachment.provider.multiple_files_constraints:
+        class: Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider:
+        alias: oro_attachment.provider.multiple_files_constraints
+
     oro_attachment.validator.constraints.file:
         class: Symfony\Component\Validator\Constraints\FileValidator
 
@@ -446,6 +464,18 @@ services:
         arguments:
             - '@oro_attachment.validator.constraints.file'
             - '@oro_attachment.provider.file_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleImageConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
         tags:
             - { name: validator.constraint_validator }
 

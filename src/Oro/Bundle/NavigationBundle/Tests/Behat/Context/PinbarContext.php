@@ -51,8 +51,8 @@ class PinbarContext extends OroFeatureContext implements
      * Example: And Users link must not be in pin holder
      * Example: And Create User link must not be in pin holder
      *
-     * @Given /^(?P<link>[\w\s-\(\)]+) link must not be in pin holder$/
-     * @Given /^"(?P<link>[\w\s-\(\)]+)" link must not be in pin holder$/
+     * @Given /^(?P<link>[\w\s\-\(\)]+) link must not be in pin holder$/
+     * @Given /^"(?P<link>[\w\s\-\(\)]+)" link must not be in pin holder$/
      */
     public function linkMustNotBeInPinHolder($link)
     {
@@ -65,8 +65,8 @@ class PinbarContext extends OroFeatureContext implements
      * Example: Then Users link must be in pin holder
      * Example: Then Create User link must be in pin holder
      *
-     * @Then /^(?P<link>[\w\s-\(\)]+) link must be in pin holder$/
-     * @Then /^"(?P<link>[\w\s-\(\)]+)" link must be in pin holder$/
+     * @Then /^(?P<link>[\w\s\-\(\)]+) link must be in pin holder$/
+     * @Then /^"(?P<link>[\w\s\-\(\)]+)" link must be in pin holder$/
      */
     public function linkMustBeInPinHolder($link)
     {
@@ -79,8 +79,8 @@ class PinbarContext extends OroFeatureContext implements
      * Example: When follow Users link in pin holder
      * Example: When I follow Create User link in pin holder
      *
-     * @When /^(?:|I )follow (?P<link>[\w\s-\(\)]+) link in pin holder$/
-     * @When /^(?:|I )follow "(?P<link>[\w\s-\(\)]+)" link in pin holder$/
+     * @When /^(?:|I )follow (?P<link>[\w\s\-\(\)]+) link in pin holder$/
+     * @When /^(?:|I )follow "(?P<link>[\w\s\-\(\)]+)" link in pin holder$/
      */
     public function followUsersLinkInPinHolder($link)
     {
@@ -93,7 +93,7 @@ class PinbarContext extends OroFeatureContext implements
     /**
      * Check is pin with given name active
      *
-     * @When /^(?:|I )should see that "(?P<pinName>[\w\s-\(\)]+)" pin is active$/
+     * @When /^(?:|I )should see that "(?P<pinName>[\w\s\-\(\)]+)" pin is active$/
      *
      * @param string $pinName
      * @return bool
@@ -107,7 +107,7 @@ class PinbarContext extends OroFeatureContext implements
     /**
      * Check is pin with given name is not active
      *
-     * @When /^(?:|I )should see that "(?P<pinName>[\w\s-\(\)]+)" pin is inactive$/
+     * @When /^(?:|I )should see that "(?P<pinName>[\w\s\-\(\)]+)" pin is inactive$/
      *
      * @param string $pinName
      * @return bool

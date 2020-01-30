@@ -13,21 +13,22 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
+/**
+ * The normalizer for workflow data.
+ */
 class WorkflowDataNormalizer implements SerializerAwareInterface, NormalizerInterface, DenormalizerInterface
 {
     use SerializerAwareTrait;
 
-    /**
-     * @var AttributeNormalizer[]
-     */
-    protected $attributeNormalizers;
+    /** @var iterable|AttributeNormalizer[] */
+    private $attributeNormalizers;
 
     /**
-     * @param AttributeNormalizer $attributeNormalizer
+     * @param iterable|AttributeNormalizer[] $attributeNormalizers
      */
-    public function addAttributeNormalizer(AttributeNormalizer $attributeNormalizer)
+    public function __construct(iterable $attributeNormalizers)
     {
-        $this->attributeNormalizers[] = $attributeNormalizer;
+        $this->attributeNormalizers = $attributeNormalizers;
     }
 
     /**

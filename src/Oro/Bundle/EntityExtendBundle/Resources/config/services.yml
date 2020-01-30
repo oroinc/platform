@@ -63,9 +63,10 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.doctrine_helper"
-            - '@oro_entity_extend.form.extension.dynamic_fields_helper'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper }
 
     oro_entity_extend.entity_generator:
         class: Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
@@ -379,14 +380,12 @@ services:
     oro_entity_extend.datagrid.action.type.ajaxdeletefield:
         class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
 
     oro_entity_extend.datagrid.action.type.ajaxrestorefield:
         class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxRestoreFieldAction
         shared: false
-        public: true
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxrestorefield }
 
@@ -551,6 +550,8 @@ services:
                 - image
                 - enum
                 - multiEnum
+                - multiFile
+                - multiImage
             -
                 #BAP-5875
                 #- oneToOne

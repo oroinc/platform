@@ -12,11 +12,8 @@ The conditions are based on the [ConfigExpression](/src/Oro/Component/ConfigExpr
 To add custom condition, simply add a service to DIC with the "oro_action.condition" tag, for example:
 
 ```
-parameters:
-    oro_action.condition.blank.class: Oro\Bundle\ActionBundle\ConfigExpression\Blank
 services:
-    oro_action.condition.blank:
-        class: %oro_action.condition.blank.class%
+    Oro\Bundle\ActionBundle\ConfigExpression\Blank:
         tags:
             - { name: oro_action.condition, alias: blank|empty }
 ```

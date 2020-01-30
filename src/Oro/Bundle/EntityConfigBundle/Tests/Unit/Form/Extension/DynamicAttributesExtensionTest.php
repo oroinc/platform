@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -93,12 +94,16 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $container = TestContainerBuilder::create()
+            ->add('oro_entity_config.manager.attribute_manager', $this->attributeManager)
+            ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)
+            ->add('oro_entity_extend.form.extension.dynamic_fields_helper', $this->dynamicFieldsHelper)
+            ->getContainer($this);
+
         $this->extension = new DynamicAttributesExtension(
             $this->configManager,
             $this->doctrineHelper,
-            $this->attributeManager,
-            $this->attributeConfigHelper,
-            $this->dynamicFieldsHelper
+            $container
         );
     }
 

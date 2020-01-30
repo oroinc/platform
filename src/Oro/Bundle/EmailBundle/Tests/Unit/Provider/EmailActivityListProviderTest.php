@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -24,7 +25,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -46,9 +46,6 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     protected $tokenAccessor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineRegistryLink;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
@@ -58,7 +55,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     protected $router;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mailboxProcessStorageLink;
+    protected $mailboxProcessStorage;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $activityAssociationHelper;
@@ -79,8 +76,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager  = $this->createMock(ConfigManager::class);
         $emailThreadProvider = $this->createMock(EmailThreadProvider::class);
         $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $this->doctrineRegistryLink = $this->createMock(ServiceLink::class);
-        $this->mailboxProcessStorageLink = $this->createMock(ServiceLink::class);
+        $this->mailboxProcessStorage = $this->createMock(MailboxProcessStorage::class);
         $this->activityAssociationHelper = $this->createMock(ActivityAssociationHelper::class);
         $this->commentAssociationHelper = $this->createMock(CommentAssociationHelper::class);
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
@@ -90,7 +86,6 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
-            $this->doctrineRegistryLink,
             $this->entityNameResolver,
             $this->router,
             $this->configManager,
@@ -98,7 +93,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             $htmlTagHelper,
             $this->authorizationChecker,
             $this->tokenAccessor,
-            $this->mailboxProcessStorageLink,
+            $this->mailboxProcessStorage,
             $this->activityAssociationHelper,
             $this->commentAssociationHelper
         );
@@ -124,14 +119,9 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 
         /** @var ActivityList $activityListMock */
         $activityListMock = $this->createMock(ActivityList::class);
-        $em = $this->createMock(EntityManagerInterface::class);
         $repository = $this->createMock(ObjectRepository::class);
-        $this->doctrineRegistryLink
-            ->expects($this->once())
-            ->method('getService')
-            ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
             ->willReturn($repository);
         $repository->expects($this->once())
             ->method('findBy')
@@ -168,14 +158,9 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 
         /** @var ActivityList $activityListMock */
         $activityListMock = $this->createMock(ActivityList::class);
-        $em = $this->createMock(EntityManagerInterface::class);
         $repository = $this->createMock(ObjectRepository::class);
-        $this->doctrineRegistryLink
-            ->expects($this->once())
-            ->method('getService')
-            ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
             ->willReturn($repository);
         $repository->expects($this->once())
             ->method('findBy')
@@ -256,8 +241,8 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($repository);
 
-        $this->doctrineRegistryLink->expects($this->once())
-            ->method('getService')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
             ->willReturn($em);
 
         $this->configManager->expects($this->once())
@@ -318,5 +303,13 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
                 'ownerLink' => null
             ]
         ];
+    }
+
+    public function testIsApplicable()
+    {
+        self::assertTrue($this->emailActivityListProvider->isApplicable(new Email()));
+        self::assertTrue($this->emailActivityListProvider->isApplicable(Email::class));
+        self::assertFalse($this->emailActivityListProvider->isApplicable(new \stdClass()));
+        self::assertFalse($this->emailActivityListProvider->isApplicable(\stdClass::class));
     }
 }

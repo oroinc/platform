@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\EventSubscriber;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Symfony\Component\Form\FormConfigInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -25,6 +27,9 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FileSubscriber */
     private $subscriber;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->validator = $this->createMock(ConfigFileValidator::class);
@@ -205,6 +210,76 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('validate')
             ->with($componentFile, $dataClass, $fieldName)
+            ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
+
+        $violationsList
+            ->expects($this->once())
+            ->method('count')
+            ->willReturn(0);
+
+        $this->subscriber->postSubmit($formEvent);
+    }
+
+    public function testPostSubmitWhenDataClassIsFileItem(): void
+    {
+        $formEvent = $this->mockFormEvent($file = new File());
+
+        $file->setFile($componentFile = $this->createMock(ComponentFile::class));
+
+        $this->form
+            ->method('getName')
+            ->willReturn('sampleField');
+
+        $this->form
+            ->method('getParent')
+            ->willReturn($parentForm = $this->createMock(FormInterface::class));
+
+        $parentForm
+            ->method('getConfig')
+            ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
+
+        $parentFormConfig
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('parentEntityClass', null)
+            ->willReturn(null);
+
+        $parentFormConfig
+            ->method('getDataClass')
+            ->willReturn(null);
+
+        $parentForm
+            ->method('getParent')
+            ->willReturn($parentParentForm = $this->createMock(FormInterface::class));
+
+        $parentParentForm
+            ->method('getConfig')
+            ->willReturn($parentParentFormConfig = $this->createMock(FormConfigInterface::class));
+
+        $parentParentFormConfig
+            ->method('getDataClass')
+            ->willReturn(FileItem::class);
+
+        $parentParentForm
+            ->method('getParent')
+            ->willReturn($parentParentParentForm = $this->createMock(FormInterface::class));
+
+        $parentParentParentForm
+            ->method('getConfig')
+            ->willReturn($parentParentParentFormConfig = $this->createMock(FormConfigInterface::class));
+
+        $parentParentParentFormConfig
+            ->method('getDataClass')
+            ->willReturn($dataClass = \stdClass::class);
+
+        $parentParentForm
+            ->method('getPropertyPath')
+            ->willReturn(new PropertyPath('fileItemField'));
+
+        $this->validator
+            ->expects($this->once())
+            ->method('validate')
+            ->with($componentFile, \stdClass::class, 'fileItemField')
             ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
 
         $violationsList

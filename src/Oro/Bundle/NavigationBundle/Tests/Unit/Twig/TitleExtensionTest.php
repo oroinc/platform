@@ -30,7 +30,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
-            ->add(TitleServiceInterface::class, $this->titleService)
+            ->add('oro_navigation.title_service', $this->titleService)
             ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 

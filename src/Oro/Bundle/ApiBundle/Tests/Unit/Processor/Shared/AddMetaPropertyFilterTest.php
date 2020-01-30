@@ -45,17 +45,6 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertSame($filter, $this->context->getFilters()->get('meta'));
     }
 
-    public function testProcessWhenMetaFilterDisabled()
-    {
-        $config = new EntityDefinitionConfig();
-        $config->disableMetaProperties();
-
-        $this->context->setConfig($config);
-        $this->processor->process($this->context);
-
-        self::assertFalse($this->context->getFilters()->has('meta'));
-    }
-
     public function testProcessWhenMetaFilterShouldBeAdded()
     {
         $config = new EntityDefinitionConfig();
@@ -65,7 +54,9 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
 
         $expectedFilter = new MetaPropertyFilter(DataType::STRING, AddMetaPropertyFilter::FILTER_DESCRIPTION);
         $expectedFilter->setArrayAllowed(true);
+        $expectedFilter->addAllowedMetaProperty('title', DataType::STRING);
 
         self::assertEquals($expectedFilter, $this->context->getFilters()->get('meta'));
+        self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('meta'));
     }
 }

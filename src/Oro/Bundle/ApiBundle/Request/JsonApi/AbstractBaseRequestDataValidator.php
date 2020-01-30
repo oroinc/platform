@@ -35,6 +35,38 @@ abstract class AbstractBaseRequestDataValidator
     }
 
     /**
+     * @param array $data
+     */
+    protected function validateJsonApiSection(array $data): void
+    {
+        if (\array_key_exists(JsonApiDoc::JSONAPI, $data)) {
+            $this->validateArray($data, JsonApiDoc::JSONAPI, self::ROOT_POINTER, false, true);
+        }
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateMetaSection(array $data, string $pointer = self::ROOT_POINTER): void
+    {
+        if (\array_key_exists(JsonApiDoc::META, $data)) {
+            $this->validateArray($data, JsonApiDoc::META, $pointer, false, true);
+        }
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateLinksSection(array $data, string $pointer = self::ROOT_POINTER): void
+    {
+        if (\array_key_exists(JsonApiDoc::LINKS, $data)) {
+            $this->validateArray($data, JsonApiDoc::LINKS, $pointer, false, true);
+        }
+    }
+
+    /**
      * @param array  $data
      * @param string $section
      */
@@ -168,7 +200,7 @@ abstract class AbstractBaseRequestDataValidator
                 \sprintf('The \'%s\' property should not be empty', $property)
             );
             $isValid = false;
-        } elseif ($associative && !ArrayUtil::isAssoc($value)) {
+        } elseif ($associative && !empty($value) && !ArrayUtil::isAssoc($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 \sprintf('The \'%s\' property should be an associative array', $property)

@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle;
 
-use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\BigNumberProviderPass;
-use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\ValueConvertersPass;
-use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\WidgetProviderFilterPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * The DashboardBundle bundle class.
+ */
 class OroDashboardBundle extends Bundle
 {
     /**
@@ -17,8 +18,15 @@ class OroDashboardBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ValueConvertersPass());
-        $container->addCompilerPass(new BigNumberProviderPass());
-        $container->addCompilerPass(new WidgetProviderFilterPass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_dashboard.widget_config_value.provider',
+            'oro_dashboard.value.converter',
+            'form_type'
+        ));
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_dashboard.provider.big_number.processor',
+            'oro_dashboard.big_number.provider',
+            'alias'
+        ));
     }
 }

@@ -292,7 +292,7 @@ class ExtendHelper
 
         $result = strtolower(
             preg_replace(
-                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+                ['/ +/', '/-+/', '/[^a-z0-9\_]+/i', '/_{2,}/'],
                 ['_', '_', '', '_'],
                 trim($name)
             )

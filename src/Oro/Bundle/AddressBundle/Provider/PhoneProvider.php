@@ -6,7 +6,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The aim of this class is to help getting a phone number from an object.
@@ -16,35 +18,50 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PhoneProvider implements PhoneProviderInterface
+class PhoneProvider implements PhoneProviderInterface, ResetInterface
 {
-    const GET_PHONE_METHOD = 'getPhone';
+    private const GET_PHONE_METHOD = 'getPhone';
+
+    /** @var array [class name => [provider id, ...], ...] */
+    private $phoneProviderMap;
+
+    /** @var ContainerInterface */
+    private $phoneProviderContainer;
 
     /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
+
+    /** @var array */
+    private $targetEntities = [];
+
+    /** @var string[] */
+    private $sortedTargetEntities;
+
+    /** @var array [class name => [provider, ...], ...] */
+    private $phoneProviders = [];
 
     /**
-     * @var string[]
+     * @param array              $phoneProviderMap
+     * @param ContainerInterface $phoneProviderContainer
+     * @param ConfigProvider     $extendConfigProvider
      */
-    protected $targetEntities = [];
-
-    /**
-     * @var string[]
-     */
-    protected $sortedTargetEntities;
-
-    /**
-     * @var array
-     * key = class name, value = PhoneProviderInterface[]
-     */
-    protected $phoneProviders = [];
-
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
-    public function __construct(ConfigProvider $extendConfigProvider)
-    {
+    public function __construct(
+        array $phoneProviderMap,
+        ContainerInterface $phoneProviderContainer,
+        ConfigProvider $extendConfigProvider
+    ) {
+        $this->phoneProviderMap = $phoneProviderMap;
+        $this->phoneProviderContainer = $phoneProviderContainer;
         $this->extendConfigProvider = $extendConfigProvider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->sortedTargetEntities = null;
+        $this->phoneProviders = [];
     }
 
     /**
@@ -56,21 +73,7 @@ class PhoneProvider implements PhoneProviderInterface
     public function addTargetEntity($className, $priority = 0)
     {
         $this->targetEntities[$priority][] = $className;
-        $this->sortedTargetEntities        = null;
-    }
-
-    /**
-     * Registers the phone number provider for the given class
-     *
-     * @param string                 $className
-     * @param PhoneProviderInterface $provider
-     */
-    public function addPhoneProvider($className, PhoneProviderInterface $provider)
-    {
-        if ($provider instanceof RootPhoneProviderAwareInterface) {
-            $provider->setRootProvider($this);
-        }
-        $this->phoneProviders[$className][] = $provider;
+        $this->sortedTargetEntities = null;
     }
 
     /**
@@ -153,17 +156,37 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return PhoneProviderInterface[]
      */
-    protected function getPhoneProviders($object)
+    private function getPhoneProviders($object)
     {
         $className = ClassUtils::getClass($object);
-        $result = isset($this->phoneProviders[$className]) ? $this->phoneProviders[$className] : [];
-        foreach ($this->phoneProviders as $class => $providers) {
-            if (is_subclass_of($className, $class)) {
-                $result = array_merge($result, $providers);
-            }
+        if (isset($this->phoneProviders[$className])) {
+            return $this->phoneProviders[$className];
         }
 
-        return $result;
+        $providerIds = [];
+        if (isset($this->phoneProviderMap[$className])) {
+            $providerIds[] = $this->phoneProviderMap[$className];
+        }
+        foreach ($this->phoneProviderMap as $class => $ids) {
+            if (is_subclass_of($className, $class)) {
+                $providerIds[] = $ids;
+            }
+        }
+        if ($providerIds) {
+            $providerIds = array_merge(...$providerIds);
+        }
+
+        $providers = [];
+        foreach ($providerIds as $id) {
+            $provider = $this->phoneProviderContainer->get($id);
+            if ($provider instanceof RootPhoneProviderAwareInterface) {
+                $provider->setRootProvider($this);
+            }
+            $providers[] = $provider;
+        }
+        $this->phoneProviders[$className] = $providers;
+
+        return $providers;
     }
 
     /**
@@ -171,14 +194,14 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return string|null
      */
-    protected function getPhoneNumberFromRelatedObject($object)
+    private function getPhoneNumberFromRelatedObject($object)
     {
         $applicableRelations = $this->getApplicableRelations($object);
         if (empty($applicableRelations)) {
             return null;
         }
 
-        $targetEntities   = $this->getTargetEntities();
+        $targetEntities = $this->getTargetEntities();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($targetEntities as $className) {
             if (!isset($applicableRelations[$className])) {
@@ -197,15 +220,15 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return array of phone number, phone owner
      */
-    protected function getPhoneNumbersFromRelatedObject($object)
+    private function getPhoneNumbersFromRelatedObject($object)
     {
         $applicableRelations = $this->getApplicableRelations($object, true);
         if (empty($applicableRelations)) {
             return [];
         }
 
-        $result           = [];
-        $targetEntities   = $this->getTargetEntities();
+        $result = [];
+        $targetEntities = $this->getTargetEntities();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($targetEntities as $className) {
             if (!isset($applicableRelations[$className])) {
@@ -232,7 +255,7 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return array
      */
-    protected function getApplicableRelations($object, $withMultiValue = false)
+    private function getApplicableRelations($object, $withMultiValue = false)
     {
         $result = [];
 
@@ -278,12 +301,12 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return string[]
      */
-    protected function getTargetEntities()
+    private function getTargetEntities()
     {
         if (null === $this->sortedTargetEntities) {
             ksort($this->targetEntities);
-            $this->sortedTargetEntities = !empty($this->targetEntities)
-                ? call_user_func_array('array_merge', $this->targetEntities)
+            $this->sortedTargetEntities = $this->targetEntities
+                ? array_merge(...$this->targetEntities)
                 : [];
         }
 
@@ -296,7 +319,7 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return array
      */
-    protected function mergePhoneNumbers(array $arr1, array $arr2)
+    private function mergePhoneNumbers(array $arr1, array $arr2)
     {
         foreach ($arr2 as $val) {
             if (!$this->isPhoneNumberExist($arr1, $val)) {
@@ -313,7 +336,7 @@ class PhoneProvider implements PhoneProviderInterface
      *
      * @return bool
      */
-    public function isPhoneNumberExist(array $arr, array $value)
+    private function isPhoneNumberExist(array $arr, array $value)
     {
         foreach ($arr as $val) {
             if ($val[0] === $value[0] && $val[1] === $value[1]) {

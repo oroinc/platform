@@ -346,6 +346,7 @@ class ConfigurationLoader
             ->register($loaderServiceId, EntityAliasLoader::class)
             ->setArguments([new Reference($entityOverrideProviderServiceId)])
             ->setPublic(false)
+            ->setLazy(true)
             ->addMethodCall('addEntityAliasProvider', [new Reference($providerServiceId)])
             ->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
 

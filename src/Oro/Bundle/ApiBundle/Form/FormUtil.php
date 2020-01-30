@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
@@ -34,6 +35,28 @@ class FormUtil
     public static function isNotSubmittedOrSubmittedAndValid(FormInterface $form): bool
     {
         return !$form->isSubmitted() || $form->isValid();
+    }
+
+    /**
+     * Creates an instance of TransformationFailedException.
+     *
+     * @param string      $message
+     * @param string|null $invalidMessage
+     * @param array|null  $invalidMessageParameters
+     *
+     * @return TransformationFailedException
+     */
+    public static function createTransformationFailedException(
+        string $message,
+        string $invalidMessage = null,
+        array $invalidMessageParameters = null
+    ): TransformationFailedException {
+        $result = new TransformationFailedException($message);
+        if ($invalidMessage) {
+            $result->setInvalidMessage($invalidMessage, $invalidMessageParameters ?? []);
+        }
+
+        return $result;
     }
 
     /**

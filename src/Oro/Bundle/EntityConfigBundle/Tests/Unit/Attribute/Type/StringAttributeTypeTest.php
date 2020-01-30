@@ -15,11 +15,6 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
         return new StringAttributeType();
     }
 
-    public function testGetType()
-    {
-        $this->assertEquals('string', $this->getAttributeType()->getType());
-    }
-
     /**
      * {@inheritdoc}
      */

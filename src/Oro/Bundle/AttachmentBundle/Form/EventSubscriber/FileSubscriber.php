@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Form\EventSubscriber;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
@@ -72,6 +73,11 @@ class FileSubscriber implements EventSubscriberInterface
             if (!$dataClass) {
                 $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
             }
+        }
+
+        if ($dataClass === FileItem::class) {
+            $dataClass = $form->getParent()->getParent()->getParent()->getConfig()->getDataClass();
+            $fieldName = (string)$form->getParent()->getParent()->getPropertyPath();
         }
 
         $violations = $this->validator->validate($entity->getFile(), $dataClass, $fieldName);

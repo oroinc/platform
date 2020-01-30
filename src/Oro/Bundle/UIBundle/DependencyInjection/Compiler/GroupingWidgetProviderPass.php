@@ -41,13 +41,12 @@ class GroupingWidgetProviderPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        [$services, $items] = $this->findAndSortTaggedServicesWithHandler(
+        [$services, $items] = $this->findAndInverseSortTaggedServicesWithHandler(
             $this->tagName,
             function (array $attributes, string $serviceId): array {
                 return [$serviceId, $this->getAttribute($attributes, 'group')];
             },
-            $container,
-            true
+            $container
         );
 
         $serviceDef = $container->getDefinition($this->serviceId);

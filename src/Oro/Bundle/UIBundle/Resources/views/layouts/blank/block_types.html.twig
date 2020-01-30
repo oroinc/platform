@@ -20,7 +20,11 @@
 {% block page_subtitle_widget %}
     {% set attr = layout_attr_defaults(attr, {'~class': ' page-subtitle'}) %}
     <h2 {{ block('block_attributes') }}>
-        {% if icon %}<span class="badge {{ badge ? 'badge--' ~ badge }}"><i class="fa-{{ icon }}"></i></span>{% endif %}
+        {% if icon %}
+            <span class="badge {{ badge ? 'badge--' ~ badge }}">
+                <span class="fa-{{ icon }}" aria-hidden="true"></span>
+            </span>
+        {% endif %}
         <span class="page-subtitle__text">{{ text|block_text(translation_domain) }}</span>
         {{ block('container_widget') }}
     </h2>
@@ -79,7 +83,7 @@
     }) %}
 
     {% if renderLink and app.request.attributes.get('_route') != route %}
-        <a href="{{ path(route) }}" {{ block('block_attributes') }}>
+        <a href="{{ path(route) }}" {{ block('block_attributes') }} aria-label="{{ 'oro_frontend.logo.aria_label'|trans }}">
             <img {{ UI.attributes(attr_img) }}>
         </a>
     {% else %}

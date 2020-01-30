@@ -5,35 +5,28 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 /**
- * Class EmailFlagManagerLoaderSelector
- * @package Oro\Bundle\EmailBundle\Provider
+ * Provides a way to find an email flags manager loader for an email origin.
  */
 class EmailFlagManagerLoaderSelector
 {
-    /**
-     * @var EmailFlagManagerLoaderInterface[]
-     */
-    private $loaders = array();
+    /** @var iterable|EmailFlagManagerLoaderInterface[] */
+    private $loaders;
 
     /**
-     * Adds implementation of EmailBodyLoaderInterface
-     *
-     * @param EmailFlagManagerLoaderInterface $loader - entity implemented
-     * EmailFlagManagerLoaderInterface
-     *
-     * @return void
+     * @param iterable|EmailFlagManagerLoaderInterface[] $loaders
      */
-    public function addLoader(EmailFlagManagerLoaderInterface $loader)
+    public function __construct(iterable $loaders)
     {
-        $this->loaders[] = $loader;
+        $this->loaders = $loaders;
     }
 
     /**
-     * Gets implementation of EmailBodyLoaderInterface for the given email origin
+     * Gets an email flags manager loader for the given email origin.
      *
-     * @param EmailOrigin $origin - entity EmailOrigin
+     * @param EmailOrigin $origin
      *
      * @return EmailFlagManagerLoaderInterface
+     *
      * @throws \RuntimeException
      */
     public function select(EmailOrigin $origin)
@@ -44,20 +37,8 @@ class EmailFlagManagerLoaderSelector
             }
         }
 
-        throw new \RuntimeException($this->getErrorMessage($origin));
-    }
-
-    /**
-     * Return test for error message
-     *
-     * @param EmailOrigin $origin - entity EmailOrigin
-     *
-     * @return string
-     */
-    protected function getErrorMessage(EmailOrigin $origin)
-    {
-        $message = 'Cannot find an email flag manager loader. Origin id: %d.';
-
-        return sprintf($message, $origin->getId());
+        throw new \RuntimeException(
+            sprintf('Cannot find an email flag manager loader. Origin id: %d.', $origin->getId())
+        );
     }
 }

@@ -2,47 +2,48 @@
 
 namespace Oro\Bundle\AddressBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all phone providers.
+ */
 class PhoneProviderPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_address.provider.phone';
-    const TAG = 'oro_address.phone_provider';
+    use TaggedServiceTrait;
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::SERVICE_KEY)) {
-            return;
-        }
-
-        $taggedServices = $container->findTaggedServiceIds(self::TAG);
-        foreach ($taggedServices as $id => $attributes) {
-            if (empty($attributes[0]['class'])) {
-                throw new InvalidConfigurationException(
-                    sprintf('Tag attribute "class" is required for "%s" service', $id)
-                );
+        $tagName = 'oro_address.phone_provider';
+        $providers = [];
+        $services = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName);
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $providers[$this->getPriorityAttribute($attributes)][] = [
+                    $id,
+                    $this->getRequiredAttribute($attributes, 'class', $id, $tagName)
+                ];
             }
-            $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $providers[$priority][] = [$attributes[0]['class'], new Reference($id)];
         }
-        if (empty($providers)) {
-            return;
+        if ($providers) {
+            $providers = $this->inverseSortByPriorityAndFlatten($providers);
         }
 
-        // sort by priority and flatten
-        ksort($providers);
-        $providers = call_user_func_array('array_merge', $providers);
-
-        // register
-        $serviceDef = $container->getDefinition(self::SERVICE_KEY);
-        foreach ($providers as $provider) {
-            $serviceDef->addMethodCall('addPhoneProvider', $provider);
+        $map = [];
+        foreach ($providers as list($id, $class)) {
+            $map[$class][] = $id;
         }
+
+        $container->getDefinition('oro_address.provider.phone')
+            ->setArgument(0, $map)
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }
