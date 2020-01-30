@@ -307,7 +307,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'form constraint',
-                'detail' => 'This value is not valid.',
+                'detail' => 'The entity does not exist.',
                 'source' => ['pointer' => '/data/relationships/biO2MOwner/data']
             ],
             $response

@@ -6,7 +6,9 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 /**
  * An instance of this class can be added to the config extras of the context
- * to request to add entity meta properties to entity configuration.
+ * to request to add entity meta properties to entity configuration
+ * or to request to perform some additional operations (in this case the data-type of a meta property must be NULL).
+ * @see \Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter
  */
 class MetaPropertiesConfigExtra implements ConfigExtraInterface
 {
@@ -20,19 +22,19 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
      *
      * @return string[]
      */
-    public function getMetaPropertyNames()
+    public function getMetaPropertyNames(): array
     {
         return array_keys($this->metaProperties);
     }
 
     /**
-     * Gets the type of a meta property.
+     * Gets the data-type of a meta property.
      *
      * @param string $name
      *
-     * @return string
+     * @return string|null the data-type or NULL if the given meta property should not be added to entity config
      */
-    public function getTypeOfMetaProperty($name)
+    public function getTypeOfMetaProperty(string $name): ?string
     {
         $this->assertMetaPropertyExists($name);
 
@@ -42,25 +44,25 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * Sets the type of a meta property.
      *
-     * @param string $name
-     * @param string $dataType
+     * @param string      $name
+     * @param string|null $type the data-type or NULL if the meta property should not be added to entity config
      */
-    public function setTypeOfMetaProperty($name, $dataType)
+    public function setTypeOfMetaProperty(string $name, ?string $type): void
     {
         $this->assertMetaPropertyExists($name);
 
-        $this->metaProperties[$name] = $dataType;
+        $this->metaProperties[$name] = $type;
     }
 
     /**
      * Adds a meta property.
      *
-     * @param string $name
-     * @param string $dataType
+     * @param string      $name
+     * @param string|null $type the data-type or NULL if the meta property should not be added to entity config
      */
-    public function addMetaProperty($name, $dataType = 'string')
+    public function addMetaProperty(string $name, ?string $type): void
     {
-        $this->metaProperties[$name] = $dataType;
+        $this->metaProperties[$name] = $type;
     }
 
     /**
@@ -68,7 +70,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
      *
      * @param string $name
      */
-    public function removeMetaProperty($name)
+    public function removeMetaProperty(string $name): void
     {
         unset($this->metaProperties[$name]);
     }
@@ -108,9 +110,9 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * @param string $name
      */
-    private function assertMetaPropertyExists($name)
+    private function assertMetaPropertyExists(string $name): void
     {
-        if (!array_key_exists($name, $this->metaProperties)) {
+        if (!\array_key_exists($name, $this->metaProperties)) {
             throw new \InvalidArgumentException(
                 sprintf('The "%s" meta property does not exist.', $name)
             );

@@ -7,14 +7,14 @@
                         <button type="button"
                                 class="btn btn--size-s btn--link reset-filter-button"
                         >
-                            <span class="fa-close"></span>
-                            <%= _.__('oro.filter.reset.label') %>
+                            <span class="fa-close" aria-hidden="true"></span>
+                            <%- _.__('oro.filter.reset.label') %>
                         </button>
                     </div>
                     <div class="filter-items"></div>
                     <select data-action="add-filter-select" multiple data-skip-input-widgets>
                         <% _.each(filters, function (filter, name) { %>
-                            <option class="<%= filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                            <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                                 <%- filter.label %>
                             </option>
                         <% }); %>
@@ -30,7 +30,7 @@
                         multiple
                 >
                     <% _.each(filters, function (filter, name) { %>
-                        <option class="<%= filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                        <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                         <%- filter.label %>
                         </option>
                     <% }); %>
@@ -38,10 +38,10 @@
                 <div class="filter-items"></div>
                 <div class="filter-items-hint">
                     <button type="button"
-                            class="btn btn--link reset-filter-button"
+                            class="btn btn--size-s btn--link reset-filter-button"
                     >
-                        <span class="fa-close"></span>
-                        <%= _.__('oro.filter.reset.label') %>
+                        <span class="fa-close" aria-hidden="true"></span>
+                        <%- _.__('oro.filter.reset.label') %>
                     </button>
                 </div>
             </div>

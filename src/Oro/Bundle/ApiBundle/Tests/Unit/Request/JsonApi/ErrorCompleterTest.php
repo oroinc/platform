@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -527,6 +528,41 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/meta/user'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForMetaProperty()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addMetaProperty(new MetaPropertyMetadata('test'));
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('test'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/meta/test'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForMetaPropertyOfEntityWithoutIdentifierFields()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->addMetaProperty(new MetaPropertyMetadata('test'));
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('test'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/meta/test'));
 
         $this->errorCompleter->complete($error, $this->requestType, $metadata);
         self::assertEquals($expectedError, $error);

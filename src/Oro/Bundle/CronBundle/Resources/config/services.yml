@@ -1,13 +1,10 @@
-parameters:
-    oro_cron.entity.schedule.class:   Oro\Bundle\CronBundle\Entity\Schedule
-
 services:
     oro_cron.schedule_manager:
         class: Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
         arguments:
             - '@doctrine'
             - '@oro_cron.filter.schedules_by_arguments'
-            - '%oro_cron.entity.schedule.class%'
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
 
     oro_cron.deferred_scheduler:
         class: Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler
@@ -15,7 +12,7 @@ services:
             - '@oro_cron.schedule_manager'
             - '@doctrine'
             - '@oro_cron.filter.schedules_by_arguments'
-            - '%oro_cron.entity.schedule.class%'
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
 
     oro_cron.command_args_tokenizer:
         class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer

@@ -36,7 +36,7 @@ services:
         arguments:
             - '@oro_digital_asset.reflector.file_reflector'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
 
     oro_digital_asset.reflector.file_reflector:
         class: Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector
@@ -50,8 +50,8 @@ services:
         arguments:
             - '@oro_digital_asset.reflector.file_reflector'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
 
     oro_digital_asset.form.transformer.digital_asset_to_id:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer
@@ -85,4 +85,4 @@ services:
         arguments:
             - '@oro_digital_asset.listener.file_delete_listener.inner'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preRemove }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preRemove }

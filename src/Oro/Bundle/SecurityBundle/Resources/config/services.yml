@@ -425,9 +425,9 @@ services:
         arguments:
             - '@oro_security.ownership_tree_provider.chain'
         calls:
-            - ['addSupportedClass', ['%oro_user.entity.class%', [owner, organization], [businessUnits, organizations]]]
-            - ['addSupportedClass', ['%oro_organization.business_unit.entity.class%', [owner, organization], [users]]]
-            - ['addSupportedClass', ['%oro_organization.organization.entity.class%']]
+            - ['addSupportedClass', ['Oro\Bundle\UserBundle\Entity\User', [owner, organization], [businessUnits, organizations]]]
+            - ['addSupportedClass', ['Oro\Bundle\OrganizationBundle\Entity\BusinessUnit', [owner, organization], [users]]]
+            - ['addSupportedClass', ['Oro\Bundle\OrganizationBundle\Entity\Organization']]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 

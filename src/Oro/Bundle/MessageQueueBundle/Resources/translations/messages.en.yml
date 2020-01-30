@@ -47,3 +47,4 @@ oro:
         job:
             entity_label: Job
             entity_plural_label: Jobs
+            entity_grid_all_view_label: All %entity_plural_label%

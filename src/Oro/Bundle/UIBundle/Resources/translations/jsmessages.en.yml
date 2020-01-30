@@ -148,6 +148,9 @@ oro:
         tab_view_more: '...'
         scroll_up_label: 'Scroll up'
         scroll_down_label: 'Scroll down'
+        show_more_view:
+            show_more: '{1}And {{ number }} more item|[2,Inf[And {{ number }} more items'
+            show_less: 'Show less items'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

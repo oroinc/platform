@@ -1,4 +1,8 @@
 oro.translation:
+    entity_label: 'Translation'
+    entity_plural_label: 'Translations'
+    entity_grid_all_view_label: 'All %entity_plural_label%'
+
     download:
         error: 'Error while downloading package'
         
@@ -32,6 +36,7 @@ oro.translation:
             group.intl: 'All Languages:'
         entity_label: 'Language'
         entity_plural_label: 'Languages'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
 
         id.label: 'Id'
         code.label: 'Code'
@@ -80,6 +85,7 @@ oro.translation:
     translation_key:
         entity_label: 'Translation Key'
         entity_plural_label: 'Translation Keys'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
 
         id.label: 'Id'
         key.label: 'Key'

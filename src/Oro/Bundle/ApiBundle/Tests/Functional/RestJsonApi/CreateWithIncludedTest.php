@@ -7,10 +7,23 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class CreateWithIncludedTest extends RestJsonApiTestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->loadFixtures([
+            LoadUser::class,
+            LoadOrganization::class,
+            LoadBusinessUnit::class
+        ]);
+    }
+
     /**
      * @return Organization
      */
@@ -215,21 +228,6 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
             'included' => [
                 [
                     'type'          => $buEntityType,
-                    'id'            => 'BU1',
-                    'attributes'    => [
-                        'name' => 'Business Unit 1'
-                    ],
-                    'relationships' => [
-                        'organization' => [
-                            'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
-                        ],
-                        'owner'        => [
-                            'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
-                        ]
-                    ]
-                ],
-                [
-                    'type'          => $buEntityType,
                     'id'            => 'BU2',
                     'attributes'    => [
                         'name' => 'Business Unit 2'
@@ -238,8 +236,26 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
                         'organization' => [
                             'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
                         ],
-                        'owner'        => [
-                            'data' => ['type' => $buEntityType, 'id' => 'BU1']
+                        'users' => [
+                            'data' => [['type' => $entityType, 'id' => 'nested_user']]
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => $entityType,
+                    'id'            => 'nested_user',
+                    'attributes'    => [
+                        'username'  => 'test_user_21',
+                        'firstName' => 'Test Second Name',
+                        'lastName'  => 'Test Last Name',
+                        'email'     => 'test_user_21@example.com',
+                    ],
+                    'relationships' => [
+                        'organization'  => [
+                            'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
+                        ],
+                        'owner'         => [
+                            'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
                         ]
                     ]
                 ]
@@ -248,19 +264,8 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
 
         $response = $this->post(['entity' => $entityType], $data);
 
-        $result = self::jsonToArray($response->getContent());
-
-        self::assertEquals('test_user_2', $result['data']['attributes']['username']);
-        self::assertCount(1, $result['data']['relationships']['businessUnits']['data']);
-        self::assertCount(2, $result['included']);
-        self::assertEquals($buEntityType, $result['included'][0]['type']);
-        self::assertEquals('Business Unit 1', $result['included'][0]['attributes']['name']);
-        self::assertEquals($buEntityType, $result['included'][1]['type']);
-        self::assertEquals('Business Unit 2', $result['included'][1]['attributes']['name']);
-        self::assertNotEmpty($result['included'][0]['meta']);
-        self::assertSame('BU1', $result['included'][0]['meta']['includeId']);
-        self::assertNotEmpty($result['included'][1]['meta']);
-        self::assertSame('BU2', $result['included'][1]['meta']['includeId']);
+        $responseContent = $this->updateResponseContent('create_included_entity_with_nested_dpendency.yml', $response);
+        $this->assertResponseContains($responseContent, $response);
     }
 
     public function testCreateIncludedEntityWithInversedDependency()

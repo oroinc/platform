@@ -47,8 +47,8 @@ Feature: Menu Items Translation
     When I go to System / Configuration
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:
-      | Enabled Localizations | [English, German] |
-      | Default Localization  | English           |
+      | Enabled Localizations | [English, German]       |
+      | Default Localization  | English (United States) |
     And I submit form
     Then I should see "Configuration saved" flash message
 

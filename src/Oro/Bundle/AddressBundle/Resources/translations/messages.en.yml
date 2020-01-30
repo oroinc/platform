@@ -10,6 +10,7 @@ oro:
         entity_description:  A place where people or organizations are located with whom the user is in touch and does business with.
         entity_label:        Address
         entity_plural_label: Addresses
+        entity_grid_all_view_label: All %entity_plural_label%
         city:
             label:           City
             description:     The city specified in the address record.
@@ -72,6 +73,7 @@ oro:
         region:
             entity_label:        State
             entity_plural_label: States
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Administrative units withing a country.
             name:
                 label:           Name
@@ -96,6 +98,7 @@ oro:
         country:
             entity_label:         Country
             entity_plural_label:  Countries
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:   A country represents an element of an address record.
             regions:
                 label:            States
@@ -117,6 +120,7 @@ oro:
         addresstype:
             entity_label:         Address Type
             entity_plural_label:  Address Types
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:   Represent address type (e.g., shipping address, billing address, default shipping address, default billing address).
             name.label:           Name
             label:

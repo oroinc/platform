@@ -2,6 +2,7 @@ oro:
     comment:
         entity_label:         Comment
         entity_plural_label:  Comments
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:   The written remarks related to specific entity records.
         id:
             label:            Id

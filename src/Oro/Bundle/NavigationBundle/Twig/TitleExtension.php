@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
@@ -38,11 +37,11 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
     }
 
     /**
-     * @return TitleService
+     * @return TitleServiceInterface
      */
     protected function getTitleService()
     {
-        return $this->container->get(TitleServiceInterface::class);
+        return $this->container->get('oro_navigation.title_service');
     }
 
     /**
@@ -193,7 +192,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
     public static function getSubscribedServices()
     {
         return [
-            TitleServiceInterface::class,
+            'oro_navigation.title_service' => TitleServiceInterface::class,
             RequestStack::class,
         ];
     }

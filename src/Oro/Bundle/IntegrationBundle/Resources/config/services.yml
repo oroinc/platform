@@ -1,7 +1,3 @@
-parameters:
-    oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
-    oro_integration.fields_changes.class:                                 Oro\Bundle\IntegrationBundle\Entity\FieldsChanges
-
 services:
     oro_integration.form.channel:
         class: Symfony\Component\Form\Form
@@ -74,7 +70,7 @@ services:
         class: Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '%oro_integration.fields_changes.class%'
+            - 'Oro\Bundle\IntegrationBundle\Entity\FieldsChanges'
 
     oro_integration.manager.types_registry.link:
         tags:

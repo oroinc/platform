@@ -1,13 +1,3 @@
-parameters:
-    oro_email.email.entity.class: Oro\Bundle\EmailBundle\Entity\Email
-    oro_email.email_folder.entity.class: Oro\Bundle\EmailBundle\Entity\EmailFolder
-    oro_email.email_origin.entity.class: Oro\Bundle\EmailBundle\Entity\EmailOrigin
-    oro_email.email_user.entity.class: Oro\Bundle\EmailBundle\Entity\EmailUser
-    oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
-    oro_email.autoresponserule.entity.class: Oro\Bundle\EmailBundle\Entity\AutoResponseRule
-    oro_email.mailbox.entity.class: Oro\Bundle\EmailBundle\Entity\Mailbox
-    oro_email.email_folder.model.class: Oro\Bundle\EmailBundle\Model\FolderType
-
 services:
     oro_email.swiftmailer.mailer.abstract:
         parent: swiftmailer.mailer.abstract
@@ -271,7 +261,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.autoresponserule.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\AutoResponseRule'
             - '@doctrine.orm.entity_manager'
 
     oro_email.autoresponserule_manager:
@@ -290,7 +280,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
             - '@doctrine.orm.entity_manager'
             - '@oro_email.datagrid_query_factory'
 
@@ -299,7 +289,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email_origin.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\EmailOrigin'
             - '@doctrine.orm.entity_manager'
 
     oro_email.direct_mailer:
@@ -314,7 +304,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.emailtemplate.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\EmailTemplate'
             - '@doctrine.orm.entity_manager'
 
     oro_email.cache:
@@ -567,7 +557,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.email_synchronization_manager'
             - '@oro_activity.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
 
     Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper:
         alias: 'oro_email.helper.datagrid.emails'
@@ -859,7 +849,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@security.token_storage'
@@ -869,7 +859,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@security.token_storage'
@@ -879,7 +869,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@oro_search.index'
@@ -890,7 +880,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.email.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
             - '@oro_search.index'
@@ -954,7 +944,7 @@ services:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_email.mailbox.entity.class%'
+            - 'Oro\Bundle\EmailBundle\Entity\Mailbox'
             - '@doctrine.orm.entity_manager'
 
     oro_email.mailbox.entity_name_provider:
@@ -1218,7 +1208,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
         calls:
-            - [setClassName, ['%oro_email.emailtemplate.entity.class%']]
+            - [setClassName, ['Oro\Bundle\EmailBundle\Entity\EmailTemplate']]
         tags:
             - { name: security.voter }
 
