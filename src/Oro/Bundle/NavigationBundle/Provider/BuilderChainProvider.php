@@ -10,6 +10,9 @@ use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
+/**
+ * Iterates over registered menu builders and calls build method for each
+ */
 class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
