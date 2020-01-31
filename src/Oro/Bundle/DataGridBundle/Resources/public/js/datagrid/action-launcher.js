@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const tools = require('oroui/js/tools');
     const Backbone = require('backbone');
     let config = require('module-config').default(module.id);
@@ -39,6 +40,9 @@ define(function(require, exports, module) {
 
         /** @property {String} */
         title: undefined,
+
+        /** @property {String} */
+        ariaLabel: undefined,
 
         /** @property {String} */
         icon: undefined,
@@ -116,7 +120,7 @@ define(function(require, exports, module) {
                 throw new TypeError('"action" is required');
             }
 
-            const truthy = _.pick(options, 'template', 'label', 'title', 'icon', 'link',
+            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'icon', 'link',
                 'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
 
             _.extend(
@@ -158,11 +162,16 @@ define(function(require, exports, module) {
         },
 
         getTemplateData: function() {
-            const data = _.pick(this, 'icon', 'title', 'label', 'className', 'iconClassName', 'launcherMode', 'link',
-                'links', 'action', 'attributes', 'enabled', 'tagName');
+            const data = _.pick(this, 'icon', 'title', 'label', 'ariaLabel', 'className', 'iconClassName',
+                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName');
 
             if (!data.label) {
                 data.label = this.action.label;
+            }
+
+            if (!data.ariaLabel) {
+                data.ariaLabel = this.action.ariaLabel
+                    ? this.action.ariaLabel : `${data.label} ${__('oro.datagrid.action.default_postfix')}`;
             }
 
             if (!data.title) {

@@ -74,6 +74,8 @@ oro:
             max_length: Please enter at most {{ max_length }} characters
         datagrid-toolbar:
             filters: Filters
+            toggle_filters: Filter Toggle
+            aria_label: Expand or Collapse Filtrs
             filters_count: Filters ({{ count }})
             save_filters: Save Filters
         dialog:

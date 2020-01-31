@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const Backbone = require('backbone');
     let config = require('module-config').default(module.id);
 
@@ -38,6 +39,9 @@ define(function(require, exports, module) {
 
         /** @property {String} */
         title: undefined,
+
+        /** @property {String} */
+        ariaLabel: undefined,
 
         /** @property {String} */
         icon: undefined,
@@ -116,6 +120,10 @@ define(function(require, exports, module) {
                 this.label = opts.label;
             }
 
+            if (opts.ariaLabel) {
+                this.ariaLabel = opts.ariaLabel;
+            }
+
             if (opts.attributes) {
                 this.attributes = opts.attributes;
             }
@@ -175,12 +183,18 @@ define(function(require, exports, module) {
 
         getTemplateData: function() {
             const label = this.label || this.action.label;
+            let ariaLabel = this.ariaLabel;
+
+            if (!ariaLabel) {
+                ariaLabel = this.action.ariaLabel || `${label} ${__('oro.datagrid.action.default_postfix')}`;
+            }
 
             this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
                 label: label,
                 icon: this.selectedItem.icon,
                 title: this.selectedItem.title,
+                ariaLabel: ariaLabel,
                 className: this.className,
                 iconClassName: this.selectedItem.iconClassName,
                 launcherMode: this.launcherMode,
