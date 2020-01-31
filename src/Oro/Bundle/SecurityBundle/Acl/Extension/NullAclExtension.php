@@ -122,7 +122,7 @@ final class NullAclExtension implements AclExtensionInterface
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -130,7 +130,7 @@ final class NullAclExtension implements AclExtensionInterface
      */
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -146,7 +146,7 @@ final class NullAclExtension implements AclExtensionInterface
      */
     public function getClasses()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -162,7 +162,7 @@ final class NullAclExtension implements AclExtensionInterface
      */
     public function getAccessLevelNames($object, $permissionName = null)
     {
-        return array();
+        return [];
     }
 
     /**

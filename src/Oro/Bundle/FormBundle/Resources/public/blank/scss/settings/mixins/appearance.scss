@@ -1,7 +1,5 @@
 /* @theme: blank; */
 
 @mixin appearance() {
-    -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
+    appearance: none;
 }

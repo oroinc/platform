@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 {
     /** All access levels from the most to the least permissive level */
-    const ACCESS_LEVELS = [
+    protected const ACCESS_LEVELS = [
         'SYSTEM' => AccessLevel::SYSTEM_LEVEL,
         'GLOBAL' => AccessLevel::GLOBAL_LEVEL,
         'DEEP'   => AccessLevel::DEEP_LEVEL,
@@ -167,7 +167,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     protected function isSupportedObject($object)
     {
         return
-            is_object($object)
+            \is_object($object)
             && !$object instanceof ObjectIdentity;
     }
 
@@ -194,7 +194,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     {
         if ($object instanceof ObjectIdentityInterface) {
             $className = $object->getType();
-        } elseif (is_string($object)) {
+        } elseif (\is_string($object)) {
             $className = $id = $group = null;
             $this->parseDescriptor($object, $className, $id, $group);
         } else {
@@ -207,7 +207,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     /**
      * Gets id for the given domain object
      *
-     * @param  object $domainObject
+     * @param object $domainObject
      *
      * @return int|string
      * @throws InvalidDomainObjectException
@@ -225,11 +225,12 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      * @param object $domainObject
      *
      * @return ObjectIdentity
+     *
      * @throws InvalidDomainObjectException
      */
     protected function fromDomainObject($domainObject)
     {
-        if (!is_object($domainObject)) {
+        if (!\is_object($domainObject)) {
             throw new InvalidDomainObjectException('$domainObject must be an object.');
         }
 

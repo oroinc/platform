@@ -39,38 +39,50 @@ abstract class MaskBuilder
      * All characters are allowed here, but only a character defined in self::OFF constant
      * is interpreted as bit placeholder.
      */
-    const PATTERN_ALL_OFF       = '................................';
-
-    /**
-     * Defines the brief form of a human-readable format of a bitmask
-     */
-    const PATTERN_ALL_OFF_BRIEF = '................................';
+    protected const PATTERN_ALL_OFF = '................................';
 
     /**
      * A symbol is used in PATTERN_ALL_* constants as a placeholder of a bit
      */
-    const OFF = '.';
+    protected const OFF = '.';
 
     /**
      * The default character is used in a human-readable format to show that a bit in the bitmask is set
      * If you want more readable character please define CODE_* constants in your mask builder class.
      */
-    const ON = '*';
+    protected const ON = '*';
 
+    /** @var int */
     protected $mask;
 
-    /**
-     * Constructor
-     */
+    /** @var MaskBuilderMap */
+    protected $map;
+
     protected function __construct()
     {
         $this->reset();
+        $this->buildMap();
+    }
+
+    private function buildMap()
+    {
+        $this->map = new MaskBuilderMap();
+        $reflection = new \ReflectionClass(static::class);
+        foreach ($reflection->getConstants() as $name => $mask) {
+            if (0 === strpos($name, 'MASK_')) {
+                $this->map->permission[substr($name, 5)] = $mask;
+                $this->map->all[$name] = $mask;
+            } elseif (0 === strpos($name, 'GROUP_')) {
+                $this->map->group[substr($name, 6)] = $mask;
+                $this->map->all[$name] = $mask;
+            }
+        }
     }
 
     /**
      * Gets the mask of this permission
      *
-     * @return integer
+     * @return int
      */
     public function get()
     {
@@ -81,22 +93,14 @@ abstract class MaskBuilder
      * Adds a mask to the permission
      *
      * @param int|string $mask
+     *
      * @return MaskBuilder
+     *
      * @throws \InvalidArgumentException
      */
     public function add($mask)
     {
-        if (is_string($mask)) {
-            $name = 'static::MASK_' . strtoupper($mask);
-            if (!defined($name)) {
-                throw new \InvalidArgumentException(sprintf('Undefined mask: %s.', $mask));
-            }
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be a string or an integer.');
-        }
-
-        $this->mask |= $mask;
+        $this->mask |= $this->parseMask($mask);
 
         return $this;
     }
@@ -105,20 +109,34 @@ abstract class MaskBuilder
      * Removes a mask from the permission
      *
      * @param int|string $mask
+     *
      * @return MaskBuilder
+     *
      * @throws \InvalidArgumentException
      */
     public function remove($mask)
     {
-        if (is_string($mask) && defined($name = 'static::MASK_' . strtoupper($mask))) {
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
+        $this->mask &= ~$this->parseMask($mask);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $mask
+     *
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseMask($mask)
+    {
+        if (\is_string($mask)) {
+            $mask = $this->getMaskForPermission(strtoupper($mask));
+        } elseif (!\is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be a string or an integer.');
         }
 
-        $this->mask &= ~$mask;
-
-        return $this;
+        return $mask;
     }
 
     /**
@@ -136,35 +154,33 @@ abstract class MaskBuilder
     /**
      * Gets a human-readable representation of this mask
      *
-     * @param bool $brief optional; defaults to false
-     *                    Determine whether the representation should be in brief of full format
      * @return string
      */
-    public function getPattern($brief = false)
+    public function getPattern()
     {
-        return static::getPatternFor($this->mask, $brief);
+        return static::getPatternFor($this->mask);
     }
 
     /**
      * Gets a human-readable representation of the given mask
      *
      * @param int $mask
-     * @param bool $brief optional; defaults to false
-     *                    Determine whether the representation should be in brief of full format
+     *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
-    public static function getPatternFor($mask, $brief = false)
+    public static function getPatternFor($mask)
     {
-        if (!is_int($mask)) {
+        if (!\is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 
-        $pattern = $brief ? static::PATTERN_ALL_OFF_BRIEF : static::PATTERN_ALL_OFF;
-        $length = strlen(static::PATTERN_ALL_OFF_BRIEF);
+        $pattern = static::PATTERN_ALL_OFF;
+        $length = \strlen(static::PATTERN_ALL_OFF);
         $bitmask = str_pad(decbin($mask), $length, '0', STR_PAD_LEFT);
 
-        for ($i = $length - 1, $p = strlen($pattern) - 1; $i >= 0; $i--, $p--) {
+        for ($i = $length - 1, $p = \strlen($pattern) - 1; $i >= 0; $i--, $p--) {
             // skip non mask chars if any
             while ($p >= 0 && static::OFF !== $pattern[$p]) {
                 $p--;
@@ -180,12 +196,13 @@ abstract class MaskBuilder
     /**
      * Gets the code for the passed mask
      *
-     * @param integer $mask
+     * @param int $mask
+     *
      * @return string
      */
     protected static function getCode($mask)
     {
-        $reflection = new \ReflectionClass(get_called_class());
+        $reflection = new \ReflectionClass(static::class);
         foreach ($reflection->getConstants() as $name => $cMask) {
             if (0 !== strpos($name, 'MASK_')) {
                 continue;
@@ -193,14 +210,14 @@ abstract class MaskBuilder
 
             if ($mask === $cMask) {
                 $cName = 'static::CODE_' . substr($name, 5);
-                if (defined($cName)) {
-                    return constant($cName);
+                if (\defined($cName)) {
+                    return \constant($cName);
                 }
                 $lastDelim = strrpos($name, '_');
                 if ($lastDelim > 5) {
                     $cName = 'static::CODE_' . substr($name, 5, $lastDelim - 5);
-                    if (defined($cName)) {
-                        return constant($cName);
+                    if (\defined($cName)) {
+                        return \constant($cName);
                     }
                 }
             }
@@ -210,42 +227,78 @@ abstract class MaskBuilder
     }
 
     /**
-     * Checks whether a constant with the given name is defined in this mask builder
+     * Checks whether a permission or a group is defined in this mask builder.
+     * A permission name should be started with MASK_ prefix.
+     * A group name should be started with GROUP_ prefix.
      *
      * @param string $name
-     * @return mixed
-     */
-    public static function hasConst($name)
-    {
-        return defined('static::' . $name);
-    }
-
-    /**
-     * Gets constant value by its name
      *
-     * @param string $name
-     * @return mixed
-     */
-    public static function getConst($name)
-    {
-        return constant('static::' . $name);
-    }
-
-    /**
-     * @param string $name
-     * @return mixed
+     * @return bool
      */
     public function hasMask($name)
     {
-        return self::hasConst($name);
+        return \array_key_exists($name, $this->map->all);
     }
 
     /**
+     * Gets a mask for a permission or a group.
+     * A permission name should be started with MASK_ prefix.
+     * A group name should be started with GROUP_ prefix.
+     *
      * @param string $name
-     * @return mixed
+     *
+     * @return int
      */
     public function getMask($name)
     {
-        return self::getConst($name);
+        return $this->map->all[$name];
+    }
+
+    /**
+     * Checks whether a permission for the given group is defined in this mask builder.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasMaskForGroup($name)
+    {
+        return \array_key_exists($name, $this->map->group);
+    }
+
+    /**
+     * Gets permission value for the given group.
+     *
+     * @param string $name
+     *
+     * @return int
+     */
+    public function getMaskForGroup($name)
+    {
+        return $this->map->group[$name];
+    }
+
+    /**
+     * Checks whether a permission with the given name is defined in this mask builder.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasMaskForPermission($name)
+    {
+        return \array_key_exists($name, $this->map->permission);
+    }
+
+    /**
+     * Gets permission value by its name.
+     *
+     * @param string $name
+     *
+     * @return int
+     */
+    public function getMaskForPermission($name)
+    {
+        return $this->map->permission[$name];
     }
 }

@@ -11,7 +11,7 @@ navigation:
         tree:
             application_menu:
                 children:
-                    marketing_tab:
+                    system_tab:
                         children:
                             digital_asset_list: ~
 
