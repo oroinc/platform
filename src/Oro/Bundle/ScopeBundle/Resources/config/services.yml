@@ -1,6 +1,3 @@
-parameters:
-    oro_scope.entity.scope.class: Oro\Bundle\ScopeBundle\Entity\Scope
-
 services:
     oro_scope.new_scope_collection:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeCollection

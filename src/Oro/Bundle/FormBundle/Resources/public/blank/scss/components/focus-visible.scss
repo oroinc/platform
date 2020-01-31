@@ -1,0 +1,12 @@
+/* @theme: blank; */
+
+@if $focus-visible-style {
+    .focus-visible {
+        box-shadow: $focus-visible-style;
+
+        &[data-skip-focus-decoration] {
+            box-shadow: none;
+        }
+    }
+}
+

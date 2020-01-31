@@ -11,3 +11,10 @@ $base-ui-element-border: $base-ui-element-border-size solid get-color('additiona
 $base-ui-element-border-radius: 2px !default;
 $base-ui-element-bg-color: get-color('additional', 'base') !default;
 $base-ui-element-color: get-color('additional', 'darker') !default;
+
+$base-ui-element-border-color-focus: transparent !default;
+$base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
+                              0 0 6px get-color('ui', 'normal') !default;
+$base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
+                          0 0 0 3px get-color('ui', 'focus'),
+                          0 0 6px get-color('ui', 'normal') !default;

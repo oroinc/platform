@@ -121,15 +121,17 @@ define(function(require) {
         _applyStateOnEl: function(isOpen) {
             this.$el.toggleClass(this.options.openClass, isOpen);
             this.$el.toggleClass(this.options.closeClass, !isOpen);
+            this.$el.attr('aria-expanded', isOpen);
         },
 
         _applyStateOnContainer: function(isOpen) {
             if (this.options.animationSpeed) {
-                if (isOpen) {
-                    this.$container.slideDown(this.options.animationSpeed);
-                } else {
-                    this.$container.slideUp(this.options.animationSpeed);
-                }
+                this.$container[isOpen ? 'slideDown' : 'slideUp'](
+                    this.options.animationSpeed,
+                    () => this.$container.attr('aria-hidden', !isOpen)
+                );
+            } else {
+                this.$container.attr('aria-hidden', !isOpen);
             }
         },
 

@@ -12,10 +12,13 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * The base class for ACL extensions that works with workflows and workflow transitions.
+ */
 abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
     /** @var WorkflowManager */
-    protected $workflowManager;
+    private $workflowManager;
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
@@ -42,7 +45,7 @@ abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAcl
     {
         if ($object instanceof ObjectIdentityInterface) {
             $workflowName = $object->getType();
-        } elseif (is_string($object)) {
+        } elseif (\is_string($object)) {
             $workflowName = $id = $group = null;
             $this->parseDescriptor($object, $workflowName, $id, $group);
         } else {

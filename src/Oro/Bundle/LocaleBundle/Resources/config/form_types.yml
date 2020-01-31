@@ -45,7 +45,7 @@ services:
         arguments:
             - '@doctrine'
         calls:
-            - [setDataClass, ['%oro_locale.entity.localization.class%']]
+            - [setDataClass, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
         tags:
             - { name: form.type, alias: oro_locale_localization_collection }
 
@@ -66,7 +66,7 @@ services:
         tags:
             - { name: form.type, alias: oro_localization }
         calls:
-            - [setDataClass, ['%oro_locale.entity.localization.class%']]
+            - [setDataClass, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
 
     oro_locale.form.type.localization_parent_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType
@@ -77,7 +77,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         class: Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler
         arguments:
-            - '%oro_locale.entity.localization.class%'
+            - 'Oro\Bundle\LocaleBundle\Entity\Localization'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_localization_parent, acl_resource: oro_locale_localization_view }
@@ -86,7 +86,7 @@ services:
         public: false
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_locale.entity.localization.class%'
+            - 'Oro\Bundle\LocaleBundle\Entity\Localization'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_localization, acl_resource: oro_locale_localization_view }

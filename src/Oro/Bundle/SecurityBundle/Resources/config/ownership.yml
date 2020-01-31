@@ -1,8 +1,8 @@
 parameters:
     oro_security.entity.owners:
-        organization: '%oro_organization.organization.entity.class%'
-        business_unit: '%oro_organization.business_unit.entity.class%'
-        user: '%oro_user.entity.class%'
+        organization: 'Oro\Bundle\OrganizationBundle\Entity\Organization'
+        business_unit: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+        user: 'Oro\Bundle\UserBundle\Entity\User'
 
 services:
     oro_security.owner.entity_owner_accessor:

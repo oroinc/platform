@@ -13,11 +13,14 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The ACL extension that works with fields of Doctrine entities.
+ */
 class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
-    const PERMISSION_VIEW   = 'VIEW';
-    const PERMISSION_CREATE = 'CREATE';
-    const PERMISSION_EDIT   = 'EDIT';
+    private const PERMISSION_VIEW   = 'VIEW';
+    private const PERMISSION_CREATE = 'CREATE';
+    private const PERMISSION_EDIT   = 'EDIT';
 
     /** @var ConfigManager */
     protected $configManager;
@@ -73,6 +76,8 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
                 FieldMaskBuilder::MASK_EDIT_SYSTEM,
             ],
         ];
+
+        $this->maskBuilder = new FieldMaskBuilder();
     }
 
     /**
@@ -88,11 +93,11 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function supports($type, $id)
     {
-        if (array_key_exists($type, $this->supportedTypes)) {
+        if (\array_key_exists($type, $this->supportedTypes)) {
             return $this->supportedTypes[$type];
         }
 
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+        if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $type) {
             $result = true;
         } else {
             $result = false;
@@ -178,22 +183,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getMaskBuilder($permission)
-    {
-        return new FieldMaskBuilder();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllMaskBuilders()
-    {
-        return [new FieldMaskBuilder()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceBits($mask)
     {
         return $mask & FieldMaskBuilder::SERVICE_BITS;
@@ -205,14 +194,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     public function removeServiceBits($mask)
     {
         return $mask & FieldMaskBuilder::REMOVE_SERVICE_BITS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMaskBuilderConst($constName)
-    {
-        return FieldMaskBuilder::getConst($constName);
     }
 
     /**

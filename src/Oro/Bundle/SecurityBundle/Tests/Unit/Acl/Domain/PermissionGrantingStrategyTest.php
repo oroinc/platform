@@ -214,14 +214,14 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($permission) {
                 $maskBuilder = $this->createMock(MaskBuilder::class);
                 $maskBuilder->expects(self::any())
-                    ->method('hasMask')
+                    ->method('hasMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return in_array($name, ['GROUP_CREATE', 'GROUP_DELETE', 'GROUP_VIEW', 'GROUP_EDIT'], true);
+                        return in_array($name, ['CREATE', 'DELETE', 'VIEW', 'EDIT'], true);
                     });
                 $maskBuilder->expects(self::any())
-                    ->method('getMask')
+                    ->method('getMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return constant(PermissionGrantingStrategyTest::class . '::' . $name);
+                        return constant(PermissionGrantingStrategyTest::class . '::GROUP_' . $name);
                     });
 
                 return $maskBuilder;

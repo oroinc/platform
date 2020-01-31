@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * CRUD for tag taxonomies.
+ */
 class TaxonomyController extends Controller
 {
     /**
@@ -30,7 +33,7 @@ class TaxonomyController extends Controller
     public function indexAction()
     {
         return array(
-            'entity_class' => $this->container->getParameter('oro_tag.taxonomy.entity.class')
+            'entity_class' => Taxonomy::class
         );
     }
 

@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * CRUD for tags.
+ */
 class TagController extends Controller
 {
     /**
@@ -31,7 +34,7 @@ class TagController extends Controller
     public function indexAction()
     {
         return array(
-            'entity_class' => $this->container->getParameter('oro_tag.tag.entity.class')
+            'entity_class' => Tag::class
         );
     }
 

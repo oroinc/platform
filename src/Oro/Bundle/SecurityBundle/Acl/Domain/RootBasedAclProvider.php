@@ -14,24 +14,16 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  */
 class RootBasedAclProvider implements AclProviderInterface
 {
-    /**
-     * @var AclProviderInterface
-     */
-    protected $baseAclProvider;
+    /** @var AclProviderInterface */
+    private $baseAclProvider;
+
+    /** @var UnderlyingAclCache */
+    private $underlyingCache;
+
+    /** @var ObjectIdentityFactory */
+    private $objectIdentityFactory;
 
     /**
-     * @var UnderlyingAclCache
-     */
-    protected $underlyingCache;
-
-    /**
-     * @var ObjectIdentityFactory
-     */
-    protected $objectIdentityFactory = null;
-
-    /**
-     * Constructor
-     *
      * @param ObjectIdentityFactory $objectIdentityFactory
      */
     public function __construct(ObjectIdentityFactory $objectIdentityFactory)
@@ -40,7 +32,7 @@ class RootBasedAclProvider implements AclProviderInterface
     }
 
     /**
-     * Sets Underlying cache
+     * Sets Underlying cache.
      *
      * @param UnderlyingAclCache $underlyingCache
      */
@@ -50,7 +42,7 @@ class RootBasedAclProvider implements AclProviderInterface
     }
 
     /**
-     * Sets the base ACL provider
+     * Sets the base ACL provider.
      *
      * @param AclProviderInterface $provider
      */
@@ -109,15 +101,15 @@ class RootBasedAclProvider implements AclProviderInterface
     }
 
     /**
-     * Get Acl based on given OID and Parent OID
+     * Get Acl based on given OID and Parent OID.
      *
      * @param ObjectIdentityInterface $oid
-     * @param array $sids
+     * @param array                   $sids
      * @param ObjectIdentityInterface $rootOid
      *
      * @return RootBasedAclWrapper|AclInterface
      */
-    protected function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
+    private function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
     {
         if ($this->underlyingCache->isUnderlying($oid)) {
             $underlyingOid = $this->objectIdentityFactory->underlying($oid);
@@ -130,9 +122,9 @@ class RootBasedAclProvider implements AclProviderInterface
             $rootAcl = $this->baseAclProvider->findAcl($rootOid, $sids);
             if ($this->baseAclProvider->isEmptyAcl($acl)) {
                 return $rootAcl;
-            } else {
-                return new RootBasedAclWrapper($acl, $rootAcl);
             }
+
+            return new RootBasedAclWrapper($acl, $rootAcl);
         } catch (AclNotFoundException $noRootAcl) {
             return $acl;
         }

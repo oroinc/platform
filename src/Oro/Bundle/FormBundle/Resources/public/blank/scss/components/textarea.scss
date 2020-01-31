@@ -1,6 +1,7 @@
 /* @theme: blank; */
 
 .textarea {
+    min-height: $textarea-min-height;
     resize: vertical;
 
     @include base-ui-element($use-base-style-for-textarea,
@@ -15,12 +16,15 @@
                             );
 
     @include element-state('hover') {
-        text-decoration: none;
-
         border-color: $textarea-border-color-hover-state;
     }
 
     @include element-state('focus') {
+        border-color: $textarea-border-color-focus-state;
+        box-shadow: $textarea-box-shadow-focus-state;
+    }
+
+    &.focus-visible {
         border-color: $textarea-border-color-focus-state;
     }
 
@@ -30,12 +34,11 @@
 
     @include element-state('disabled') {
         background: get-color('additional', 'base');
-        
+
         @include base-disabled-style();
-        
+
         @include element-state('hover') {
             border-color: get-color('additional', 'light');
-            box-shadow: none;
         }
     }
 }

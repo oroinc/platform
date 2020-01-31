@@ -18,7 +18,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_report.report.entity.class%'
+            - 'Oro\Bundle\ReportBundle\Entity\Report'
             - '@doctrine.orm.entity_manager'
 
     oro_report.form.type.entity_choice:

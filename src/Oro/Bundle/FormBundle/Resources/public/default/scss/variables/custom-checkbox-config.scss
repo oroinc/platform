@@ -22,14 +22,6 @@ $checkbox-icon-absolute-offset: $checkbox-icon-size + 8px;
 
 // Checked
 $checkbox-icon-bg-color-focus-state: get-color('ui', 'normal');
-$checkbox-icon-border-focus-state: 1px solid get-color('ui', 'normal');
-
-// Hover
-$checkbox-icon-border-hover-state: 1px solid get-color('ui', 'normal');
-$checkbox-icon-box-shadow-hover-state: 0 0 8px transparentize(get-color('ui', 'focus'), .6) !default;
-
-// Checked & Focus
-$checkbox-icon-box-shadow-focus-state: $checkbox-icon-box-shadow-hover-state !default;
 
 // Disabled
 $checkbox-icon-bg-color-disabled-state: get-color('additional', 'base');

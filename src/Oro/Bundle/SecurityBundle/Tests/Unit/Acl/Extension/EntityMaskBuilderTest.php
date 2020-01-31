@@ -7,6 +7,11 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 
 class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    private const PATTERN_ALL_OFF = '................................';
+
+    private const OFF = '.';
+    private const ON  = '*';
+
     /** @var int */
     protected $identity;
 
@@ -60,29 +65,14 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     public function testGetPattern()
     {
         $builder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
-        $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF, $builder->getPattern());
-        $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF, $builder->getPattern(true));
+        $this->assertEquals(self::PATTERN_ALL_OFF, $builder->getPattern());
 
         $builder->add('view_basic');
-        $expected =
-            substr(
-                EntityMaskBuilder::PATTERN_ALL_OFF,
-                0,
-                strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
-            )
-            . EntityMaskBuilder::ON;
+        $expected = substr(self::PATTERN_ALL_OFF, 0, -1) . self::ON;
         $this->assertEquals($expected, $builder->getPattern());
-        $expectedBrief =
-            substr(
-                EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF,
-                0,
-                strlen(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF) - 1
-            )
-            . EntityMaskBuilder::ON;
-        $this->assertEquals($expectedBrief, $builder->getPattern(true));
 
-        $offOn = EntityMaskBuilder::OFF . EntityMaskBuilder::ON;
-        $onOn = EntityMaskBuilder::ON . EntityMaskBuilder::ON;
+        $offOn = self::OFF . self::ON;
+        $onOn = self::ON . self::ON;
 
         $builder->add('view_local');
         $expected = str_replace($offOn, $onOn, $expected);
@@ -103,13 +93,9 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPatternWithUndefinedMask()
     {
-        $expected = EntityMaskBuilder::ON . substr(
-            EntityMaskBuilder::PATTERN_ALL_OFF,
-            1,
-            strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
-        );
+        $expected = self::ON . substr(self::PATTERN_ALL_OFF, 1);
 
-        $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((integer) 2147483648));
+        $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((int)2147483648));
     }
 
     public function testReset()

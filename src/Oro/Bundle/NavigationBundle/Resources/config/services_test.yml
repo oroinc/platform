@@ -1,0 +1,4 @@
+services:
+    oro_navigation.tests.navigation_history_logger:
+        alias: oro_navigation.navigation_history_logger
+        public: true
