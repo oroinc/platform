@@ -8,10 +8,13 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Reader for export filtered entities.
@@ -29,6 +32,9 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
     /** @var EntityReader */
     private $entityReader;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
      * @param Manager $datagridManager
      * @param AclHelper $aclHelper
@@ -39,6 +45,14 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
         $this->datagridManager = $datagridManager;
         $this->aclHelper = $aclHelper;
         $this->entityReader = $entityReader;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -67,6 +81,9 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
         }
 
         $qb = $this->getQueryBuilder($options['filteredResultsGrid'], $options['filteredResultsGridParams']);
+
+        $event = new ExportPreGetIds($qb, $options);
+        $this->eventDispatcher->dispatch(Events::BEFORE_EXPORT_GET_IDS, $event);
 
         $identifier = $qb->getEntityManager()
             ->getClassMetadata($entityName)

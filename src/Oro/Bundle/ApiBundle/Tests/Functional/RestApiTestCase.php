@@ -711,7 +711,7 @@ abstract class RestApiTestCase extends ApiTestCase
         if ($assertValid) {
             self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
             self::assertSame('', $response->getContent());
-            self::assertSame(0, $response->headers->get('Content-Length'));
+            self::assertSame('0', $response->headers->get('Content-Length'));
             $this->assertOptionsResponseCacheHeader($response);
         }
 

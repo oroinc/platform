@@ -71,7 +71,7 @@ class ValueNormalizer
         }
 
         $cacheKey = (string)$value . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
-        if (array_key_exists($cacheKey, $this->cachedData[$dataType])) {
+        if (\array_key_exists($cacheKey, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$cacheKey];
         }
 
@@ -99,13 +99,24 @@ class ValueNormalizer
         $isRangeAllowed = false
     ) {
         $requirementKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
-        if (!array_key_exists($requirementKey, $this->requirements)) {
+        if (!\array_key_exists($requirementKey, $this->requirements)) {
             $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed, $isRangeAllowed);
 
             $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
 
         return $this->requirements[$requirementKey];
+    }
+
+    /**
+     * Resets an object to its initial state.
+     */
+    public function reset()
+    {
+        $this->requirements = [];
+        foreach (array_keys($this->cachedData) as $dataType) {
+            $this->cachedData[$dataType] = [];
+        }
     }
 
     /**

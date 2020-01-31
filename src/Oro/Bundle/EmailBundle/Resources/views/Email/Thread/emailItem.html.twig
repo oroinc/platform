@@ -124,9 +124,9 @@
                         {% set emailBodyViewOptions = {
                             name: 'email-body',
                             view: 'oroemail/js/app/views/email-body-view',
-                            bodyContent: email.emailBody.bodyContent|oro_html_sanitize,
+                            bodyContent: email.emailBody.bodyContent|oro_html_sanitize_wysiwyg,
                             styles: [
-                                asset('bundles/oroform/css/wysiwyg-editor.css'),
+                                asset('css/tinymce/wysiwyg-editor.css'),
                                 asset('bundles/oroemail/css/email-body.css')
                             ]
                         } %}

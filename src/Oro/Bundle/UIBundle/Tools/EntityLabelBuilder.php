@@ -4,10 +4,13 @@ namespace Oro\Bundle\UIBundle\Tools;
 
 use Doctrine\Common\Util\Inflector;
 
+/**
+ * Provides a set of static methods to build entity related translation keys.
+ */
 class EntityLabelBuilder
 {
     /**
-     * Returns the translation key for entity label
+     * Returns the translation key for entity label.
      *
      * @param string $className
      *
@@ -19,7 +22,7 @@ class EntityLabelBuilder
     }
 
     /**
-     * Returns the translation key for entity plural label
+     * Returns the translation key for entity plural label.
      *
      * @param string $className
      *
@@ -31,7 +34,19 @@ class EntityLabelBuilder
     }
 
     /**
-     * Returns the translation key for field label
+     * Returns the translation key for entity description.
+     *
+     * @param string $className
+     *
+     * @return string
+     */
+    public static function getEntityDescriptionTranslationKey($className)
+    {
+        return self::getTranslationKey('description', $className);
+    }
+
+    /**
+     * Returns the translation key for field label.
      *
      * @param string $className
      * @param string $fieldName
@@ -43,9 +58,21 @@ class EntityLabelBuilder
         return self::getTranslationKey('label', $className, $fieldName);
     }
 
+    /**
+     * Returns the translation key for field description.
+     *
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    public static function getFieldDescriptionTranslationKey($className, $fieldName)
+    {
+        return self::getTranslationKey('description', $className, $fieldName);
+    }
 
     /**
-     * Returns the translation key for the given entity property
+     * Returns the translation key for the given entity property.
      *
      * The result format for entity: [vendor].[bundle].[entity].entity_[property]
      * Examples:
@@ -78,7 +105,7 @@ class EntityLabelBuilder
     }
 
     /**
-     * Returns significant for building the translation key parts of the class name
+     * Returns significant for building the translation key parts of the class name.
      *
      * @param $className
      *
@@ -99,12 +126,12 @@ class EntityLabelBuilder
         );
 
         // split the class name to parts
-        $items = array_filter(explode('\\', str_replace("_", "", $className)));
+        $items = array_filter(explode('\\', str_replace('_', '', $className)));
 
         // remove duplicates
         $result = [];
         foreach ($items as $item) {
-            if (!in_array($item, $result)) {
+            if (!\in_array($item, $result, true)) {
                 $result[] = $item;
             }
         }

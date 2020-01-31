@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -18,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * The api controller for the email related functionality.
+ *
  * @RouteResource("email")
  * @NamePrefix("oro_api_")
  */
@@ -73,7 +74,7 @@ class EmailController extends RestController
      *
      * @param string $id
      *
-     * @Get("/emails/{id}", requirements={"id"="\d+"})
+     * @Rest\Get("/emails/{id}", requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get email",
@@ -92,9 +93,11 @@ class EmailController extends RestController
      *
      * @param int $id The id of the email
      *
+     * @Rest\Put(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Update email",
-     *      resource=true
+     *      resintource=true
      * )
      * @AclAncestor("oro_email_email_user_edit")
      * @return Response

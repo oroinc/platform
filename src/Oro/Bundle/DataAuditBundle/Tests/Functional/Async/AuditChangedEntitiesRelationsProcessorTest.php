@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -60,7 +61,11 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
             'entities_updated' => [],
             'entities_deleted' => [],
             'collections_updated' => [
-                ['entity_class' => Organization::class, 'entity_id' => 1]
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_class' => Organization::class,
+                    'entity_id' => 1,
+                    'change_set' => [],
+                ],
             ],
         ]);
 

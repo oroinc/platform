@@ -169,7 +169,7 @@ JS;
                 return false;
             }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
@@ -180,8 +180,10 @@ JS;
                 return true;
             }
 
-            if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                && typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active) {
+            if ((document.querySelector('script[src*="js/oro.min.js"]') !== null
+                && (typeof(jQuery) === 'undefined' || jQuery == null))
+                || (typeof(jQuery) !== 'undefined' && jQuery.active)
+            ) {
                 return false;
             }
             
@@ -218,8 +220,12 @@ JS;
             if (document.body.classList.contains('loading')) {
                 return false;
             }
+            
+            if (document.body.classList.contains('img-loading')) {
+                return false;
+            }
 
-            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
@@ -231,8 +237,9 @@ JS;
             }
             
             try {
-                if (document.querySelector('script[src*="js/oro.min.js"]') !== null
-                    && (typeof(jQuery) === 'undefined' || jQuery == null || jQuery.active)
+                if ((document.querySelector('script[src*="js/oro.min.js"]') !== null
+                    && (typeof(jQuery) === 'undefined' || jQuery == null))
+                    || (typeof(jQuery) !== 'undefined' && jQuery.active)
                 ) {
                     return false;
                 }
@@ -243,7 +250,7 @@ JS;
                 
                 var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
                 
-                if (isInAction !== false || jQuery.active) {
+                if (isInAction !== false) {
                     return false;
                 }
             } catch (e) {

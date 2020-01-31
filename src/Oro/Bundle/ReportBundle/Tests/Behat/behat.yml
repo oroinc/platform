@@ -40,5 +40,6 @@ oro_behat_extension:
         - OroFilterBundle::FilterContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
+        - OroLocaleBundle::LocalizationContext
       paths:
         - '@OroReportBundle/Tests/Behat/Features'

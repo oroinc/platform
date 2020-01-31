@@ -15,7 +15,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
      */
     private $searchHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], static::generateBasicAuthHeader());
         $this->loadFixtures([LoadLocalizationData::class]);
@@ -24,7 +24,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
         self::getContainer()->get('oro_search.search.engine.indexer')->reindex(Localization::class);
     }
 
-    public function testSearch()
+    public function testSearch(): void
     {
         $result = $this->searchHandler->search('', 1, 10, false);
         $this->assertSearchResult($result, []);
@@ -33,11 +33,6 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
         $this->assertSearchResult(
             $result,
             [
-                self::getContainer()
-                    ->get('doctrine')
-                    ->getManagerForClass(Localization::class)
-                    ->getRepository(Localization::class)
-                    ->findOneBy([], ['id' => 'ASC'])->getId(),
                 $this->getReference('en_US')->getId(),
                 $this->getReference('en_CA')->getId(),
                 $this->getReference('es')->getId(),
@@ -65,11 +60,32 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
         );
     }
 
+    public function testSearchById(): void
+    {
+        self::getContainer()->get('oro_config.manager')->flush(2);
+
+        $idForSearch = $this->getReference('en_CA')->getId();
+
+        $this->assertSearchResult($this->searchHandler->search("$idForSearch;2", 1, 10, true), [$idForSearch]);
+    }
+
+    public function testSearchByIdNotExistingId(): void
+    {
+        self::getContainer()->get('oro_config.manager')->flush(2);
+
+        $this->assertSearchResult($this->searchHandler->search('77777;2', 1, 10, true), []);
+    }
+
+    public function testSearchByIdWrongScope(): void
+    {
+        $this->assertSearchResult($this->searchHandler->search('1;777', 1, 10, true), []);
+    }
+
     /**
      * @param Localization[] $result
      * @param array $expected
      */
-    private function assertSearchResult(array $result, array $expected)
+    private function assertSearchResult(array $result, array $expected): void
     {
         $searchItems = $result['results'];
         $this->assertCount(count($expected), $searchItems);

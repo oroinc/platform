@@ -20,6 +20,9 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Collect email address from entities
+ */
 class EntityListener implements OptionalListenerInterface
 {
     /** @var EmailOwnerManager */
@@ -106,7 +109,7 @@ class EntityListener implements OptionalListenerInterface
         $uow = $em->getUnitOfWork();
 
         $emailAddressData = $this->emailOwnerManager->createEmailAddressData($uow);
-        list($updatedEmailAddresses, $created) = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
+        [$updatedEmailAddresses, $created] = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
         foreach ($updatedEmailAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
@@ -263,10 +266,16 @@ class EntityListener implements OptionalListenerInterface
     {
         $flush = false;
 
+        $newEmails = [];
         foreach ($this->newEmailAddresses as $newEmailAddress) {
+            $newEmails[$newEmailAddress->getEmail()] = $newEmailAddress;
+        }
+
+        foreach ($newEmails as $email => $newEmailAddress) {
             $emailAddress = $this->emailAddressManager
                 ->getEmailAddressRepository()
-                ->findOneBy(['email' => $newEmailAddress->getEmail()]);
+                ->findOneBy(['email' => $email]);
+
             if ($emailAddress === null) {
                 $em->persist($newEmailAddress);
                 $flush = true;

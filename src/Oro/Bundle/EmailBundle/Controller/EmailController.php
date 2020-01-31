@@ -63,6 +63,26 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/check-saved-smtp-connection", name="oro_email_check_saved_smtp_connection")
+     * @Method("GET")
+     * @CsrfProtection()
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function checkSavedSmtpConnectionAction(Request $request)
+    {
+        $scopeIdentifier = $this->getScopeIdentifier($request);
+        $settingsProvider = $this->get('oro_email.provider.smtp_settings');
+        $smtpSettings = $settingsProvider->getSmtpSettings($scopeIdentifier);
+        $smtpSettingsChecker = $this->get('oro_email.mailer.checker.smtp_settings');
+
+        return new JsonResponse(
+            $smtpSettingsChecker->checkConnection($smtpSettings)
+        );
+    }
+
+    /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
      * @Method("POST")
      * @CsrfProtection()
@@ -1000,5 +1020,21 @@ class EmailController extends Controller
     private function getMessageProducer()
     {
         return $this->get('oro_message_queue.message_producer');
+    }
+
+    /**
+     * @param Request $request
+     * @return object|null
+     */
+    private function getScopeIdentifier(Request $request)
+    {
+        $scopeClass = $request->get('scopeClass');
+        $scopeId = $request->get('scopeId');
+        $scopeIdentifier = null;
+        if ($scopeClass && $scopeId) {
+            $scopeIdentifier = $this->get('oro_entity.doctrine_helper')->getEntity($scopeClass, $scopeId);
+        }
+
+        return $scopeIdentifier;
     }
 }

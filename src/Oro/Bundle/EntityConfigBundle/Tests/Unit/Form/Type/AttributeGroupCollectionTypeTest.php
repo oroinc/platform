@@ -26,13 +26,15 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeMultiSelectType = new AttributeMultiSelectType($attributeManagerMock);
+        $attributeMultiSelectType->setTranslator($this->getTranslator());
 
         return [
             new PreloadedExtension([
                 CollectionType::class => new CollectionType(),
                 AttributeGroupType::class => new AttributeGroupType(),
                 LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
-                AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock)
+                AttributeMultiSelectType::class => $attributeMultiSelectType
             ], []),
 
         ];

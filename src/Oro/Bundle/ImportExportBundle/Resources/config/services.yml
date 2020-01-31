@@ -125,3 +125,75 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+
+    oro_importexport.validator.identity_validation_loader:
+        class: Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader
+        public: false
+        arguments:
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity_config.provider.importexport'
+            - '@oro_entity.doctrine_helper'
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?\d+$/'
+                              message: "This value should contain only valid integer."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - smallint
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?\d+$/'
+                              message: "This value should contain only valid integer."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - bigint
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?\d+$/'
+                              message: "This value should contain only valid integer."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - float
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
+                              message: "This value should contain only valid float."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - decimal
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
+                              message: "This value should contain only valid decimal."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - money
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
+                              message: "This value should contain only valid decimal."
+                              groups: ['import_identity']
+            -
+                - addConstraints
+                -
+                    - percent
+                    -
+                        - Regex:
+                              pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
+                              message: "This value should contain only valid float."
+                              groups: ['import_identity']

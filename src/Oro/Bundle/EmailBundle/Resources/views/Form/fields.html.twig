@@ -22,8 +22,15 @@
                     <button class="btn btn-primary check-connection-messages"
                             data-role="check-smtp-connection"
                             data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
-                            data-page-component-options="{{ options|json_encode }}"
+                            data-page-component-options="{{ options|merge({view: 'new'})|json_encode }}"
                     >{{ 'oro.email.system_configuration.smtp_settings.check_connection.label'|trans }}</button>
+                </span>
+                <span class="form-text">
+                    <button class="btn btn-primary check-connection-messages"
+                            data-role="check-saved-smtp-connection"
+                            data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
+                            data-page-component-options="{{ options|merge({view: 'saved'})|json_encode }}"
+                    >{{ 'oro.email.system_configuration.smtp_settings.check_saved_connection.label'|trans }}</button>
                 </span>
                 <div class="check-connection-messages check-smtp-connection-messages"></div>
             </div>

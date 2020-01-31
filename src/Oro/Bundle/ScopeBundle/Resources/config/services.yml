@@ -16,10 +16,16 @@ services:
             - '@oro_scope.entity_storage'
             - '@oro_entity.entity_field_provider.link'
 
+    Oro\Bundle\ScopeBundle\Manager\ScopeManager:
+        alias: oro_scope.scope_manager
+
     oro_scope.scope_repository.cache:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_scope_repository' ] ]
+
+    oro_scope.scope_cache_key_builder:
+        class: Oro\Bundle\ScopeBundle\Manager\ScopeCacheKeyBuilder
 
     oro_scope.repository.country:
         class: Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository
@@ -28,6 +34,7 @@ services:
             - '%oro_scope.entity.scope.class%'
         calls:
             - [ setScopeRepositoryCache, [ '@oro_scope.scope_repository.cache' ] ]
+            - [ setScopeCacheKeyBuilder, [ '@oro_scope.scope_cache_key_builder' ] ]
 
     oro_scope.migration.extension.scope:
         class: 'Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtension'
@@ -41,6 +48,7 @@ services:
             - '@oro_scope.scope_repository.cache'
         tags:
             - { name: doctrine.event_listener, event: preFlush }
+            - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 

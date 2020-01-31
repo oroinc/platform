@@ -7,6 +7,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * Abstract class for context aware readers
+ */
 abstract class AbstractReader implements ReaderInterface
 {
     /**
@@ -15,7 +18,7 @@ abstract class AbstractReader implements ReaderInterface
     protected $contextRegistry;
 
     /**
-     * @var StepExecution
+     * @var StepExecution|null
      */
     protected $stepExecution;
 

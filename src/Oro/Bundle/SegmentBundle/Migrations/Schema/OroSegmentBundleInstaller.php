@@ -17,7 +17,7 @@ class OroSegmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_10';
     }
 
     /**
@@ -57,7 +57,7 @@ class OroSegmentBundleInstaller implements Installation
     protected function createOroSegmentSnapshotTable(Schema $schema)
     {
         $table = $schema->createTable('oro_segment_snapshot');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('id', 'bigint', ['autoincrement' => true]);
         $table->addColumn('segment_id', 'integer', []);
         $table->addColumn('integer_entity_id', 'integer', ['notnull' => false]);
         $table->addColumn('entity_id', 'string', ['length' => 255, 'notnull' => false]);

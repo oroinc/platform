@@ -136,8 +136,47 @@ class UserTest extends RestJsonApiTestCase
         self::assertEquals($data['data']['attributes']['lastName'], $user->getLastName());
         self::assertEquals($data['data']['attributes']['email'], $user->getEmail());
         self::assertEquals($organizationId, $user->getOrganization()->getId());
-        self::assertNull($user->getOwner());
+        self::assertEquals($this->getReference('business_unit'), $user->getOwner());
 
+        self::assertEmpty($user->getPlainPassword());
+        self::assertNotEmpty($user->getPassword());
+        self::assertNotEmpty($user->getSalt());
+    }
+
+    public function testCreateAsIncludedDataWithRequiredDataOnly()
+    {
+        $data = [
+            'data' => [
+                'type'          => 'businessunits',
+                'id'            => 'new_bu',
+                'attributes'    => [
+                    'name' => 'New Business Unit'
+                ],
+                'relationships' => [
+                    'users' => ['data' => [['type' => 'users', 'id' => 'new_user']]]
+                ]
+            ]
+        ];
+        $userData = $this->getRequestData('create_user_min.yml')['data'];
+        $userData['id'] = 'new_user';
+        $userData['relationships']['businessUnits']['data'] = [
+            ['type' => 'businessunits', 'id' => 'new_bu']
+        ];
+        $userData['relationships']['owner']['data'] = ['type' => 'businessunits', 'id' => 'new_bu'];
+        $data['included'][] = $userData;
+
+        $response = $this->post(
+            ['entity' => 'businessunits'],
+            $data
+        );
+
+        $businessUnitId = (int)$this->getResourceId($response);
+        /** @var BusinessUnit $businessUnit */
+        $businessUnit = $this->getEntityManager()
+            ->find(BusinessUnit::class, $businessUnitId);
+        /** @var User $user */
+        $user = $businessUnit->getUsers()->first();
+        self::assertInstanceOf(User::class, $user);
         self::assertEmpty($user->getPlainPassword());
         self::assertNotEmpty($user->getPassword());
         self::assertNotEmpty($user->getSalt());

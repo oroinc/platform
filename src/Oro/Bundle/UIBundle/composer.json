@@ -15,7 +15,7 @@
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
         "oro/theme-bundle": "dev-master",
-        "components/jquery": "3.1.*",
+        "components/jquery": "3.4.*",
         "bower-asset/backbone": "1.2.3",
         "bower-asset/underscore": "1.8.3",
         "vakata/jstree": "3.3.*",

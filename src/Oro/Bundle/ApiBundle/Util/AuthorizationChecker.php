@@ -2,18 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
-use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * The main authorization point of the Security component for Data API.
- * @see \Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker
+ * @deprecated this class will be removed in v4.2
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
@@ -46,30 +40,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      */
     public function isGranted($attributes, $subject = null)
     {
-        if (\is_string($subject)) {
-            if (\class_exists($subject) && $this->doctrineHelper->isManageableEntityClass($subject)) {
-                $group = $this->aclGroupProvider->getGroup();
-                $subject = new ObjectIdentity(
-                    EntityAclExtension::NAME,
-                    $group ? ObjectIdentityHelper::buildType($subject, $group) : $subject
-                );
-            }
-        } elseif (\is_object($subject) && !$subject instanceof ObjectIdentityInterface) {
-            $className = ClassUtils::getRealClass($subject);
-            if ($this->doctrineHelper->isManageableEntityClass($className)) {
-                $group = $this->aclGroupProvider->getGroup();
-                if ($group) {
-                    $subject = new DomainObjectWrapper(
-                        $subject,
-                        new ObjectIdentity(
-                            EntityAclExtension::NAME,
-                            ObjectIdentityHelper::buildType($className, $group)
-                        )
-                    );
-                }
-            }
-        }
-
         return $this->authorizationChecker->isGranted($attributes, $subject);
     }
 }

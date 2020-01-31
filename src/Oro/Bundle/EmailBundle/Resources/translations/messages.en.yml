@@ -67,8 +67,10 @@ oro:
                     label: Username
                 password:
                     label: Password
+                check_saved_connection:
+                    label: Check Connection (Saved Settings)
                 check_connection:
-                  label: Check SMTP Connection
+                    label: Check Connection (New Settings)
 
             signature_configuration:
                 label: Signature
@@ -130,6 +132,7 @@ oro:
         emailtemplate:
             entity_label:        Email Template
             entity_plural_label: Email Templates
+            entity_grid_all_view_label: All %entity_plural_label%
             edit_entity:         Edit email template "%name%"
             clone_entity:        Clone email template
             entity_description:  Represent email template
@@ -268,6 +271,7 @@ oro:
         email_body.label:         Body
         entity_label:             Email
         entity_plural_label:      Emails
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:       Email message
         id.label:                 Id
         importance.label:         Importance
@@ -332,6 +336,7 @@ oro:
         emailuser:
             entity_label:             Email-User Relation
             entity_plural_label:      Email-User Relations
+            entity_grid_all_view_label: All %entity_plural_label%
             email.label:              Email
             folder.label:             Folder
             id.label:                 Id
@@ -346,6 +351,7 @@ oro:
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label:                 Id
             label.label:              Mailbox Label
             general.label:            General
@@ -369,6 +375,7 @@ oro:
             process_settings.label: Process Settings
         autoresponserule:
             entity_plural_label: Autoresponse Rules
+            entity_grid_all_view_label: All %entity_plural_label%
             name.label:          Name
             active.label:        Active
             status.label:        Status

@@ -63,6 +63,8 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeMultiSelectType = new AttributeMultiSelectType($attributeManagerMock);
+        $attributeMultiSelectType->setTranslator($this->getTranslator());
 
         return [
             new PreloadedExtension(
@@ -70,7 +72,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
                     AttributeFamilyType::class => $this->type,
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
                     ImageType::class => new ImageTypeStub(),
-                    AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock),
+                    AttributeMultiSelectType::class => $attributeMultiSelectType,
                 ],
                 [
                     FormType::class => [

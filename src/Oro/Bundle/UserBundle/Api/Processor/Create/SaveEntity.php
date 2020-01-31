@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Api\Processor\Create;
 
-use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Saves new User entity to the database.
+ * @deprecated replaced with Oro\Bundle\UserBundle\Api\Processor\UpdateNewUser
  */
 class SaveEntity implements ProcessorInterface
 {
@@ -29,20 +28,5 @@ class SaveEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var CreateContext $context */
-
-        /** @var User $user */
-        $user = $context->getResult();
-        if (!is_object($user)) {
-            // entity does not exist
-            return;
-        }
-
-        // generate random secure password for a user
-        if (!$user->getPlainPassword()) {
-            $user->setPlainPassword($this->userManager->generatePassword());
-        }
-
-        $this->userManager->updateUser($user);
     }
 }

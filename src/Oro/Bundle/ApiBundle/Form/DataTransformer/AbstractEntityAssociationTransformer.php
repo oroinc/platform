@@ -65,9 +65,6 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
         if (empty($value['class'])) {
             throw new TransformationFailedException('Expected an array with "class" element.');
         }
-        if (empty($value['id'])) {
-            throw new TransformationFailedException('Expected an array with "id" element.');
-        }
 
         $entityClass = $value['class'];
         $acceptableClassNames = $this->metadata->getAcceptableTargetClassNames();
@@ -85,7 +82,28 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
             );
         }
 
+        if (!array_key_exists('id', $value)) {
+            throw new TransformationFailedException('Expected an array with "id" element.');
+        }
+
+        if (!$this->isEntityIdAcceptable($value['id'])) {
+            throw new TransformationFailedException(
+                '"id" element is expected to be integer, non-empty string or non-empty array.'
+            );
+        }
+
         return $this->getEntity($entityClass, $value['id']);
+    }
+
+    /**
+     * @param mixed $entityId
+     * @return bool
+     */
+    protected function isEntityIdAcceptable($entityId): bool
+    {
+        return is_int($entityId)
+            || (is_string($entityId) && '' !== trim($entityId))
+            || (is_array($entityId) && \count($entityId));
     }
 
     /**

@@ -173,7 +173,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
         $identityObject = $object;
         if ($object instanceof DomainObjectWrapper) {
-            $identityObject = $object->getDomainObject();
+            $identityObject = $object->getObjectIdentity();
         }
 
         $group = null;
@@ -203,7 +203,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected function getObjectToVote($object)
     {
         return $object instanceof FieldVote
-            ? $object
+            // create new FieldVote with DomainObject that have no information about the group in it.
+            ? new FieldVote($this->object, $object->getField())
             : $this->object;
     }
 

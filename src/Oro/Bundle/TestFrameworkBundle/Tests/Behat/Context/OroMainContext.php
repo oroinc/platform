@@ -611,7 +611,18 @@ class OroMainContext extends MinkContext implements
      */
     public function closeUiDialog()
     {
-        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+        $buttons = $this->getSession()->getPage()->findAll('css', 'button.ui-dialog-titlebar-close');
+        /**
+         * The last dialog window in most cases will be visible,
+         * because dialog adds one after another to HTML tree
+         */
+        rsort($buttons);
+        foreach ($buttons as $button) {
+            if ($button->isVisible()) {
+                $button->press();
+                break;
+            }
+        }
     }
 
     /**
@@ -2096,6 +2107,38 @@ JS;
     }
 
     /**
+     * Example: Then I should see "sample text" inside "Default Addresses" iframe
+     *
+     * @Then /^(?:|I )should see "(?P<text>[^\"]+)" inside "(?P<iframeName>(?:[^"]|\\")*)" iframe$/
+     *
+     * @param string $text
+     * @param string $iframeName
+     */
+    public function iShouldSeeTextInsideIframe(string $text, string $iframeName)
+    {
+        $iframeElement = $this->createElement($iframeName);
+        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
+            'Iframe element "%s" not found on page',
+            $iframeName
+        ));
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $driver->switchToIFrameByElement($iframeElement);
+
+        $iframeBody = $this->getSession()->getPage()->find('css', 'body');
+        $element = $iframeBody->find('named', ['content', $text]);
+        self::assertNotNull($element, sprintf('Text "%s" not found inside iframe "%s"', $text, $iframeName));
+        self::assertTrue($element->isVisible(), sprintf(
+            'Text "%s" found inside iframe "%s", but it\'s not visible',
+            $text,
+            $iframeName
+        ));
+
+        $driver->switchToWindow();
+    }
+
+    /**
      * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
      *
      * @Then I should see :childElementName element with text :text inside :parentElementName element
@@ -2348,5 +2391,35 @@ JS;
     protected function fixStepArgument($argument)
     {
         return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
+    }
+
+    /**
+     * @Then /^"(?P<element>[^"]*)" element "(?P<attribute>[^"]*)" attribute should contain "(?P<value>[^"]*)"$/
+     *
+     * @param string $element
+     * @param string $attribute
+     * @param string $value
+     */
+    public function elementAttributeContains($element, $attribute, $value)
+    {
+        $element = $this->createElement($element);
+        $this->assertNotNull($element);
+        $this->assertTrue($element->isValid());
+        $this->assertContains($value, $element->getAttribute($attribute));
+    }
+
+    /**
+     * @Then /^"(?P<element>[^"]*)" element "(?P<attribute>[^"]*)" attribute should not contain "(?P<value>[^"]*)"$/
+     *
+     * @param string $element
+     * @param string $attribute
+     * @param string $value
+     */
+    public function elementAttributeNotContains($element, $attribute, $value)
+    {
+        $element = $this->createElement($element);
+        $this->assertNotNull($element);
+        $this->assertTrue($element->isValid());
+        $this->assertNotContains($value, $element->getAttribute($attribute));
     }
 }

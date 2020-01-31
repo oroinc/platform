@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Liuggio\ExcelBundle\Factory as ExcelFactory;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Corresponds for reading xlsx file line by line using context passed
+ */
 class XlsxFileReader extends AbstractFileReader
 {
     /**
@@ -70,15 +72,9 @@ class XlsxFileReader extends AbstractFileReader
                 }
             }
 
-            if ($data && count($this->header) !== count($data)) {
-                throw new InvalidItemException(
-                    sprintf(
-                        'Expecting to get %d columns, actually got %d',
-                        count($this->header),
-                        count($data)
-                    ),
-                    $data
-                );
+            if ($data) {
+                $this->validateHeader();
+                $this->validateColumnCount($data);
             }
         }
 

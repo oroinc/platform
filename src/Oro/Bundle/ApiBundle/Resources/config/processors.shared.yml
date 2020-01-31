@@ -494,6 +494,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - VIEW
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
@@ -503,6 +506,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - DELETE
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
@@ -518,6 +524,9 @@ services:
             - '@oro_api.security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
@@ -531,6 +540,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - VIEW
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
@@ -540,6 +552,9 @@ services:
         arguments:
             - '@oro_api.security.authorization_checker'
             - EDIT
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: add_subresource, group: security_check, priority: 10 }
@@ -555,6 +570,9 @@ services:
             - '@oro_api.security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setDoctrineHelper, ['@oro_api.doctrine_helper']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: add_subresource, group: security_check, priority: 5 }
@@ -876,6 +894,30 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -50 }
 
+    oro_api.pre_validate_included_forms:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PreValidateIncludedForms
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -58 }
+
+    oro_api.pre_validate_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PreValidateForm
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -60 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -60 }
+
     oro_api.validate_included_forms:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateIncludedForms
         arguments:
@@ -899,6 +941,30 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -90 }
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -90 }
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -90 }
+
+    oro_api.post_validate_included_forms:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PostValidateIncludedForms
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -96 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -96 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -96 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -96 }
+
+    oro_api.post_validate_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PostValidateForm
+        arguments:
+            - '@oro_api.form_validation_handler'
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: -97 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -97 }
 
     oro_api.json_api.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors

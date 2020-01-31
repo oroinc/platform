@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Oro\Bundle\ImportExportBundle\Event\BeforeImportChunksEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
@@ -16,6 +18,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A base class for pre import message processors.
@@ -66,6 +69,11 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
      * @var integer
      */
     protected $batchSize;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param JobRunner $jobRunner
@@ -120,6 +128,14 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
      * @param string $error
      */
     abstract protected function sendErrorNotification(array $body, $error);
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     /**
      * @param array $body
@@ -187,5 +203,18 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
         $result = $this->processJob($parentMessageId, $body, $files);
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    /**
+     * @param array $body
+     */
+    protected function dispatchBeforeChunksEvent(array $body)
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
+                new BeforeImportChunksEvent($body)
+            );
+        }
     }
 }

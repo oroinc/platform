@@ -307,12 +307,10 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('isHiddenModel')
             ->with($entityClass)
@@ -338,20 +336,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -378,20 +372,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -423,20 +413,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -492,29 +478,67 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.product.updated_at.label';
         $expectedValue = 'updated at';
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::never())
             ->method('getFieldConfig');
 
-        $this->translator->expects(self::never())
-            ->method('trans');
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($fieldLabel);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDescriptionForHiddenConfigurableFieldWhenTranslationExists()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.product.updated_at.label';
+        $expectedValue = 'translated updated at';
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, true]
+            ]);
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($expectedValue);
 
         self::assertSame(
             $expectedValue,
@@ -535,24 +559,18 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldLabel = 'label trans key';
         $expectedValue = 'label';
 
-        $this->configManager->expects(self::exactly(3))
+        $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [Entity\Category::class, null, true],
-                    [Entity\Category::class, 'name', true]
-                ]
-            );
-        $this->configManager->expects(self::exactly(3))
+            ->willReturnMap([
+                [Entity\Category::class, null, true],
+                [Entity\Category::class, 'name', true]
+            ]);
+        $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [Entity\Category::class, null, false],
-                    [Entity\Category::class, 'name', false]
-                ]
-            );
+            ->willReturnMap([
+                [Entity\Category::class, null, false],
+                [Entity\Category::class, 'name', false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', Entity\Category::class, 'name')
@@ -579,23 +597,51 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.label';
         $expectedValue = null;
 
-        $this->configManager->expects(self::exactly(2))
-            ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [Entity\Category::class, null, false]
-                ]
-            );
         $this->configManager->expects(self::once())
-            ->method('isHiddenModel')
-            ->with($entityClass)
+            ->method('hasConfig')
+            ->with(Entity\Category::class, null)
             ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('isHiddenModel');
 
-        $this->translator->expects(self::never())
-            ->method('trans');
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($fieldLabel);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath)
+        );
+    }
+
+    public function testGetFieldDescriptionForRelatedNotConfigurableEntityWhenTranslationExists()
+    {
+        $entityClass = Entity\Product::class;
+        $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.label';
+        $expectedValue = 'translated name';
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(Entity\Category::class, null)
+            ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('isHiddenModel');
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($expectedValue);
 
         self::assertSame(
             $expectedValue,
@@ -655,12 +701,10 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('isHiddenModel')
             ->with($entityClass)
@@ -686,20 +730,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -726,20 +766,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -771,20 +807,16 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, false]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', $entityClass, $fieldName)
@@ -840,29 +872,67 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.product.updated_at.description';
         $expectedValue = null;
 
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [$entityClass, $fieldName, true]
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, true]
+            ]);
         $this->configManager->expects(self::never())
             ->method('getFieldConfig');
 
-        $this->translator->expects(self::never())
-            ->method('trans');
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($fieldLabel);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDocumentationForHiddenConfigurableFieldWhenTranslationExists()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.product.updated_at.description';
+        $expectedValue = 'translated updated at';
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [$entityClass, $fieldName, true]
+            ]);
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap([
+                [$entityClass, null, false],
+                [$entityClass, $fieldName, true]
+            ]);
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($expectedValue);
 
         self::assertSame(
             $expectedValue,
@@ -883,24 +953,18 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldDescription = 'description trans key';
         $expectedValue = 'description';
 
-        $this->configManager->expects(self::exactly(3))
+        $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [Entity\Category::class, null, true],
-                    [Entity\Category::class, 'name', true]
-                ]
-            );
-        $this->configManager->expects(self::exactly(3))
+            ->willReturnMap([
+                [Entity\Category::class, null, true],
+                [Entity\Category::class, 'name', true]
+            ]);
+        $this->configManager->expects(self::exactly(2))
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [Entity\Category::class, null, false],
-                    [Entity\Category::class, 'name', false]
-                ]
-            );
+            ->willReturnMap([
+                [Entity\Category::class, null, false],
+                [Entity\Category::class, 'name', false]
+            ]);
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('entity', Entity\Category::class, 'name')
@@ -927,23 +991,51 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.description';
         $expectedValue = null;
 
-        $this->configManager->expects(self::exactly(2))
-            ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [Entity\Category::class, null, false]
-                ]
-            );
         $this->configManager->expects(self::once())
-            ->method('isHiddenModel')
-            ->with($entityClass)
+            ->method('hasConfig')
+            ->with(Entity\Category::class, null)
             ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('isHiddenModel');
 
-        $this->translator->expects(self::never())
-            ->method('trans');
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($fieldLabel);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+    }
+
+    public function testGetFieldDocumentationForRelatedNotConfigurableEntityWhenTranslationExists()
+    {
+        $entityClass = Entity\Product::class;
+        $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.description';
+        $expectedValue = 'translated name';
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(Entity\Category::class, null)
+            ->willReturn(false);
+        $this->configManager->expects(self::never())
+            ->method('isHiddenModel');
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($expectedValue);
 
         self::assertSame(
             $expectedValue,
@@ -961,27 +1053,55 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.description';
         $expectedValue = null;
 
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [Entity\Category::class, null, true]
-                ]
-            );
-        $this->configManager->expects(self::exactly(2))
+            ->with(Entity\Category::class, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
             ->method('isHiddenModel')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, false],
-                    [Entity\Category::class, null, true]
-                ]
-            );
+            ->with(Entity\Category::class, null)
+            ->willReturn(true);
 
-        $this->translator->expects(self::never())
-            ->method('trans');
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($fieldLabel);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+    }
+
+    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntityWhenTranslationExists()
+    {
+        $entityClass = Entity\Product::class;
+        $propertyPath = 'category.name';
+        $fieldLabel = 'oro.api.tests.unit.fixtures.entity.category.name.description';
+        $expectedValue = 'translated name';
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(Entity\Category::class, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with(Entity\Category::class, null)
+            ->willReturn(true);
+
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with($fieldLabel)
+            ->willReturn($expectedValue);
 
         self::assertSame(
             $expectedValue,

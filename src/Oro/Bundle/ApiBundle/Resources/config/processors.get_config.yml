@@ -166,7 +166,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&definition', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions&definition', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
     oro_api.get_config.complete_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
@@ -238,14 +238,14 @@ services:
             - '@oro_api.data_transformer_registry'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&data_transformers&definition', priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions&data_transformers&definition', priority: -160 }
 
     oro_api.get_config.set_data_customization_handler:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler
         arguments:
             - '@oro_api.customize_loaded_data.processor'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&customize_loaded_data&definition', priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions&customize_loaded_data&definition', priority: -160 }
 
     oro_api.get_config.complete_status_codes:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteStatusCodes

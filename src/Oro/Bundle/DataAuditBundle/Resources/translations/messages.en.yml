@@ -12,6 +12,7 @@ oro:
         auditfield:
             entity_label:         Audit Field
             entity_plural_label:  Audit Fields
+            entity_grid_all_view_label: All %entity_plural_label%
             data_type.label:      Data Type
             field.label:          Field
             id.label:             Id
@@ -41,6 +42,12 @@ oro:
             audit_list.label:       "Data Audit"
             audit_list.description: "Data Audit"
 
+        collection:
+            added: '%record% "%entity_name%" added'
+            removed: '%record% "%entity_name%" removed'
+            changed: '%record% "%entity_name%" changed'
+        record: '%record% "%entity_name%"'
+
         datagrid:
             author: Author
             logged_at: Logged at
@@ -64,6 +71,7 @@ oro:
             field:
                 items:
                     auditable: Auditable
+                    propagate: Append audit log to the related entity
 
         condition_builder:
             criteria:
@@ -72,11 +80,13 @@ oro:
         abstractaudit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at
             object_class.label: Audit class
             object_id.label: Id
+            entity_id.label: Id
             object_name.label: Audit
             owner_description.label: Audit owner description
             transaction_id.label: Audit transaction id
@@ -90,11 +100,13 @@ oro:
         audit:
             entity_label: Audit
             entity_plural_label: Audits
+            entity_grid_all_view_label: All %entity_plural_label%
             action.label: Audit action
             id.label: Id
             logged_at.label: Logged at
             object_class.label: Audit class
             object_id.label: Id
+            entity_id.label: Id
             object_name.label: Audit
             owner_description.label: Audit owner description
             transaction_id.label: Audit transaction id

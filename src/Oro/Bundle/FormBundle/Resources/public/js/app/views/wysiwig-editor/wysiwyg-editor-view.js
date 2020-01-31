@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var tools = require('oroui/js/tools');
+    var __ = require('orotranslation/js/translator');
     var txtHtmlTransformer = require('./txt-html-transformer');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var tinyMCE = require('tinymce/tinymce');
@@ -29,13 +30,23 @@ define(function(require) {
                 bdesk_photo: 'bundles/oroform/lib/bdeskphoto/plugin.min.js'
             },
             menubar: false,
-            toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
+            toolbar: ['undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist' +
+            '| code | alignleft aligncenter alignright alignjustify | bdesk_photo'],
             statusbar: false,
             browser_spellcheck: true,
             images_dataimg_filter: function() {
                 return false;
             },
-            paste_data_images: false
+            paste_data_images: false,
+            block_formats: [
+                __('oro.form.tinymce.paragraph') + '=p',
+                __('oro.form.tinymce.h1') + '=h1',
+                __('oro.form.tinymce.h2') + '=h2',
+                __('oro.form.tinymce.h3') + '=h3',
+                __('oro.form.tinymce.h4') + '=h4',
+                __('oro.form.tinymce.h5') + '=h5',
+                __('oro.form.tinymce.h6') + '=h6'
+            ].join(';')
         },
 
         events: {
@@ -184,6 +195,13 @@ define(function(require) {
                     }, 20);
                 }
             }, options));
+
+            tinyMCE.activeEditor.on('OpenWindow', function(window) {
+                window.win.moveTo(
+                    Math.max(0, document.body.offsetWidth / 2 - window.win._lastRect.w / 2),
+                    0
+                );
+            });
             this.tinymceConnected = true;
             this.deferredRender.fail(function() {
                 self.removeSubview('loadingMask');

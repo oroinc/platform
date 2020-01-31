@@ -740,11 +740,25 @@
     ) }}
 
     {{ form_widget(form) }}
-    {{ form_errors(form) }}
 {% endblock %}
 
 {% block button_row %}
     <div class="control-group-container control-group-button">
         {{ form_widget(form) }}
+    </div>
+{% endblock %}
+
+{% block oro_checkbox_widget %}
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {
+             view: 'oroform/js/app/views/checkbox-view',
+             selectors: {
+                 checkbox: '#' ~ form.vars.id,
+                 hiddenInput: '#' ~ form.vars.id ~ '-hidden'
+             }
+         }|json_encode }}"
+    >
+        {{ block('checkbox_widget') }}
+        <input id="{{ form.vars.id }}-hidden" type="hidden" value="0" name="{{ form.vars.full_name }}" disabled="disabled">
     </div>
 {% endblock %}

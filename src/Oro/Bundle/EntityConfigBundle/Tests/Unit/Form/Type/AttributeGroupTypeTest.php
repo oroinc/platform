@@ -82,13 +82,16 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
+        $attributeMultiSelectType = new AttributeMultiSelectType($this->attributeManager);
+        $attributeMultiSelectType->setTranslator($this->getTranslator());
+
         return [
             new PreloadedExtension(
                 [
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                         $this->registry
                     ),
-                    AttributeMultiSelectType::class => new AttributeMultiSelectType($this->attributeManager),
+                    AttributeMultiSelectType::class => $attributeMultiSelectType,
                     LocalizedPropertyType::class => new LocalizedPropertyType(),
                     LocalizationCollectionType::class => new LocalizationCollectionTypeStub(
                         [

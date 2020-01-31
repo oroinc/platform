@@ -34,13 +34,13 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
-      'public/bundles/*/js/**/*.js': ['requirejs-exposure']//, 'coverage']
+      'public/bundles/*/js/**/*.js': ['requirejs-exposure']
     },
 
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress'
     // CLI --reporters progress
-    reporters: ['progress', /*'coverage',*/ 'junit'],
+    reporters: ['progress', 'junit'],
 
     junitReporter: {
       // will be resolved to basePath (in the same way as files/exclude patterns)
@@ -48,11 +48,6 @@ module.exports = function(config) {
       outputFile: 'karma.xml',
       useBrowserName: false
     },
-
-    /*coverageReporter: {
-      type: 'html',
-      dir:  'build/logs/js-coverage/'
-    },*/
 
     // web server port
     // CLI --port 9876
@@ -104,7 +99,6 @@ module.exports = function(config) {
       'karma-requirejs',
       'karma-jasmine',
       'karma-junit-reporter',
-      'karma-coverage',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-requirejs-exposure'

@@ -11,6 +11,7 @@ oro:
         attribute:
             entity_label: Attribute
             entity_plural_label: Attributes
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_not_supported: This entity does not support attributes
             not_attribute: This field is not an attribute
             successfully_deleted: Attribute successfully deleted
@@ -18,10 +19,12 @@ oro:
             was_restored: Attribute was restored
             cannot_be_restored: This attribute cannot be restored because an attribute with similar name exists.
             confirm_delete: Do you really want to delete this attribute?
+            system: system
 
         attribute_family:
             entity_label: Product Family
             entity_plural_label: Product Families
+            entity_grid_all_view_label: All %entity_plural_label%
             code.label: Code
             enabled.label: Enabled
             labels.label: Label
@@ -46,6 +49,7 @@ oro:
 
         config_log:
             entity_plural_label: Histories
+            entity_grid_all_view_label: All %entity_plural_label%
             user.label:      Author
             diffs.label:     Diffs
             logged_at.label: Logged at
@@ -95,6 +99,7 @@ oro:
 
         field_config:
             entity_plural_label: Fields
+            entity_grid_all_view_label: All %entity_plural_label%
             field_name.label: Name
             type.label:       Data Type
             records_count.label: Number of records
@@ -129,6 +134,7 @@ oro:
             attributefamily:
                 entity_label:             Product Family
                 entity_plural_label:      Product Families
+                entity_grid_all_view_label: All %entity_plural_label%
                 entity_description:       A product family is a set of the <a href="https://www.oroinc.com/doc/orocommerce/current/user-guide/products/product-families#products-product-families">product attributes</a> that are enough to store complete information about the products of a similar type (e.g., TV attributes vs T-shirts attributes). In the product family, attributes are organized into attribute groups that are displayed as titled sections on the OroCommerce front store.
                 code:
                     label:                Code

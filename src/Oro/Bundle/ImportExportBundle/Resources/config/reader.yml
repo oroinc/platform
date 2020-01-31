@@ -1,17 +1,25 @@
 services:
+    oro_importexport.reader.file.abstract:
+        class: Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader
+        arguments:
+            - '@oro_importexport.context_registry'
+        calls:
+            - ['setImportHelper', ['@oro_importexport.strategy.import.helper']]
+
     oro_importexport.reader.csv:
         class: 'Oro\Bundle\ImportExportBundle\Reader\CsvFileReader'
-        arguments:
-            - '@oro_importexport.context_registry'
+        parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: csv }
+
     oro_importexport.reader.xlsx:
         class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
+        parent: oro_importexport.reader.file.abstract
         arguments:
-            - '@oro_importexport.context_registry'
             - '@phpexcel'
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
+
     oro_importexport.reader.entity:
         class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
         arguments:
@@ -23,6 +31,7 @@ services:
             - [setAclHelper, ['@oro_security.acl_helper']]
         tags:
             - { name: oro_importexport.reader, alias: entity }
+
     oro_importexport.reader.template_fixture:
         class: 'Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader'
         arguments:

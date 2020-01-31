@@ -39,6 +39,11 @@ class HtmlTagExtension extends \Twig_Extension
             new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter(
+                'oro_html_sanitize_wysiwyg',
+                [$this, 'htmlSanitizeWYSIWYG'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
@@ -73,6 +78,17 @@ class HtmlTagExtension extends \Twig_Extension
     public function htmlSanitize($string)
     {
         return $this->getHtmlTagHelper()->sanitize($string);
+    }
+
+    /**
+     * Remove html elements except allowed for WYSIWYG
+     *
+     * @param string $string
+     * @return string
+     */
+    public function htmlSanitizeWYSIWYG($string)
+    {
+        return $this->getHtmlTagHelper()->sanitizeWysiwyg($string);
     }
 
     /**

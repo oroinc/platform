@@ -190,10 +190,7 @@ class ImportExportContext extends OroFeatureContext implements
                 'options' => $options
             ]
         ));
-        $this->template = tempnam(
-            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
-            'import_template_'
-        );
+        $this->template = $this->getTempFilePath('import_template_');
 
         $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client([
@@ -459,10 +456,7 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function iFillTemplateWithData(TableNode $table)
     {
-        $this->importFile = tempnam(
-            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
-            'import_data_'
-        );
+        $this->importFile = $this->getTempFilePath('import_data_');
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);
@@ -473,7 +467,7 @@ class ImportExportContext extends OroFeatureContext implements
             foreach ($headers as $header) {
                 $value = '';
                 foreach ($row as $rowHeader => $rowValue) {
-                    if (preg_match(sprintf('/^%s$/i', $rowHeader), $header)) {
+                    if ($rowHeader === $header || preg_match(sprintf('/^%s$/i', $rowHeader), $header)) {
                         $value = $rowValue;
                     }
                 }
@@ -562,11 +556,7 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function iSaveImportFileWithBOM()
     {
-        $newImportFile = tempnam(
-            $this->getKernel()->getProjectDir() . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'import_export',
-            'import_data_'
-        );
-
+        $newImportFile = $this->getTempFilePath('import_data_');
         file_put_contents($newImportFile, pack('H*', 'EFBBBF'));
 
         $readTheFile = function ($path) {
@@ -783,5 +773,18 @@ class ImportExportContext extends OroFeatureContext implements
         static::assertTrue($jobResult->isSuccessful());
 
         return $filePath;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    private function getTempFilePath(string $prefix): string
+    {
+        return tempnam(
+            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
+            $prefix
+        ) . '.csv';
     }
 }

@@ -63,6 +63,7 @@ oro:
         entityfieldfallbackvalue:
             entity_label: Entity fallback value
             entity_plural_label: Entity fallback values
+            entity_grid_all_view_label: All %entity_plural_label%
             array_value:
                 label: Array value
                 description: The array value for the field

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -81,14 +82,15 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => 1
+                    'entity_id' => 1,
+                    'change_set' => [],
                 ]
             ],
             'entities_deleted' => [],
             'collections_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataChild::class,
                     'entity_id' => 1,
                     'change_set' => [
@@ -96,7 +98,11 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
                             null,
                             [
                                 'inserted' => [
-                                    ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 1]
+                                    [
+                                        'entity_class' => TestAuditDataOwner::class,
+                                        'entity_id' => 1,
+                                        'change_set' => [],
+                                    ]
                                 ],
                                 'deleted' => [],
                                 'changed' => [],
@@ -154,7 +160,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -184,7 +190,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -214,7 +220,13 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 123]
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['123', null]
+                    ],
+                ]
             ],
             'collections_updated' => [],
         ]);
@@ -246,7 +258,13 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => 123]
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => ['123', null]
+                    ],
+                ]
             ],
             'collections_updated' => [],
         ]);
@@ -273,7 +291,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -282,7 +300,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
                 ]
             ],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 234,
                     'change_set' => [
@@ -291,9 +309,12 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
                 ]
             ],
             'entities_deleted' => [
-                [
+                '000000007ec8f22c00000000236823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 345
+                    'entity_id' => 345,
+                    'change_set' => [
+                        'stringProperty' => ['123', null]
+                    ],
                 ]
             ],
             'collections_updated' => [],
@@ -316,7 +337,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -337,7 +358,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => time(),
             'transaction_id' => 'anotherTransactionId',
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -361,7 +382,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -392,20 +413,20 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => null,
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000236823d4' => [
                     'entity_class' => '',
                     'entity_id' => 123,
                     'change_set' => [
@@ -434,13 +455,13 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => null,
                     'change_set' => [
@@ -470,20 +491,20 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => null,
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000236823d4' => [
                     'entity_class' => '',
                     'entity_id' => 123,
                     'change_set' => [
@@ -512,13 +533,13 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'change_set' => [
                         'stringProperty' => [null, 'aNewValue']
                     ]
                 ],
-                [
+                '000000007ec8f22c00000000136823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => null,
                     'change_set' => [
@@ -548,9 +569,20 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                ['entity_id' => 123],
-                ['entity_class' => null, 'entity_id' => 123],
-                ['entity_class' => '', 'entity_id' => 123]
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_id' => 123,
+                    'change_set' => []
+                ],
+                '000000007ec8f22c00000000136823d4' => [
+                    'entity_class' => null,
+                    'entity_id' => 123,
+                    'change_set' => []
+                ],
+                '000000007ec8f22c00000000236823d4' => [
+                    'entity_class' => '',
+                    'entity_id' => 123,
+                    'change_set' => []
+                ]
             ],
             'collections_updated' => []
         ]);
@@ -573,8 +605,15 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [
-                ['entity_class' => TestAuditDataOwner::class],
-                ['entity_class' => TestAuditDataOwner::class, 'entity_id' => null]
+                '000000007ec8f22c00000000536823d4' => [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'change_set' => []
+                ],
+                '000000007ec8f22c00000000136823d4' => [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => null,
+                    'change_set' => []
+                ]
             ],
             'collections_updated' => []
         ]);
@@ -613,7 +652,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -636,7 +675,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         $this->assertStoredAuditCount(1);
         $audit = $this->findLastStoredAudit();
         self::assertNull($audit->getField('child')->getOldValue());
-        self::assertEquals('TestAuditDataChild::20', $audit->getField('child')->getNewValue());
+        self::assertEquals('Added: TestAuditDataChild::20', $audit->getField('child')->getNewValue());
     }
 
     /**
@@ -651,7 +690,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -673,7 +712,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $this->assertStoredAuditCount(1);
         $audit = $this->findLastStoredAudit();
-        self::assertEquals('TestAuditDataChild::20', $audit->getField('child')->getOldValue());
+        self::assertEquals('Removed: TestAuditDataChild::20', $audit->getField('child')->getOldValue());
         self::assertNull($audit->getField('child')->getNewValue());
     }
 
@@ -689,7 +728,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -730,7 +769,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
@@ -771,7 +810,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'transaction_id' => 'aTransactionId',
             'entities_inserted' => [],
             'entities_updated' => [
-                [
+                '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [

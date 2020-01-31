@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
@@ -28,15 +29,20 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagHelper */
+    private $htmlTagHelper;
+
     protected function setUp()
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $this->context = $this->createMock(ContextInterface::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
         $this->formType->setAssetHelper($this->assetsHelper);
+        $this->formType->setHtmlTagHelper($this->htmlTagHelper);
         parent::setUp();
     }
 
@@ -125,7 +131,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         foreach ($viewData as $key => $value) {
             $this->assertArrayHasKey($key, $view->vars);
             $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
-            
+
             $expected = json_decode($value['data-page-component-options'], true);
             ksort($expected);
 
@@ -143,8 +149,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider()
     {
         $toolbar = [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
-             | fullscreen'
+            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| code | alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
         ];
         $elements = [
             '@[style|class]',
@@ -180,8 +186,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => 'bundles/oroform/css/tinymce',
+                'content_css' => 'css/tinymce/wysiwyg-editor.css',
+                'skin_url' => 'css/tinymce',
                 'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
                 'toolbar' => $toolbar,
                 'valid_elements' => '',
@@ -275,8 +281,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
+                                'content_css' => 'subfolder/css/tinymce/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/css/tinymce'
                             ]
                         )
                     ]

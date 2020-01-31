@@ -1,37 +1,87 @@
-{% macro renderFieldValue(fieldValue, field) %}
-    {%- set type = null %}
+{%- macro renderFieldValue(fieldValue, field) -%}
+    {%- set type = null -%}
     {%- if fieldValue.type is defined -%}
-        {% set type = fieldValue.type %}
-    {%- endif %}
-    {%- if fieldValue.value is defined -%}
-        {% set fieldValue = fieldValue.value %}
-    {%- endif %}
-
-    {%- if fieldValue.timestamp is defined -%}
-        {{ type == 'date' ? fieldValue|oro_format_date : fieldValue|oro_format_datetime }}
-    {%- elseif type == 'array' or type == 'jsonarray' -%}
-        {{ fieldValue is not null ? fieldValue|json_encode(constant('JSON_FORCE_OBJECT')) }}
-    {%- elseif type == 'boolean' or fieldValue is same as(true) or fieldValue is same as(false) -%}
-        {{ fieldValue ? 'Yes'|trans : 'No'|trans }}
-    {%- else -%}
-        {% if fieldValue is iterable %}
-            {{ fieldValue|join(', ') }}
-        {% else %}
-            {% if field.translationDomain is defined %}
-                {{ fieldValue|trans({}, field.translationDomain)|default('') }}
-            {% else %}
-                {{ fieldValue|default('') }}
-            {% endif %}
-        {% endif %}
+        {%- set type = fieldValue.type -%}
     {%- endif -%}
-{% endmacro %}
+    {%- if fieldValue.value is defined -%}
+        {%- set fieldValue = fieldValue.value -%}
+    {%- endif -%}
 
-{% macro renderFieldName(objectClass, fieldKey, fieldValue) %}
-    {% set fieldLabel = oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldKey) %}
-    {% if fieldValue.translationDomain is defined %}
-        {% set fieldLabel = fieldLabel|trans({}, fieldValue.translationDomain) %}
-    {% else %}
-        {% set fieldLabel = fieldLabel|trans %}
-    {% endif %}
-    {{- fieldLabel -}}:
-{% endmacro %}
+    {%- if fieldValue.timestamp is defined and type == 'date' -%}
+        {{- fieldValue|oro_format_date -}}
+    {%- elseif fieldValue.timestamp is defined and type in ['datetime', 'datetimetz'] -%}
+        {{- fieldValue|oro_format_datetime -}}
+    {%- elseif fieldValue.timestamp is defined and type == 'time' -%}
+        {{- fieldValue|oro_format_time -}}
+    {%- elseif type == 'array' or type == 'jsonarray' -%}
+        {{- fieldValue is not null ? fieldValue|json_encode(constant('JSON_FORCE_OBJECT')) -}}
+    {%- elseif type == 'boolean' or fieldValue is same as(true) or fieldValue is same as(false) -%}
+        {{- fieldValue ? 'Yes'|trans : 'No'|trans -}}
+    {%- else -%}
+        {%- if fieldValue is iterable and fieldValue.entity_class is defined and fieldValue.entity_class is not empty -%}
+            {{- 'oro.dataaudit.record'|trans({'%record%': oro_entity_config_value(fieldValue.entity_class, 'label')|trans, '%entity_name%': fieldValue.entity_name|default(fieldValue.entity_id|default('oro.ui.empty'|trans)) }) -}}
+            {%- if fieldValue.change_set is defined and fieldValue.change_set is not empty -%}
+                <dd>
+                    <ul>
+                        {%- for diffFieldName, diffFieldValues in fieldValue.change_set -%}
+                            <li>
+                                {{- oro_field_config_value(fieldValue.entity_class, diffFieldName, 'label')|default(diffFieldName)|trans -}}:
+                                <s>{{- _self.renderFieldValue(diffFieldValues|first) -}}</s>&nbsp;{{- _self.renderFieldValue(diffFieldValues|last) -}}
+                            </li>
+                        {%- endfor -%}
+                    </ul>
+                </dd>
+            {%- endif -%}
+        {%- elseif fieldValue is iterable -%}
+            {%- set result = [] -%}
+            {%- for item in fieldValue -%}
+                {%- set result = result|merge([_self.renderFieldValue(item)]) -%}
+            {%- endfor -%}
+            {{- result|join(', ') -}}
+        {%- else -%}
+            {%- if field.translationDomain is defined -%}
+                {{- fieldValue|trans({}, field.translationDomain)|default('') -}}
+            {%- else -%}
+                {{- fieldValue|default('') -}}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro renderFieldName(objectClass, fieldKey, fieldValue) -%}
+    {%- set fieldLabel = oro_field_config_value(fieldKey|split('::')|first, fieldKey|split('::')|last, 'label')|default(fieldKey) -%}
+    {{- oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldLabel)|trans({}, fieldValue.translationDomain|default('messages')) -}}:
+{%- endmacro -%}
+
+{%- macro renderCollection(objectClass, fieldKey, fieldValue, allowedDiffTypes) -%}
+    {%- for diffType, diffValues in fieldValue.collectionDiffs if diffValues is not empty -%}
+        {%- if diffType in allowedDiffTypes -%}
+            <dl class="audit-list">
+                {%- for diffValue in diffValues -%}
+                    {%- set record = oro_entity_config_value(diffValue.entity_class, 'label') -%}
+                    {%- if record == record|trans -%}
+                        {%- set record = oro_field_config_value(fieldKey|split('::')|first, fieldKey|split('::')|last, 'label')|default(fieldKey) -%}
+                        {%- set record = oro_field_config_value(objectClass, fieldKey, 'label')|default(record)|trans({}, fieldValue.translationDomain|default('messages')) -%}
+                    {%- endif -%}
+                    <dt>{{- ('oro.dataaudit.collection.' ~ diffType)|trans({'%record%': record|trans, '%entity_name%': diffValue.entity_name|trans|default('oro.ui.empty'|trans) }) -}}
+                    {%- if diffValue.change_set is not empty -%}
+                        :
+                        <dd>
+                            <ul>
+                                {%- for diffFieldName in diffValue.change_set|keys|sort -%}
+                                    {%- set diffFieldValues = diffValue.change_set[diffFieldName] -%}
+                                    <li>
+                                        {{- oro_field_config_value(diffValue.entity_class, diffFieldName, 'label')|default(diffFieldName)|trans -}}:
+                                        <s>{{- _self.renderFieldValue(diffFieldValues|first) -}}</s>
+                                        {%- if diffFieldValues|first is not empty and diffFieldValues|last  is not empty -%}&nbsp;{% endif %}
+                                        {{- _self.renderFieldValue(diffFieldValues|last) -}}
+                                    </li>
+                                {%- endfor -%}
+                            </ul>
+                        </dd>
+                    {%- endif -%}
+                {%- endfor -%}
+            </dl>
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}

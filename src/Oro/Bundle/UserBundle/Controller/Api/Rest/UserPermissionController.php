@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -16,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * API controller for user permissions.
+ *
  * @RouteResource("user_permission")
  * @NamePrefix("oro_api_")
  */
@@ -33,6 +35,9 @@ class UserPermissionController extends RestGetController
      *      description="The entity class name. One or several classes names separated by comma.
      * Defaults to all classes."
      *)
+     *
+     * @Rest\Get(requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get user permissions",
      *      resource=true

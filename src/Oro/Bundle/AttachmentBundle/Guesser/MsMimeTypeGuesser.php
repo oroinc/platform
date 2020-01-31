@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Guesser;
 
+use Oro\Bundle\ImportExportBundle\MimeType\UploadedFileExtensionHelper;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\FileBag;
 
+/**
+ * MIME Type guesser for ms outlook msg files.
+ */
 class MsMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
@@ -25,7 +27,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
      */
     public function guess($path)
     {
-        $extension = $this->getExtensionByPath($path);
+        $extension = UploadedFileExtensionHelper::getExtensionByPath($path);
         if (!$extension) {
             return null;
         }
@@ -43,49 +45,5 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         return $this->typesMap[$extension][$bytes];
-    }
-
-    /**
-     * @param string $path
-     * @return string|null
-     */
-    private function getExtensionByPath($path)
-    {
-        $extension = null;
-
-        $uploadedFiles = $this->fetchUploadedFiles();
-        if (isset($uploadedFiles[$path])) {
-            $path = $uploadedFiles[$path];
-        }
-
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        if ($extension) {
-            $extension = strtolower($extension);
-        }
-
-        return $extension;
-    }
-
-    /**
-     * @return array
-     */
-    private function fetchUploadedFiles()
-    {
-        if (null === $this->files) {
-            $this->files = [];
-
-            $fileBagArray = (new FileBag($_FILES))->getIterator()->getArrayCopy();
-            array_walk_recursive(
-                $fileBagArray,
-                function ($item) {
-                    /** $item UploadedFile */
-                    if ($item instanceof UploadedFile) {
-                        $this->files[$item->getRealPath()] = $item->getClientOriginalName();
-                    }
-                }
-            );
-        }
-
-        return $this->files;
     }
 }

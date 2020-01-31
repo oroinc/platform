@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -47,35 +48,31 @@ class ConfigProvider extends AbstractConfigProvider
         RequestType $requestType,
         array $extras = []
     ): Config {
-        if (empty($className)) {
+        if (!$className) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
-        if (array_key_exists($cacheKey, $this->cache)) {
+        $identifierFieldsOnly = false;
+        $cacheKey = (string)$requestType . self::KEY_DELIMITER . $version . self::KEY_DELIMITER . $className;
+        foreach ($extras as $extra) {
+            $part = $extra->getCacheKeyPart();
+            if ($part) {
+                $cacheKey .= self::KEY_DELIMITER . $part;
+            }
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                $identifierFieldsOnly = true;
+            }
+        }
+
+        if (!$identifierFieldsOnly) {
+            return $this->loadConfig($className, $version, $requestType, $extras, false, $cacheKey);
+        }
+
+        if (\array_key_exists($cacheKey, $this->cache)) {
             return clone $this->cache[$cacheKey];
         }
 
-        if (isset($this->processing[$cacheKey])) {
-            throw new RuntimeException(sprintf(
-                'Cannot build the configuration of "%s" because this causes the circular dependency.',
-                $className
-            ));
-        }
-
-        /** @var ConfigContext $context */
-        $context = $this->processor->createContext();
-        $this->initContext($context, $className, $version, $requestType, $extras);
-
-        $this->processing[$cacheKey] = true;
-        try {
-            $this->processor->process($context);
-        } finally {
-            unset($this->processing[$cacheKey]);
-        }
-
-        $config = $this->buildResult($context);
-
+        $config = $this->loadConfig($className, $version, $requestType, $extras, true, $cacheKey);
         $this->cache[$cacheKey] = $config;
 
         return clone $config;
@@ -87,5 +84,62 @@ class ConfigProvider extends AbstractConfigProvider
     public function clearCache(): void
     {
         $this->cache = [];
+    }
+
+    /**
+     * Resets an object to its initial state.
+     */
+    public function reset()
+    {
+        $this->cache = [];
+    }
+
+    /**
+     * @param string      $className
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
+     * @param bool        $identifierFieldsOnly
+     * @param string      $cacheKey
+     *
+     * @return Config
+     */
+    private function loadConfig(
+        string $className,
+        string $version,
+        RequestType $requestType,
+        array $extras,
+        bool $identifierFieldsOnly,
+        string $cacheKey
+    ): Config {
+        if (isset($this->processing[$cacheKey])) {
+            throw new RuntimeException(sprintf(
+                'Cannot build the configuration of "%s" because this causes the circular dependency.',
+                $className
+            ));
+        }
+
+        /** @var ConfigContext $context */
+        $context = $this->processor->createContext();
+        $this->initContext($context, $className, $version, $requestType, $extras);
+        $context->set(FilterIdentifierFieldsConfigExtra::NAME, $identifierFieldsOnly);
+
+        $this->processing[$cacheKey] = true;
+        try {
+            $this->processor->process($context);
+        } finally {
+            unset($this->processing[$cacheKey]);
+        }
+
+        $config = $this->buildResult($context);
+
+        if ($identifierFieldsOnly) {
+            $definition = $config->getDefinition();
+            if (null !== $definition) {
+                $definition->setKey($this->buildConfigKey($context->getClassName(), $context->getExtras()));
+            }
+        }
+
+        return $config;
     }
 }

@@ -80,6 +80,14 @@ services:
             - '@service_container'
             - [] # a list of service ids of column options guessers
 
+    oro_datagrid.datagrid.primary_key_column_options_guesser:
+        class: 'Oro\Bundle\DataGridBundle\Datagrid\PrimaryKeyColumnOptionsGuesser'
+        public: true
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
+
     oro_datagrid.datagrid.column_options_guesser:
         class: '%oro_datagrid.datagrid.column_options_guesser.class%'
         tags:
@@ -352,3 +360,13 @@ services:
         public: false
         arguments:
             - '@router'
+
+    oro_datagrid.event_listener.default_grid_view_load:
+        class: Oro\Bundle\DataGridBundle\EventListener\DefaultGridViewLoadListener
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_search.provider.search_mapping'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }

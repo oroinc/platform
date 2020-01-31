@@ -46,12 +46,9 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
         $notAffectedListener = $this->createMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
         $notAffectedListener->expects($this->once())->method($eventName);
 
-        $listenerService = 'test.listener.service';
-        $this->container->expects($this->once())->method('get')->with($listenerService)
-            ->will($this->returnValue($affectedListener));
-
-        $this->manager->addEventListener(array($eventName), $listenerService);     // class name Oro\Bundle\*
-        $this->manager->addEventListener(array($eventName), $notAffectedListener); // class name Mock_*
+        // https://github.com/symfony/symfony/pull/31335#issuecomment-562576326
+        $this->manager->addEventListener([$eventName], $affectedListener);     // class name Oro\Bundle\*
+        $this->manager->addEventListener([$eventName], $notAffectedListener); // class name Mock_*
 
         if (!$isEnabled) {
             $this->manager->disableListeners('^Oro');
@@ -64,11 +61,11 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dispatchEventDataProvider()
+    public function dispatchEventDataProvider(): array
     {
-        return array(
-            'enabled'  => array(true),
-            'disabled' => array(false),
-        );
+        return [
+            'enabled'  => [true],
+            'disabled' => [false],
+        ];
     }
 }

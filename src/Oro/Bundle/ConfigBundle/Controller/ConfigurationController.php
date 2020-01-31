@@ -8,6 +8,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Controller for system config functionality
+ */
 class ConfigurationController extends Controller
 {
     /**
@@ -64,7 +67,10 @@ class ConfigurationController extends Controller
             'data'           => $jsTree,
             'form'           => $form ? $form->createView() : null,
             'activeGroup'    => $activeGroup,
-            'activeSubGroup' => $activeSubGroup
+            'activeSubGroup' => $activeSubGroup,
+            'scopeEntity'    => null,
+            'scopeEntityClass' => null,
+            'scopeEntityId'  => null
         ];
     }
 }

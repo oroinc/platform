@@ -120,17 +120,12 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
         $data->offsetAddToArray('state', ['gridView' => $this->getCurrentViewId($gridName)]);
 
-        $systemGridView = new View(self::DEFAULT_VIEW_ID);
-        $systemGridView->setDefault($this->getDefaultViewId($gridName) === null);
-        if ($config->offsetGetByPath('[options][gridViews][allLabel]')) {
-            $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
-        }
-
         $currentUser = $this->tokenAccessor->getUser();
         $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $gridName);
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($gridName, $gridViews);
+            $event->setGridConfiguration($config);
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
@@ -140,7 +135,7 @@ class GridViewsExtension extends AbstractExtension
             [
                 'views'       => $gridViews,
                 'gridName'    => $gridName,
-                'permissions' => $this->getPermissions()
+                'permissions' => $this->getPermissions(),
             ]
         );
     }
@@ -232,7 +227,7 @@ class GridViewsExtension extends AbstractExtension
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
                 $this->getParameters()->mergeKey(AppearanceExtension::APPEARANCE_ROOT_PARAM, [
                     AppearanceExtension::APPEARANCE_TYPE_PARAM => $defaultGridView->getAppearanceTypeName(),
-                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData()
+                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData(),
                 ]);
             }
         }

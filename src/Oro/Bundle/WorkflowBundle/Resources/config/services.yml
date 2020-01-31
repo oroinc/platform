@@ -206,7 +206,7 @@ services:
         calls:
             - [ setAdditionalEmailAssociationProvider, ['@oro_notification.additional_email_association_provider'] ]
         tags:
-            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+            - { name: notification.handler, alias: workflow_notification_handler, priority: 100 }
 
     oro_workflow.database_checker:
         public: false
@@ -316,6 +316,8 @@ services:
             - '@security.authorization_checker'
             - '@translator'
             - '@router'
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
 
     oro_workflow.helper.transition_cron_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper'

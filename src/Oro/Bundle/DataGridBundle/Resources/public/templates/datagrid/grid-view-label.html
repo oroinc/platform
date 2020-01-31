@@ -1,6 +1,8 @@
 <% if (navbar) { %>
     <h1 class="oro-subtitle"><%- title %></h1>
-    <span class="grid-view-icon" aria-hidden="true"></span>
 <% } else { %>
-    <h3 class="grid-view-title"><%- title %></h3><span class="grid-view-icon" aria-hidden="true"></span>
+    <h3 class="grid-view-title"><%- title %></h3>
+<% } %>
+<% if (hasCaret) { %>
+    <span class="grid-view-icon" aria-hidden="true"></span>
 <% } %>

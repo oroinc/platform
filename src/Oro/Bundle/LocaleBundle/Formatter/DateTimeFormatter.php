@@ -55,7 +55,11 @@ class DateTimeFormatter
 
         // use Formatter if we have DateTime object and return the incoming argument otherwise
         if ($dateTime) {
+            if (!$pattern) {
+                $pattern = $this->getPattern($dateType, $timeType, $locale);
+            }
             $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
+
             return $formatter->format((int)$dateTime->format('U'));
         }
         return $date;
@@ -163,6 +167,20 @@ class DateTimeFormatter
      */
     public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
+        return $this->updatePattern($dateType, $timeType, $locale);
+    }
+
+    /**
+     * Update cached pattern
+     *
+     * @param int|string  $dateType Constant of IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param int|string  $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param string|null $locale
+     * @param string|null $pattern
+     * @return string
+     */
+    public function updatePattern($dateType, $timeType, $locale = null, $pattern = null): string
+    {
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
         }
@@ -179,10 +197,13 @@ class DateTimeFormatter
         $timeType = $this->parseDateType($timeType);
 
         $key = md5(serialize([$dateType, $timeType, $locale]));
+        if ($pattern) {
+            $this->cachedPatterns[$key] = $pattern;
+        }
+
         if (!isset($this->cachedPatterns[$key])) {
-            $this->cachedPatterns[$key] =
-                (new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN))
-                    ->getPattern();
+            $intlFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
+            $this->cachedPatterns[$key] = $intlFormatter->getPattern();
         }
 
         return $this->cachedPatterns[$key];

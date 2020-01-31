@@ -166,6 +166,7 @@ services:
             - '%kernel.cache_dir%'
         calls:
             - [setAssetHelper, ['@assets.packages']]
+            - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
         tags:
             - { name: form.type, alias: oro_rich_text }
 
@@ -397,3 +398,8 @@ services:
             - '@oro_locale.formatter.number'
         tags:
             - { name: form.type, alias: oro_hidden_number }
+
+    oro_form.type.checkbox:
+        class: Oro\Bundle\FormBundle\Form\Type\CheckboxType
+        tags:
+            - { name: form.type, alias: oro_checkbox }

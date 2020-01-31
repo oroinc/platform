@@ -16,6 +16,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Persists supplied data to the database within a transaction
+ */
 class PersistentBatchWriter implements
     ItemWriterInterface,
     StepExecutionAwareInterface,
@@ -91,10 +94,7 @@ class PersistentBatchWriter implements
 
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
-                $importContext->setValue(
-                    'error_entries_count',
-                    (int)$importContext->getValue('error_entries_count') + count($items)
-                );
+                $importContext->incrementErrorEntriesCount(count($items));
 
                 $this->logger->warning($event->getWarning());
 

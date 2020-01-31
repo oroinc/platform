@@ -14,6 +14,22 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Transforms form array of LocalizedFallbackValue objects to array of arrays like
+ * [
+ *     'values' => [
+ *         null => <value>,
+ *         1 => <value>,
+ *         2 => new FallbackType(FallbackType::SYSTEM),
+ *     ],
+ *     'ids' => [
+ *         0 => 1,
+ *         1 => 2,
+ *         2 => 3,
+ *     ],
+ * ]
+ * for processing in form, and back.
+ */
 class LocalizedFallbackValueCollectionTransformer implements DataTransformerInterface
 {
     /**
@@ -69,7 +85,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             }
 
             $fallback = $localizedFallbackValue->getFallback();
-            if ($fallback) {
+            if ($fallback && $localization) {
                 $value = new FallbackType($fallback);
             } else {
                 $value = $this->getPropertyAccessor()->getValue($localizedFallbackValue, $this->field);
