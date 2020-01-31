@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
 /**
+ * Responsible for update ACL items
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -985,6 +987,14 @@ class AclManager extends AbstractAclManager
             // non valid empty ACL is cached by MutableAclProvider::cacheEmptyAcl() method
             $this->aclProvider->clearOidCache($oid);
             $acl = $this->aclProvider->findAcl($oid);
+
+            // Force return null if MutableAclProvider::cacheEmptyAcl worked before this method.
+            // We don't have possibility to correct clear in-memory acl cache in aclProvider,
+            // because he may already have children
+            if ($acl->getId() === 0) {
+                $acl = null;
+                throw new AclNotFoundException();
+            }
         } catch (AclNotFoundException $ex) {
             if ($ifNotExist === true) {
                 $state = BatchItem::STATE_CREATE;
