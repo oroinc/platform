@@ -12,9 +12,12 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The ACL extension that works with workflow transitions.
+ */
 class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
-    const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
+    private const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
@@ -51,6 +54,8 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
                 MaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
             ],
         ];
+
+        $this->maskBuilder = new MaskBuilder();
     }
 
     /**
@@ -116,30 +121,6 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getMaskBuilder($permission)
-    {
-        return new MaskBuilder();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllMaskBuilders()
-    {
-        return [new MaskBuilder()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMaskBuilderConst($constName)
-    {
-        return MaskBuilder::getConst($constName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceBits($mask)
     {
         return $mask & MaskBuilder::SERVICE_BITS;
@@ -171,7 +152,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      */
     protected function getObjectClassName($object)
     {
-        if (is_string($object)) {
+        if (\is_string($object)) {
             $workflowName = $id = $group = null;
             $this->parseDescriptor($object, $workflowName, $id, $group);
             $fieldName = ObjectIdentityHelper::decodeEntityFieldInfo($object)[1];
