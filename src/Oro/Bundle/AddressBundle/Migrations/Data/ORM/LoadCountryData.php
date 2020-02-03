@@ -12,6 +12,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Imports country and regions data into the application. Includes translations for the English language.
+ */
 class LoadCountryData extends AbstractTranslatableEntityFixture implements
     VersionedFixtureInterface,
     ContainerAwareInterface
@@ -52,7 +55,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     public function getVersion()
     {
-        return '1.2';
+        return '1.3';
     }
 
     /**
