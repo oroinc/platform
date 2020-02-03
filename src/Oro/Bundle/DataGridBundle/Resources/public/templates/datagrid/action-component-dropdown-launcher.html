@@ -28,7 +28,7 @@
        title="<%= title %>"
        role="button" id="<%- togglerId %>" data-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false"
-       <% if (launcherMode == 'icon-only') { %> aria-label="<%- ariaLabel %>" <% } %>
+       <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %> aria-label="<%- ariaLabel %>" <% } %>
        <% attributesTemplate(attributes) %>>
         <% if (launcherMode == 'icon-text') { %>
             <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>

@@ -44,6 +44,13 @@ define(function(require, exports, module) {
         /** @property {String} */
         ariaLabel: undefined,
 
+        /**
+         * Allow to use / set default aria-label attribute if it not defined
+         *
+         * @property {boolean}
+         */
+        allowDefaultAriaLabel: false,
+
         /** @property {String} */
         icon: undefined,
 
@@ -120,8 +127,8 @@ define(function(require, exports, module) {
                 throw new TypeError('"action" is required');
             }
 
-            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'icon', 'link',
-                'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
+            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'allowDefaultAriaLabel',
+                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
 
             _.extend(
                 this,
@@ -169,9 +176,12 @@ define(function(require, exports, module) {
                 data.label = this.action.label;
             }
 
-            if (!data.ariaLabel) {
-                data.ariaLabel = this.action.ariaLabel
-                    ? this.action.ariaLabel : `${data.label} ${__('oro.datagrid.action.default_postfix')}`;
+            if (!data.ariaLabel && this.action.ariaLabel) {
+                data.ariaLabel = this.action.ariaLabel;
+            }
+
+            if (!data.ariaLabel && this.allowDefaultAriaLabel) {
+                data.ariaLabel = this.getDefaultAriaLabel(data.label);
             }
 
             if (!data.title) {
@@ -183,6 +193,13 @@ define(function(require, exports, module) {
             }
 
             return data;
+        },
+
+        /**
+         * @return {string}
+         */
+        getDefaultAriaLabel: function(label) {
+            return `${label} ${__('oro.datagrid.action.default_postfix')}`;
         },
 
         /**

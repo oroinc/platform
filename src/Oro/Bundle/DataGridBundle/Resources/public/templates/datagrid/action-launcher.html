@@ -32,7 +32,7 @@
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
     class="<%= actionClassNames.join(' ') %>"
     title="<%- title %>"
-    <% if (launcherMode == 'icon-only') { %>
+    <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %>
     aria-label="<%- ariaLabel %>"
     <% } %>
     <% attributesTemplate(attributes) %>
@@ -56,7 +56,7 @@
         <li>
             <a href="<%- link %>" class="dropdown-item" data-index="<%- index %>" title="<%- item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
-            <% if (launcherMode == 'icon-only') { %> aria-label="<%- ariaLabel %>" <% } %>
+            <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %> aria-label="<%- ariaLabel %>" <% } %>
             data-key="<%- item.key %>">
                 <% if (launcherMode == 'icon-text') { %>
                     <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
