@@ -29,11 +29,15 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 {
@@ -113,15 +117,174 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with(
-                [
-                    'dam_widget_enabled' => true,
-                    'dam_widget_route' => 'oro_digital_asset_widget_choose',
-                    'dam_widget_parameters' => null,
-                ]
+            ->willReturnCallback(
+                function (array $defaults) {
+                    $this->assertArrayHasKey('dam_widget_enabled', $defaults);
+                    $this->assertTrue($defaults['dam_widget_enabled']);
+                    $this->assertArrayHasKey('dam_widget_route', $defaults);
+                    $this->assertSame($defaults['dam_widget_route'], 'oro_digital_asset_widget_choose');
+                    $this->assertArrayHasKey('dam_widget_parameters', $defaults);
+                    $this->assertNull($defaults['dam_widget_parameters']);
+                    $this->assertArrayHasKey('validation_groups', $defaults);
+                }
             );
 
+        $resolver->expects($this->once())
+            ->method('setNormalizer')
+            ->with('fileOptions', $this->isType('callable'));
+
         $this->extension->configureOptions($resolver);
+    }
+
+    /**
+     * @dataProvider validationGroupsCallbackDataProvider
+     *
+     * @param array $options
+     * @param bool $useDam
+     * @param array $expectedGroups
+     */
+    public function testValidationGroupsCallbackWhenCheckEmptyFile(
+        array $options,
+        bool $useDam,
+        array $expectedGroups
+    ): void {
+        $this->form
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
+
+        $formConfig
+            ->expects($this->once())
+            ->method('getOptions')
+            ->willReturn($options);
+
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+
+        $entityFieldConfig
+            ->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn($useDam);
+
+        $this->assertEquals($expectedGroups, $this->extension->validationGroupsCallback($this->form));
+    }
+
+    /**
+     * @return array
+     */
+    public function validationGroupsCallbackDataProvider(): array
+    {
+        return [
+            'DAM widget enabled, useDam on' => [
+                'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => true],
+                'useDam' => true,
+                'expectedGroups' => ['Default', 'DamWidgetEnabled'],
+            ],
+            'DAM widget enabled, useDam off' => [
+                'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => true],
+                'useDam' => false,
+                'expectedGroups' => ['Default', 'DamWidgetDisabled'],
+            ],
+        ];
+    }
+
+    public function testValidationGroupsCallbackWhenNotCheckEmptyFile(): void
+    {
+        $this->form
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
+
+        $formConfig
+            ->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['checkEmptyFile' => false]);
+
+        $this->assertEquals(['Default'], $this->extension->validationGroupsCallback($this->form));
+    }
+
+    /**
+     * @dataProvider normalizeFileOptionsDataProvider
+     *
+     * @param Options $allOptions
+     * @param array $option
+     * @param array $expectedOption
+     */
+    public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
+    {
+        $reflectionProperty = new \ReflectionProperty($allOptions, 'locked');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($allOptions, true);
+
+        $this->assertEquals(
+            $expectedOption,
+            $this->extension->normalizeFileOptions($allOptions, $option)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function normalizeFileOptionsDataProvider(): array
+    {
+        return [
+            'empty options' => [
+                'allOptions' => (new OptionsResolver())->setDefaults(
+                    [
+                        'checkEmptyFile' => false,
+                    ]
+                ),
+                'option' => [],
+                'expectedOption' => [
+                    'required' => false,
+                    'label' => 'oro.attachment.file.label',
+                ],
+            ],
+            'required is set' => [
+                'allOptions' => (new OptionsResolver())->setDefaults(
+                    [
+                        'checkEmptyFile' => true,
+                    ]
+                ),
+                'option' => [
+                    'required' => false,
+                ],
+                'expectedOption' => [
+                    'required' => false,
+                    'label' => 'oro.attachment.file.label',
+                    'constraints' => [new NotBlank(['groups' => 'DamWidgetDisabled'])],
+                ],
+            ],
+            'constraints is set' => [
+                'allOptions' => (new OptionsResolver())->setDefaults(
+                    [
+                        'checkEmptyFile' => true,
+                    ]
+                ),
+                'option' => [
+                    'constraints' => [],
+                ],
+                'expectedOption' => [
+                    'required' => true,
+                    'label' => 'oro.attachment.file.label',
+                    'constraints' => [],
+                ],
+            ],
+            'label is set' => [
+                'allOptions' => (new OptionsResolver())->setDefaults(
+                    [
+                        'checkEmptyFile' => false,
+                    ]
+                ),
+                'option' => [
+                    'label' => 'sample-label',
+                ],
+                'expectedOption' => [
+                    'required' => false,
+                    'label' => 'sample-label',
+                ],
+            ],
+        ];
     }
 
     public function testBuildForm(): void
@@ -134,7 +297,12 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->with(
                 'digitalAsset',
                 HiddenType::class,
-                ['error_bubbling' => false, 'invalid_message' => 'oro.digitalasset.validator.digital_asset.invalid']
+                [
+                    'error_bubbling' => false,
+                    'invalid_message' => 'oro.digitalasset.validator.digital_asset.invalid',
+                    'auto_initialize' => false,
+                    'constraints' => [new NotBlank(['groups' => 'DamWidgetEnabled'])],
+                ]
             );
 
         $builder
@@ -154,6 +322,38 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->with(FormEvents::POST_SUBMIT, $this->isType('array'));
 
         $this->extension->buildForm($builder, []);
+    }
+
+    /**
+     * @return array
+     */
+    public function buildFormDataProvider(): array
+    {
+        $commonOptions = [
+            'error_bubbling' => false,
+            'invalid_message' => 'oro.digitalasset.validator.digital_asset.invalid',
+            'auto_initialize' => false,
+            'constraints' => [new NotBlank(['groups' => 'DamWidgetEnabled'])],
+        ];
+
+        return [
+            [
+                'options' => [],
+                'expectedOptions' => $commonOptions + ['constraints' => []],
+            ],
+            [
+                'options' => ['checkEmptyFile' => false],
+                'expectedOptions' => $commonOptions + ['constraints' => []]
+            ],
+            [
+                'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => true],
+                'expectedOptions' => $commonOptions + ['constraints' => [new NotBlank()]],
+            ],
+            [
+                'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => false],
+                'expectedOptions' => $commonOptions + ['constraints' => []]
+            ],
+        ];
     }
 
     public function testPostSubmitWhenNoFile(): void
@@ -784,16 +984,19 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->with(EntityWithMultiFile::class, 'multiFileField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig->expects($this->once())
+        $entityFieldConfig
+            ->expects($this->once())
             ->method('is')
             ->with('use_dam')
             ->willReturn(true);
 
-        $entityFieldConfig->expects($this->once())
+        $entityFieldConfig
+            ->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
 
-        $fieldConfigId->expects($this->once())
+        $fieldConfigId
+            ->expects($this->once())
             ->method('getFieldType')
             ->willReturn('image');
 
@@ -842,6 +1045,16 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->expects($this->once())
             ->method('getFieldType')
             ->willReturn('image');
+
+        $fieldConfigId
+            ->expects($this->once())
+            ->method('getClassName')
+            ->willReturn(self::SAMPLE_CLASS);
+
+        $fieldConfigId
+            ->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn(self::SAMPLE_FIELD);
 
         $this->form
             ->expects($this->once())
