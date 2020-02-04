@@ -13,7 +13,8 @@ define(function(require, exports, module) {
     config = _.extend({
         icon: 'cog',
         wrapperClassName: 'datagrid-settings dropleft',
-        label: __('oro.datagrid.settings.title')
+        label: __('oro.datagrid.settings.title'),
+        ariaLabel: __('oro.datagrid.settings.title_aria_label')
     }, config);
 
     const DatagridSettingPlugin = BasePlugin.extend({

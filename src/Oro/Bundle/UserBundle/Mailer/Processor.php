@@ -10,7 +10,6 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
 class Processor
 {
     const TEMPLATE_USER_RESET_PASSWORD          = 'user_reset_password';
-    const TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN = 'user_reset_password_as_admin';
     const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
     const TEMPLATE_FORCE_RESET_PASSWORD         = 'force_reset_password';
     const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
@@ -52,20 +51,6 @@ class Processor
         return $this->userTemplateEmailSender->sendUserTemplateEmail(
             $user,
             static::TEMPLATE_USER_RESET_PASSWORD,
-            ['entity' => $user]
-        );
-    }
-
-    /**
-     * @param UserInterface $user
-     *
-     * @return int
-     */
-    public function sendResetPasswordAsAdminEmail(UserInterface $user): int
-    {
-        return $this->userTemplateEmailSender->sendUserTemplateEmail(
-            $user,
-            static::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
             ['entity' => $user]
         );
     }
