@@ -20,6 +20,7 @@
 "oro.datagrid.headerCell.selectAll.all": "All"
 "oro.datagrid.headerCell.selectAll.allVisible": "All visible"
 "oro.datagrid.headerCell.selectAll.none": "None"
+"oro.datagrid.headerCell.selectAll.input.aria_label": "Select"
 "only short": "only short"
 "this is long text for test": "this is long text for test"
 "View per page": "View per page"
@@ -52,7 +53,9 @@ oro.datagrid.extension.export.tooltip: "With this button you will export the con
 oro_datagrid.label_add_filter: "Manage filters"
 oro_datagrid.label_reset_button: "Reset Filter"
 oro_datagrid.action.reset: "Reset"
+oro_datagrid.action.reset.aria_label: "Reset grid action"
 oro_datagrid.action.refresh: "Refresh"
+oro_datagrid.action.refresh.aria_label: "Refresh grid action"
 oro_datagrid.action.appearance: "Data appearance"
 "oro.datagrid.action.save_grid_view": "Save"
 "oro.datagrid.action.rename_grid_view": "Rename"
@@ -88,6 +91,7 @@ oro:
                 filters: "Filters"
             header.title: "Settings"
             title: "Grid Settings"
+            title_aria_label: "Expand or Collapse Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
             unselect_all: "Unselect All"
@@ -122,6 +126,8 @@ oro:
                 	<li><span style="font-family: monospace">Ctrl + Enter</span> - Save and close</li>
                 	<li><span style="font-family: monospace">Escape</span> - Quit</li>
                 </ul>
+        action:
+            default_postfix: "row action"
         mass_action:
             title: Mass Actions
             button_title: "..."

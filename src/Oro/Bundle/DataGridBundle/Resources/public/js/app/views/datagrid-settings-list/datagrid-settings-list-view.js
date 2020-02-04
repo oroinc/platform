@@ -32,7 +32,8 @@ define(function(require) {
         events: {
             'click [data-role="datagrid-settings-select-all"]': 'onSelectAll',
             'click [data-role="datagrid-settings-unselect-all"]': 'onUnselectAll',
-            'click [data-role="datagrid-settings-reset"]': 'reset'
+            'click [data-role="datagrid-settings-reset"]': 'reset',
+            'click .close': 'closeDropdown'
         },
 
         /**
@@ -197,6 +198,13 @@ define(function(require) {
             return _.filter(this.collection.filter(this.filterer), function(model) {
                 return !model.get('disabledVisibilityChange');
             });
+        },
+
+        /**
+         * Extra handler for close dropdown
+         */
+        closeDropdown: function() {
+            this.$el.trigger('tohide.bs.dropdown');
         }
     });
 

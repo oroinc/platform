@@ -27,13 +27,14 @@
     <a href="#" class="<%= actionClassNames.join(' ') %>"
        title="<%= title %>"
        role="button" id="<%- togglerId %>" data-toggle="dropdown"
-       aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"
+       aria-haspopup="true" aria-expanded="false"
+       <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %> aria-label="<%- ariaLabel %>" <% } %>
        <% attributesTemplate(attributes) %>>
         <% if (launcherMode == 'icon-text') { %>
             <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
             <%= label %>
         <% } else if (launcherMode == 'icon-only') { %>
-            <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+            <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %> fa--no-offset" aria-hidden="true"></span>
         <% } else if (launcherMode == 'text-only') { %>
             <% if (iconClassName) { %><span class="<%= iconClassName %>" aria-hidden="true"></span><% } %>
             <%- label %>
