@@ -458,7 +458,9 @@ define(function(require, exports, module) {
                 this.settings.errorPlacement(label, element);
             }
 
-            message = '<span><span>' + message + '</span></span>';
+            message = '<span>' +
+                '<span class="validation-failed__icon" aria-hidden="true"></span>' +
+                '<span>' + message + '</span></span>';
 
             original.showLabel.call(this, element, message);
 

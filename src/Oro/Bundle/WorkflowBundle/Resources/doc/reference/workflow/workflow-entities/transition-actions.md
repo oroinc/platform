@@ -15,11 +15,8 @@ Add Custom Action
 To add custom action add a service to DIC with tag "oro_action.action", for example:
 
 ```
-parameters:
-    oro_workflow.action.close_workflow.class: Oro\Component\Action\Action\CloseWorkflow
 services:
-    oro_workflow.action.close_workflow:
-        class: %oro_workflow.action.close_workflow.class%
+    Oro\Component\Action\Action\CloseWorkflow:
         tags:
             - { name: oro_action.action, alias: close_workflow }
 ```

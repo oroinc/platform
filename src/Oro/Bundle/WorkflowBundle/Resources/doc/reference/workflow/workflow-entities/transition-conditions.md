@@ -13,11 +13,8 @@ The conditions are based on the [ConfigExpression](../../../../../../../Componen
 To add custom condition simply add a service to DIC with the tag "oro_action.condition", for example:
 
 ```
-parameters:
-    oro_workflow.condition.blank.class: Oro\Bundle\WorkflowBundle\ConfigExpression\Blank
 services:
-    oro_workflow.condition.blank:
-        class: %oro_workflow.condition.blank.class%
+    Oro\Bundle\WorkflowBundle\ConfigExpression\Blank:
         tags:
             - { name: oro_action.condition, alias: blank|empty }
 ```

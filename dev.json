@@ -11,12 +11,16 @@
     ],
     "require": {
         "php": "~7.3.13",
-        "ext-intl": "*",
-        "ext-mbstring": "*",
+        "ext-dom": "*",
         "ext-gd": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pcntl": "*",
+        "ext-pdo": "*",
         "ext-xml": "*",
         "ext-zip": "*",
-        "ext-openssl": "*",
         "psr/container": "^1.0",
         "psr/simple-cache": "1.0.*",
         "nyholm/psr7": "1.2.*",
@@ -78,6 +82,8 @@
         "salsify/json-streaming-parser": "8.0.1"
     },
     "require-dev": {
+        "ext-ftp": "*",
+        "ext-sqlite3": "*",
         "behat/behat": "3.4.*",
         "behat/mink": "1.7.x-dev#6d637f7",
         "behat/mink-extension": "2.3.*",
@@ -95,6 +101,11 @@
         "symfony/phpunit-bridge": "4.3.*",
         "friendsofphp/php-cs-fixer": "2.12.*",
         "oro/twig-inspector": "1.0.*"
+    },
+    "suggest": {
+        "ext-imap": "To improve parsing of email headers.",
+        "ext-soap": "To enable SOAP API calls.",
+        "ext-tidy": "To improve parsing of email content."
     },
     "repositories": {
         "monorepo": {

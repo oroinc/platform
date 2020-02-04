@@ -375,9 +375,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $permissions = $extension->getPermissions($mask, true);
         foreach ($permissions as $permission) {
             $maskBuilder = $extension->getMaskBuilder($permission);
-            $permissionGroup = 'GROUP_' . $permission;
-            if ($maskBuilder->hasMask($permissionGroup)) {
-                $permissionGroupMask = $maskBuilder->getMask($permissionGroup);
+            if ($maskBuilder->hasMaskForGroup($permission)) {
+                $permissionGroupMask = $maskBuilder->getMaskForGroup($permission);
                 break;
             }
         }

@@ -22,6 +22,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    private const PATTERN_ALL_OFF = '(PV) system:.. global:.. deep:.. local:.. basic:..';
+
     /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $objectIdAccessor;
 
@@ -138,10 +140,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaskPattern()
     {
-        self::assertEquals(
-            WorkflowMaskBuilder::PATTERN_ALL_OFF,
-            $this->extension->getMaskPattern(0)
-        );
+        self::assertEquals(self::PATTERN_ALL_OFF, $this->extension->getMaskPattern(0));
     }
 
     public function testGetMaskBuilder()

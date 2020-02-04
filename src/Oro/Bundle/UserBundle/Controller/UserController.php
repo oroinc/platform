@@ -158,7 +158,7 @@ class UserController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_user.entity.class')
+            'entity_class' => User::class
         ];
     }
 

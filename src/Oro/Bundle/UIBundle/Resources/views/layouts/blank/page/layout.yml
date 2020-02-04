@@ -57,6 +57,8 @@ layout:
                     blockType: js_build
                     options:
                         src: '="layout-build/" ~ context["theme"] ~ "/app.js"'
+                skip_to_content:
+                    blockType: container
             tree:
                 root:
                     head:
@@ -67,6 +69,7 @@ layout:
                         styles: ~
                     body:
                         wrapper:
+                            skip_to_content: ~
                             page_container:
                                 page_main:
                                     page_main_content:

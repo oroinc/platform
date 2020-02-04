@@ -52,7 +52,7 @@ datagrids:
                 select:
                     - origin
                 from:
-                    - { table: %oro_email.email_origin.entity.class%, alias: origin }
+                    - { table: Oro\Bundle\EmailBundle\Entity\EmailOrigin, alias: origin }
             hints:
                 - HINT_FILTER_BY_CURRENT_USER
 ```

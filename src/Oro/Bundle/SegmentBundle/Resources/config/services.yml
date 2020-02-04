@@ -1,6 +1,3 @@
-parameters:
-    oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
-
 services:
     oro_segment.entity_provider:
         alias: oro_entity.entity_provider
@@ -40,7 +37,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_segment.segment.entity.class%'
+            - 'Oro\Bundle\SegmentBundle\Entity\Segment'
             - '@doctrine.orm.entity_manager'
 
     oro_segment.datagrid.configuration.provider:

@@ -11,34 +11,24 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * The base class for data fixtures that load users with their roles.
+ */
 abstract class AbstractLoadMultipleUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     const ACL_PERMISSION = 'permission';
     const ACL_LEVEL = 'level';
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritdoc}
      */
     public function getDependencies()
     {
-        return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
-        ];
+        return [LoadAdminUserData::class];
     }
 
     /**
@@ -55,7 +45,7 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function loadRoles(ObjectManager $manager)
     {
-        /* @var $aclManager AclManager */
+        /* @var AclManager $aclManager */
         $aclManager = $this->container->get('oro_security.acl.manager');
 
         foreach ($this->getRolesData() as $key => $items) {
@@ -63,17 +53,19 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
             $role->setLabel($key);
             $manager->persist($role);
 
-            foreach ($items as $acls) {
-                $className = $this->container->getParameter($acls['class']);
-
-                $this->setRolePermissions($aclManager, $role, $className, $acls['acls']);
+            if ($aclManager->isAclEnabled()) {
+                foreach ($items as $acls) {
+                    $this->setRolePermissions($aclManager, $role, $acls['class'], $acls['acls']);
+                }
             }
 
             $this->setReference($key, $role);
         }
 
         $manager->flush();
-        $aclManager->flush();
+        if ($aclManager->isAclEnabled()) {
+            $aclManager->flush();
+        }
     }
 
     /**
@@ -131,41 +123,18 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function setRolePermissions(AclManager $aclManager, Role $role, $className, array $allowedAcls)
     {
-        if (!$aclManager->isAclEnabled()) {
-            return;
-        }
-
         $sid = $aclManager->getSid($role);
-        $oid = $aclManager->getOid($this->getOidDescriptorByClassname($className));
-        $extension = $aclManager->getExtensionSelector()->select($oid);
-        $maskBuilders = $extension->getAllMaskBuilders();
-
+        $oid = $aclManager->getOid('entity:' . $className);
+        $maskBuilders = $aclManager->getAllMaskBuilders($oid);
         foreach ($maskBuilders as $maskBuilder) {
-            $maskBuilder->reset();
-
             foreach ($allowedAcls as $acl) {
-                $permission = $acl[self::ACL_PERMISSION];
-                $level = $acl[self::ACL_LEVEL];
-
-                $maskName = $permission . '_' . $level;
-
-                if ($maskBuilder->hasMask('MASK_' . $maskName)) {
-                    $maskBuilder->add($maskName);
+                $permission = $acl[self::ACL_PERMISSION] . '_' . $acl[self::ACL_LEVEL];
+                if ($maskBuilder->hasMaskForPermission($permission)) {
+                    $maskBuilder->add($permission);
                 }
             }
-
             $aclManager->setPermission($sid, $oid, $maskBuilder->get());
         }
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getOidDescriptorByClassname($className)
-    {
-        return 'entity:' . $className;
     }
 
     /**
@@ -176,10 +145,9 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
     protected function getUser(ObjectManager $manager)
     {
         /* @var $user User */
-        $user = $manager->getRepository('OroUserBundle:User')->findOneBy([
-            'email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL,
+        $user = $manager->getRepository(User::class)->findOneBy([
+            'email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL
         ]);
-
         if (!$user) {
             throw new \LogicException('There are no users in system');
         }

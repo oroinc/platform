@@ -202,7 +202,7 @@ services:
     oro_imap.listener.user_email_change:
         class: Oro\Bundle\ImapBundle\EventListener\UserEmailChangeListener
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\UserBundle\Entity\User', event: preUpdate }
 
     oro_imap.origin_credentials.issue_manager:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager

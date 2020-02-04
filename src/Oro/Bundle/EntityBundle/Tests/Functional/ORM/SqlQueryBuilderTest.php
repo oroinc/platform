@@ -37,7 +37,25 @@ class SqlQueryBuilderTest extends WebTestCase
 
         $qb->execute();
 
-        $result = $this->getUserFirstName($qb, $user);
+        $result = $this->getUserFirstName($user);
+        $this->assertEquals([['first_name' => 'UPDATE FN1']], $result);
+    }
+
+    public function testSimpleUpdateWithoutTableAlias()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $qb = $this->createSqlQueryBuilder();
+        $qb->update('oro_user')
+            ->set('first_name', ':newFN')
+            ->where($qb->expr()->eq('id', ':id'))
+            ->setParameter('newFN', 'UPDATE FN1')
+            ->setParameter('id', $user->getId());
+
+        $qb->execute();
+
+        $result = $this->getUserFirstName($user, true);
         $this->assertEquals([['first_name' => 'UPDATE FN1']], $result);
     }
 
@@ -61,7 +79,7 @@ class SqlQueryBuilderTest extends WebTestCase
 
         $qb->execute();
 
-        $result = $this->getUserFirstName($qb, $user);
+        $result = $this->getUserFirstName($user);
         $this->assertEquals([['first_name' => 'UPDATE FN2']], $result);
     }
 
@@ -93,7 +111,7 @@ class SqlQueryBuilderTest extends WebTestCase
             ]
         );
 
-        $result = $this->getUserFirstName($qb, $user);
+        $result = $this->getUserFirstName($user);
         $this->assertEquals([['first_name' => 'UPDATE FN3']], $result);
     }
 
@@ -110,7 +128,7 @@ class SqlQueryBuilderTest extends WebTestCase
 
         $qb->getQuery()->execute(['newFN' => 'UPDATE FN4']);
 
-        $result = $this->getUserFirstName($qb, $user);
+        $result = $this->getUserFirstName($user);
         $this->assertEquals([['first_name' => 'UPDATE FN4']], $result);
     }
 
@@ -142,7 +160,7 @@ class SqlQueryBuilderTest extends WebTestCase
             ]
         );
 
-        $result = $this->getUserFirstName($qb, $user);
+        $result = $this->getUserFirstName($user);
         $this->assertEquals([['first_name' => 'UPDATE FN5']], $result);
     }
 
@@ -162,18 +180,27 @@ class SqlQueryBuilderTest extends WebTestCase
     }
 
     /**
-     * @param SqlQueryBuilder $qb
      * @param User $user
+     * @param bool $withoutTableAlias
+     *
      * @return array
      */
-    protected function getUserFirstName(SqlQueryBuilder $qb, User $user): array
+    protected function getUserFirstName(User $user, bool $withoutTableAlias = false): array
     {
-        $selectQb = $this->createSqlQueryBuilder()
-            ->select('u.first_name')
-            ->from('oro_user', 'u')
-            ->where($qb->expr()->eq('u.id', ':id'))
-            ->setParameter('id', $user->getId());
+        $qb = $this->createSqlQueryBuilder();
+        if ($withoutTableAlias) {
+            $qb
+                ->select('first_name')
+                ->from('oro_user')
+                ->where('id = :id');
+        } else {
+            $qb
+                ->select('u.first_name')
+                ->from('oro_user', 'u')
+                ->where('u.id = :id');
+        }
+        $qb->setParameter('id', $user->getId());
 
-        return $selectQb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getArrayResult();
     }
 }

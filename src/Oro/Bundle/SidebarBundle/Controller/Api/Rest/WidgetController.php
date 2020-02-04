@@ -197,6 +197,6 @@ class WidgetController extends FOSRestController
      */
     protected function getWidgetClass()
     {
-        return $this->getParameter('oro_sidebar.entity.widget.class');
+        return \Oro\Bundle\SidebarBundle\Entity\Widget::class;
     }
 }

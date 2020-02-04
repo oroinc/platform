@@ -4,11 +4,19 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 
+/**
+ * The base class for ACL extensions that check permissions based on access levels
+ * and have only one mask builder for all supported permissions.
+ */
 abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevelAclExtension
 {
     /** @var string[] */
     protected $permissions;
+
+    /** @var MaskBuilder */
+    protected $maskBuilder;
 
     /**
      * {@inheritdoc}
@@ -20,13 +28,13 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         }
 
         if (null !== $permission) {
-            $mask &= $this->getMaskBuilderConst('GROUP_' . $permission);
+            $mask &= $this->getMaskForGroup($permission);
         }
 
         $result = AccessLevel::NONE_LEVEL;
         if (0 !== $mask) {
             foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
-                if (0 !== ($mask & $this->getMaskBuilderConst('GROUP_' . $accessLevelName))) {
+                if (0 !== ($mask & $this->getMaskForGroup($accessLevelName))) {
                     $result = $accessLevel;
                     break;
                 }
@@ -50,7 +58,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
             $result = $this->permissions;
         } elseif (0 !== $mask) {
             foreach ($this->permissions as $permission) {
-                if (0 !== ($mask & $this->getMaskBuilderConst('GROUP_' . $permission))) {
+                if (0 !== ($mask & $this->getMaskForGroup($permission))) {
                     $result[] = $permission;
                 }
             }
@@ -68,23 +76,23 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
         if (!empty($permissions)) {
             $metadata = $this->getMetadata($object);
             foreach ($permissions as $permission) {
-                $permissionMask = $this->getMaskBuilderConst('GROUP_' . $permission);
+                $permissionMask = $this->getMaskForGroup($permission);
                 $mask = $rootMask & $permissionMask;
                 $accessLevel = $this->getAccessLevel($mask);
                 if (!$metadata->hasOwner()) {
                     if ($accessLevel < AccessLevel::SYSTEM_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_SYSTEM');
+                        $rootMask |= $this->getMaskForPermission($permission . '_SYSTEM');
                     }
                 } elseif ($metadata->isOrganizationOwned()) {
                     if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_GLOBAL');
+                        $rootMask |= $this->getMaskForPermission($permission . '_GLOBAL');
                     }
                 } elseif ($metadata->isBusinessUnitOwned()) {
                     if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_LOCAL');
+                        $rootMask |= $this->getMaskForPermission($permission . '_LOCAL');
                     }
                 }
             }
@@ -118,13 +126,44 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     }
 
     /**
-     * Gets the constant value defined in the mask builder
+     * {@inheritdoc}
+     */
+    public function getMaskBuilder($permission)
+    {
+        return clone $this->maskBuilder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllMaskBuilders()
+    {
+        return [clone $this->maskBuilder];
+    }
+
+    /**
+     * Gets permission value for the given group
      *
-     * @param string $constName
+     * @param string $name
      *
      * @return int
      */
-    abstract protected function getMaskBuilderConst($constName);
+    protected function getMaskForGroup($name)
+    {
+        return $this->maskBuilder->getMaskForGroup($name);
+    }
+
+    /**
+     * Gets permission value by its name
+     *
+     * @param string $name
+     *
+     * @return int
+     */
+    protected function getMaskForPermission($name)
+    {
+        return $this->maskBuilder->getMaskForPermission($name);
+    }
 
     /**
      * Gets all valid bitmasks for the given object
@@ -137,29 +176,31 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     {
         $metadata = $this->getMetadata($object);
         if (!$metadata->hasOwner()) {
-            return $this->getMaskBuilderConst('GROUP_SYSTEM');
+            return $this->getMaskForGroup('SYSTEM');
         }
 
         if ($metadata->isOrganizationOwned()) {
             return
-                $this->getMaskBuilderConst('GROUP_SYSTEM')
-                | $this->getMaskBuilderConst('GROUP_GLOBAL');
-        } elseif ($metadata->isBusinessUnitOwned()) {
+                $this->getMaskForGroup('SYSTEM')
+                | $this->getMaskForGroup('GLOBAL');
+        }
+        if ($metadata->isBusinessUnitOwned()) {
             return
-                $this->getMaskBuilderConst('GROUP_SYSTEM')
-                | $this->getMaskBuilderConst('GROUP_GLOBAL')
-                | $this->getMaskBuilderConst('GROUP_DEEP')
-                | $this->getMaskBuilderConst('GROUP_LOCAL');
-        } elseif ($metadata->isUserOwned()) {
+                $this->getMaskForGroup('SYSTEM')
+                | $this->getMaskForGroup('GLOBAL')
+                | $this->getMaskForGroup('DEEP')
+                | $this->getMaskForGroup('LOCAL');
+        }
+        if ($metadata->isUserOwned()) {
             return
-                $this->getMaskBuilderConst('GROUP_SYSTEM')
-                | $this->getMaskBuilderConst('GROUP_GLOBAL')
-                | $this->getMaskBuilderConst('GROUP_DEEP')
-                | $this->getMaskBuilderConst('GROUP_LOCAL')
-                | $this->getMaskBuilderConst('GROUP_BASIC');
+                $this->getMaskForGroup('SYSTEM')
+                | $this->getMaskForGroup('GLOBAL')
+                | $this->getMaskForGroup('DEEP')
+                | $this->getMaskForGroup('LOCAL')
+                | $this->getMaskForGroup('BASIC');
         }
 
-        return $this->getMaskBuilderConst('GROUP_NONE');
+        return $this->getMaskForGroup('NONE');
     }
 
     /**
@@ -173,13 +214,13 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
      */
     protected function validateMaskAccessLevel($permission, $mask, $object)
     {
-        if (0 !== ($mask & $this->getMaskBuilderConst('GROUP_' . $permission))) {
+        if (0 !== ($mask & $this->getMaskForGroup($permission))) {
             $maskAccessLevels = [];
             foreach ($this->getAccessLevelNames($object, $permission) as $accessLevel) {
                 if ($accessLevel === AccessLevel::NONE_LEVEL_NAME) {
                     continue;
                 }
-                if (0 !== ($mask & $this->getMaskBuilderConst('MASK_' . $permission . '_' . $accessLevel))) {
+                if (0 !== ($mask & $this->getMaskForPermission($permission . '_' . $accessLevel))) {
                     $maskAccessLevels[] = $accessLevel;
                 }
             }
