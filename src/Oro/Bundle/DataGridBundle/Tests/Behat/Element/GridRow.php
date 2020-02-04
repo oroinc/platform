@@ -62,10 +62,15 @@ class GridRow extends TableRow
     {
         $cell = $this->startInlineEditing($header);
 
-        $this->getElement('OroForm')->fillField(
-            'value',
-            new InputValue(InputMethod::TYPE, $value)
-        );
+        //Tries to locate element several times to prevent premature ElementNotFoundException
+        $this->spin(function () use ($value) {
+            $this->getElement('OroForm')->fillField(
+                'value',
+                new InputValue(InputMethod::TYPE, $value)
+            );
+
+            return true;
+        });
 
         $this->getDriver()->waitForAjax();
 
