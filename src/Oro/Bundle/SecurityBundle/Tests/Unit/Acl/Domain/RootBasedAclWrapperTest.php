@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
+use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
 class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,22 +22,15 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->acl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->rootAcl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->acl = $this->createMock(Acl::class);
+        $this->rootAcl = $this->createMock(Acl::class);
     }
 
     public function testGetClassAces()
     {
-        $context = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface');
-        $aclExtension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
-        $permissionGrantingStrategy = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(PermissionGrantingStrategyContextInterface::class);
+        $aclExtension = $this->createMock(AclExtensionInterface::class);
+        $permissionGrantingStrategy = $this->createMock(PermissionGrantingStrategy::class);
         $permissionGrantingStrategy->expects($this->any())
             ->method('getContext')
             ->willReturn($context);
@@ -69,7 +66,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $acl->insertClassAce($sid3, 4, 4); // new ACE, root ACL does not have ACE for this SID
         $rootAcl->insertObjectAce($sid2, 1, 0);
         $rootAcl->insertObjectAce($sid2, 256 + 1, 1);
-        $rootAcl->insertObjectAce($sid2, 256*2 + 1, 2); // ACE existing only in root ACL
+        $rootAcl->insertObjectAce($sid2, 256 * 2 + 1, 2); // ACE existing only in root ACL
         $rootAcl->insertObjectAce($sid4, 8, 3); // ACL does not have ACE for this SID
 
         $aclExtension->expects($this->any())
@@ -93,7 +90,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
                 2,
                 256 + 2,
                 4,
-                256*2 + 1,
+                256 * 2 + 1,
                 8
             ],
             $resultMasks
@@ -104,12 +101,9 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'testField';
 
-        $context = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface');
-        $aclExtension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
-        $permissionGrantingStrategy = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(PermissionGrantingStrategyContextInterface::class);
+        $aclExtension = $this->createMock(AclExtensionInterface::class);
+        $permissionGrantingStrategy = $this->createMock(PermissionGrantingStrategy::class);
         $permissionGrantingStrategy->expects($this->any())
             ->method('getContext')
             ->willReturn($context);
@@ -145,7 +139,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $acl->insertClassFieldAce($fieldName, $sid3, 4, 4); // new ACE, root ACL does not have ACE for this SID
         $rootAcl->insertObjectFieldAce($fieldName, $sid2, 1, 0);
         $rootAcl->insertObjectFieldAce($fieldName, $sid2, 256 + 1, 1);
-        $rootAcl->insertObjectFieldAce($fieldName, $sid2, 256*2 + 1, 2); // ACE existing only in root ACL
+        $rootAcl->insertObjectFieldAce($fieldName, $sid2, 256 * 2 + 1, 2); // ACE existing only in root ACL
         $rootAcl->insertObjectFieldAce($fieldName, $sid4, 8, 3); // ACL does not have ACE for this SID
 
         $aclExtension->expects($this->any())
@@ -169,7 +163,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
                 2,
                 256 + 2,
                 4,
-                256*2 + 1,
+                256 * 2 + 1,
                 8
             ],
             $resultMasks
@@ -178,29 +172,29 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetObjectAces()
     {
-        $ace = $this->createMock('Symfony\Component\Security\Acl\Model\EntryInterface');
+        $ace = $this->createMock(EntryInterface::class);
 
         $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
         $this->acl->expects($this->once())
             ->method('getObjectAces')
-            ->will($this->returnValue(array($ace)));
+            ->will($this->returnValue([$ace]));
         $result = $obj->getObjectAces();
 
-        $this->assertEquals(array($ace), $result);
+        $this->assertEquals([$ace], $result);
     }
 
     public function testGetObjectFieldAces()
     {
-        $ace = $this->createMock('Symfony\Component\Security\Acl\Model\EntryInterface');
+        $ace = $this->createMock(EntryInterface::class);
 
         $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
         $this->acl->expects($this->once())
             ->method('getObjectFieldAces')
             ->with($this->equalTo('SomeField'))
-            ->will($this->returnValue(array($ace)));
+            ->will($this->returnValue([$ace]));
         $result = $obj->getObjectFieldAces('SomeField');
 
-        $this->assertEquals(array($ace), $result);
+        $this->assertEquals([$ace], $result);
     }
 
     public function testGetObjectIdentity()
@@ -208,7 +202,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $id = new ObjectIdentity('1', 'SomeType');
         $this->acl->expects($this->once())
             ->method('getObjectAces')
-            ->will($this->returnValue(array('test')));
+            ->will($this->returnValue(['test']));
         $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
         $this->acl->expects($this->once())
             ->method('getObjectIdentity')
@@ -220,9 +214,7 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParentAcl()
     {
-        $parentAcl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parentAcl = $this->createMock(Acl::class);
 
         $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
         $this->acl->expects($this->once())
@@ -262,26 +254,28 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $sid = new RoleSecurityIdentity('sid1');
 
-        $strategy = $this->createMock('Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface');
+        $strategy = $this->createMock(PermissionGrantingStrategyInterface::class);
 
-        $obj = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper')
-            ->setConstructorArgs(array($this->acl, $this->rootAcl))
-            ->setMethods(array('getPermissionGrantingStrategy'))
-            ->getMock();
-        $obj->expects($this->once())
-            ->method('getPermissionGrantingStrategy')
-            ->will($this->returnValue($strategy));
+        $acl = new Acl(
+            1,
+            new ObjectIdentity('Test\Entity1', 'entity'),
+            $strategy,
+            [],
+            false
+        );
+
+        $obj = new RootBasedAclWrapper($acl, $this->rootAcl);
         $strategy->expects($this->once())
             ->method('isGranted')
             ->with(
                 $this->identicalTo($obj),
-                $this->equalTo(array(1)),
-                $this->equalTo(array($sid)),
+                $this->equalTo([1]),
+                $this->equalTo([$sid]),
                 $this->equalTo(true)
             )
             ->will($this->returnValue(true));
 
-        $result = $obj->isGranted(array(1), array($sid), true);
+        $result = $obj->isGranted([1], [$sid], true);
 
         $this->assertTrue($result);
     }
@@ -290,27 +284,29 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $sid = new RoleSecurityIdentity('sid1');
 
-        $strategy = $this->createMock('Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface');
+        $strategy = $this->createMock(PermissionGrantingStrategyInterface::class);
 
-        $obj = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper')
-            ->setConstructorArgs(array($this->acl, $this->rootAcl))
-            ->setMethods(array('getPermissionGrantingStrategy'))
-            ->getMock();
-        $obj->expects($this->once())
-            ->method('getPermissionGrantingStrategy')
-            ->will($this->returnValue($strategy));
+        $acl = new Acl(
+            1,
+            new ObjectIdentity('Test\Entity1', 'entity'),
+            $strategy,
+            [],
+            false
+        );
+
+        $obj = new RootBasedAclWrapper($acl, $this->rootAcl);
         $strategy->expects($this->once())
             ->method('isFieldGranted')
             ->with(
                 $this->identicalTo($obj),
                 $this->equalTo('SomeField'),
-                $this->equalTo(array(1)),
-                $this->equalTo(array($sid)),
+                $this->equalTo([1]),
+                $this->equalTo([$sid]),
                 $this->equalTo(true)
             )
             ->will($this->returnValue(true));
 
-        $result = $obj->isFieldGranted('SomeField', array(1), array($sid), true);
+        $result = $obj->isFieldGranted('SomeField', [1], [$sid], true);
 
         $this->assertTrue($result);
     }

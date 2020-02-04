@@ -211,7 +211,7 @@ trait UnchangeableAddressOwnerTestTrait
             false
         );
 
-        $this->assertResponseValidationErrors(
+        $this->assertResponseContainsValidationErrors(
             [
                 [
                     'title'  => 'unchangeable field constraint',

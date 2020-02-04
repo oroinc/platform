@@ -7,26 +7,21 @@ use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
+/**
+ * An access control list (ACL) implementation that combines ACEs from a main ACL and a root ACL.
+ */
 class RootBasedAclWrapper implements AclInterface
 {
-    /**
-     * @var Acl
-     */
+    /** @var Acl */
     private $acl;
 
-    /**
-     * @var Acl
-     */
+    /** @var Acl */
     private $rootAcl;
 
-    /**
-     * @var PermissionGrantingStrategyInterface
-     */
+    /** @var PermissionGrantingStrategyInterface */
     private $permissionGrantingStrategy;
 
     /**
-     * Constructor
-     *
      * @param Acl $acl
      * @param Acl $rootAcl
      */
@@ -145,11 +140,9 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * Gets the permission granting strategy implementation
-     *
      * @return PermissionGrantingStrategyInterface
      */
-    protected function getPermissionGrantingStrategy()
+    private function getPermissionGrantingStrategy()
     {
         if ($this->permissionGrantingStrategy === null) {
             // Unfortunately permissionGrantingStrategy property is private, so the only way
@@ -167,7 +160,7 @@ class RootBasedAclWrapper implements AclInterface
      * @param EntryInterface[] $aces
      * @param string|null      $field
      */
-    protected function addRootAces(array &$aces, $field = null)
+    private function addRootAces(array &$aces, $field = null)
     {
         /** @var PermissionGrantingStrategy $permissionGrantingStrategy */
         $permissionGrantingStrategy = $this->getPermissionGrantingStrategy();
@@ -200,9 +193,9 @@ class RootBasedAclWrapper implements AclInterface
     /**
      * @param string $field
      *
-     * @return array|EntryInterface[]
+     * @return EntryInterface[]
      */
-    protected function getAces($field = null)
+    private function getAces($field = null)
     {
         $rootAces = $field
             ? $this->rootAcl->getObjectFieldAces($field)

@@ -151,7 +151,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * The priority of `oro_api.post_validate_form` processor was changed from `-97` to `-80`.
 
 #### AssetBundle
-* The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
+* The new feature, Hot Module Replacement (HMR or Hot Reload) enabled for SCSS. To enable HMR for custom CSS links, please [follow the documentation](https://doc.oroinc.com/master/backend/bundles/platform/AssetBundle/index.rs)).
 
 #### NavigationBundle
 * The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
