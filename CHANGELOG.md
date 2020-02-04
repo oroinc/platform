@@ -65,6 +65,9 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
   Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
 
+#### RequireJsBundle
+* The bundle was completely removed, see [tips](https://doc.oroinc.com/master/backend/bundles/platform/AssetBundle/#migration-from-requirejs-to-jsmodules) how to migrate to Webpack builder
+
 #### UIBundle
 * The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
   Use the `alias` attribute of the `oro_ui.content_provider` DIC tag instead.
