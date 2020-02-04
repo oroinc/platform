@@ -36,6 +36,7 @@ oro:
             totalRecords: "Total of %totalRecords% records"
             prev: Prev
             next: Next
+            pageNumber: Page Number
         pagesize:
             label: View per page
             labelShort: Per page
