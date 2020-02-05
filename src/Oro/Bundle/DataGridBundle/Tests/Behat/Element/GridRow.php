@@ -63,7 +63,7 @@ class GridRow extends TableRow
         $cell = $this->startInlineEditing($header);
 
         //Tries to locate element several times to prevent premature ElementNotFoundException
-        $this->spin(function () use ($value) {
+        $isElementFilled = $this->spin(function () use ($value) {
             $this->getElement('OroForm')->fillField(
                 'value',
                 new InputValue(InputMethod::TYPE, $value)
@@ -71,6 +71,11 @@ class GridRow extends TableRow
 
             return true;
         });
+
+        self::assertTrue(
+            $isElementFilled,
+            "Element for value '$value' was not found."
+        );
 
         $this->getDriver()->waitForAjax();
 
