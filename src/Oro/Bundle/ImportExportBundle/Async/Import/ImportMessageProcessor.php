@@ -10,7 +10,6 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -47,11 +46,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
     protected $fileManager;
 
     /**
-     * @var JobStorage
-     */
-    protected $jobStorage;
-
-    /**
      * @var PostponedRowsHandler
      */
     protected $postponedRowsHandler;
@@ -59,7 +53,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
     /**
      * @param JobRunner                    $jobRunner
      * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param JobStorage                   $jobStorage
      * @param LoggerInterface              $logger
      * @param FileManager                  $fileManager
      * @param ImportHandler                $importHandler
@@ -68,7 +61,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
     public function __construct(
         JobRunner $jobRunner,
         ImportExportResultSummarizer $importExportResultSummarizer,
-        JobStorage $jobStorage,
         LoggerInterface $logger,
         FileManager $fileManager,
         ImportHandler $importHandler,
@@ -77,7 +69,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
         $this->importHandler = $importHandler;
         $this->jobRunner = $jobRunner;
         $this->importExportResultSummarizer = $importExportResultSummarizer;
-        $this->jobStorage = $jobStorage;
         $this->logger = $logger;
         $this->fileManager = $fileManager;
         $this->postponedRowsHandler = $postponedRowsHandler;
@@ -171,7 +162,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
             )
         );
 
-        return !!$result['success'];
+        return (bool)$result['success'];
     }
 
     /**
@@ -180,18 +171,13 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function saveJobResult(Job $job, array $data)
     {
-        unset($data['message']);
-        unset($data['importInfo']);
-
-        $job = $this->jobStorage->findJobById($job->getId());
         if (isset($data['errors']) && ! empty(($data['errors']))) {
             $data['errorLogFile'] = $this->saveToStorageErrorLog($data['errors']);
         }
 
-        unset($data['errors']);
-        $job->setData($data);
+        unset($data['message'], $data['importInfo'], $data['errors']);
 
-        $this->jobStorage->saveJob($job);
+        $job->setData($data);
     }
 
     /**

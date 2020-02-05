@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -25,11 +24,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     /**
      * @var LoggerInterface
      */
-    protected $jobStorage;
-
-    /**
-     * @var LoggerInterface
-     */
     protected $logger;
 
     /**
@@ -39,18 +33,15 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
 
     /**
      * @param JobRunner $jobRunner
-     * @param JobStorage $jobStorage
      * @param FileManager $fileManager
      * @param LoggerInterface $logger
      */
     public function __construct(
         JobRunner $jobRunner,
-        JobStorage $jobStorage,
         FileManager $fileManager,
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
-        $this->jobStorage = $jobStorage;
         $this->fileManager = $fileManager;
         $this->logger = $logger;
     }
@@ -101,16 +92,14 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
      */
     protected function saveJobResult(Job $job, array $data)
     {
-        $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
-            if (!empty($data['errors'])) {
-                $errorLogFile = $this->saveToStorageErrorLog($data['errors']);
-                if ($errorLogFile) {
-                    $data['errorLogFile'] = $errorLogFile;
-                }
+        if (!empty($data['errors'])) {
+            $errorLogFile = $this->saveToStorageErrorLog($data['errors']);
+            if ($errorLogFile) {
+                $data['errorLogFile'] = $errorLogFile;
             }
+        }
 
-            $job->setData($data);
-        });
+        $job->setData($data);
     }
 
     /**

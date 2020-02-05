@@ -13,7 +13,6 @@ use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -28,6 +27,9 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function invalidMessageProvider()
     {
         return [
@@ -62,7 +64,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
-            $this->createJobStorageMock(),
             $this->createMock(FileManager::class),
             $logger
         );
@@ -92,7 +93,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
-            $this->createJobStorageMock(),
             $this->createMock(FileManager::class),
             $logger
         );
@@ -131,11 +131,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 return $callback($jobRunner, $job);
             }));
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
-            ->method('saveJob');
-
         $fileStreamWriter = $this->createFileStreamWriterMock();
 
         $writerChain = $this->createWriterChainMock();
@@ -150,7 +145,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new ExportMessageProcessor(
             $jobRunner,
-            $jobStorage,
             $this->createMock(FileManager::class),
             $logger
         );
@@ -199,14 +193,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private function createJobRunnerMock()
     {
         return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    private function createJobStorageMock()
-    {
-        return $this->createMock(JobStorage::class);
     }
 
     /**
