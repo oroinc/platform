@@ -10,6 +10,9 @@ use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
+/**
+ * Iterates over registered menu builders and calls build method for each
+ */
 class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
@@ -194,7 +197,7 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     protected function buildMenu($alias, array $options)
     {
-        $menu = $this->factory->createItem($alias);
+        $menu = $this->factory->createItem($alias, $options);
 
         /** @var BuilderInterface $builder */
         // try to find builder for the specified menu alias
