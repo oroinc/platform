@@ -47,6 +47,7 @@ services:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.checker.job_status_checker'
             - '@oro_message_queue.status_calculator.status_calculator_resolver'
+            - '@oro_message_queue.client.message_producer'
 
     oro_message_queue.checker.job_status_checker:
         class: 'Oro\Component\MessageQueue\Checker\JobStatusChecker'
@@ -83,7 +84,6 @@ services:
         arguments:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.job.root_job_status_calculator'
-            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -121,6 +121,6 @@ services:
         class: 'Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension'
         public: false
         arguments:
-            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.root_job_status_calculator'
         tags:
             - { name: oro_message_queue.job.extension }

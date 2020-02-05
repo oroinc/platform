@@ -8,7 +8,8 @@ define(function(require, exports, module) {
     let config = require('module-config').default(module.id);
 
     config = _.extend({
-        showCloseButton: false
+        showCloseButton: false,
+        allowDefaultAriaLabel: true
     }, config);
 
     /**
@@ -26,7 +27,7 @@ define(function(require, exports, module) {
         /** @property {Array} */
         actions: undefined,
 
-        /** @property {Boolean} */
+        /** @property {boolean} */
         isDropdownActions: null,
 
         /** @property Integer */
@@ -35,13 +36,20 @@ define(function(require, exports, module) {
         /** @property {Array} */
         launchers: undefined,
 
-        /** @property Boolean */
+        /** @property boolean */
         showCloseButton: config.showCloseButton,
 
-        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        /** @property {string}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
 
-        /** @property {String}: 'show' | 'hide' */
+        /**
+         * Allow launcher to use / set default aria-label attribute if it not defined
+         *
+         * @property boolean
+         * */
+        allowDefaultAriaLabel: config.allowDefaultAriaLabel,
+
+        /** @property {string}: 'show' | 'hide' */
         actionsState: '',
 
         /** @property */
@@ -114,12 +122,16 @@ define(function(require, exports, module) {
             const opts = options || {};
             this.subviews = [];
 
-            if (!_.isUndefined(opts.actionsHideCount)) {
+            if (opts.actionsHideCount !== void 0) {
                 this.actionsHideCount = opts.actionsHideCount;
             }
 
-            if (!_.isUndefined(opts.themeOptions.actionsHideCount)) {
+            if (opts.themeOptions.actionsHideCount !== void 0) {
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
+            }
+
+            if (opts.allowDefaultAriaLabel !== void 0) {
+                this.allowDefaultAriaLabel = opts.allowDefaultAriaLabel;
             }
 
             if (_.isObject(opts.themeOptions.launcherOptions)) {
@@ -199,7 +211,10 @@ define(function(require, exports, module) {
          */
         createLaunchers: function() {
             return _.map(this.actions, function(action) {
-                return action.createLauncher({launcherMode: this.launcherMode});
+                return action.createLauncher({
+                    launcherMode: this.launcherMode,
+                    allowDefaultAriaLabel: this.allowDefaultAriaLabel
+                });
             }, this);
         },
 

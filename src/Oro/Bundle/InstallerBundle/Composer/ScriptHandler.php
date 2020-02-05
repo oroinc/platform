@@ -23,7 +23,7 @@ class ScriptHandler
      *
      * @param Event $event A instance
      */
-    public static function installAssets(Event $event)
+    public static function installAssets(Event $event): void
     {
         $options = self::getOptions($event);
         $npmAssets = self::collectNpmAssets($event->getComposer());
@@ -50,6 +50,19 @@ class ScriptHandler
         }
 
         self::copyAssets('node_modules', $options['symfony-web-dir'] . '/bundles/npmassets');
+    }
+
+    /**
+     * Updates npm assets
+     *
+     * @param Event $event A instance
+     */
+    public static function updateAssets(Event $event): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->remove('package-lock.json');
+
+        self::installAssets($event);
     }
 
     /**

@@ -2,15 +2,14 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job\Extension;
 
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 
 class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
+    /** @var RootJobStatusCalculator|\PHPUnit\Framework\MockObject\MockObject */
+    private $rootJobStatusCalculator;
 
     /** @var RootJobStatusExtension */
     private $extension;
@@ -20,108 +19,61 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->producer = $this->createMock(MessageProducerInterface::class);
-        $this->extension = new RootJobStatusExtension($this->producer);
+        $this->rootJobStatusCalculator = $this->createMock(RootJobStatusCalculator::class);
+        $this->extension = new RootJobStatusExtension($this->rootJobStatusCalculator);
     }
 
-    public function testOnPreRunUnique()
+    public function testOnPreRunUnique(): void
     {
         $job = new Job();
-        $job->setId('uniqueJobId');
-        $message = new Message(
-            ['jobId' => 'uniqueJobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
+        $this->rootJobStatusCalculator
             ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
+            ->method('calculate')
+            ->with($job);
 
         $this->extension->onPreRunUnique($job);
     }
 
-    public function testOnPostRunUnique()
+    public function testOnPostRunUnique(): void
     {
         $job = new Job();
-        $job->setId('uniqueJobId');
-        $message = new Message(
-            ['jobId' => 'uniqueJobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
+        $this->rootJobStatusCalculator
             ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
+            ->method('calculate')
+            ->with($job);
 
         $this->extension->onPostRunUnique($job, '');
     }
 
-    public function testOnPreRunDelayed()
+    public function testOnPostRunDelayed(): void
     {
         $job = new Job();
-        $job->setId('delayedJobId');
-        $message = new Message(
-            ['jobId' => 'delayedJobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
+        $this->rootJobStatusCalculator
             ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
-
-        $this->extension->onPreRunDelayed($job);
-    }
-
-    public function testOnPostRunDelayed()
-    {
-        $job = new Job();
-        $job->setId('delayedJobId');
-        $message = new Message(
-            ['jobId' => 'delayedJobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
-            ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
+            ->method('calculate')
+            ->with($job);
 
         $this->extension->onPostRunUnique($job, '');
     }
 
-    public function testOnCancel()
+    public function testOnCancel(): void
     {
         $job = new Job();
-        $job->setId('jobId');
-        $message = new Message(
-            ['jobId' => 'jobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
+        $this->rootJobStatusCalculator
             ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
+            ->method('calculate')
+            ->with($job);
 
         $this->extension->onCancel($job);
     }
 
-    public function testOnError()
+    public function testOnError(): void
     {
         $job = new Job();
-        $job->setId('jobId');
-        $message = new Message(
-            ['jobId' => 'jobId', 'calculateProgress' => true],
-            'oro.message_queue.client.high_message_priority'
-        );
-
-        $this->producer
+        $this->rootJobStatusCalculator
             ->expects($this->once())
-            ->method('send')
-            ->with('oro.message_queue.job.calculate_root_job_status', $message);
+            ->method('calculate')
+            ->with($job);
 
         $this->extension->onError($job);
     }

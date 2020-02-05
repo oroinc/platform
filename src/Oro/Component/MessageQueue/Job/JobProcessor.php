@@ -205,8 +205,6 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t start root jobs. id: "%s"', $job->getId()));
         }
 
-        $job = $this->jobStorage->findJobById($job->getId());
-
         if (! in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
             throw new \LogicException(sprintf(
                 'Can start only new jobs: id: "%s", status: "%s"',
@@ -230,8 +228,6 @@ class JobProcessor
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t success root jobs. id: "%s"', $job->getId()));
         }
-
-        $job = $this->jobStorage->findJobById($job->getId());
 
         if ($job->getStatus() !== Job::STATUS_RUNNING) {
             throw new \LogicException(sprintf(
@@ -289,8 +285,6 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
         }
 
-        $job = $this->jobStorage->findJobById($job->getId());
-
         if ($job->getStatus() !== Job::STATUS_RUNNING) {
             throw new \LogicException(sprintf(
                 'Can fail only running jobs. id: "%s", status: "%s"',
@@ -315,8 +309,6 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
         }
 
-        $job = $this->jobStorage->findJobById($job->getId());
-
         if ($job->getStatus() !== Job::STATUS_RUNNING) {
             throw new \LogicException(sprintf(
                 'Can fail and redelivery only running jobs. id: "%s", status: "%s"',
@@ -338,8 +330,6 @@ class JobProcessor
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t cancel root jobs. id: "%s"', $job->getId()));
         }
-
-        $job = $this->jobStorage->findJobById($job->getId());
 
         if (! in_array($job->getStatus(), $this->getActiveJobStatuses(), true)) {
             throw new \LogicException(sprintf(

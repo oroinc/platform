@@ -204,7 +204,6 @@ trait RolePermissionExtension
      */
     private function buildAclMask(MaskBuilder $maskBuilder, array $permissions): int
     {
-        $mask = $maskBuilder->reset()->get();
         foreach ($permissions as $permission => $accessLevel) {
             $permissionName = null;
             if (is_int($accessLevel)) {
@@ -213,10 +212,10 @@ trait RolePermissionExtension
                 $permissionName = $permission;
             }
             if (null !== $permissionName && $maskBuilder->hasMaskForPermission($permissionName)) {
-                $mask = $maskBuilder->add($permissionName)->get();
+                $maskBuilder->add($permissionName);
             }
         }
 
-        return $mask;
+        return $maskBuilder->get();
     }
 }

@@ -120,6 +120,10 @@ class HtmlTagHelper
             $config->set('HTML.DefinitionID', __CLASS__);
             $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
 
+            // Disabled `rel` attribute transformer.
+            $config->set('HTML.TargetNoopener', false);
+            $config->set('HTML.TargetNoreferrer', false);
+
             // add inline data support
             $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
             $config->set('Attr.EnableID', true);

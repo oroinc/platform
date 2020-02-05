@@ -8,13 +8,15 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class provides functional for loading default Role permissions
+ * The base class for data fixtures that load default permissions for roles.
  */
 abstract class AbstractLoadAclData extends AbstractFixture implements
     DependentFixtureInterface,
@@ -29,26 +31,18 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
      */
     public function getDependencies()
     {
-        return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData',
-        ];
+        return [LoadRolesData::class];
     }
 
     /**
-     * Load roles default acls
-     *
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */
         $aclManager = $this->container->get('oro_security.acl.manager');
-        if (!$aclManager->isAclEnabled()) {
-            return;
-        }
 
         $rolesData = $this->getAclData();
-
         foreach ($rolesData as $roleName => $roleConfigData) {
             if (self::ALL_ROLES === $roleName) {
                 foreach ($this->getRoles($manager) as $role) {
@@ -56,15 +50,16 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
                 }
             } else {
                 $role = $this->getRole($manager, $roleName, $roleConfigData);
-                if (!$role) {
-                    continue;
+                if (null !== $role) {
+                    $this->processRole($aclManager, $manager, $role, $roleConfigData);
                 }
-
-                $this->processRole($aclManager, $manager, $role, $roleConfigData);
             }
         }
 
-        $aclManager->flush();
+        $manager->flush();
+        if ($aclManager->isAclEnabled()) {
+            $aclManager->flush();
+        }
     }
 
     /**
@@ -75,36 +70,25 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
     abstract protected function getDataPath();
 
     /**
-     * Sets ACL
-     *
-     * @param AclManager $aclManager
-     * @param mixed      $sid
-     * @param string     $permission
-     * @param array      $acls
+     * @param AclManager                $aclManager
+     * @param SecurityIdentityInterface $sid
+     * @param ObjectIdentity            $oid
+     * @param string[]                  $permissions
      */
-    protected function processPermission(
+    protected function setPermissions(
         AclManager $aclManager,
         SecurityIdentityInterface $sid,
-        $permission,
-        array $acls
+        ObjectIdentity $oid,
+        array $permissions
     ) {
-        $oid = $aclManager->getOid(str_replace('|', ':', $permission));
-
-        $extension = $aclManager->getExtensionSelector()->select($oid);
-        $maskBuilders = $extension->getAllMaskBuilders();
-
+        $maskBuilders = $aclManager->getAllMaskBuilders($oid);
         foreach ($maskBuilders as $maskBuilder) {
-            $mask = $maskBuilder->reset()->get();
-
-            if (!empty($acls)) {
-                foreach ($acls as $acl) {
-                    if ($maskBuilder->hasMask('MASK_' . $acl)) {
-                        $mask = $maskBuilder->add($acl)->get();
-                    }
+            foreach ($permissions as $permission) {
+                if ($maskBuilder->hasMaskForPermission($permission)) {
+                    $maskBuilder->add($permission);
                 }
             }
-
-            $aclManager->setPermission($sid, $oid, $mask);
+            $aclManager->setPermission($sid, $oid, $maskBuilder->get());
         }
     }
 
@@ -148,8 +132,7 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
             $roleName = $roleConfigData['bap_role'];
         }
 
-        return $objectManager->getRepository('OroUserBundle:Role')
-            ->findOneBy(['role' => $roleName]);
+        return $objectManager->getRepository(Role::class)->findOneBy(['role' => $roleName]);
     }
 
     /**
@@ -170,10 +153,15 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
             $objectManager->persist($role);
         }
 
-        if (isset($roleConfigData['permissions'])) {
+        if (isset($roleConfigData['permissions']) && $aclManager->isAclEnabled()) {
             $sid = $aclManager->getSid($role);
-            foreach ($roleConfigData['permissions'] as $permission => $acls) {
-                $this->processPermission($aclManager, $sid, $permission, $acls);
+            foreach ($roleConfigData['permissions'] as $oid => $permissions) {
+                $this->setPermissions(
+                    $aclManager,
+                    $sid,
+                    $aclManager->getOid(str_replace('|', ':', $oid)),
+                    $permissions
+                );
             }
         }
     }
@@ -187,7 +175,7 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
      */
     protected function getRoles(ObjectManager $objectManager)
     {
-        return $objectManager->getRepository('OroUserBundle:Role')
+        return $objectManager->getRepository(Role::class)
             ->createQueryBuilder('r')
             ->where('r.role <> :role')
             ->setParameter('role', User::ROLE_ANONYMOUS)
