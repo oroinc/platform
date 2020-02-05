@@ -9,7 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\Constraint\IsType;
@@ -19,9 +18,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
-
-    /** @var JobStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobStorage;
 
     /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
@@ -35,12 +31,11 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->jobStorage = $this->createMock(JobStorage::class);
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->fileManager = $this->createMock(FileManager::class);
 
         $this->processor = $this->getMockBuilder(ExportMessageProcessorAbstract::class)
-            ->setConstructorArgs([$this->jobRunner, $this->jobStorage, $this->fileManager, $this->logger])
+            ->setConstructorArgs([$this->jobRunner, $this->fileManager, $this->logger])
             ->setMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
             ->getMock();
     }
@@ -71,6 +66,9 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
     }
 
+    /**
+     * @return array
+     */
     public function runDelayedJobResultProvider()
     {
         return [
@@ -125,11 +123,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('info')
             ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'))
-        ;
-
-        $this->jobStorage
-            ->expects($this->once())
-            ->method('saveJob')
         ;
 
         $this->processor
@@ -202,16 +195,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($jobId, $callback) use ($job) {
                     return $callback($this->jobRunner, $job);
-                }
-            );
-
-        $this->jobStorage
-            ->expects($this->once())
-            ->method('saveJob')
-            ->with($job, $this->isType(IsType::TYPE_CALLABLE))
-            ->willReturnCallback(
-                static function ($job, $callback) {
-                    return $callback($job);
                 }
             );
 

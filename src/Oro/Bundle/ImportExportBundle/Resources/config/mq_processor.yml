@@ -22,7 +22,6 @@ services:
         abstract: true
         arguments:
             - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.job.storage'
             - '@oro_importexport.file.file_manager'
             - '@logger'
 
@@ -71,7 +70,6 @@ services:
         arguments:
             - '@oro_message_queue.job.runner'
             - '@oro_importexport.async.import_export_result_summarizer'
-            - '@oro_message_queue.job.storage'
             - '@logger'
             - '@oro_importexport.file.file_manager'
             - '@oro_importexport.handler.import'

@@ -2,26 +2,24 @@
 
 namespace Oro\Component\MessageQueue\Job\Extension;
 
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Job\RootJobStatusCalculatorInterface;
 
 /**
- * This extension is used to send root job recalculation message based on event instead of from the code
+ * This extension is used to recalculate root job status in cases:
+ * job is started, job is finished or job is interrupted.
  */
 class RootJobStatusExtension extends AbstractExtension
 {
-    /** @var MessageProducerInterface */
-    private $producer;
+    /** @var RootJobStatusCalculatorInterface */
+    private $rootJobStatusCalculator;
 
     /**
-     * @param MessageProducerInterface $producer
+     * @param RootJobStatusCalculatorInterface $rootJobStatusCalculator
      */
-    public function __construct(MessageProducerInterface $producer)
+    public function __construct(RootJobStatusCalculatorInterface $rootJobStatusCalculator)
     {
-        $this->producer = $producer;
+        $this->rootJobStatusCalculator = $rootJobStatusCalculator;
     }
 
     /**
@@ -29,7 +27,7 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onPreRunUnique(Job $job)
     {
-        $this->sendCalculateJobStatusMessage($job);
+        $this->calculateJobStatusMessage($job);
     }
 
     /**
@@ -37,15 +35,7 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onPostRunUnique(Job $job, $jobResult)
     {
-        $this->sendCalculateJobStatusMessage($job);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function onPreRunDelayed(Job $job)
-    {
-        $this->sendCalculateJobStatusMessage($job);
+        $this->calculateJobStatusMessage($job);
     }
 
     /**
@@ -53,7 +43,7 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onPostRunDelayed(Job $job, $jobResult)
     {
-        $this->sendCalculateJobStatusMessage($job);
+        $this->calculateJobStatusMessage($job);
     }
 
     /**
@@ -61,7 +51,7 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onCancel(Job $job)
     {
-        $this->sendCalculateJobStatusMessage($job);
+        $this->calculateJobStatusMessage($job);
     }
 
     /**
@@ -69,15 +59,14 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onError(Job $job)
     {
-        $this->sendCalculateJobStatusMessage($job);
+        $this->calculateJobStatusMessage($job);
     }
 
     /**
      * @param Job $job
      */
-    private function sendCalculateJobStatusMessage($job)
+    private function calculateJobStatusMessage(Job $job): void
     {
-        $message = ['jobId' => $job->getId(), 'calculateProgress' => true];
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, new Message($message, MessagePriority::HIGH));
+        $this->rootJobStatusCalculator->calculate($job);
     }
 }
