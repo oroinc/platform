@@ -4,6 +4,9 @@ namespace Oro\Bundle\CronBundle\Helper;
 
 use Cron\CronExpression;
 
+/**
+ * Helps create CRON expression using CRON definition.
+ */
 class CronHelper
 {
     /**
@@ -23,6 +26,9 @@ class CronHelper
      */
     public function createCron($definition)
     {
+        // prevent exception "Module by zero" in cron definition
+        $definition = str_replace('*/0', '*', $definition);
+
         return CronExpression::factory($definition);
     }
 }
