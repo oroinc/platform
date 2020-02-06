@@ -26,6 +26,7 @@
     </div>
     <div class="value-field-frame">
         <input class="input input--size-m <% if (renderMode === 'toggle-mode') { %> input--full <% } %>" type="text" name="value" value="">
+        <label class="sr-only" for="<%= name %>"><%= name %> input</label>
         <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>">
         <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">

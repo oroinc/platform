@@ -31,7 +31,10 @@
 <<%- tagName %>
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
     class="<%= actionClassNames.join(' ') %>"
-    title="<%- title %>"
+    <% if (launcherMode == 'icon-only') { %>
+        title="<%- title %>"
+        aria-label="<%- label %>"
+    <% } %>
     <% attributesTemplate(attributes) %>
     <% if (links) { %> data-toggle="dropdown" data-inherit-parent-width="loosely" role="button" id="<%- togglerId %>"
         aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
