@@ -28,7 +28,8 @@ define(function(require) {
                 firstChildItem: '.fallback-item:first',
                 childItem: '.fallback-item:not(:first)',
                 itemValue: '.fallback-item-value',
-                itemFallback: '.fallback-item-fallback'
+                itemFallback: '.fallback-item-fallback',
+                itemUseFallback: '.fallback-item-use-fallback'
             }
         },
 
@@ -218,13 +219,16 @@ define(function(require) {
          * @param {jQuery} $item
          */
         switchUseFallback: function($item) {
-            const $useFallback = this.getFallbackEl($item);
-            if ($useFallback.length === 0) {
+            const $fallback = this.getFallbackEl($item);
+            if ($fallback.length === 0) {
                 this.enableDisableValue(this.getValueEl($item), true);
                 return;
             }
 
-            this.enableDisableValue(this.getValueEl($item), $useFallback.val() === '');
+            const isFallbackNotUsed = $fallback.val() === '';
+
+            this.enableDisableValue(this.getValueEl($item), isFallbackNotUsed);
+            this.getUseFallbackEl($item).prop('disabled', isFallbackNotUsed).val(!isFallbackNotUsed);
         },
 
         /**
@@ -300,6 +304,17 @@ define(function(require) {
          */
         getFallbackEl: function($el) {
             return $el.find(this.options.selectors.itemFallback).find('select');
+        },
+
+        /**
+         * Get use_fallback element
+         *
+         * @param {jQuery} $el
+         *
+         * @returns {jQuery}
+         */
+        getUseFallbackEl: function($el) {
+            return $el.find(this.options.selectors.itemUseFallback).find('input');
         },
 
         /**

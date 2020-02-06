@@ -190,10 +190,6 @@ class OroEntityExtendBundle extends Bundle
         $projectDir = $this->kernel->getProjectDir();
         $processArguments = [
             $this->getPhpExecutable(),
-            '-dxdebug.remote_enable=1',
-            '-dxdebug.remote_mode=req',
-            '-dxdebug.remote_port=9900',
-            '-dxdebug.remote_host=127.0.0.1',
             $projectDir . '/bin/console',
             $commandName,
             sprintf('%s=%s', '--env', $this->kernel->getEnvironment()),

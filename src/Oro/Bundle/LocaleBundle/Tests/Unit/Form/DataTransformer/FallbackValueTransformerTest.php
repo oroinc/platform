@@ -55,7 +55,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testReverseTransform($input, $expected)
     {
-        $this->assertEquals($expected, $this->transformer->reverseTransform($input));
+        $this->assertSame($expected, $this->transformer->reverseTransform($input));
     }
 
     /**
@@ -74,16 +74,22 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             'empty values' => [
                 'input'    => ['value' => null, 'fallback' => null],
-                'expected' => null,
+                'expected' => '',
             ],
             'scalar' => [
                 'input'    => ['value' => 'string', 'fallback' => null],
                 'expected' => 'string',
             ],
-            'fallback' => [
-                'input' => ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
-                'expected' => new FallbackType(FallbackType::SYSTEM),
-            ],
         ];
+    }
+
+    public function testReverseTransformWhenFallback(): void
+    {
+        $this->assertEquals(
+            new FallbackType(FallbackType::SYSTEM),
+            $this->transformer->reverseTransform(
+                ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true]
+            )
+        );
     }
 }
