@@ -6,9 +6,11 @@ use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +25,9 @@ class LayoutListener
     /** @var LayoutHelper */
     private $layoutHelper;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var ContainerInterface */
     private $container;
 
@@ -34,6 +39,14 @@ class LayoutListener
     {
         $this->layoutHelper = $layoutHelper;
         $this->container = $container;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -136,8 +149,11 @@ class LayoutListener
             $response = [];
             foreach ($blockIds as $blockId) {
                 if ($blockId) {
-                    $layout = $layoutManager->getLayout($context, $blockId);
-                    $response[$blockId] = $layout->render();
+                    try {
+                        $response[$blockId] = $layoutManager->getLayout($context, $blockId)->render();
+                    } catch (BlockViewNotFoundException $e) {
+                        $this->logNotFoundViewException($blockId, $e);
+                    }
                 }
             }
             $response = new JsonResponse($response);
@@ -146,5 +162,17 @@ class LayoutListener
             $response = new Response($layout->render());
         }
         return $response;
+    }
+
+    /**
+     * @param string $blockId
+     * @param BlockViewNotFoundException $e
+     */
+    private function logNotFoundViewException($blockId, BlockViewNotFoundException $e)
+    {
+        $this->logger->warning(
+            sprintf('Unknown block "%s" was requested via layout_block_ids', $blockId),
+            ['exception' => $e]
+        );
     }
 }
