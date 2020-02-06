@@ -193,27 +193,61 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Asserts the response content contains the given validation errors.
+     * Asserts that the response content contains the given validation errors.
      *
      * @param array    $expectedErrors
      * @param Response $response
      * @param int      $statusCode
+     */
+    protected function assertResponseContainsValidationErrors(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertResponseValidationErrorsWithStrictOption($expectedErrors, $response, $statusCode, false);
+    }
+
+    /**
+     * Asserts the response content contains the given validation errors.
+     *
+     * @param array $expectedErrors
+     * @param Response $response
+     * @param int $statusCode
      */
     protected function assertResponseValidationErrors(
         $expectedErrors,
         Response $response,
         $statusCode = Response::HTTP_BAD_REQUEST
     ) {
+        $this->assertResponseValidationErrorsWithStrictOption($expectedErrors, $response, $statusCode);
+    }
+
+    /**
+     * Asserts the response content contains the given validation errors.
+     *
+     * @param array $expectedErrors
+     * @param Response $response
+     * @param int $statusCode
+     * @param bool $strict
+     */
+    private function assertResponseValidationErrorsWithStrictOption(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST,
+        $strict = true
+    ) {
         static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains([JsonApiDoc::ERRORS => $expectedErrors], $response);
-            self::assertCount(
-                count($expectedErrors),
-                $content[JsonApiDoc::ERRORS],
-                'Unexpected number of validation errors'
-            );
+            if ($strict) {
+                self::assertCount(
+                    count($expectedErrors),
+                    $content[JsonApiDoc::ERRORS],
+                    'Unexpected number of validation errors'
+                );
+            }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(

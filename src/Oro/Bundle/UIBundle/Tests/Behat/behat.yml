@@ -111,5 +111,8 @@ oro_behat_extension:
     Alert Error Message:
       selector: '.alert-error .message'
 
+    Alert Error Flash Message:
+      selector: '.alert .notification-flash__text'
+
     TypeaheadSuggestionsDropdown:
       selector: '.typeahead.dropdown-menu'

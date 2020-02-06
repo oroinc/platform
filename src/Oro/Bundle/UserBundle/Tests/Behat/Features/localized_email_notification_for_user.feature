@@ -12,7 +12,7 @@ Feature: Localized email notification for user
     When I go to System / Configuration
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:
-      | Enabled Localizations | [English, German Localization, French Localization] |
+      | Enabled Localizations | [English (United States), German Localization, French Localization] |
       | Default Localization  | French Localization                                 |
     And I submit form
     Then I should see "Configuration saved" flash message
@@ -28,7 +28,7 @@ Feature: Localized email notification for user
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And uncheck "Use Organization" for "Default Localization" field
     And I fill form with:
-      | Default Localization | English |
+      | Default Localization | English (United States) |
     And I submit form
     Then I should see "Configuration saved" flash message
 

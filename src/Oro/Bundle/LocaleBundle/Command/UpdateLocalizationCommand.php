@@ -79,6 +79,12 @@ EOD;
         $localization = $localizationRepository
             ->findOneByLanguageCodeAndFormattingCode(Translator::DEFAULT_LOCALE, Translator::DEFAULT_LOCALE);
 
+        // Try to fetch localization for en_US default formatting code. Should be removed in scope of #BAP-19605
+        if (!$localization) {
+            $localization = $localizationRepository
+                ->findOneByLanguageCodeAndFormattingCode(Translator::DEFAULT_LOCALE, 'en_US');
+        }
+
         if ($localization) {
             $language = $localization->getLanguage();
             if ($language->getCode() !== $languageCode) {

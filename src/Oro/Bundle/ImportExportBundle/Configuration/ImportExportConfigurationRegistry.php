@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Configuration;
 
+/**
+ * Import/Export configurations registry.
+ */
 class ImportExportConfigurationRegistry implements ImportExportConfigurationRegistryInterface
 {
     /**
@@ -14,7 +17,7 @@ class ImportExportConfigurationRegistry implements ImportExportConfigurationRegi
      */
     public function addConfiguration(ImportExportConfigurationProviderInterface $provider, string $alias)
     {
-        $this->configurations[$alias][] = $provider->get();
+        $this->configurations[$alias][] = $provider;
     }
 
     /**
@@ -26,6 +29,11 @@ class ImportExportConfigurationRegistry implements ImportExportConfigurationRegi
             return [];
         }
 
-        return $this->configurations[$alias];
+        return array_map(
+            static function (ImportExportConfigurationProviderInterface $provider) {
+                return $provider->get();
+            },
+            $this->configurations[$alias]
+        );
     }
 }
