@@ -11,6 +11,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -137,27 +138,17 @@ class OroMainContext extends MinkContext implements
         }
 
         $session = $this->getMink()->getSession();
-
-        /** @var OroSelenium2Driver $driver */
-        $driver = $session->getDriver();
-        try {
-            $url = $session->getCurrentUrl();
-        } catch (\Exception $e) {
-            // there is some age cases when url is not reachable
+        if (!$this->isSupportedUrl($session)) {
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
-            return;
-        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
-            return;
-        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
-            return;
-        } elseif (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
             // Don't wait when we need assert the flash message, because it can disappear until ajax in process
             return;
         }
 
+        /** @var OroSelenium2Driver $driver */
+        $driver = $session->getDriver();
         $driver->waitPageToLoad();
     }
 
@@ -174,36 +165,66 @@ class OroMainContext extends MinkContext implements
         }
 
         $session = $this->getMink()->getSession();
+        if (!$this->isSupportedUrl($session)) {
+            return;
+        }
 
         /** @var OroSelenium2Driver $driver */
         $driver = $session->getDriver();
+        $driver->waitForAjax();
+
+        $this->checkForUnexpectedErrors($scope);
+    }
+
+    /**
+     * @param Session $session
+     * @return bool
+     */
+    protected function isSupportedUrl(Session $session): bool
+    {
         try {
             $url = $session->getCurrentUrl();
         } catch (\Exception $e) {
-            // there is some age cases when url is not reachable
-            return;
+            // there is some edge cases when url is not reachable
+            return false;
         }
 
         if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
-            return;
-        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
-            return;
-        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
-            return;
+            return false;
         }
 
-        $driver->waitForAjax();
+        if (0 === preg_match('/^https?:\/\//', $url)) {
+            return false;
+        }
 
-        // Check for unforeseen 500 errors
-        $error = $this->elementFactory->findElementContains(
+        if (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function checkForUnexpectedErrors(AfterStepScope $scope): void
+    {
+        $errorNotifyElements = [
             'Alert Error Message',
-            'There was an error performing the requested operation. Please try again or contact us for assistance.'
-        );
+            'Alert Error Flash Message'
+        ];
+        $errors = [
+            'There was an error performing the requested operation. Please try again or contact us for assistance.',
+            'Error occurred during layout update. Please contact system administrator.'
+        ];
 
-        if ($error->isIsset()) {
-            self::fail(
-                sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
-            );
+        foreach ($errorNotifyElements as $element) {
+            foreach ($errors as $error) {
+                $error = $this->elementFactory->findElementContains($element, $error);
+                if ($error->isIsset()) {
+                    self::fail(sprintf(
+                        'There is an error message "%s" found on the page, something went wrong',
+                        $error->getText()
+                    ));
+                }
+            }
         }
     }
 
@@ -1478,6 +1499,26 @@ JS;
             });
         }
         $this->assertCount(0, $options);
+    }
+
+    /**
+     * Assert that options is selected in select field
+     * Example: Then the "Custom" option from "MyField" is selected
+     *
+     * @Then /^the "(?P<option>(?:[^"]|\\")*)" option from "(?P<fieldName>(?:[^"]|\\")*)" (?:is|should be) selected$/
+     *
+     * @param string $fieldName
+     * @param string $option
+     */
+    public function optionShouldBeSelected(string $fieldName, string $option)
+    {
+        $field = $this->createElement($fieldName);
+        $this->assertTrue($field->isValid(), sprintf('Select "%s" not found on page', $fieldName));
+
+        $optionElement = $field->find('named', ['option', $option]);
+        $this->assertNotNull($optionElement, sprintf('Option %s was not found', $option));
+
+        $this->assertTrue($optionElement->isSelected(), sprintf('Option %s is not selected', $option));
     }
 
     /**

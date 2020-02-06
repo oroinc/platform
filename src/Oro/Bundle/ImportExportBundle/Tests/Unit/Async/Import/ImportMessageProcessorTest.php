@@ -15,7 +15,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -28,7 +27,6 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $chunkImportMessageProcessor = new ImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createImportExportResultSummarizerMock(),
-            $this->createJobStorageMock(),
             $this->createLoggerMock(),
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
@@ -49,7 +47,6 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createImportExportResultSummarizerMock(),
-            $this->createJobStorageMock(),
             $logger,
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
@@ -66,6 +63,9 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
+    /**
+     * @return array
+     */
     public function dataProviderForTestProcessImport()
     {
         return [
@@ -95,6 +95,9 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataProviderForTestProcessImport
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @param $body
+     * @param $writeLog
      */
     public function testShouldProcessedDataMessage($body, $writeLog)
     {
@@ -138,25 +141,12 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('handle')
             ->willReturn($body);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
-            ->method('saveJob')
-            ;
-        $jobStorage
-            ->expects($this->once())
-            ->method('findJobById')
-            ->with(1)
-            ->willReturn($job);
-        ;
-
         $importExportResultSummarizer = $this->createImportExportResultSummarizerMock();
         $importExportResultSummarizer
             ->expects($this->once())
             ->method('getImportSummaryMessage')
             ->with()
             ->willReturn('Import of the csv is completed, success: 1, info: imports was done, message: ');
-        ;
 
         $fileManager = $this->createFileManagerMock();
         $fileManager
@@ -178,7 +168,6 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new ImportMessageProcessor(
             $jobRunner,
             $importExportResultSummarizer,
-            $jobStorage,
             $logger,
             $fileManager,
             $httpImportHandler,
@@ -200,6 +189,10 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertContains([
+            'success' => true,
+            'filePath' => 'csv',
+        ], $job->getData());
     }
 
     /**
@@ -241,14 +234,6 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     protected function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    protected function createJobStorageMock()
-    {
-        return $this->createMock(JobStorage::class);
     }
 
     /**
