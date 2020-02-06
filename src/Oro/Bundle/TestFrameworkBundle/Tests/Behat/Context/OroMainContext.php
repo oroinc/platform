@@ -1481,6 +1481,26 @@ JS;
     }
 
     /**
+     * Assert that options is selected in select field
+     * Example: Then the "Custom" option from "MyField" is selected
+     *
+     * @Then /^the "(?P<option>(?:[^"]|\\")*)" option from "(?P<fieldName>(?:[^"]|\\")*)" (?:is|should be) selected$/
+     *
+     * @param string $fieldName
+     * @param string $option
+     */
+    public function optionShouldBeSelected(string $fieldName, string $option)
+    {
+        $field = $this->createElement($fieldName);
+        $this->assertTrue($field->isValid(), sprintf('Select "%s" not found on page', $fieldName));
+
+        $optionElement = $field->find('named', ['option', $option]);
+        $this->assertNotNull($optionElement, sprintf('Option %s was not found', $option));
+
+        $this->assertTrue($optionElement->isSelected(), sprintf('Option %s is not selected', $option));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function fillField($field, $value)
