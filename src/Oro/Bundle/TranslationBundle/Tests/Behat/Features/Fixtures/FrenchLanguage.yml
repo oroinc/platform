@@ -1,0 +1,6 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    french_lang:
+        code: 'fr_FR'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'

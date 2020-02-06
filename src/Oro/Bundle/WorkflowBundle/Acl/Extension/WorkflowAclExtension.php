@@ -13,12 +13,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The ACL extension that works with workflows.
+ */
 class WorkflowAclExtension extends AbstractWorkflowAclExtension
 {
-    const NAME = 'workflow';
+    public const NAME = 'workflow';
 
-    const PERMISSION_VIEW    = 'VIEW_WORKFLOW';
-    const PERMISSION_PERFORM = 'PERFORM_TRANSITIONS';
+    private const PERMISSION_VIEW    = 'VIEW_WORKFLOW';
+    private const PERMISSION_PERFORM = 'PERFORM_TRANSITIONS';
 
     /** @var WorkflowAclMetadataProvider */
     protected $workflowMetadataProvider;
@@ -75,6 +78,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
                 MaskBuilder::MASK_PERFORM_TRANSITIONS_SYSTEM,
             ],
         ];
+
+        $this->maskBuilder = new MaskBuilder();
     }
 
     /**
@@ -90,7 +95,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
      */
     public function supports($type, $id)
     {
-        return $id === $this->getExtensionKey();
+        return $this->getExtensionKey() === $id;
     }
 
     /**
@@ -134,7 +139,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
      */
     public function getObjectIdentity($val)
     {
-        if (is_string($val)) {
+        if (\is_string($val)) {
             $type = $id = $group = null;
             $this->parseDescriptor($val, $type, $id, $group);
             if ($this->getExtensionKey() !== $id) {
@@ -142,7 +147,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
             }
 
             return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
-        } elseif ($val instanceof AclAnnotation) {
+        }
+        if ($val instanceof AclAnnotation) {
             throw new \InvalidArgumentException('Workflow ACL Extension does not support ACL annotations.');
         }
 
@@ -160,22 +166,6 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getMaskBuilder($permission)
-    {
-        return new MaskBuilder();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllMaskBuilders()
-    {
-        return [new MaskBuilder()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceBits($mask)
     {
         return $mask & MaskBuilder::SERVICE_BITS;
@@ -187,13 +177,5 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     public function removeServiceBits($mask)
     {
         return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMaskBuilderConst($constName)
-    {
-        return MaskBuilder::getConst($constName);
     }
 }

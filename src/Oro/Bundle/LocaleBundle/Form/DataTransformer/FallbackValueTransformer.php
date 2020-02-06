@@ -42,10 +42,8 @@ class FallbackValueTransformer implements DataTransformerInterface
 
         if (!empty($value['fallback']) && !empty($value['use_fallback'])) {
             return new FallbackType($value['fallback']);
-        } elseif (!empty($value['value'])) {
-            return $value['value'];
         }
 
-        return null;
+        return $value['value'] ?? '';
     }
 }

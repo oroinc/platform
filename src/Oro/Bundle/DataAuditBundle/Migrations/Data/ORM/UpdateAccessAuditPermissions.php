@@ -60,7 +60,7 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
             return;
         }
 
-        $roles = $this->loadRoles();
+        $roles = $this->loadRoles($manager);
         $oldObjectIdentity = $this->createObjectIdentity(self::ACL_ACTION_AUDIT);
         $newObjectIdentity = $aclManager->getOid(self::ACL_ENTITY_AUDIT);
 
@@ -84,14 +84,13 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
     }
 
     /**
+     * @param ObjectManager $manager
+     *
      * @return Role[]
      */
-    private function loadRoles()
+    private function loadRoles(ObjectManager $manager)
     {
-        return $this->container
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepository('OroUserBundle:Role')
-            ->findAll();
+        return $manager->getRepository(Role::class)->findAll();
     }
 
     /**
@@ -105,13 +104,10 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
         $permission
     ) {
         $aclManager = $this->getAclManager();
-        $extension = $aclManager->getExtensionSelector()->select($objectIdentity);
-        $maskBuilders = $extension->getAllMaskBuilders();
-
+        $maskBuilders = $aclManager->getAllMaskBuilders($objectIdentity);
         foreach ($maskBuilders as $maskBuilder) {
-            if ($maskBuilder->hasMask('MASK_' . $permission)) {
+            if ($maskBuilder->hasMaskForPermission($permission)) {
                 $maskBuilder->add($permission);
-
                 $aclManager->setPermission($securityIdentity, $objectIdentity, $maskBuilder->get());
             }
         }
