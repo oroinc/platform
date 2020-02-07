@@ -4,6 +4,7 @@
 "Save and New": "Save and New"
 "Update": "Update"
 "Accept": "Accept"
+"Apply": "Apply"
 "Decline": "Decline"
 "Cancel": "Cancel"
 "Close": "Close"
@@ -144,7 +145,9 @@ oro:
         button:
             copy_to_clipboard.label: 'Copy to Clipboard'
             skip_to_content: 'Skip to Main Content'
-            
+        collapse:
+            more: 'View More'
+            less: 'View Less'
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'
