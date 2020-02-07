@@ -1,5 +1,3 @@
-{% set linkTitle = params.frontendOptions.title|default('')|trans %}
-{% set linkLabel = params.label|trans %}
 {% set isAjax = false %}
 
 {% block button %}
@@ -10,7 +8,9 @@
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
                 href="#"
                 class="icons-holder-text operation-button {{ params.buttonOptions.class|default('') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
-                title="{{ linkTitle }}"
+                {% if params.frontendOptions.title is defined %}
+                    title="{{ params.frontendOptions.title|trans }}"
+                {% endif %}
                 {% for name,value in options.data %}
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
@@ -25,7 +25,7 @@
                 {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
                     <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
                 {% endif %}
-                {{ linkLabel|trim }}
+                {{ params.label|trans|trim }}
             </a>
         {% endblock %}
     {% if not onlyLink|default(false) %}</div>{% endif %}

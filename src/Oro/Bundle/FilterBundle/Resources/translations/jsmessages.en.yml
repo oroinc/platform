@@ -20,6 +20,8 @@ oro:
             reset:
                 hint: Reset
                 tooltip: Reset this filter
+                aria_label.text_reset: Reset
+                aria_label.text_filter: Filter
         date:
             variable:
                 title: Available variables
