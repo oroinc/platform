@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Acl\Voter;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -16,7 +16,7 @@ class EmailTemplateVoter extends AbstractEntityVoter
 
     /** @var array */
     protected $supportedAttributes = [
-        BasicPermissionMap::PERMISSION_DELETE,
+        BasicPermission::DELETE,
         self::EMAIL_TEMPLATE_DELETE_ALIAS
     ];
 

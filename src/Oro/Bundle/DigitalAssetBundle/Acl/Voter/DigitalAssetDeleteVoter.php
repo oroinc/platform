@@ -3,11 +3,12 @@
 namespace Oro\Bundle\DigitalAssetBundle\Acl\Voter;
 
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Checks if DigitalAsset can be deleted depending on existing child files.
+ * Prevents removal of digital assets that have child files.
  */
 class DigitalAssetDeleteVoter implements VoterInterface
 {
@@ -21,7 +22,7 @@ class DigitalAssetDeleteVoter implements VoterInterface
         }
 
         foreach ($attributes as $attribute) {
-            if ($attribute !== 'DELETE') {
+            if (BasicPermission::DELETE !== $attribute) {
                 continue;
             }
 
