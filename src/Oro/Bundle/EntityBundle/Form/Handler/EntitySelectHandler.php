@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityBundle\Form\Handler;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
+/**
+ * The autocomplete handler to search different kind of entities.
+ */
 class EntitySelectHandler extends SearchHandler
 {
     /** @var array */
@@ -18,8 +21,7 @@ class EntitySelectHandler extends SearchHandler
 
     public function __construct()
     {
-        // give some values in order to prevent warnings
-        parent::__construct(false, []);
+        parent::__construct('', []);
     }
 
     /**
@@ -84,7 +86,7 @@ class EntitySelectHandler extends SearchHandler
         $queryBuilder->setMaxResults($maxResults);
         $queryBuilder->setFirstResult($firstResult);
 
-        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
+        $query = $this->aclHelper->apply($queryBuilder);
 
         return $query->getArrayResult();
     }

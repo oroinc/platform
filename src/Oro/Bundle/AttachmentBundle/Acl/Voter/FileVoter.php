@@ -7,18 +7,19 @@ use Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * ACL voter which defines whether current user is allowed to view File.
+ * Defines whether the current user is allowed to view File.
  */
 class FileVoter extends AbstractEntityVoter
 {
     /** @var array */
-    protected $supportedAttributes = ['VIEW', 'EDIT', 'DELETE'];
+    protected $supportedAttributes = [BasicPermission::VIEW, BasicPermission::EDIT, BasicPermission::DELETE];
 
     /** @var CurrentApplicationProviderInterface */
     private $currentApplicationProvider;
@@ -86,7 +87,7 @@ class FileVoter extends AbstractEntityVoter
             return VoterInterface::ACCESS_DENIED;
         }
 
-        if ($attribute === 'VIEW' && $this->tokenAccessor->getUser() === $parentEntity) {
+        if (BasicPermission::VIEW === $attribute && $this->tokenAccessor->getUser() === $parentEntity) {
             // Allows to view own avatar for those who do not have permission to view User entity.
             return VoterInterface::ACCESS_GRANTED;
         }

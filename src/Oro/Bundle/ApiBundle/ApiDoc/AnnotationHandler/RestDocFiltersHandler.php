@@ -1,8 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;

@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -94,7 +95,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             
             $query = $this->aclHelper->apply(
                 $qb,
-                'VIEW',
+                BasicPermission::VIEW,
                 [
                     AclAccessRule::DISABLE_RULE => true,
                     ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'

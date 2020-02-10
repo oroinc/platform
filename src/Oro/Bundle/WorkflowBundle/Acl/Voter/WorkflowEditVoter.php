@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * Prevents editing of non active workflow definitions.
+ */
 class WorkflowEditVoter extends Voter
 {
     /**
@@ -13,7 +17,7 @@ class WorkflowEditVoter extends Voter
      */
     protected function supports($attribute, $subject)
     {
-        return $attribute === 'EDIT' && $subject instanceof WorkflowDefinition;
+        return BasicPermission::EDIT === $attribute && $subject instanceof WorkflowDefinition;
     }
 
     /**
