@@ -9,78 +9,67 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Sets full permissions for ROLE_ADMINISTRATOR role.
+ */
 class UpdateAclAdministratorRole extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData'];
+        return [LoadRolesData::class];
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * Load ACL for security roles
-     *
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
-        $this->objectManager = $manager;
-
-        /** @var AclManager $manager */
-        $manager = $this->container->get('oro_security.acl.manager');
-
-        if ($manager->isAclEnabled()) {
-            $this->loadSuperAdminRole($manager);
-            $manager->flush();
+        /** @var AclManager $aclManager */
+        $aclManager = $this->container->get('oro_security.acl.manager');
+        if (!$aclManager->isAclEnabled()) {
+            return;
         }
+
+        $this->setPermissionsForAdminRole(
+            $aclManager,
+            $this->getRole($manager, LoadRolesData::ROLE_ADMINISTRATOR)
+        );
+        $aclManager->flush();
     }
 
     /**
-     * @param AclManager $manager
+     * @param AclManager $aclManager
+     * @param Role       $role
      */
-    protected function loadSuperAdminRole(AclManager $manager)
+    private function setPermissionsForAdminRole(AclManager $aclManager, Role $role)
     {
-        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_ADMINISTRATOR));
-
-        foreach ($manager->getAllExtensions() as $extension) {
-            $rootOid = $manager->getRootOid($extension->getExtensionKey());
+        $sid = $aclManager->getSid($role);
+        foreach ($aclManager->getAllExtensions() as $extension) {
+            $rootOid = $aclManager->getRootOid($extension->getExtensionKey());
             foreach ($extension->getAllMaskBuilders() as $maskBuilder) {
-                $fullAccessMask = $maskBuilder->hasMask('GROUP_SYSTEM')
-                    ? $maskBuilder->getMask('GROUP_SYSTEM')
-                    : $maskBuilder->getMask('GROUP_ALL');
-                $manager->setPermission($sid, $rootOid, $fullAccessMask, true);
+                $mask = $maskBuilder->hasMaskForGroup('SYSTEM')
+                    ? $maskBuilder->getMaskForGroup('SYSTEM')
+                    : $maskBuilder->getMaskForGroup('ALL');
+                $aclManager->setPermission($sid, $rootOid, $mask, true);
             }
         }
     }
 
     /**
-     * @param string $roleName
+     * @param ObjectManager $manager
+     * @param string        $roleName
+     *
      * @return Role
      */
-    protected function getRole($roleName)
+    private function getRole(ObjectManager $manager, string $roleName)
     {
-        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
+        return $manager->getRepository(Role::class)->findOneBy(['role' => $roleName]);
     }
 }

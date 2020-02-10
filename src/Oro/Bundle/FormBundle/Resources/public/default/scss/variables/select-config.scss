@@ -11,13 +11,9 @@ $select-height--s: 32px;
 $select-bg: url('#{$global-url}/oroform/default/images/icons/arrow-down--gray.svg') no-repeat right 8px center get-color('additional', 'ultra');
 
 // Hover
-$select-border-color-hover-state: get-color('ui', 'normal');
+$select-border-color-hover-state: get-color('additional', 'dark');
 $select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-    0 0 8px transparentize(get-color('ui', 'focus'), .6);
-
-// Focus
-$select-border-color-focus-state: get-color('ui', 'normal');
-$select-box-shadow-focus-state: $select-box-shadow-hover-state;
+                                      0 0 8px transparentize(get-color('ui', 'focus'), .6);
 
 // Error
 $select-border-color-error-state: get-color('ui', 'error-dark');

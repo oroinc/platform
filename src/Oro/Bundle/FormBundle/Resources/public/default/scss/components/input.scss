@@ -34,14 +34,6 @@
         }
     }
 
-    @include element-state('hover') {
-        box-shadow: $input-box-shadow-hover-state;
-    }
-
-    @include element-state('focus') {
-        box-shadow: $input-box-shadow-focus-state;
-    }
-
     @include element-state('error') {
         box-shadow: $input-box-shadow-error-state;
     }

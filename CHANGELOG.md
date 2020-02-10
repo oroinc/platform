@@ -2,6 +2,13 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.1.1 (?)
+
+### Removed
+
+#### UserBundle
+* Email template `user_reset_password_as_admin` has been removed. Use `force_reset_password` instead.
+
 ## 4.1.0 (2020-01-31)
 [Show detailed list of changes](incompatibilities-4-1.md)
 
@@ -64,6 +71,9 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 #### ReminderBundle
 * The `getName()` method was removed from `Oro\Bundle\ReminderBundle\Model\SendProcessorInterface`.
   Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
+
+#### RequireJsBundle
+* The bundle was completely removed, see [tips](https://doc.oroinc.com/master/backend/bundles/platform/AssetBundle/#migration-from-requirejs-to-jsmodules) how to migrate to Webpack builder
 
 #### UIBundle
 * The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
@@ -151,7 +161,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * The priority of `oro_api.post_validate_form` processor was changed from `-97` to `-80`.
 
 #### AssetBundle
-* The new feature, [Hot Module Replacement (HMR or Hot Reload) enabled for SCSS](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#hot-module-replacement-hmr-or-hot-reload-for-scss). To enable HMR for custom CSS links, please [follow the documentation](./src/Oro/Bundle/AssetBundle/Resources/doc/index.md#enable-for-css-links).
+* The new feature, Hot Module Replacement (HMR or Hot Reload) enabled for SCSS. To enable HMR for custom CSS links, please [follow the documentation](https://doc.oroinc.com/master/backend/bundles/platform/AssetBundle/index.rs)).
 
 #### NavigationBundle
 * The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.

@@ -24,6 +24,11 @@
 
     @include element-state('focus') {
         border-color: $input-border-color-focus-state;
+        box-shadow: $input-box-shadow-focus-state;
+    }
+
+    &.focus-visible {
+        border-color: $input-border-color-focus-state;
     }
 
     @include element-state('error') {
@@ -37,7 +42,6 @@
 
         @include element-state('hover') {
             border-color: get-color('additional', 'light');
-            box-shadow: none;
         }
     }
 
@@ -56,11 +60,6 @@
         &::-webkit-datetime-edit {
             line-height: 1;
         }
-    }
-
-    &[type="number"] {
-        // fix FireFox platform styles
-        box-shadow: $input-number-box-shadow;
     }
 
     &--empty {

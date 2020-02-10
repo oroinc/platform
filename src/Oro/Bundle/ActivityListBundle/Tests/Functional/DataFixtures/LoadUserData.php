@@ -5,42 +5,29 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\SetRolePermissionsTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
+    use SetRolePermissionsTrait;
 
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $this->initUserPermissions($manager);
-        $manager->flush();
-    }
-
-    protected function initUserPermissions(ObjectManager $manager)
-    {
         /** @var AclManager $aclManager */
         $aclManager = $this->container->get('oro_security.acl.manager');
-        $roleAdmin = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
-        $sid = $aclManager->getSid($roleAdmin);
-        $oid = $aclManager->getOid('entity:Oro\Bundle\TestFrameworkBundle\Entity\TestActivity');
-        $maskBuilder = $aclManager->getMaskBuilder($oid)
-            ->reset();
-        $aclManager->setPermission($sid, $oid, $maskBuilder->get());
+        $this->setPermissions(
+            $aclManager,
+            $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']),
+            ['entity:' . TestActivity::class => []]
+        );
+        $aclManager->flush();
     }
 }

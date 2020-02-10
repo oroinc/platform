@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Handler;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,11 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entity;
 
+    /**
+     * @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $ownerTreeProvider;
+
     protected function setUp()
     {
         $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
@@ -50,8 +56,10 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
+
         $this->entity  = new BusinessUnit();
-        $this->handler = new BusinessUnitHandler($this->form, $requestStack, $this->manager);
+        $this->handler = new BusinessUnitHandler($this->form, $requestStack, $this->manager, $this->ownerTreeProvider);
     }
 
     public function testProcessValidData()
@@ -115,6 +123,9 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->manager->expects($this->once())
             ->method('flush');
+
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
         $this->assertTrue($this->handler->process($this->entity));
 

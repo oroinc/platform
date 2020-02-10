@@ -894,6 +894,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     public function testShouldSendOwnerDescriptionIfPresent()
     {
         $organization = new Organization();
+        $organization->setId(123);
         $token = new OrganizationToken($organization);
         $token->setAttribute('owner_description', 'Test Description');
 

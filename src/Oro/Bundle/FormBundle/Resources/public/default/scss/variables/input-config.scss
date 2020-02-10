@@ -7,13 +7,13 @@ $input-padding--x-s: 6px 9px;
 $input-date-height: 40px;
 
 // Hover
-$input-border-color-hover-state: get-color('ui', 'normal');
+$input-border-color-hover-state: get-color('additional', 'dark');
 $input-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
                                      0 0 8px transparentize(get-color('ui', 'focus'), .6);
 
 // Focus
-$input-border-color-focus-state: get-color('ui', 'normal');
-$input-box-shadow-focus-state: $input-box-shadow-hover-state;
+$input-border-color-focus-state: $base-ui-element-border-color-focus;
+$input-box-shadow-focus-state: $base-ui-element-focus-style;
 
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark');

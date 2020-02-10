@@ -7,10 +7,12 @@ use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -18,21 +20,33 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject */
+    /**
+     * @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $layoutManager;
 
-    /** @var LayoutListener */
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var LayoutListener
+     */
     private $listener;
 
     protected function setUp()
     {
         $this->layoutManager = $this->createMock(LayoutManager::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $container = TestContainerBuilder::create()
             ->add(LayoutManager::class, $this->layoutManager)
+            ->add(LoggerInterface::class, $this->logger)
             ->getContainer($this);
 
         $this->listener = new LayoutListener($container);
@@ -151,6 +165,49 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         );
         $this->listener->onKernelView($responseEvent);
         $this->assertEquals(json_encode($blocks), $responseEvent->getResponse()->getContent());
+    }
+
+    public function testShouldReturnAvailableBlocksContentWhenUnknownBlocksRequested()
+    {
+        $builder = $this->createMock(LayoutBuilderInterface::class);
+        $this->layoutManager->expects($this->any())
+            ->method('getLayoutBuilder')
+            ->willReturn($builder);
+
+        $layout = $this->createMock(Layout::class);
+        $layout->expects($this->once())
+            ->method('render')
+            ->willReturn('Test block 1');
+
+        $exception = new BlockViewNotFoundException();
+        $this->layoutManager->expects($this->exactly(2))
+            ->method('getLayout')
+            ->willReturnCallback(function ($context, $blockId) use ($layout, $exception) {
+                if ($blockId === 'block1') {
+                    return $layout;
+                }
+
+                throw $exception;
+            });
+
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with(
+                'Unknown block "block2" was requested via layout_block_ids',
+                ['exception' => $exception]
+            );
+
+        $layoutAnnotation = new LayoutAnnotation([]);
+        $attributes = [
+            '_layout' => $layoutAnnotation,
+            'layout_block_ids' => ['block1', 'block2'],
+        ];
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            $attributes,
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
+        $this->assertEquals(json_encode(['block1' => 'Test block 1']), $responseEvent->getResponse()->getContent());
     }
 
     /**

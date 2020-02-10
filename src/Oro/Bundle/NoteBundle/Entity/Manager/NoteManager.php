@@ -8,6 +8,7 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -73,7 +74,7 @@ class NoteManager
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
             ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 
-        $query = $this->aclHelper->apply($qb, 'VIEW', [AclHelper::CHECK_RELATIONS => false]);
+        $query = $this->aclHelper->apply($qb, BasicPermission::VIEW, [AclHelper::CHECK_RELATIONS => false]);
 
         return $query->getResult();
     }
