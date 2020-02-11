@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Dashboard widget configuration model
+ */
 class WidgetConfigs
 {
     /** @var ConfigProvider */
@@ -297,7 +300,7 @@ class WidgetConfigs
      */
     protected function loadDefaultValue($options, $widgetConfig)
     {
-        if (!$options['title']['title'] || $options['title']['useDefault']) {
+        if (!isset($options['title']) || !$options['title']['title'] || $options['title']['useDefault']) {
             $options['title']['title'] = $this->translator->trans($widgetConfig['label']);
             $options['title']['useDefault'] = true;
         }

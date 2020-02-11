@@ -45,9 +45,9 @@ class UserPreferredLocalizationProvider extends AbstractPreferredLocalizationPro
 
     /**
      * @param User $entity
-     * @return Localization
+     * @return Localization|null
      */
-    public function getPreferredLocalizationForEntity($entity): Localization
+    public function getPreferredLocalizationForEntity($entity): ?Localization
     {
         $originalScopeId = $this->userConfigManager->getScopeId();
         $this->userConfigManager->setScopeIdFromEntity($entity);

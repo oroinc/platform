@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 $finder = PhpCsFixer\Finder::create()

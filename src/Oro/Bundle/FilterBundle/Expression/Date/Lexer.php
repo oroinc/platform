@@ -6,6 +6,9 @@ use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Responsible for tokenize date from string
+ */
 class Lexer
 {
     const REGEXP_TIME     = '#(\d\d:\d\d(:\d\d)?)#';
@@ -21,6 +24,10 @@ class Lexer
     /** @var DateModifierProvider */
     private $provider;
 
+    /**
+     * @param TranslatorInterface $translator
+     * @param DateModifierProvider $provider
+     */
     public function __construct(TranslatorInterface $translator, DateModifierProvider $provider)
     {
         $this->translator = $translator;
@@ -33,7 +40,7 @@ class Lexer
      * @return Token[]
      * @throws SyntaxException
      */
-    public function tokenize($string)
+    public function tokenize(string $string): array
     {
         $cursor = 0;
         $tokens = $brackets = [];

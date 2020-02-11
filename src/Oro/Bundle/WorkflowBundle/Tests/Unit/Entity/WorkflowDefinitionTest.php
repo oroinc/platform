@@ -335,6 +335,8 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
 
     public function testExcludeRestrictionsField()
     {
+        $this->markTestSkipped('Skipped while not updated "jms/serializer" to >= 3.2');
+
         $step = new WorkflowStep();
         $step->setName('step');
 

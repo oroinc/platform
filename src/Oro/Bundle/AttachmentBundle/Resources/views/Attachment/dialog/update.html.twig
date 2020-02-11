@@ -1,5 +1,3 @@
-{% import _self as attachmentDialogUpdate %}
-
 {% if saved is defined and saved %}
     {% set messageText = update|default(false) ? 'Attachment updated successfully' : 'Attachment created successfully' %}
     {% set widgetResponse = {
@@ -13,7 +11,7 @@
     {{ widgetResponse|json_encode|raw }}
 {% else %}
 <div class="widget-content">
-    {% form_theme form with ['OroFormBundle:Form:fields.html.twig', attachmentDialogUpdate] %}
+    {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 
     <div class="form-container">
         <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post">

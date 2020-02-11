@@ -49,7 +49,8 @@ class EmailConfigurationConfigurator
             $data = (array) $event->getData();
 
             if (empty($data[$passwordKey]['value'])) {
-                $data[$passwordKey]['value'] = $event->getForm()->get($passwordKey)->getData()['value'];
+                $passwordData = $event->getForm()->get($passwordKey)->getData();
+                $data[$passwordKey]['value'] = $passwordData['value'] ?? null;
             } else {
                 $data[$passwordKey]['value'] = $this->encryptor->encryptData($data[$passwordKey]['value']);
             }

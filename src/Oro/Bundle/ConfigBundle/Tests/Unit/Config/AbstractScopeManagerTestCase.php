@@ -90,6 +90,12 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $key = $this->getScopedEntityName() . '_0';
         $this->assertFalse($this->cache->contains($key));
 
+        $this->configBag->expects($this->any())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [],
+            ]);
+
         list($created, $updated, $isNullValue) = $this->manager->getInfo('oro_user.level');
 
         $this->assertEquals($this->cache->fetch($key), $this->getCachedConfig($config));
@@ -191,6 +197,12 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->cache->contains($key));
         $this->assertNotEmpty($this->manager->getChanges($scopeId));
 
+        $this->configBag->expects($this->any())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [],
+            ]);
+
         $this->manager->flush($scopeId);
 
         $this->assertEquals($this->cache->fetch($key), $this->getCachedConfig($config));
@@ -226,6 +238,13 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $key = sprintf('%s_%s', $this->getScopedEntityName(), (int) $scopeId);
 
         $this->assertFalse($this->cache->contains($key));
+
+        $this->configBag->expects($this->any())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [],
+            ]);
+
         $result = $this->manager->save($settings);
         $this->assertEquals(
             [

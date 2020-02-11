@@ -146,7 +146,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('foo_binary', $twig->getBinaryOperators());
         $this->assertArrayHasKey('foo_global', $twig->getGlobals());
         $visitors = $twig->getNodeVisitors();
-        $this->assertInstanceOf(EnvironmentNodeVisitor::class, $visitors[2]);
+        $this->assertInstanceOf(EnvironmentNodeVisitor::class, end($visitors));
     }
 
     public function testGenerateTemplateCache()

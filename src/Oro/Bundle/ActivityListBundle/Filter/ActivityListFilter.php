@@ -270,7 +270,7 @@ class ActivityListFilter extends EntityFilter
             $to->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
     }

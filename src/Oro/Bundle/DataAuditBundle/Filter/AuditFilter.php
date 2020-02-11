@@ -138,7 +138,7 @@ class AuditFilter extends EntityFilter
             $qb->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
     }
