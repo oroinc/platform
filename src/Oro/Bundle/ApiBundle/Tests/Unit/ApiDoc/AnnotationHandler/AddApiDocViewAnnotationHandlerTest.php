@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\AnnotationHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
+use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\AddApiDocViewAnnotationHandler;
 use Symfony\Component\Routing\Route;
 
 class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase

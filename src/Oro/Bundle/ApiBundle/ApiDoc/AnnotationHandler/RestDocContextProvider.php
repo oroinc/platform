@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;

@@ -572,7 +572,7 @@ services:
             - '@oro_api.rest.error_handling_body_listener.inner'
 
     oro_api.rest.api_doc_annotation_handler:
-        class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ChainApiDocAnnotationHandler
         arguments:
             - !tagged_iterator oro.api.api_doc_annotation_handler
 
@@ -616,7 +616,7 @@ services:
             - '@oro_api.rest.action_mapper'
 
     oro_api.rest.doc_handler:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocHandler
         arguments:
             - 'rest_api'
             - '@oro_api.rest.doc_view_detector'
@@ -629,27 +629,27 @@ services:
             - { name: nelmio_api_doc.extractor.handler }
 
     oro_api.rest.doc_handler.context_provider:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocContextProvider
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocContextProvider
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
 
     oro_api.rest.doc_handler.identifier:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocIdentifierHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocIdentifierHandler
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.doc_data_type_converter'
 
     oro_api.rest.doc_handler.filters:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocFiltersHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocFiltersHandler
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.doc_data_type_converter'
 
     oro_api.rest.doc_handler.status_codes:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocStatusCodesHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocStatusCodesHandler
 
     oro_api.rest.doc_data_type_converter:
         class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter

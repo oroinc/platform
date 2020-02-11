@@ -9,9 +9,9 @@ use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 /**
  * The access rule that allows access to the drafts that owned by the current user
@@ -74,7 +74,7 @@ class DraftAccessRule implements AccessRuleInterface
 
         return $this->enabled
             && is_a($entityClass, DraftableInterface::class, true)
-            && BasicPermissionMap::PERMISSION_VIEW === $permission;
+            && BasicPermission::VIEW === $permission;
     }
 
     /**
@@ -91,7 +91,7 @@ class DraftAccessRule implements AccessRuleInterface
             return;
         }
 
-        list($ownerField, $ownerValue, $organizationField, $organizationValue, $ignoreOwner) = $conditionData;
+        [$ownerField, $ownerValue, $organizationField, $organizationValue, $ignoreOwner] = $conditionData;
 
         $alias = $criteria->getAlias();
 

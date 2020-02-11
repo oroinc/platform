@@ -73,7 +73,7 @@ oro:
             performing: "There was an error performing the requested operation. Please try again or contact us for assistance."
         request_too_large_error: >
             The data you are submitting is too large to be processed by the web server.
-            This can happen due to attachments such as high-resolution images. 
+            This can happen due to attachments such as high-resolution images.
             Please reduce the file size, or contact your admin to adjust the web server configuration.
         page_header:
             button:
@@ -148,6 +148,9 @@ oro:
         tab_view_more: '...'
         scroll_up_label: 'Scroll up'
         scroll_down_label: 'Scroll down'
+        collapse:
+            more: 'View More'
+            less: 'View Less'
         show_more_view:
             show_more: '{1}And {{ number }} more item|[2,Inf[And {{ number }} more items'
             show_less: 'Show less items'

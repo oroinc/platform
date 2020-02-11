@@ -1,16 +1,21 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Adds "id" attribute to ApiDoc annotation.
+ */
 class RestDocIdentifierHandler
 {
-    const ID_ATTRIBUTE = 'id';
+    private const ID_ATTRIBUTE = 'id';
 
     /** @var RestDocViewDetector */
     private $docViewDetector;
@@ -42,7 +47,7 @@ class RestDocIdentifierHandler
      * @param EntityMetadata $metadata
      * @param string|null    $description
      */
-    public function handle(ApiDoc $annotation, Route $route, EntityMetadata $metadata, ?string $description)
+    public function handle(ApiDoc $annotation, Route $route, EntityMetadata $metadata, ?string $description): void
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = DataType::STRING;
@@ -75,7 +80,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    private function getIdRequirement(EntityMetadata $metadata)
+    private function getIdRequirement(EntityMetadata $metadata): string
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $idFieldCount = \count($idFields);
@@ -98,7 +103,7 @@ class RestDocIdentifierHandler
      *
      * @return string
      */
-    private function getIdFieldRequirement($fieldType)
+    private function getIdFieldRequirement(string $fieldType): string
     {
         $result = $this->valueNormalizer->getRequirement(
             $fieldType,

@@ -5,10 +5,12 @@ namespace Oro\Bundle\LayoutBundle\EventListener;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +41,8 @@ class LayoutListener implements ServiceSubscriberInterface
     public static function getSubscribedServices()
     {
         return [
-            LayoutManager::class
+            LayoutManager::class,
+            LoggerInterface::class
         ];
     }
 
@@ -139,7 +142,11 @@ class LayoutListener implements ServiceSubscriberInterface
             $data = [];
             foreach ($blockIds as $blockId) {
                 if ($blockId) {
-                    $data[$blockId] = $layoutManager->getLayout($context, $blockId)->render();
+                    try {
+                        $data[$blockId] = $layoutManager->getLayout($context, $blockId)->render();
+                    } catch (BlockViewNotFoundException $e) {
+                        $this->logNotFoundViewException($blockId, $e);
+                    }
                 }
             }
 
@@ -147,5 +154,19 @@ class LayoutListener implements ServiceSubscriberInterface
         }
 
         return new Response($layoutManager->getLayout($context)->render());
+    }
+
+    /**
+     * @param string $blockId
+     * @param BlockViewNotFoundException $e
+     */
+    private function logNotFoundViewException($blockId, BlockViewNotFoundException $e)
+    {
+        /** @var LoggerInterface $logger */
+        $logger = $this->container->get(LoggerInterface::class);
+        $logger->warning(
+            sprintf('Unknown block "%s" was requested via layout_block_ids', $blockId),
+            ['exception' => $e]
+        );
     }
 }
