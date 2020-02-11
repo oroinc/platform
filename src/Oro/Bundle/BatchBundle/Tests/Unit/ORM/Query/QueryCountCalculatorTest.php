@@ -69,17 +69,17 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
         return [
             'empty'                                  => [
                 'dql'         => 'SELECT e FROM Stub:Entity e',
-                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM tableName t0_',
             ],
             'empty with group by'                    => [
                 'dql'         => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b)'
+                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM tableName t0_ GROUP BY t0_.b)'
                     . ' AS count_query',
             ],
             'single parameters'                      => [
                 'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
-                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?',
                 'sqlParams'   => [1, 2],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => ['a' => 1, 'b' => 2],
@@ -87,7 +87,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'single parameters (disable walker)'     => [
                 'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?)'
                     . ' AS count_query',
                 'sqlParams'   => [1, 2],
                 'types'       => [Type::INTEGER, Type::INTEGER],
@@ -97,7 +97,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'multiple parameters'                    => [
                 'dql'         => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
                 'expectedSql' => 'SELECT DISTINCT count(DISTINCT t0_.a) AS sclr_0'
-                    . ' FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                    . ' FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?',
                 'sqlParams'   => [3, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => ['value' => 3],
@@ -105,7 +105,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'multiple parameters (disable walker)'   => [
                 'dql'         => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT DISTINCT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' FROM (SELECT DISTINCT t0_.a AS a_0 FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?)'
                     . ' AS count_query',
                 'sqlParams'   => [3, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
@@ -114,7 +114,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             ],
             'positional parameters'                  => [
                 'dql'         => 'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
-                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?',
                 'sqlParams'   => [4, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
                 'queryParams' => [3, 4],
@@ -122,7 +122,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
             'positional parameters (disable walker)' => [
                 'dql'         => 'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
                 'expectedSql' => 'SELECT COUNT(*)'
-                    . ' FROM (SELECT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?)'
+                    . ' FROM (SELECT t0_.a AS a_0 FROM tableName t0_ WHERE t0_.a = ? AND t0_.b = ?)'
                     . ' AS count_query',
                 'sqlParams'   => [4, 3],
                 'types'       => [Type::INTEGER, Type::INTEGER],
@@ -202,6 +202,7 @@ class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
         $configuration->addEntityNamespace('Stub', 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
 
         $classMetadata = new ClassMetadata(\stdClass::class);
+        $classMetadata->setPrimaryTable(['name' => 'tableName']);
         $classMetadata->mapField(['fieldName' => 'a', 'columnName' => 'a']);
         $classMetadata->mapField(['fieldName' => 'b', 'columnName' => 'b']);
         $classMetadata->setIdentifier(['a']);

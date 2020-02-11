@@ -298,8 +298,7 @@ abstract class OroKernel extends Kernel
     protected function initializeContainer()
     {
         if ($this->getEnvironment() !== 'test') {
-            $handler = new ErrorHandler();
-            $handler->registerHandlers();
+            ErrorHandler::register();
         }
 
         $class = $this->getContainerClass();

@@ -177,6 +177,10 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ]
         ];
 
+        $this->functionProvider->expects($this->once())
+            ->method('getFunction')
+            ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
+
         $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
@@ -237,6 +241,10 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
                 ['name' => $expectedIdName]
             ]
         ];
+
+        $this->functionProvider->expects($this->once())
+            ->method('getFunction')
+            ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
 
         $report = $this->getReportEntity($entity, $definition);
         $this->prepareRepository($report);
@@ -315,6 +323,10 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
                 ['name' => $expectedIdName]
             ]
         ];
+
+        $this->functionProvider->expects($this->once())
+            ->method('getFunction')
+            ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
 
         $report = $this->getReportEntity($entity, $definition);
 

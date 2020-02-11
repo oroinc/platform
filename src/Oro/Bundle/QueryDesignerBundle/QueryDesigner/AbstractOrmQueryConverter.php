@@ -6,6 +6,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * Provides functionality to convert a query definition created by the query designer to doctrine ORM query
+ */
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {
     /**
@@ -80,9 +83,13 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias, $entityClassName)
     {
         $metaData = $this->getClassMetadata($entityClassName);
-        $associationMapping = $metaData->getAssociationMapping($joinFieldName);
-        if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
-            return sprintf('%s MEMBER OF %s.%s', $joinTableAlias, $joinAlias, $joinFieldName);
+
+        // In the case of virtual fields, metadata may not have an association mapping
+        if ($metaData->hasAssociation($joinFieldName)) {
+            $associationMapping = $metaData->getAssociationMapping($joinFieldName);
+            if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
+                return sprintf('%s MEMBER OF %s.%s', $joinTableAlias, $joinAlias, $joinFieldName);
+            }
         }
 
         return sprintf('%s.%s = %s', $joinAlias, $joinFieldName, $joinTableAlias);

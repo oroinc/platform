@@ -148,12 +148,12 @@
         </div>
     </div>
     {% block widgets_content %}
-        {% import _self as dashboardMacros %}
         {% set contentClass = contentClass|default('dashboard-container') %}
         <div class="scrollable-container">
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
+                    {% import _self as dashboardMacros %}
                     {{
                         dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(0, false, true),

@@ -123,7 +123,11 @@ class ConditionsGroupFilter extends AbstractFilter
     private function applyParameters(OrmFilterDatasourceAdapter $ds, $boundParameters)
     {
         foreach ($boundParameters as $parameter) {
-            $ds->getQueryBuilder()->setParameter($parameter->getName(), $parameter->getValue(), $parameter->getType());
+            $ds->getQueryBuilder()->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
+            );
         }
     }
 }
