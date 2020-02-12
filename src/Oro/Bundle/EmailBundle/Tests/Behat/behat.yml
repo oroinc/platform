@@ -91,6 +91,14 @@ oro_behat_extension:
       selector: '[name^="oro_email_email[attachments]"][type="file"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
 
+    Preview Email:
+      selector: 'iframe#preview-frame'
+
+    Ellipsis button:
+      selector:
+        type: xpath
+        locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@role="button"]'
+
   pages:
     User Emails:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails

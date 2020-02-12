@@ -1,4 +1,0 @@
-services:
-    oro_currency.tests.price_rounding_service:
-        alias: oro_currency.rounding.price_rounding_service
-        public: true

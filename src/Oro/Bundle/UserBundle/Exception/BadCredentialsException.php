@@ -31,20 +31,17 @@ class BadCredentialsException extends BaseBadCredentialsException
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->getToken(), $this->code, $this->messageKey, $this->file, $this->line]);
+        return [$this->messageKey, parent::__serialize()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($string)
+    public function __unserialize(array $data): void
     {
-        list($token, $this->code, $this->messageKey, $this->file, $this->line) = unserialize($string);
-
-        if ($token) {
-            $this->setToken($token);
-        }
+        $this->setMessageKey($data[0]);
+        parent::__unserialize($data[1]);
     }
 }

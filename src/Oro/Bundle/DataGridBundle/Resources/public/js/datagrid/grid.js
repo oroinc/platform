@@ -134,6 +134,7 @@ define(function(require) {
                 refreshAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
+                        ariaLabel: __('oro_datagrid.action.refresh.aria_label'),
                         className: 'btn refresh-action',
                         iconClassName: 'fa-repeat',
                         launcherMode: 'icon-only'
@@ -142,6 +143,7 @@ define(function(require) {
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
+                        ariaLabel: __('oro_datagrid.action.reset.aria_label'),
                         className: 'btn reset-action',
                         iconClassName: 'fa-refresh',
                         launcherMode: 'icon-only'

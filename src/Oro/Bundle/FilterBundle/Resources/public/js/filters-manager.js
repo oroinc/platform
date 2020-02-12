@@ -673,6 +673,9 @@ define(function(require, exports, module) {
                     refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
+                    close: _.bind(function() {
+                        this.selectWidget.onClose();
+                    }, this),
                     appendTo: this.dropdownContainer
                 },
                 this.multiselectParameters

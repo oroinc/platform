@@ -603,13 +603,13 @@ class AclPrivilegeRepository
             $maskBuilder = $maskBuilders[$permission->getName()];
             $accessLevelName = AccessLevel::getAccessLevelName($permission->getAccessLevel());
             if ($accessLevelName !== null) {
-                $maskName = 'MASK_' . $permission->getName() . '_' . $accessLevelName;
+                $permissionName = $permission->getName() . '_' . $accessLevelName;
                 // check if a mask builder supports access levels
-                if (!$maskBuilder->hasMask($maskName)) {
+                if (!$maskBuilder->hasMaskForPermission($permissionName)) {
                     // remove access level name from the mask name if a mask builder do not support access levels
-                    $maskName = 'MASK_' . $permission->getName();
+                    $permissionName = $permission->getName();
                 }
-                $maskBuilder->add($maskBuilder->getMask($maskName));
+                $maskBuilder->add($maskBuilder->getMaskForPermission($permissionName));
             }
             $masks[$extension->getServiceBits($maskBuilder->get())] = $maskBuilder->get();
         }

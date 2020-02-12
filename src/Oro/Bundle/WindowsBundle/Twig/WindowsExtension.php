@@ -9,7 +9,6 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -58,6 +57,14 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
+     * @return FragmentHandler
+     */
+    protected function getFragmentHandler()
+    {
+        return $this->container->get('fragment.handler');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
@@ -71,7 +78,7 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
             new TwigFunction(
                 'oro_window_render_fragment',
                 [$this, 'renderFragment'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['is_safe' => ['html']]
             ),
         ];
     }
@@ -91,11 +98,10 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
 
         $this->rendered = true;
 
-        try {
-            $windowsStates = $this->getWindowsStateManagerRegistry()->getManager()->getWindowsStates();
-        } catch (AccessDeniedException $e) {
-            $windowsStates = [];
-        }
+        $manager = $this->getWindowsStateManagerRegistry()->getManager();
+        $windowsStates = null !== $manager
+            ? $manager->getWindowsStates()
+            : [];
 
         return $environment->render(
             'OroWindowsBundle::states.html.twig',
@@ -106,41 +112,30 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
     /**
      * Renders fragment by window state.
      *
-     * @param Environment $environment
      * @param AbstractWindowsState $windowState
      *
      * @return string
      */
-    public function renderFragment(Environment $environment, AbstractWindowsState $windowState)
+    public function renderFragment(AbstractWindowsState $windowState)
     {
-        $result = '';
-        $scheduleDelete = false;
         $windowState->setRenderedSuccessfully(false);
-
         try {
             $uri = $this->getWindowsStateRequestManager()->getUri($windowState->getData());
 
-            /** @var FragmentHandler $fragmentHandler */
-            $fragmentHandler = $this->container->get('fragment.handler');
-            $result = $fragmentHandler->render($uri);
+            $result = $this->getFragmentHandler()->render($uri);
             $windowState->setRenderedSuccessfully(true);
 
             return $result;
         } catch (NotFoundHttpException $e) {
-            $scheduleDelete = true;
         } catch (\InvalidArgumentException $e) {
-            $scheduleDelete = true;
         }
 
-        if ($scheduleDelete) {
-            try {
-                $this->getWindowsStateManagerRegistry()->getManager()->deleteWindowsState($windowState->getId());
-            } catch (AccessDeniedException $e) {
-                return $result;
-            }
+        $manager = $this->getWindowsStateManagerRegistry()->getManager();
+        if (null !== $manager) {
+            $manager->deleteWindowsState($windowState->getId());
         }
 
-        return $result;
+        return '';
     }
 
     /**

@@ -2237,7 +2237,7 @@ TEXT;
         if (!$filters->isVisible()) {
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
             if ($gridToolbarActions->isVisible()) {
-                $gridToolbarActions->getActionByTitle('Filters')->click();
+                $gridToolbarActions->getActionByTitle('Filter Toggle')->click();
             }
 
             $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');

@@ -3,6 +3,7 @@ oro:
         css.label:           CSS
         entity_label:        Embedded Form
         entity_plural_label: Embedded Forms
+        entity_grid_all_view_label: All %entity_plural_label%
         form_type.label:     Form Type
         id.label:            ID
         title.label:         Title

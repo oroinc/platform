@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Request;
 
-use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Provides methods to check whether or not a web request is processed by the layout engine.
+ */
 class LayoutHelper
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var RequestStack */
+    private $requestStack;
 
     /**
      * @param RequestStack $requestStack
@@ -23,31 +23,24 @@ class LayoutHelper
 
     /**
      * @param Request|null $request
-     * @return LayoutAnnotation
+     *
+     * @return bool
      */
-    public function getLayoutAnnotation(Request $request = null)
+    public function isLayoutRequest(Request $request = null): bool
     {
-        if ($request === null) {
+        if (null === $request) {
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        return $request->attributes->get('_layout');
+        return null !== $request && null !== $request->attributes->get('_layout');
     }
 
     /**
      * @param Request|null $request
+     *
      * @return bool
      */
-    public function isLayoutRequest(Request $request = null)
-    {
-        return $this->getLayoutAnnotation($request) !== null;
-    }
-
-    /**
-     * @param Request|null $request
-     * @return bool
-     */
-    public function isTemplateRequest(Request $request = null)
+    public function isTemplateRequest(Request $request = null): bool
     {
         return !$this->isLayoutRequest($request);
     }

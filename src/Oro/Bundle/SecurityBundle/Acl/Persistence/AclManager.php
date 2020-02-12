@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
 /**
+ * Represents an entry point to manage ACLs.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -32,34 +34,20 @@ class AclManager extends AbstractAclManager
     const CLASS_ACE = 'Class';
     const OBJECT_ACE = 'Object';
 
-    /**
-     * @var ObjectIdentityFactory
-     */
+    /** @var ObjectIdentityFactory */
     protected $objectIdentityFactory;
 
-    /**
-     * @var AclExtensionSelector
-     */
+    /** @var AclExtensionSelector */
     protected $extensionSelector;
 
-    /**
-     * @var MutableAclProvider
-     */
+    /** @var MutableAclProvider */
     private $aclProvider;
 
-    /**
-     * @var AceManipulationHelper
-     */
+    /** @var AceManipulationHelper */
     protected $aceProvider;
 
-    /**
-     * This array contains all requested ACLs and flags indicate which changes are queued
-     * key = a string unique for each OID
-     * value = BatchItem
-     *
-     * @var BatchItem[]
-     */
-    protected $items = array();
+    /** @var BatchItem[] [oid => batch item, ...] all requested ACLs and flags indicate which changes are queued */
+    protected $items = [];
 
     /**
      * Constructor
@@ -78,9 +66,7 @@ class AclManager extends AbstractAclManager
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->extensionSelector = $extensionSelector;
         $this->aclProvider = $aclProvider;
-        $this->aceProvider = $aceProvider !== null
-            ? $aceProvider
-            : new AceManipulationHelper();
+        $this->aceProvider = $aceProvider ?? new AceManipulationHelper();
     }
 
     /**
@@ -157,6 +143,21 @@ class AclManager extends AbstractAclManager
         return $this->extensionSelector
             ->select($oid)
             ->getMaskBuilder($permission);
+    }
+
+    /**
+     * Gets all mask builders which can be used to build permission bitmasks
+     * for an object with the given object identity.
+     *
+     * @param OID $oid
+     *
+     * @return MaskBuilder[]
+     */
+    public function getAllMaskBuilders(OID $oid)
+    {
+        return $this->extensionSelector
+            ->select($oid)
+            ->getAllMaskBuilders();
     }
 
     /**
@@ -985,6 +986,14 @@ class AclManager extends AbstractAclManager
             // non valid empty ACL is cached by MutableAclProvider::cacheEmptyAcl() method
             $this->aclProvider->clearOidCache($oid);
             $acl = $this->aclProvider->findAcl($oid);
+
+            // Force return null if MutableAclProvider::cacheEmptyAcl worked before this method.
+            // We don't have possibility to correct clear in-memory acl cache in aclProvider,
+            // because he may already have children
+            if ($acl->getId() === 0) {
+                $acl = null;
+                throw new AclNotFoundException();
+            }
         } catch (AclNotFoundException $ex) {
             if ($ifNotExist === true) {
                 $state = BatchItem::STATE_CREATE;

@@ -31,14 +31,10 @@ The FormTypes that can be used in embedded forms are registered as services and 
 
 **Example:**
 ```yml
-parameters:
-    acme_demo.form.embedded_form.class: Acme\Bundle\DemoBundle\Form\Type\SomeFormType
-
 services:
-    acme_demo.form.embedded_form:
-        class: %acme_demo.form.embedded_form.class%
+    Acme\Bundle\DemoBundle\Form\Type\SomeFormType:
         tags:
-            - { name: oro_embedded_form, label: 'Embedded Form Type Label Here', type: %acme_demo.form.embedded_form.class% }
+            - { name: oro_embedded_form, label: 'Embedded Form Type Label Here', type: Acme\Bundle\DemoBundle\Form\Type\SomeFormType }
 ```
 
 The `label` option is a translatable text used in the select box when creating/updating an embedded form. If omitted, the service id will be used instead.

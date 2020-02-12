@@ -45,11 +45,11 @@
     <div class="fallback-item-fallback">
         {{ form_row(form.fallback, {'attr': {'class': 'fallback'}}) }}
     </div>
-    <div class="hide">
-        {{ form_widget(form.use_fallback) }}
-    </div>
     <div class="fallback-item-value">
         {{ form_widget(form.value, {'attr': {'class' : 'fallback-item-value-input'}}) }}
+    </div>
+    <div class="fallback-item-use-fallback hide">
+        {{ form_widget(form.use_fallback) }}
     </div>
     {{ form_errors(form.value) }}
 {% endblock %}

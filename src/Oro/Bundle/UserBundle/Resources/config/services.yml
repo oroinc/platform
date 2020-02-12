@@ -1,11 +1,6 @@
 imports:
     - { resource: controllers.yml }
 
-parameters:
-    oro_user.entity.class:                        Oro\Bundle\UserBundle\Entity\User
-    oro_user.group.entity.class:                  Oro\Bundle\UserBundle\Entity\Group
-    oro_user.role.entity.class:                   Oro\Bundle\UserBundle\Entity\Role
-
 services:
     oro_user.manager:
         class: Oro\Bundle\UserBundle\Entity\UserManager
@@ -29,7 +24,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@doctrine.orm.entity_manager'
 
     oro_user.permission_manager.api:
@@ -37,7 +32,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@security.token_storage'
@@ -122,7 +117,7 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_user.role.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\Role'
             - '@doctrine.orm.entity_manager'
 
     oro_user.group_manager:
@@ -135,14 +130,14 @@ services:
         public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_user.group.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\Group'
             - '@doctrine.orm.entity_manager'
 
     oro_user.impersonation_authenticator:
         class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
         arguments:
             - '@doctrine'
-            - '@oro_security.token.factory.username_password_organization'
+            - '@oro_user.security.factory.impersonation_username_password_organization'
             - '@oro_security.authentication.organization_guesser'
             - '@event_dispatcher'
             - '@router'
@@ -162,7 +157,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
@@ -184,7 +179,7 @@ services:
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_attachment.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
@@ -194,7 +189,7 @@ services:
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_attachment.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
@@ -207,7 +202,7 @@ services:
         arguments:
             - '@translator'
             - '@oro_attachment.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
@@ -234,7 +229,7 @@ services:
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_attachment.manager'
-            - '%oro_user.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
@@ -243,7 +238,7 @@ services:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_user.role.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\Role'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
@@ -252,7 +247,7 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\WidgetRoleSearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_user.role.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\Role'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
@@ -261,7 +256,7 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\AuthenticatedRolesHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - '%oro_user.role.entity.class%'
+            - 'Oro\Bundle\UserBundle\Entity\Role'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
@@ -324,7 +319,7 @@ services:
            - '@oro_entity.entity_identifier_accessor'
            - '@oro_ui.twig.tab_extension'
            - 'user_activity_tab_panel'
-           - '%oro_user.entity.class%'
+           - 'Oro\Bundle\UserBundle\Entity\User'
         tags:
            - { name: oro_activity.activity_widget_provider, priority: -10 }
 
@@ -591,3 +586,6 @@ services:
         tags:
             - { name: oro_locale.preferred_localization_provider }
 
+    oro_user.security.factory.impersonation_username_password_organization:
+        class: Oro\Bundle\UserBundle\Security\ImpersonationUsernamePasswordOrganizationTokenFactory
+        public: true

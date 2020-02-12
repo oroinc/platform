@@ -249,6 +249,9 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn($fieldConfigId);
 
+        $formView->children[self::FIELD_NAME] = $this->getMockBuilder(FormInterface::class)
+            ->getMock();
+
         $this->helper->addInitialElements($formView, $form, $formConfig);
     }
 

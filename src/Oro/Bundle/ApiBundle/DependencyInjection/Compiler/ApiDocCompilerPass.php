@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Nelmio\ApiDocBundle\Extractor as NelmioExtractor;
 use Nelmio\ApiDocBundle\Formatter as NelmioFormatter;
-use Oro\Bundle\ApiBundle\ApiDoc\AddApiDocViewAnnotationHandler;
+use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\AddApiDocViewAnnotationHandler;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;

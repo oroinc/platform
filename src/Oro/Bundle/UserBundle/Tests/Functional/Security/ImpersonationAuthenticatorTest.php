@@ -101,7 +101,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
     public function testGetUserWhenTokenAlreadyUsed(): void
     {
         $this->expectException(CustomUserMessageAuthenticationException::class);
-        $this->expectExceptionMessage('Impersonation token is already used.');
+        $this->expectExceptionMessage('Impersonation token has already been used.');
 
         /** @var Impersonation $impersonation */
         $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);

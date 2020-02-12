@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 
@@ -67,7 +66,6 @@ class GetScopeTest extends GetListProcessorTestCase
                     'default_scope'
                 )
             );
-        $this->context->setFilterValues(new TestFilterValueAccessor());
         $this->context->getFilterValues()->set('scope', new FilterValue('scope', $scope));
         $this->processor->process($this->context);
 
@@ -92,7 +90,6 @@ class GetScopeTest extends GetListProcessorTestCase
                     'default_scope'
                 )
             );
-        $this->context->setFilterValues(new TestFilterValueAccessor());
         $this->context->getFilterValues()->set('scope', new FilterValue('scope', $scope));
         $this->processor->process($this->context);
 

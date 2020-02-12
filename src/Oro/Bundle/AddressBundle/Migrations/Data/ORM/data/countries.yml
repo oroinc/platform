@@ -1715,6 +1715,9 @@ BS:
         BS-NO:
             combinedCode: BS-NO
             code: NO
+        BS-NP:
+            combinedCode: BS-NP
+            code: NP
         BS-NS:
             combinedCode: BS-NS
             code: NS

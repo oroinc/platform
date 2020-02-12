@@ -6,8 +6,8 @@ use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -34,9 +34,9 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
      * @var array
      */
     protected $supportedAttributes = [
-        BasicPermissionMap::PERMISSION_VIEW,
-        BasicPermissionMap::PERMISSION_EDIT,
-        BasicPermissionMap::PERMISSION_DELETE,
+        BasicPermission::VIEW,
+        BasicPermission::EDIT,
+        BasicPermission::DELETE,
         self::PERMISSION_CREATE,
         self::PERMISSION_PUBLISH
     ];
@@ -79,11 +79,11 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         }
 
         switch ($attribute) {
-            case BasicPermissionMap::PERMISSION_EDIT:
-            case BasicPermissionMap::PERMISSION_VIEW:
+            case BasicPermission::EDIT:
+            case BasicPermission::VIEW:
                 return $this->checkBasicPermission($entity, $attribute);
                 break;
-            case BasicPermissionMap::PERMISSION_DELETE:
+            case BasicPermission::DELETE:
                 return $this->checkDeletePermission($entity, $attribute);
                 break;
             case self::PERMISSION_CREATE:
@@ -134,7 +134,7 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
     private function checkSourcePermission(DraftableInterface $object, string $attribute): int
     {
         $source = $object->getDraftSource();
-        $permissions = $this->draftPermissionHelper->generatePermissions($object, BasicPermissionMap::PERMISSION_VIEW);
+        $permissions = $this->draftPermissionHelper->generatePermissions($object, BasicPermission::VIEW);
 
         return $this->isGranted($source, $attribute) | $this->isGranted($object, $permissions);
     }

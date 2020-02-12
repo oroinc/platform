@@ -11,8 +11,8 @@ Feature: Localization Crud
   Scenario: Check default localization
     Given I login as administrator
     When I go to System/Localization/Localizations
-    Then I should see "English" in grid with following data:
-      | Title               | English |
+    Then I should see "English (United States)" in grid with following data:
+      | Title               | English (United States) |
       | Parent localization | N/A     |
 
   Scenario: Verify HTML tags
@@ -94,16 +94,16 @@ Feature: Localization Crud
       | Default Localization  | Dutch |
     And save form
     And go to System/Localization/Localizations
-    Then I should see following actions for English in grid:
+    Then I should see following actions for English (United States) in grid:
       | View   |
       | Edit   |
       | Delete |
 
   Scenario: Delete new localization but default can't be removed
-    Given I click Delete English in grid
+    Given I click Delete English (United States) in grid
     When I confirm deletion
     Then there is two record in grid
-    And there is no "English" in grid
+    And there is no "English (United States)" in grid
     And I should see Dutch in grid
     But I should not see following actions for Dutch in grid:
       | Delete |

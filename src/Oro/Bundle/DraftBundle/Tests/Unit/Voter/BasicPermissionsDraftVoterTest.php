@@ -14,7 +14,6 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -103,22 +102,22 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
         return [
             'Original entity with VIEW permission' => [
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
-                'permissions' => [BasicPermissionMap::PERMISSION_VIEW],
+                'permissions' => ['VIEW'],
                 'source' => $this->getEntity(DraftableEntityStub::class)
             ],
             'Original entity with EDIT permission' => [
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
-                'permissions' => [BasicPermissionMap::PERMISSION_EDIT],
+                'permissions' => ['EDIT'],
                 'source' => $this->getEntity(DraftableEntityStub::class)
             ],
             'Original entity with DELETE permission' => [
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
-                'permissions' => [BasicPermissionMap::PERMISSION_DELETE],
+                'permissions' => ['DELETE'],
                 'source' => $this->getEntity(DraftableEntityStub::class)
             ],
             'Draft entity with VIEW permission' => [
                 'expected' => VoterInterface::ACCESS_DENIED,
-                'permissions' => [BasicPermissionMap::PERMISSION_VIEW],
+                'permissions' => ['VIEW'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4()]
@@ -126,7 +125,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
             ],
             'Draft entity with EDIT permission' => [
                 'expected' => VoterInterface::ACCESS_DENIED,
-                'permissions' => [BasicPermissionMap::PERMISSION_EDIT],
+                'permissions' => ['EDIT'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4()]
@@ -134,7 +133,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
             ],
             'Draft entity with DELETE permission' => [
                 'expected' => VoterInterface::ACCESS_DENIED,
-                'permissions' => [BasicPermissionMap::PERMISSION_DELETE],
+                'permissions' => ['DELETE'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4()]
@@ -142,7 +141,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
             ],
             'Draft entity with VIEW permission and user owner' => [
                 'expected' => VoterInterface::ACCESS_GRANTED,
-                'permissions' => [BasicPermissionMap::PERMISSION_VIEW],
+                'permissions' => ['VIEW'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4(), 'draftOwner' => self::$user]
@@ -150,7 +149,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
             ],
             'Draft entity with EDIT permission and user owner' => [
                 'expected' => VoterInterface::ACCESS_GRANTED,
-                'permissions' => [BasicPermissionMap::PERMISSION_EDIT],
+                'permissions' => ['EDIT'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4(), 'draftOwner' => self::$user]
@@ -158,7 +157,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
             ],
             'Draft entity with DELETE permission and user owner' => [
                 'expected' => VoterInterface::ACCESS_DENIED,
-                'permissions' => [BasicPermissionMap::PERMISSION_DELETE],
+                'permissions' => ['DELETE'],
                 'source' => $this->getEntity(
                     DraftableEntityStub::class,
                     ['draftUuid' => UUIDGenerator::v4(), 'draftOwner' => self::$user]

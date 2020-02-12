@@ -17,19 +17,23 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class EntityListener implements OptionalListenerInterface
+/**
+ * Handles Email entity related changes.
+ */
+class EntityListener implements OptionalListenerInterface, ServiceSubscriberInterface
 {
-    /** @var EmailOwnerManager */
-    protected $emailOwnerManager;
+    /** @var  MessageProducerInterface */
+    protected $producer;
 
-    /** @var ServiceLink */
-    protected $emailActivityManagerLink;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /** @var ServiceLink */
-    protected $emailThreadManagerLink;
+    /** @var bool */
+    protected $enabled = true;
 
     /** @var Email[] */
     protected $emailsToRemove = [];
@@ -46,43 +50,30 @@ class EntityListener implements OptionalListenerInterface
     /** @var EmailAddress[] */
     protected $newEmailAddresses = [];
 
-    /** @var EmailActivityUpdates */
-    protected $emailActivityUpdates;
-
-    /** @var  MessageProducerInterface */
-    protected $producer;
-
     /**
-     * @var bool
-     */
-    protected $enabled = true;
-    /**
-     * @var EmailAddressManager
-     */
-    private $emailAddressManager;
-
-    /**
-     * @param EmailOwnerManager        $emailOwnerManager
-     * @param ServiceLink              $emailActivityManagerLink
-     * @param ServiceLink              $emailThreadManagerLink
-     * @param EmailActivityUpdates     $emailActivityUpdates
      * @param MessageProducerInterface $producer
-     * @param EmailAddressManager      $emailAddressManager
+     * @param ContainerInterface       $container
      */
     public function __construct(
-        EmailOwnerManager    $emailOwnerManager,
-        ServiceLink          $emailActivityManagerLink,
-        ServiceLink          $emailThreadManagerLink,
-        EmailActivityUpdates $emailActivityUpdates,
         MessageProducerInterface $producer,
-        EmailAddressManager $emailAddressManager
+        ContainerInterface $container
     ) {
-        $this->emailOwnerManager        = $emailOwnerManager;
-        $this->emailActivityManagerLink = $emailActivityManagerLink;
-        $this->emailThreadManagerLink   = $emailThreadManagerLink;
-        $this->emailActivityUpdates     = $emailActivityUpdates;
         $this->producer = $producer;
-        $this->emailAddressManager = $emailAddressManager;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_email.email.owner.manager' => EmailOwnerManager::class,
+            'oro_email.email.thread.manager' => EmailThreadManager::class,
+            'oro_email.email.activity.manager' => EmailActivityManager::class,
+            'oro_email.model.email_activity_updates' => EmailActivityUpdates::class,
+            'oro_email.email.address.manager' => EmailAddressManager::class
+        ];
     }
 
     /**
@@ -105,8 +96,9 @@ class EntityListener implements OptionalListenerInterface
         $em = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
 
-        $emailAddressData = $this->emailOwnerManager->createEmailAddressData($uow);
-        list($updatedEmailAddresses, $created) = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
+        $emailOwnerManager = $this->getEmailOwnerManager();
+        $emailAddressData = $emailOwnerManager->createEmailAddressData($uow);
+        [$updatedEmailAddresses, $created] = $emailOwnerManager->handleChangedAddresses($emailAddressData);
         foreach ($updatedEmailAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
@@ -126,7 +118,7 @@ class EntityListener implements OptionalListenerInterface
             )
         );
 
-        $this->emailActivityUpdates->processUpdatedEmailAddresses($updatedEmailAddresses);
+        $this->getEmailActivityUpdates()->processUpdatedEmailAddresses($updatedEmailAddresses);
         $this->newEmailAddresses = array_merge($this->newEmailAddresses, $created);
     }
 
@@ -178,8 +170,9 @@ class EntityListener implements OptionalListenerInterface
      */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        $entities = $this->emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
-        $this->emailActivityUpdates->clearPendingEntities();
+        $emailActivityUpdates = $this->getEmailActivityUpdates();
+        $entities = $emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
+        $emailActivityUpdates->clearPendingEntities();
 
         if (!$entities) {
             return;
@@ -241,30 +234,14 @@ class EntityListener implements OptionalListenerInterface
     }
 
     /**
-     * @return EmailThreadManager
-     */
-    public function getEmailThreadManager()
-    {
-        return $this->emailThreadManagerLink->getService();
-    }
-
-    /**
-     * @return EmailActivityManager
-     */
-    protected function getEmailActivityManager()
-    {
-        return $this->emailActivityManagerLink->getService();
-    }
-
-    /**
      * @param EntityManager $em
      */
-    private function saveNewEmailAddresses(EntityManager $em)
+    protected function saveNewEmailAddresses(EntityManager $em)
     {
         $flush = false;
 
         foreach ($this->newEmailAddresses as $newEmailAddress) {
-            $emailAddress = $this->emailAddressManager
+            $emailAddress = $this->getEmailAddressManager()
                 ->getEmailAddressRepository()
                 ->findOneBy(['email' => $newEmailAddress->getEmail()]);
             if ($emailAddress === null) {
@@ -278,5 +255,45 @@ class EntityListener implements OptionalListenerInterface
         if ($flush) {
             $em->flush();
         }
+    }
+
+    /**
+     * @return EmailOwnerManager
+     */
+    protected function getEmailOwnerManager(): EmailOwnerManager
+    {
+        return $this->container->get('oro_email.email.owner.manager');
+    }
+
+    /**
+     * @return EmailThreadManager
+     */
+    protected function getEmailThreadManager()
+    {
+        return $this->container->get('oro_email.email.thread.manager');
+    }
+
+    /**
+     * @return EmailActivityManager
+     */
+    protected function getEmailActivityManager()
+    {
+        return $this->container->get('oro_email.email.activity.manager');
+    }
+
+    /**
+     * @return EmailActivityUpdates
+     */
+    protected function getEmailActivityUpdates(): EmailActivityUpdates
+    {
+        return $this->container->get('oro_email.model.email_activity_updates');
+    }
+
+    /**
+     * @return EmailAddressManager
+     */
+    protected function getEmailAddressManager(): EmailAddressManager
+    {
+        return $this->container->get('oro_email.email.address.manager');
     }
 }

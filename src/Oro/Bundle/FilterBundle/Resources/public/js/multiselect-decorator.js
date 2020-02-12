@@ -118,6 +118,14 @@ define([
          */
         onOpenDropdown: function() {
             this.getWidget().find('input[type="search"]').focus();
+            this.getWidgetTrigger().addClass('pressed');
+        },
+
+        /**
+         * Action performed on dropdown close
+         */
+        onClose: function() {
+            this.getWidgetTrigger().removeClass('pressed');
         },
 
         /**
@@ -171,6 +179,15 @@ define([
          */
         getWidget: function() {
             return this.multiselect('widget');
+        },
+
+        /**
+         * Get multiselect trigger
+         *
+         * @return {Object}
+         */
+        getWidgetTrigger: function() {
+            return this.multiselect('instance').button;
         },
 
         /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
@@ -98,7 +99,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
             'user' => [$view1, $view2]
         ];
 
-        $event = new GridViewsLoadEvent('grid', $gridViews);
+        $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), $gridViews);
 
         $expectedViews = [
             [
@@ -155,7 +156,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
     public function testListenerShouldNotAddViewsIntoIfUserIsNotLoggedIn()
     {
         $originalView = new View('view');
-        $event = new GridViewsLoadEvent('grid', [$originalView]);
+        $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), [$originalView]);
 
         $this->gridViewRepository
             ->expects($this->never())

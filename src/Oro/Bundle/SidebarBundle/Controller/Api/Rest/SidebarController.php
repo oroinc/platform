@@ -8,11 +8,14 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
+use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * Provides REST API for the sidebar.
+ *
  * @RouteResource("sidebars")
  * @NamePrefix("oro_api_")
  */
@@ -129,6 +132,6 @@ class SidebarController extends FOSRestController
      */
     protected function getSidebarStateClass()
     {
-        return $this->getParameter('oro_sidebar.entity.sidebar_state.class');
+        return SidebarState::class;
     }
 }

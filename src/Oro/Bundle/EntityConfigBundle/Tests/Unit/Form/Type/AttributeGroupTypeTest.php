@@ -20,7 +20,6 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -108,7 +107,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                 ],
                 [
                     FormType::class => [
-                        new StripTagsExtensionStub($this->createMock(HtmlTagHelper::class)),
+                        new StripTagsExtensionStub($this),
                         new TooltipFormExtension($entityConfigProvider, $this->translator),
                     ]
                 ]

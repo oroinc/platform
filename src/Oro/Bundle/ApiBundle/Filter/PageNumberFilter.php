@@ -7,6 +7,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * A filter that can be used to specify the page number.
+ * @see \Oro\Bundle\ApiBundle\Filter\FilterNames::getPageNumberFilterName
  */
 class PageNumberFilter extends StandaloneFilterWithDefaultValue
 {

@@ -218,7 +218,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->resolve();
         $hash = $this->context->getHash();
 
-        $this->assertEquals(md5(serialize([])), $hash);
+        $this->assertEquals(md5(serialize([]) . serialize([])), $hash);
     }
 
     public function testGetHashWithContextItemInterfaceDescendantItems()
@@ -230,7 +230,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->set('item', $item);
         $this->context->resolve();
 
-        $this->assertEquals(md5(serialize(['item' => 'value'])), $this->context->getHash());
+        $this->assertEquals(md5(serialize(['item' => 'value']) . serialize([])), $this->context->getHash());
     }
 
     /**

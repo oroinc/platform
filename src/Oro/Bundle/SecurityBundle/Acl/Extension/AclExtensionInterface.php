@@ -58,11 +58,11 @@ interface AclExtensionInterface
      * supported this ACL extension.
      *
      * As one ACL extension may support several bitmasks (and as result it gives us an ability to
-     * associate several ACEs with the same domain object) we need should use correct implementation
+     * associate several ACEs with the same domain object) we should use correct implementation
      * of the mask builder for each type of a bitmask. To find correct mask builder we can use one of
      * a permission name the required mask builder supports.
      *
-     * @param string $permission
+     * @param string|null $permission
      *
      * @return MaskBuilder
      */

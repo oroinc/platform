@@ -11,6 +11,8 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
+ * A model that stores all the necessary functionality for transferring between workflow states.
+ *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -367,11 +369,12 @@ class Transition
      * Run transition process.
      *
      * @param WorkflowItem $workflowItem
+     * @param Collection|null $errors
      * @throws ForbiddenTransitionException
      */
-    public function transit(WorkflowItem $workflowItem)
+    public function transit(WorkflowItem $workflowItem, Collection $errors = null)
     {
-        if ($this->isAllowed($workflowItem)) {
+        if ($this->isAllowed($workflowItem, $errors)) {
             $stepTo = $this->getStepTo();
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 

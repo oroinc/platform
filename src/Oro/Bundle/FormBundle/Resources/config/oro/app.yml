@@ -54,6 +54,7 @@ oro_form:
                         - "!href"
                         - target
                         - title
+                        - draggable
                 dl: ~
                 dt: ~
                 div:
@@ -135,5 +136,9 @@ oro_form:
                 time: ~
                 tfoot: ~
                 var: ~
-                video: ~
+                video:
+                    attributes:
+                        - allowfullscreen
+                        - src
+                        - controls
                 aside: ~

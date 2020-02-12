@@ -7,15 +7,19 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\SetRolePermissionsTrait;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
+    use ContainerAwareTrait;
+    use SetRolePermissionsTrait;
+
     const SIMPLE_USER_ROLE_SYSTEM = 'simple_system_user@example.com';
     const SIMPLE_USER_ROLE_LOCAL = 'simple_local_user@example.com';
     const SIMPLE_USER_2_ROLE_LOCAL = 'simple_local_user2@example.com';
@@ -61,11 +65,6 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
     }
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * {@inheritDoc}
      */
     public function getDependencies()
@@ -73,14 +72,6 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         return [
             LoadBusinessUnitData::class, LoadBusinessUnit::class
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 
     /**
@@ -95,9 +86,9 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
     /**
      * @param ObjectManager $manager
      */
-    protected function loadRoles(ObjectManager $manager)
+    private function loadRoles(ObjectManager $manager)
     {
-        /* @var $aclManager AclManager */
+        /* @var AclManager $aclManager */
         $aclManager = $this->container->get('oro_security.acl.manager');
 
         $roles = [
@@ -105,14 +96,18 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
             static::ROLE_SYSTEM => 'VIEW_SYSTEM',
             static::ROLE_DEEP => 'VIEW_DEEP'
         ];
-        foreach ($roles as $key => $roleName) {
-            $role = new Role($key);
-            $role->setLabel($key);
+        foreach ($roles as $roleName => $permission) {
+            $role = new Role($roleName);
+            $role->setLabel($roleName);
             $manager->persist($role);
 
-            $this->setRolePermissions($aclManager, $role, User::class, $roleName);
+            $this->setPermissions(
+                $aclManager,
+                $role,
+                ['entity:' . User::class => [$permission]]
+            );
 
-            $this->setReference($key, $role);
+            $this->setReference($roleName, $role);
         }
 
         $manager->flush();
@@ -122,7 +117,7 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
     /**
      * @param ObjectManager $manager
      */
-    protected function loadUsers($manager)
+    private function loadUsers(ObjectManager $manager)
     {
         /** @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
@@ -153,26 +148,6 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
             $userManager->updateUser($user);
 
             $this->setReference($item['email'], $user);
-        }
-    }
-
-    /**
-     * @param AclManager $aclManager
-     * @param Role $role
-     * @param string $className
-     * @param string $allowedAcls
-     */
-    protected function setRolePermissions(AclManager $aclManager, Role $role, $className, $allowedAcls)
-    {
-        if ($aclManager->isAclEnabled()) {
-            $sid = $aclManager->getSid($role);
-            $oid = $aclManager->getOid('entity:' . $className);
-
-            $builder = $aclManager->getMaskBuilder($oid);
-            $builder->reset()->get();
-            $mask = $builder->add($allowedAcls)->get();
-
-            $aclManager->setPermission($sid, $oid, $mask);
         }
     }
 }

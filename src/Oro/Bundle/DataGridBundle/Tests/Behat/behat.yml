@@ -57,7 +57,7 @@ oro_behat_extension:
         selector: 'div.filters-state'
 
     GridFiltersButton:
-      selector: 'div.toolbar div.actions-panel .action[title=Filters]'
+      selector: 'div.toolbar div.actions-panel .action[title="Filter Toggle"]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
     GridFilterStringItem:
@@ -248,5 +248,6 @@ oro_behat_extension:
         - OroDataGridBundle::GridContext
         - OroUIBundle::ContextSelectorContext
         - OroSecurityBundle::ACLContext
+        - OroConfigBundle::FeatureContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

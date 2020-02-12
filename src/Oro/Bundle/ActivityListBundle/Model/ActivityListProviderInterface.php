@@ -91,14 +91,6 @@ interface ActivityListProviderInterface
     public function getRoutes($activityEntity);
 
     /**
-     * Gets a class name of entity for which ACL should be checked
-     * to determine whether an activity entity is accessible in the activity list.
-     *
-     * @return string|null The class name or NULL if ACL class is equal to activity entity class of this provider
-     */
-    public function getAclClass();
-
-    /**
      * @param object $entity
      *
      * @return integer

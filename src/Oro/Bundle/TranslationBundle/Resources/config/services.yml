@@ -1,8 +1,4 @@
 parameters:
-    oro_translation.entity.language.class:                      Oro\Bundle\TranslationBundle\Entity\Language
-    oro_translation.entity.translation.class:                   Oro\Bundle\TranslationBundle\Entity\Translation
-    oro_translation.entity.translation_key.class:               Oro\Bundle\TranslationBundle\Entity\TranslationKey
-
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
 
 services:
@@ -267,7 +263,7 @@ services:
         class: Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_translation.entity.language.class%'
+            - 'Oro\Bundle\TranslationBundle\Entity\Language'
 
     oro_translation.provider.translation_context:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider

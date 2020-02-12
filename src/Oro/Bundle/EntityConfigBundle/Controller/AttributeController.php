@@ -201,7 +201,7 @@ class AttributeController extends Controller
 
         $response = [
             'entity' => $entityConfigModel,
-            'fieldClassName' => $this->container->getParameter('oro_entity_config.entity.entity_field.class'),
+            'fieldClassName' => FieldConfigModel::class,
             'params' => ['entityId' => $entityConfigModel->getId()],
             'layoutActions' => $layoutActions
         ];

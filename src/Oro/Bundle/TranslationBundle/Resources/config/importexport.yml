@@ -17,8 +17,8 @@ services:
         calls:
              - [setStrategy, ['@oro_translation.importexport.strategy.translation.add_or_replace']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
-            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.add_or_replace }
+            - { name: oro_importexport.processor, type: import, entity: 'Oro\Bundle\TranslationBundle\Entity\Translation', alias: oro_translation_translation.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: 'Oro\Bundle\TranslationBundle\Entity\Translation', alias: oro_translation_translation.add_or_replace }
 
     oro_translation.importexport.processor.import.translation_reset:
         parent: oro_importexport.processor.import_abstract
@@ -26,15 +26,15 @@ services:
         calls:
              - [setStrategy, ['@oro_translation.importexport.strategy.translation.reset']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
-            - { name: oro_importexport.processor, type: import_validation, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation.reset }
+            - { name: oro_importexport.processor, type: import, entity: 'Oro\Bundle\TranslationBundle\Entity\Translation', alias: oro_translation_translation.reset }
+            - { name: oro_importexport.processor, type: import_validation, entity: 'Oro\Bundle\TranslationBundle\Entity\Translation', alias: oro_translation_translation.reset }
 
     # Export processor
     oro_translation.importexport.processor.export.translation:
         parent: oro_importexport.processor.export_abstract
         public: false
         tags:
-            - { name: oro_importexport.processor, type: export, entity: '%oro_translation.entity.translation.class%', alias: oro_translation_translation }
+            - { name: oro_importexport.processor, type: export, entity: 'Oro\Bundle\TranslationBundle\Entity\Translation', alias: oro_translation_translation }
 
     # Reader
     oro_translation.importexport.reader.translations:

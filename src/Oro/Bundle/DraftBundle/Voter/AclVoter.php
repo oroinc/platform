@@ -4,11 +4,11 @@ namespace Oro\Bundle\DraftBundle\Voter;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter as BaseAclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -20,9 +20,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class AclVoter implements AclVoterInterface
 {
     private const IGNORED_PERMISSIONS = [
-        BasicPermissionMap::PERMISSION_VIEW,
-        BasicPermissionMap::PERMISSION_EDIT,
-        BasicPermissionMap::PERMISSION_DELETE
+        BasicPermission::VIEW,
+        BasicPermission::EDIT,
+        BasicPermission::DELETE
     ];
 
     /**

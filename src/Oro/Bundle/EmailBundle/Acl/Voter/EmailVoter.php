@@ -8,13 +8,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Security voter that prevents finding available mailboxes
+ * Prevents finding not available mailboxes.
  */
 class EmailVoter implements VoterInterface
 {
@@ -54,7 +55,7 @@ class EmailVoter implements VoterInterface
      */
     protected function supportsAttribute($attribute)
     {
-        return in_array($attribute, ['VIEW', 'EDIT'], true);
+        return in_array($attribute, [BasicPermission::VIEW, BasicPermission::EDIT], true);
     }
 
     /**

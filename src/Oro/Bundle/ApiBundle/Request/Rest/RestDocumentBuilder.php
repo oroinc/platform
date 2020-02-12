@@ -166,7 +166,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
                 continue;
             }
             $propertyPath = $property->getPropertyPath();
-            if ($this->isIgnoredMeta($propertyPath, $metadata)) {
+            if (!$propertyPath || $this->isIgnoredMeta($propertyPath, $metadata)) {
                 continue;
             }
             $resultName = $property->getResultName();

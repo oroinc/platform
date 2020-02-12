@@ -1,4 +1,13 @@
 services:
+    oro_organization.api.validate_business_unit_new_included_entity_existence:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNewIncludedEntityExistence
+        arguments:
+            - '@oro_api.form_property_accessor'
+            - '@translator'
+            - { owner: false }
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, class: Oro\Bundle\OrganizationBundle\Entity\BusinessUnit }
+
     oro_organization.api.config.add_owner_validator:
         class: Oro\Bundle\OrganizationBundle\Api\Processor\GetConfig\AddOwnerValidator
         arguments:

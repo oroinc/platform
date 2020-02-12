@@ -2,8 +2,8 @@ services:
     oro_layout.view.listener:
         class: Oro\Bundle\LayoutBundle\EventListener\LayoutListener
         arguments:
-            - '@oro_layout.helper'
-            - '@oro_layout.layout_manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
             # process the '@Layout' annotation before the '@Template' annotation
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView, priority: 10 }
+            - { name: container.service_subscriber }

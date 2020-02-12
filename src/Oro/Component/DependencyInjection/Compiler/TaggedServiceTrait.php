@@ -2,7 +2,6 @@
 
 namespace Oro\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -107,32 +106,5 @@ trait TaggedServiceTrait
         }
 
         return $services;
-    }
-
-    /**
-     * Iterates over the given tagged services and adds each tagged service to the definition
-     * of the given service via the given method name.
-     *
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     * @param string           $addMethodName
-     * @param array            $taggedServices
-     *
-     * @deprecated use "!tagged_iterator tag_name" for new tags
-     */
-    private function registerTaggedServicesViaAddMethod(
-        ContainerBuilder $container,
-        string $serviceId,
-        string $addMethodName,
-        array $taggedServices
-    ): void {
-        if (!$taggedServices) {
-            return;
-        }
-
-        $chainProviderDef = $container->getDefinition($serviceId);
-        foreach ($taggedServices as $service) {
-            $chainProviderDef->addMethodCall($addMethodName, [$service]);
-        }
     }
 }
