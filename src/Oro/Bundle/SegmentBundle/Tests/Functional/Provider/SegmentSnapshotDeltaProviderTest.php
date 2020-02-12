@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Provider;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentDeltaData;

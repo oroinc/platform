@@ -25,7 +25,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->entityMetadata->mode = ConfigModel::MODE_DEFAULT;
 
 
-        $this->fieldMetadata       = new FieldMetadata(new \ReflectionClass(DemoEntity::ENTITY_NAME), 'name');
+        $this->fieldMetadata       = new FieldMetadata(DemoEntity::ENTITY_NAME, 'name');
         $this->fieldMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 

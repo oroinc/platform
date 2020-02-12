@@ -55,11 +55,14 @@ class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
-    public function testInitialize(): void
+    public function testInitializeException(): void
     {
         $this->expectExceptionMessage('The required options "attribute", "object" are missing.');
         $this->action->initialize([]);
+    }
 
+    public function testInitialize(): void
+    {
         $options = [
             'object' => new PropertyPath('object'),
             'attribute' => new PropertyPath('attribute')
@@ -95,6 +98,11 @@ class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
         $context = new ActionData(['object' => $entity]);
+
+        $this->action->initialize([
+            'object' => new PropertyPath('object'),
+            'attribute' => new PropertyPath('attribute')
+        ]);
 
         $this->action->execute($context);
         $this->assertNull($context->get('attribute'));

@@ -207,8 +207,12 @@ class SegmentManager
 
         $params = $segmentQueryBuilder->getParameters();
 
-        foreach ($params as $param) {
-            $queryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
+        foreach ($params as $parameter) {
+            $queryBuilder->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
+            );
         }
     }
 
@@ -314,8 +318,12 @@ class SegmentManager
 
         /** @var Parameter[] $params */
         $params = $queryBuilder->getParameters();
-        foreach ($params as $param) {
-            $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
+        foreach ($params as $parameter) {
+            $externalQueryBuilder->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
+            );
         }
 
         return $subQuery;

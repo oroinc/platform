@@ -30,7 +30,10 @@ services:
     oro_message_queue.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
         lazy: true
-        arguments: ['@oro_message_queue.client.driver']
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.router'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
 
     Oro\Component\MessageQueue\Client\MessageProducerInterface:
         alias: 'oro_message_queue.client.message_producer'

@@ -57,7 +57,11 @@ define(function(require) {
                     prefix = options.negative_prefix;
                     suffix = options.negative_suffix;
                 }
-                return prefix + formattedNumber + suffix;
+                const result = prefix + formattedNumber + suffix;
+
+                // Fixes the case when sometimes (depending on ICU version) prefix/suffix contain XXX instead
+                // of currency symbol.
+                return result.replace('XXX', options.currency_symbol);
             },
             replaceMonetarySeparator: function(formattedNumber, options) {
                 const defaultGroupingSeparator = ',';

@@ -35,7 +35,7 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
         $userManager->updateUser($user);
 
         $messageProcessor = $this->getContainer()->get('oro_message_queue.client.delegate_message_processor');
-        $consumer = $this->getContainer()->get('oro_test.consumption.queue_consumer');
+        $consumer = $this->getContainer()->get('oro_message_queue.consumption.queue_consumer');
         $logger = new TestLogger();
 
         $consumer->bind('oro.default', $messageProcessor);

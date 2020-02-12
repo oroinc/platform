@@ -14,6 +14,22 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### InstallerBundle
+
+* JS dependencies management has been moved from [Asset Packagist](https://asset-packagist.oroinc.com/) to
+Composer + NPM solution. So the corresponding Asset Packagist entry in the `repositories` section of `composer.json`
+must be removed.
+
+	If there are bower or npm dependencies (packages with names starting with `bower-asset/` or `npm-asset/`) specified in your `composer.json`, then do the following:
+
+	1) for package names starting with `npm-asset/`: remove the `npm-asset/` prefix, move the dependency to the `extra.npm` section
+  of `composer.json`;
+	2) for package names starting with `bower-asset/`: remove the `bower-asset/` prefix, find the corresponding or alternative
+ npm packages instead of bower packages, and add them to the `extra.npm` section of `composer.json`.
+
+	If you have your own `package.json` with npm dependencies, then move them to the `extra.npm` section of `composer.json`.
+	If you need a custom script to be executed as well, then you can add your custom script to the `scripts` section of `composer.json`.
+
 #### ConfigBundle
 * The handling of `priority` attribute for `oro_config.configuration_search_provider` DIC tag
   was changed to correspond Symfony recommendations.

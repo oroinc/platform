@@ -130,6 +130,9 @@ abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
             }
             if (!empty($associationMap)) {
                 $metadata->expects($this->any())
+                    ->method('hasAssociation')
+                    ->willReturn(true);
+                $metadata->expects($this->any())
                     ->method('getAssociationMapping')
                     ->will($this->returnValueMap($associationMap));
             }

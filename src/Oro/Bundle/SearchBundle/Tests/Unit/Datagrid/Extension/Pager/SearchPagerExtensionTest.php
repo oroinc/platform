@@ -157,8 +157,8 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->pagerExtension->processConfigs($datagridConfiguration);
 
         $pagerParameters = $parameterBag->get('_pager');
-        $this->assertEquals($expectedPageSize, $pagerParameters['_per_page']);
-        $this->assertEquals($expectPage, $pagerParameters['_page']);
+        $this->assertEquals($expectedPageSize, $pagerParameters['_per_page'] ?? null);
+        $this->assertEquals($expectPage, $pagerParameters['_page'] ?? null);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub;
+namespace Oro\Component\MessageQueue\Test\Async;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -9,14 +9,20 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class UniqueMessageProcessorStub implements MessageProcessorInterface, TopicSubscriberInterface
+/**
+ * Unique message processor for test purposes.
+ */
+class UniqueMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const TEST_TOPIC = 'oro.message_queue.unique_test_topic';
-    const TEST_JOB_NAME = 'test_job_unique|123456789';
+    private const TEST_TOPIC = 'oro.message_queue.unique_test_topic';
+    public const TEST_JOB_NAME = 'test_job_unique|123456789';
 
     /** @var JobRunner */
     private $jobRunner;
 
+    /**
+     * @param JobRunner $jobRunner
+     */
     public function __construct(JobRunner $jobRunner)
     {
         $this->jobRunner = $jobRunner;
@@ -25,7 +31,7 @@ class UniqueMessageProcessorStub implements MessageProcessorInterface, TopicSubs
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $messageBody = JSON::decode($message->getBody());
 
@@ -43,9 +49,9 @@ class UniqueMessageProcessorStub implements MessageProcessorInterface, TopicSubs
      *
      * @return bool
      */
-    private function runUnique($ownerId)
+    private function runUnique($ownerId): bool
     {
-        $jobName = $this->buildJobNameForMessage();
+        $jobName = self::TEST_JOB_NAME;
         $closure = function () {
             return true;
         };
@@ -54,17 +60,9 @@ class UniqueMessageProcessorStub implements MessageProcessorInterface, TopicSubs
     }
 
     /**
-     * @return string
-     */
-    private function buildJobNameForMessage()
-    {
-        return self::TEST_JOB_NAME;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [self::TEST_TOPIC];
     }

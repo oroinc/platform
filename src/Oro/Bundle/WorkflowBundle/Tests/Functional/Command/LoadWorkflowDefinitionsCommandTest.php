@@ -137,10 +137,17 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
         ];
 
-        yield 'invalid filter expression' => [
-            'expectedMessages' => ['Expected =, <, <=, <>, >, >=, !=, got end of string'],
-            'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
-        ];
+        if (PHP_VERSION_ID >= 70400) {
+            yield 'invalid filter expression' => [
+                'expectedMessages' => ['Unexpected query syntax error'],
+                'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
+            ];
+        } else {
+            yield 'invalid filter expression' => [
+                'expectedMessages' => ['Error: Expected =, <, <=, <>, >, >=, !=, got end of string'],
+                'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
+            ];
+        }
 
         yield 'empty start step' => [
             'expectedMessages' => ['does not contains neither start step nor start transitions'],

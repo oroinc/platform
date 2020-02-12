@@ -123,7 +123,7 @@ class ImapEmailIterator implements \Iterator, \Countable
      */
     public function current()
     {
-        return $this->batch[$this->iterationPos];
+        return $this->batch[$this->iterationPos] ?? null;
     }
 
     /**

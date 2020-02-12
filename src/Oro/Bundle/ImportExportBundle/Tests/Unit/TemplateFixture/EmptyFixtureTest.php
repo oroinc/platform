@@ -22,6 +22,6 @@ class EmptyFixtureTest extends \PHPUnit\Framework\TestCase
         $fixture = $templateManager->getEntityFixture('\stdClass');
         $data    = $fixture->getData();
         $this->assertCount(1, $data);
-        $this->assertInstanceOf('\stdClass', reset($data));
+        $this->assertInstanceOf('\stdClass', $data->current());
     }
 }
