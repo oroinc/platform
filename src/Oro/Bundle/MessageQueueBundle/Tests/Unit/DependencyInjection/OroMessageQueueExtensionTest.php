@@ -362,8 +362,8 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
 
         $this->assertParametersLoaded($this->getRequiredParameters());
         $this->assertDefinitionsLoaded(array_merge($this->getRequiredDefinitions(), [
-            'oro_message_queue.async.unique_message_processor.stub',
-            'oro_message_queue.async.dependent_message_processor.stub',
+            'oro_message_queue.async.unique_message_processor',
+            'oro_message_queue.async.dependent_message_processor',
         ]));
         $this->assertExtensionConfigsLoaded([]);
 

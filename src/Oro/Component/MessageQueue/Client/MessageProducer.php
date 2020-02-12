@@ -1,42 +1,84 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
+use Oro\Component\MessageQueue\Exception\TopicSubscriberNotFoundException;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Message producer that used when messages are sending to the queue.
+ * Prepares a message before sending, forward the message to all queues associated with the current topic.
+ */
 class MessageProducer implements MessageProducerInterface
 {
-    /**
-     * @var DriverInterface
-     */
-    protected $driver;
+    /** @var DriverInterface */
+    private $driver;
+
+    /** @var RecipientListRouterInterface */
+    private $router;
+
+    /** @var DestinationMetaRegistry */
+    private $destinationMetaRegistry;
 
     /**
      * @param DriverInterface $driver
+     * @param RecipientListRouterInterface $router
+     * @param DestinationMetaRegistry $destinationMetaRegistry
      */
-    public function __construct(DriverInterface $driver)
-    {
+    public function __construct(
+        DriverInterface $driver,
+        RecipientListRouterInterface $router,
+        DestinationMetaRegistry $destinationMetaRegistry
+    ) {
         $this->driver = $driver;
+        $this->router = $router;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send($topic, $message)
+    public function send($topic, $message): void
     {
-        if ($message instanceof Message) {
-            $message = clone $message;
-        } else {
-            $body = $message;
-            $message = new Message();
-            $message->setBody($body);
+        $subscribers = $this->router->getTopicSubscribers($topic);
+        if (!$subscribers) {
+            throw new TopicSubscriberNotFoundException(
+                sprintf('There is no message processors subscribed for topic "%s".', $topic)
+            );
         }
 
-        $this->prepareBody($message);
+        foreach ($subscribers as [$processorName, $queueName]) {
+            $queueName = $this->destinationMetaRegistry->getDestinationMeta($queueName)->getTransportName();
 
-        $config = $this->driver->getConfig();
-        $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
-        $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $config->getRouterMessageProcessorName());
-        $message->setProperty(Config::PARAMETER_QUEUE_NAME, $config->getRouterQueueName());
+            $message = $this->getMessage($message);
+            $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
+            $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $processorName);
+            $message->setProperty(Config::PARAMETER_QUEUE_NAME, $queueName);
+
+            $queue = $this->driver->createQueue($queueName);
+            $this->driver->send($queue, $message);
+        }
+    }
+
+    /**
+     * @param Message|array|string|null $rawMessage
+     *
+     * @return Message
+     */
+    private function getMessage($rawMessage): Message
+    {
+        if ($rawMessage instanceof Message) {
+            $message = clone $rawMessage;
+        } else {
+            $message = new Message();
+            $message->setBody($rawMessage);
+        }
+
+        $message->setContentType($this->getContentType($message));
+        $message->setBody($this->getBody($message));
 
         if (!$message->getMessageId()) {
             $message->setMessageId(uniqid('oro.', true));
@@ -48,51 +90,49 @@ class MessageProducer implements MessageProducerInterface
             $message->setPriority(MessagePriority::NORMAL);
         }
 
-        $queue = $this->driver->createQueue($config->getRouterQueueName());
-
-        $this->driver->send($queue, $message);
+        return $message;
     }
 
     /**
      * @param Message $message
+     *
+     * @return string
      */
-    private function prepareBody(Message $message)
+    private function getContentType(Message $message): string
     {
         $body = $message->getBody();
         $contentType = $message->getContentType();
-
-        if (is_scalar($body) || is_null($body)) {
-            $contentType = $contentType ?: 'text/plain';
-            $body = (string) $body;
-        } elseif (is_array($body)) {
-            $body = $message->getBody();
-            $contentType = $message->getContentType();
-
-
+        if (is_array($body)) {
             if ($contentType && $contentType !== 'application/json') {
-                throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
+                throw new InvalidArgumentException('When body is array content type must be "application/json".');
             }
 
-            // only array of scalars is allowed.
-            array_walk_recursive($body, function ($value) {
-                if (!is_scalar($value) && !is_null($value)) {
-                    throw new \LogicException(sprintf(
-                        'The message\'s body must be an array of scalars. Found not scalar in the array: %s',
-                        is_object($value) ? get_class($value) : gettype($value)
-                    ));
-                }
-            });
-
-            $contentType = 'application/json';
-            $body = JSON::encode($body);
-        } else {
-            throw new \InvalidArgumentException(sprintf(
-                'The message\'s body must be either null, scalar or array. Got: %s',
-                is_object($body) ? get_class($body) : gettype($body)
-            ));
+            return 'application/json';
         }
 
-        $message->setContentType($contentType);
-        $message->setBody($body);
+        return $contentType ?: 'text/plain';
+    }
+
+    /**
+     * @param Message $message
+     *
+     * @return string
+     */
+    private function getBody(Message $message): string
+    {
+        $body = $message->getBody();
+
+        if (null === $body || is_scalar($body)) {
+            return (string) $body;
+        }
+
+        if (is_array($body)) {
+            return JSON::encode($body);
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'The message\'s body must be either null, scalar or array. Got: %s',
+            is_object($body) ? get_class($body) : gettype($body)
+        ));
     }
 }
