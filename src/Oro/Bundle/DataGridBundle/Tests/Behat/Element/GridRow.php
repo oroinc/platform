@@ -62,10 +62,18 @@ class GridRow extends TableRow
     {
         $cell = $this->startInlineEditing($header);
 
-        $this->getElement('OroForm')->fillField(
-            'value',
-            new InputValue(InputMethod::TYPE, $value)
-        );
+        //Tries to locate element several times to prevent premature ElementNotFoundException
+        $isElementFilled = $this->spin(function () use ($value) {
+            $this->getElement('OroForm')->fillField(
+                'value',
+                new InputValue(InputMethod::TYPE, $value)
+            );
+
+            return true;
+        });
+
+        $this->assertTrue($isElementFilled, "Could not fill field in '$header' column with value '$value'");
+
 
         $this->getDriver()->waitForAjax();
 
@@ -155,11 +163,11 @@ class GridRow extends TableRow
     {
         if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
             $showMoreLink->mouseOver();
-            $link = $this->waitFor(5, function () use ($action) {
+            $link = $this->spin(function () use ($action) {
                 return $this->elementFactory
                     ->createElement('GridRowActionMenu')
                     ->find('named', ['link', ucfirst($action)]);
-            });
+            }, 5);
         } else {
             $link = $this->find('named', ['link', ucfirst($action)]);
         }

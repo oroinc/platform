@@ -8,13 +8,14 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Handler that enables user list.
+ * The datagrid mass action for enable/disable users.
  */
 class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
 {
@@ -79,7 +80,7 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
             $results = $args->getResults();
             /** @var Query $query */
             $query   = $results->getSource();
-            $this->aclHelper->apply($query, 'EDIT');
+            $this->aclHelper->apply($query, BasicPermission::EDIT);
             $em = $results->getSource()->getEntityManager();
 
             $processedEntities = [];

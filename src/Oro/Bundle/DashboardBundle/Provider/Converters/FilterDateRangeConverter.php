@@ -93,7 +93,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             );
         } else {
             $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
-            list($start, $end, $type) = $this->getPeriodValues($value, $saveOpenRange);
+            [$start, $end, $type] = $this->getPeriodValues($value, $saveOpenRange);
             $start = $this->getCompiledDate($start);
             $end   = $this->getCompiledDate($end);
             
@@ -140,42 +140,44 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      */
     public function getViewValue($value)
     {
-        $start = $this->getCompiledDate($value['start']);
-        $end   = $this->getCompiledDate($value['end']);
+        $start = $this->getCompiledDate($value['start'] ?? '');
+        $end   = $this->getCompiledDate($value['end'] ?? '');
 
-        if (isset($value['part']) && $value['part'] === DateModifierInterface::PART_ALL_TIME) {
-            return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
-        }
+        if (is_array($value)) {
+            if (isset($value['part']) && $value['part'] === DateModifierInterface::PART_ALL_TIME) {
+                return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
+            }
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_MONTH) {
-            return $this->formatter->formatMonth($start);
-        }
+            if ($value['type'] === AbstractDateFilterType::TYPE_THIS_MONTH) {
+                return $this->formatter->formatMonth($start);
+            }
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_QUARTER) {
-            return $this->formatter->formatQuarter($start);
-        }
+            if ($value['type'] === AbstractDateFilterType::TYPE_THIS_QUARTER) {
+                return $this->formatter->formatQuarter($start);
+            }
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_YEAR) {
-            return $this->formatter->formatYear($start);
-        }
+            if ($value['type'] === AbstractDateFilterType::TYPE_THIS_YEAR) {
+                return $this->formatter->formatYear($start);
+            }
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
-            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end
-        ) {
-            return sprintf(
-                '%s %s',
-                $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-                $this->formatter->formatDate($start)
-            );
-        }
-        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
-            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start
-        ) {
-            return sprintf(
-                '%s %s',
-                $this->translator->trans('oro.filter.form.label_date_type_less_than'),
-                $this->formatter->formatDate($end)
-            );
+            if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
+                || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end
+            ) {
+                return sprintf(
+                    '%s %s',
+                    $this->translator->trans('oro.filter.form.label_date_type_more_than'),
+                    $this->formatter->formatDate($start)
+                );
+            }
+            if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+                || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start
+            ) {
+                return sprintf(
+                    '%s %s',
+                    $this->translator->trans('oro.filter.form.label_date_type_less_than'),
+                    $this->formatter->formatDate($end)
+                );
+            }
         }
         $startDate = $this->formatter->formatDate($start);
         $endDate   = $this->formatter->formatDate($end);

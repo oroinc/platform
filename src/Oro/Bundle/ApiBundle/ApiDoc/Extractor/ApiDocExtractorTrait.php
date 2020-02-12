@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\ApiBundle\ApiDoc\ApiDocAnnotationHandlerInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ApiDocAnnotationHandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;

@@ -27,13 +27,6 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->owners = [
-            new TestUser('1'),
-            new TestUser('2'),
-            new TestUser('3'),
-            new TestUser('4')
-        ];
-
         $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -166,7 +159,16 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected function getEmailEntity($id = null, $thread = null)
     {
-        /** @var Email $email */
+        if (!$this->owners) {
+            $this->owners = [
+                new TestUser('1'),
+                new TestUser('2'),
+                new TestUser('3'),
+                new TestUser('4')
+            ];
+        }
+
+        /** @var Email|\PHPUnit\Framework\MockObject\MockObject $email */
         $email = $this->createPartialMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
 
         $email->method('getId')

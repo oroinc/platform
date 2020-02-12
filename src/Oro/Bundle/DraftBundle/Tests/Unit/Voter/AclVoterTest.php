@@ -7,7 +7,6 @@ use Oro\Bundle\DraftBundle\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter as BaseAclVoter;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -29,12 +28,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $source = $this->getEntity(DraftableEntityStub::class, ['draftUuid' => $sourceUuid]);
         $voter = new AclVoter($decorateVoter);
-        $attributes = [
-            BasicPermissionMap::PERMISSION_MASTER,
-            BasicPermissionMap::PERMISSION_VIEW,
-            BasicPermissionMap::PERMISSION_EDIT,
-            BasicPermissionMap::PERMISSION_DELETE,
-        ];
+        $attributes = ['MASTER', 'VIEW', 'EDIT', 'DELETE'];
 
         $decorateVoter
             ->expects($this->once())
@@ -56,18 +50,11 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'Draft with view permission' => [
-                'expected' => [
-                    BasicPermissionMap::PERMISSION_MASTER,
-                ],
+                'expected' => ['MASTER'],
                 'sourceUuid' => UUIDGenerator::v4(),
             ],
             'Real entity with view permission' => [
-                'expected' => [
-                    BasicPermissionMap::PERMISSION_MASTER,
-                    BasicPermissionMap::PERMISSION_VIEW,
-                    BasicPermissionMap::PERMISSION_EDIT,
-                    BasicPermissionMap::PERMISSION_DELETE,
-                ],
+                'expected' => ['MASTER', 'VIEW', 'EDIT', 'DELETE'],
                 'sourceUuid' => '',
             ],
         ];

@@ -65,6 +65,10 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->exactly(4))
             ->method('createRequest')
             ->will($this->returnValue($this->request));
+
+        $this->response->expects($this->any())
+            ->method('json')
+            ->willReturn(['success' => true]);
         $this->request->expects($this->exactly(4))
             ->method('send')
             ->will($this->returnValue($this->response));

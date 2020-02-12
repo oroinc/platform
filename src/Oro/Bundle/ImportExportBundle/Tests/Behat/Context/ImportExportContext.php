@@ -550,6 +550,32 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * Fill import csv file
+     * Example: And I fill import file with data:
+     *            | Account Customer name | Channel Name        | Opportunity name | Status Id   |
+     *            | Charlie               | First Sales Channel | Opportunity one  | in_progress |
+     *            | Samantha              | First Sales Channel | Opportunity two  | in_progress |
+     *
+     * @Given /^(?:|I )fill import file with data:$/
+     */
+    public function iFillImportFileWithData(TableNode $table)
+    {
+        $this->importFile = $this->getTempFilePath('import_data_');
+        $fp = fopen($this->importFile, 'w');
+
+        fputcsv($fp, array_keys($table->getRow(0)));
+
+        foreach ($table as $row) {
+            $values = [];
+            foreach ($row as $rowHeader => $rowValue) {
+                $values[] = $rowValue;
+            }
+
+            fputcsv($fp, $values);
+        }
+    }
+
+    /**
      * Takes from exported file the value of $column from row where $searchedColumn equals $searchedColumnValue
      *
      * @param string $searchedColumn

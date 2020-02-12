@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Psr\Container\ContainerInterface;
@@ -14,7 +15,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
     /** @var array */
-    protected $supportedAttributes = ['DELETE'];
+    protected $supportedAttributes = [BasicPermission::DELETE];
 
     /** @var ContainerInterface */
     private $container;

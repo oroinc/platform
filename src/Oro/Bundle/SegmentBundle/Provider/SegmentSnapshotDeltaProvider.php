@@ -71,7 +71,7 @@ class SegmentSnapshotDeltaProvider
             $entitySegmentQueryBuilder->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
 
@@ -102,7 +102,7 @@ class SegmentSnapshotDeltaProvider
             $segmentSnapshotQueryBuilder->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
 
@@ -130,6 +130,7 @@ class SegmentSnapshotDeltaProvider
      */
     private function getSegmentSnapshotQueryBuilder(Segment $segment)
     {
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->registry
             ->getRepository(SegmentSnapshot::class)
             ->createQueryBuilder('segmentSnapshot');
