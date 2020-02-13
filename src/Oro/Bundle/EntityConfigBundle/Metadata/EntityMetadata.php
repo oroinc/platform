@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Metadata;
 use Metadata\MergeableClassMetadata;
 use Metadata\MergeableInterface;
 
+/**
+ * Adds additional specific properties and flags
+ */
 class EntityMetadata extends MergeableClassMetadata
 {
     /**
@@ -45,7 +48,7 @@ class EntityMetadata extends MergeableClassMetadata
     /**
      * {@inheritdoc}
      */
-    public function merge(MergeableInterface $object)
+    public function merge(MergeableInterface $object): void
     {
         parent::merge($object);
 
@@ -66,7 +69,7 @@ class EntityMetadata extends MergeableClassMetadata
     public function serialize()
     {
         return serialize(
-            array(
+            [
                 $this->configurable,
                 $this->defaultValues,
                 $this->routeName,
@@ -75,7 +78,7 @@ class EntityMetadata extends MergeableClassMetadata
                 $this->routes,
                 $this->mode,
                 parent::serialize(),
-            )
+            ]
         );
     }
 
@@ -84,7 +87,7 @@ class EntityMetadata extends MergeableClassMetadata
      */
     public function unserialize($str)
     {
-        list(
+        [
             $this->configurable,
             $this->defaultValues,
             $this->routeName,
@@ -93,7 +96,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->routes,
             $this->mode,
             $parentStr
-            ) = unserialize($str);
+        ] = unserialize($str);
 
         parent::unserialize($parentStr);
     }
