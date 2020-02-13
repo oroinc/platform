@@ -25,6 +25,7 @@ define(function(require) {
      *    module: 'oroform/js/app/components/inline-editable-view-component',
      *    options: {
      *        frontend_type: 'tags',
+     *        inputAriaLabel: 'Input aria-label text',
      *        value: oro_tag_get_list(entity),
      *        fieldName: 'tags',
      *        insertEditorMethod: 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
@@ -67,6 +68,7 @@ define(function(require) {
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
+     * @param {string} options.inputAriaLabel - text to aria-label attr for input field
      * @param {string} options.insertEditorMethod - 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
@@ -126,6 +128,7 @@ define(function(require) {
             this.inlineEditingOptions = options.metadata.inline_editing;
             const waitors = [];
             this.fieldName = options.fieldName;
+            this.inputAriaLabel = options.inputAriaLabel;
             // frontend type mapped to viewer/editor/reader
             const classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
@@ -221,7 +224,8 @@ define(function(require) {
                 className: 'inline-view-editor inline-editor-wrapper',
                 autoRender: true,
                 model: this.model,
-                fieldName: this.fieldName
+                fieldName: this.fieldName,
+                inputAriaLabel: this.inputAriaLabel
             });
         },
 
