@@ -146,59 +146,6 @@ services:
     twig.form.renderer.alias:
         alias: twig.form.renderer
 
-    # Consumer services
-    oro_test.async.change_config:
-        class: 'Oro\Bundle\TestFrameworkBundle\Async\ChangeConfigProcessor'
-        arguments:
-            - '@oro_config.manager'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_test.consumption.queue_consumer:
-        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
-        arguments:
-            - '@oro_message_queue.transport.connection'
-            - '@oro_message_queue.consumption.extensions'
-            - '@oro_message_queue.log.consumer_state'
-
-    oro_test.client.message_producer:
-        class: 'Oro\Component\MessageQueue\Client\MessageProducer'
-        arguments: ['@oro_test.client.driver']
-
-    oro_test.client.driver:
-        class: 'Oro\Component\MessageQueue\Client\DriverInterface'
-        factory: ['@oro_message_queue.client.driver_factory', 'create']
-        arguments:
-            - '@oro_message_queue.transport.connection'
-            - '@oro_test.client.config'
-
-    oro_test.client.route_message_processor:
-        class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        arguments:
-            - '@oro_test.client.router'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.route_message' }
-
-    oro_test.client.router:
-        class: 'Oro\Component\MessageQueue\Client\Router'
-        public: false
-        arguments:
-            - '@oro_test.client.driver'
-            - '@oro_message_queue.client.meta.destination_meta_registry'
-            -
-              oro.test.change_config:
-                - ['oro_test.async.change_config', 'default']
-
-    oro_test.client.config:
-        class: 'Oro\Component\MessageQueue\Client\Config'
-        public: false
-        arguments:
-            - oro
-            - oro_test.client.route_message_processor
-            - default
-            - default
-            - default
-
     oro_test.layout.data_provider.test:
         class: 'Oro\Bundle\TestFrameworkBundle\Layout\TestProvider'
         tags:

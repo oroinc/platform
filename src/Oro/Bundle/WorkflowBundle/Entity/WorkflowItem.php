@@ -75,7 +75,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     protected $workflowName;
 
     /**
-     * @var int
+     * @var string
      *
      * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
      * @Serializer\Expose()
@@ -311,7 +311,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      * @return WorkflowItem
      * @throws WorkflowException
      */
-    public function setEntityId($entityId)
+    public function setEntityId(?string $entityId)
     {
         if ($this->entityId !== null && $this->entityId !== $entityId) {
             throw new WorkflowException('Workflow item entity ID can not be changed');

@@ -7,6 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 
 class BufferedMessageProducerTest extends WebTestCase
@@ -56,7 +57,7 @@ class BufferedMessageProducerTest extends WebTestCase
 
     public function testBufferModeDisabled()
     {
-        $topic = 'test_buffered_queue_producer';
+        $topic = BasicMessageProcessor::TEST_TOPIC;
         $message = 'foo';
 
         // buffered producer should send messages directly omitting buffering
@@ -67,7 +68,7 @@ class BufferedMessageProducerTest extends WebTestCase
 
     public function testFlushBufferOnCommit()
     {
-        $topic = 'test_buffered_queue_producer';
+        $topic = BasicMessageProcessor::TEST_TOPIC;
         $messages = ['foo', 'bar'];
 
         $this->connection->beginTransaction();
@@ -85,7 +86,7 @@ class BufferedMessageProducerTest extends WebTestCase
 
     public function testClearBufferOnRollback()
     {
-        $topic = 'test_buffered_queue_producer';
+        $topic = BasicMessageProcessor::TEST_TOPIC;
         $messages = ['foo', 'bar'];
 
         $this->connection->beginTransaction();
@@ -104,7 +105,7 @@ class BufferedMessageProducerTest extends WebTestCase
 
     public function testNestedTransactions()
     {
-        $topic = 'test_buffered_queue_producer';
+        $topic = BasicMessageProcessor::TEST_TOPIC;
         $messages = ['foo', 'bar'];
 
         // begin root transaction and send a message
