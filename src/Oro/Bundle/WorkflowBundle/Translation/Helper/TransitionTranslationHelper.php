@@ -34,9 +34,7 @@ class TransitionTranslationHelper
         $buttonTitle = $this->trans($transition->getButtonTitle());
         if (null !== $buttonTitle) {
             $transition->setButtonTitle($buttonTitle);
-        } else {
-            $transition->setButtonTitle($transition->getButtonLabel());
-        }
+        } 
 
         $frontendOptions = $transition->getFrontendOptions();
         if (empty($frontendOptions['message']['title'])) {

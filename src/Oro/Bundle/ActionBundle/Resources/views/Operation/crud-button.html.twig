@@ -3,6 +3,7 @@
 {% block button %}
     {% if actionData.entityLabel is defined %}
         {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%entityLabel%': actionData.entityLabel|trans}) %}
+        {% set linkAriaLabel = params.frontendOptions.options.ariaLabel|trans({'%entityLabel%': actionData.entityLabel|trans}) %}
     {% endif %}
 
     {{ parent() }}

@@ -65,6 +65,7 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {string} options.className - CSS class name for editor element
      * @param {string} options.fieldName - Field name to edit in model
+     * @param {string} options.inputAriaLabel - Text to aria-label attr for input field
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
@@ -130,7 +131,7 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options;
-            _.extend(this, _.pick(options, ['fieldName', 'placeholder', 'placeholder_raw', 'validationRules']));
+            _.extend(this, _.pick(options, ['fieldName', 'inputAriaLabel', 'placeholder', 'placeholder_raw', 'validationRules']));
             _.defaults(this, {
                 validationRules: {}
             });
@@ -162,6 +163,7 @@ define(function(require) {
             data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.fieldName = this.fieldName;
+            data.inputAriaLabel = this.inputAriaLabel;
             data.value = this.formatRawValue(this.getRawModelValue());
             data.placeholder = this.getPlaceholder();
             return data;

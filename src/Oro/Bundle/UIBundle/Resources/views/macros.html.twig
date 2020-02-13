@@ -311,7 +311,7 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <span class="{{ parameters.iCss }}" >
+        <span class="{{ parameters.iCss }}" aria-hidden="true">
             {% if not parameters.noIconText|default(false)%}
                 <span class="sr-only">{{ parameters.label }}</span>
             {% endif %}
@@ -331,7 +331,7 @@
         {% endif %}
         class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
         {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
-        {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {% if parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
     {% endspaceless %}
@@ -796,7 +796,11 @@
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
     {% spaceless %}
-        <button {{- UIMacro.clientControlAttrs(parameters) -}}>
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}
+            {% if (parameters.title is defined) %}
+                title="{{ parameters.title }}"
+            {% endif %}
+        >
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
