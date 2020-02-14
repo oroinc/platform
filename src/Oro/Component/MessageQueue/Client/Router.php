@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
@@ -6,6 +7,9 @@ use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
+/**
+ * Knows about the list of queues associated with the topic, determines the list of desired recipients.
+ */
 class Router implements RecipientListRouterInterface
 {
     /**
@@ -65,13 +69,11 @@ class Router implements RecipientListRouterInterface
     }
 
     /**
-     * @internal
-     *
      * @param string $topicName
      *
      * @return array
      */
-    public function getTopicSubscribers($topicName)
+    public function getTopicSubscribers(string $topicName): array
     {
         return array_key_exists($topicName, $this->routes) ? $this->routes[$topicName] : [];
     }

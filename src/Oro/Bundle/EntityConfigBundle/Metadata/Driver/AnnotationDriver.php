@@ -3,12 +3,16 @@
 namespace Oro\Bundle\EntityConfigBundle\Metadata\Driver;
 
 use Doctrine\Common\Annotations\Reader;
+use Metadata\ClassMetadata;
 use Metadata\Driver\DriverInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 
+/**
+ * Annotation driver for entity and field configs
+ */
 class AnnotationDriver implements DriverInterface
 {
     /**
@@ -33,7 +37,7 @@ class AnnotationDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function loadMetadataForClass(\ReflectionClass $class)
+    public function loadMetadataForClass(\ReflectionClass $class): ?ClassMetadata
     {
         /** @var Config $annotation */
         if ($annotation = $this->reader->getClassAnnotation($class, self::ENTITY_CONFIG)) {

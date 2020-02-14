@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler;
 
@@ -39,8 +40,7 @@ class WorkflowResultHandlerTest extends \PHPUnit\Framework\TestCase
         array $doctrineHelperExpectedCalls,
         $expectedResult
     ) {
-        $visitor = $this->getMockBuilder('JMS\Serializer\JsonSerializationVisitor')
-            ->disableOriginalConstructor()->getMock();
+        $visitor = $this->createMock(SerializationVisitorInterface::class);
         $visitor->expects($this->never())->method($this->anything());
         $context = $this->getMockBuilder('JMS\Serializer\Context')
             ->disableOriginalConstructor()->getMock();
@@ -51,7 +51,7 @@ class WorkflowResultHandlerTest extends \PHPUnit\Framework\TestCase
         } else {
             $index = 0;
             foreach ($doctrineHelperExpectedCalls as $expectedCall) {
-                list($method, $arguments, $stub) = array_values($expectedCall);
+                [$method, $arguments, $stub] = array_values($expectedCall);
                 $mock = $this->doctrineHelper->expects($this->at($index++))->method($method);
                 $mock = call_user_func_array(array($mock, 'with'), $arguments);
                 $mock->will($stub);
