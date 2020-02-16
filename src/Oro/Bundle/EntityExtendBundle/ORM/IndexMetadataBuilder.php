@@ -46,13 +46,14 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
         $indices   = $extendConfig->get('index');
         // TODO: need to be changed to fieldName => columnName
         // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
-        foreach ($indices as $columnName => $indexType) {
-            $fieldConfig = $this->extendConfigProvider->getConfig($className, $columnName);
+        foreach ($indices as $fieldName => $indexType) {
+            $fieldConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
+            $columnName = $fieldConfig->get('column_name', false, $fieldName);
 
             if ($indexType && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
                 $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                     $className,
-                    $columnName
+                    $fieldName
                 );
                 if ((int)$indexType === IndexScope::INDEX_UNIQUE) {
                     $metadataBuilder->addUniqueConstraint([$columnName], $indexName);
