@@ -7,7 +7,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 /**
- * Resolves allowed applications from the given File entity.
+ * Resolves allowed applications for the given File entity or field name
  */
 class FileApplicationsProvider
 {
@@ -38,7 +38,18 @@ class FileApplicationsProvider
             return [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
         }
 
-        $config = $this->attachmentEntityConfigProvider->getFieldConfig($parentEntityClass, $parentEntityFieldName);
+        return $this->getFileApplicationsForField($parentEntityClass, $parentEntityFieldName);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return array
+     */
+    public function getFileApplicationsForField(string $className, string $fieldName): array
+    {
+        $config = $this->attachmentEntityConfigProvider->getFieldConfig($className, $fieldName);
         if (!$config) {
             return self::DEFAULT_ALLOWED_APPLICATIONS;
         }

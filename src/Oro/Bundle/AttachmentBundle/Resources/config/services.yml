@@ -494,3 +494,11 @@ services:
 
     Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface:
         alias: oro_attachment.provider.attachment_entity_config
+
+    oro_attachment.layout.data_provider.file_applications:
+        class: 'Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider'
+        arguments:
+            - '@oro_attachment.provider.file_applications'
+            - '@oro_action.provider.current_application'
+        tags:
+            - { name: layout.data_provider, alias: file_applications }
