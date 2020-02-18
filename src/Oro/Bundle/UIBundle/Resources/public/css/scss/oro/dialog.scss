@@ -96,6 +96,10 @@
         flex-shrink: $dialog-content-flex-shrink;
         flex-grow: $dialog-content-flex-grow;
 
+        &:focus {
+            outline: none;
+        }
+
         .ui-resizable-handle {
             cursor: $dialog-resizable-handle-cursor;
         }
