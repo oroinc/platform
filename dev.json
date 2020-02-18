@@ -78,7 +78,8 @@
         "brick/math": "0.8.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
-        "salsify/json-streaming-parser": "8.0.1"
+        "salsify/json-streaming-parser": "8.0.1",
+        "myclabs/deep-copy": "1.8.*"
     },
     "require-dev": {
         "ext-ftp": "*",

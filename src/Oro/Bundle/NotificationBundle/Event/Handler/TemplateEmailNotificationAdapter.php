@@ -11,6 +11,7 @@ use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -112,10 +113,28 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
             $this->getRecipientsFromEntityEmails($this->entity, $recipientList)
         ));
 
+        $this->removeDisabledUsers($recipients);
+
         $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
         $this->eventDispatcher->dispatch(NotificationProcessRecipientsEvent::NAME, $event);
 
         return $event->getRecipients();
+    }
+
+    /**
+     * @param array $recipients
+     */
+    protected function removeDisabledUsers(array &$recipients)
+    {
+        foreach ($recipients as $key => $recipient) {
+            if (($recipient instanceof AbstractUser && !$recipient->isEnabled())
+                || ($recipient instanceof EmailAddressWithContext
+                    && $recipient->getContext() instanceof AbstractUser
+                    && !$recipient->getContext()->isEnabled())
+            ) {
+                unset($recipients[$key]);
+            }
+        }
     }
 
     /**
