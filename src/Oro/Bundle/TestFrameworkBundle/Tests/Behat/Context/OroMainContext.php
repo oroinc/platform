@@ -1052,6 +1052,8 @@ class OroMainContext extends MinkContext implements
      * Example: And I should see "My Link" button with attributes:
      *            | title | Button title |
      *            | alt   | Button alt   |
+     *            | name  | ~            |
+     * Where '~' is null (the attribute doesn't exist)
      *
      * @When /^(?:|I )should see "(?P<buttonName>[^"]*)" button with attributes:$/
      */
@@ -1072,8 +1074,12 @@ class OroMainContext extends MinkContext implements
             list($attributeName, $expectedValue) = $row;
             $attribute = $button->getAttribute($attributeName);
 
-            self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
-            self::assertContains($expectedValue, $attribute);
+            if ($expectedValue !== '~') {
+                self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
+                self::assertContains($expectedValue, $attribute);
+            } else {
+                self::assertNull($attribute, sprintf("Attribute with name '%s' shouldn't exist", $attributeName));
+            }
         }
     }
 

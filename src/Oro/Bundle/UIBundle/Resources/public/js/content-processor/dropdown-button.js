@@ -168,7 +168,12 @@ define([
                 // set text value string
                 $main.contents().each(function() {
                     if (this.nodeType === Node.TEXT_NODE) {
-                        this.nodeValue = _.trunc(this.nodeValue.trim(), self.options.truncateLength, false, '...');
+                        const text = this.nodeValue.trim();
+                        const shortText = text.substring(0, self.options.truncateLength);
+                        if (shortText !== text) {
+                            this.parentNode.setAttribute('title', text);
+                            this.nodeValue = shortText + '\u2026';
+                        }
                     }
                 });
             }

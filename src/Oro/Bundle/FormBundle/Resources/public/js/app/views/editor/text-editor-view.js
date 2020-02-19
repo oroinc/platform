@@ -131,7 +131,8 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options;
-            _.extend(this, _.pick(options, ['fieldName', 'inputAriaLabel', 'placeholder', 'placeholder_raw', 'validationRules']));
+            _.extend(this, _.pick(options, ['fieldName', 'inputAriaLabel', 'placeholder', 'placeholder_raw',
+                'validationRules']));
             _.defaults(this, {
                 validationRules: {}
             });
