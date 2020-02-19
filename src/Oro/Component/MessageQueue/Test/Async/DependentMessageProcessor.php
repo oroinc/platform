@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub;
+namespace Oro\Component\MessageQueue\Test\Async;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
@@ -9,13 +10,15 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
-class DependentMessageProcessorStub implements MessageProcessorInterface, TopicSubscriberInterface
+/**
+ * Depended message processor for test purposes.
+ */
+class DependentMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const TEST_TOPIC = 'oro.message_queue.test_topic';
-    const TEST_DEPENDENT_JOB_TOPIC = 'oro.message_queue.dependent_test_topic';
-    const TEST_JOB_NAME = 'test_job_dependent|123456789';
+    private const TEST_TOPIC = 'oro.message_queue.test_topic';
+    private const TEST_DEPENDENT_JOB_TOPIC = 'oro.message_queue.dependent_test_topic';
+    public const TEST_JOB_NAME = 'test_job_dependent|123456789';
 
     /** @var JobRunner */
     private $jobRunner;
@@ -23,6 +26,10 @@ class DependentMessageProcessorStub implements MessageProcessorInterface, TopicS
     /** @var DependentJobService */
     private $dependentJobService;
 
+    /**
+     * @param JobRunner $jobRunner
+     * @param DependentJobService $dependentJobService
+     */
     public function __construct(JobRunner $jobRunner, DependentJobService $dependentJobService)
     {
         $this->jobRunner = $jobRunner;
@@ -32,28 +39,25 @@ class DependentMessageProcessorStub implements MessageProcessorInterface, TopicS
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageBody = JSON::decode($message->getBody());
-
-        if (false === is_array($messageBody)) {
-            return self::REJECT;
+        if ($message->getProperty(Config::PARAMETER_TOPIC_NAME) === self::TEST_DEPENDENT_JOB_TOPIC) {
+            return self::ACK;
         }
 
         $ownerId = $message->getMessageId();
 
-        return $this->runUnique($messageBody, $ownerId) ? self::ACK : self::REJECT;
+        return $this->runUnique($ownerId) ? self::ACK : self::REJECT;
     }
 
     /**
-     * @param array $messageBody
      * @param string $ownerId
      *
      * @return bool
      */
-    private function runUnique(array $messageBody, $ownerId)
+    private function runUnique($ownerId): bool
     {
-        $jobName = $this->buildJobNameForMessage();
+        $jobName = self::TEST_JOB_NAME;
         $closure = function (JobRunner $jobRunner, Job $job) {
             $context = $this->dependentJobService->createDependentJobContext($job->getRootJob());
             $context->addDependentJob(
@@ -71,18 +75,10 @@ class DependentMessageProcessorStub implements MessageProcessorInterface, TopicS
     }
 
     /**
-     * @return string
-     */
-    private function buildJobNameForMessage()
-    {
-        return self::TEST_JOB_NAME;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
-        return [self::TEST_TOPIC];
+        return [self::TEST_TOPIC, self::TEST_DEPENDENT_JOB_TOPIC];
     }
 }

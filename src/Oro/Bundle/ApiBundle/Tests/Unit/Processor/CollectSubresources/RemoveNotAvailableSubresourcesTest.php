@@ -42,7 +42,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         return $subresources;
     }
 
-    public function testNotAccessibleSubresource()
+    public function testSubresourceWithoutExcludedActions()
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -53,28 +53,6 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         $subresource->setIsCollection(false);
 
         $this->context->setResources([$resource]);
-        $this->context->setAccessibleResources([]);
-        $this->context->setResult($subresources);
-        $this->processor->process($this->context);
-
-        self::assertEquals(
-            [$entityClass => new ApiResourceSubresources($entityClass)],
-            $this->context->getResult()->toArray()
-        );
-    }
-
-    public function testAccessibleSubresourceWithoutExcludedActions()
-    {
-        $entityClass = 'Test\Class';
-        $targetEntityClass = 'Test\TargetClass';
-        $resource = new ApiResource($entityClass);
-        $subresources = $this->getApiResourceSubresources($resource);
-        $subresource = $subresources->get($entityClass)->addSubresource('subresource1');
-        $subresource->setTargetClassName($targetEntityClass);
-        $subresource->setIsCollection(false);
-
-        $this->context->setResources([$resource]);
-        $this->context->setAccessibleResources([$targetEntityClass]);
         $this->context->setResult($subresources);
         $this->processor->process($this->context);
 
@@ -87,7 +65,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessibleSubresourceWhenAllActionsAreExcluded()
+    public function testSubresourceWhenAllActionsAreExcluded()
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -108,7 +86,6 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->context->setResources([$resource]);
-        $this->context->setAccessibleResources([$targetEntityClass]);
         $this->context->setResult($subresources);
         $this->processor->process($this->context);
 
@@ -118,7 +95,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessibleSubresourceWhenNotAllActionsAreExcluded()
+    public function testSubresourceWhenNotAllActionsAreExcluded()
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -138,7 +115,6 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->context->setResources([$resource]);
-        $this->context->setAccessibleResources([$targetEntityClass]);
         $this->context->setResult($subresources);
         $this->processor->process($this->context);
 

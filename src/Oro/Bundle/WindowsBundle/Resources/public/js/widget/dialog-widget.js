@@ -258,7 +258,7 @@ define(function(require, exports, module) {
         focusContent: function() {
             this.$('form:first').focusFirstInput();
             if (!$.contains(this.el, document.activeElement)) {
-                this.widget.closest('.ui-dialog').trigger('focus');
+                this.widget.dialog('instance').element.attr('tabindex', '0').trigger('focus');
             }
         },
 

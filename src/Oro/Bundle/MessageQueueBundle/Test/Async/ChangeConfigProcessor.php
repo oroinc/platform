@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Async;
+namespace Oro\Bundle\MessageQueueBundle\Test\Async;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -13,6 +13,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
+    const TEST_TOPIC = 'oro.test.change_config';
     const COMMAND_NOOP = 'noop';
     const COMMAND_CHANGE_CACHE = 'change';
 
@@ -48,6 +49,6 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::CHANGE_CONFIG];
+        return [self::TEST_TOPIC];
     }
 }

@@ -192,6 +192,12 @@ class LoadFromConfigBag extends LoadSubresources
             $accessibleResources,
             SubresourceUtil::SUBRESOURCE_ACTIONS_WITHOUT_GET_SUBRESOURCE
         );
+        $actions = $subresourceConfig->getActions();
+        foreach ($actions as $actionName => $action) {
+            if (!$action->isExcluded() && $subresource->isExcludedAction($actionName)) {
+                $subresource->removeExcludedAction($actionName);
+            }
+        }
 
         return $subresource;
     }
@@ -350,7 +356,11 @@ class LoadFromConfigBag extends LoadSubresources
             if (null !== $actions) {
                 $action = $actions->getAction($actionName);
             }
-            if (null === $action || !$action->isExcluded()) {
+            if (null === $action) {
+                $subresourceAction->setExcluded(false);
+            } elseif ($action->isExcluded()) {
+                $subresourceAction->setExcluded(true);
+            } else {
                 $subresourceAction->setExcluded(false);
             }
         }
