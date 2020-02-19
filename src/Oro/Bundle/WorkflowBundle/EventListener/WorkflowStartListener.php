@@ -48,7 +48,10 @@ class WorkflowStartListener
         }
 
         foreach ($this->getApplicableWorkflowsForStart($entity) as $activeWorkflow) {
-            if ($activeWorkflow->getStepManager()->hasStartStep()) {
+            if (
+                $activeWorkflow->getStepManager()->hasStartStep()
+                || $activeWorkflow->getTransitionManager()->getStartTransition(null)
+            ) {
                 $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = new WorkflowStartArguments(
                     $activeWorkflow->getName(),
                     $entity
