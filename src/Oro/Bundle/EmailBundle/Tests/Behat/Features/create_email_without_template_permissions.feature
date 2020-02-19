@@ -17,7 +17,7 @@ Feature: Create email without template permissions
   Scenario: Create new email without template permissions
     Given I login as "charlie" user
     And I click My Emails in user menu
-    When I follow "Compose"
+    When I click "Compose"
     And I should not see "Apply template"
     And fill "Email Form" with:
       | Body    | Create new email without template permissions |

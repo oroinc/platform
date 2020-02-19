@@ -124,7 +124,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedButtonLabel',
-                    'buttonTitle' => 'TranslatedButtonLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedButtonLabel',
@@ -146,7 +146,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedLabel',
-                    'buttonTitle' => 'TranslatedLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedLabel',
@@ -168,7 +168,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedButtonLabel',
-                    'buttonTitle' => 'TranslatedButtonLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedButtonLabel',
@@ -190,7 +190,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expected' => [
                     'buttonLabel' => 'TranslatedLabel',
-                    'buttonTitle' => 'TranslatedLabel',
+                    'buttonTitle' => null,
                     'frontendOptions' => [
                         'message' => [
                             'title' => 'TranslatedLabel',

@@ -331,7 +331,7 @@
         {% endif %}
         class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
         {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
-        {% if parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
     {% endspaceless %}
@@ -666,7 +666,6 @@
     })%}
     {% spaceless %}
         <a href="#"
-            title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
             {%- if (parameters.dataUrlRaw is defined) -%}
                 data-url="{{ parameters.dataUrlRaw|raw }}"
             {% elseif (parameters.dataUrl is defined) %}
@@ -707,6 +706,9 @@
     {%- if (parameters.id is defined) -%}
         id="{{ parameters.id }}"
     {%- endif -%}
+    {% if (parameters.title is defined) %}
+        title="{{ parameters.title }}"
+    {% endif %}
     {%- if (parameters.dataId is defined) -%}
         data-id="{{ parameters.dataId }}"
     {%- endif -%}
@@ -796,11 +798,7 @@
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
     {% spaceless %}
-        <button {{- UIMacro.clientControlAttrs(parameters) -}}
-            {% if (parameters.title is defined) %}
-                title="{{ parameters.title }}"
-            {% endif %}
-        >
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}>
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
@@ -884,7 +882,7 @@
 
     {#{% espaceless %}#}
         <div class="pull-left btn-group icons-holder">
-            {{ UIMacro.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+            {{ UIMacro.clientLink(parameters|merge({class: 'btn icons-holder-text', role: 'button'})) }}
         </div>
     {#{% endspaceless %}#}
 {% endmacro %}
@@ -911,7 +909,7 @@
     {% import _self as UIMacro %}
 
     <div class="pull-left btn-group icons-holder">
-        {{ UIMacro.ajaxLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+        {{ UIMacro.ajaxLink(parameters|merge({'class': 'btn icons-holder-text', role: 'button'})) }}
     </div>
 {% endmacro %}
 

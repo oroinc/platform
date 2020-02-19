@@ -8,7 +8,7 @@ Feature: My emails 
   Scenario: Filter emails
     Given I login as administrator
       And I click My Emails in user menu
-    When I follow "Compose"
+    When I click "Compose"
       And fill "Email Form" with:
       | Body    | This is very simple test mail |
       | To      | Charlie Sheen                 |
