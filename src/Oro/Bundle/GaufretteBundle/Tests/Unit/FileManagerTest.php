@@ -123,6 +123,30 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testHasFileWhenFileExists()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(true);
+
+        $this->assertTrue($this->fileManager->hasFile($fileName));
+    }
+
+    public function testHasFileWhenFileDoesNotExist()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(false);
+
+        $this->assertFalse($this->fileManager->hasFile($fileName));
+    }
+
     public function testGetFileByFileName()
     {
         $fileName = 'testFile.txt';
