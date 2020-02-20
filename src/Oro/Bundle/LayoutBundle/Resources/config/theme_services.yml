@@ -134,7 +134,8 @@ services:
 
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
-        public: false
+        arguments:
+            - '@oro_layout.expression_language.expression_validator'
         calls:
             - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.add_tree']]

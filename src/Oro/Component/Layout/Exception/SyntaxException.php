@@ -2,25 +2,29 @@
 
 namespace Oro\Component\Layout\Exception;
 
+/**
+ * Error in layout definition
+ */
 class SyntaxException extends LogicException
 {
-    /** @var string */
+    /** @var array */
     protected $source;
 
     /**
      * @param string $message
-     * @param string $source
+     * @param array|mixed $source on incorrect source type expected non-array values
      * @param string $path
+     * @param \Throwable|null $previous
      */
-    public function __construct($message, $source, $path = '.')
+    public function __construct(string $message, $source, string $path = '.', \Throwable $previous = null)
     {
         $this->source = $source;
 
-        parent::__construct(sprintf('Syntax error: %s at "%s"', $message, $path));
+        parent::__construct(sprintf('Syntax error: %s at "%s"', $message, $path), 0, $previous);
     }
 
     /**
-     * @return string
+     * @return array|mixed
      */
     public function getSource()
     {
