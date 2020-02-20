@@ -106,6 +106,18 @@ class FileManager
     }
 
     /**
+     * Checks if the given file exists in the Gaufrette file system.
+     *
+     * @param string $fileName
+     *
+     * @return bool
+     */
+    public function hasFile($fileName)
+    {
+        return $this->filesystem->has($fileName);
+    }
+
+    /**
      * Returns a File object for the file stored in the Gaufrette file system.
      *
      * @param string $fileName
