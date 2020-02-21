@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\AbstractExtension;
 use Twig\Template;
@@ -201,6 +202,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                 [$this, 'getSkypeButton'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
+            new TwigFunction('oro_default_page', [$this, 'getDefaultPage']),
         ];
     }
 
@@ -682,6 +684,14 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         unset($options['template']);
 
         return $environment->render($templateName, ['options' => $options]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultPage(): string
+    {
+        return $this->container->get(RouterInterface::class)->generate('oro_default');
     }
 
     /**

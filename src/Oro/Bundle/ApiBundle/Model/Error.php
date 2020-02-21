@@ -7,40 +7,40 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Represents an error happened during the processing of an action.
+ * Represents an error happened during the processing of an API action.
  */
 class Error
 {
     /** @var int|null */
-    protected $statusCode;
+    private $statusCode;
 
     /** @var string|null */
-    protected $code;
+    private $code;
 
     /** @var string|Label|null */
-    protected $title;
+    private $title;
 
     /** @var string|Label|null */
-    protected $detail;
+    private $detail;
 
     /** @var ErrorSource|null */
-    protected $source;
+    private $source;
 
     /** @var \Exception|null */
-    protected $innerException;
+    private $innerException;
 
     /**
-     * Creates an instance of Error class.
+     * Creates an error object.
      *
      * @param string|Label      $title  A short, human-readable summary of the problem that should not change
      *                                  from occurrence to occurrence of the problem.
      * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
      *
-     * @return Error
+     * @return $this
      */
-    public static function create($title, $detail = null)
+    public static function create($title, $detail = null): Error
     {
-        $error = new self();
+        $error = new static();
         $error->setTitle($title);
         $error->setDetail($detail);
 
@@ -48,43 +48,46 @@ class Error
     }
 
     /**
-     * Creates an instance of Error class represents a violation of validation constraint.
+     * Creates an error object that represents a violation of validation constraint.
      *
      * @param string|Label      $title      A short, human-readable summary of the problem that should not change
      *                                      from occurrence to occurrence of the problem.
      * @param string|Label|null $detail     A human-readable explanation specific to this occurrence of the problem
-     * @param integer|null      $statusCode A status code should be returned for the error. Default value - 400
+     * @param int|null          $statusCode A status code should be returned for the error. Default value - 400
      *
-     * @return Error
+     * @return $this
      */
-    public static function createValidationError($title, $detail = null, $statusCode = Response::HTTP_BAD_REQUEST)
-    {
-        return self::create($title, $detail)->setStatusCode($statusCode);
+    public static function createValidationError(
+        $title,
+        $detail = null,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): Error {
+        return static::create($title, $detail)->setStatusCode($statusCode);
     }
 
     /**
-     * Creates an instance of Error class represents a violation of 409 Conflict validation constraint.
+     * Creates an error object that represents a violation of 409 Conflict validation constraint.
      * @link https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10
      *
      * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
      *
-     * @return Error
+     * @return $this
      */
-    public static function createConflictValidationError($detail = null)
+    public static function createConflictValidationError($detail = null): Error
     {
-        return self::create(Constraint::CONFLICT, $detail)->setStatusCode(Response::HTTP_CONFLICT);
+        return static::create(Constraint::CONFLICT, $detail)->setStatusCode(Response::HTTP_CONFLICT);
     }
 
     /**
-     * Creates an instance of Error class based on a given exception object.
+     * Creates an error object based on a given exception object.
      *
      * @param \Exception $exception An exception object that caused this occurrence of the problem
      *
-     * @return Error
+     * @return $this
      */
-    public static function createByException(\Exception $exception)
+    public static function createByException(\Exception $exception): Error
     {
-        $error = new self();
+        $error = new static();
         $error->setInnerException($exception);
 
         return $error;
@@ -95,7 +98,7 @@ class Error
      *
      * @return int|null
      */
-    public function getStatusCode()
+    public function getStatusCode(): ?int
     {
         return $this->statusCode;
     }
@@ -105,9 +108,9 @@ class Error
      *
      * @param int|null $statusCode
      *
-     * @return self
+     * @return $this
      */
-    public function setStatusCode($statusCode)
+    public function setStatusCode(?int $statusCode): Error
     {
         $this->statusCode = $statusCode;
 
@@ -119,7 +122,7 @@ class Error
      *
      * @return string|null
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
@@ -129,9 +132,9 @@ class Error
      *
      * @param string|null $code
      *
-     * @return self
+     * @return $this
      */
-    public function setCode($code)
+    public function setCode(?string $code): Error
     {
         $this->code = $code;
 
@@ -155,9 +158,9 @@ class Error
      *
      * @param string|Label $title
      *
-     * @return self
+     * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): Error
     {
         $this->title = $title;
 
@@ -179,9 +182,9 @@ class Error
      *
      * @param string|Label $detail
      *
-     * @return self
+     * @return $this
      */
-    public function setDetail($detail)
+    public function setDetail($detail): Error
     {
         $this->detail = $detail;
 
@@ -193,7 +196,7 @@ class Error
      *
      * @return ErrorSource|null
      */
-    public function getSource()
+    public function getSource(): ?ErrorSource
     {
         return $this->source;
     }
@@ -203,9 +206,9 @@ class Error
      *
      * @param ErrorSource|null $source
      *
-     * @return self
+     * @return $this
      */
-    public function setSource(ErrorSource $source = null)
+    public function setSource(ErrorSource $source = null): Error
     {
         $this->source = $source;
 
@@ -217,7 +220,7 @@ class Error
      *
      * @return \Exception|null
      */
-    public function getInnerException()
+    public function getInnerException(): ?\Exception
     {
         return $this->innerException;
     }
@@ -227,9 +230,9 @@ class Error
      *
      * @param \Exception|null $exception
      *
-     * @return self
+     * @return $this
      */
-    public function setInnerException(\Exception $exception = null)
+    public function setInnerException(\Exception $exception = null): Error
     {
         $this->innerException = $exception;
 
@@ -241,7 +244,7 @@ class Error
      *
      * @param TranslatorInterface $translator
      */
-    public function trans(TranslatorInterface $translator)
+    public function trans(TranslatorInterface $translator): void
     {
         if ($this->title instanceof Label) {
             $this->title = $this->title->trans($translator);

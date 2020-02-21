@@ -25,51 +25,41 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     private const PATTERN_ALL_OFF = '(PV) system:.. global:.. deep:.. local:.. basic:..';
 
     /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $objectIdAccessor;
+    private $objectIdAccessor;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityOwnerAccessor;
+    private $entityOwnerAccessor;
 
     /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $decisionMaker;
+    private $decisionMaker;
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var WorkflowAclMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowMetadataProvider;
+    private $workflowMetadataProvider;
 
     /** @var WorkflowTransitionAclExtension|\PHPUnit\Framework\MockObject\MockObject */
-    protected $transitionAclExtension;
+    private $transitionAclExtension;
 
     /** @var WorkflowAclExtension */
-    protected $extension;
+    private $extension;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
         $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->workflowMetadataProvider = $this->getMockBuilder(WorkflowAclMetadataProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->transitionAclExtension = $this->getMockBuilder(WorkflowTransitionAclExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->workflowMetadataProvider = $this->createMock(WorkflowAclMetadataProvider::class);
+        $this->transitionAclExtension = $this->createMock(WorkflowTransitionAclExtension::class);
 
         $this->extension = new WorkflowAclExtension(
             $this->objectIdAccessor,
@@ -124,6 +114,36 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
             $classes,
             $this->extension->getClasses()
         );
+    }
+
+    public function testGetDefaultPermission()
+    {
+        self::assertSame('', $this->extension->getDefaultPermission());
+    }
+
+    /**
+     * @dataProvider getPermissionGroupMaskProvider
+     */
+    public function testGetPermissionGroupMask(int $mask, ?int $expectedPermissionGroupMask)
+    {
+        self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
+    }
+
+    public function getPermissionGroupMaskProvider()
+    {
+        return [
+            [0, null],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_BASIC, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_LOCAL, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_DEEP, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_GLOBAL, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_SYSTEM, WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_BASIC, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_LOCAL, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_DEEP, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_GLOBAL, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS],
+            [WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_SYSTEM, WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS]
+        ];
     }
 
     public function testGetAllowedPermissions()
@@ -244,12 +264,8 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         $relatedEntity = new \stdClass();
         $securityToken = $this->createMock(TokenInterface::class);
 
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->createMock(Workflow::class);
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflow->expects(self::once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
