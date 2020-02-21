@@ -115,7 +115,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function assertKeysAreValidVendorNames(array $vendors)
     {
         foreach (array_keys($vendors) as $vendorName) {
-            if (!preg_match('/^[a-z_][a-z0-9_]*$/i', $vendorName)) {
+            if (!preg_match('/^[a-z\_][a-z0-9\_]*$/i', $vendorName)) {
                 throw new InvalidConfigurationException(
                     sprintf('Node "vendors" contains invalid vendor name "%s".', $vendorName)
                 );
@@ -130,7 +130,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function assertKeysAreValidResourceNames(array $resources)
     {
         foreach (array_keys($resources) as $resourceName) {
-            if (!preg_match('/^[a-z_][a-z0-9_]*(:[a-z_][a-z0-9_]*){0,2}$/i', $resourceName)) {
+            if (!preg_match('/^[a-z\_][a-z0-9\_]*(:[a-z\_][a-z0-9\_]*){0,2}$/i', $resourceName)) {
                 throw new InvalidConfigurationException(
                     sprintf('Node "resources" contains invalid resource name "%s".', $resourceName)
                 );

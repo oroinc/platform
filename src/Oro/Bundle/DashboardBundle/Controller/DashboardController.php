@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * CRUD controller for the Dashboard entity.
  * @Route("/dashboard")
  */
 class DashboardController extends Controller
@@ -206,7 +207,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      *
      * @param string $widget
@@ -226,7 +227,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/itemized_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      *
      * @param string $widget
@@ -256,7 +257,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/itemized_data_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_data_widget",
-     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
      * )
      * @param Request $request
      * @param string $widget

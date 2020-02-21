@@ -5,13 +5,16 @@ namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * Provide functionality to manage recent emails on dashboard
+ */
 class DashboardController extends Controller
 {
     /**
      * @Route(
      *      "/recent_emails/{widget}/{activeTab}/{contentType}",
      *      name="oro_email_dashboard_recent_emails",
-     *      requirements={"widget"="[\w-]+", "activeTab"="inbox|sent|new", "contentType"="full|tab"},
+     *      requirements={"widget"="[\w\-]+", "activeTab"="inbox|sent|new", "contentType"="full|tab"},
      *      defaults={"activeTab" = "inbox", "contentType" = "full"}
      * )
      */

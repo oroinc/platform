@@ -310,7 +310,7 @@ class AttachmentManager
 
         $routerContext = $this->router->getContext();
         $prevBaseUrl = $routerContext->getBaseUrl();
-        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
+        $baseUrlWithoutFrontController = preg_replace('/\/[\w\_]+\.php$/', '', $prevBaseUrl);
         $routerContext->setBaseUrl($baseUrlWithoutFrontController);
 
         $url = $this->router->generate($name, $parameters);

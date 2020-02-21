@@ -27,7 +27,7 @@ class DragAndDropContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^(?:|I )resize Sidebar Drag Handler by vector \[([-?\d]+),([-?\d]+)\]$/
+     * @When /^(?:|I )resize Sidebar Drag Handler by vector \[([\-?\d]+),([\-?\d]+)\]$/
      * @param string $elementName
      * @param integer $xOffset
      * @param integer $yOffset
