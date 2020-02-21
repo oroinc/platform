@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *  - series of processors for HTML (oro_form_process, oro_widget_render and other)
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UiExtension extends \Twig_Extension
 {
@@ -160,6 +161,7 @@ class UiExtension extends \Twig_Extension
                 [$this, 'getSkypeButton'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
+            new \Twig_SimpleFunction('oro_default_page', [$this, 'getDefaultPage']),
         ];
     }
 
@@ -608,5 +610,13 @@ class UiExtension extends \Twig_Extension
         unset($options['template']);
 
         return $environment->render($templateName, ['options' => $options]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultPage(): string
+    {
+        return $this->container->get('router')->generate('oro_default');
     }
 }

@@ -17,6 +17,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Set current localization to all depended services
+ */
 class LocaleListener implements EventSubscriberInterface
 {
     /** @var LocaleSettings */

@@ -15,7 +15,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
@@ -35,6 +39,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userAgentProvider;
 
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
+
     /** @var UiExtension */
     protected $extension;
 
@@ -49,10 +56,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('event_dispatcher', $this->eventDispatcher)
             ->add('request_stack', $this->requestStack)
+            ->add('router', $this->router)
             ->add('oro_ui.content_provider.manager', $this->contentProviderManager)
             ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
             ->getContainer($this);
@@ -672,5 +681,19 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             [5, 4.6],
             [5, 4.1]
         ];
+    }
+
+    public function testGetDefaultPage(): void
+    {
+        $this->router
+            ->expects($this->once())
+            ->method('generate')
+            ->with($routeName = 'oro_default')
+            ->willReturn($url = 'http://sample-app/sample-url');
+
+        $this->assertEquals(
+            $url,
+            self::callTwigFunction($this->extension, 'oro_default_page', [$this->environment])
+        );
     }
 }
