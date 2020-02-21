@@ -89,6 +89,8 @@ services:
             - '@oro_locale.cache.provider.tree_fallback_strategy'
         calls:
             - [setEntityClass, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
+        tags:
+            - { name: kernel.cache_warmer }
 
     # Calendar
     oro_locale.calendar:

@@ -28,7 +28,7 @@
         <div class="error-page-main">
             <div class="error-page-content">
                 {% if oro_theme_logo() %}
-                    <a href="{{ path('oro_default') }}">
+                    <a href="{{ oro_default_page() }}">
                         <img class="error-page-img" alt="logo" src="{{ asset(oro_theme_logo()) }}"/>
                     </a>
                 {% endif %}

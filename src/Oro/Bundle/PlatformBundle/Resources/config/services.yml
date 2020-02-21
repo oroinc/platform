@@ -26,6 +26,9 @@ services:
             - "@lexik_maintenance.driver.factory"
             - "@event_dispatcher"
 
+    Oro\Bundle\PlatformBundle\Maintenance\Mode:
+        alias: oro_platform.maintenance
+
     oro_platform.event_listener.driver_lock:
         class: Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
         arguments:
@@ -143,3 +146,8 @@ services:
 
     Doctrine\Persistence\ManagerRegistry:
         alias: 'doctrine'
+
+    oro_platform.listener.maintenance_propagation:
+        class: Oro\Bundle\PlatformBundle\EventListener\MaintenancePropagationListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1024 }
