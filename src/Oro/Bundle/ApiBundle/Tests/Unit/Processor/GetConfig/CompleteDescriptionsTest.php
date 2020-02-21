@@ -2016,16 +2016,21 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all'
         ];
-        $entityDescription = 'some entity';
+        $singularEntityDescription = 'some entity';
+        $pluralEntityDescription = 'some entities';
         $resourceDocumentation = 'Get some entity';
 
         $this->entityDocProvider->expects(self::once())
             ->method('getEntityDescription')
             ->with($entityClass)
-            ->willReturn($entityDescription);
+            ->willReturn($singularEntityDescription);
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityPluralDescription')
+            ->with($entityClass)
+            ->willReturn($pluralEntityDescription);
         $this->resourceDocProvider->expects(self::once())
             ->method('getResourceDocumentation')
-            ->with($targetAction, $entityDescription)
+            ->with($targetAction, $singularEntityDescription, $pluralEntityDescription)
             ->willReturn($resourceDocumentation);
 
         $this->context->setClassName($entityClass);
