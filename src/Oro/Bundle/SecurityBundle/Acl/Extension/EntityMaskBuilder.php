@@ -13,15 +13,15 @@ final class EntityMaskBuilder extends MaskBuilder
     /**
      * Determines how many permissions stored in one mask.
      * For service mask is used 32 bit integer value. We use five bits for each permissions in mask to store
-     * all access levels (basic, local, deep, global, system). So 15 bits used for permissions data. The remaining 16
+     * all access levels (basic, local, deep, global, system). 25 bits used for permissions data. The remaining 6
      * bits will be used as service bits (as we know, 31 bits we can use for data and 1 bit is used for sign) and we
-     * have 65536 (2^16) unique combinations of masks.
-     * Current constant value was selected based on optimal numbers of unique masks and better performance.
+     * have 320 ((2^6)*5) unique permissions.
+     * Current constant value was selected based on optimal numbers of unique permissions and better performance.
      */
-    public const MAX_PERMISSIONS_IN_MASK = 3;
+    public const MAX_PERMISSIONS_IN_MASK = 5;
 
-    public const SERVICE_BITS        = -32768; // 0xFFFF8000
-    public const REMOVE_SERVICE_BITS = 32767;  // 0x00007FFF
+    public const SERVICE_BITS        = -33554432; // 0xFE000000
+    public const REMOVE_SERVICE_BITS = 33554431;  // 0x01FFFFFF
 
     /** @var int */
     private $identity;

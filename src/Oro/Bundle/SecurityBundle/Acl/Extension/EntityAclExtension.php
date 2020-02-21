@@ -51,6 +51,15 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /** @var EntityMaskBuilder[] [the identity of a permission mask builder => EntityMaskBuilder, ...] */
     private $builders = [];
 
+    /** @var array [mask => access level, ...] */
+    private $accessLevelForMask = [];
+
+    /** @var array [group => permissions, ...] */
+    private $permissionsForGroup = [];
+
+    /** @var array [mask => group mask, ...] */
+    private $permissionGroupMasks = [];
+
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
      * @param EntityClassResolver                        $entityClassResolver
@@ -134,6 +143,29 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $this->buildPermissionsMap();
 
         return parent::hasMasks($permission);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPermissionGroupMask($mask)
+    {
+        if (\array_key_exists($mask, $this->permissionGroupMasks)) {
+            return $this->permissionGroupMasks[$mask];
+        }
+
+        $result = null;
+        $permissions = $this->getPermissions($mask, true);
+        foreach ($permissions as $permission) {
+            $maskBuilder = $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
+            if ($maskBuilder->hasMaskForGroup($permission)) {
+                $result = $maskBuilder->getMaskForGroup($permission);
+                break;
+            }
+        }
+        $this->permissionGroupMasks[$mask] = $result;
+
+        return $result;
     }
 
     /**
@@ -289,16 +321,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
 
         $mask = $this->removeServiceBits($mask);
 
-        $result = AccessLevel::NONE_LEVEL;
-        if (0 !== $mask) {
-            $maskBuilder = $this->getEntityMaskBuilder($identity);
-            foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
-                if (0 !== ($mask & $maskBuilder->getMaskForGroup($accessLevelName))) {
-                    $result = $accessLevel;
-                    break;
-                }
-            }
-        }
+        $result = $this->getAccessLevelForMask($mask, $identity);
 
         if (null !== $object) {
             $result = $this->metadataProvider->getMaxAccessLevel($result, $this->getObjectClassName($object));
@@ -313,7 +336,11 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         if (null === $mask) {
-            return array_keys($this->getPermissionsToIdentityMap($byCurrentGroup));
+            if ($byCurrentGroup) {
+                return $this->getPermissionsForGroup($this->groupProvider->getGroup());
+            }
+
+            return array_keys($this->getPermissionsToIdentityMap());
         }
         if (!$setOnly) {
             $result = $this->getPermissionsForIdentity($this->getServiceBits($mask));
@@ -587,22 +614,28 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     }
 
     /**
-     * @param bool $byCurrentGroup
-     *
      * @return int[]
      */
-    protected function getPermissionsToIdentityMap($byCurrentGroup = false)
+    protected function getPermissionsToIdentityMap()
     {
         $this->ensurePermissionsInitialized();
 
-        $map = $this->permissionsToIdentity;
-        if ($byCurrentGroup) {
-            $permissions = $this->permissionManager->getPermissionsMap($this->groupProvider->getGroup());
+        return $this->permissionsToIdentity;
+    }
 
-            $map = array_intersect_key($map, $permissions);
-        }
+    /**
+     * @param string $group
+     *
+     * @return int[]
+     */
+    protected function getPermissionsToIdentityMapForGroup($group)
+    {
+        $this->ensurePermissionsInitialized();
 
-        return $map;
+        return array_intersect_key(
+            $this->permissionsToIdentity,
+            $this->permissionManager->getPermissionsMap($group)
+        );
     }
 
     /**
@@ -640,6 +673,23 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     }
 
     /**
+     * @param string $aclGroup
+     *
+     * @return string[]
+     */
+    private function getPermissionsForGroup($aclGroup)
+    {
+        if (isset($this->permissionsForGroup[$aclGroup])) {
+            return $this->permissionsForGroup[$aclGroup];
+        }
+
+        $result = array_keys($this->getPermissionsToIdentityMapForGroup($aclGroup));
+        $this->permissionsForGroup[$aclGroup] = $result;
+
+        return $result;
+    }
+
+    /**
      * @param int $identity
      *
      * @return EntityMaskBuilder
@@ -654,5 +704,32 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $this->builders[$identity] = $maskBuilder;
 
         return $maskBuilder;
+    }
+
+    /**
+     * @param int $mask
+     * @param int $identity
+     *
+     * @return int
+     */
+    private function getAccessLevelForMask($mask, $identity)
+    {
+        if (isset($this->accessLevelForMask[$mask])) {
+            return $this->accessLevelForMask[$mask];
+        }
+
+        $result = AccessLevel::NONE_LEVEL;
+        if (0 !== $mask) {
+            $maskBuilder = $this->getEntityMaskBuilder($identity);
+            foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
+                if (0 !== ($mask & $maskBuilder->getMaskForGroup($accessLevelName))) {
+                    $result = $accessLevel;
+                    break;
+                }
+            }
+        }
+        $this->accessLevelForMask[$mask] = $result;
+
+        return $result;
     }
 }

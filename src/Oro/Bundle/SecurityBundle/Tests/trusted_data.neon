@@ -21,7 +21,27 @@ trusted_data:
             getOwnerFieldName: true
             getOrganizationFieldName: true
             getOrganizationColumnName: true
+        Oro\Bundle\SecurityBundle\Acl\Dbal\AclProvider:
+            getFindChildrenSql: true
+            getSelectObjectIdentityIdSql: true
+            getAncestorLookupSql: true
+            getLookupSqlBySids: true
         Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider:
             getUpdateSecurityIdentitySql: true
             getDeleteSecurityIdentityIdSql: true
             getDeleteClassIdSql: true
+            getInsertObjectIdentityRelationSql: true
+            getUpdateObjectIdentitySql: true
+            getUpdateUserSecurityIdentitySql: true
+            getInsertObjectIdentitySql: true
+            getSelectClassIdSql: true
+            getInsertClassSql: true
+            getSelectSecurityIdentityIdSql: true
+            getInsertSecurityIdentitySql: true
+            getDeleteAccessControlEntriesSql: true
+            getDeleteObjectIdentitySql: true
+            getDeleteObjectIdentityRelationsSql: true
+            getInsertAccessControlEntrySql: true
+            getSelectAccessControlEntryIdSql: true
+            getDeleteAccessControlEntrySql: true
+            getUpdateAccessControlEntrySql: true

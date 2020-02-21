@@ -715,9 +715,7 @@ class AclPrivilegeRepository
     ) {
         $allowedPermissions = $extension->getAllowedPermissions($oid, null, $aclGroup);
         $acl = $this->findAclByOid($acls, $oid);
-        if ($rootAcl !== null) {
-            $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
-        }
+        $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
 
         // add default permission for not found in db privileges
         foreach ($allowedPermissions as $permission) {

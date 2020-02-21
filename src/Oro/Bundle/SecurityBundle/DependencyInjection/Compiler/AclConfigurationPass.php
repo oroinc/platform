@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
@@ -26,6 +27,7 @@ class AclConfigurationPass implements CompilerPassInterface
         $this->configureAclExtensionSelector($container);
         $this->configureDefaultAclProvider($container);
         $this->configureDefaultAclVoter($container);
+        $this->configureAclCache($container);
     }
 
     /**
@@ -61,7 +63,11 @@ class AclConfigurationPass implements CompilerPassInterface
     private function configureDefaultAclProvider(ContainerBuilder $container): void
     {
         $container->getDefinition('security.acl.dbal.provider')
-            ->setClass(MutableAclProvider::class);
+            ->setClass(MutableAclProvider::class)
+            ->addMethodCall(
+                'setSecurityIdentityToStringConverter',
+                [new Reference('oro_security.acl.security_identity_to_string_converter')]
+            );
     }
 
     /**
@@ -75,5 +81,21 @@ class AclConfigurationPass implements CompilerPassInterface
         $newProviderDef = $container->getDefinition($newProviderId);
         $newProviderDef->addMethodCall('setBaseAclProvider', [$voterDef->getArgument(0)]);
         $voterDef->replaceArgument(0, new Reference($newProviderId));
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureAclCache(ContainerBuilder $container): void
+    {
+        $container->getDefinition('security.acl.cache.doctrine')
+            ->setClass(AclCache::class)
+            ->setArguments([
+                new Reference('security.acl.cache.doctrine.cache_impl'),
+                new Reference('oro_security.acl.permission_granting_strategy'),
+                new Reference('security.acl.underlying.cache'),
+                new Reference('event_dispatcher'),
+                new Reference('oro_security.acl.security_identity_to_string_converter')
+            ]);
     }
 }

@@ -71,6 +71,14 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getPermissionGroupMask($mask)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         if (null === $mask || !$setOnly || 0 !== $mask) {

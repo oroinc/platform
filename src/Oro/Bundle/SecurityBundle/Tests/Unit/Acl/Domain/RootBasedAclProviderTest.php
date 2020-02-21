@@ -3,8 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Domain\RootAclWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -36,7 +38,8 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider     = new RootBasedAclProvider(
             new ObjectIdentityFactory(
                 TestHelper::get($this)->createAclExtensionSelector()
-            )
+            ),
+            new SecurityIdentityToStringConverter()
         );
         $this->provider->setBaseAclProvider($this->baseProvider);
         $this->underlyingCache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache')
@@ -98,7 +101,10 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $resultAcl = $this->provider->findAcl($oid, $sids);
         $this->assertEquals(
-            new RootBasedAclWrapper($acl, $rootAcl),
+            new RootBasedAclWrapper(
+                $acl,
+                new RootAclWrapper($rootAcl, new SecurityIdentityToStringConverter())
+            ),
             $resultAcl
         );
     }
@@ -166,7 +172,10 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $resultAcl = $this->provider->findAcl($oid, $sids);
         $this->assertEquals(
-            new RootBasedAclWrapper($underlyingAcl, $rootAcl),
+            new RootBasedAclWrapper(
+                $underlyingAcl,
+                new RootAclWrapper($rootAcl, new SecurityIdentityToStringConverter())
+            ),
             $resultAcl
         );
     }
@@ -208,7 +217,10 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $resultAcl = $this->provider->findAcl($oid, $sids);
         $this->assertEquals(
-            new RootBasedAclWrapper($underlyingAcl, $rootAcl),
+            new RootBasedAclWrapper(
+                $underlyingAcl,
+                new RootAclWrapper($rootAcl, new SecurityIdentityToStringConverter())
+            ),
             $resultAcl
         );
     }
