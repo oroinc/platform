@@ -41,8 +41,11 @@ define([
             addressCreateUrl: null,
             addressUpdateUrl: null,
             addressDeleteUrl: null,
+            addressesContainerHtml: '<div class="map-address-list"></div>',
+            noDataContainerHtml: '<div class="no-data"></div>',
             mapView: Googlemaps,
             addressMapOptions: {},
+            addressTagName: 'div',
             allowToRemovePrimary: false,
             confirmRemove: true,
             confirmRemoveComponent: deleteConfirmation,
@@ -116,14 +119,14 @@ define([
         },
 
         _initMainContainers: function() {
-            this.$noDataContainer = $('<div class="no-data">' + this.noDataMessage + '</div>');
-            this.$addressesContainer = $('<div class="map-address-list"/>');
+            this.$noDataContainer = $(this.options.noDataContainerHtml).text(this.noDataMessage);
+            this.$addressesContainer = $(this.options.addressesContainerHtml);
 
-            if (!this.$el.find('.map-address-list').length) {
+            if (!$.contains(this.$el[0], this.$addressesContainer[0])) {
                 this.$el.append(this.$addressesContainer);
             }
 
-            if (!this.$el.find('.no-data').length) {
+            if (!$.contains(this.$el[0], this.$noDataContainer[0])) {
                 this.$el.append(this.$noDataContainer);
             }
         },
@@ -208,7 +211,8 @@ define([
                     allowToRemovePrimary: this.options.allowToRemovePrimary,
                     confirmRemove: this.options.confirmRemove,
                     confirmRemoveComponent: this.options.confirmRemoveComponent,
-                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address)
+                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address),
+                    tagName: this.options.addressTagName
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);
