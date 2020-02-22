@@ -214,12 +214,35 @@ trait DocumentationTestTrait
             $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
         if (!empty($definition['parameters'])) {
+            $idFieldName = null;
+            if (!empty($definition['requirements']) && count($definition['requirements']) === 1) {
+                $idFieldName = key($definition['requirements']);
+            }
             foreach ($definition['parameters'] as $name => $item) {
-                if (empty($item['description'])
-                    && !$this->isSkippedField($entityClass, $name)
-                    && !$this->isTestField($entityClass, $name)
-                ) {
-                    $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
+                if (!$this->isSkippedField($entityClass, $name) && !$this->isTestField($entityClass, $name)) {
+                    if (empty($item['description'])) {
+                        $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
+                    } elseif (ApiAction::UPDATE === $action && $idFieldName && $name === $idFieldName) {
+                        $description = $item['description'];
+                        if (false === strpos($description, 'The required field.')) {
+                            $missingDocs[] = sprintf(
+                                'Input Field: %s. No "The required field." note. (Description: "%s")',
+                                $name,
+                                $item['description']
+                            );
+                        } else {
+                            $description = preg_replace('#\<\/?\w+\>#', '', $description);
+                            $description = trim(substr($description, 0, strpos($description, 'The required field.')));
+                            if (!$description) {
+                                $missingDocs[] = sprintf(
+                                    'Input Field: %s. Empty description before "The required field." note.'
+                                    . ' (Description: "%s")',
+                                    $name,
+                                    $item['description']
+                                );
+                            }
+                        }
+                    }
                 }
             }
         }

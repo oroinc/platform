@@ -132,14 +132,6 @@ Delete a collection of user records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### emails
 
 An array of email addresses.

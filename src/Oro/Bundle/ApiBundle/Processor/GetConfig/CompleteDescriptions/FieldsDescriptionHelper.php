@@ -89,8 +89,7 @@ class FieldsDescriptionHelper
         string $targetAction,
         string $fieldPrefix = null
     ): void {
-        $this->identifierDescriptionHelper->setDescriptionForIdentifierField($definition);
-
+        $identifierFieldName = $this->getIdentifierFieldName($definition);
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($isInherit || !$field->hasDescription()) {
@@ -100,7 +99,8 @@ class FieldsDescriptionHelper
                     $entityClass,
                     $targetAction,
                     $fieldName,
-                    $fieldPrefix
+                    $fieldPrefix,
+                    $fieldName === $identifierFieldName ? IdentifierDescriptionHelper::ID_DESCRIPTION : null,
                 );
                 if ($description) {
                     $field->setDescription($description);
@@ -112,7 +112,9 @@ class FieldsDescriptionHelper
                 } elseif (InheritDocUtil::hasInheritDoc($description)) {
                     $field->setDescription(InheritDocUtil::replaceInheritDoc(
                         $description,
-                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
+                        $fieldName === $identifierFieldName
+                            ? IdentifierDescriptionHelper::ID_DESCRIPTION
+                            : $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
                     ));
                 }
             }
@@ -127,7 +129,7 @@ class FieldsDescriptionHelper
                 $targetClass = $field->getTargetClass();
                 $targetFieldPrefix = null;
                 if (!$targetClass) {
-                    $targetFieldPrefix = $field->getPropertyPath($fieldName) . ConfigUtil::PATH_DELIMITER;
+                    $targetFieldPrefix = $this->resolveFieldName($fieldName, $field) . ConfigUtil::PATH_DELIMITER;
                 }
                 $this->setDescriptionsForFields(
                     $targetEntity,
@@ -140,12 +142,48 @@ class FieldsDescriptionHelper
             }
         }
 
+        $this->identifierDescriptionHelper->setDescriptionForIdentifierField(
+            $definition,
+            $entityClass,
+            $targetAction
+        );
         $this->setDescriptionForCreatedAtField($definition, $targetAction);
         $this->setDescriptionForUpdatedAtField($definition, $targetAction);
         $this->setDescriptionsForOwnershipFields($definition, $entityClass);
         if (\is_a($entityClass, AbstractEnumValue::class, true)) {
             $this->setDescriptionsForEnumFields($definition);
         }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     *
+     * @return string
+     */
+    private function getIdentifierFieldName(EntityDefinitionConfig $definition): ?string
+    {
+        $identifierFieldNames = $definition->getIdentifierFieldNames();
+        if (count($identifierFieldNames) !== 1) {
+            return null;
+        }
+
+        return $definition->findFieldNameByPropertyPath(reset($identifierFieldNames));
+    }
+
+    /**
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     *
+     * @return string
+     */
+    private function resolveFieldName(string $fieldName, EntityDefinitionFieldConfig $field): string
+    {
+        $propertyPath = $field->getPropertyPath();
+        if ($propertyPath && ConfigUtil::IGNORE_PROPERTY_PATH !== $propertyPath) {
+            $fieldName = $propertyPath;
+        }
+
+        return $fieldName;
     }
 
     /**
@@ -255,6 +293,7 @@ class FieldsDescriptionHelper
      * @param string                      $targetAction
      * @param string                      $fieldName
      * @param string|null                 $fieldPrefix
+     * @param string|null                 $fieldDescriptionReplacement
      *
      * @return string|null
      */
@@ -264,22 +303,24 @@ class FieldsDescriptionHelper
         string $entityClass,
         string $targetAction,
         string $fieldName,
-        ?string $fieldPrefix
+        ?string $fieldPrefix,
+        ?string $fieldDescriptionReplacement
     ): ?string {
         $resourceDocParser = $this->resourceDocParserProvider->getResourceDocParser($requestType);
         $description = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName, $targetAction);
         if ($description) {
             if (InheritDocUtil::hasInheritDoc($description)) {
+                $fieldDescription = $fieldDescriptionReplacement;
+                if (!$fieldDescription) {
+                    $fieldDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                }
                 $commonDescription = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
                 if ($commonDescription) {
                     if (InheritDocUtil::hasInheritDoc($commonDescription)) {
-                        $commonDescription = InheritDocUtil::replaceInheritDoc(
-                            $commonDescription,
-                            $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
-                        );
+                        $commonDescription = InheritDocUtil::replaceInheritDoc($commonDescription, $fieldDescription);
                     }
                 } else {
-                    $commonDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                    $commonDescription = $fieldDescription;
                 }
                 $description = InheritDocUtil::replaceInheritDoc($description, $commonDescription);
             }
@@ -287,13 +328,17 @@ class FieldsDescriptionHelper
             $description = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
             if ($description) {
                 if (InheritDocUtil::hasInheritDoc($description)) {
-                    $description = InheritDocUtil::replaceInheritDoc(
-                        $description,
-                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
-                    );
+                    $fieldDescription = $fieldDescriptionReplacement;
+                    if (!$fieldDescription) {
+                        $fieldDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                    }
+                    $description = InheritDocUtil::replaceInheritDoc($description, $fieldDescription);
                 }
             } else {
                 $description = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                if ($description && $fieldDescriptionReplacement) {
+                    $description = $fieldDescriptionReplacement;
+                }
             }
         }
 
