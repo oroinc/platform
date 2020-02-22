@@ -64,6 +64,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUpCache()
     {
+        $this->resourcesProvider->clearCache();
         foreach ($this->requestTypes as $aspects) {
             $version = Version::LATEST;
             $requestType = new RequestType($aspects);

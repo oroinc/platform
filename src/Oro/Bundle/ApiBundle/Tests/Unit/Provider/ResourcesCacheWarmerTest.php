@@ -37,6 +37,8 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $version = Version::LATEST;
         $requestType = new RequestType(['rest']);
         $this->resourcesProvider->expects(self::once())
+            ->method('clearCache');
+        $this->resourcesProvider->expects(self::once())
             ->method('getResources')
             ->with($version, $requestType)
             ->willReturn([new ApiResource('Test\Entity1')]);
