@@ -27,8 +27,8 @@ const NavigationMenuView = BaseView.extend({
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
             'hide.bs.dropdown': 'onDropdownToggle',
-            [`mousemove ${this.options.linkSelector}`]: 'onMouseMove',
-            [`mouseleave ${this.options.linkSelector}`]: 'onMouseLeave'
+            [`mousemove ${this.options.itemSelector}`]: 'onMouseMove',
+            [`mouseleave ${this.options.itemSelector}`]: 'onMouseLeave'
         };
     },
 
@@ -54,7 +54,8 @@ const NavigationMenuView = BaseView.extend({
     options: {
         openClass: 'show',
         focusableElements: 'a:visible, button:visible',
-        linkSelector: '.main-menu__link',
+        itemSelector: '.main-menu__item',
+        linkSelector: '.main-menu__link:first',
         subMenus: 'ul, ol, nav, [data-role="sub-menu"]',
         popupMenuCriteria: '[aria-hidden]'
     },
@@ -854,7 +855,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     onMouseMove: function(e) {
-        const $menuLink = $(e.currentTarget);
+        const $menuLink = $(e.currentTarget).find(this.options.linkSelector);
         const $subMenu = this.getMenuBarSubMenu($menuLink);
 
         if ($subMenu && !$subMenu.is(':visible')) {
@@ -871,7 +872,8 @@ const NavigationMenuView = BaseView.extend({
         if (!this.hasFocus) {
             this.hideSubMenu();
         } else {
-            const $subMenu = this.getMenuBarSubMenu(e.currentTarget);
+            const $menuLink = $(e.currentTarget).find(this.options.linkSelector);
+            const $subMenu = this.getMenuBarSubMenu($menuLink);
 
             if ($subMenu && $subMenu.is(':visible') && !$.contains($subMenu[0], document.activeElement)) {
                 this.hideSubMenu();
