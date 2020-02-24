@@ -73,7 +73,7 @@ define(function(require) {
                 throw new TypeError('Entity type is required for EntityModel');
             }
             if (data && data.data) {
-                // assume it is raw data from JSON API and it need to be parsed
+                // assume it is raw data from JSON:API and it need to be parsed
                 options.parse = true;
             }
             this._relationships = {};

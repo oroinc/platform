@@ -5,9 +5,10 @@
     <span class="filter-criteria-hint"></span>
     <% if (allowClear) { %>
         <button class="btn btn--plain reset-filter"
-            title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            title="<%- _.__('oro.filter.wrapper.reset.tooltip') %>"
+            aria-label="<%- _.__('oro.filter.wrapper.reset.aria_label.text_reset') %> <%- label %> <%- _.__('oro.filter.wrapper.reset.aria_label.text_filter') %>"
         >
-            <i class="fa-close hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
+            <span class="fa-close" aria-hidden="true"></span>
         </button>
     <% } %>
 </span>

@@ -18,6 +18,12 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     /** @var MaskBuilder */
     protected $maskBuilder;
 
+    /** @var array [mask => access level, ...] */
+    private $accessLevelForMask = [];
+
+    /** @var array [mask => group mask, ...] */
+    private $permissionGroupMasks = [];
+
     /**
      * {@inheritdoc}
      */
@@ -31,17 +37,7 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
             $mask &= $this->getMaskForGroup($permission);
         }
 
-        $result = AccessLevel::NONE_LEVEL;
-        if (0 !== $mask) {
-            foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
-                if (0 !== ($mask & $this->getMaskForGroup($accessLevelName))) {
-                    $result = $accessLevel;
-                    break;
-                }
-            }
-        }
-
-        return $result;
+        return $this->getAccessLevelForMask($mask);
     }
 
     /**
@@ -63,6 +59,28 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
                 }
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPermissionGroupMask($mask)
+    {
+        if (\array_key_exists($mask, $this->permissionGroupMasks)) {
+            return $this->permissionGroupMasks[$mask];
+        }
+
+        $result = null;
+        $permissions = $this->getPermissions($mask, true);
+        foreach ($permissions as $permission) {
+            if ($this->maskBuilder->hasMaskForGroup($permission)) {
+                $result = $this->maskBuilder->getMaskForGroup($permission);
+                break;
+            }
+        }
+        $this->permissionGroupMasks[$mask] = $result;
 
         return $result;
     }
@@ -228,5 +246,30 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
                 throw $this->createInvalidAccessLevelAclMaskException($mask, $object, $permission, $maskAccessLevels);
             }
         }
+    }
+
+    /**
+     * @param int $mask
+     *
+     * @return int
+     */
+    private function getAccessLevelForMask($mask)
+    {
+        if (isset($this->accessLevelForMask[$mask])) {
+            return $this->accessLevelForMask[$mask];
+        }
+
+        $result = AccessLevel::NONE_LEVEL;
+        if (0 !== $mask) {
+            foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
+                if (0 !== ($mask & $this->getMaskForGroup($accessLevelName))) {
+                    $result = $accessLevel;
+                    break;
+                }
+            }
+        }
+        $this->accessLevelForMask[$mask] = $result;
+
+        return $result;
     }
 }

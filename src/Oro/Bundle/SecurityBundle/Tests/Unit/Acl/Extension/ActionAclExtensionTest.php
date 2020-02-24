@@ -10,26 +10,17 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionSecurityMetadataProvider
-     */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionSecurityMetadataProvider */
+    private $metadataProvider;
 
-    /**
-     * @var ActionAclExtension
-     */
-    protected $extension;
+    /** @var ActionAclExtension */
+    private $extension;
 
     protected function setUp()
     {
         $this->metadataProvider = $this->createMock(ActionSecurityMetadataProvider::class);
 
         $this->extension = new ActionAclExtension($this->metadataProvider);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->metadataProvider, $this->extension);
     }
 
     /**
@@ -137,6 +128,16 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'expected' => new ObjectIdentity('action', 'group@action_id')
             ]
         ];
+    }
+
+    public function testGetDefaultPermission()
+    {
+        self::assertEquals('EXECUTE', $this->extension->getDefaultPermission());
+    }
+
+    public function testGetPermissionGroupMask()
+    {
+        self::assertNull($this->extension->getPermissionGroupMask(1));
     }
 
     /**

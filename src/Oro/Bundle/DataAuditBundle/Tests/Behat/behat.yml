@@ -22,7 +22,7 @@ oro_behat_extension:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
             type: xpath
           Birthday:
-            locator: 'input[id^="date_selector_oro_user_user_form_birthday-uid"]'
+            locator: 'input[id^="oro_user_user_form_birthday-uid"]'
             type: css
             element: DateTimePicker
 

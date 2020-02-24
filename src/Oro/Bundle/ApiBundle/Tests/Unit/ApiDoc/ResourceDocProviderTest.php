@@ -29,39 +29,39 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     public function getResourceDescriptionProvider()
     {
         return [
-            ['unknown', 'Test', null],
-            [ApiAction::OPTIONS, 'Test', 'Get options'],
-            [ApiAction::GET, 'Test', 'Get Test'],
-            [ApiAction::GET_LIST, 'Test', 'Get Test'],
-            [ApiAction::UPDATE, 'Test', 'Update Test'],
-            [ApiAction::CREATE, 'Test', 'Create Test'],
-            [ApiAction::DELETE, 'Test', 'Delete Test'],
-            [ApiAction::DELETE_LIST, 'Test', 'Delete Test']
+            ['unknown', 'Product', null],
+            [ApiAction::OPTIONS, 'Product', 'Get options'],
+            [ApiAction::GET, 'Product', 'Get Product'],
+            [ApiAction::GET_LIST, 'Products', 'Get Products'],
+            [ApiAction::UPDATE, 'Product', 'Update Product'],
+            [ApiAction::CREATE, 'Product', 'Create Product'],
+            [ApiAction::DELETE, 'Product', 'Delete Product'],
+            [ApiAction::DELETE_LIST, 'Products', 'Delete Products']
         ];
     }
 
     /**
      * @dataProvider getResourceDocumentationProvider
      */
-    public function testGetResourceDocumentation($action, $entityDescription, $expected)
+    public function testGetResourceDocumentation($action, $entitySingularName, $entityPluralName, $expected)
     {
         self::assertSame(
             $expected,
-            $this->resourceDocProvider->getResourceDocumentation($action, $entityDescription)
+            $this->resourceDocProvider->getResourceDocumentation($action, $entitySingularName, $entityPluralName)
         );
     }
 
     public function getResourceDocumentationProvider()
     {
         return [
-            ['unknown', 'Test', null],
-            [ApiAction::OPTIONS, 'Test', 'Get communication options for a resource'],
-            [ApiAction::GET, 'Test', 'Get an entity'],
-            [ApiAction::GET_LIST, 'Test', 'Get a list of entities'],
-            [ApiAction::UPDATE, 'Test', 'Update an entity'],
-            [ApiAction::CREATE, 'Test', 'Create an entity'],
-            [ApiAction::DELETE, 'Test', 'Delete an entity'],
-            [ApiAction::DELETE_LIST, 'Test', 'Delete a list of entities']
+            ['unknown', 'Product', 'Products', null],
+            [ApiAction::OPTIONS, 'Product', 'Products', 'Get communication options for a resource'],
+            [ApiAction::GET, 'Product', 'Products', 'Get an entity'],
+            [ApiAction::GET_LIST, 'Product', 'Products', 'Get a list of entities'],
+            [ApiAction::UPDATE, 'Product', 'Products', 'Update an entity'],
+            [ApiAction::CREATE, 'Product', 'Products', 'Create an entity'],
+            [ApiAction::DELETE, 'Product', 'Products', 'Delete an entity'],
+            [ApiAction::DELETE_LIST, 'Product', 'Products', 'Delete a list of entities']
         ];
     }
 
@@ -79,7 +79,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     public function getSubresourceDescriptionProvider()
     {
         return [
-            ['unknown', 'Test', false, null],
+            ['unknown', 'test', false, null],
             [ApiAction::OPTIONS, 'test', false, 'Get options'],
             [ApiAction::OPTIONS, 'test', true, 'Get options'],
             [ApiAction::GET_SUBRESOURCE, 'test', false, 'Get test'],
@@ -115,7 +115,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     public function getSubresourceDocumentationProvider()
     {
         return [
-            ['unknown', 'Test', false, null],
+            ['unknown', 'test', false, null],
             [ApiAction::OPTIONS, 'test', false, 'Get communication options for a resource'],
             [ApiAction::OPTIONS, 'test', true, 'Get communication options for a resource'],
             [ApiAction::GET_SUBRESOURCE, 'test', false, 'Get a related entity'],

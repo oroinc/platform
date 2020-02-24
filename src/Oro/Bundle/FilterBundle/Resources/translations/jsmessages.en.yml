@@ -20,6 +20,8 @@ oro:
             reset:
                 hint: Reset
                 tooltip: Reset this filter
+                aria_label.text_reset: Reset
+                aria_label.text_filter: Filter
         date:
             variable:
                 title: Available variables
@@ -74,7 +76,7 @@ oro:
             max_length: Please enter at most {{ max_length }} characters
         datagrid-toolbar:
             filters: Filter Toggle
-            aria_label: Expand or Collapse Filters
+            aria_label: Expand or Collapse Grid Filters
             filters_count: Filters ({{ count }})
             save_filters: Save Filters
         dialog:

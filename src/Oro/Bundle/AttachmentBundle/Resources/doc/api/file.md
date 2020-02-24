@@ -89,14 +89,6 @@ Delete a set of file records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### uuid
 
 {@inheritdoc}

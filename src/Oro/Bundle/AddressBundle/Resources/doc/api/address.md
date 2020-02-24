@@ -119,14 +119,6 @@ Delete a collection of address records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### street
 
 #### create

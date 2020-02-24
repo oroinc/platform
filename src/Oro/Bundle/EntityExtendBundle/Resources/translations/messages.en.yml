@@ -68,6 +68,7 @@ oro:
                 entity_data_fields: Related entity data fields
                 entity_info_title:  Related entity info title
                 entity_detailed:    Related entity detailed
+            field_exists: Extend field "%fieldName%" cannot be added to the form. A field with the same name already exists or was added by other extensions.
 
         enum_name:    Option Set Name
         enum_public:  Public

@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Removes not accessible sub-resources and sub-resources if all their actions are excluded.
+ * Removes sub-resources if all their actions are excluded.
  */
 class RemoveNotAvailableSubresources implements ProcessorInterface
 {
@@ -18,36 +18,29 @@ class RemoveNotAvailableSubresources implements ProcessorInterface
     {
         /** @var CollectSubresourcesContext $context */
 
-        $accessibleResources = \array_fill_keys($context->getAccessibleResources(), true);
-        $subresources = $context->getResult();
-
         $resources = $context->getResources();
+        $subresources = $context->getResult();
+        $numberOfSubresourceActions = \count(SubresourceUtil::SUBRESOURCE_ACTIONS);
         foreach ($resources as $entityClass => $resource) {
             $entitySubresources = $subresources->get($entityClass);
             if (null !== $entitySubresources) {
-                $this->removeNotAvailableSubresources($entitySubresources, $accessibleResources);
+                $this->removeNotAvailableSubresources($entitySubresources, $numberOfSubresourceActions);
             }
         }
     }
 
     /**
      * @param ApiResourceSubresources $entitySubresources
-     * @param array                   $accessibleResources
+     * @param int                     $numberOfSubresourceActions
      */
     private function removeNotAvailableSubresources(
         ApiResourceSubresources $entitySubresources,
-        array $accessibleResources
+        int $numberOfSubresourceActions
     ): void {
-        $numberOfSubresourceActions = \count(SubresourceUtil::SUBRESOURCE_ACTIONS);
         $subresources = $entitySubresources->getSubresources();
         foreach ($subresources as $associationName => $subresource) {
-            if (SubresourceUtil::isAccessibleSubresource($subresource, $accessibleResources)) {
-                if (\count($subresource->getExcludedActions()) === $numberOfSubresourceActions) {
-                    // remove sub-resource if all its actions are excluded
-                    $entitySubresources->removeSubresource($associationName);
-                }
-            } else {
-                // remove not accessible sub-resource
+            if (\count($subresource->getExcludedActions()) === $numberOfSubresourceActions) {
+                // remove sub-resource if all its actions are excluded
                 $entitySubresources->removeSubresource($associationName);
             }
         }

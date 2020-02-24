@@ -4,7 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
+use Oro\Bundle\SecurityBundle\Acl\Domain\RootAclWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverter;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -58,12 +60,16 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $sid3 = new RoleSecurityIdentity('sid3');
         $sid4 = new RoleSecurityIdentity('sid4');
 
-        $obj = new RootBasedAclWrapper($acl, $rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $acl,
+            new RootAclWrapper($rootAcl, new SecurityIdentityToStringConverter())
+        );
         $acl->insertClassAce($sid1, 1, 0); // new ACE
         $acl->insertClassAce($sid1, 256 + 1, 1); // new ACE, with service bits
         $acl->insertClassAce($sid2, 2, 2); // override root ACE
         $acl->insertClassAce($sid2, 256 + 2, 3); // override root ACE, with service bits
-        $acl->insertClassAce($sid3, 4, 4); // new ACE, root ACL does not have ACE for this SID
+        $acl->insertClassAce($sid2, 256 * 3 + 2, 4); // new ACE for SID that have root ACEs
+        $acl->insertClassAce($sid3, 4, 5); // new ACE, root ACL does not have ACE for this SID
         $rootAcl->insertObjectAce($sid2, 1, 0);
         $rootAcl->insertObjectAce($sid2, 256 + 1, 1);
         $rootAcl->insertObjectAce($sid2, 256 * 2 + 1, 2); // ACE existing only in root ACL
@@ -85,13 +91,14 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         }
         $this->assertEquals(
             [
-                1,
-                256 + 1,
                 2,
                 256 + 2,
-                4,
                 256 * 2 + 1,
-                8
+                8,
+                1,
+                256 + 1,
+                256 * 3 + 2,
+                4
             ],
             $resultMasks
         );
@@ -131,7 +138,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $sid3 = new RoleSecurityIdentity('sid3');
         $sid4 = new RoleSecurityIdentity('sid4');
 
-        $obj = new RootBasedAclWrapper($acl, $rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $acl,
+            new RootAclWrapper($rootAcl, new SecurityIdentityToStringConverter())
+        );
         $acl->insertClassFieldAce($fieldName, $sid1, 1, 0); // new ACE
         $acl->insertClassFieldAce($fieldName, $sid1, 256 + 1, 1); // new ACE, with service bits
         $acl->insertClassFieldAce($fieldName, $sid2, 2, 2); // override root ACE
@@ -158,13 +168,13 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         }
         $this->assertEquals(
             [
-                1,
-                256 + 1,
                 2,
                 256 + 2,
-                4,
                 256 * 2 + 1,
-                8
+                8,
+                1,
+                256 + 1,
+                4
             ],
             $resultMasks
         );
@@ -174,7 +184,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $ace = $this->createMock(EntryInterface::class);
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('getObjectAces')
             ->will($this->returnValue([$ace]));
@@ -187,7 +200,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $ace = $this->createMock(EntryInterface::class);
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('getObjectFieldAces')
             ->with($this->equalTo('SomeField'))
@@ -203,7 +219,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $this->acl->expects($this->once())
             ->method('getObjectAces')
             ->will($this->returnValue(['test']));
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('getObjectIdentity')
             ->will($this->returnValue($id));
@@ -216,7 +235,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $parentAcl = $this->createMock(Acl::class);
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('getParentAcl')
             ->will($this->returnValue($parentAcl));
@@ -227,7 +249,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsEntriesInheriting()
     {
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('isEntriesInheriting')
             ->will($this->returnValue(true));
@@ -240,7 +265,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
     {
         $sid = new RoleSecurityIdentity('sid1');
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $this->acl->expects($this->once())
             ->method('isSidLoaded')
             ->with($this->identicalTo($sid))
@@ -264,7 +292,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
             false
         );
 
-        $obj = new RootBasedAclWrapper($acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $strategy->expects($this->once())
             ->method('isGranted')
             ->with(
@@ -294,7 +325,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
             false
         );
 
-        $obj = new RootBasedAclWrapper($acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $strategy->expects($this->once())
             ->method('isFieldGranted')
             ->with(
@@ -316,7 +350,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testSerialize()
     {
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $obj->serialize();
     }
 
@@ -325,7 +362,10 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testUnserialize()
     {
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
+        $obj = new RootBasedAclWrapper(
+            $this->acl,
+            new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
+        );
         $obj->unserialize('');
     }
 }

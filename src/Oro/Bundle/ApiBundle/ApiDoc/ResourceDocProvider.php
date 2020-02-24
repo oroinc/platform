@@ -94,14 +94,14 @@ class ResourceDocProvider
      * Gets a short, human-readable description of API resource.
      *
      * @param string $action
-     * @param string $entityDescription
+     * @param string $entityName
      *
      * @return string|null
      */
-    public function getResourceDescription(string $action, string $entityDescription): ?string
+    public function getResourceDescription(string $action, string $entityName): ?string
     {
         return isset(self::TEMPLATES[$action])
-            ? \strtr(self::TEMPLATES[$action]['description'], ['{name}' => $entityDescription])
+            ? strtr(self::TEMPLATES[$action]['description'], ['{name}' => $entityName])
             : null;
     }
 
@@ -109,29 +109,43 @@ class ResourceDocProvider
      * Gets a detailed documentation of API resource.
      *
      * @param string $action
-     * @param string $entityDescription
+     * @param string $entitySingularName
+     * @param string $entityPluralName
      *
      * @return string|null
      */
-    public function getResourceDocumentation(string $action, string $entityDescription): ?string
-    {
-        return isset(self::TEMPLATES[$action]['documentation'])
-            ? \strtr(self::TEMPLATES[$action]['documentation'], ['{name}' => $entityDescription])
-            : null;
+    public function getResourceDocumentation(
+        string $action,
+        string $entitySingularName,
+        string $entityPluralName
+    ): ?string {
+        if (!isset(self::TEMPLATES[$action]['documentation'])) {
+            return null;
+        }
+
+        return strtr(
+            self::TEMPLATES[$action]['documentation'],
+            [
+                '{singular_name}'       => $entitySingularName,
+                '{singular_name|lower}' => strtolower($entitySingularName),
+                '{plural_name}'         => $entityPluralName,
+                '{plural_name|lower}'   => strtolower($entityPluralName)
+            ]
+        );
     }
 
     /**
      * Gets a short, human-readable description of API sub-resource.
      *
      * @param string $action
-     * @param string $associationDescription
+     * @param string $associationName
      * @param bool   $isCollection
      *
      * @return string|null
      */
     public function getSubresourceDescription(
         string $action,
-        string $associationDescription,
+        string $associationName,
         bool $isCollection
     ): ?string {
         if (!isset(self::TEMPLATES[$action])) {
@@ -143,21 +157,21 @@ class ResourceDocProvider
             $template = $isCollection ? $template['collection'] : $template['single_item'];
         }
 
-        return \strtr($template, ['{association}' => $associationDescription]);
+        return strtr($template, ['{association}' => $associationName]);
     }
 
     /**
      * Gets a detailed documentation of API sub-resource.
      *
      * @param string $action
-     * @param string $associationDescription
+     * @param string $associationName
      * @param bool   $isCollection
      *
      * @return string|null
      */
     public function getSubresourceDocumentation(
         string $action,
-        string $associationDescription,
+        string $associationName,
         bool $isCollection
     ): ?string {
         if (!isset(self::TEMPLATES[$action])) {
@@ -169,6 +183,6 @@ class ResourceDocProvider
             $template = $isCollection ? $template['collection'] : $template['single_item'];
         }
 
-        return \strtr($template, ['{association}' => $associationDescription]);
+        return strtr($template, ['{association}' => $associationName]);
     }
 }

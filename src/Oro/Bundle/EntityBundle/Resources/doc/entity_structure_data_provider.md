@@ -16,6 +16,6 @@ For every field, the following information is provided:
 - type of relation (`oneToMany`, `manyToMany` and so on)
 - options (for example `[configurable: true, auditable: false]`).
 
-This data can be returned by [JSON API](./../config/oro/api.yml#L18)
+This data can be returned by API.
 
-This data can be extended or modified using event (see [Entity Structure Options Event](./events.md#entity-structure-options-event))
+This data can be extended or modified using event (see [Entity Structure Options Event](./events.md#entity-structure-options-event)).
