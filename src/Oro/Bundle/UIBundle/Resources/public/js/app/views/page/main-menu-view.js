@@ -2,13 +2,11 @@ define([
     './../base/page-region-view',
     'underscore',
     'jquery',
-    'oroui/js/mediator',
-    'oronavigation/js/app/views/navigation-menu-view'
-], function(PageRegionView, _, $, mediator, NavigationMenuView) {
+    'oroui/js/mediator'
+], function(PageRegionView, _, $, mediator) {
     'use strict';
 
-    NavigationMenuView = NavigationMenuView.default;
-    const PageMainMenuView = NavigationMenuView.extend({
+    const PageMainMenuView = PageRegionView.extend({
         template: function(data) {
             return data.mainMenu;
         },
@@ -24,9 +22,7 @@ define([
             if (this.$el.hasClass('main-menu-top')) {
                 events = {
                     'mouseenter .dropdown': '_onDropdownMouseEnter',
-                    'mouseleave .dropdown': '_onDropdownMouseLeave',
-                    'focus .dropdown': '_onDropdownMouseEnter',
-                    'focusout .dropdown': '_onDropdownMouseLeave'
+                    'mouseleave .dropdown': '_onDropdownMouseLeave'
                 };
             }
             return events;
@@ -47,7 +43,6 @@ define([
          * @inheritDoc
          */
         constructor: function PageMainMenuView(options) {
-            options.popupMenuCriteria = '[aria-hidden], .dropdown-menu-level-3';
             PageMainMenuView.__super__.constructor.call(this, options);
         },
 

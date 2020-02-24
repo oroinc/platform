@@ -389,6 +389,7 @@ const NavigationMenuView = BaseView.extend({
                 return;
             }
 
+            this.hideSubMenu();
             this.showSubMenu($element);
             this.setFocus(this.getFirstFocusableElement($subMenu));
         } else {
@@ -402,6 +403,19 @@ const NavigationMenuView = BaseView.extend({
      */
     getSubMenu($element) {
         return $element.nextAll(this.options.subMenus).first();
+    },
+
+    getMenuBarSubMenu: function(menuLink) {
+        const $menuLink = $(menuLink);
+        const $currentMenu = this.getCurrentMenu($menuLink);
+
+        if (!this.isMenuBar($currentMenu)) {
+            return null;
+        }
+
+        const $subMenu = this.getSubMenu($menuLink);
+
+        return this.isPopupMenu($subMenu) ? $subMenu : null;
     },
 
     /**
@@ -840,29 +854,28 @@ const NavigationMenuView = BaseView.extend({
     },
 
     onMouseMove: function(e) {
-        if (!this.hasFocus) {
-            return;
-        }
-
         const $menuLink = $(e.currentTarget);
-        const $currentMenu = this.getCurrentMenu($menuLink);
-        const $subMenu = this.getSubMenu($menuLink);
+        const $subMenu = this.getMenuBarSubMenu($menuLink);
 
-        if (this.isMenuBar($currentMenu) && this.isPopupMenu($subMenu) && !$subMenu.hasClass(this.options.openClass)) {
+        if ($subMenu && !$subMenu.is(':visible')) {
+            if (this.hasFocus) {
+                this.setFocus(this.getRootFocusableElement($(document.activeElement)));
+            }
+
             this.hideSubMenu();
-            this.setFocus($menuLink);
             this.showSubMenu($menuLink);
         }
     },
 
     onMouseLeave: function(e) {
-        const $menuLink = $(e.currentTarget);
-        const $currentMenu = this.getCurrentMenu($menuLink);
-        const $subMenu = this.getSubMenu($menuLink);
-
-        if (this.isMenuBar($currentMenu) && this.isPopupMenu($subMenu) && $subMenu.hasClass(this.options.openClass)) {
-            this.openNextRootMenu = false;
+        if (!this.hasFocus) {
             this.hideSubMenu();
+        } else {
+            const $subMenu = this.getMenuBarSubMenu(e.currentTarget);
+
+            if ($subMenu && $subMenu.is(':visible') && !$.contains($subMenu[0], document.activeElement)) {
+                this.hideSubMenu();
+            }
         }
     }
 });
