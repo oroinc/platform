@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'underscore';
 import BaseView from 'oroui/js/app/views/base/view';
 
 const KEY_CODES = {
@@ -25,9 +26,13 @@ const NavigationMenuView = BaseView.extend({
             [`focus ${this.options.focusableElements}`]: 'onFocus',
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
-            'hide.bs.dropdown': 'onDropdownToggle'
+            'hide.bs.dropdown': 'onDropdownToggle',
+            [`mousemove ${this.options.linkSelector}`]: 'onMouseMove',
+            [`mouseleave ${this.options.linkSelector}`]: 'onMouseLeave'
         };
     },
+
+    hasFocus: false,
 
     isPlainMenu: false,
 
@@ -37,6 +42,8 @@ const NavigationMenuView = BaseView.extend({
      * @inheritDoc
      */
     constructor: function NavigationMenuView(options) {
+        this.onMouseLeave = _.throttle(this.onMouseLeave, 100);
+
         NavigationMenuView.__super__.constructor.call(this, options);
     },
 
@@ -47,6 +54,7 @@ const NavigationMenuView = BaseView.extend({
     options: {
         openClass: 'show',
         focusableElements: 'a:visible, button:visible',
+        linkSelector: '.main-menu__link',
         subMenus: 'ul, ol, nav, [data-role="sub-menu"]',
         popupMenuCriteria: '[aria-hidden]'
     },
@@ -169,6 +177,7 @@ const NavigationMenuView = BaseView.extend({
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
 
+        this.hasFocus = true;
         this.overloadDataForSearch($element);
 
         if (!this.isMenuBar($currentMenu)) {
@@ -188,6 +197,7 @@ const NavigationMenuView = BaseView.extend({
     onFocusOut(event) {
         if (!$.contains(event.currentTarget, event.relatedTarget)) {
             this.openNextRootMenu = false;
+            this.hasFocus = false;
             this.setRovingTabIndex(this.getRootFocusableElement($(event.target)));
             this.hideSubMenu();
         }
@@ -289,6 +299,7 @@ const NavigationMenuView = BaseView.extend({
         event.preventDefault();
 
         if (this.isMenuBar($currentMenu)) {
+            this.hideSubMenu();
             this.moveFocusToPreviousRelativeSibling($currentMenu);
         } else {
             const $lastOpenedPopup = this.getPopupMenus($element).first();
@@ -315,6 +326,7 @@ const NavigationMenuView = BaseView.extend({
         event.preventDefault();
 
         if (this.isMenuBar($currentMenu)) {
+            this.hideSubMenu();
             this.moveFocusToNextRelativeSibling($currentMenu);
         } else {
             if (this.isPopupMenu($subMenu)) {
@@ -824,6 +836,33 @@ const NavigationMenuView = BaseView.extend({
             $menu.attr(MENU_ITEM_INDEX_ATTR, this.getIndexForElement($(event.relatedTarget)));
         } else if (event.type === 'hide') {
             $menu.removeAttr(MENU_ITEM_INDEX_ATTR);
+        }
+    },
+
+    onMouseMove: function(e) {
+        if (!this.hasFocus) {
+            return;
+        }
+
+        const $menuLink = $(e.currentTarget);
+        const $currentMenu = this.getCurrentMenu($menuLink);
+        const $subMenu = this.getSubMenu($menuLink);
+
+        if (this.isMenuBar($currentMenu) && this.isPopupMenu($subMenu) && !$subMenu.hasClass(this.options.openClass)) {
+            this.hideSubMenu();
+            this.setFocus($menuLink);
+            this.showSubMenu($menuLink);
+        }
+    },
+
+    onMouseLeave: function(e) {
+        const $menuLink = $(e.currentTarget);
+        const $currentMenu = this.getCurrentMenu($menuLink);
+        const $subMenu = this.getSubMenu($menuLink);
+
+        if (this.isMenuBar($currentMenu) && this.isPopupMenu($subMenu) && $subMenu.hasClass(this.options.openClass)) {
+            this.openNextRootMenu = false;
+            this.hideSubMenu();
         }
     }
 });
