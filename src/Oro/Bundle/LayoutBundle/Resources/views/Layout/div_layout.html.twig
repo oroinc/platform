@@ -9,7 +9,7 @@
         {%- if required -%}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
-        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}{% if required %}<em>*</em>{% endif %}</label>
+        <label{{ block('block_label_attributes') }}>{{ label|block_text(translation_domain) }}{% if required %}<em aria-hidden="true">*</em>{% endif %}</label>
     {%- endif %}
 {%- endblock %}
 
