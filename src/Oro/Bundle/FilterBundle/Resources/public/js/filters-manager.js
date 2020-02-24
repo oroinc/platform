@@ -184,6 +184,7 @@ define(function(require) {
                     _.extend(filter, filterWrapper);
                 }
                 this.listenTo(filter, filterListeners);
+                filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
             }, this);
 
             if (this.isFiltersStateViewNeeded(options)) {
@@ -218,6 +219,8 @@ define(function(require) {
         updateFilters: function(grid) {
             _.each(grid.metadata.filters, function(metadata) {
                 if (this.filters[metadata.name]) {
+                    this.filters[metadata.name]
+                        .trigger('total-records-count-updated', this.collection.state.totalRecords);
                     this.filters[metadata.name].trigger('metadata-loaded', metadata);
                 }
             }, this);
