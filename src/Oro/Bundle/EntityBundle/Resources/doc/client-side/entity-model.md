@@ -1,7 +1,7 @@
 # EntityModel
 
 **EntityModel**:
- - Provides an approach to work with backend over JSON API
+ - Provides an approach to work with backend over JSON:API
  - With the help of registry, allows to share data over the user interface
 
 ### Create a new model

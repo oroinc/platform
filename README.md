@@ -11,7 +11,7 @@ high quality of the code and powerful features like:
  - Multi layer application configuration
  - Entity and entity fields manager
  - Users, roles and multi scope permissions management
- - REST API with JSON API standard support
+ - REST API with JSON:API standard support
  - Reports, Workflows, Data audit and many other features
  
 OroPlatform is a good starting point for any kind of business applications, from custom intranet apps to

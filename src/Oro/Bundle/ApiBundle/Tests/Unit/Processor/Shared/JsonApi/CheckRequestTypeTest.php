@@ -91,7 +91,7 @@ class CheckRequestTypeTest extends GetListProcessorTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Not supported "Accept" header. It contains the JSON API content type and all instances of that are modified with media type parameters.
+     * @expectedExceptionMessage Not supported "Accept" header. It contains the JSON:API content type and all instances of that are modified with media type parameters.
      */
     // @codingStandardsIgnoreEnd
     public function testJsonApiContentTypeAndJsonApiAcceptWithMediaType()
