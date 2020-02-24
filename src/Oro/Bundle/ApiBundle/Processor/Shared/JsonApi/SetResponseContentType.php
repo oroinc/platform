@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class SetResponseContentType implements ProcessorInterface
 {
     /**
-     * Content-Type of REST API response conforms JSON API specification
+     * Content-Type of REST API response conforms JSON:API specification
      */
     const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 

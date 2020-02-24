@@ -101,14 +101,6 @@ Delete a collection of user group records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### name
 
 #### create

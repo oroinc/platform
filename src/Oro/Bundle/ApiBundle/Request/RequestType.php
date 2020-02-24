@@ -15,7 +15,7 @@ class RequestType implements ToArrayInterface
     public const REST = 'rest';
 
     /**
-     * A request that conforms JSON API specification.
+     * A request that conforms JSON:API specification.
      * @link http://jsonapi.org
      */
     public const JSON_API = 'json_api';

@@ -125,14 +125,6 @@ Delete a set of attachment records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### file
 
 #### create

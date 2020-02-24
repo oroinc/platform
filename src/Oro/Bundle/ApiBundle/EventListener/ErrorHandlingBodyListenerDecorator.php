@@ -60,7 +60,11 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
             $parser = new Parser($stream, new InMemoryListener());
             $parser->parse();
         } catch (ParsingException $e) {
-            $errorMessage = sprintf('Invalid json message received. %s', $e->getMessage());
+            $errorMessage = sprintf(
+                'Invalid json message received. %s',
+                // remove invalid UTF-8 characters from the error message
+                mb_convert_encoding($e->getMessage(), 'UTF-8', 'UTF-8')
+            );
         } catch (\Throwable $e) {
             // ignore not parsing exceptions
         } finally {

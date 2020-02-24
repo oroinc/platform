@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting as BaseSetDefaultSor
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 /**
- * Sets default sorting for JSON API requests.
+ * Sets default sorting for JSON:API requests.
  * The default sorting expression is "id ASC".
  */
 class SetDefaultSorting extends BaseSetDefaultSorting
