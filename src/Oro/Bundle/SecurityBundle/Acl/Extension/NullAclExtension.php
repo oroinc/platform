@@ -144,6 +144,14 @@ final class NullAclExtension implements AclExtensionInterface
     /**
      * {@inheritdoc}
      */
+    public function getPermissionGroupMask($mask)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getClasses()
     {
         return [];

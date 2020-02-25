@@ -119,14 +119,6 @@ Example:
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### name
 
 #### create

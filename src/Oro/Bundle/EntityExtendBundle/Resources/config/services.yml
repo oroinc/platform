@@ -58,14 +58,22 @@ services:
             - "@router"
             - "@translator"
 
+    oro_entity_extend.form_extension.dynamic_fields_options_extension:
+        class: Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsOptionsExtension
+        tags:
+            - { name: form.type_extension, alias: form, priority: 255 }
+
+    # This extension cannot be used through a tag: form.type_extension!
     oro_entity_extend.form.extension.dynamic_fields:
         class: Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension
         arguments:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.doctrine_helper"
+            - '@logger'
+            - '@translator'
             - '@Psr\Container\ContainerInterface'
+            - '%kernel.debug%'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
             - { name: container.service_subscriber, id: oro_entity_extend.form.extension.dynamic_fields_helper }
 
     oro_entity_extend.entity_generator:
@@ -677,3 +685,10 @@ services:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+
+    oro_entity_extend.form.entity_extend_form_extension:
+        class: Oro\Bundle\EntityExtendBundle\Form\EntityExtendFormExtension
+        decorates: 'form.extension'
+        arguments:
+            - '@oro_entity_extend.form.extension.dynamic_fields'
+            - '@oro_entity_extend.form.entity_extend_form_extension.inner'

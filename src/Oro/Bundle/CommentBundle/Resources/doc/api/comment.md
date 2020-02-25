@@ -125,14 +125,6 @@ Delete a collection of comment records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### message
 
 #### create

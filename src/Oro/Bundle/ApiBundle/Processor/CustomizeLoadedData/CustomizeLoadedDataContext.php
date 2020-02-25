@@ -118,7 +118,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * This method takes into account whether the "customize_loaded_data" action is executed
      * for a relationship (in this case only identifier field is returned)
      * or for primary or included resource (in this case a list of returned fields
-     * can be limited, e.g. using "fields" filter in REST API conforms JSON:API specification).
+     * can be limited, e.g. using "fields" filter in REST API that conforms the JSON:API specification).
      * @link http://jsonapi.org/format/#fetching-sparse-fieldsets
      *
      * @param string|null $fieldName The name under which a field should be represented in response data

@@ -1,86 +1,116 @@
 <?php
 
+/*
+ * This file is a copy of {@see \Symfony\Component\Security\Acl\Domain\DoctrineAclCache}.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ */
+
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
-use Symfony\Component\Security\Acl\Domain\DoctrineAclCache;
+use Symfony\Component\Security\Acl\Domain\Entry;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class AclCache extends DoctrineAclCache
+/**
+ * ACL cache that stores ACL by OID and SIDs.
+ */
+class AclCache implements AclCacheInterface
 {
-    const ENTRY_CLASS = 'Symfony\Component\Security\Acl\Domain\Entry';
+    private const CACHE_CLEAR_EVENT = 'oro_security.acl_cache.clear';
 
-    const CACHE_CLEAR_EVENT = 'oro_security.acl_cache.clear';
+    /** @var Cache */
+    private $cache;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
+    /** @var PermissionGrantingStrategyInterface */
+    private $permissionGrantingStrategy;
 
-    /**
-     * @var UnderlyingAclCache
-     */
-    protected $underlyingCache;
+    /** @var UnderlyingAclCache */
+    private $underlyingCache;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    /** @var SecurityIdentityToStringConverterInterface */
+    private $sidConverter;
 
     /**
-     * @param CacheProvider $cache
-     * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param string $prefix
+     * @param Cache                                      $cache
+     * @param PermissionGrantingStrategyInterface        $permissionGrantingStrategy
+     * @param UnderlyingAclCache                         $underlyingCache
+     * @param EventDispatcherInterface                   $eventDispatcher
+     * @param SecurityIdentityToStringConverterInterface $sidConverter
      */
     public function __construct(
-        CacheProvider $cache,
+        Cache $cache,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,
-        $prefix = DoctrineAclCache::PREFIX
+        UnderlyingAclCache $underlyingCache,
+        EventDispatcherInterface $eventDispatcher,
+        SecurityIdentityToStringConverterInterface $sidConverter
     ) {
         $this->cache = $cache;
-        $this->cache->setNamespace($prefix);
-        parent::__construct($this->cache, $permissionGrantingStrategy, $prefix);
-    }
-
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-    }
-
-    /**
-     * Set Underlying cache
-     *
-     * @param UnderlyingAclCache $underlyingCache
-     */
-    public function setUnderlyingCache(UnderlyingAclCache $underlyingCache)
-    {
+        $this->permissionGrantingStrategy = $permissionGrantingStrategy;
         $this->underlyingCache = $underlyingCache;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->sidConverter = $sidConverter;
     }
 
     /**
-     * {@inheritDoc}
+     * Retrieves an ACL for the given object identity from the cache.
+     *
+     * @param ObjectIdentityInterface     $oid
+     * @param SecurityIdentityInterface[] $sids
+     *
+     * @return AclInterface
      */
-    public function clearCache()
+    public function getFromCacheByIdentityAndSids(ObjectIdentityInterface $oid, array $sids):? AclInterface
     {
-        $this->cache->deleteAll();
-        // we should clear underlying cache to avoid generation of wrong ACLs
-        $this->underlyingCache->clearCache();
+        $key = $this->getDataKeyByIdentity($oid);
+        $sidKey = $this->getSidKey($sids);
 
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(self::CACHE_CLEAR_EVENT);
+        $data = $this->cache->fetch($key);
+        if (false !== $data && array_key_exists($sidKey, $data)) {
+            return $this->unserializeAcl($data[$sidKey]);
         }
+
+        return null;
     }
 
     /**
-     * {@inheritdoc}
+     * Stores a new ACL in the cache.
+     *
+     * @param AclInterface                $acl
+     * @param SecurityIdentityInterface[] $sids
+     */
+    public function putInCacheBySids(AclInterface $acl, array $sids)
+    {
+        $acl = $this->fixAclAces($acl);
+
+        $key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
+        $sidKey = $this->getSidKey($sids);
+
+        $data = $this->cache->fetch($key);
+        if (false === $data) {
+            $data = [];
+        }
+        $data[$sidKey] = serialize($acl);
+
+        $this->cache->save($key, $data);
+    }
+
+    /**
+     * Removes an ACL from the cache by the reference OID.
+     *
+     * @param ObjectIdentityInterface $oid
      */
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
@@ -88,13 +118,109 @@ class AclCache extends DoctrineAclCache
             $this->underlyingCache->evictFromCache($oid);
         }
 
-        parent::evictFromCacheByIdentity($oid);
+        $key = $this->getDataKeyByIdentity($oid);
+        if (!$this->cache->contains($key)) {
+            return;
+        }
+
+        $this->cache->delete($key);
+    }
+
+    /**
+     * Removes all ACLs from the cache.
+     */
+    public function clearCache()
+    {
+        if ($this->cache instanceof CacheProvider) {
+            $this->cache->deleteAll();
+        }
+
+        // we should clear underlying cache to avoid generation of wrong ACLs
+        $this->underlyingCache->clearCache();
+        $this->eventDispatcher->dispatch(self::CACHE_CLEAR_EVENT);
+    }
+
+    /**
+     * Returns the key for the object identity.
+     *
+     * @param ObjectIdentityInterface $oid
+     *
+     * @return string
+     */
+    private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
+    {
+        return md5($oid->getType()).sha1($oid->getType())
+            .'_'.md5($oid->getIdentifier()).sha1($oid->getIdentifier());
+    }
+
+    /**
+     * @param SecurityIdentityInterface[] $sids
+     *
+     * @return string
+     */
+    private function getSidKey(array $sids): string
+    {
+        $sidsString = 'sid';
+        foreach ($sids as $sid) {
+            $sidsString .= $this->sidConverter->convert($sid);
+        }
+
+        return md5($sidsString);
+    }
+
+    /**
+     * Unserializes the ACL.
+     *
+     * @param string $serialized
+     *
+     * @return AclInterface
+     */
+    private function unserializeAcl($serialized)
+    {
+        $acl = unserialize($serialized);
+
+        $reflectionProperty = new \ReflectionProperty($acl, 'permissionGrantingStrategy');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($acl, $this->permissionGrantingStrategy);
+        $reflectionProperty->setAccessible(false);
+
+        $aceAclProperty = new \ReflectionProperty(Entry::class, 'acl');
+        $aceAclProperty->setAccessible(true);
+
+        foreach ($acl->getObjectAces() as $ace) {
+            $aceAclProperty->setValue($ace, $acl);
+        }
+        foreach ($acl->getClassAces() as $ace) {
+            $aceAclProperty->setValue($ace, $acl);
+        }
+
+        $aceClassFieldProperty = new \ReflectionProperty($acl, 'classFieldAces');
+        $aceClassFieldProperty->setAccessible(true);
+        foreach ($aceClassFieldProperty->getValue($acl) as $aces) {
+            foreach ($aces as $ace) {
+                $aceAclProperty->setValue($ace, $acl);
+            }
+        }
+        $aceClassFieldProperty->setAccessible(false);
+
+        $aceObjectFieldProperty = new \ReflectionProperty($acl, 'objectFieldAces');
+        $aceObjectFieldProperty->setAccessible(true);
+        foreach ($aceObjectFieldProperty->getValue($acl) as $aces) {
+            foreach ($aces as $ace) {
+                $aceAclProperty->setValue($ace, $acl);
+            }
+        }
+        $aceObjectFieldProperty->setAccessible(false);
+
+        $aceAclProperty->setAccessible(false);
+
+        return $acl;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function putInCache(AclInterface $acl)
+    public function fixAclAces(AclInterface $acl)
     {
         // get access to field aces in order to clone their identity
         // to prevent serialize/unserialize bug with few field aces per one sid
@@ -114,11 +240,43 @@ class AclCache extends DoctrineAclCache
         foreach ($aces as $fieldAces) {
             /** @var FieldEntry $fieldEntry */
             foreach ($fieldAces as $fieldEntry) {
-                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, self::ENTRY_CLASS);
+                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, Entry::class);
                 $writeClosure($fieldEntry, 'securityIdentity', clone $fieldEntry->getSecurityIdentity());
             }
         }
 
-        parent::putInCache($acl);
+        return $acl;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function evictFromCacheById($primaryKey)
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFromCacheById($primaryKey)
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function putInCache(AclInterface $acl)
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 }

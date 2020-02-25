@@ -4,8 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Translation\Strategy;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
@@ -34,11 +35,11 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->cache = $this->getMockBuilder(CacheProvider::class)
             ->setMethods(['fetch', 'save', 'delete'])->getMockForAbstractClass();
         $this->strategy = new LocalizationFallbackStrategy($this->doctrine, $this->cache);
-        $this->strategy->setEntityClass('Oro\Bundle\LocaleBundle\Entity\Localization');
+        $this->strategy->setEntityClass(Localization::class);
     }
 
     public function testIsApplicable()
@@ -182,5 +183,69 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('delete')
             ->with(LocalizationFallbackStrategy::CACHE_KEY);
         $this->strategy->clearCache();
+    }
+
+    /**
+     * @dataProvider getLocaleFallbacksDataProvider
+     *
+     * @param array|null $entities
+     * @param array $localizations
+     */
+    public function testWarmup($entities, array $localizations): void
+    {
+        $this->doctrine
+            ->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Localization::class)
+            ->willReturn($em = $this->createMock(EntityManager::class));
+
+        $em
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with(Localization::class)
+            ->willReturn($repository = $this->createMock(LocalizationRepository::class));
+
+        $repository
+            ->expects($this->once())
+            ->method('findRootsWithChildren')
+            ->willReturn($entities);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('save')
+            ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations);
+
+        $this->strategy->warmUp('sample/path');
+    }
+
+    public function testWarmupWhenInvalidFieldNameException(): void
+    {
+        $this->doctrine
+            ->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Localization::class)
+            ->willReturn($em = $this->createMock(EntityManager::class));
+
+        $em
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with(Localization::class)
+            ->willReturn($repository = $this->createMock(LocalizationRepository::class));
+
+        $repository
+            ->expects($this->once())
+            ->method('findRootsWithChildren')
+            ->willThrowException($this->createMock(InvalidFieldNameException::class));
+
+        $this->cache
+            ->expects($this->never())
+            ->method('save');
+
+        $this->strategy->warmUp('sample/path');
+    }
+
+    public function testIsOptional(): void
+    {
+        $this->assertTrue($this->strategy->isOptional());
     }
 }

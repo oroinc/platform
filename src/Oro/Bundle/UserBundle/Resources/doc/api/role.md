@@ -101,14 +101,6 @@ Delete a collection of user roles.
 
 **The required field.**
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ## SUBRESOURCES
 
 ### organization
