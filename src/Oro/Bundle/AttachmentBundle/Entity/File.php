@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Table(name="oro_attachment_file", indexes = {
  *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
  * })
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={

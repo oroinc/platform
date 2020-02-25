@@ -89,4 +89,18 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
             ->willReturn('/test/1');
         $this->assertSame('/test/1', $this->filterAwareGenerator->generate($route, $parameters));
     }
+
+    public function testGetFilterHash()
+    {
+        $filterName = 'filterName';
+        $filterConfig = ['filterConfig'];
+        $this->filterConfiguration->expects($this->once())
+            ->method('get')
+            ->with($filterName)
+            ->willReturn($filterConfig);
+
+        $expected = md5(json_encode($filterConfig));
+
+        $this->assertEquals($expected, $this->filterAwareGenerator->getFilterHash($filterName));
+    }
 }
