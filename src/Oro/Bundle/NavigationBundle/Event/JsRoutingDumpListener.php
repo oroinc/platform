@@ -72,6 +72,6 @@ class JsRoutingDumpListener
      */
     private function getFilename(): string
     {
-        return implode('_', array_filter([$this->filenamePrefix, 'routes']));
+        return implode('_', array_filter([rtrim($this->filenamePrefix, '_'), 'routes']));
     }
 }
