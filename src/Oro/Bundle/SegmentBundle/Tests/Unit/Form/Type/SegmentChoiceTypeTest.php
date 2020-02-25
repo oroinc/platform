@@ -2,31 +2,37 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'TestEntityClass';
+    private const ENTITY_CLASS = 'TestEntityClass';
 
     /** @var SegmentChoiceType */
-    protected $formType;
+    private $formType;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
-    protected function setUp()
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
+
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
 
-        $this->formType = new SegmentChoiceType($this->registry, self::ENTITY_CLASS);
+        $this->formType = new SegmentChoiceType($this->registry, $this->aclHelper);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $expectedOptions = [
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
@@ -40,15 +46,16 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $repo->expects($this->once())
             ->method('findByEntity')
+            ->with($this->aclHelper, self::ENTITY_CLASS)
             ->willReturn(['First Segment' => 1, 'Second Segment' => 5]);
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->once())
             ->method('getRepository')
-            ->with(self::ENTITY_CLASS)
+            ->with(Segment::class)
             ->willReturn($repo);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with(self::ENTITY_CLASS)
+            ->with(Segment::class)
             ->willReturn($manager);
 
         $resolver = new OptionsResolver();
@@ -63,7 +70,7 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
