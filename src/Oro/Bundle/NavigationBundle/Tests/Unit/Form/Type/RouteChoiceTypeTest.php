@@ -9,7 +9,6 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -62,7 +61,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             $this->router,
             $this->readerRegistry,
             $this->translator,
-            new ServiceLink($this->titleService),
+            $this->titleService,
             $this->cache
         );
 

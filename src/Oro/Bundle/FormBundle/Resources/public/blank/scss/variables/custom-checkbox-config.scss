@@ -8,11 +8,13 @@ $checkbox-icon-border-radius: null !default;
 
 // Checked
 $checkbox-icon-bg-color-focus-state: get-color('ui', 'focus') !default;
-$checkbox-icon-border-focus-state: 1px solid get-color('ui', 'focus') !default;
 
 // Indeterminate
 $checkbox-icon-bg-color-indeterminate-state: get-color('ui', 'focus') !default;
 
 // Hover
-$checkbox-icon-border-hover-state: 1px solid get-color('primary', 'light') !default;
-$checkbox-icon-border-focus-state: 1px solid get-color('primary', 'light') !default;
+$checkbox-icon-border-color-hover-state: get-color('additional', 'dark') !default;
+
+// Focus
+$checkbox-icon-border-color-focus-state: $base-ui-element-border-color-focus !default;
+$checkbox-icon-box-shadow-focus-state: $base-ui-element-focus-style !default;

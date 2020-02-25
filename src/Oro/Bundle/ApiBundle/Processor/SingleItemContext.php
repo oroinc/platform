@@ -14,7 +14,7 @@ class SingleItemContext extends Context
     /**
      * Gets an identifier of an entity
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getId()
     {

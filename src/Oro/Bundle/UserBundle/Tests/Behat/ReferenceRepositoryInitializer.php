@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -49,5 +50,13 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $groupRepository = $em->getRepository('OroUserBundle:Group');
 
         $referenceRepository->set('adminsGroup', $groupRepository->findOneBy(['name' => 'Administrators']));
+
+        $referenceRepository->set(
+            'oro_group_all_grid_view_label',
+            $doctrine->getManager()->getRepository(TranslationKey::class)->findOneBy([
+                'key' => 'oro.user.group.entity_grid_all_view_label',
+                'domain' => 'messages'
+            ])
+        );
     }
 }

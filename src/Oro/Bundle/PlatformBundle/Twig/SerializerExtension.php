@@ -37,7 +37,7 @@ class SerializerExtension extends BaseSerializerExtension implements ServiceSubs
     /**
      * {@inheritdoc}
      */
-    public function serialize($object, $type = 'json', SerializationContext $context = null)
+    public function serialize($object, $type = 'json', SerializationContext $context = null): string
     {
         if (!$this->serializer) {
             $this->serializer = $this->getSerializer();

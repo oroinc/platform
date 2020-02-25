@@ -23,7 +23,7 @@
                     <% if (isSelected === true) { %>
                         selected="selected"
                     <% } else { %>
-                        <% if (option.count !== undefined && option.count == 0) { %>
+                        <% if (option.disabled !== undefined && option.disabled) { %>
                             disabled="disabled"
                         <% } %>
                     <% } %>

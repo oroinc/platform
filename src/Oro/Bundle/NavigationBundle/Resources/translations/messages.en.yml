@@ -37,6 +37,7 @@ oro:
             reset_title: Reset Confirmation
             entity_label: Menu Item
             entity_plural_label: Menu Item
+            entity_grid_all_view_label: All %entity_plural_label%
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key

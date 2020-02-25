@@ -20,6 +20,8 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 /**
+ * A model that stores all the necessary workflow management functionality.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Workflow
@@ -172,17 +174,18 @@ class Workflow
      * @param object $entity
      * @param array $data
      * @param string|Transition $startTransition
+     * @param Collection|null $errors
      *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = [], $startTransition = null)
+    public function start($entity, array $data = [], $startTransition = null, Collection $errors = null)
     {
         if (null === $startTransition) {
             $startTransition = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
         $workflowItem = $this->createWorkflowItem($entity, $data);
-        $this->transit($workflowItem, $startTransition);
+        $this->transit($workflowItem, $startTransition, $errors);
 
         // transition started without related entity, workflow item must be created for specified entity
         if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
@@ -288,18 +291,19 @@ class Workflow
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
+     * @param Collection|null $errors
      *
      * @throws ForbiddenTransitionException
      * @throws InvalidTransitionException
      */
-    public function transit(WorkflowItem $workflowItem, $transition)
+    public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
         $transition = $this->transitionManager->extractTransition($transition);
 
         $this->checkTransitionValid($transition, $workflowItem, true);
 
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
-        $transition->transit($workflowItem);
+        $transition->transit($workflowItem, $errors);
         $workflowItem->addTransitionRecord($transitionRecord);
 
         $this->aclManager->updateAclIdentities($workflowItem);

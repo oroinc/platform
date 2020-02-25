@@ -4,6 +4,7 @@
 "Save and New": "Save and New"
 "Update": "Update"
 "Accept": "Accept"
+"Apply": "Apply"
 "Decline": "Decline"
 "Cancel": "Cancel"
 "Close": "Close"
@@ -143,6 +144,12 @@ oro:
         page_loading: 'Page loading...'
         button:
             copy_to_clipboard.label: 'Copy to Clipboard'
+            skip_to_content: 'Skip to Main Content'
+        collapse:
+            more: 'View More'
+            less: 'View Less'
+        breadcrumb.aria_label: Breadcrumbs
+
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'

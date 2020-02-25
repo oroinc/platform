@@ -24,7 +24,7 @@ class HtmlTagProviderTest extends WebTestCase
         'tr[align|valign]',
         'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
         'th[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'a[!href|target|title]',
+        'a[!href|target|title|draggable]',
         'dl',
         'dt',
         'div[data-title|data-type]',
@@ -86,7 +86,7 @@ class HtmlTagProviderTest extends WebTestCase
         'time',
         'tfoot',
         'var',
-        'video[allowfullscreen|autoplay|loop|poster|src|controls]',
+        'video[allowfullscreen|src|controls]',
         'aside',
     ];
 

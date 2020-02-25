@@ -88,6 +88,10 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testExtendWithParentConstructorWithArgs()
     {
+        if (version_compare(phpversion(), '7.4.0', '>=')) {
+            $this->markTestSkipped('Skipped while "jms/cg" throwing php deprecation errors');
+        }
+
         $schema = [
             'type'      => 'Extend',
             'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs',

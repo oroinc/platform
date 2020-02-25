@@ -57,6 +57,12 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDriverException()
     {
+        $this->connection->expects($this->once())
+            ->method('getParams')
+            ->willReturn([
+                'driver' => 'driverName'
+            ]);
+
         $this->testable->disable();
     }
 
@@ -71,13 +77,11 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->testable->addDriver($driver);
 
-        $connectionParams = [
-            'driver' => 'driverName'
-        ];
-
         $this->connection->expects($this->once())
             ->method('getParams')
-            ->willReturn($connectionParams);
+            ->willReturn([
+                'driver' => 'driverName'
+            ]);
 
         $driver->expects($this->once())
             ->method('setEntityClass')

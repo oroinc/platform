@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterf
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -124,21 +123,6 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getOrganizationMetadata()
-    {
-        return new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id');
-    }
-
-    private function getBusinessUnitMetadata()
-    {
-        return new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id');
-    }
-
-    private function getUserMetadata()
-    {
-        return new OwnershipMetadata('USER', 'owner', 'owner_id');
-    }
-
     private function configureTestAclExtension()
     {
         $this->extension->expects(self::any())
@@ -214,14 +198,14 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($permission) {
                 $maskBuilder = $this->createMock(MaskBuilder::class);
                 $maskBuilder->expects(self::any())
-                    ->method('hasMask')
+                    ->method('hasMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return in_array($name, ['GROUP_CREATE', 'GROUP_DELETE', 'GROUP_VIEW', 'GROUP_EDIT'], true);
+                        return in_array($name, ['CREATE', 'DELETE', 'VIEW', 'EDIT'], true);
                     });
                 $maskBuilder->expects(self::any())
-                    ->method('getMask')
+                    ->method('getMaskForGroup')
                     ->willReturnCallback(function ($name) {
-                        return constant(PermissionGrantingStrategyTest::class . '::' . $name);
+                        return constant(PermissionGrantingStrategyTest::class . '::GROUP_' . $name);
                     });
 
                 return $maskBuilder;
@@ -508,6 +492,24 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
                 }
             }
         } else {
+            $this->extension->expects(self::any())
+                ->method('getPermissionGroupMask')
+                ->willReturnCallback(function ($mask) {
+                    if ($mask & self::GROUP_VIEW) {
+                        return self::GROUP_VIEW;
+                    }
+                    if ($mask & self::GROUP_EDIT) {
+                        return self::GROUP_EDIT;
+                    }
+                    if ($mask & self::GROUP_CREATE) {
+                        return self::GROUP_CREATE;
+                    }
+                    if ($mask & self::GROUP_DELETE) {
+                        return self::GROUP_DELETE;
+                    }
+
+                    return null;
+                });
             $this->assertSame(
                 $result,
                 $this->strategy->isGranted($acl, [$requiredMask], [$this->sid])
@@ -644,6 +646,12 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $acl = $this->getAcl();
         $acl->insertObjectAce($this->sid, self::MASK_VIEW_BASIC, 0, false, 'all');
 
+        $this->extension->expects(self::exactly(2))
+            ->method('getPermissionGroupMask')
+            ->willReturnMap([
+                [self::MASK_VIEW_BASIC, self::GROUP_VIEW],
+                [self::MASK_EDIT_SYSTEM, self::GROUP_EDIT]
+            ]);
         $this->extension->expects(self::never())
             ->method('decideIsGranting');
 

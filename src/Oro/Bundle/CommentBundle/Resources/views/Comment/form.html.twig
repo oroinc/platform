@@ -1,6 +1,4 @@
-{% import _self as commentForm %}
-
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', commentForm] %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 
 <form method="post" class="comment-form">
     <fieldset class="form-horizontal">

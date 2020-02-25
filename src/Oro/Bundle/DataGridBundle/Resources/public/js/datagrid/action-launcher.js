@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const tools = require('oroui/js/tools');
     const Backbone = require('backbone');
     let config = require('module-config').default(module.id);
@@ -39,6 +40,16 @@ define(function(require, exports, module) {
 
         /** @property {String} */
         title: undefined,
+
+        /** @property {String} */
+        ariaLabel: undefined,
+
+        /**
+         * Allow to use / set default aria-label attribute if it not defined
+         *
+         * @property {boolean}
+         */
+        allowDefaultAriaLabel: false,
 
         /** @property {String} */
         icon: undefined,
@@ -116,8 +127,8 @@ define(function(require, exports, module) {
                 throw new TypeError('"action" is required');
             }
 
-            const truthy = _.pick(options, 'template', 'label', 'title', 'icon', 'link',
-                'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
+            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'allowDefaultAriaLabel',
+                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
 
             _.extend(
                 this,
@@ -158,11 +169,19 @@ define(function(require, exports, module) {
         },
 
         getTemplateData: function() {
-            const data = _.pick(this, 'icon', 'title', 'label', 'className', 'iconClassName', 'launcherMode', 'link',
-                'links', 'action', 'attributes', 'enabled', 'tagName');
+            const data = _.pick(this, 'icon', 'title', 'label', 'ariaLabel', 'className', 'iconClassName',
+                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName');
 
             if (!data.label) {
                 data.label = this.action.label;
+            }
+
+            if (!data.ariaLabel && this.action.ariaLabel) {
+                data.ariaLabel = this.action.ariaLabel;
+            }
+
+            if (!data.ariaLabel && this.allowDefaultAriaLabel) {
+                data.ariaLabel = this.getDefaultAriaLabel(data.label);
             }
 
             if (!data.title) {
@@ -174,6 +193,13 @@ define(function(require, exports, module) {
             }
 
             return data;
+        },
+
+        /**
+         * @return {string}
+         */
+        getDefaultAriaLabel: function(label) {
+            return `${label} ${__('oro.datagrid.action.default_postfix')}`;
         },
 
         /**

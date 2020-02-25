@@ -6,8 +6,12 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 
+/**
+ * Prevents removal of the default localization and the last localization that exists in the system.
+ */
 class LocalizationVoter extends AbstractEntityVoter
 {
     /**
@@ -18,9 +22,7 @@ class LocalizationVoter extends AbstractEntityVoter
     /**
      * @var array
      */
-    protected $supportedAttributes = [
-        'DELETE'
-    ];
+    protected $supportedAttributes = [BasicPermission::DELETE];
 
     /**
      * @param DoctrineHelper $doctrineHelper

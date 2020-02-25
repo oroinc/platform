@@ -39,7 +39,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
             ]
         ],
         'Oro\TestBundle\Entity\Custom' => [
-            'alias'           => null,
+            'alias'           => 'testTable',
             'label'           => 'custom',
             'title_fields'    => ['string'],
             'route'           => [
@@ -80,13 +80,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $mappingConfig      = [
             'Oro\TestBundle\Entity\Test' => [
                 'title_fields' => ['name'],
-                'fields'       => [
-                    [
-                        'name'          => 'name',
-                        'target_type'   => 'text',
-                        'target_fields' => ['name']
-                    ]
-                ]
+                'fields' => [['name' => 'name', 'target_type' => 'text', 'target_fields' => ['name']]]
             ]
         ];
         $testEntityConfigId = new EntityConfigId('extend', 'Oro\TestBundle\Entity\Test');
@@ -95,6 +89,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $testEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
         $testEntityConfig->set('owner', ExtendScope::OWNER_SYSTEM);
         $testEntityConfig->set('label', 'test');
+        $testEntityConfig->set('schema', ['doctrine' => ['Oro\TestBundle\Entity\Test' => ['table' => 'testTable']]]);
         $testEntityFirstField       = new FieldConfigId('search', 'Oro\TestBundle\Entity\Test', 'first', 'integer');
         $testEntityFirstFieldConfig = new Config($testEntityFirstField);
         $testEntityFirstFieldConfig->set('searchable', true);
@@ -103,12 +98,16 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $testEntitySecondConfig->set('searchable', true);
         $testEntitySecondConfig->set('title_field', true);
         $testEntitySearchConfigs = [$testEntityFirstFieldConfig, $testEntitySecondConfig];
+
         $customEntityConfigId    = new EntityConfigId('extend', 'Oro\TestBundle\Entity\Custom');
         $customEntityConfig      = new Config($customEntityConfigId);
         $customEntityConfig->set('is_extend', true);
         $customEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
         $customEntityConfig->set('owner', ExtendScope::ORIGIN_CUSTOM);
         $customEntityConfig->set('label', 'custom');
+        $customEntityConfig->set('schema', [
+            'doctrine' => ['Oro\TestBundle\Entity\Custom' => ['table' => 'testTable']]
+        ]);
         $customEntityFirstField       = new FieldConfigId('search', 'Oro\TestBundle\Entity\Custom', 'first', 'percent');
         $customEntityFirstFieldConfig = new Config($customEntityFirstField);
         $customEntityFirstFieldConfig->set('searchable', true);

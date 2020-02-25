@@ -3,9 +3,13 @@
 namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ReflectionClassHelper;
 
+/**
+ * Generate layout updates from config files
+ */
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
     const NODE_ACTIONS = 'actions';
@@ -17,6 +21,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
     /** @var ReflectionClassHelper */
     protected $helper;
+
+    /** @var ExpressionValidator */
+    private $expressionValidator;
+
+    /**
+     * @param ExpressionValidator $expressionValidator
+     */
+    public function __construct(ExpressionValidator $expressionValidator)
+    {
+        $this->expressionValidator = $expressionValidator;
+    }
 
     /**
      * @param ConfigLayoutUpdateGeneratorExtensionInterface $extension
@@ -112,6 +127,8 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 throw new SyntaxException($this->getHelper()->getLastError(), $actionDefinition, $path);
             }
         }
+
+        $this->validateExpressionsRecursive($source);
     }
 
     /**
@@ -144,5 +161,35 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     protected function normalizeActionName(&$actionName)
     {
         $actionName = substr($actionName, 1);
+    }
+
+    /**
+     * @param array $source
+     * @param string|null $path
+     */
+    private function validateExpressionsRecursive(array $source, ?string $path = null): void
+    {
+        if ($path) {
+            $path .= '.';
+        }
+
+        foreach ($source as $key => $value) {
+            if (!$value) {
+                continue;
+            }
+
+            if (\is_array($value)) {
+                $this->validateExpressionsRecursive($value, $path . $key);
+                continue;
+            }
+
+            if (\is_string($value) && $value[0] === '=') {
+                try {
+                    $this->expressionValidator->validate(\substr($value, 1));
+                } catch (\Throwable $e) {
+                    throw new SyntaxException($e->getMessage(), $source, $path . $key, $e);
+                }
+            }
+        }
     }
 }

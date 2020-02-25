@@ -227,6 +227,7 @@ services:
             - ['setAttribute', ['a', 'data-content', 'Text']]
             - ['setAttribute', ['a', 'tabindex', 'Text']]
             - ['setAttribute', ['a', 'data-placement', 'Enum#top,bottom,left,right']]
+            - ['setAttribute', ['a', 'draggable', 'Enum#true,false']]
             # area attributes
             - ['setAttribute', ['area', 'id', 'ID']]
             - ['setAttribute', ['area', 'name', 'CDATA']]
@@ -241,10 +242,6 @@ services:
             - ['setAttribute', ['area', 'tabindex', 'Text']]
             # video attributes
             - ['setAttribute', ['video', 'allowfullscreen', 'Bool']]
-            - ['setAttribute', ['video', 'autoplay', 'Bool']]
-            - ['setAttribute', ['video', 'controls', 'Bool']]
-            - ['setAttribute', ['video', 'loop', 'Bool']]
-            - ['setAttribute', ['video', 'poster', 'URI']]
             # Set Custom Elements
             - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]

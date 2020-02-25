@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -16,19 +16,19 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 class WorkflowControllerTest extends WebTestCase
 {
     /** @var string */
-    protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
+    private $entityClass = WorkflowAwareEntity::class;
 
     /** @var EntityManager */
-    protected $entityManager;
+    private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);
+        $this->loadFixtures([LoadWorkflowDefinitions::class]);
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass($this->entityClass);
     }
 
-    public function testDeleteAction()
+    public function testDeleteAction(): void
     {
         $workflowManager = $this->getWorkflowManager();
         $repository = $this->entityManager->getRepository('OroWorkflowBundle:WorkflowDefinition');
@@ -67,7 +67,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertNotEmpty($this->getWorkflowItem($entity, $workflowTwoName));
     }
 
-    public function testDeactivateAndActivateActions()
+    public function testDeactivateAndActivateActions(): void
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
 
@@ -120,7 +120,7 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @return WorkflowAwareEntity
      */
-    protected function createNewEntity()
+    protected function createNewEntity(): WorkflowAwareEntity
     {
         $testEntity = new WorkflowAwareEntity();
         $testEntity->setName('test_' . uniqid('test', true));
@@ -133,7 +133,7 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @return WorkflowManager
      */
-    protected function getWorkflowManager()
+    protected function getWorkflowManager(): WorkflowManager
     {
         return $this->client->getContainer()->get('oro_workflow.manager.system');
     }
@@ -141,7 +141,7 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @param array $result
      */
-    protected function assertActivationResult($result)
+    protected function assertActivationResult(array $result): void
     {
         $this->assertArrayHasKey('successful', $result);
         $this->assertArrayHasKey('message', $result);
@@ -153,7 +153,7 @@ class WorkflowControllerTest extends WebTestCase
      * @param WorkflowAwareEntity $entity
      * @param string|null $workflowName
      */
-    protected function assertEntityWorkflowItem(WorkflowAwareEntity $entity, $workflowName)
+    protected function assertEntityWorkflowItem(WorkflowAwareEntity $entity, ?string $workflowName): void
     {
         $workflowItem = $this->getWorkflowItem($entity, $workflowName);
         $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem', $workflowItem);
@@ -164,7 +164,7 @@ class WorkflowControllerTest extends WebTestCase
      * @param object $entity
      * @param string|null $workflowName
      */
-    protected function assertActiveWorkflow($entity, $workflowName)
+    protected function assertActiveWorkflow(object $entity, ?string $workflowName): void
     {
         $activeWorkflowNames = $this->getActiveWorkflowNames($entity);
 
@@ -176,7 +176,7 @@ class WorkflowControllerTest extends WebTestCase
      * @param object $entity
      * @param string|null $workflowName
      */
-    protected function assertInactiveWorkflow($entity, $workflowName)
+    protected function assertInactiveWorkflow(object $entity, ?string $workflowName): void
     {
         $this->assertNotContains($workflowName, $this->getActiveWorkflowNames($entity));
     }
@@ -186,7 +186,7 @@ class WorkflowControllerTest extends WebTestCase
      *
      * @return ObjectManager
      */
-    protected function getObjectManager($entityClass)
+    protected function getObjectManager(string $entityClass): ObjectManager
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
     }
@@ -196,12 +196,12 @@ class WorkflowControllerTest extends WebTestCase
      *
      * @return ObjectRepository
      */
-    protected function getRepository($entityClass)
+    protected function getRepository(string $entityClass): ObjectRepository
     {
         return $this->getObjectManager($entityClass)->getRepository($entityClass);
     }
 
-    public function testGetValidWorkflowItem()
+    public function testGetValidWorkflowItem(): void
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
 
@@ -229,7 +229,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
-    public function testStartWorkflow()
+    public function testStartWorkflow(): void
     {
         $testEntity = $this->createNewEntity();
 
@@ -260,7 +260,32 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
-    public function testTransitAction()
+    public function testStartWorkflowWithInvalidCondition(): void
+    {
+        $testEntity = $this->createNewEntity();
+
+        $this->getWorkflowManager()->activateWorkflow('test_flow_with_condition');
+        $this->assertActiveWorkflow($testEntity, 'test_flow_with_condition');
+
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_start',
+                [
+                    'workflowName' => 'test_flow_with_condition',
+                    'transitionName' => 'start_transition',
+                    'entityId' => $testEntity->getId()
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 403);
+        $this->assertEquals(['message' => 'custom.test.message'], $result);
+
+        $this->assertNull($this->getWorkflowItem($testEntity, 'test_flow_with_condition'));
+    }
+
+    public function testTransitAction(): void
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
 
@@ -288,11 +313,85 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
 
-        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $workflowItemNew = $this->getRepository(WorkflowItem::class)
             ->find($workflowItem->getId());
 
-        $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_transit',
+                [
+                    'workflowItemId' => $workflowItem->getId(),
+                    'transitionName' => 'second_point_transition',
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(
+            [
+                'workflowItem' => [
+                    'id' => $workflowItem->getId(),
+                    'workflow_name' => LoadWorkflowDefinitions::MULTISTEP,
+                    'entity_id' => $workflowItem->getEntityId(),
+                    'entity_class' => $workflowItem->getEntityClass(),
+                    'result' => null,
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testTransitActionWithInvalidCondition(): void
+    {
+        $this->getWorkflowManager()->activateWorkflow('test_flow_transition_with_condition');
+
+        $testEntity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($testEntity, 'test_flow_transition_with_condition');
+
+        $workflowItem = $this->getWorkflowItem($testEntity, 'test_flow_transition_with_condition');
+
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_transit',
+                [
+                    'workflowItemId' => $workflowItem->getId(),
+                    'transitionName' => 'starting_point_transition',
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals($workflowItem->getId(), $result['workflowItem']['id']);
+        $this->assertEquals($workflowItem->getWorkflowName(), $result['workflowItem']['workflow_name']);
+        $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
+        $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
+
+        $workflowItemNew = $this->getRepository(WorkflowItem::class)
+            ->find($workflowItem->getId());
+
+        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_transit',
+                [
+                    'workflowItemId' => $workflowItem->getId(),
+                    'transitionName' => 'second_point_transition',
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 403);
+
+        $this->assertEquals(['message' => 'custom.test.message'], $result);
     }
 
     /**
@@ -302,8 +401,11 @@ class WorkflowControllerTest extends WebTestCase
      * @param string $entityClass
      * @param string $transitionName
      */
-    public function testStartWorkflowFromNonRelatedEntity($routeName, $entityClass, $transitionName)
-    {
+    public function testStartWorkflowFromNonRelatedEntity(
+        string $routeName,
+        string $entityClass,
+        string $transitionName
+    ): void {
         $this->client->request(
             'POST',
             $this->getUrl(
@@ -337,7 +439,7 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @return array
      */
-    public function startWorkflowDataProvider()
+    public function startWorkflowDataProvider(): array
     {
         return [
             'startFromNonRelatedEntity' => [
@@ -359,7 +461,7 @@ class WorkflowControllerTest extends WebTestCase
      *
      * @return null|WorkflowItem
      */
-    protected function getWorkflowItem($entity, $workflowName)
+    protected function getWorkflowItem($entity, $workflowName): ?WorkflowItem
     {
         return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
     }
@@ -367,10 +469,8 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @param string|WorkflowAwareEntity $entity
      * @param string|Workflow $workflowName
-     *
-     * @return null|WorkflowItem
      */
-    protected function createWorkflowItem($entity, $workflowName)
+    protected function createWorkflowItem($entity, $workflowName): void
     {
         $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);
         $workflowItem = $workflow->createWorkflowItem($entity);
@@ -384,7 +484,7 @@ class WorkflowControllerTest extends WebTestCase
      * @param object $entity
      * @return array
      */
-    protected function getActiveWorkflowNames($entity)
+    protected function getActiveWorkflowNames(object $entity): array
     {
         $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);
 

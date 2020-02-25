@@ -11,10 +11,6 @@ oro_permissions:
         exclude_entities:
             - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
 
-    SHARE:
-        exclude_entities:
-            - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
-
     CREATE:
         exclude_entities:
             - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult

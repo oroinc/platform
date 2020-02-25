@@ -58,11 +58,11 @@ interface AclExtensionInterface
      * supported this ACL extension.
      *
      * As one ACL extension may support several bitmasks (and as result it gives us an ability to
-     * associate several ACEs with the same domain object) we need should use correct implementation
+     * associate several ACEs with the same domain object) we should use correct implementation
      * of the mask builder for each type of a bitmask. To find correct mask builder we can use one of
      * a permission name the required mask builder supports.
      *
-     * @param string $permission
+     * @param string|null $permission
      *
      * @return MaskBuilder
      */
@@ -153,9 +153,9 @@ interface AclExtensionInterface
      * If $mask argument contains a bitmask for several permissions you must specify a permission
      * for which the access level you need to check.
      *
-     * @param int    $mask
-     * @param string $permission
-     * @param mixed  $object An object to test
+     * @param int         $mask
+     * @param string|null $permission
+     * @param mixed|null  $object An object to test
      *
      * @return int Can be one of AccessLevel::*_LEVEL constants
      */
@@ -184,8 +184,8 @@ interface AclExtensionInterface
      * Gets all permissions allowed for a domain object represented by te given object identity.
      *
      * @param ObjectIdentity $oid
-     * @param string|null $fieldName
-     * @param string|null $aclGroup
+     * @param string|null    $fieldName
+     * @param string|null    $aclGroup
 
      * @return string[]
      */
@@ -200,6 +200,17 @@ interface AclExtensionInterface
      * @return string
      */
     public function getDefaultPermission();
+
+    /**
+     * Determines a permission for the given bitmask
+     * and returns a bitmask with turned-on bits for all possible access levels allowed for this permission.
+     *
+     * @param int $mask
+     *
+     * @return int|null The mask or NULL if it is not possible to determine the permission
+     *                  or the permission does not support access levels
+     */
+    public function getPermissionGroupMask($mask);
 
     /**
      * Gets all types of domain objects or resources supported by this ACL extension.

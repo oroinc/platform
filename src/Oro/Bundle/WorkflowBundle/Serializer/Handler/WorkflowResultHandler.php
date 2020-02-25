@@ -3,10 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Serializer\Handler;
 
 use JMS\Serializer\Context;
-use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 
+/**
+ * Provides the workflow result in the desired format
+ */
 class WorkflowResultHandler
 {
     /**
@@ -23,14 +26,14 @@ class WorkflowResultHandler
     }
 
     /**
-     * @param JsonSerializationVisitor $visitor
+     * @param SerializationVisitorInterface $visitor
      * @param WorkflowResult $workflowResult
      * @param array $type
      * @param $context
      * @return array
      */
     public function workflowResultToJson(
-        JsonSerializationVisitor $visitor,
+        SerializationVisitorInterface $visitor,
         WorkflowResult $workflowResult,
         array $type,
         Context $context

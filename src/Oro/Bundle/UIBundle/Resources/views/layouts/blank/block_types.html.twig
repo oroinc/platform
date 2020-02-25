@@ -20,7 +20,11 @@
 {% block page_subtitle_widget %}
     {% set attr = layout_attr_defaults(attr, {'~class': ' page-subtitle'}) %}
     <h2 {{ block('block_attributes') }}>
-        {% if icon %}<span class="badge {{ badge ? 'badge--' ~ badge }}"><i class="fa-{{ icon }}"></i></span>{% endif %}
+        {% if icon %}
+            <span class="badge {{ badge ? 'badge--' ~ badge }}" aria-hidden="true">
+                <span class="fa-{{ icon }}"></span>
+            </span>
+        {% endif %}
         <span class="page-subtitle__text">{{ text|block_text(translation_domain) }}</span>
         {{ block('container_widget') }}
     </h2>
@@ -34,33 +38,40 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' breadcrumbs'
     }) %}
-    <div {{ block('block_attributes') }}>
-        <span class="breadcrumbs__item">
+    <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">
+        <ol {{ block('block_attributes') }}>
             {% if breadcrumbs is not iterable %}
-                {{ breadcrumbs }}
+                <li class="breadcrumbs__item">
+                    <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumbs }}</a>
+                </li>
             {% else %}
                 {% for breadcrumb in breadcrumbs %}
-                    {{ not loop.first ? ' / ' }}
-                    {% if breadcrumb.label is defined %}
-                        {% if breadcrumb.uri is defined %}
-                            {% set url = breadcrumb.uri %}
-                        {% else %}
-                            {% set url = breadcrumb.url %}
-                        {% endif %}
+                    <li class="breadcrumbs__item">
+                        {% if breadcrumb.label is defined %}
+                            {% if breadcrumb.uri is defined %}
+                                {% set url = breadcrumb.uri %}
+                            {% else %}
+                                {% set url = breadcrumb.url %}
+                            {% endif %}
 
-                        {% if url and not loop.last %}
-                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
-                        {% else %}
-                            {{ breadcrumb.label|trans }}
-                        {% endif %}
-                    {%  else %}
-                        {{ breadcrumb }}
-                    {%  endif %}
+                            {% if url and not loop.last %}
+                                <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                                <span aria-hidden="true">/</span>
+                            {% else %}
+                                <a href="{{ url  }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
+                            {% endif %}
+                        {%  else %}
+                            {% if not loop.first %}
+                                <span aria-hidden="true">/</span>
+                            {% endif %}
+                            <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumb }}</a>
+                        {%  endif %}
+                    </li>
                 {% endfor %}
             {% endif %}
-        </span>
+        </ol>
         {{ block('container_widget') }}
-    </div>
+    </nav>
 {% endblock %}
 
 {% block logo_widget %}
@@ -79,7 +90,7 @@
     }) %}
 
     {% if renderLink and app.request.attributes.get('_route') != route %}
-        <a href="{{ path(route) }}" {{ block('block_attributes') }}>
+        <a href="{{ path(route) }}" {{ block('block_attributes') }} aria-label="{{ 'oro_frontend.logo.aria_label'|trans }}">
             <img {{ UI.attributes(attr_img) }}>
         </a>
     {% else %}

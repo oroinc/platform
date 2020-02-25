@@ -49,7 +49,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'scope' => 'app'
                         ],
                         'timezone' => [
-                            'value' => 'UTC',
+                            'value' => \date_default_timezone_get(),
                             'scope' => 'app'
                         ],
                         'format_address_by_address_country' => [

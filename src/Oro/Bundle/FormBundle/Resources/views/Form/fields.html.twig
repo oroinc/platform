@@ -243,8 +243,8 @@
         nativeMode: isMobileVersion(),
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
-            id: 'date_selector_' ~ id,
-            name: 'date_selector_' ~ id,
+            id: id,
+            name: id,
             'data-validation': dateValidation,
             class: 'datepicker-input ' ~ (attribute(attr, 'class') is defined ? attr['class'] : ''),
         },
@@ -258,7 +258,7 @@
             showButtonPanel: true
         }
     } %}
-
+    {% set id = 'hidden_' ~ id %}
     {% set attr = attr|merge({
         'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
@@ -287,8 +287,8 @@
         nativeMode: isMobileVersion(),
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
-            id: 'date_selector_' ~ id,
-            name: 'date_selector_' ~ id,
+            id: id,
+            name: id,
             class: 'input-small datepicker-input ' ~ attrClass,
             'data-validation': dateValidation|json_encode(constant('JSON_FORCE_OBJECT'))
         },
@@ -309,7 +309,7 @@
         timePickerOptions: {
         }
     } %}
-
+    {% set id = 'hidden_' ~ id %}
     {% set attr = attr|merge({
         'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))

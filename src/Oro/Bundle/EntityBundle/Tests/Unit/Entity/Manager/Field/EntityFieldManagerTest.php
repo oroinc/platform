@@ -57,8 +57,6 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
-
         $this->manager = new EntityFieldManager(
             $this->registry,
             $this->formBuilder,
@@ -178,7 +176,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
 
         if (array_key_exists('getFieldMapping', $options)) {
             $metadata->expects($this->any())
-                ->method('hasField')
+                ->method('getFieldMapping')
                 ->willReturn($options['getFieldMapping']);
         }
 

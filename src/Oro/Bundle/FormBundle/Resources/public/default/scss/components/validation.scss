@@ -11,11 +11,11 @@
 .validation-error {
     @extend .notification--error;
 
-    @include fa-icon($fa-var-warning);
-
-    &:before {
-        display: inline-block;
-        margin-right: 6px;
+    &__icon {
+        @include fa-icon($fa-var-warning, before, true) {
+            display: inline-block;
+            margin-right: 6px;
+        }
     }
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
@@ -29,11 +29,11 @@
 .validation-warning {
     @extend .notification--warning;
 
-    @include fa-icon($fa-var-warning);
-
-    &:before {
-        display: inline-block;
-        margin-right: 6px;
+    &__icon {
+        @include fa-icon($fa-var-warning, before, true) {
+            display: inline-block;
+            margin-right: 6px;
+        }
     }
 }
 

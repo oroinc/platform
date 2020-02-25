@@ -7,40 +7,46 @@ use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Extends the default Symfony ACL provider with support of a root ACL.
  * It means that the special ACL named "root" will be used in case when more sufficient ACL was not found.
  */
-class RootBasedAclProvider implements AclProviderInterface
+class RootBasedAclProvider implements AclProviderInterface, ResetInterface
 {
-    /**
-     * @var AclProviderInterface
-     */
-    protected $baseAclProvider;
+    /** @var AclProviderInterface */
+    private $baseAclProvider;
+
+    /** @var UnderlyingAclCache */
+    private $underlyingCache;
+
+    /** @var ObjectIdentityFactory */
+    private $objectIdentityFactory;
+
+    /** @var SecurityIdentityToStringConverterInterface */
+    private $sidConverter;
+
+    /** @var RootBasedAclWrapper[] */
+    private $rootBasedAclWrappers = [];
+
+    /** @var RootAclWrapper[] */
+    private $rootAclWrappers = [];
 
     /**
-     * @var UnderlyingAclCache
+     * @param ObjectIdentityFactory                      $objectIdentityFactory
+     * @param SecurityIdentityToStringConverterInterface $sidConverter
      */
-    protected $underlyingCache;
-
-    /**
-     * @var ObjectIdentityFactory
-     */
-    protected $objectIdentityFactory = null;
-
-    /**
-     * Constructor
-     *
-     * @param ObjectIdentityFactory $objectIdentityFactory
-     */
-    public function __construct(ObjectIdentityFactory $objectIdentityFactory)
-    {
+    public function __construct(
+        ObjectIdentityFactory $objectIdentityFactory,
+        SecurityIdentityToStringConverterInterface $sidConverter
+    ) {
         $this->objectIdentityFactory = $objectIdentityFactory;
+        $this->sidConverter = $sidConverter;
     }
 
     /**
-     * Sets Underlying cache
+     * Sets Underlying cache.
      *
      * @param UnderlyingAclCache $underlyingCache
      */
@@ -50,13 +56,22 @@ class RootBasedAclProvider implements AclProviderInterface
     }
 
     /**
-     * Sets the base ACL provider
+     * Sets the base ACL provider.
      *
      * @param AclProviderInterface $provider
      */
     public function setBaseAclProvider(AclProviderInterface $provider)
     {
         $this->baseAclProvider = $provider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->rootBasedAclWrappers = [];
+        $this->rootAclWrappers = [];
     }
 
     /**
@@ -84,7 +99,7 @@ class RootBasedAclProvider implements AclProviderInterface
             } catch (\Exception $noUnderlyingAcl) {
                 // Try to get ACL for root object
                 try {
-                    $this->baseAclProvider->cacheEmptyAcl($oid);
+                    $this->baseAclProvider->cacheEmptyAcl($oid, $sids);
 
                     return $this->baseAclProvider->findAcl($rootOid, $sids);
                 } catch (AclNotFoundException $noRootAcl) {
@@ -109,32 +124,41 @@ class RootBasedAclProvider implements AclProviderInterface
     }
 
     /**
-     * Get Acl based on given OID and Parent OID
+     * Get Acl based on given OID and Parent OID.
      *
      * @param ObjectIdentityInterface $oid
-     * @param array $sids
+     * @param array                   $sids
      * @param ObjectIdentityInterface $rootOid
      *
-     * @return RootBasedAclWrapper|AclInterface
+     * @return AclInterface
      */
-    protected function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
+    private function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
     {
         if ($this->underlyingCache->isUnderlying($oid)) {
-            $underlyingOid = $this->objectIdentityFactory->underlying($oid);
-            return $this->getAcl($underlyingOid, $sids, $rootOid);
+            return $this->getAcl($this->objectIdentityFactory->underlying($oid), $sids, $rootOid);
         }
 
         $acl = $this->baseAclProvider->findAcl($oid, $sids);
 
         try {
             $rootAcl = $this->baseAclProvider->findAcl($rootOid, $sids);
-            if ($this->baseAclProvider->isEmptyAcl($acl)) {
-                return $rootAcl;
-            } else {
-                return new RootBasedAclWrapper($acl, $rootAcl);
-            }
         } catch (AclNotFoundException $noRootAcl) {
             return $acl;
         }
+
+        if ($this->baseAclProvider->isEmptyAcl($acl)) {
+            return $rootAcl;
+        }
+
+        $rootAclKey = spl_object_hash($rootAcl);
+        $key = spl_object_hash($acl) . '_' . $rootAclKey;
+        if (!isset($this->rootBasedAclWrappers[$key])) {
+            if (!isset($this->rootAclWrappers[$rootAclKey])) {
+                $this->rootAclWrappers[$rootAclKey] = new RootAclWrapper($rootAcl, $this->sidConverter);
+            }
+            $this->rootBasedAclWrappers[$key] = new RootBasedAclWrapper($acl, $this->rootAclWrappers[$rootAclKey]);
+        }
+
+        return $this->rootBasedAclWrappers[$key];
     }
 }

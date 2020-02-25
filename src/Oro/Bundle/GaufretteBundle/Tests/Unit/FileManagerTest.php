@@ -123,6 +123,30 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testHasFileWhenFileExists()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(true);
+
+        $this->assertTrue($this->fileManager->hasFile($fileName));
+    }
+
+    public function testHasFileWhenFileDoesNotExist()
+    {
+        $fileName = 'testFile.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(false);
+
+        $this->assertFalse($this->fileManager->hasFile($fileName));
+    }
+
     public function testGetFileByFileName()
     {
         $fileName = 'testFile.txt';
@@ -342,6 +366,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('createStream')
             ->with($fileName)
             ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $this->fileManager->writeToStorage($content, $fileName);
 
@@ -361,6 +388,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('createStream')
             ->with($fileName)
             ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $this->fileManager->writeFileToStorage($localFilePath, $fileName);
 
@@ -381,6 +411,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('createStream')
             ->with($fileName)
             ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
 
@@ -402,6 +435,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->filesystem->expects($this->never())
             ->method('createStream')
             ->with($fileName);
+        $this->filesystem->expects($this->never())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
 
@@ -422,6 +458,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('createStream')
             ->with($fileName)
             ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
 
@@ -445,6 +484,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('createStream')
             ->with($fileName)
             ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
 

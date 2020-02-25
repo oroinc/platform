@@ -137,7 +137,7 @@ services:
         class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
         arguments:
             - '@doctrine'
-            - '@oro_security.token.factory.username_password_organization'
+            - '@oro_user.security.factory.impersonation_username_password_organization'
             - '@oro_security.authentication.organization_guesser'
             - '@event_dispatcher'
             - '@router'
@@ -586,3 +586,6 @@ services:
         tags:
             - { name: oro_locale.preferred_localization_provider }
 
+    oro_user.security.factory.impersonation_username_password_organization:
+        class: Oro\Bundle\UserBundle\Security\ImpersonationUsernamePasswordOrganizationTokenFactory
+        public: true

@@ -7,6 +7,11 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 
 class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    private const PATTERN_ALL_OFF = '................................';
+
+    private const OFF = '.';
+    private const ON  = '*';
+
     /** @var int */
     protected $identity;
 
@@ -16,7 +21,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->identity = $this->getIdentity(rand(0, 20));
-        $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT']);
+        $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
     }
 
     protected function tearDown()
@@ -59,30 +64,15 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPattern()
     {
-        $builder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
-        $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF, $builder->getPattern());
-        $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF, $builder->getPattern(true));
+        $builder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
+        $this->assertEquals(self::PATTERN_ALL_OFF, $builder->getPattern());
 
         $builder->add('view_basic');
-        $expected =
-            substr(
-                EntityMaskBuilder::PATTERN_ALL_OFF,
-                0,
-                strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
-            )
-            . EntityMaskBuilder::ON;
+        $expected = substr(self::PATTERN_ALL_OFF, 0, -1) . self::ON;
         $this->assertEquals($expected, $builder->getPattern());
-        $expectedBrief =
-            substr(
-                EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF,
-                0,
-                strlen(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF) - 1
-            )
-            . EntityMaskBuilder::ON;
-        $this->assertEquals($expectedBrief, $builder->getPattern(true));
 
-        $offOn = EntityMaskBuilder::OFF . EntityMaskBuilder::ON;
-        $onOn = EntityMaskBuilder::ON . EntityMaskBuilder::ON;
+        $offOn = self::OFF . self::ON;
+        $onOn = self::ON . self::ON;
 
         $builder->add('view_local');
         $expected = str_replace($offOn, $onOn, $expected);
@@ -103,13 +93,9 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPatternWithUndefinedMask()
     {
-        $expected = EntityMaskBuilder::ON . substr(
-            EntityMaskBuilder::PATTERN_ALL_OFF,
-            1,
-            strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
-        );
+        $expected = self::ON . substr(self::PATTERN_ALL_OFF, 1);
 
-        $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((integer) 2147483648));
+        $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((int)2147483648));
     }
 
     public function testReset()
@@ -191,7 +177,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
             [4096, 4096],
             [8192, 8192],
             [16384, 16384],
-            [PHP_INT_MAX, 32767],
+            [PHP_INT_MAX, 33554431],
         ];
     }
 
@@ -227,23 +213,23 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         return [
             'GROUP_BASIC' => [
                 'groupName' => 'GROUP_BASIC',
-                'expectedMask' => 1 << 0 | 1 << 5 | 1 << 10
+                'expectedMask' => 1 << 0 | 1 << 5 | 1 << 10 | 1 << 15 | 1 << 20
             ],
             'GROUP_LOCAL' => [
                 'groupName' => 'GROUP_LOCAL',
-                'expectedMask' => 1 << 1 | 1 << 6 | 1 << 11
+                'expectedMask' => 1 << 1 | 1 << 6 | 1 << 11 | 1 << 16 | 1 << 21
             ],
             'GROUP_DEEP' => [
                 'groupName' => 'GROUP_DEEP',
-                'expectedMask' => 1 << 2 | 1 << 7 | 1 << 12
+                'expectedMask' => 1 << 2 | 1 << 7 | 1 << 12 | 1 << 17 | 1 << 22
             ],
             'GROUP_GLOBAL' => [
                 'groupName' => 'GROUP_GLOBAL',
-                'expectedMask' => 1 << 3 | 1 << 8 | 1 << 13
+                'expectedMask' => 1 << 3 | 1 << 8 | 1 << 13 | 1 << 18 | 1 << 23
             ],
             'GROUP_SYSTEM' => [
                 'groupName' => 'GROUP_SYSTEM',
-                'expectedMask' => 1 << 4 | 1 << 9 | 1 << 14
+                'expectedMask' => 1 << 4 | 1 << 9 | 1 << 14 | 1 << 19 | 1 << 24
             ],
             'GROUP_VIEW' => [
                 'groupName' => 'GROUP_VIEW',
@@ -257,13 +243,21 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
                 'groupName' => 'GROUP_EDIT',
                 'expectedMask' => (1 << 15) - (1 << 10)
             ],
+            'GROUP_DELETE' => [
+                'groupName' => 'GROUP_DELETE',
+                'expectedMask' => (1 << 20) - (1 << 15)
+            ],
+            'GROUP_ASSIGN' => [
+                'groupName' => 'GROUP_ASSIGN',
+                'expectedMask' => (1 << 25) - (1 << 20)
+            ],
             'GROUP_NONE' => [
                 'groupName' => 'GROUP_NONE',
                 'expectedMask' => 0
             ],
             'GROUP_ALL' => [
                 'groupName' => 'GROUP_ALL',
-                'expectedMask' => (1 << 15) - 1
+                'expectedMask' => (1 << 25) - 1
             ]
         ];
     }

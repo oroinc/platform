@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Adds possible status codes specific for REST API conforms JSON:API specification.
+ * Adds possible status codes specific for REST API that conforms the JSON:API specification.
  */
 class CompleteStatusCodes extends AbstractAddStatusCodes
 {

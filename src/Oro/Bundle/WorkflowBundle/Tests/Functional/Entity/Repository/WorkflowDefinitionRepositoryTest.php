@@ -83,7 +83,10 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
                 'test_groups_flow2',
                 'test_multistep_flow',
                 'test_start_init_option',
-                'test_start_step_flow'
+                'test_start_step_flow',
+                'test_flow_with_condition',
+                'test_flow_transition_with_condition',
+
             ],
             $this->repository->findForRelatedEntity($class)
         );

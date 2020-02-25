@@ -20,7 +20,7 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileApplicationsProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
         $this->provider = new FileApplicationsProvider($this->attachmentEntityConfigProvider);
@@ -53,6 +53,44 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             $fileApplications,
             $this->provider->getFileApplications($this->getFile())
+        );
+    }
+
+    public function testGetFileApplicationsForField(): void
+    {
+        $applications = ['sample_app1', 'sample_app2'];
+
+        $config = $this->createMock(Config::class);
+        $config->expects($this->once())
+            ->method('get')
+            ->with('file_applications', false, [CurrentApplicationProviderInterface::DEFAULT_APPLICATION])
+            ->willReturn($applications);
+
+        $this->attachmentEntityConfigProvider->expects($this->once())
+            ->method('getFieldConfig')
+            ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
+            ->willReturn($config);
+
+        $this->assertEquals(
+            $applications,
+            $this->provider->getFileApplicationsForField(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
+        );
+    }
+
+    public function testGetFileApplicationsForFieldWithoutConfig(): void
+    {
+        $config = $this->createMock(Config::class);
+        $config->expects($this->never())
+            ->method('get');
+
+        $this->attachmentEntityConfigProvider->expects($this->once())
+            ->method('getFieldConfig')
+            ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
+            ->willReturn(null);
+
+        $this->assertEquals(
+            [CurrentApplicationProviderInterface::DEFAULT_APPLICATION],
+            $this->provider->getFileApplicationsForField(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
         );
     }
 

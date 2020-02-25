@@ -99,6 +99,9 @@ services:
     oro_layout.expression_language.expression_manipulator:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator
 
+    oro_layout.expression_language.expression_validator:
+        class: Oro\Component\Layout\ExpressionLanguage\ExpressionValidator
+
     oro_layout.expression.json_encoder:
         class: Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder
         arguments:
@@ -125,8 +128,6 @@ services:
         public: true
         arguments:
             - '@request_stack'
-        tags:
-            - { name: container.hot_path }
 
     oro_layout.imports_storage:
         class: Doctrine\Common\Collections\ArrayCollection

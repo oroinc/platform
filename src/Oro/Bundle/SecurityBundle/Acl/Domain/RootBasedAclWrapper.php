@@ -7,30 +7,31 @@ use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
+/**
+ * An access control list (ACL) implementation that combines ACEs from a main ACL and a root ACL.
+ */
 class RootBasedAclWrapper implements AclInterface
 {
-    /**
-     * @var Acl
-     */
+    /** @var Acl */
     private $acl;
 
-    /**
-     * @var Acl
-     */
+    /** @var RootAclWrapper */
     private $rootAcl;
 
-    /**
-     * @var PermissionGrantingStrategyInterface
-     */
+    /** @var PermissionGrantingStrategyInterface */
     private $permissionGrantingStrategy;
 
+    /** @var array|null */
+    private $classAces;
+
+    /** @var array */
+    private $classFieldAces = [];
+
     /**
-     * Constructor
-     *
-     * @param Acl $acl
-     * @param Acl $rootAcl
+     * @param Acl            $acl
+     * @param RootAclWrapper $rootAcl
      */
-    public function __construct(Acl $acl, Acl $rootAcl)
+    public function __construct(Acl $acl, RootAclWrapper $rootAcl)
     {
         $this->acl = $acl;
         $this->rootAcl = $rootAcl;
@@ -41,8 +42,12 @@ class RootBasedAclWrapper implements AclInterface
      */
     public function getClassAces()
     {
-        $aces = $this->acl->getClassAces();
-        $this->addRootAces($aces);
+        if (null !== $this->classAces) {
+            return $this->classAces;
+        }
+
+        $aces = $this->addRootAces($this->acl->getClassAces());
+        $this->classAces = $aces;
 
         return $aces;
     }
@@ -52,8 +57,12 @@ class RootBasedAclWrapper implements AclInterface
      */
     public function getClassFieldAces($field)
     {
-        $aces = $this->acl->getClassFieldAces($field);
-        $this->addRootAces($aces, $field);
+        if (isset($this->classFieldAces[$field])) {
+            return $this->classFieldAces[$field];
+        }
+
+        $aces = $this->addRootAces($this->acl->getClassFieldAces($field), $field);
+        $this->classFieldAces[$field] = $aces;
 
         return $aces;
     }
@@ -79,7 +88,7 @@ class RootBasedAclWrapper implements AclInterface
      */
     public function getObjectIdentity()
     {
-        if (empty($this->acl->getClassAces()) && empty($this->acl->getObjectAces())) {
+        if (!$this->acl->getClassAces() && !$this->acl->getObjectAces()) {
             return $this->rootAcl->getObjectIdentity();
         }
 
@@ -145,16 +154,14 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * Gets the permission granting strategy implementation
-     *
-     * @return PermissionGrantingStrategyInterface
+     * @return PermissionGrantingStrategy
      */
-    protected function getPermissionGrantingStrategy()
+    private function getPermissionGrantingStrategy()
     {
         if ($this->permissionGrantingStrategy === null) {
             // Unfortunately permissionGrantingStrategy property is private, so the only way
             // to get it is to use the reflection
-            $r = new \ReflectionClass(get_class($this->acl));
+            $r = new \ReflectionClass(\get_class($this->acl));
             $p = $r->getProperty('permissionGrantingStrategy');
             $p->setAccessible(true);
             $this->permissionGrantingStrategy = $p->getValue($this->acl);
@@ -166,50 +173,15 @@ class RootBasedAclWrapper implements AclInterface
     /**
      * @param EntryInterface[] $aces
      * @param string|null      $field
-     */
-    protected function addRootAces(array &$aces, $field = null)
-    {
-        /** @var PermissionGrantingStrategy $permissionGrantingStrategy */
-        $permissionGrantingStrategy = $this->getPermissionGrantingStrategy();
-        $ext = $permissionGrantingStrategy->getContext()->getAclExtension();
-
-        $groupedAces = [];
-        foreach ($aces as $ace) {
-            $groupedAces[(string)$ace->getSecurityIdentity()][] = $ace;
-        }
-
-        $rootAces = $this->getAces($field);
-        foreach ($rootAces as $rootAce) {
-            $exists = false;
-            $rootSid = (string)$rootAce->getSecurityIdentity();
-            if (isset($groupedAces[$rootSid])) {
-                /** @var EntryInterface $ace */
-                foreach ($groupedAces[$rootSid] as $ace) {
-                    if ($ext->getServiceBits($rootAce->getMask()) === $ext->getServiceBits($ace->getMask())) {
-                        $exists = true;
-                        break;
-                    }
-                }
-            }
-            if (!$exists) {
-                $aces[] = $rootAce;
-            }
-        }
-    }
-
-    /**
-     * @param string $field
      *
-     * @return array|EntryInterface[]
+     * @return EntryInterface[]
      */
-    protected function getAces($field = null)
+    private function addRootAces(array $aces, $field = null)
     {
-        $rootAces = $field
-            ? $this->rootAcl->getObjectFieldAces($field)
-            : $this->rootAcl->getObjectAces();
-
-        return $field && empty($rootAces)
-            ? $this->rootAcl->getClassFieldAces($field)
-            : $rootAces;
+        return $this->rootAcl->addRootAces(
+            $this->getPermissionGrantingStrategy()->getContext()->getAclExtension(),
+            $aces,
+            $field
+        );
     }
 }

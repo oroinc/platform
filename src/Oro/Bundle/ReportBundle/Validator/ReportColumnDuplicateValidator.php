@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Class ReportColumnDuplicateValidator
+ * Report column duplicate validator
  */
 class ReportColumnDuplicateValidator extends ConstraintValidator
 {
@@ -46,7 +46,7 @@ class ReportColumnDuplicateValidator extends ConstraintValidator
             $useMap[$key] = $value['name'];
         }
         if ($result) {
-            return implode($result, ', ');
+            return implode(', ', $result);
         }
 
         return false;

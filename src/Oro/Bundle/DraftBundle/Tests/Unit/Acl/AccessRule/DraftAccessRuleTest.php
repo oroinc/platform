@@ -12,7 +12,6 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,25 +77,25 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
             'disabled' => [
                 'isEnabled' => false,
                 'entityClass' => DraftableEntityStub::class,
-                'permission' => BasicPermissionMap::PERMISSION_VIEW,
+                'permission' => 'VIEW',
                 'expectedValue' => false
             ],
             'not DraftableInterface' => [
                 'isEnabled' => true,
                 'entityClass' => 'className',
-                'permission' => BasicPermissionMap::PERMISSION_VIEW,
+                'permission' => 'VIEW',
                 'expectedValue' => false
             ],
             'not view permission' => [
                 'isEnabled' => true,
                 'entityClass' => DraftableEntityStub::class,
-                'permission' => BasicPermissionMap::PERMISSION_CREATE,
+                'permission' => 'CREATE',
                 'expectedValue' => false
             ],
             'applicable' => [
                 'isEnabled' => true,
                 'entityClass' => DraftableEntityStub::class,
-                'permission' => BasicPermissionMap::PERMISSION_VIEW,
+                'permission' => 'VIEW',
                 'expectedValue' => true
             ],
         ];
@@ -104,7 +103,7 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessFullAccess(): void
     {
-        $permission = BasicPermissionMap::PERMISSION_VIEW;
+        $permission = 'VIEW';
         $globalPermission = sprintf('%s_ALL_DRAFTS', $permission);
 
         $criteria = new Criteria(
@@ -132,7 +131,7 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessNoAccess(): void
     {
-        $permission = BasicPermissionMap::PERMISSION_VIEW;
+        $permission = 'VIEW';
         $globalPermission = sprintf('%s_ALL_DRAFTS', $permission);
         $alias = 'e';
 
@@ -169,7 +168,7 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessOrganizationAccess(): void
     {
-        $permission = BasicPermissionMap::PERMISSION_VIEW;
+        $permission = 'VIEW';
         $globalPermission = sprintf('%s_ALL_DRAFTS', $permission);
         $alias = 'e';
 
