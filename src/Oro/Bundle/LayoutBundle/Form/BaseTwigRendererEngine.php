@@ -70,7 +70,8 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
         unset(
             $this->parentResourceOffsets[$cacheKey],
             $this->parentResourceHierarchyLevels[$cacheKey],
-            $this->overrideResources[$cacheKey]
+            $this->overrideResources[$cacheKey],
+            $this->resources[$cacheKey]
         );
 
         return ob_get_clean();

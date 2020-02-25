@@ -1,5 +1,5 @@
 oro_navigation_js_routing_js:
-    path: "/media/js/%oro_navigation.js_routing_filename_prefix%_routes.{_format}"
+    path: "/media/js/%oro_navigation.js_routing_filename_prefix%routes.{_format}"
     methods: [GET]
     defaults: { _controller: fos_js_routing.controller:indexAction }
     requirements:

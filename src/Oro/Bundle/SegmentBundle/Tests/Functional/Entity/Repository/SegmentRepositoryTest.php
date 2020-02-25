@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SegmentRepositoryTest extends WebTestCase
@@ -13,20 +13,23 @@ class SegmentRepositoryTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentData::class]);
     }
 
-    public function testFindByEntity()
+    public function testFindByEntity(): void
     {
-        /** @var Registry $registry */
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var SegmentRepository $segmentRepository */
-        $segmentRepository = $registry->getRepository('OroSegmentBundle:Segment');
+        $container = $this->getContainer();
 
-        $result = $segmentRepository->findByEntity('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
+        /** @var SegmentRepository $segmentRepository */
+        $segmentRepository = $container->get('doctrine')->getRepository(Segment::class);
+
+        $result = $segmentRepository->findByEntity(
+            $container->get('oro_security.acl_helper'),
+            WorkflowAwareEntity::class
+        );
 
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
