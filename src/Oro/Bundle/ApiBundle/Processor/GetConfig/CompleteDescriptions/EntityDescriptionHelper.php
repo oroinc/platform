@@ -9,12 +9,13 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The helper that is used to set descriptions of entities.
  */
-class EntityDescriptionHelper
+class EntityDescriptionHelper implements ResetInterface
 {
     /** @var EntityDescriptionProvider */
     private $entityDocProvider;
@@ -33,6 +34,15 @@ class EntityDescriptionHelper
 
     /** @var IdentifierDescriptionHelper */
     private $identifierDescriptionHelper;
+
+    /** @var array [entity class => entity description, ...] */
+    private $singularEntityDescriptions = [];
+
+    /** @var array [entity class => entity description, ...] */
+    private $pluralEntityDescriptions = [];
+
+    /** @var array [association name => humanized association name, ...] */
+    private $humanizedAssociationNames = [];
 
     /**
      * @param EntityDescriptionProvider   $entityDocProvider
@@ -59,6 +69,16 @@ class EntityDescriptionHelper
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->singularEntityDescriptions = [];
+        $this->pluralEntityDescriptions = [];
+        $this->humanizedAssociationNames = [];
+    }
+
+    /**
      * @param EntityDefinitionConfig $definition
      * @param RequestType            $requestType
      * @param string                 $entityClass
@@ -80,14 +100,6 @@ class EntityDescriptionHelper
     ): void {
         $this->identifierDescriptionHelper->setDescriptionForEntityIdentifier($definition);
 
-        $entityDescription = null;
-        if ($isInherit || !$definition->hasDescription()) {
-            if ($associationName) {
-                $entityDescription = $this->getAssociationDescription($associationName);
-            } else {
-                $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
-            }
-        }
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
             if ($description instanceof Label) {
@@ -97,13 +109,13 @@ class EntityDescriptionHelper
             if ($associationName) {
                 $description = $this->resourceDocProvider->getSubresourceDescription(
                     $targetAction,
-                    $entityDescription,
+                    $this->getAssociationDescription($associationName),
                     $isCollection
                 );
             } else {
                 $description = $this->resourceDocProvider->getResourceDescription(
                     $targetAction,
-                    $entityDescription
+                    $this->getEntityDescription($entityClass, $isCollection)
                 );
             }
             if ($description) {
@@ -119,8 +131,7 @@ class EntityDescriptionHelper
             $targetAction,
             $isCollection,
             $associationName,
-            $parentEntityClass,
-            $entityDescription
+            $parentEntityClass
         );
     }
 
@@ -133,7 +144,6 @@ class EntityDescriptionHelper
      * @param bool                   $isCollection
      * @param string|null            $associationName
      * @param string|null            $parentEntityClass
-     * @param string|null            $entityDescription
      */
     private function setDocumentationForEntity(
         EntityDefinitionConfig $definition,
@@ -143,8 +153,7 @@ class EntityDescriptionHelper
         string $targetAction,
         bool $isCollection,
         ?string $associationName,
-        ?string $parentEntityClass,
-        ?string $entityDescription
+        ?string $parentEntityClass
     ): void {
         $this->registerDocumentationResources($definition, $requestType);
         $this->loadDocumentationForEntity(
@@ -159,16 +168,20 @@ class EntityDescriptionHelper
         $processInheritDoc = !$associationName;
         if (!$definition->hasDocumentation()) {
             if ($associationName) {
-                if (!$entityDescription) {
-                    $entityDescription = $this->getAssociationDescription($associationName);
-                }
-                $this->setDocumentationForSubresource($definition, $entityDescription, $targetAction, $isCollection);
+                $this->setDocumentationForSubresource(
+                    $definition,
+                    $this->getAssociationDescription($associationName),
+                    $targetAction,
+                    $isCollection
+                );
             } else {
                 $processInheritDoc = false;
-                if (!$entityDescription) {
-                    $entityDescription = $this->getEntityDescription($entityClass, $isCollection);
-                }
-                $this->setDocumentationForResource($definition, $targetAction, $entityDescription);
+                $this->setDocumentationForResource(
+                    $definition,
+                    $targetAction,
+                    $this->getEntityDescription($entityClass, false),
+                    $this->getEntityDescription($entityClass, true)
+                );
             }
         }
         if ($processInheritDoc) {
@@ -284,14 +297,20 @@ class EntityDescriptionHelper
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $targetAction
-     * @param string                 $entityDescription
+     * @param string                 $entitySingularName
+     * @param string                 $entityPluralName
      */
     private function setDocumentationForResource(
         EntityDefinitionConfig $definition,
         string $targetAction,
-        string $entityDescription
+        string $entitySingularName,
+        string $entityPluralName
     ): void {
-        $documentation = $this->resourceDocProvider->getResourceDocumentation($targetAction, $entityDescription);
+        $documentation = $this->resourceDocProvider->getResourceDocumentation(
+            $targetAction,
+            $entitySingularName,
+            $entityPluralName
+        );
         if ($documentation) {
             $definition->setDocumentation($documentation);
         }
@@ -327,19 +346,33 @@ class EntityDescriptionHelper
      */
     private function getEntityDescription(string $entityClass, bool $isCollection): string
     {
+        if ($isCollection) {
+            if (isset($this->pluralEntityDescriptions[$entityClass])) {
+                return $this->pluralEntityDescriptions[$entityClass];
+            }
+        } elseif (isset($this->singularEntityDescriptions[$entityClass])) {
+            return $this->singularEntityDescriptions[$entityClass];
+        }
+
         $entityDescription = $isCollection
             ? $this->entityDocProvider->getEntityPluralDescription($entityClass)
             : $this->entityDocProvider->getEntityDescription($entityClass);
         if (!$entityDescription) {
-            $lastDelimiter = \strrpos($entityClass, '\\');
+            $shortEntityClass = $entityClass;
+            $lastDelimiter = \strrpos($shortEntityClass, '\\');
             if (false !== $lastDelimiter) {
-                $entityClass = \substr($entityClass, $lastDelimiter + 1);
+                $shortEntityClass = \substr($shortEntityClass, $lastDelimiter + 1);
             }
             // convert "SomeClassName" to "Some Class Name".
-            $entityDescription = preg_replace('~(?<=\\w)([A-Z])~', ' $1', $entityClass);
+            $entityDescription = preg_replace('~(?<=\\w)([A-Z])~', ' $1', $shortEntityClass);
             if ($isCollection) {
                 $entityDescription = Inflector::pluralize($entityDescription);
             }
+        }
+        if ($isCollection) {
+            $this->pluralEntityDescriptions[$entityClass] = $entityDescription;
+        } else {
+            $this->singularEntityDescriptions[$entityClass] = $entityDescription;
         }
 
         return $entityDescription;
@@ -352,7 +385,14 @@ class EntityDescriptionHelper
      */
     private function getAssociationDescription(string $associationName): string
     {
-        return $this->entityDocProvider->humanizeAssociationName($associationName);
+        if (isset($this->humanizedAssociationNames[$associationName])) {
+            return $this->humanizedAssociationNames[$associationName];
+        }
+
+        $humanizedAssociationName = $this->entityDocProvider->humanizeAssociationName($associationName);
+        $this->humanizedAssociationNames[$associationName] = $humanizedAssociationName;
+
+        return $humanizedAssociationName;
     }
 
     /**

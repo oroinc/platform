@@ -37,6 +37,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
@@ -334,6 +335,34 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
+    public function testGetDefaultPermission()
+    {
+        self::assertSame('', $this->extension->getDefaultPermission());
+    }
+
+    /**
+     * @dataProvider getPermissionGroupMaskProvider
+     */
+    public function testGetPermissionGroupMask(int $mask, ?int $expectedPermissionGroupMask)
+    {
+        self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
+    }
+
+    public function getPermissionGroupMaskProvider()
+    {
+        return [
+            [0, null],
+            [1, 31],
+            [2, 31],
+            [4, 31],
+            [8, 31],
+            [16, 31],
+            [32, 31 << 5],
+            [32 << 5, 31 << 10],
+            [EntityMaskBuilder::REMOVE_SERVICE_BITS + 1 + 1, EntityMaskBuilder::REMOVE_SERVICE_BITS + 1 + 31]
+        ];
+    }
+
     public function testGetPermissions()
     {
         $this->assertEquals(
@@ -345,7 +374,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetPermissionsByMask()
     {
         $this->assertEquals(
-            ['VIEW', 'CREATE', 'EDIT'],
+            ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN'],
             $this->extension->getPermissions(1)
         );
     }
@@ -504,12 +533,36 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function getMaskBuilderProvider()
     {
         return [
-            ['permission' => 'VIEW', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'CREATE', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'EDIT', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'DELETE', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
-            ['permission' => 'ASSIGN', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
-            ['permission' => 'PERMIT', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
+            [
+                'permission' => 'VIEW',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'CREATE',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'EDIT',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'DELETE',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'ASSIGN',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'PERMIT',
+                'identity' => 33554432,
+                'permissions' => ['PERMIT']
+            ],
         ];
     }
 
@@ -517,8 +570,8 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             [
-                new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']),
-                new EntityMaskBuilder(32768, ['DELETE', 'ASSIGN', 'PERMIT'])
+                new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']),
+                new EntityMaskBuilder(33554432, ['PERMIT'])
             ],
             $this->extension->getAllMaskBuilders()
         );
@@ -583,7 +636,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedLevel' => AccessLevel::NONE_LEVEL
             ],
             [
-                'mask' => 32768 /* GROUP_NONE */,
+                'mask' => 33554432 /* GROUP_NONE */,
                 'expectedLevel' => AccessLevel::NONE_LEVEL
             ],
             [
@@ -848,8 +901,20 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 new TestEntity(),
                 null,
-                ((1 << 9) | 32768) /* MASK_ASSIGN_SYSTEM */,
-                32768 /* GROUP_NONE */
+                (1 << 19) /* MASK_DELETE_SYSTEM */,
+                (1 << 19) /* MASK_DELETE_SYSTEM */
+            ],
+            [
+                new TestEntity(),
+                null,
+                (1 << 24) /* MASK_ASSIGN_SYSTEM */,
+                0 /* GROUP_NONE */
+            ],
+            [
+                new TestEntity(),
+                null,
+                ((1 << 4) | 33554432) /* MASK_PERMIT_SYSTEM */,
+                ((1 << 4) | 33554432) /* MASK_PERMIT_SYSTEM */
             ],
             [
                 new Organization(),
@@ -905,8 +970,9 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 4) /* MASK_VIEW_SYSTEM */ | ((1 << 4) + 32768) /* MASK_DELETE_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
+            [(1 << 4) /* MASK_VIEW_SYSTEM */ | ((1 << 4) + 33554432) /* MASK_PERMIT_SYSTEM */],
         ];
     }
 
@@ -916,7 +982,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public static function validateMaskForOrganizationInvalidProvider()
     {
         return [
-            [(1 << 9) + 32768 /*MASK_ASSIGN_SYSTEM*/],
+            [(1 << 9) + 33554432 /*MASK_PERMIT_SYSTEM*/],
             [1 << 3 /*MASK_VIEW_GLOBAL*/],
             [1 << 2 /*MASK_VIEW_DEEP*/],
             [1 << 1 /*MASK_VIEW_LOCAL*/],
@@ -933,27 +999,27 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 3) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 8) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 13) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 2) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 7) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 12) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 2) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 1) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 6) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 11) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_LOCAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */]
         ];
@@ -981,27 +1047,27 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 4) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_LOCAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */]
         ];
@@ -1029,33 +1095,33 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 4) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_LOCAL */],
             [1 << 0 /* MASK_VIEW_BASIC */],
             [1 << 5 /* MASK_CREATE_BASIC */],
             [1 << 10 /* MASK_EDIT_BASIC */],
-            [(1 << 0) + 32768 /* MASK_DELETE_BASIC */],
-            [(1 << 5) + 32768 /* MASK_ASSIGN_BASIC */],
-            [(1 << 10) + 32768 /* MASK_PERMIT_BASIC */],
+            [1 << 15 /* MASK_DELETE_BASIC */],
+            [1 << 20 /* MASK_ASSIGN_BASIC */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_BASIC */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */],
             [(1 << 2) /* MASK_VIEW_DEEP */ | (1 << 6) /* MASK_CREATE_LOCAL */ | (1 << 10) /* MASK_EDIT_BASIC */]
@@ -1084,15 +1150,15 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */]
         ];
     }
@@ -1295,7 +1361,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         return $mock;
     }
 
-    protected function buildTree()
+    private function buildTree()
     {
         $subordinateBusinessUnits = [
             'bu3'  => ['bu31'],

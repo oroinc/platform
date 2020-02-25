@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 class FileManager
 {
     /** The number of bytes to be read from a source stream at a time */
-    const READ_BATCH_SIZE = 100000;
+    protected const READ_BATCH_SIZE = 100000;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -103,6 +103,18 @@ class FileManager
         }
 
         return $result;
+    }
+
+    /**
+     * Checks if the given file exists in the Gaufrette file system.
+     *
+     * @param string $fileName
+     *
+     * @return bool
+     */
+    public function hasFile($fileName)
+    {
+        return $this->filesystem->has($fileName);
     }
 
     /**
@@ -191,6 +203,7 @@ class FileManager
         } finally {
             $dstStream->close();
         }
+        $this->filesystem->removeFromRegister($fileName);
     }
 
     /**
@@ -244,6 +257,7 @@ class FileManager
                 } finally {
                     $dstStream->close();
                 }
+                $this->filesystem->removeFromRegister($fileName);
             }
         } finally {
             $srcStream->close();

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
  */
 class CheckRequestType implements ProcessorInterface
 {
-    /** Content-Type of REST API request conforms JSON API specification */
+    /** Content-Type of REST API request conforms JSON:API specification */
     private const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
@@ -60,7 +60,7 @@ class CheckRequestType implements ProcessorInterface
                 );
             }
             // Servers MUST respond with a 406 Not Acceptable status code if a request's Accept header contains
-            // the JSON API media type and all instances of that media type are modified with media type parameters.
+            // the JSON:API media type and all instances of that media type are modified with media type parameters.
             $acceptHeader = array_map('trim', explode(',', $requestHeaders->get('Accept')));
             $isCorrectHeader = true;
             foreach ($acceptHeader as $header) {
@@ -74,7 +74,7 @@ class CheckRequestType implements ProcessorInterface
             }
             if (!$isCorrectHeader) {
                 throw new NotAcceptableHttpException(
-                    'Not supported "Accept" header. It contains the JSON API content type ' .
+                    'Not supported "Accept" header. It contains the JSON:API content type ' .
                     'and all instances of that are modified with media type parameters.'
                 );
             }

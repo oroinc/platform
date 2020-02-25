@@ -4,12 +4,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
@@ -24,7 +24,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionGrantingStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $permissionGrantingStrategy;
 
-    /** @var AclCacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     protected function setUp()
@@ -49,7 +49,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             });
 
         $this->permissionGrantingStrategy = $this->createMock(PermissionGrantingStrategyInterface::class);
-        $this->cache = $this->createMock(AclCacheInterface::class);
+        $this->cache = $this->createMock(AclCache::class);
 
         $this->provider = new MutableAclProvider(
             $this->connection,
@@ -218,10 +218,10 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $oid = new ObjectIdentity('test_id', 'test_type');
 
         $this->cache->expects($this->once())
-            ->method('putInCache')
-            ->with(new Acl(0, $oid, $this->permissionGrantingStrategy, [], false));
+            ->method('putInCacheBySids')
+            ->with(new Acl(0, $oid, $this->permissionGrantingStrategy, [], false), []);
 
-        $this->provider->cacheEmptyAcl($oid);
+        $this->provider->cacheEmptyAcl($oid, []);
     }
 
     public function testClearOidCache(): void

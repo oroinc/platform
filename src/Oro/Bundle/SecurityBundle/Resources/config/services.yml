@@ -117,6 +117,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
         arguments:
             - '@oro_security.acl.object_identity_factory'
+            - '@oro_security.acl.security_identity_to_string_converter'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
 
@@ -189,6 +190,9 @@ services:
         class: Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter
         arguments:
             - '@oro_security.acl.configurable_permission_provider'
+
+    oro_security.acl.security_identity_to_string_converter:
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverter
 
     oro_security.acl.object_identity_factory:
         class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
@@ -633,16 +637,6 @@ services:
         parent: sensio_framework_extra.converter.doctrine.orm
         arguments:
             - '@oro_security.request_authorization_checker'
-
-    oro_security.acl.cache.doctrine_decorator:
-        class: Oro\Bundle\SecurityBundle\Acl\Cache\AclCache
-        decorates: security.acl.cache.doctrine
-        parent: security.acl.cache.doctrine
-        arguments:
-            index_1: '@oro_security.acl.permission_granting_strategy'
-        calls:
-            - [setUnderlyingCache, ['@security.acl.underlying.cache']]
-            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_security.security.acl.security_identity_retrieval_strategy.cacheable:
         class: Oro\Bundle\SecurityBundle\Acl\Domain\CacheableSecurityIdentityRetrievalStrategy

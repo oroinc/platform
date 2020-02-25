@@ -24,7 +24,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
     public function assertAddressCount($count)
     {
         $this->waitForAjax();
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         self::assertCount(
             $this->getCount($count),
@@ -43,7 +43,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
     public function assertPrimaryAddress($address)
     {
         $this->waitForAjax();
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
@@ -86,7 +86,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function clickEditAddress($address)
     {
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
@@ -108,7 +108,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDeleteAddress($address)
     {
-        $addresses = $this->getSession()->getPage()->findAll('css', 'div.map-address-list .map-item');
+        $addresses = $this->getSession()->getPage()->findAll('css', '.map-address-list .map-item');
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {

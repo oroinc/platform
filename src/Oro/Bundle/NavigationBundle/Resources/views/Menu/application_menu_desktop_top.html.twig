@@ -3,13 +3,13 @@
 {%- block list_wrapper -%}
     {% if item.hasChildren %}
         {% if item.level == 1 %}
-            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__placeholder">
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__placeholder" data-role="sub-menu" aria-hidden="true">
                 <div class="dropdown-menu-wrapper dropdown-menu-wrapper__scrollable">
                     {{- block('list') -}}
                 </div>
             </div>
         {% elseif item.level == 2 %}
-            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__child">
+            <div class="dropdown-menu-wrapper dropdown-menu-wrapper__child" data-role="sub-menu" aria-hidden="true">
                 {{- block('list') -}}
             </div>
         {% else %}

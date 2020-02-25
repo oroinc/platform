@@ -93,6 +93,8 @@ services:
 
     oro_api.complete_descriptions_helper.identifier:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\IdentifierDescriptionHelper
+        arguments:
+            - '@oro_api.doctrine_helper'
 
     oro_api.complete_descriptions_helper.entity:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\EntityDescriptionHelper

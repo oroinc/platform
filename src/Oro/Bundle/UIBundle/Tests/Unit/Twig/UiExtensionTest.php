@@ -14,11 +14,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 use Twig\Template;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -39,6 +41,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userAgentProvider;
 
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
+
     /** @var UiExtension */
     protected $extension;
 
@@ -49,10 +54,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->contentProviderManager = $this->createMock(TwigContentProviderManager::class);
         $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $container = self::getContainerBuilder()
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
+            ->add(RouterInterface::class, $this->router)
             ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
             ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
             ->getContainer($this);
@@ -716,6 +723,20 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             $actualResult
+        );
+    }
+
+    public function testGetDefaultPage(): void
+    {
+        $this->router
+            ->expects($this->once())
+            ->method('generate')
+            ->with($routeName = 'oro_default')
+            ->willReturn($url = 'http://sample-app/sample-url');
+
+        $this->assertEquals(
+            $url,
+            self::callTwigFunction($this->extension, 'oro_default_page', [$this->environment])
         );
     }
 }

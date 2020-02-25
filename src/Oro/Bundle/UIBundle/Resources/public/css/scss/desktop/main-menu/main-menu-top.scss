@@ -86,6 +86,7 @@
             }
 
             // Open menu
+            &.show,
             &:hover {
                 .title {
                     &:hover {
@@ -132,6 +133,7 @@
             }
         }
 
+        &.show,
         &:hover {
             > .dropdown-menu,
             > .dropdown-menu-wrapper__child,

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
@@ -21,6 +22,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\ProductPrice as TestEntity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -37,6 +39,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
     private const ID_DESCRIPTION                 = 'The unique identifier of a resource.';
+    private const REQUIRED_ID_DESCRIPTION        = '<p>The unique identifier of a resource.</p>'
+    . '<p><strong>The required field.</strong></p>';
     private const CREATED_AT_DESCRIPTION         = 'The date and time of resource record creation.';
     private const UPDATED_AT_DESCRIPTION         = 'The date and time of the last update of the resource record.';
     private const OWNER_DESCRIPTION              = 'An owner record represents'
@@ -66,6 +70,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
     /** @var ConfigProviderMock */
     private $ownershipConfigProvider;
 
@@ -80,6 +87,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->resourceDocProvider = $this->createMock(ResourceDocProvider::class);
         $this->resourceDocParserRegistry = $this->createMock(ResourceDocParserRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->ownershipConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'ownership');
 
         $this->resourceDocParser = $this->createMock(ResourceDocParserInterface::class);
@@ -92,7 +100,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             new RequestDependedTextProcessor(),
             new FeatureDependedTextProcessor($this->createMock(FeatureChecker::class))
         );
-        $identifierDescriptionHelper = new IdentifierDescriptionHelper();
+        $identifierDescriptionHelper = new IdentifierDescriptionHelper($this->doctrineHelper);
 
         $this->processor = new CompleteDescriptions(
             $this->createMock(ResourcesProvider::class),
@@ -206,6 +214,211 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'     => [
                         'description' => self::ID_DESCRIPTION
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForUpdateAction()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $this->context->setTargetAction('update');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'id'     => [
+                        'description' => self::REQUIRED_ID_DESCRIPTION
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForCreateActionAndNotManageableEntity()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEntity::class)
+            ->willReturn(false);
+
+        $this->context->setTargetAction('create');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'id'     => [
+                        'description' => self::REQUIRED_ID_DESCRIPTION
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithoutIdGenerator()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEntity::class)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEntity::class)
+            ->willReturn($classMetadata);
+        $classMetadata->expects(self::once())
+            ->method('usesIdGenerator')
+            ->willReturn(false);
+
+        $this->context->setTargetAction('create');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'id'     => [
+                        'description' => self::REQUIRED_ID_DESCRIPTION
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGenerator()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEntity::class)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEntity::class)
+            ->willReturn($classMetadata);
+        $classMetadata->expects(self::once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->context->setTargetAction('create');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'id'     => [
+                        'description' => self::ID_DESCRIPTION
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGeneratorButApiIdNotEqualEntityId()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(TestEntity::class)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(TestEntity::class)
+            ->willReturn($classMetadata);
+        $classMetadata->expects(self::once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['entityId']);
+
+        $this->context->setTargetAction('create');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'id'     => [
+                        'description' => self::REQUIRED_ID_DESCRIPTION
                     ],
                     'field1' => null
                 ]
@@ -2016,16 +2229,21 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all'
         ];
-        $entityDescription = 'some entity';
+        $singularEntityDescription = 'some entity';
+        $pluralEntityDescription = 'some entities';
         $resourceDocumentation = 'Get some entity';
 
         $this->entityDocProvider->expects(self::once())
             ->method('getEntityDescription')
             ->with($entityClass)
-            ->willReturn($entityDescription);
+            ->willReturn($singularEntityDescription);
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityPluralDescription')
+            ->with($entityClass)
+            ->willReturn($pluralEntityDescription);
         $this->resourceDocProvider->expects(self::once())
             ->method('getResourceDocumentation')
-            ->with($targetAction, $entityDescription)
+            ->with($targetAction, $singularEntityDescription, $pluralEntityDescription)
             ->willReturn($resourceDocumentation);
 
         $this->context->setClassName($entityClass);

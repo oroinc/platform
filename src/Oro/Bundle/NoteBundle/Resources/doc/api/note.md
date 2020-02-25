@@ -105,14 +105,6 @@ Delete a collection of note records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field.**
-
 ### message
 
 #### create
