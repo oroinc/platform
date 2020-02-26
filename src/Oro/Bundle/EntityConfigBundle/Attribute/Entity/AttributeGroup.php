@@ -13,6 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Model\ExtendAttributeGroup;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
+ * Represents group of attributes.
+ *
  * @ORM\Table(name="oro_attribute_group")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
  * @ORM\HasLifecycleCallbacks
@@ -163,6 +165,18 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     public function getAttributeRelations()
     {
         return $this->attributeRelations;
+    }
+
+    /**
+     * @param ArrayCollection $collection
+     *
+     * @return $this
+     */
+    public function setAttributeRelations(ArrayCollection $collection)
+    {
+        $this->attributeRelations = $collection;
+
+        return $this;
     }
 
     /**

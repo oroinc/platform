@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Form data transformer for AttributeMultiSelectType
+ */
 class AttributeRelationsTransformer implements DataTransformerInterface
 {
     /** @var \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup|null */
@@ -42,10 +46,36 @@ class AttributeRelationsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($arrayToCollection)
     {
-        $existingRelations = [];
+        // New group(null) passed - create empty instance
+        if (!$this->attributeGroup instanceof AttributeGroup) {
+            $this->attributeGroup = new AttributeGroup();
+        }
 
-        //Existing group passed
-        if ($this->attributeGroup instanceof AttributeGroup) {
+        $attributeGroupRelations = $this->attributeGroup->getAttributeRelations();
+        $newAttributeGroupRelations = new ArrayCollection();
+        $replaceWholeCollection = false;
+
+        foreach ($arrayToCollection as $i => $attributeId) {
+            // Adds to new collection in case it will be needed to replace the old one.
+            $newAttributeGroupRelations[$i] = new AttributeGroupRelation();
+            $newAttributeGroupRelations[$i]->setEntityConfigFieldId($attributeId);
+            $newAttributeGroupRelations[$i]->setAttributeGroup($this->attributeGroup);
+
+            if (!$replaceWholeCollection) {
+                if (!$attributeGroupRelations->offsetExists($i)) {
+                    // Adds to old collection if it should not be replaced.
+                    $this->attributeGroup->addAttributeRelation($newAttributeGroupRelations[$i]);
+                } elseif ($attributeGroupRelations[$i]->getEntityConfigFieldId() !== $attributeId) {
+                    // If attributes order is changed, then it is needed to replace whole collection to avoid constraint
+                    // violation errors on saving.
+                    $replaceWholeCollection = true;
+                }
+            }
+        }
+
+        if ($replaceWholeCollection) {
+            $this->attributeGroup->setAttributeRelations($newAttributeGroupRelations);
+        } else {
             /** @var AttributeGroupRelation $relation */
             foreach ($this->attributeGroup->getAttributeRelations() as $relation) {
                 $attributeId = $relation->getEntityConfigFieldId();
@@ -54,21 +84,7 @@ class AttributeRelationsTransformer implements DataTransformerInterface
                     $this->attributeGroup->removeAttributeRelation($relation);
                     continue;
                 }
-                $existingRelations[] = $attributeId;
             }
-        } else { //New group(null) passed - create empty instance
-            $this->attributeGroup = new AttributeGroup();
-        }
-
-        foreach ($arrayToCollection as $attributeId) {
-            //Such attribute and relation already assigned
-            if (in_array($attributeId, $existingRelations, true)) {
-                continue;
-            }
-            //Create new relation
-            $relation = new AttributeGroupRelation();
-            $relation->setEntityConfigFieldId($attributeId);
-            $this->attributeGroup->addAttributeRelation($relation);
         }
 
         return $this->attributeGroup->getAttributeRelations();

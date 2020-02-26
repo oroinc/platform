@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
@@ -24,10 +25,14 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 class AttributeGroupTypeTest extends FormIntegrationTestCase
 {
-    const LOCALIZATION_ID = 42;
+    private const LOCALIZATION_ID = 42;
+    private const ATTRIBUTES_CHOICES = ['choice_1' => 1, 'choice_5' => 5, 'choice_15' => 15, 'choice_20' => 20];
 
     use EntityTrait;
 
@@ -71,8 +76,6 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             );
 
         $this->attributeManager = $this->createMock(AttributeManager::class);
-        $this->attributeManager->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
-
         $this->translator = $this->createMock(Translator::class);
 
         parent::setUp();
@@ -92,9 +95,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                         $this->registry
                     ),
-                    AttributeMultiSelectType::class => new AttributeMultiSelectType(
-                        $this->attributeManager,
-                        $this->getTranslator()
+                    AttributeMultiSelectType::class => $this->getEntity(
+                        AttributeMultiSelectType::class,
+                        ['choices' => self::ATTRIBUTES_CHOICES],
+                        [$this->attributeManager, $this->getTranslator()]
                     ),
                     LocalizedPropertyType::class => new LocalizedPropertyType(),
                     LocalizationCollectionType::class => new LocalizationCollectionTypeStub(
@@ -171,6 +175,193 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
         $formData = $form->getData();
         $this->assertEquals($entity, $formData);
+    }
+
+    public function testSubmitWhenOrderedAttributeRelations(): void
+    {
+        $existingGroup = new AttributeGroup();
+        $existingGroup->addAttributeRelation($attributeRelation5 = new AttributeGroupRelation());
+        $attributeRelation5->setAttributeGroup($existingGroup);
+        $attributeRelation5->setEntityConfigFieldId($attribute5Id = 5);
+
+        $existingGroup->addAttributeRelation($attributeRelation1 = new AttributeGroupRelation());
+        $attributeRelation1->setAttributeGroup($existingGroup);
+        $attributeRelation1->setEntityConfigFieldId($attribute1Id = 1);
+
+        $existingGroup->addAttributeRelation($attributeRelation15 = new AttributeGroupRelation());
+        $attributeRelation15->setAttributeGroup($existingGroup);
+        $attributeRelation15->setEntityConfigFieldId($attribute15Id = 15);
+
+        $attributeRelation20 = new AttributeGroupRelation();
+        $attributeRelation20->setAttributeGroup($existingGroup);
+        $attributeRelation20->setEntityConfigFieldId($attribute20Id = 20);
+
+        $submittedData = [
+            'labels' => [
+                'values' => [
+                    'default' => 'Group Label 1',
+                    'localizations' => [
+                        self::LOCALIZATION_ID => [
+                            'value' => 'Group Label 2',
+                        ],
+                    ],
+                ],
+            ],
+            'isVisible' => true,
+            'attributeRelations' => [$attribute1Id, $attribute5Id, $attribute20Id, $attribute15Id],
+        ];
+
+        $form = $this->factory->create(
+            AttributeGroupType::class,
+            $existingGroup,
+            ['attributeEntityClass' => 'EntityClass']
+        );
+
+        $this->assertSame(
+            [
+                'choice_5' => $attribute5Id,
+                'choice_1' => $attribute1Id,
+                'choice_15' => $attribute15Id,
+                'choice_20' => $attribute20Id,
+            ],
+            $form->get('attributeRelations')->getConfig()->getOption('choices')
+        );
+
+        $form->submit($submittedData);
+        $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
+
+        $entity = new AttributeGroup();
+
+        $entity->addLabel(
+            $this->createLocalizedValue(
+                'Group Label 2_stripped',
+                null,
+                $this->getEntity(Localization::class, ['id' => self::LOCALIZATION_ID])
+            )
+        );
+        $entity->addLabel($this->createLocalizedValue('Group Label 1_stripped'));
+
+        $entity->addAttributeRelation($attributeRelation1);
+        $entity->addAttributeRelation($attributeRelation5);
+        $entity->addAttributeRelation($attributeRelation20);
+        $entity->addAttributeRelation($attributeRelation15);
+
+        $formData = $form->getData();
+        $this->assertEquals($entity, $formData);
+    }
+
+    public function testPostSetDataWhenNoData(): void
+    {
+        $formEvent = $this->createMock(FormEvent::class);
+        $formEvent
+            ->expects($this->once())
+            ->method('getData')
+            ->willReturn(null);
+
+        $formEvent
+            ->expects($this->never())
+            ->method('getForm');
+
+        (new AttributeGroupType())->postSetData($formEvent);
+    }
+
+    /**
+     * @dataProvider postSetDataDataProvider
+     *
+     * @param AttributeGroup $attributeGroup
+     * @param array $choices
+     * @param array $expectedChoices
+     */
+    public function testPostSetData(AttributeGroup $attributeGroup, array $choices, array $expectedChoices): void
+    {
+        $formEvent = new FormEvent($form = $this->createMock(FormInterface::class), $attributeGroup);
+
+        $form
+            ->expects($this->once())
+            ->method('get')
+            ->with('attributeRelations')
+            ->willReturn($attributeRelationsForm = $this->createMock(FormInterface::class));
+
+        $attributeRelationsForm
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
+
+        $formConfig
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('choices')
+            ->willReturn($choices);
+
+        $expectedOptions = [
+            'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
+            'configs' => [
+                'component' => 'attribute-autocomplete',
+            ],
+            'attributeGroup' => $attributeGroup,
+            'by_reference' => false,
+            'choices' => $expectedChoices,
+        ];
+
+        $form
+            ->expects($this->once())
+            ->method('add')
+            ->with('attributeRelations', AttributeMultiSelectType::class, $expectedOptions);
+
+        (new AttributeGroupType())->postSetData($formEvent);
+    }
+
+    /**
+     * @return array
+     */
+    public function postSetDataDataProvider(): array
+    {
+        $attributeGroup = new AttributeGroup();
+        $attributeGroup->addAttributeRelation($attributeRelation5 = new AttributeGroupRelation());
+        $attributeRelation5->setAttributeGroup($attributeGroup);
+        $attributeRelation5->setEntityConfigFieldId($attribute5Id = 5);
+
+        $attributeGroup->addAttributeRelation($attributeRelation1 = new AttributeGroupRelation());
+        $attributeRelation1->setAttributeGroup($attributeGroup);
+        $attributeRelation1->setEntityConfigFieldId($attribute1Id = 1);
+
+        return [
+            'attribute relations are not empty, choices are reordered' => [
+                'attributeGroup' => $attributeGroup,
+                'choices' => self::ATTRIBUTES_CHOICES,
+                'expectedChoices' => ['choice_5' => 5, 'choice_1' => 1, 'choice_15' => 15, 'choice_20' => 20],
+            ],
+            'choices are empty' => [
+                'attributeGroup' => $attributeGroup,
+                'choices' => [],
+                'expectedChoices' => [],
+            ],
+        ];
+    }
+
+    public function testPostSetDataWhenNoAttributeRelations(): void
+    {
+        $formEvent = new FormEvent(
+            $form = $this->createMock(FormInterface::class),
+            $attributeGroup = new AttributeGroup()
+        );
+
+        $expectedOptions = [
+            'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
+            'configs' => [
+                'component' => 'attribute-autocomplete',
+            ],
+            'attributeGroup' => $attributeGroup,
+            'by_reference' => false,
+        ];
+
+        $form
+            ->expects($this->once())
+            ->method('add')
+            ->with('attributeRelations', AttributeMultiSelectType::class, $expectedOptions);
+
+        (new AttributeGroupType())->postSetData($formEvent);
     }
 
     public function testGetName()

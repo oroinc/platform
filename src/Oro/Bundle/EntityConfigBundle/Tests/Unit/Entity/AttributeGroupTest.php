@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
@@ -35,5 +36,14 @@ class AttributeGroupTest extends \PHPUnit\Framework\TestCase
 
         $entity = new AttributeGroup();
         $this->assertPropertyCollections($entity, $collections);
+    }
+
+    public function testSetAttributeRelations(): void
+    {
+        $entity = new AttributeGroup();
+        $collection = $this->createMock(ArrayCollection::class);
+
+        $entity->setAttributeRelations($collection);
+        $this->assertSame($collection, $entity->getAttributeRelations());
     }
 }
