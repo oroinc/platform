@@ -3,7 +3,8 @@ services:
         alias: oro_layout.theme_extension.resource_provider.theme
         public: true
 
-    oro_layout.theme_manager.test:
-        decorates: 'oro_layout.theme_manager'
-        parent: 'oro_layout.theme_manager'
+    oro_layout.theme_extension.configuration.provider.test:
+        class: Oro\Bundle\LayoutBundle\Tests\Functional\Stub\Layout\Extension\ThemeConfigurationTestProvider
+        decorates: oro_layout.theme_extension.configuration.provider
+        parent: oro_layout.theme_extension.configuration.provider
         public: true
