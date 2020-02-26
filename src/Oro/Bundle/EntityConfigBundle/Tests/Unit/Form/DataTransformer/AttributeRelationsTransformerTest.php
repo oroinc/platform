@@ -13,7 +13,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeRelationsTransformer */
     private $dataTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataTransformer = new AttributeRelationsTransformer(null);
     }
@@ -21,7 +21,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         $relation = new AttributeGroupRelation();
         $relation->setEntityConfigFieldId(777);
@@ -31,15 +31,15 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'collection' => null,
-                'expectation' => []
+                'expectation' => [],
             ],
             [
                 'collection' => (new AttributeGroup)->getAttributeRelations(),
-                'expectation' => []
+                'expectation' => [],
             ],
             [
                 'collection' => $attributeGroup->getAttributeRelations(),
-                'expectation' => [777]
+                'expectation' => [777],
             ],
         ];
     }
@@ -49,7 +49,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
      * @param Collection|null $collection
      * @param array $expectation
      */
-    public function testTransform($collection, array $expectation)
+    public function testTransform($collection, array $expectation): void
     {
         $this->assertEquals($expectation, $this->dataTransformer->transform($collection));
     }
@@ -57,43 +57,58 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
-        $relation1 = new AttributeGroupRelation();
-        $relation1->setEntityConfigFieldId(111);
-        $relation2 = new AttributeGroupRelation();
-        $relation2->setEntityConfigFieldId(333);
-
-        $existingGroup1 = new AttributeGroup();
-        $existingGroup1->addAttributeRelation($relation1)->addAttributeRelation($relation2);
-
-        $existingGroup2 = new AttributeGroup();
-        $existingGroup2->addAttributeRelation($relation1);
-
-        $newRelation = new AttributeGroupRelation();
-        $newRelation->setEntityConfigFieldId(777);
-        $newRelation->setAttributeGroup($existingGroup2);
-
         return [
             'new group with no attributes selected' => [
                 'attributeGroup' => null,
                 'selectedAttributes' => [],
-                'expectation' => (new AttributeGroup)->getAttributeRelations()
+                'expectation' => new ArrayCollection(),
             ],
             'new group with attributes selected' => [
                 'attributeGroup' => null,
                 'selectedAttributes' => [333],
-                'expectation' => (new AttributeGroup)->addAttributeRelation($relation2)->getAttributeRelations()
+                'expectation' => (new AttributeGroup)
+                    ->addAttributeRelation(
+                        (new AttributeGroupRelation())->setEntityConfigFieldId(333)
+                    )
+                    ->getAttributeRelations(),
             ],
             'existing group with all attributes removed' => [
-                'attributeGroup' => $existingGroup1,
+                'attributeGroup' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
                 'selectedAttributes' => [],
-                'expectation' => new ArrayCollection()
+                'expectation' => new ArrayCollection(),
             ],
             'existing group with new attribute added' => [
-                'attributeGroup' => $existingGroup2,
+                'attributeGroup' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777)),
                 'selectedAttributes' => [111, 777],
-                'expectation' => new ArrayCollection([$relation1, $newRelation])
+                'expectation' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777))
+                    ->getAttributeRelations(),
+            ],
+            'existing group with attributes order changed' => [
+                'attributeGroup' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
+                'selectedAttributes' => [333, 111],
+                'expectation' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
+                    ->getAttributeRelations(),
+            ],
+            'existing group with attributes changed' => [
+                'attributeGroup' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
+                'selectedAttributes' => [777, 333],
+                'expectation' => (new AttributeGroup)
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777))
+                    ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333))
+                    ->getAttributeRelations(),
             ],
         ];
     }
@@ -104,7 +119,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
      * @param array $selectedAttributes
      * @param Collection $expectation
      */
-    public function testReverseTransform($attributeGroup, array $selectedAttributes, Collection $expectation)
+    public function testReverseTransform($attributeGroup, array $selectedAttributes, Collection $expectation): void
     {
         $transformer = new AttributeRelationsTransformer($attributeGroup);
         $this->assertEquals($expectation, $transformer->reverseTransform($selectedAttributes));

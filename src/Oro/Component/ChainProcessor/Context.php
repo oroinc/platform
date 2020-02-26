@@ -92,6 +92,14 @@ class Context extends ParameterBag implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function resetSkippedGroups()
+    {
+        $this->skippedGroups = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function skipGroup($group)
     {
         if (!\in_array($group, $this->skippedGroups, true)) {

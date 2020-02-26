@@ -213,6 +213,11 @@ define(function(require) {
         // Overridden full onSelect method for multi chooses,
         // this solution related to https://github.com/select2/select2/issues/1513
         onSelect: function (data, options) {
+            // Detaches the selected option and attaches it to the end of collection. Ensures correct order of
+            // the submitted options.
+            const option = $(this.select).children('[value="' + $.escapeSelector(data.id) + '"]');
+            option.detach();
+            $(this.select).append(option).change();
 
             if (!this.triggerSelect(data)) { return; }
 

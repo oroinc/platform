@@ -183,7 +183,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     protected function getResourceId(Response $response, string $identifierFieldName = 'id')
     {
         $content = self::jsonToArray($response->getContent());
-        self::assertInternalType('array', $content);
+        self::assertIsArray($content);
         self::assertArrayHasKey($identifierFieldName, $content);
 
         return $content[$identifierFieldName];

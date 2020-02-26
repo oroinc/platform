@@ -2548,4 +2548,30 @@ JS;
         $this->assertTrue($element->isValid());
         $this->assertNotContains($value, $element->getAttribute($attribute));
     }
+
+    /**
+     * Checks that one element goes after another.
+     * Example: Then I should see "Drawing Field" goes after "Document Field"
+     *
+     * @Then /^(?:|I )should see "(?P<element1Name>(?:[^"]|\\")+)" goes after "(?P<element2Name>(?:[^"]|\\")+)"$/
+     *
+     * @param string $element1Name
+     * @param string $element2Name
+     */
+    public function iSeeElementGoesAfterAnother(string $element1Name, string $element2Name)
+    {
+        $element1 = $this->createElement($this->fixStepArgument($element1Name));
+        $this->assertTrue($element1->isValid(), sprintf('Element %s is not found', $element1Name));
+
+        $element2 = $this->createElement($this->fixStepArgument($element2Name));
+        $this->assertTrue($element2->isValid(), sprintf('Element %s is not found', $element2Name));
+
+        $page = $this->getSession()->getPage();
+        $nextElement = $page->find('xpath', $element2->getXpath() . '/following-sibling::*');
+        $this->assertEquals(
+            $element1->getOuterHtml(),
+            $nextElement->getOuterHtml(),
+            sprintf('Element %s does not go after %s', $element1Name, $element2Name)
+        );
+    }
 }

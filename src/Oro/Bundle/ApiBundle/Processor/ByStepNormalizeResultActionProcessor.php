@@ -28,6 +28,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 $context->getLastGroup()
             ));
         }
+        $context->resetSkippedGroups();
         $context->setFailedGroup(null);
 
         parent::process($context);
@@ -63,6 +64,8 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 if (!$errorsHandled && count($context->getErrors()) > $initialErrorCount) {
                     $this->handleErrors($context, $processorId, $group);
                 }
+            } catch (\Error $e) {
+                $this->handlePhpError($e, $context, $processorId, $group);
             } catch (\Exception $e) {
                 $this->handleException($e, $context, $processorId, $group);
             }

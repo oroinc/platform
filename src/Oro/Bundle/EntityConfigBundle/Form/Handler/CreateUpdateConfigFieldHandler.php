@@ -20,14 +20,14 @@ class CreateUpdateConfigFieldHandler
     /** @var ConfigHelperHandler */
     private $configHelperHandler;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var ConfigHelper */
-    private $configHelper;
-
     /** @var FieldSessionStorage */
     private $sessionStorage;
+
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /** @var ConfigHelper */
+    protected $configHelper;
 
     /**
      * @param ConfigHelperHandler $configHelperHandler
@@ -129,7 +129,7 @@ class CreateUpdateConfigFieldHandler
      *
      * @return FieldConfigModel
      */
-    protected function createFieldModel(
+    public function createFieldModel(
         $fieldName,
         $fieldType,
         ConfigInterface $extendEntityConfig,
@@ -141,11 +141,28 @@ class CreateUpdateConfigFieldHandler
             $additionalFieldOptions
         );
 
-        $newFieldModel = $this->configManager->createConfigFieldModel(
+        return $this->createAndUpdateFieldModel(
             $extendEntityConfig->getId()->getClassName(),
             $fieldName,
-            $fieldType
+            $fieldType,
+            $fieldOptions
         );
+    }
+
+    /**
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param array $fieldOptions
+     * @return FieldConfigModel
+     */
+    protected function createAndUpdateFieldModel(
+        string $entityClassName,
+        string $fieldName,
+        string $fieldType,
+        array $fieldOptions
+    ): FieldConfigModel {
+        $newFieldModel = $this->configManager->createConfigFieldModel($entityClassName, $fieldName, $fieldType);
 
         $this->configHelper->updateFieldConfigs($newFieldModel, $fieldOptions);
 
