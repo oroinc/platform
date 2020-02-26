@@ -154,9 +154,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     {
         $content = self::jsonToArray($response->getContent());
         self::assertArrayHasKey('data', $content);
-        self::assertInternalType('array', $content['data']);
+        self::assertIsArray($content['data']);
         self::assertArrayHasKey('attributes', $content['data']);
-        self::assertInternalType('array', $content['data']['attributes']);
+        self::assertIsArray($content['data']['attributes']);
         foreach ($attributes as $name) {
             self::assertArrayNotHasKey($name, $content['data']['attributes']);
         }
@@ -172,9 +172,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     {
         $content = self::jsonToArray($response->getContent());
         self::assertArrayHasKey('data', $content);
-        self::assertInternalType('array', $content['data']);
+        self::assertIsArray($content['data']);
         self::assertArrayHasKey('relationships', $content['data']);
-        self::assertInternalType('array', $content['data']['relationships']);
+        self::assertIsArray($content['data']['relationships']);
         foreach ($relationships as $name) {
             self::assertArrayNotHasKey($name, $content['data']['relationships']);
         }
@@ -337,7 +337,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         if (isset($data[JsonApiDoc::TYPE], $data[JsonApiDoc::ID])) {
             $key = $data[JsonApiDoc::TYPE] . '::' . $data[JsonApiDoc::ID];
             if (isset($idReferences[$key])) {
-                list($referenceId, $entityIdFieldName) = $idReferences[$key];
+                [$referenceId, $entityIdFieldName] = $idReferences[$key];
                 $data[JsonApiDoc::ID] = sprintf('<toString(@%s->%s)>', $referenceId, $entityIdFieldName);
                 if (isset($data[JsonApiDoc::ATTRIBUTES])) {
                     $attributes = $data[JsonApiDoc::ATTRIBUTES];
@@ -381,9 +381,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected function getResourceId(Response $response)
     {
         $content = self::jsonToArray($response->getContent());
-        self::assertInternalType('array', $content);
+        self::assertIsArray($content);
         self::assertArrayHasKey(JsonApiDoc::DATA, $content);
-        self::assertInternalType('array', $content[JsonApiDoc::DATA]);
+        self::assertIsArray($content[JsonApiDoc::DATA]);
         self::assertArrayHasKey(JsonApiDoc::ID, $content[JsonApiDoc::DATA]);
 
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
@@ -417,9 +417,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected function getResponseErrors(Response $response)
     {
         $content = self::jsonToArray($response->getContent());
-        self::assertInternalType('array', $content);
+        self::assertIsArray($content);
         self::assertArrayHasKey(JsonApiDoc::ERRORS, $content);
-        self::assertInternalType('array', $content[JsonApiDoc::ERRORS]);
+        self::assertIsArray($content[JsonApiDoc::ERRORS]);
 
         return $content[JsonApiDoc::ERRORS];
     }

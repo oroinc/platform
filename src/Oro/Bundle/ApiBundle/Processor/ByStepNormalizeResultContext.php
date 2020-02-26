@@ -8,11 +8,11 @@ namespace Oro\Bundle\ApiBundle\Processor;
  */
 class ByStepNormalizeResultContext extends NormalizeResultContext
 {
-    /** the name of failed group */
+    /** the name of the last group that execution was finished with an error or an exception */
     private const FAILED_GROUP = 'failedGroup';
 
     /**
-     * Gets the name of failed group.
+     * Gets the name of the last group that execution was finished with an error or an exception.
      *
      * @return string|null
      */
@@ -22,7 +22,7 @@ class ByStepNormalizeResultContext extends NormalizeResultContext
     }
 
     /**
-     * Sets the name of failed group.
+     * Sets the name of the last group that execution was finished with an error or an exception.
      *
      * @param string $groupName
      */

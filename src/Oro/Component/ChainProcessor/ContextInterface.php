@@ -97,6 +97,11 @@ interface ContextInterface extends \ArrayAccess
     public function getSkippedGroups();
 
     /**
+     * Clears a list of groups to be skipped
+     */
+    public function resetSkippedGroups();
+
+    /**
      * Adds the given group to a list of groups to be skipped
      *
      * @param string $group

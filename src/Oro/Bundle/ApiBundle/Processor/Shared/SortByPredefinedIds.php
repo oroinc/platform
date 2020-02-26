@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Sorts the result in the same order as the order of identifiers
  * stored in the "_sorted_ids" item in the context.
- * This processor can be useful in case if entity IDs are loaded from one source, e.g. by the search index,
+ * This processor can be useful in case entity IDs are loaded from one source, e.g. by the search index,
  * but other entity properties are loaded from another source by these IDs, e.g. from the database.
  */
 class SortByPredefinedIds implements ProcessorInterface
