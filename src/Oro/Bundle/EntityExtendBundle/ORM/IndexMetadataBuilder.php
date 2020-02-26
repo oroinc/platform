@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
+use Doctrine\DBAL\Types\JsonType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -9,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
+/**
+ * Builder for extend config indexes
+ */
 class IndexMetadataBuilder implements MetadataBuilderInterface
 {
     /** @var ConfigProvider */
@@ -44,11 +49,13 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
     {
         $className = $extendConfig->getId()->getClassName();
         $indices   = $extendConfig->get('index');
-        // TODO: need to be changed to fieldName => columnName
-        // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
+        // Should be changed to fieldName => columnName
+        // in scope https://magecore.atlassian.net/browse/BAP-3940
         foreach ($indices as $columnName => $indexType) {
             $fieldConfig = $this->extendConfigProvider->getConfig($className, $columnName);
-
+            if (\is_a(Type::getType($fieldConfig->getId()->getFieldType()), JsonType::class, true)) {
+                continue;
+            }
             if ($indexType && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
                 $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                     $className,
