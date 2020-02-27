@@ -573,11 +573,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     ) {
         $output->writeln('<info>Preparing application.</info>');
 
-        $assetsOptions = [];
-        if ($input->hasOption('symlink') && $input->getOption('symlink')) {
-            $assetsOptions['--symlink'] = true;
-        }
-
         $this->processTranslations($input, $commandExecutor);
 
         // run installer scripts
@@ -838,6 +833,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
         if ($input->getOption('env')) {
             $command[] = sprintf('--env=%s', $input->getOption('env'));
+        }
+
+        if ($input->hasOption('timeout')) {
+            $command[] = sprintf('--timeout=%d', $input->getOption('timeout'));
         }
 
         $this->assetsCommandProcess = new Process(

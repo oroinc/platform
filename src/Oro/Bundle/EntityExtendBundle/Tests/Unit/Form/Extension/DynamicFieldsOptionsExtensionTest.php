@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsOptionsExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
