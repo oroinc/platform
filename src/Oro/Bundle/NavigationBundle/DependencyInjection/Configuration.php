@@ -27,7 +27,9 @@ class Configuration implements ConfigurationInterface
             ->beforeNormalization()
                 ->always(
                     function ($data) {
-                        return ltrim($data, '/');
+                        $data = trim($data, '/_');
+
+                        return $data ? $data . '_' : '';
                     }
                 )
                 ->end()
