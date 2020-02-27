@@ -394,3 +394,30 @@ services:
             - '@oro_api.security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get_list, group: data_security_check, class: '%oro_attachment.file.entity.class%', priority: 10 }
+
+    oro_attachment.liip_imagine.filter.loader.watermark:
+        class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader
+        decorates: liip_imagine.filter.loader.watermark
+        arguments:
+            - '@liip_imagine'
+            - 'gaufrette:/' # One slash instead of two used intentionally due to specifics of WatermarkFilterLoader
+
+    oro_attachment.manager.image_removal_manager:
+        class: Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManager
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@oro_config.manager'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.resized_image_path'
+            - '@filesystem'
+            - '@knp_gaufrette.filesystem_map'
+            - '%oro_attachment.filesystem_name.mediacache%'
+            - 'public/%oro_attachment.media_cache_dir%'
+
+    oro_attachment.message_processor.image_remove:
+        class: Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor
+        arguments:
+            - '@logger'
+            - '@oro_attachment.manager.image_removal_manager'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

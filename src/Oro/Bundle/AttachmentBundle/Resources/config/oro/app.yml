@@ -10,6 +10,9 @@ knp_gaufrette:
             local:
                 directory: '%kernel.project_dir%/var/%oro_attachment.filesystem_dir.protected_mediacache%'
     filesystems:
+        attachment:
+            adapter:    attachments
+            alias:      attachment_filesystem
         attachments:
             adapter:    attachments
             alias:      attachments_filesystem
@@ -19,3 +22,5 @@ knp_gaufrette:
         protected_mediacache:
             adapter:    protected_mediacache
             alias:      protected_mediacache_filesystem
+
+    stream_wrapper: ~

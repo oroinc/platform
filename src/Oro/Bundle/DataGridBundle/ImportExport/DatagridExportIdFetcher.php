@@ -171,6 +171,6 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             return false;
         }
 
-        return preg_match('/^[\w_\$]+$/', $fieldName);
+        return preg_match('/^[\w\_\$]+$/', $fieldName);
     }
 }

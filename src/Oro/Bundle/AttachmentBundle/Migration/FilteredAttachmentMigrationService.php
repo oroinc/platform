@@ -63,8 +63,8 @@ class FilteredAttachmentMigrationService
     ) {
         $this->filesystemMap = $filesystemMap;
         $this->filterConfiguration = $filterConfiguration;
-        $this->fsName = $fsName;
         $this->filterLoader = $filterLoader;
+        $this->fsName = $fsName;
     }
 
     /**

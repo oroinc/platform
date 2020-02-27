@@ -41,6 +41,13 @@ oro_behat_extension:
   suites:
     OroAttachmentBundle:
       contexts:
+        - OroAttachmentBundle::AttachmentImageContext:
+            - '@doctrine'
+            - '@oro_website.website.provider'
+            - '@oro_website.manager'
+            - '@oro_config.website'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.manager.image_removal_manager'
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroFormBundle::FormContext
         - OroFormBundle::FeatureContext

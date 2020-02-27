@@ -3,8 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -13,29 +16,19 @@ use Oro\Component\DependencyInjection\ServiceLink;
  */
 class TitleServiceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $titleReaderRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $titleTranslator;
+    /** @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject */
+    private $titleTranslator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $breadcrumbManager;
+    /** @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $breadcrumbManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $userConfigManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $userConfigManager;
 
-    /**
-     * @var TitleService
-     */
+    /** @var TitleService */
     private $titleService;
 
     /**
@@ -43,19 +36,10 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp()
     {
-        $this->titleReaderRegistry = $this->getMockBuilder(TitleReaderRegistry::class)->getMock();
-
-        $this->titleTranslator = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleTranslator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->titleReaderRegistry = $this->createMock(TitleReaderRegistry::class);
+        $this->titleTranslator = $this->createMock(TitleTranslator::class);
+        $this->userConfigManager = $this->createMock(ConfigManager::class);
+        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
 
         $breadcrumbLink = $this->createMock(ServiceLink::class);
 
@@ -260,6 +244,27 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($testTitle.' - '.$parentLabel.' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
+    }
+
+    public function testLoadByRouteForNullRoute(): void
+    {
+        $this->titleReaderRegistry->expects($this->never())
+            ->method('getTitleByRoute');
+        $this->breadcrumbManager->expects($this->never())
+            ->method('getBreadcrumbLabels');
+        $this->breadcrumbManager->expects($this->never())
+            ->method('getBreadcrumbs');
+        $this->userConfigManager->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
+                ['oro_navigation.title_delimiter', false, false, null, '-']
+            ]);
+
+        $this->titleService->loadByRoute(null);
+
+        $this->assertSame('Suffix', $this->titleService->getTemplate());
+        $this->assertSame('', $this->titleService->getShortTemplate());
     }
 
     public function testLoadByRouteWhenTitleDoesNotExist()

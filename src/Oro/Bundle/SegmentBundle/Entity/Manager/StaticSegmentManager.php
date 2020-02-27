@@ -162,7 +162,7 @@ class StaticSegmentManager
      */
     private function getDoctrineIdentifierAlias($identifier, $sql)
     {
-        $regex = "/(?<=\b.$identifier AS )(?:[\w-]+)/is";
+        $regex = "/(?<=\b.$identifier AS )(?:[\w\-]+)/is";
         preg_match($regex, $sql, $matches);
 
         return current($matches);

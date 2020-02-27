@@ -175,7 +175,7 @@ class WorkflowDatagridLabelListener
         $selects = $configuration->getOrmQuery()->getSelect();
         foreach ($selects as $select) {
             $matches = [];
-            if (preg_match('/^(.*)\.[a-zA-Z0-9_]+\sas\s' . $columnName . '$/', $select, $matches)) {
+            if (preg_match('/^(.*)\.[a-zA-Z0-9\_]+\sas\s' . $columnName . '$/', $select, $matches)) {
                 if ($matches && isset($matches[1])) {
                     return $matches[1];
                 }

@@ -52,7 +52,7 @@ class CommandsTest extends WebTestCase
             )
         );
 
-        preg_match_all('/(^Authorization:\s*(.*$))|(^X-WSSE:\s*(.*$))/im', $commandTester->getDisplay(), $header);
+        preg_match_all('/(^Authorization:\s*(.*$))|(^X-WSSE\:\s*(.*$))/im', $commandTester->getDisplay(), $header);
 
         return $header;
     }

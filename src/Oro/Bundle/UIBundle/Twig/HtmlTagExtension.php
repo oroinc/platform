@@ -66,7 +66,7 @@ class HtmlTagExtension extends \Twig_Extension
      */
     public function attributeNamePurify($string)
     {
-        return preg_replace('/[^a-z0-9_-]+/i', '', $string);
+        return preg_replace('/[^a-z0-9\_\-]+/i', '', $string);
     }
 
     /**

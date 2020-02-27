@@ -14,6 +14,7 @@ use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -203,7 +204,14 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'email as object with EmailHolderInterface' => [
-                'actual'   => $emailHolderStub,
+                'actual'   => [
+                    $emailHolderStub,
+                    (new User())->setEmail('some@example.com')->setEnabled(false),
+                    new EmailAddressWithContext(
+                        'some2@example.com',
+                        (new User())->setEnabled(false)
+                    ),
+                ],
                 'expected' => [$emailHolderStub]
             ],
             'email as multidimensional array' => [
