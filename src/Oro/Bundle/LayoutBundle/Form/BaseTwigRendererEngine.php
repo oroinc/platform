@@ -8,7 +8,7 @@ use Twig\Environment;
 use Twig\Template;
 
 /**
- * Extends TwigRendererEngine to add possability to render parent blocks without "extend"
+ * Extends TwigRendererEngine to add possibility to render parent blocks without "extend"
  */
 class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererEngineInterface
 {
@@ -67,12 +67,13 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
 
         $this->template->displayBlock($blockName, $context, $resource);
 
-        unset(
-            $this->parentResourceOffsets[$cacheKey],
-            $this->parentResourceHierarchyLevels[$cacheKey],
-            $this->overrideResources[$cacheKey],
-            $this->resources[$cacheKey]
-        );
+        // Resets all property cache after certain block rendered to avoid unpredictable behaviour
+        // if several blocks are rendered
+        $this->parentResourceOffsets = [];
+        $this->resourcesHierarchy = [];
+        $this->overrideResources = [];
+        $this->parentResourceHierarchyLevels = [];
+        $this->resources = [];
 
         return ob_get_clean();
     }
