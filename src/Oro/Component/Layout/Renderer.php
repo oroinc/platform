@@ -129,6 +129,7 @@ class Renderer implements FormRendererInterface
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * {@inheritdoc}
      */
@@ -139,7 +140,7 @@ class Renderer implements FormRendererInterface
         $renderParentBlock = false
     ) {
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
+        $viewAndSuffixCacheKey = $viewCacheKey . '_' . $blockNameSuffix;
 
         if (!isset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey])) {
             // INITIAL CALL
