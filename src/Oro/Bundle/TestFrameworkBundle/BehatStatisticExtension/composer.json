@@ -4,6 +4,7 @@
     "require": {
         "php": "7.1.*",
         "behat/behat": "^3.2",
+        "behat/gherkin": "4.6.0",
         "doctrine/dbal": "2.5.5",
         "symfony/config": "3.4.*"
     },
