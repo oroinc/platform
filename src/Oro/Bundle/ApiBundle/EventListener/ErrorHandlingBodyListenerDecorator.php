@@ -53,10 +53,10 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
     private function getInvalidJsonExceptionMessage(string $content): ?string
     {
         $errorMessage = null;
-        $stream = fopen('php://memory', 'r+');
+        $stream = fopen('php://memory', 'rb+');
         try {
             fwrite($stream, $content);
-            \rewind($stream);
+            rewind($stream);
             $parser = new Parser($stream, new InMemoryListener());
             $parser->parse();
         } catch (ParsingException $e) {
@@ -68,7 +68,7 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
         } catch (\Throwable $e) {
             // ignore not parsing exceptions
         } finally {
-            \fclose($stream);
+            fclose($stream);
         }
 
         return $errorMessage;
