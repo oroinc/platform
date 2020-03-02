@@ -95,6 +95,13 @@ class GroupByHelper
             return $select;
         }
 
+        // 't1.id ASC' or 't1.id DESC'
+        preg_match('/([^\s]+)\s+(?=ASC$|DESC$)/i', $select, $parts);
+        if (!empty($parts[1])) {
+            // Add field from the ORDER BY clause
+            return $parts[1];
+        }
+
         return null;
     }
 }

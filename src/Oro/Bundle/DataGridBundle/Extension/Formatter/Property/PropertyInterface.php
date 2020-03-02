@@ -27,6 +27,7 @@ interface PropertyInterface
     const TYPE_ARRAY        = 'array';
     const TYPE_SIMPLE_ARRAY = 'simple_array';
     const TYPE_ROW_ARRAY    = 'row_array';
+    const TYPE_TAGS         = 'tags';
 
     const METADATA_NAME_KEY = 'name';
     const METADATA_TYPE_KEY = 'type';
