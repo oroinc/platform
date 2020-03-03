@@ -30,7 +30,7 @@ interface DataAccessorInterface
      *
      * @param string $propertyPath The property path.
      *                             It can starts with "_." to get access to an entity data
-     *                             in case if this method is called in the context of an association.
+     *                             in case this method is called in the context of an association.
      * @param mixed  $value        Contains a value extracted by the specified property path.
      *                             A value of this variable is set to NULL if the operation failed.
      *

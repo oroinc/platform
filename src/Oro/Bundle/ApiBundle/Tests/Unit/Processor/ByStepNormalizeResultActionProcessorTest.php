@@ -12,6 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\BufferingLogger;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -161,12 +162,35 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
+    public function testShouldRemoveSkippedGroupsBeforeCallParentProcess()
+    {
+        $context = $this->getContext();
+        $context->skipGroup('group2');
+
+        [$processor1] = $this->addProcessors([
+            'processor1' => 'group1'
+        ]);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(
+                function (ByStepNormalizeResultContext $context) {
+                    self::assertFalse($context->hasSkippedGroups());
+                }
+            );
+
+        $this->processor->process($context);
+        self::assertFalse($context->hasSkippedGroups());
+        self::assertFalse($context->hasErrors());
+    }
+
     public function testShouldRemoveFailedGroupBeforeCallParentProcess()
     {
         $context = $this->getContext();
         $context->setFailedGroup('group2');
 
-        list($processor1) = $this->addProcessors([
+        [$processor1] = $this->addProcessors([
             'processor1' => 'group1'
         ]);
 
@@ -181,13 +205,14 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $this->processor->process($context);
         self::assertNull($context->getFailedGroup());
+        self::assertFalse($context->hasErrors());
     }
 
     public function testWhenNoExceptionsAndErrors()
     {
         $context = $this->getContext();
 
-        list($processor1, $processor10) = $this->addProcessors([
+        [$processor1, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
@@ -218,7 +243,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -237,7 +262,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -281,7 +306,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -300,7 +325,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -341,7 +366,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -364,7 +389,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -405,7 +430,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
@@ -426,7 +451,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -468,7 +493,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -491,7 +516,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -533,7 +558,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
@@ -554,7 +579,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -586,7 +611,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $initialError = Error::create('initial error');
         $context->addError($initialError);
 
-        list($processor1, $processor10) = $this->addProcessors([
+        [$processor1, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
         ]);
@@ -624,7 +649,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -643,7 +668,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -689,7 +714,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -708,7 +733,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -751,7 +776,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -774,7 +799,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -820,7 +845,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
@@ -841,7 +866,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -888,7 +913,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor3, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor3'  => 'group2',
@@ -911,7 +936,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -958,7 +983,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor2, $processor10) = $this->addProcessors([
+        [$processor1, $processor2, $processor10] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor2'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT
@@ -979,7 +1004,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('process')
             ->with(self::identicalTo($context))
             ->willReturnCallback(
-                function (ByStepNormalizeResultContext $context) use ($error) {
+                function (ByStepNormalizeResultContext $context) {
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -1025,7 +1050,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $exception = new \Exception('test exception');
 
-        list($processor1, $processor10, $processor11) = $this->addProcessors([
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT,
             'processor11' => ApiActionGroup::NORMALIZE_RESULT
@@ -1082,7 +1107,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::createByException($exception);
 
-        list($processor1, $processor10, $processor11) = $this->addProcessors([
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT,
             'processor11' => ApiActionGroup::NORMALIZE_RESULT
@@ -1135,7 +1160,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor10, $processor11) = $this->addProcessors([
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT,
             'processor11' => ApiActionGroup::NORMALIZE_RESULT
@@ -1185,7 +1210,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         $error = Error::create('some error');
 
-        list($processor1, $processor10, $processor11) = $this->addProcessors([
+        [$processor1, $processor10, $processor11] = $this->addProcessors([
             'processor1'  => 'group1',
             'processor10' => ApiActionGroup::NORMALIZE_RESULT,
             'processor11' => ApiActionGroup::NORMALIZE_RESULT
@@ -1215,5 +1240,74 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
+    }
+
+    /**
+     * @dataProvider loggerProvider
+     */
+    public function testWhenInternalPhpErrorOccursAndHasInitialErrors($withLogger)
+    {
+        $logger = null;
+        if ($withLogger) {
+            $logger = new BufferingLogger();
+            $this->processor->setLogger($logger);
+        }
+
+        $context = $this->getContext();
+        $initialError = Error::create('initial error');
+        $context->addError($initialError);
+
+        $internalPhpError = new \Error('test error', 1);
+
+        [$processor1, $processor2, $processor3, $processor10] = $this->addProcessors([
+            'processor1'  => 'group1',
+            'processor2'  => 'group1',
+            'processor3'  => 'group2',
+            'processor10' => ApiActionGroup::NORMALIZE_RESULT
+        ]);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->will(new \PHPUnit\Framework\MockObject\Stub\Exception($internalPhpError));
+        $processor2->expects(self::never())
+            ->method('process');
+        $processor3->expects(self::never())
+            ->method('process');
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(
+                function (ByStepNormalizeResultContext $context) {
+                    self::assertEquals('group1', $context->getFailedGroup());
+                }
+            );
+
+        $this->processor->process($context);
+
+        $errors = $context->getErrors();
+        self::assertCount(2, $errors);
+        self::assertSame($initialError, $errors[0]);
+        $errorException = $errors[1]->getInnerException();
+        self::assertInstanceOf(\ErrorException::class, $errorException);
+        self::assertSame($internalPhpError->getMessage(), $errorException->getMessage());
+        self::assertSame($internalPhpError->getCode(), $errorException->getCode());
+        self::assertSame($internalPhpError->getFile(), $errorException->getFile());
+        self::assertSame($internalPhpError->getLine(), $errorException->getLine());
+
+        if (null !== $logger) {
+            $logs = $logger->cleanLogs();
+            self::assertCount(1, $logs);
+            unset($logs[0][2]);
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'The execution of "processor1" processor is failed.'
+                    ]
+                ],
+                $logs
+            );
+        }
     }
 }
