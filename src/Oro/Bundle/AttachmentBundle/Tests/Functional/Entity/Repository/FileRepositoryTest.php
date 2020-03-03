@@ -17,7 +17,9 @@ class FileRepositoryTest extends WebTestCase
      */
     protected function setUp(): void
     {
-        $this->initClient();
+        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
+
         $this->loadFixtures([LoadFileData::class]);
 
         $container = $this->getContainer();

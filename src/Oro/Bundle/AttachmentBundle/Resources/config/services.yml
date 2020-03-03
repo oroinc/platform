@@ -502,3 +502,31 @@ services:
             - '@oro_action.provider.current_application'
         tags:
             - { name: layout.data_provider, alias: file_applications }
+
+    oro_attachment.manager.image_removal_manager:
+        class: Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManager
+        arguments:
+            - '@oro_config.manager'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.resized_image_path'
+            - '@filesystem'
+            - '@knp_gaufrette.filesystem_map'
+            - '%oro_attachment.filesystem_name.mediacache%'
+            - 'public/%oro_attachment.filesystem_dir.mediacache%'
+
+    oro_attachment.message_processor.image_remove:
+        class: Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor
+        arguments:
+            - '@logger'
+            - '@oro_attachment.manager.image_removal_manager'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_attachment.image_removal.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: true
+        arguments:
+            -
+                liip_imagine.filter.configuration: '@liip_imagine.filter.configuration'
+                oro_attachment.manager.image_removal_manager: '@oro_attachment.manager.image_removal_manager'
+        tags: ['container.service_locator']
