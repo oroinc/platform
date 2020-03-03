@@ -42,7 +42,7 @@
             {%- else -%}
                 {{ label|trans({}, translation_domain) }}
             {%- endif -%}
-            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+            <em aria-hidden="true">{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
             </label>
         {%- endif -%}
     {% endspaceless %}
