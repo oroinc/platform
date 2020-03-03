@@ -22,6 +22,7 @@ class ScriptHandler
      * Installs npm assets
      *
      * @param Event $event A instance
+     * @throws \Exception
      */
     public static function installAssets(Event $event): void
     {
@@ -33,13 +34,31 @@ class ScriptHandler
 
         $filesystem = new Filesystem();
 
-        // File package.json with actual dependencies is required for correct work of npm.
-        $packageJson = [
-            'description' => 'FILE IS GENERATED PROGRAMMATICALLY, NOT TRACKED BY VCS, ALL MANUAL CHANGES WILL BE LOST',
-            'dependencies' => $npmAssets,
-            'private' => true,
-        ];
-        $filesystem->dumpFile('package.json', json_encode($packageJson));
+        if ($filesystem->exists('package.json')) {
+            try {
+                $packageJsonContent = file_get_contents('package.json');
+            } catch (\Exception $exception) {
+                throw new \Exception('Can not read "package.json" file, ' .
+                    'make sure the user has permission to read it');
+            }
+            try {
+                $packageJson = json_decode($packageJsonContent, false, 512, JSON_THROW_ON_ERROR);
+            } catch (\Exception $exception) {
+                throw new \Exception('Can not parse "package.json" file, ' .
+                    'make sure it has valid JSON structure');
+            }
+            $packageJson->dependencies = $npmAssets;
+        } else {
+            // File package.json with actual dependencies is required for correct work of npm.
+            $packageJson = [
+                'description' =>
+                    'THE FILE IS GENERATED PROGRAMMATICALLY, ALL MANUAL CHANGES IN DEPENDENCIES SECTION WILL BE LOST',
+                'homepage' => 'https://doc.oroinc.com/master/frontend/javascript/composer-js-dependencies/',
+                'dependencies' => $npmAssets,
+                'private' => true,
+            ];
+        }
+        $filesystem->dumpFile('package.json', json_encode($packageJson, JSON_PRETTY_PRINT));
 
         if (!$filesystem->exists('package-lock.json')) {
             // Creates lock file, installs assets.
@@ -69,6 +88,7 @@ class ScriptHandler
      * Collects npm assets from extra.npm section of installed packages.
      *
      * @param Composer $composer
+     * @throws
      *
      * @return array
      */
@@ -79,21 +99,31 @@ class ScriptHandler
         // Gets array of installed packages.
         $packages = $composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
 
-        $npmAssets = [[]];
-        $packageNpm = $rootPackage->getExtra()['npm'] ?? [];
-        if (is_array($packageNpm)) {
-            $npmAssets[$rootPackage->getName()] = $packageNpm;
+        $npmAssets = [];
+        $rootNpmAssets = $rootPackage->getExtra()['npm'] ?? [];
+        if (!is_array($rootNpmAssets)) {
+            $rootNpmAssets = [];
         }
 
         foreach ($packages as $package) {
             $packageNpm = $package->getExtra()['npm'] ?? [];
 
             if ($packageNpm && is_array($packageNpm) && !isset($npmAssets[$package->getName()])) {
-                $npmAssets[$package->getName()] = $packageNpm;
+                $conflictingPackages = array_diff_key(array_intersect_key($packageNpm, $npmAssets), $rootNpmAssets);
+
+                if (!empty($conflictingPackages)) {
+                    throw new \Exception('Where are some conflicting npm packages "' .
+                        implode('", "', array_keys($conflictingPackages)) . '". To how resolve conflicts, see ' .
+                        'https://doc.oroinc.com/master/frontend/javascript/composer-js-dependencies' .
+                        '#resolving-conflicting-npm-dependencies/');
+                }
+
+                $npmAssets = array_merge($npmAssets, $packageNpm);
             }
         }
 
-        $npmAssets = array_merge(...array_values($npmAssets));
+        $npmAssets = array_merge($npmAssets, $rootNpmAssets);
+        ksort($npmAssets);
 
         return $npmAssets;
     }
