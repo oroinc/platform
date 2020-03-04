@@ -4,11 +4,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -29,6 +31,19 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     }
 
     /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Value class must extend AbstractLocalizedFallbackValue
+     */
+    public function testConstructWithInvalidValueClass()
+    {
+        new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            'string',
+            \DateTime::class
+        );
+    }
+
+    /**
      * @param string|array $field
      * @param mixed $source
      * @param mixed $expected
@@ -36,7 +51,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testTransform($field, $source, $expected)
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, $field);
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            $field,
+            LocalizedFallbackValue::class
+        );
         $this->assertEquals($expected, $transformer->transform($source));
     }
 
@@ -208,8 +227,9 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testReverseTransform(array $values, array $localizations, $field, $source, $expected)
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, $field);
-        $this->addRegistryExpectations($values, $localizations);
+        $valueClass = CustomLocalizedFallbackValueStub::class;
+        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, $field, $valueClass);
+        $this->addRegistryExpectations($values, $localizations, $valueClass);
         $this->assertEquals($expected, $transformer->reverseTransform($source));
     }
 
@@ -228,9 +248,9 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
             ],
             'valid data' => [
                 'values' => [
-                    1 => $this->createLocalizedFallbackValue(1, null, 'default'),
-                    2 => $this->createLocalizedFallbackValue(2, 1, null, 'first'),
-                    3 => $this->createLocalizedFallbackValue(3, 2, FallbackType::SYSTEM),
+                    1 => $this->createCustomLocalizedFallbackValue(1, null, 'default'),
+                    2 => $this->createCustomLocalizedFallbackValue(2, 1, null, 'first'),
+                    3 => $this->createCustomLocalizedFallbackValue(3, 2, FallbackType::SYSTEM),
                 ],
                 'localizations' => [
                     1 => $this->createLocalization(1),
@@ -252,10 +272,10 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
                     ],
                 ],
                 'expected' => new ArrayCollection([
-                    $this->createLocalizedFallbackValue(1, null, null, 'default_updated'),
-                    $this->createLocalizedFallbackValue(2, 1, FallbackType::PARENT_LOCALIZATION),
-                    $this->createLocalizedFallbackValue(3, 2, null, 'second_updated'),
-                    $this->createLocalizedFallbackValue(null, 3, null, 'new_value'),
+                    $this->createCustomLocalizedFallbackValue(1, null, null, 'default_updated'),
+                    $this->createCustomLocalizedFallbackValue(2, 1, FallbackType::PARENT_LOCALIZATION),
+                    $this->createCustomLocalizedFallbackValue(3, 2, null, 'second_updated'),
+                    $this->createCustomLocalizedFallbackValue(null, 3, null, 'new_value'),
                 ]),
             ],
             'valid data multi field' => [
@@ -302,7 +322,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
                     $this->createLocalizedFallbackValue(4, 3, FallbackType::SYSTEM),
                     $this->createLocalizedFallbackValue(5, 4, FallbackType::PARENT_LOCALIZATION),
                     $this->createLocalizedFallbackValue(6, 5, null, 'string4', 'text4'),
-                    $this->createLocalizedFallbackValue(null, 6, null, 'new_string', 'new_text'),
+                    $this->createCustomLocalizedFallbackValue(null, 6, null, 'new_string', 'new_text'),
                 ]),
             ],
         ];
@@ -314,7 +334,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testTransformUnexpectedType()
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, 'text');
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            'text',
+            LocalizedFallbackValue::class
+        );
         $transformer->transform(new \DateTime());
     }
 
@@ -324,7 +348,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testTransformUnexpectedTypeMultifield()
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, ['text']);
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            ['text'],
+            LocalizedFallbackValue::class
+        );
         $transformer->transform(new \DateTime());
     }
 
@@ -334,7 +362,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testReverseTransformUnexpectedType()
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, 'text');
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            'text',
+            LocalizedFallbackValue::class
+        );
         $transformer->reverseTransform(new \DateTime());
     }
 
@@ -344,7 +376,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testReverseTransformUnexpectedTypeMultifield()
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, ['text']);
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            ['text'],
+            LocalizedFallbackValue::class
+        );
         $transformer->reverseTransform(new \DateTime());
     }
 
@@ -354,7 +390,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
      */
     public function testReverseTransformNoLocalization()
     {
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, 'text');
+        $transformer = new LocalizedFallbackValueCollectionTransformer(
+            $this->registry,
+            'text',
+            LocalizedFallbackValue::class
+        );
         $this->addRegistryExpectations([], []);
         $transformer->reverseTransform(
             [LocalizedFallbackValueCollectionType::FIELD_VALUES => [1 => 'value']]
@@ -364,9 +404,13 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     /**
      * @param array $values
      * @param array $localizations
+     * @param string $valueClass
      */
-    protected function addRegistryExpectations(array $values, array $localizations)
-    {
+    protected function addRegistryExpectations(
+        array $values,
+        array $localizations,
+        $valueClass = LocalizedFallbackValue::class
+    ) {
         $valueRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $valueRepository->expects($this->any())
             ->method('find')
@@ -381,7 +425,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
             ->method('getRepository')
             ->will(
                 $this->returnValueMap([
-                    ['OroLocaleBundle:LocalizedFallbackValue', null, $valueRepository],
+                    [$valueClass, null, $valueRepository],
                     ['OroLocaleBundle:Localization', null, $localizationRepository],
                 ])
             );
@@ -417,6 +461,46 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     ) {
         $value = new LocalizedFallbackValue();
 
+        return $this->setLocalizedFallbackValues($value, $id, $localizationId, $fallback, $string, $text);
+    }
+
+    /**
+     * @param int $id
+     * @param int|null $localizationId
+     * @param string|null $fallback
+     * @param string|null $string
+     * @param string|null $text
+     * @return LocalizedFallbackValue
+     */
+    protected function createCustomLocalizedFallbackValue(
+        $id,
+        $localizationId = null,
+        $fallback = null,
+        $string = null,
+        $text = null
+    ) {
+        $value = new CustomLocalizedFallbackValueStub();
+
+        return $this->setLocalizedFallbackValues($value, $id, $localizationId, $fallback, $string, $text);
+    }
+
+    /**
+     * @param AbstractLocalizedFallbackValue $entity
+     * @param int $id
+     * @param int|null $localizationId
+     * @param string|null $fallback
+     * @param string|null $string
+     * @param string|null $text
+     * @return AbstractLocalizedFallbackValue
+     */
+    protected function setLocalizedFallbackValues(
+        AbstractLocalizedFallbackValue $value,
+        $id,
+        $localizationId = null,
+        $fallback = null,
+        $string = null,
+        $text = null
+    ) {
         if ($id) {
             $reflection = new \ReflectionProperty(get_class($value), 'id');
             $reflection->setAccessible(true);

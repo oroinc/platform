@@ -4,18 +4,19 @@ namespace Oro\Bundle\LocaleBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
- * Transforms form array of LocalizedFallbackValue objects to array of arrays like
+ * Transforms entity representation of localized fallback value collection to array representation like
  * [
  *     'values' => [
  *         null => <value>,
@@ -28,7 +29,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  *         2 => 3,
  *     ],
  * ]
- * for processing in form, and back.
+ * for processing in form, and vice versa.
  */
 class LocalizedFallbackValueCollectionTransformer implements DataTransformerInterface
 {
@@ -43,6 +44,11 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     protected $field;
 
     /**
+     * @var string
+     */
+    protected $valueClass;
+
+    /**
      * @var PropertyAccessor
      */
     private $propertyAccessor;
@@ -50,11 +56,17 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     /**
      * @param ManagerRegistry $registry
      * @param string|array $field
+     * @param string $valueClass
      */
-    public function __construct(ManagerRegistry $registry, $field)
+    public function __construct(ManagerRegistry $registry, $field, $valueClass)
     {
         $this->registry = $registry;
         $this->field = $field;
+        $this->valueClass = $valueClass;
+
+        if (!is_a($valueClass, AbstractLocalizedFallbackValue::class, true)) {
+            throw new InvalidArgumentException('Value class must extend AbstractLocalizedFallbackValue');
+        }
     }
 
     /**
@@ -76,7 +88,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         ];
 
         foreach ($value as $localizedFallbackValue) {
-            /* @var $localizedFallbackValue LocalizedFallbackValue */
+            /* @var $localizedFallbackValue AbstractLocalizedFallbackValue */
             $localization = $localizedFallbackValue->getLocalization();
             if ($localization) {
                 $key = $localization->getId();
@@ -96,11 +108,11 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     }
 
     /**
-     * @param LocalizedFallbackValue $localizedFallbackValue
+     * @param AbstractLocalizedFallbackValue $localizedFallbackValue
      *
      * @return string|FallbackType
      */
-    private function getResultValue(LocalizedFallbackValue $localizedFallbackValue)
+    private function getResultValue(AbstractLocalizedFallbackValue $localizedFallbackValue)
     {
         $localization = $localizedFallbackValue->getLocalization();
         $propertyAccessor = $this->getPropertyAccessor();
@@ -165,7 +177,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
      * @param int|null $entityId
      * @param int|null $localizationId
      * @param string|FallbackType $fieldValue
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue
      */
     protected function generateLocalizedFallbackValue($entityId, $localizationId, $fieldValue)
     {
@@ -174,7 +186,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             $localizedFallbackValue = $this->findLocalizedFallbackValue($entityId);
         }
         if (!$localizedFallbackValue) {
-            $localizedFallbackValue = new LocalizedFallbackValue();
+            $localizedFallbackValue = new $this->valueClass();
         }
         $localizedFallbackValue->setLocalization($localizationId ? $this->findLocalization($localizationId) : null);
 
@@ -201,11 +213,11 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
 
     /**
      * @param int $id
-     * @return LocalizedFallbackValue|null
+     * @return AbstractLocalizedFallbackValue|null
      */
     protected function findLocalizedFallbackValue($id)
     {
-        return $this->registry->getRepository('OroLocaleBundle:LocalizedFallbackValue')->find($id);
+        return $this->registry->getRepository($this->valueClass)->find($id);
     }
 
     /**

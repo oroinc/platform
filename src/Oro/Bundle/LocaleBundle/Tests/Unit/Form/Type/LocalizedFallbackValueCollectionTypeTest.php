@@ -3,9 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -34,6 +36,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
     {
         $expectedOptions = [
             'field' => 'string',
+            'value_class' => LocalizedFallbackValue::class,
             'entry_type' => TextType::class,
             'entry_options' => [],
             'exclude_parent_localization' => false,
@@ -53,6 +56,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
         $type = 'form_text';
         $options = ['key' => 'value'];
         $field = 'text';
+        $valueClass = CustomLocalizedFallbackValueStub::class;
 
         $builder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
         $builder->expects($this->at(0))
@@ -76,13 +80,14 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
             )->willReturnSelf();
         $builder->expects($this->once())
             ->method('addViewTransformer')
-            ->with(new LocalizedFallbackValueCollectionTransformer($this->registry, $field))
+            ->with(new LocalizedFallbackValueCollectionTransformer($this->registry, $field, $valueClass))
             ->willReturnSelf();
 
         $this->type->buildForm(
             $builder,
             [
                 'entry_type' => $type,
+                'value_class' => $valueClass,
                 'entry_options' => $options,
                 'field' => $field,
                 'exclude_parent_localization' => false,

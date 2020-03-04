@@ -10,7 +10,7 @@ services:
         parent: oro_locale.importexport.data_converter.property_path_title
         calls:
             - [setRegistry, ["@doctrine"]]
-            - [setLocalizedFallbackValueClassName, ['Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue']]
+            - [setLocalizedFallbackValueClassName, ['Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue']]
             - [setLocalizationClassName, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
 
     oro_locale.importexport.strategy.localized_fallback_value_aware:
@@ -25,7 +25,7 @@ services:
         public: false
         arguments:
             - "@doctrine"
-            - 'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue'
+            - 'Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue'
             - 'Oro\Bundle\LocaleBundle\Entity\Localization'
         tags:
             - { name: oro_importexport.normalizer, priority: -5 }
