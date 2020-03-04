@@ -185,6 +185,29 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         self::assertFalse($context->hasErrors());
     }
 
+    public function testShouldRemoveSourceGroupBeforeCallParentProcess()
+    {
+        $context = $this->getContext();
+        $context->setSourceGroup('group2');
+
+        [$processor1] = $this->addProcessors([
+            'processor1' => 'group1'
+        ]);
+
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(
+                function (ByStepNormalizeResultContext $context) {
+                    self::assertNull($context->getSourceGroup());
+                }
+            );
+
+        $this->processor->process($context);
+        self::assertSame('group1', $context->getSourceGroup());
+        self::assertFalse($context->hasErrors());
+    }
+
     public function testShouldRemoveFailedGroupBeforeCallParentProcess()
     {
         $context = $this->getContext();
@@ -204,7 +227,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             );
 
         $this->processor->process($context);
-        self::assertNull($context->getFailedGroup());
+        self::assertSame('', $context->getFailedGroup());
         self::assertFalse($context->hasErrors());
     }
 
@@ -220,8 +243,13 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
-        $processor10->expects(self::never())
-            ->method('process');
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(function (ByStepNormalizeResultContext $context) {
+                self::assertEquals('group1', $context->getSourceGroup());
+                self::assertSame('', $context->getFailedGroup());
+            });
 
         $this->processor->process($context);
     }
@@ -263,6 +291,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -326,6 +355,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -390,6 +420,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -452,6 +483,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -517,6 +549,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -580,6 +613,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -622,8 +656,13 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->willReturnCallback(function (ByStepNormalizeResultContext $context) use ($initialError) {
                 self::assertEquals([$initialError], $context->getErrors());
             });
-        $processor10->expects(self::never())
-            ->method('process');
+        $processor10->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context))
+            ->willReturnCallback(function (ByStepNormalizeResultContext $context) {
+                self::assertEquals('group1', $context->getSourceGroup());
+                self::assertSame('', $context->getFailedGroup());
+            });
 
         $this->processor->process($context);
 
@@ -669,6 +708,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -734,6 +774,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -800,6 +841,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -867,6 +909,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -937,6 +980,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -1005,6 +1049,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
@@ -1279,6 +1324,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
             ->with(self::identicalTo($context))
             ->willReturnCallback(
                 function (ByStepNormalizeResultContext $context) {
+                    self::assertSame('', $context->getSourceGroup());
                     self::assertEquals('group1', $context->getFailedGroup());
                 }
             );
