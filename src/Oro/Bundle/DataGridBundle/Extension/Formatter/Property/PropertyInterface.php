@@ -5,7 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
 /**
- * Interface PropertyInterface
+ * Data grid property interface.
+ *
  * @package Oro\Bundle\DataGridBundle\Extension\Formatter\Property
  *
  * Every property should be stateless

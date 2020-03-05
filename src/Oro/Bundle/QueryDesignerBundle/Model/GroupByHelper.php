@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+/**
+ * Group by query part manipulation helper.
+ */
 class GroupByHelper
 {
     /**
