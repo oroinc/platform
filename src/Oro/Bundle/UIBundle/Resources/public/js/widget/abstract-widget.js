@@ -294,7 +294,7 @@ define(function(require) {
                     let actionId = $action.data('action-name') || 'adopted_action_' + idx;
                     switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
-                            const submitReplacement = $('<input type="submit"/>');
+                            const submitReplacement = $('<input type="submit" tabindex="-1" aria-hidden="true"/>');
                             submitReplacement.css({
                                 position: 'absolute',
                                 left: '-9999px',
