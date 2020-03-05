@@ -9,6 +9,10 @@ define(function(require) {
     const _ = require('underscore');
 
     const LayoutSubtreeView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat([
+            'keepAttrs', 'useHiddenElement'
+        ]),
+
         options: {
             blockId: '',
             reloadEvents: [],
@@ -23,6 +27,8 @@ define(function(require) {
 
         /** @property */
         useHiddenElement: false,
+
+        keepAttrs: [],
 
         /** @property */
         events: {
@@ -48,6 +54,7 @@ define(function(require) {
         },
 
         setContent: function(content) {
+            const $content = $(content);
             this._hideLoading();
             this.disposePageComponents();
 
@@ -56,13 +63,19 @@ define(function(require) {
                 this.hiddenElement = this.$el.clone(true).hide();
                 this.hiddenElement.insertAfter(this.$el);
                 this.hiddenElement.trigger('content:remove')
-                    .html($(content).children())
+                    .html($content.children())
                     .trigger('content:changed');
             } else {
                 this.$el
                     .trigger('content:remove')
-                    .html($(content).children())
+                    .html($content.children())
                     .trigger('content:changed');
+            }
+
+            if (this.keepAttrs.length) {
+                for (const attr of this.keepAttrs) {
+                    this.$el.attr(attr, $content.attr(attr));
+                }
             }
         },
 
