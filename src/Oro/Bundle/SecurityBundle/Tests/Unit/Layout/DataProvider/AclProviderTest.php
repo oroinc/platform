@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -13,6 +14,9 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
     protected $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
+    protected $tokenAccessor;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     /** @var AclProvider */
@@ -21,10 +25,12 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->provider = new AclProvider(
             $this->authorizationChecker,
+            $this->tokenAccessor,
             $this->doctrine
         );
     }
