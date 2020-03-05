@@ -23,6 +23,10 @@ define(['underscore', 'asap'], function(_, asap) {
                 .indexOf(' mobile-version ') !== -1;
         },
 
+        isTouchDevice() {
+            return (('ontouchstart' in window) || (navigator.MaxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0));
+        },
+
         isDesktop: function() {
             return !this.isMobile();
         },
