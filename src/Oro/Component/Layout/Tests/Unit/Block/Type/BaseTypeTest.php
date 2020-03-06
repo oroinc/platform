@@ -58,7 +58,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                         'block',
                         '_test_block_1'
                     ],
-                    'cache_key'            => '_test:block--1_block',
+                    'cache_key'            => '_test:block--1_block_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain'   => 'messages',
                     'visible'              => true,
                 ]
@@ -98,7 +98,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                         'additional_prefix_2',
                         '_block_id'
                     ],
-                    'cache_key'            => '_block_id_block',
+                    'cache_key'            => '_block_id_block_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain'   => 'test_translation_domain',
                     'attr'                 => ['test_attr' => 'test_attr_val'],
                     'label'                => 'Test Label',
