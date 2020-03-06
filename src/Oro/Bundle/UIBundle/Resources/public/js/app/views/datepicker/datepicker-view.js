@@ -3,6 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const moment = require('moment');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
     const BaseView = require('oroui/js/app/views/base/view');
@@ -11,7 +12,8 @@ define(function(require) {
     const DatePickerView = BaseView.extend({
         defaults: {
             dateInputAttrs: {
-                autocomplete: 'off'
+                'autocomplete': 'off',
+                'aria-label': __('oro.ui.datepicker.aria_label')
             },
             datePickerOptions: {}
         },
