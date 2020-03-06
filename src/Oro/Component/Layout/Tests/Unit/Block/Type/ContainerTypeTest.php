@@ -27,7 +27,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                         'container',
                         '_container_id'
                     ],
-                    'cache_key'            => '_container_id_container',
+                    'cache_key'            => '_container_id_container_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain'   => 'messages'
                 ]
             ],
@@ -63,7 +63,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                         'container',
                         '_container_id'
                     ],
-                    'cache_key'            => '_container_id_container',
+                    'cache_key'            => '_container_id_container_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain'   => 'test_translation_domain',
                     'attr'                 => ['test_attr' => 'test_attr_val'],
                     'label'                => 'Test Label',

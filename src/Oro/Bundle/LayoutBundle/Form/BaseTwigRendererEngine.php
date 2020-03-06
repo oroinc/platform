@@ -70,8 +70,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
         unset(
             $this->parentResourceOffsets[$cacheKey],
             $this->parentResourceHierarchyLevels[$cacheKey],
-            $this->overrideResources[$cacheKey],
-            $this->resources[$cacheKey]
+            $this->overrideResources[$cacheKey]
         );
 
         return ob_get_clean();
@@ -105,7 +104,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
                 if (!array_key_exists($block, $this->resourcesHierarchy)) {
                     $this->resources[$cacheKey][$block] = $blockData;
                     $this->resourcesHierarchy[$block] = [$blockData];
-                } else {
+                } elseif (!\in_array($blockData, $this->resourcesHierarchy[$block], true)) {
                     array_unshift($this->resourcesHierarchy[$block], $blockData);
                 }
             }
