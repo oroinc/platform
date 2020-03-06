@@ -19,6 +19,10 @@ class DynamicFieldsOptionsExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('dynamic_fields_disabled', false);
+        $resolver->setDefaults([
+            'dynamic_fields_disabled' => false,
+            'dynamic_fields_ignore_exception' => false,
+            'is_dynamic_field' => false
+        ]);
     }
 }

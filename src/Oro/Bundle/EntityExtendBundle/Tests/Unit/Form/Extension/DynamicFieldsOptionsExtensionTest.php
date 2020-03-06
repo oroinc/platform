@@ -14,7 +14,14 @@ class DynamicFieldsOptionsExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new DynamicFieldsOptionsExtension();
         $extension->configureOptions($optionsResolver);
 
-        $this->assertEquals(['dynamic_fields_disabled' => false], $optionsResolver->resolve());
+        $this->assertEquals(
+            [
+                'dynamic_fields_disabled' => false,
+                'dynamic_fields_ignore_exception' => false,
+                'is_dynamic_field' => false
+            ],
+            $optionsResolver->resolve()
+        );
     }
 
     public function testGetExtendedTypes(): void
