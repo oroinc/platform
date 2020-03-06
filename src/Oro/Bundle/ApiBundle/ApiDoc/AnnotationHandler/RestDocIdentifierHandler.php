@@ -68,7 +68,10 @@ class RestDocIdentifierHandler
         $annotation->addRequirement(
             self::ID_ATTRIBUTE,
             [
-                'dataType'    => $this->dataTypeConverter->convertDataType($dataType),
+                'dataType'    => $this->dataTypeConverter->convertDataType(
+                    $dataType,
+                    $this->docViewDetector->getView()
+                ),
                 'requirement' => $this->getIdRequirement($metadata),
                 'description' => $description
             ]

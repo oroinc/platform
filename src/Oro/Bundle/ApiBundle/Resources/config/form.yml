@@ -71,7 +71,7 @@ services:
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:
-            - [] # Data type mappings are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - [] # data type mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
