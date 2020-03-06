@@ -29,22 +29,22 @@ use Symfony\Component\Form\Guess\TypeGuess;
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {
     /** @var array [data type => [form type, options], ...] */
-    protected $dataTypeMappings = [];
+    private $dataTypeMappings;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var MetadataAccessorInterface|null */
-    protected $metadataAccessor;
+    private $metadataAccessor;
 
     /** @var ConfigAccessorInterface|null */
-    protected $configAccessor;
+    private $configAccessor;
 
     /** @var EntityMapper|null */
-    protected $entityMapper;
+    private $entityMapper;
 
     /** @var IncludedEntityCollection|null */
-    protected $includedEntities;
+    private $includedEntities;
 
     /**
      * @param array          $dataTypeMappings [data type => [form type, options], ...]
@@ -121,16 +121,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param string $dataType
-     * @param string $formType
-     * @param array  $formOptions
-     */
-    public function addDataTypeMapping($dataType, $formType, array $formOptions = [])
-    {
-        $this->dataTypeMappings[$dataType] = [$formType, $formOptions];
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function guessType($class, $property)
@@ -199,7 +189,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return EntityMetadata|null
      */
-    protected function getMetadataForClass($class)
+    private function getMetadataForClass($class)
     {
         return null !== $this->metadataAccessor
             ? $this->metadataAccessor->getMetadata($class)
@@ -211,7 +201,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return EntityDefinitionConfig|null
      */
-    protected function getConfigForClass($class)
+    private function getConfigForClass($class)
     {
         return null !== $this->configAccessor
             ? $this->configAccessor->getConfig($class)
@@ -224,7 +214,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return EntityDefinitionFieldConfig|null
      */
-    protected function getFieldConfig($class, $property)
+    private function getFieldConfig($class, $property)
     {
         $config = $this->getConfigForClass($class);
 
@@ -240,7 +230,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess
      */
-    protected function createTypeGuess($formType, array $formOptions, $confidence)
+    private function createTypeGuess($formType, array $formOptions, $confidence)
     {
         return new TypeGuess($formType, $formOptions, $confidence);
     }
@@ -248,7 +238,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * @return TypeGuess
      */
-    protected function createDefaultTypeGuess()
+    private function createDefaultTypeGuess()
     {
         return $this->createTypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
@@ -258,7 +248,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess
      */
-    protected function getTypeGuessForField($dataType)
+    private function getTypeGuessForField($dataType)
     {
         if (!isset($this->dataTypeMappings[$dataType])) {
             return $this->createDefaultTypeGuess();
@@ -274,7 +264,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
+    private function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
         return $this->createTypeGuess(
             EntityType::class,
@@ -293,7 +283,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForArrayAssociation(
+    private function getTypeGuessForArrayAssociation(
         AssociationMetadata $metadata,
         EntityDefinitionFieldConfig $config
     ) {
@@ -326,7 +316,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess
      */
-    protected function getTypeGuessForNestedObjectAssociation(
+    private function getTypeGuessForNestedObjectAssociation(
         AssociationMetadata $metadata,
         EntityDefinitionFieldConfig $config
     ) {
@@ -348,7 +338,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForCollapsedArrayAssociation(AssociationMetadata $metadata)
+    private function getTypeGuessForCollapsedArrayAssociation(AssociationMetadata $metadata)
     {
         $targetMetadata = $metadata->getTargetMetadata();
         if (null === $targetMetadata) {
@@ -386,7 +376,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForNestedAssociation(
+    private function getTypeGuessForNestedAssociation(
         AssociationMetadata $metadata,
         EntityDefinitionFieldConfig $config
     ) {

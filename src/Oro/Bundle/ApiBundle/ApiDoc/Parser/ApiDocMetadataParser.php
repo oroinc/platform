@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -25,18 +26,24 @@ class ApiDocMetadataParser implements ParserInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
+    /** @var RestDocViewDetector */
+    private $docViewDetector;
+
     /** @var ApiDocDataTypeConverter */
     private $dataTypeConverter;
 
     /**
      * @param ValueNormalizer         $valueNormalizer
+     * @param RestDocViewDetector     $docViewDetector
      * @param ApiDocDataTypeConverter $dataTypeConverter
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
+        RestDocViewDetector $docViewDetector,
         ApiDocDataTypeConverter $dataTypeConverter
     ) {
         $this->valueNormalizer = $valueNormalizer;
+        $this->docViewDetector = $docViewDetector;
         $this->dataTypeConverter = $dataTypeConverter;
     }
 
@@ -159,7 +166,10 @@ class ApiDocMetadataParser implements ParserInterface
      */
     private function getPropertyData(PropertyMetadata $metadata, EntityDefinitionFieldConfig $config)
     {
-        $dataType = $this->dataTypeConverter->convertDataType($metadata->getDataType());
+        $dataType = $this->dataTypeConverter->convertDataType(
+            $metadata->getDataType(),
+            $this->docViewDetector->getView()
+        );
 
         return [
             'description' => $config->getDescription(),
