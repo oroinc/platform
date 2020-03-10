@@ -43,12 +43,6 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
     /** @var bool */
     private $debug;
 
-    /** @var array */
-    private $shouldBeAdded = [];
-
-    /** @var array */
-    private $shouldBeInitialized = [];
-
     /**
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
@@ -88,14 +82,18 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!$this->isApplicable($options)) {
-            return;
+        if ($this->isApplicable($options)) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], -255);
         }
+    }
 
-        $className = $builder->getOption('data_class', null);
-        if (!$className) {
-            return;
-        }
+    /**
+     * @param PreSetDataEvent $event
+     */
+    public function preSetData(PreSetDataEvent $event): void
+    {
+        $form = $event->getForm();
+        $className = $form->getConfig()->getOption('data_class');
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
@@ -128,29 +126,11 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
         }
 
         ArrayUtil::sortBy($fields, true);
-        $this->shouldBeAdded[$className] = [];
         foreach ($fields as $fieldName => $priority) {
-            $this->shouldBeAdded[$className][] = $fieldName;
-        }
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], -255);
-    }
-
-    /**
-     * @param PreSetDataEvent $event
-     */
-    public function preSetData(PreSetDataEvent $event): void
-    {
-        $form = $event->getForm();
-        $className = $form->getConfig()->getOption('data_class');
-        $fields = $this->shouldBeAdded[$className];
-        foreach ($fields as $fieldName) {
             if (!$this->fieldExists($form, $fieldName)) {
                 $form->add($fieldName, null, ['is_dynamic_field' => true]);
             }
         }
-
-        $this->shouldBeInitialized = array_unique($this->shouldBeInitialized);
     }
 
     /**
@@ -205,7 +185,6 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
-        $resolver->setDefault('is_dynamic_field', false);
     }
 
     /**
@@ -258,7 +237,11 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
     private function fieldExists(FormInterface $form, string $fieldName): bool
     {
         if ($form->has($fieldName)) {
-            if (!$this->isDynamicField($form, $fieldName)) {
+            if ($this->isDynamicField($form, $fieldName)) {
+                return true;
+            }
+
+            if (!$this->isIgnoreException($form, $fieldName)) {
                 $this->createException($fieldName);
             }
 
@@ -277,6 +260,17 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
     private function isDynamicField(FormInterface $form, string $fieldName): bool
     {
         return $form->get($fieldName)->getConfig()->getOption('is_dynamic_field', false);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    private function isIgnoreException(FormInterface $form, string $fieldName): bool
+    {
+        return $form->get($fieldName)->getConfig()->getOption('dynamic_fields_ignore_exception', false);
     }
 
     /**

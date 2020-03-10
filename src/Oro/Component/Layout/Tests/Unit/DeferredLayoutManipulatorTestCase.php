@@ -35,6 +35,7 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     protected function setUp()
     {
         $this->context = new LayoutContext();
+        $this->context->resolve();
 
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
