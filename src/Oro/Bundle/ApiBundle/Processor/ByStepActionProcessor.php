@@ -26,6 +26,7 @@ class ByStepActionProcessor extends ActionProcessor
                 $context->getLastGroup()
             ));
         }
+        $context->resetSkippedGroups();
 
         parent::process($context);
     }

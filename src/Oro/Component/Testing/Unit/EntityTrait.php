@@ -53,7 +53,7 @@ trait EntityTrait
      *
      * @param object $object
      * @param string $property
-     * @param string $value
+     * @param mixed $value
      */
     protected function setValue($object, $property, $value)
     {

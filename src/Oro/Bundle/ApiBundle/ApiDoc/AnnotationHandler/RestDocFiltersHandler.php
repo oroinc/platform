@@ -153,7 +153,10 @@ class RestDocFiltersHandler
      */
     private function getFilterType($dataType, $isArrayAllowed, $isRangeAllowed)
     {
-        $dataType = $this->dataTypeConverter->convertDataType($dataType);
+        $dataType = $this->dataTypeConverter->convertDataType(
+            $dataType,
+            $this->docViewDetector->getView()
+        );
 
         $result = '%1$s';
         if ($isArrayAllowed) {

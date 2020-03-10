@@ -5,9 +5,12 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
+/**
+ * Normalizes objects which implements AbstractLocalizedFallbackValue class.
+ */
 class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 {
     /** @var ManagerRegistry */
@@ -71,8 +74,8 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         $result = new ArrayCollection();
         foreach ($data as $localizationName => $item) {
             // Create new object instead of clone because cloned object could have extended fields with excessive data
-            /** @var LocalizedFallbackValue $object */
-            $object = new $this->localizedFallbackValueClass;
+            /** @var AbstractLocalizedFallbackValue $object */
+            $object = new $itemType();
 
             if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
                 if (!array_key_exists($localizationName, $this->localizations)) {

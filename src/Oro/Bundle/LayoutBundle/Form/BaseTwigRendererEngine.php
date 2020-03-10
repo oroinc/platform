@@ -8,7 +8,7 @@ use Twig\Environment;
 use Twig\Template;
 
 /**
- * Extends TwigRendererEngine to add possability to render parent blocks without "extend"
+ * Extends TwigRendererEngine to add possibility to render parent blocks without "extend"
  */
 class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererEngineInterface
 {
@@ -104,7 +104,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
                 if (!array_key_exists($block, $this->resourcesHierarchy)) {
                     $this->resources[$cacheKey][$block] = $blockData;
                     $this->resourcesHierarchy[$block] = [$blockData];
-                } else {
+                } elseif (!\in_array($blockData, $this->resourcesHierarchy[$block], true)) {
                     array_unshift($this->resourcesHierarchy[$block], $blockData);
                 }
             }

@@ -11,10 +11,10 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 trait FallbackTrait
 {
     /**
-     * @param Collection|LocalizedFallbackValue[] $values
-     * @param Localization|null                   $localization
+     * @param Collection|AbstractLocalizedFallbackValue[] $values
+     * @param Localization|null                           $localization
      *
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue
      */
     protected function getFallbackValue(Collection $values, Localization $localization = null)
     {
@@ -22,9 +22,9 @@ trait FallbackTrait
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $values
+     * @param Collection|AbstractLocalizedFallbackValue[] $values
      *
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue
      */
     protected function getDefaultFallbackValue(Collection $values)
     {
@@ -32,19 +32,24 @@ trait FallbackTrait
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $values
-     * @param string                              $value
+     * @param Collection|AbstractLocalizedFallbackValue[] $values
+     * @param string                                      $value
+     * @param string                                      $className
      *
      * @return $this
      */
-    protected function setDefaultFallbackValue(Collection $values, $value)
-    {
+    protected function setDefaultFallbackValue(
+        Collection $values,
+        $value,
+        string $className = LocalizedFallbackValue::class
+    ) {
         $oldValue = $this->getLocalizedFallbackValue($values);
         if ($oldValue && $values->contains($oldValue)) {
             $values->removeElement($oldValue);
         }
 
-        $newValue = new LocalizedFallbackValue();
+        /** @var AbstractLocalizedFallbackValue $newValue */
+        $newValue = new $className();
         $newValue->setString($value);
 
         if (!$values->contains($newValue)) {
@@ -55,10 +60,10 @@ trait FallbackTrait
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $values
-     * @param Localization                        $localization
+     * @param Collection|AbstractLocalizedFallbackValue[] $values
+     * @param Localization                                $localization
      *
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue
      *
      * @throws \LogicException
      */
@@ -95,10 +100,10 @@ trait FallbackTrait
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $values
-     * @param Localization|null                   $localization
+     * @param Collection|AbstractLocalizedFallbackValue[] $values
+     * @param Localization|null                           $localization
      *
-     * @return LocalizedFallbackValue|null
+     * @return AbstractLocalizedFallbackValue|null
      *
      * @throws \LogicException
      */

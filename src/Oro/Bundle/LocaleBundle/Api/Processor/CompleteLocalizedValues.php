@@ -8,8 +8,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -72,7 +72,7 @@ class CompleteLocalizedValues implements ProcessorInterface
         }
 
         $entity = $form->getData();
-        $em = $this->doctrineHelper->getEntityManagerForClass(LocalizedFallbackValue::class);
+        $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
         $localizations = null;
         /** @var FormInterface $child */
         foreach ($form as $child) {
@@ -81,11 +81,16 @@ class CompleteLocalizedValues implements ProcessorInterface
                 if (null === $localizations) {
                     $localizations = $this->localizationHelper->getLocalizations();
                 }
-                $this->addMissingLocalizedValues(
-                    $this->propertyAccessor->getValue($entity, $fieldName),
+
+                $oldValue = $this->propertyAccessor->getValue($entity, $fieldName);
+                $added = $this->addMissingLocalizedValues(
+                    $oldValue,
                     $em,
-                    $localizations
+                    $localizations,
+                    $metadata->getAssociationMapping($fieldName)
                 );
+
+                $this->propertyAccessor->setValue($entity, $fieldName, array_merge($oldValue->toArray(), $added));
             }
         }
     }
@@ -120,31 +125,37 @@ class CompleteLocalizedValues implements ProcessorInterface
         $mapping = $metadata->getAssociationMapping($fieldName);
 
         return
-            $mapping['type'] & ClassMetadata::MANY_TO_MANY
-            && LocalizedFallbackValue::class === $mapping['targetEntity'];
+            $mapping['type'] & ClassMetadata::TO_MANY
+            && \is_a($mapping['targetEntity'], AbstractLocalizedFallbackValue::class, true);
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $associationValue
-     * @param EntityManagerInterface              $em
-     * @param Localization[]                      $localizations
+     * @param Collection|AbstractLocalizedFallbackValue[] $associationValue
+     * @param EntityManagerInterface                      $em
+     * @param Localization[]                              $localizations
+     * @param array                                       $mapping
+     * @return array
      */
     private function addMissingLocalizedValues(
         Collection $associationValue,
         EntityManagerInterface $em,
-        array $localizations
-    ): void {
+        array $localizations,
+        array $mapping
+    ): array {
+        $added = [];
         $missingLocalizations = $this->getMissingLocalizations($associationValue, $localizations);
         foreach ($missingLocalizations as $localization) {
-            $localizedFallbackValue = $this->createLocalizedFallbackValue($localization);
+            $localizedFallbackValue = $this->createLocalizedFallbackValue($localization, $mapping['targetEntity']);
             $em->persist($localizedFallbackValue);
-            $associationValue->add($localizedFallbackValue);
+            $added[] = $localizedFallbackValue;
         }
+
+        return $added;
     }
 
     /**
-     * @param Collection|LocalizedFallbackValue[] $associationValue
-     * @param Localization[]                      $localizations
+     * @param Collection|AbstractLocalizedFallbackValue[] $associationValue
+     * @param Localization[]                              $localizations
      *
      * @return Localization[]
      */
@@ -168,12 +179,16 @@ class CompleteLocalizedValues implements ProcessorInterface
 
     /**
      * @param Localization|null $localization
+     * @param string $className
      *
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue
      */
-    private function createLocalizedFallbackValue(?Localization $localization): LocalizedFallbackValue
-    {
-        $localizedFallbackValue = new LocalizedFallbackValue();
+    private function createLocalizedFallbackValue(
+        ?Localization $localization,
+        string $className
+    ): AbstractLocalizedFallbackValue {
+        /** @var AbstractLocalizedFallbackValue $localizedFallbackValue */
+        $localizedFallbackValue = new $className();
         if (null !== $localization) {
             $localizedFallbackValue->setLocalization($localization);
             $parent = $localization->getParentLocalization();

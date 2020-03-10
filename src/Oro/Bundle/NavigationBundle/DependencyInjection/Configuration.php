@@ -21,8 +21,10 @@ class Configuration implements ConfigurationInterface
             ->defaultValue('')
             ->info('The prefix in the name of the file with a list of js routes.')
             ->beforeNormalization()
-                ->always(function ($data) {
-                    return ltrim($data, '/');
+                ->always(static function (string $data) {
+                    $data = trim($data, '/_');
+
+                    return $data ? $data . '_' : '';
                 })
                 ->end()
             ->end();

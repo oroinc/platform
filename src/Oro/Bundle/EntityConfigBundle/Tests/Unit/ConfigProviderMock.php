@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -98,8 +99,11 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function getId($className = null, $fieldName = null, $fieldType = null)
-    {
+    public function getId(
+        string $className = null,
+        string $fieldName = null,
+        string $fieldType = null
+    ): ConfigIdInterface {
         return $fieldName
             ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
             : new EntityConfigId($this->getScope(), $className);
@@ -108,7 +112,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function hasConfig($className, $fieldName = null)
+    public function hasConfig(string $className, string $fieldName = null): bool
     {
         return $fieldName
             ? isset($this->fieldConfigs[$className][$fieldName])
@@ -118,7 +122,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function hasConfigById(ConfigIdInterface $configId)
+    public function hasConfigById(ConfigIdInterface $configId): bool
     {
         return $configId instanceof FieldConfigId
             ? $this->hasConfig($configId->getClassName(), $configId->getFieldName())
@@ -128,7 +132,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function getConfig($className, $fieldName = null)
+    public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
     {
         if (!$this->hasConfig($className, $fieldName)) {
             if ($fieldName) {
@@ -154,7 +158,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function getConfigById(ConfigIdInterface $configId)
+    public function getConfigById(ConfigIdInterface $configId): ConfigInterface
     {
         return $configId instanceof FieldConfigId
             ? $this->getConfig($configId->getClassName(), $configId->getFieldName())
@@ -164,7 +168,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function getIds($className = null, $withHidden = false)
+    public function getIds(string $className = null, bool $withHidden = false): array
     {
         $result = [];
         if ($className) {
@@ -199,7 +203,7 @@ class ConfigProviderMock extends ConfigProvider
     /**
      * {@inheritdoc}
      */
-    public function getConfigs($className = null, $withHidden = false)
+    public function getConfigs(string $className = null, bool $withHidden = false): array
     {
         $result = [];
         if ($className) {

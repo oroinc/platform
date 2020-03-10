@@ -639,31 +639,17 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.doc_data_type_converter'
+            - '@oro_api.api_doc.data_type_converter'
 
     oro_api.rest.doc_handler.filters:
         class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocFiltersHandler
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.doc_data_type_converter'
+            - '@oro_api.api_doc.data_type_converter'
 
     oro_api.rest.doc_handler.status_codes:
         class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocStatusCodesHandler
-
-    oro_api.rest.doc_data_type_converter:
-        class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter
-        arguments:
-            -
-                'unsignedInteger': 'integer'
-                'text': 'string'
-                'guid': 'string'
-                'json_array': 'object'
-                'simple_array': 'array'
-                'percent': 'float'
-                'currency': 'string'
-                'money_value': 'money'
-                'duration': 'integer'
 
     oro_api.rest.doc_url_generator:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator
@@ -671,6 +657,12 @@ services:
             - '@router'
             - '%oro_api.api_doc.views%'
             - '%oro_api.api_doc.default_view%'
+
+    oro_api.api_doc.data_type_converter:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter
+        arguments:
+            - [] # default mapping. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
+            - [] # view mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
 
     oro_api.api_doc.security_context:
         class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext
@@ -727,7 +719,8 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.doc_data_type_converter'
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.api_doc.data_type_converter'
         tags:
             - { name: nelmio_api_doc.extractor.parser }
 

@@ -356,7 +356,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
 
             /** @var AttributeGroupRelation $attributeRelation */
             foreach ($group->getAttributeRelations() as $attributeRelation) {
-                $item['attributes'][] = $attributeRelation->getEntityConfigFieldId();
+                $item['attributes'][] = $attributeRelation->getId();
             }
             $data[] = $item;
         }

@@ -216,6 +216,13 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('data_types')
+                            ->info('The map between data-type names and their representation in API documentation.')
+                            ->example(['guid' => 'string', 'currency' => 'string'])
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->prototype('scalar')->cannotBeEmpty()->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -225,6 +232,16 @@ class Configuration implements ConfigurationInterface
                     . ' that does not have own documentation.'
                 )
                 ->defaultNull()
+            ->end()
+            ->arrayNode('api_doc_data_types')
+                ->info(
+                    'The map between data-type names and their representation in API documentation. The data-types'
+                    . ' declared in this map can be overridden in "data_types" section of a particular API view.'
+                )
+                ->example(['guid' => 'string', 'currency' => 'string'])
+                ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
+                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
         $node->end()
             ->validate()
@@ -243,6 +260,9 @@ class Configuration implements ConfigurationInterface
                         }
                         if (!\array_key_exists('documentation_path', $views[$viewName])) {
                             $value['api_doc_views'][$viewName]['documentation_path'] = $documentationPath;
+                        }
+                        if (empty($value['api_doc_views'][$viewName]['data_types'])) {
+                            unset($value['api_doc_views'][$viewName]['data_types']);
                         }
                     }
 
@@ -299,6 +319,12 @@ class Configuration implements ConfigurationInterface
                         if (!isset($existingHeaderValues[$headerValue['value']])) {
                             $view[$key][$headerName][] = $headerValue;
                         }
+                    }
+                }
+            } elseif ('data_types' === $key) {
+                foreach ($underlyingView[$key] as $dataType => $docDataType) {
+                    if (!isset($view[$key][$dataType])) {
+                        $view[$key][$dataType] = $docDataType;
                     }
                 }
             }

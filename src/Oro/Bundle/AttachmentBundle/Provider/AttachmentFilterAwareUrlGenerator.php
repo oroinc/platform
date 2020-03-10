@@ -44,8 +44,7 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
         if (!empty($parameters['filter'])) {
-            $filterConfig = $this->filterConfiguration->get($parameters['filter']);
-            $parameters['filterMd5'] = md5(json_encode($filterConfig));
+            $parameters['filterMd5'] = $this->getFilterHash($parameters['filter']);
         }
 
         try {
@@ -81,5 +80,16 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     public function getContext(): RequestContext
     {
         return $this->urlGenerator->getContext();
+    }
+
+    /**
+     * @param string $filterName
+     * @return string
+     */
+    public function getFilterHash(string $filterName): string
+    {
+        $filterConfig = $this->filterConfiguration->get($filterName);
+
+        return md5(json_encode($filterConfig));
     }
 }

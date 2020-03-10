@@ -28,6 +28,8 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 $context->getLastGroup()
             ));
         }
+        $context->resetSkippedGroups();
+        $context->setSourceGroup(null);
         $context->setFailedGroup(null);
 
         parent::process($context);
@@ -40,6 +42,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     {
         /** @var ByStepNormalizeResultContext $context */
 
+        $sourceGroup = $context->getFirstGroup();
         if ($context->hasErrors()) {
             $initialErrorCount = count($context->getErrors());
             $processors = $this->processorBag->getProcessors($context);
@@ -63,11 +66,18 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 if (!$errorsHandled && count($context->getErrors()) > $initialErrorCount) {
                     $this->handleErrors($context, $processorId, $group);
                 }
+            } catch (\Error $e) {
+                $this->handlePhpError($e, $context, $processorId, $group);
             } catch (\Exception $e) {
                 $this->handleException($e, $context, $processorId, $group);
             }
         } else {
             parent::executeProcessors($context);
+        }
+        if ($context->getFirstGroup() !== ApiActionGroup::NORMALIZE_RESULT) {
+            $context->setSourceGroup($sourceGroup);
+            $context->setFailedGroup('');
+            $this->executeNormalizeResultProcessors($context);
         }
     }
 
@@ -79,6 +89,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         /** @var ByStepNormalizeResultContext $context */
 
         if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
+            $context->setSourceGroup('');
             $context->setFailedGroup($group);
         }
         parent::handleErrors($context, $processorId, $group);
@@ -92,6 +103,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
         /** @var ByStepNormalizeResultContext $context */
 
         if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
+            $context->setSourceGroup('');
             $context->setFailedGroup($group);
         }
         parent::handleException($e, $context, $processorId, $group);

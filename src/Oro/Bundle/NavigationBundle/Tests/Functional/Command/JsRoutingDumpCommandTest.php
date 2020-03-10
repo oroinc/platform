@@ -59,6 +59,6 @@ class JsRoutingDumpCommandTest extends WebTestCase
      */
     private function getFilename(): string
     {
-        return implode('_', array_filter([$this->filenamePrefix, 'routes']));
+        return $this->filenamePrefix . 'routes';
     }
 }

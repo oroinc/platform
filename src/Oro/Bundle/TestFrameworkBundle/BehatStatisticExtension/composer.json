@@ -4,15 +4,16 @@
     "require": {
         "php": "~7.3.13 || ~7.4.2",
         "behat/behat": "3.4.*",
+        "behat/gherkin": "4.6.0",
         "doctrine/dbal": "2.5.5",
-        "symfony/config": "3.4.*"
+        "symfony/config": "4.4.*"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "phpunit/phpunit": "7.5.15",
-        "symfony/process": "3.4.*",
-        "symfony/yaml": "3.4.*",
-        "symfony/console": "3.4.*"
+        "phpunit/phpunit": "7.5.*",
+        "symfony/process": "4.4.*",
+        "symfony/yaml": "4.4.*",
+        "symfony/console": "4.4.*"
     },
     "license": "MIT",
     "authors": [

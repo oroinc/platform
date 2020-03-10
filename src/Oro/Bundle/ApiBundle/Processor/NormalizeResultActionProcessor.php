@@ -67,12 +67,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
                 $this->handleErrors($context, $processorId, $group);
             }
         } catch (\Error $e) {
-            $this->handleException(
-                new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()),
-                $context,
-                $processorId,
-                $group
-            );
+            $this->handlePhpError($e, $context, $processorId, $group);
         } catch (\Exception $e) {
             $this->handleException($e, $context, $processorId, $group);
         }
@@ -103,6 +98,24 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         } elseif (!$context->isSoftErrorsHandling()) {
             throw new UnhandledErrorsException($context->getErrors());
         }
+    }
+
+    /**
+     * @param \Error                 $e
+     * @param NormalizeResultContext $context
+     * @param string                 $processorId
+     * @param string|null            $group
+     *
+     * @throws \Exception if the soft handling of errors was not requested
+     */
+    protected function handlePhpError(\Error $e, NormalizeResultContext $context, $processorId, $group)
+    {
+        $this->handleException(
+            new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()),
+            $context,
+            $processorId,
+            $group
+        );
     }
 
     /**

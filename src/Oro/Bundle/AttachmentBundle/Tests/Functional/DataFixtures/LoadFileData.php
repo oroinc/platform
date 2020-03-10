@@ -36,7 +36,7 @@ class LoadFileData extends AbstractFixture
         $this->setReference(self::FILE_2, $file);
 
         $file = new File();
-        $file->setFilename('file_a');
+        $file->setFilename('file_c');
         $file->setParentEntityClass(\stdClass::class);
         $file->setParentEntityId(1);
         $file->setParentEntityFieldName('fieldC');

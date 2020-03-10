@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsOptionsExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -14,7 +14,14 @@ class DynamicFieldsOptionsExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new DynamicFieldsOptionsExtension();
         $extension->configureOptions($optionsResolver);
 
-        $this->assertEquals(['dynamic_fields_disabled' => false], $optionsResolver->resolve());
+        $this->assertEquals(
+            [
+                'dynamic_fields_disabled' => false,
+                'dynamic_fields_ignore_exception' => false,
+                'is_dynamic_field' => false
+            ],
+            $optionsResolver->resolve()
+        );
     }
 
     public function testGetExtendedTypes(): void

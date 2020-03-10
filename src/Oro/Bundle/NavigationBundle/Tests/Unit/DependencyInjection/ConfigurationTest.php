@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\Configuration;
@@ -8,7 +9,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    public function testGetConfigTreeBuilder(): void
     {
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
@@ -20,33 +21,96 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_navigation', $root->getName());
     }
 
-    public function testProcessConfiguration()
+    /**
+     * @dataProvider processConfigurationDataProvider
+     *
+     * @param array $configs
+     * @param array $expected
+     */
+    public function testProcessConfiguration(array $configs, array $expected): void
     {
-        $configuration = new Configuration();
-        $processor     = new Processor();
-        $expected = [
-            'settings' => [
-                'resolved' => true,
-                'max_items' => [
-                    'value' => 20,
-                    'scope' => 'app'
+        $processor = new Processor();
+
+        $this->assertEquals(
+            array_merge(
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'max_items' => [
+                            'value' => 20,
+                            'scope' => 'app'
+                        ],
+                        'title_suffix' => [
+                            'value' => '',
+                            'scope' => 'app'
+                        ],
+                        'title_delimiter' => [
+                            'value' => '-',
+                            'scope' => 'app'
+                        ],
+                        'breadcrumb_menu' => [
+                            'value' => 'application_menu',
+                            'scope' => 'app'
+                        ],
+                    ],
+                    'js_routing_filename_prefix' => ''
                 ],
-                'title_suffix' => [
-                    'value' => '',
-                    'scope' => 'app'
+                $expected
+            ),
+            $processor->processConfiguration(new Configuration(), $configs)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function processConfigurationDataProvider(): array
+    {
+        return [
+            [
+                'configs' => [],
+                'expected' => [],
+            ],
+            [
+                'configs' => [
+                    'oro_navigation' => [
+                        'js_routing_filename_prefix' => '/prefix/'
+                    ]
                 ],
-                'title_delimiter' => [
-                    'value' => '-',
-                    'scope' => 'app'
-                ],
-                'breadcrumb_menu' => [
-                    'value' => 'application_menu',
-                    'scope' => 'app'
+                'expected' => [
+                    'js_routing_filename_prefix' => 'prefix_'
                 ],
             ],
-            'js_routing_filename_prefix' => ''
+            [
+                'configs' => [
+                    'oro_navigation' => [
+                        'js_routing_filename_prefix' => '/prefix_'
+                    ]
+                ],
+                'expected' => [
+                    'js_routing_filename_prefix' => 'prefix_'
+                ],
+            ],
+            [
+                'configs' => [
+                    'oro_navigation' => [
+                        'js_routing_filename_prefix' => '/_prefix/_'
+                    ]
+                ],
+                'expected' => [
+                    'js_routing_filename_prefix' => 'prefix_'
+                ],
+            ],
+            [
+                'configs' => [
+                    'oro_navigation' => [
+                        'js_routing_filename_prefix' => 'prefix'
+                    ]
+                ],
+                'expected' => [
+                    'js_routing_filename_prefix' => 'prefix_'
+                ],
+            ]
         ];
-
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, []));
     }
 }

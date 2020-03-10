@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizedFallbackValueCollectionTypeStub extends AbstractType
@@ -25,6 +27,7 @@ class LocalizedFallbackValueCollectionTypeStub extends AbstractType
     {
         $resolver->setDefaults([
             'field' => 'string',
+            'value_class' => LocalizedFallbackValue::class,
             'entry_type' => TextType::class,
             'entry_options' => [],
             'allow_add' => true,
@@ -36,8 +39,8 @@ class LocalizedFallbackValueCollectionTypeStub extends AbstractType
             return LocalizedFallbackValueTypeStub::class;
         });
 
-        $resolver->setNormalizer('entry_options', function () {
-            return [];
+        $resolver->setNormalizer('entry_options', function (Options $options) {
+            return ['data_class' => $options['value_class']];
         });
     }
 

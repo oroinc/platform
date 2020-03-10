@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * The configuration provider can be used to get configuration data inside particular configuration scope.
@@ -17,10 +15,10 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 class ConfigProvider
 {
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var string */
-    protected $scope;
+    private $scope;
 
     /** @var PropertyConfigBag */
     private $configBag;
@@ -30,7 +28,7 @@ class ConfigProvider
      * @param string            $scope         The configuration scope this provider works with
      * @param PropertyConfigBag $configBag     A bag contains the configuration of all scopes
      */
-    public function __construct(ConfigManager $configManager, $scope, PropertyConfigBag $configBag)
+    public function __construct(ConfigManager $configManager, string $scope, PropertyConfigBag $configBag)
     {
         $this->scope = $scope;
         $this->configManager = $configManager;
@@ -42,7 +40,7 @@ class ConfigProvider
      *
      * @return PropertyConfigContainer
      */
-    public function getPropertyConfig()
+    public function getPropertyConfig(): PropertyConfigContainer
     {
         return $this->configBag->getPropertyConfig($this->scope);
     }
@@ -52,7 +50,7 @@ class ConfigProvider
      *
      * @return ConfigManager
      */
-    public function getConfigManager()
+    public function getConfigManager(): ConfigManager
     {
         return $this->configManager;
     }
@@ -66,21 +64,24 @@ class ConfigProvider
      *
      * @return ConfigIdInterface
      */
-    public function getId($className = null, $fieldName = null, $fieldType = null)
-    {
+    public function getId(
+        string $className = null,
+        string $fieldName = null,
+        string $fieldType = null
+    ): ConfigIdInterface {
         if ($className) {
-            $className = $this->getClassName($className);
+            $className = ClassUtils::getRealClass($className);
         }
 
         if ($fieldName) {
             if ($fieldType) {
                 return new FieldConfigId($this->scope, $className, $fieldName, $fieldType);
-            } else {
-                return $this->configManager->getId($this->scope, $className, $fieldName);
             }
-        } else {
-            return new EntityConfigId($this->scope, $className);
+
+            return $this->configManager->getId($this->scope, $className, $fieldName);
         }
+
+        return new EntityConfigId($this->scope, $className);
     }
 
     /**
@@ -91,9 +92,9 @@ class ConfigProvider
      *
      * @return bool
      */
-    public function hasConfig($className, $fieldName = null)
+    public function hasConfig(string $className, string $fieldName = null): bool
     {
-        return $this->configManager->hasConfig($this->getClassName($className), $fieldName);
+        return $this->configManager->hasConfig(ClassUtils::getRealClass($className), $fieldName);
     }
 
     /**
@@ -103,34 +104,38 @@ class ConfigProvider
      *
      * @return bool
      */
-    public function hasConfigById(ConfigIdInterface $configId)
+    public function hasConfigById(ConfigIdInterface $configId): bool
     {
-        return $configId instanceof FieldConfigId
-            ? $this->configManager->hasConfig($configId->getClassName(), $configId->getFieldName())
-            : $this->configManager->hasConfig($configId->getClassName());
+        if ($configId instanceof FieldConfigId) {
+            return $this->configManager->hasConfig($configId->getClassName(), $configId->getFieldName());
+        }
+
+        return $this->configManager->hasConfig($configId->getClassName());
     }
 
     /**
      * Gets configuration data for the given entity or field.
      *
-     * @param string      $className
+     * @param string|null $className
      * @param string|null $fieldName
      *
      * @return ConfigInterface
      */
-    public function getConfig($className, $fieldName = null)
+    public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
     {
         if ($className) {
-            $className = $this->getClassName($className);
+            $className = ClassUtils::getRealClass($className);
         }
 
         if ($fieldName) {
             return $this->configManager->getFieldConfig($this->scope, $className, $fieldName);
-        } elseif ($className) {
-            return $this->configManager->getEntityConfig($this->scope, $className);
-        } else {
-            return $this->configManager->createEntityConfig($this->scope);
         }
+
+        if ($className) {
+            return $this->configManager->getEntityConfig($this->scope, $className);
+        }
+
+        return $this->configManager->createEntityConfig($this->scope);
     }
 
     /**
@@ -140,16 +145,22 @@ class ConfigProvider
      *
      * @return ConfigInterface
      */
-    public function getConfigById(ConfigIdInterface $configId)
+    public function getConfigById(ConfigIdInterface $configId): ConfigInterface
     {
-        $className = $configId->getClassName();
         if ($configId instanceof FieldConfigId) {
-            return $this->configManager->getFieldConfig($this->scope, $className, $configId->getFieldName());
-        } elseif ($className) {
-            return $this->configManager->getEntityConfig($this->scope, $className);
-        } else {
-            return $this->configManager->createEntityConfig($this->scope);
+            return $this->configManager->getFieldConfig(
+                $this->scope,
+                $configId->getClassName(),
+                $configId->getFieldName()
+            );
         }
+
+        $className = $configId->getClassName();
+        if ($className) {
+            return $this->configManager->getEntityConfig($this->scope, $className);
+        }
+
+        return $this->configManager->createEntityConfig($this->scope);
     }
 
     /**
@@ -162,10 +173,10 @@ class ConfigProvider
      *
      * @return ConfigIdInterface[]
      */
-    public function getIds($className = null, $withHidden = false)
+    public function getIds(string $className = null, bool $withHidden = false): array
     {
         if ($className) {
-            $className = $this->getClassName($className);
+            $className = ClassUtils::getRealClass($className);
         }
 
         return $this->configManager->getIds($this->scope, $className, $withHidden);
@@ -181,10 +192,10 @@ class ConfigProvider
      *
      * @return ConfigInterface[]
      */
-    public function getConfigs($className = null, $withHidden = false)
+    public function getConfigs(string $className = null, bool $withHidden = false): array
     {
         if ($className) {
-            $className = $this->getClassName($className);
+            $className = ClassUtils::getRealClass($className);
         }
 
         return $this->configManager->getConfigs($this->scope, $className, $withHidden);
@@ -200,7 +211,7 @@ class ConfigProvider
      *
      * @return array
      */
-    public function map(\Closure $callback, $className = null, $withHidden = false)
+    public function map($callback, string $className = null, bool $withHidden = false): array
     {
         return array_map($callback, $this->getConfigs($className, $withHidden));
     }
@@ -215,45 +226,9 @@ class ConfigProvider
      *
      * @return ConfigInterface[]
      */
-    public function filter($callback, $className = null, $withHidden = false)
+    public function filter($callback, string $className = null, bool $withHidden = false): array
     {
         return array_filter($this->getConfigs($className, $withHidden), $callback);
-    }
-
-    /**
-     * Gets the real fully-qualified class name of the given object (even if its a proxy).
-     *
-     * @param string|object|array|PersistentCollection $object
-     *
-     * @return string
-     *
-     * @throws RuntimeException if a class name cannot be retrieved
-     */
-    public function getClassName($object)
-    {
-        if (is_string($object)) {
-            return ClassUtils::getRealClass($object);
-        }
-
-        if (is_object($object)) {
-            if ($object instanceof PersistentCollection) {
-                return $object->getTypeClass()->getName();
-            }
-
-            return ClassUtils::getClass($object);
-        }
-
-        if (is_array($object) && !empty($object) && is_object(reset($object))) {
-            return ClassUtils::getClass(reset($object));
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'ConfigProvider::getClassName expects Object, ' .
-                'PersistentCollection, array of entities or string. "%s" given',
-                gettype($object)
-            )
-        );
     }
 
     /**
@@ -261,7 +236,7 @@ class ConfigProvider
      *
      * @return string
      */
-    public function getScope()
+    public function getScope(): string
     {
         return $this->scope;
     }
