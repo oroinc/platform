@@ -58,6 +58,11 @@ class ImageRemovalManagerTest extends \PHPUnit\Framework\TestCase
     private $mediaCacheDir = 'public/media/cache';
 
     /**
+     * @var string
+     */
+    private $projectDir = '/var/www';
+
+    /**
      * @var \Gaufrette\Filesystem|\PHPUnit\Framework\MockObject\MockObject
      */
     private $gaufretteFs;
@@ -85,7 +90,8 @@ class ImageRemovalManagerTest extends \PHPUnit\Framework\TestCase
             $this->filesystem,
             $this->filesystemMap,
             $this->fsName,
-            $this->mediaCacheDir
+            $this->mediaCacheDir,
+            $this->projectDir
         );
     }
 
@@ -109,8 +115,11 @@ class ImageRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->filesystem->expects($this->exactly(2))
             ->method('exists')
             ->withConsecutive(
-                [$this->mediaCacheDir . '/attachment/resize/171'],
-                [$this->mediaCacheDir . '/attachment/resize/filter1/11c00c6d0bd6b875afe655d3c9d4f942/171']
+                [$this->projectDir . '/' . $this->mediaCacheDir . '/attachment/resize/171'],
+                [
+                    $this->projectDir . '/' . $this->mediaCacheDir .
+                    '/attachment/resize/filter1/11c00c6d0bd6b875afe655d3c9d4f942/171'
+                ]
             )
             ->willReturnOnConsecutiveCalls(
                 true,
@@ -119,8 +128,11 @@ class ImageRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->filesystem->expects($this->exactly(2))
             ->method('remove')
             ->withConsecutive(
-                [$this->mediaCacheDir . '/attachment/resize/171'],
-                [$this->mediaCacheDir . '/attachment/resize/filter1/11c00c6d0bd6b875afe655d3c9d4f942/171']
+                [$this->projectDir . '/' . $this->mediaCacheDir . '/attachment/resize/171'],
+                [
+                    $this->projectDir . '/' . $this->mediaCacheDir .
+                    '/attachment/resize/filter1/11c00c6d0bd6b875afe655d3c9d4f942/171'
+                ]
             );
 
         $this->manager->removeImageWithVariants($file);

@@ -413,6 +413,7 @@ services:
             - '@knp_gaufrette.filesystem_map'
             - '%oro_attachment.filesystem_name.mediacache%'
             - 'public/%oro_attachment.media_cache_dir%'
+            - '%kernel.project_dir%'
 
     oro_attachment.message_processor.image_remove:
         class: Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor

@@ -77,8 +77,14 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(InstallCommand::NAME);
 
-        $this->input->expects($this->never())
-            ->method($this->anything());
+        $this->input->expects($this->once())
+            ->method('hasOption')
+            ->with('timeout')
+            ->willReturn(true);
+        $this->input->expects($this->once())
+            ->method('getOption')
+            ->with('timeout')
+            ->willReturn(500);
 
         $this->output->expects($this->exactly(2))
             ->method('writeln')
@@ -87,7 +93,7 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
                 ['']
             );
 
-        $expectedParams = ['--scheduled' => true, '--process-isolation' => true];
+        $expectedParams = ['--scheduled' => true, '--process-isolation' => true, '--process-timeout' => 500];
         if (!$isScheduled) {
             unset($expectedParams['--scheduled']);
         }

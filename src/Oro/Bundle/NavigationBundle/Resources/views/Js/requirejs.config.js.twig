@@ -22,7 +22,7 @@ require({
     {% if app.debug %}
         'oro/routes': '{{ path('oro_navigation_js_routing_js', {_format: 'json'}) }}'
     {% else %}
-        'oro/routes': '{{ asset('media/js/' ~ oro_parameter('oro_navigation.js_routing_filename_prefix') ~ '_routes.json', 'routing') }}'
+        'oro/routes': '{{ asset('media/js/' ~ oro_parameter('oro_navigation.js_routing_filename_prefix') ~ 'routes.json', 'routing') }}'
     {% endif %}
     }
 });

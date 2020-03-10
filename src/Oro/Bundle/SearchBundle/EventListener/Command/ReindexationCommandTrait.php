@@ -28,6 +28,9 @@ trait ReindexationCommandTrait
         if ($processIsolation) {
             $params['--process-isolation'] = true;
         }
+        if ($event->getInput()->hasOption('timeout')) {
+            $params['--process-timeout'] = $event->getInput()->getOption('timeout');
+        }
 
         $commandExecutor = $event->getCommandExecutor();
         $commandExecutor->runCommand($commandName, $params);

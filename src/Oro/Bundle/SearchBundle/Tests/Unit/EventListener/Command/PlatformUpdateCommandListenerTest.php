@@ -80,6 +80,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getOption')
             ->willReturnMap(
                 [
+                    ['timeout', 500],
                     [SearchReindexationGlobalOptionsProvider::SKIP_REINDEXATION_OPTION_NAME, $isSkip],
                     [SearchReindexationGlobalOptionsProvider::SCHEDULE_REINDEXATION_OPTION_NAME, $isScheduled],
                 ]
@@ -89,7 +90,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('writeln')
             ->with([$expectedMessage, '']);
 
-        $expectedParams = ['--scheduled' => true, '--process-isolation' => true];
+        $expectedParams = ['--scheduled' => true, '--process-isolation' => true, '--process-timeout' => 500];
         if (!$isScheduled) {
             unset($expectedParams['--scheduled']);
         }
