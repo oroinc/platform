@@ -8,14 +8,12 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
 class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityMetadata
-     */
-    protected $classMetadata;
+    /** @var EntityMetadata */
+    private $classMetadata;
 
     protected function setUp()
     {
-        $this->classMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $this->classMetadata = new EntityMetadata(DemoEntity::class);
         $this->classMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 
@@ -26,7 +24,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testMerge()
     {
-        $newMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $newMetadata = new EntityMetadata(DemoEntity::class);
         $newMetadata->mode = ConfigModel::MODE_READONLY;
         $this->classMetadata->merge($newMetadata);
 
@@ -117,7 +115,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
      */
     public function testHasRoute($routeName, $strict, $expected, array $properties = [])
     {
-        $metadata = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $metadata = new EntityMetadata(DemoEntity::class);
 
         foreach ($properties as $name => $value) {
             $metadata->$name = $value;
