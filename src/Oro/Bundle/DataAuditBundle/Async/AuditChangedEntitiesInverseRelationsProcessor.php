@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -79,15 +80,19 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $this->processEntityFromCollection($body['entities_updated'], $map, 'changed', 1);
         $this->processEntityFromCollection($body['entities_deleted'], $map, 'deleted', 0);
 
-        $this->entityChangesToAuditEntryConverter->convert(
-            $map,
-            $transactionId,
-            $loggedAt,
-            $user,
-            $organization,
-            $impersonation,
-            $ownerDescription
-        );
+        try {
+            $this->entityChangesToAuditEntryConverter->convert(
+                $map,
+                $transactionId,
+                $loggedAt,
+                $user,
+                $organization,
+                $impersonation,
+                $ownerDescription
+            );
+        } catch (WrongDataAuditEntryStateException $e) {
+            return self::REQUEUE;
+        }
 
         return self::ACK;
     }
