@@ -56,6 +56,11 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
     private $mediaCacheDir;
 
     /**
+     * @var string
+     */
+    private $projectDir;
+
+    /**
      * @var \Gaufrette\Filesystem
      */
     private $gaufretteFs;
@@ -83,6 +88,7 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
      * @param FilesystemMap $filesystemMap
      * @param string $fsName
      * @param string $mediaCacheDir
+     * @param string $projectDir
      */
     public function __construct(
         FileManager $attachmentFileManager,
@@ -92,7 +98,8 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
         Filesystem $filesystem,
         FilesystemMap $filesystemMap,
         string $fsName,
-        string $mediaCacheDir
+        string $mediaCacheDir,
+        string $projectDir
     ) {
         $this->attachmentFileManager = $attachmentFileManager;
         $this->configManager = $configManager;
@@ -102,6 +109,7 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
         $this->filesystemMap = $filesystemMap;
         $this->fsName = $fsName;
         $this->mediaCacheDir = $mediaCacheDir;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -152,7 +160,8 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
             }
 
             $imageDirs[] = sprintf(
-                '%s%s',
+                '%s/%s%s',
+                $this->projectDir,
                 $this->mediaCacheDir,
                 $path
             );

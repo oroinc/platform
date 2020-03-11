@@ -58,6 +58,11 @@ define(function(require) {
         },
 
         /**
+         * Collection of GET parameters which must remain in action url.
+         */
+        contextParameters: ['entityClass', 'entityId[id]', 'route', 'datagrid', 'group', 'fromUrl'],
+
+        /**
          * @inheritDoc
          */
         constructor: function AbstractWidgetView() {
@@ -691,8 +696,14 @@ define(function(require) {
             if (method.toUpperCase() === 'POST') {
                 var urlParts = url.split('?');
 
-                url = urlParts[0];
                 query = typeof urlParts[1] === 'undefined' ? '' : urlParts[1] + '&';
+                url = urlParts[0] + '?' + query.split('&').filter((function(item) {
+                    if (!item) {
+                        return false;
+                    }
+
+                    return _.contains(this.contextParameters, decodeURIComponent(item.split('=')[0]));
+                }).bind(this)).join('&');
             }
 
             var options = {

@@ -1015,11 +1015,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function applyDateTimeFilter($filterName, $type, $start, $end = null, $filterGridName = 'Grid')
     {
-        /** @var GridFilterDateTimeItem $filterItem */
-        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
+        $filterItem = $this->spin(function () use ($filterGridName, $filterName, $type) {
+            /** @var GridFilterDateTimeItem $filterItem */
+            $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
+            $filterItem->open();
+            $filterItem->selectType($type);
 
-        $filterItem->open();
-        $filterItem->selectType($type);
+            return $filterItem;
+        }, 10);
+
+        if (!$filterItem) {
+            self::fail(sprintf('Date time filter "%s" not found', $filterName));
+        }
+
         $filterItem->setStartTime(new \DateTime($start));
 
         if (null !== $end) {
