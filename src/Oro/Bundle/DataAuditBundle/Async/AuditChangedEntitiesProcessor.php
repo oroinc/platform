@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -51,43 +52,47 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
         $impersonation = $this->getImpersonationReference($body);
         $ownerDescription = $this->getOwnerDescription($body);
 
-        if ($body['entities_inserted']) {
-            $this->entityChangesToAuditEntryConverter->convert(
-                $body['entities_inserted'],
-                $transactionId,
-                $loggedAt,
-                $user,
-                $organization,
-                $impersonation,
-                $ownerDescription,
-                AbstractAudit::ACTION_CREATE
-            );
-        }
+        try {
+            if ($body['entities_inserted']) {
+                $this->entityChangesToAuditEntryConverter->convert(
+                    $body['entities_inserted'],
+                    $transactionId,
+                    $loggedAt,
+                    $user,
+                    $organization,
+                    $impersonation,
+                    $ownerDescription,
+                    AbstractAudit::ACTION_CREATE
+                );
+            }
 
-        if ($body['entities_updated']) {
-            $this->entityChangesToAuditEntryConverter->convert(
-                $body['entities_updated'],
-                $transactionId,
-                $loggedAt,
-                $user,
-                $organization,
-                $impersonation,
-                $ownerDescription,
-                AbstractAudit::ACTION_UPDATE
-            );
-        }
+            if ($body['entities_updated']) {
+                $this->entityChangesToAuditEntryConverter->convert(
+                    $body['entities_updated'],
+                    $transactionId,
+                    $loggedAt,
+                    $user,
+                    $organization,
+                    $impersonation,
+                    $ownerDescription,
+                    AbstractAudit::ACTION_UPDATE
+                );
+            }
 
-        if ($body['entities_deleted']) {
-            $this->entityChangesToAuditEntryConverter->convert(
-                $body['entities_deleted'],
-                $transactionId,
-                $loggedAt,
-                $user,
-                $organization,
-                $impersonation,
-                $ownerDescription,
-                AbstractAudit::ACTION_REMOVE
-            );
+            if ($body['entities_deleted']) {
+                $this->entityChangesToAuditEntryConverter->convert(
+                    $body['entities_deleted'],
+                    $transactionId,
+                    $loggedAt,
+                    $user,
+                    $organization,
+                    $impersonation,
+                    $ownerDescription,
+                    AbstractAudit::ACTION_REMOVE
+                );
+            }
+        } catch (WrongDataAuditEntryStateException $e) {
+            return self::REQUEUE;
         }
 
         $nextMessage = new Message($body, MessagePriority::VERY_LOW);

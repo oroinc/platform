@@ -24,7 +24,14 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *         @ORM\Index(name="idx_oro_audit_owner_descr", columns={"owner_description"})
  *     },
  *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
+ *         @ORM\UniqueConstraint(
+ *              name="idx_oro_audit_version",
+ *              columns={"object_id", "object_class", "version", "type"}
+ *         ),
+ *         @ORM\UniqueConstraint(
+ *              name="idx_oro_audit_transaction",
+ *              columns={"object_id", "object_class", "transaction_id", "type"}
+ *         )
  *     }
  * )
  * @ORM\InheritanceType("SINGLE_TABLE")
