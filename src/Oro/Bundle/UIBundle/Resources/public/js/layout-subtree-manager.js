@@ -36,9 +36,8 @@ define([
                         this.reloadEvents[eventItem] = [];
                         mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem), this);
                     }
-                    
-                    if (!this.reloadEvents[eventItem].includes(blockId))
-                    {
+
+                    if (!this.reloadEvents[eventItem].includes(blockId)) {
                         this.reloadEvents[eventItem].push(blockId);
                     }
                 }).bind(this));
