@@ -23,7 +23,7 @@ class TableRow extends Element
     public function getCellByNumber($number)
     {
         $number = (int) $number;
-        $columns = $this->findAll('xpath', 'child::td');
+        $columns = $this->findAll('xpath', 'child::td|child::th');
         self::assertArrayHasKey($number, $columns);
 
         return $columns[$number];
