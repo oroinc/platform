@@ -95,7 +95,7 @@ class SetNewAuditVersionServiceTest extends WebTestCase
         $audit->setObjectName('anObjectName');
         $audit->setVersion(10);
         $audit->setLoggedAt();
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setAction('anAction');
 
         $this->getEntityManager()->persist($audit);
@@ -107,7 +107,7 @@ class SetNewAuditVersionServiceTest extends WebTestCase
         $newAudit->setObjectName('anObjectName');
         $newAudit->setVersion(null);
         $newAudit->setLoggedAt();
-        $newAudit->setTransactionId('aTransactionId');
+        $newAudit->setTransactionId('aTransactionId2');
         $newAudit->setAction('anAction');
         $this->getEntityManager()->persist($newAudit);
         $this->getEntityManager()->flush();
