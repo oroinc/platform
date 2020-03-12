@@ -34,7 +34,10 @@ define([
                         this.reloadEvents[eventItem] = [];
                         mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem), this);
                     }
-                    this.reloadEvents[eventItem].push(blockId);
+
+                    if (!this.reloadEvents[eventItem].includes(blockId)) {
+                        this.reloadEvents[eventItem].push(blockId);
+                    }
                 }).bind(this));
             }
         },
