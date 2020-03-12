@@ -37,7 +37,7 @@ define([
                         mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem), this);
                     }
 
-                    if (!this.reloadEvents[eventItem].includes(blockId)) {
+                    if (this.reloadEvents[eventItem].indexOf(blockId) === -1) {
                         this.reloadEvents[eventItem].push(blockId);
                     }
                 }).bind(this));
