@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+/**
+ * Group by query part manipulation helper.
+ */
 class GroupByHelper
 {
     /**
@@ -93,6 +96,13 @@ class GroupByHelper
         } elseif (!$parts && strpos($select, ' ') === false) {
             // Add field itself when there is no alias
             return $select;
+        }
+
+        // 't1.id ASC' or 't1.id DESC'
+        preg_match('/([^\s]+)\s+(?=ASC$|DESC$)/i', $select, $parts);
+        if (!empty($parts[1])) {
+            // Add field from the ORDER BY clause
+            return $parts[1];
         }
 
         return null;
