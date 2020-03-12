@@ -34,6 +34,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
+    private const API_DOC_DATA_TYPE_CONVERTER               = 'oro_api.api_doc.data_type_converter';
     private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
@@ -51,6 +52,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $this->configureUnderlyingViews($container);
         $this->configureApiDocExtractor($container);
         $this->configureApiDocFormatters($container);
+        $this->configureApiDocDataTypeConverter($container);
         $this->registerRoutingOptionsResolvers($container);
         $this->configureRequestTypeProvider($container);
         $this->configureApiSourceListener($container);
@@ -246,6 +248,27 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE)->setPublic(true);
         $container->getDefinition(self::API_DOC_MARKDOWN_FORMATTER_SERVICE)->setPublic(true);
         $container->getDefinition(self::API_DOC_SWAGGER_FORMATTER_SERVICE)->setPublic(true);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureApiDocDataTypeConverter(ContainerBuilder $container)
+    {
+        $config = DependencyInjectionUtil::getConfig($container);
+        $defaultMapping = $config['api_doc_data_types'];
+
+        $viewMappings = [];
+        $views = $this->getApiDocViews($container);
+        foreach ($views as $name => $view) {
+            if (!empty($view['data_types'])) {
+                $viewMappings[$name] = $view['data_types'];
+            }
+        }
+
+        $container->getDefinition(self::API_DOC_DATA_TYPE_CONVERTER)
+            ->setArgument(0, $defaultMapping)
+            ->setArgument(1, $viewMappings);
     }
 
     /**

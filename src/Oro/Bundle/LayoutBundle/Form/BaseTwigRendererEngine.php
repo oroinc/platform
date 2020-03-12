@@ -67,13 +67,11 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
 
         $this->template->displayBlock($blockName, $context, $resource);
 
-        // Resets all property cache after certain block rendered to avoid unpredictable behaviour
-        // if several blocks are rendered
-        $this->parentResourceOffsets = [];
-        $this->resourcesHierarchy = [];
-        $this->overrideResources = [];
-        $this->parentResourceHierarchyLevels = [];
-        $this->resources = [];
+        unset(
+            $this->parentResourceOffsets[$cacheKey],
+            $this->parentResourceHierarchyLevels[$cacheKey],
+            $this->overrideResources[$cacheKey]
+        );
 
         return ob_get_clean();
     }
@@ -106,7 +104,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
                 if (!array_key_exists($block, $this->resourcesHierarchy)) {
                     $this->resources[$cacheKey][$block] = $blockData;
                     $this->resourcesHierarchy[$block] = [$blockData];
-                } else {
+                } elseif (!\in_array($blockData, $this->resourcesHierarchy[$block], true)) {
                     array_unshift($this->resourcesHierarchy[$block], $blockData);
                 }
             }

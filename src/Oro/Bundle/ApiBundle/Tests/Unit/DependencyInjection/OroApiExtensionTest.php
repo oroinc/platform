@@ -1360,6 +1360,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                             ['value' => 'totalCount', 'actions' => ['get_list']],
                             ['value' => 'forAllActions']
                         ]
+                    ],
+                    'data_types'   => [
+                        'guid'     => 'string',
+                        'currency' => 'string'
                     ]
                 ],
                 'view2' => [
@@ -1378,6 +1382,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                             ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
                             ['value' => 'another']
                         ]
+                    ],
+                    'data_types'      => [
+                        'currency' => 'decimal',
+                        'percent'  => 'float'
                     ]
                 ]
             ]
@@ -1404,6 +1412,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                             ['value' => 'totalCount', 'actions' => ['get_list']],
                             ['value' => 'forAllActions', 'actions' => []]
                         ]
+                    ],
+                    'data_types'         => [
+                        'guid'     => 'string',
+                        'currency' => 'string'
                     ]
                 ],
                 'view2' => [
@@ -1439,6 +1451,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                             ['value' => 'another', 'actions' => []],
                             ['value' => 'forAllActions', 'actions' => []]
                         ]
+                    ],
+                    'data_types'         => [
+                        'guid'     => 'string',
+                        'currency' => 'decimal',
+                        'percent'  => 'float'
                     ]
                 ]
             ],

@@ -9,23 +9,19 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
 class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityMetadata
-     */
-    protected $entityMetadata;
+    /** @var EntityMetadata */
+    private $entityMetadata;
 
-    /**
-     * @var FieldMetadata
-     */
-    protected $fieldMetadata;
+    /** @var FieldMetadata */
+    private $fieldMetadata;
 
     protected function setUp()
     {
-        $this->entityMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
+        $this->entityMetadata = new EntityMetadata(DemoEntity::class);
         $this->entityMetadata->mode = ConfigModel::MODE_DEFAULT;
 
 
-        $this->fieldMetadata       = new FieldMetadata(DemoEntity::ENTITY_NAME, 'name');
+        $this->fieldMetadata = new FieldMetadata(DemoEntity::class, 'name');
         $this->fieldMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 

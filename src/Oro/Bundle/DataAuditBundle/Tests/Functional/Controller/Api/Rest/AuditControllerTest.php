@@ -179,7 +179,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -187,7 +187,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -195,7 +195,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
@@ -223,7 +223,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -231,7 +231,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -239,7 +239,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
@@ -267,7 +267,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -275,7 +275,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -283,7 +283,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
@@ -311,7 +311,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setLoggedAt(new \DateTime('2012-10-10 00:01+0000'));
         $em->persist($audit);
 
@@ -319,7 +319,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setLoggedAt(new \DateTime('2012-10-12 00:01+0000'));
         $em->persist($audit);
 
@@ -327,7 +327,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setLoggedAt(new \DateTime('2012-10-14 00:01+0000'));
         $em->persist($audit);
 
@@ -355,7 +355,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setAction('create');
         $em->persist($audit);
 
@@ -363,7 +363,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setAction('update');
         $em->persist($audit);
 
@@ -371,7 +371,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setAction('remove');
         $em->persist($audit);
 
@@ -399,7 +399,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setAction('create');
         $em->persist($audit);
 
@@ -407,7 +407,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setAction('update');
         $em->persist($audit);
 
@@ -415,7 +415,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setAction('remove');
         $em->persist($audit);
 
@@ -443,7 +443,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -451,7 +451,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -459,7 +459,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setObjectClass(TestAuditDataOwner::class);
         $em->persist($audit);
 
@@ -487,7 +487,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -495,7 +495,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setObjectClass(TestAuditDataChild::class);
         $em->persist($audit);
 
@@ -503,7 +503,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setObjectClass(TestAuditDataOwner::class);
         $em->persist($audit);
 
@@ -533,7 +533,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId1');
         $audit->setUser($user);
         $em->persist($audit);
 
@@ -541,7 +541,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId2');
         $audit->setUser(null);
         $em->persist($audit);
 
@@ -549,7 +549,7 @@ class AuditControllerTest extends WebTestCase
         $audit->setObjectName('aName');
         $audit->setObjectClass('aClass');
         $audit->setObjectId(123);
-        $audit->setTransactionId('aTransactionId');
+        $audit->setTransactionId('aTransactionId3');
         $audit->setUser(null);
         $em->persist($audit);
 

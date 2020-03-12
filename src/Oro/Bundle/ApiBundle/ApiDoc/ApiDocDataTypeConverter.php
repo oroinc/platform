@@ -8,38 +8,31 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 class ApiDocDataTypeConverter
 {
     /** @var array [data type => data type in documentation, ...] */
-    private $map;
+    private $defaultMapping;
+
+    /** @var array [view name => [data type => data type in documentation, ...], ...] */
+    private $viewMappings;
 
     /**
-     * @param array $map [data type => data type in documentation, ...]
+     * @param array $defaultMapping [data type => data type in documentation, ...]
+     * @param array $viewMappings   [view name => [data type => data type in documentation, ...], ...]
      */
-    public function __construct(array $map)
+    public function __construct(array $defaultMapping, array $viewMappings)
     {
-        $this->map = $map;
-    }
-
-    /**
-     * @param string $dataType
-     * @param string $docDataType
-     */
-    public function addDataType($dataType, $docDataType)
-    {
-        $this->map[$dataType] = $docDataType;
+        $this->defaultMapping = $defaultMapping;
+        $this->viewMappings = $viewMappings;
     }
 
     /**
      * Converts a data-type to a data-type that should be returned in API documentation.
      *
      * @param string $dataType
+     * @param string $view
      *
      * @return string
      */
-    public function convertDataType($dataType)
+    public function convertDataType(string $dataType, string $view): string
     {
-        if (!isset($this->map[$dataType])) {
-            return $dataType;
-        }
-
-        return $this->map[$dataType];
+        return $this->viewMappings[$view][$dataType] ?? $this->defaultMapping[$dataType] ?? $dataType;
     }
 }
