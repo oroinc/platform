@@ -205,8 +205,8 @@ services:
         tags:
             - { name: layout.data_provider, alias: property_accessor }
 
-    oro_layout.layout.data_provider.image_placeholder.abstract:
-        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\ImagePlaceholderProvider'
+    oro_layout.layout.data_provider.filtered_image.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\FilteredImageProvider'
         public: false
         abstract: true
 
