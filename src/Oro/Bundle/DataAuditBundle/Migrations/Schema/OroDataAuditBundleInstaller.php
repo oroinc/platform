@@ -18,7 +18,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_7';
+        return 'v2_8';
     }
 
     /**
@@ -60,7 +60,14 @@ class OroDataAuditBundleInstaller implements Installation
 
         $auditTable->addIndex(['user_id'], 'IDX_5FBA427CA76ED395', []);
         $auditTable->addIndex(['type'], 'idx_oro_audit_type');
-        $auditTable->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
+        $auditTable->addUniqueIndex(
+            ['object_id', 'object_class', 'version', 'type'],
+            'idx_oro_audit_version'
+        );
+        $auditTable->addUniqueIndex(
+            ['object_id', 'object_class', 'transaction_id', 'type'],
+            'idx_oro_audit_transaction'
+        );
 
         $auditTable->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
