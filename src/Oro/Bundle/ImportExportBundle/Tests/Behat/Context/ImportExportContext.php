@@ -19,6 +19,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -314,15 +315,26 @@ class ImportExportContext extends OroFeatureContext implements
             $headers = $exportedFile->current();
             $expectedHeaders = $expectedEntities->getRow(0);
 
+            $errors = [];
             foreach ($exportedFile as $line => $data) {
                 $entityDataFromCsv = array_combine($headers, array_values($data));
                 $expectedEntityData = array_combine($expectedHeaders, array_values($expectedEntities->getRow($line)));
 
                 // Ensure that at least expected data is present.
                 foreach ($expectedEntityData as $property => $value) {
-                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                    try {
+                        static::assertEquals(
+                            $value,
+                            $entityDataFromCsv[$property],
+                            sprintf('Failed asserting that two columns "%s" are equal on row %d', $property, $line)
+                        );
+                    } catch (ExpectationFailedException $exception) {
+                        $errors[] = $exception->getMessage() . $exception->getComparisonFailure()->getDiff();
+                    }
                 }
             }
+
+            static::assertEmpty($errors, implode("\n\n", $errors));
 
             static::assertCount($exportedFile->key(), $expectedEntities->getRows());
         } finally {

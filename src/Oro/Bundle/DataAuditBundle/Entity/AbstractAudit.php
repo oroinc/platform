@@ -28,7 +28,11 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(
  *              name="idx_oro_audit_version",
- *              columns={"object_id", "entity_id", "object_class", "version"}
+ *              columns={"object_id", "entity_id", "object_class", "version", "type"}
+ *         ),
+ *         @ORM\UniqueConstraint(
+ *              name="idx_oro_audit_transaction",
+ *              columns={"object_id", "entity_id", "object_class", "transaction_id", "type"}
  *         )
  *     }
  * )
