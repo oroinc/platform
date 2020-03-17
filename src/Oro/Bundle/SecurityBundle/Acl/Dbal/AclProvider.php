@@ -512,8 +512,8 @@ QUERY;
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
 
-        $sql = $this->getLookupSqlBySids($ancestorIds, $sids);
-        $stmt = $this->connection->executeQuery($sql);
+        [$sql, $params, $types] = $this->getLookupSqlBySids($ancestorIds, $sids);
+        $stmt = $this->connection->executeQuery($sql, $params, $types);
 
         return $this->hydrateObjectIdentities($stmt, $oidLookup, $sids);
     }
@@ -759,11 +759,13 @@ QUERY;
      * @param array $ancestorIds
      * @param array $sids
      *
-     * @return string
+     * @return array
      */
-    private function getLookupSqlBySids(array $ancestorIds, array $sids)
+    private function getLookupSqlBySids(array $ancestorIds, array $sids): array
     {
         $sql = $this->getLookupSql($ancestorIds);
+        $params = [];
+        $types = [];
 
         if (count($sids)) {
             $sidsArray = [];
@@ -771,10 +773,12 @@ QUERY;
                 list($identifier) = $this->parseSecurityIdentity($sid);
                 $sidsArray[] = $identifier;
             }
-            $sql .= ' AND s.identifier in (\''.implode('\', \'', $sidsArray).'\')';
+            $sql .= ' AND s.identifier in (?)';
+            $params[] = $sidsArray;
+            $types[] = Connection::PARAM_STR_ARRAY;
         }
 
-        return $sql;
+        return [$sql, $params, $types];
     }
 
     /**
