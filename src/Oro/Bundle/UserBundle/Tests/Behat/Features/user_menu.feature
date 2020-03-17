@@ -19,7 +19,7 @@ Feature: User menu
     Given I click My Emails in user menu
     And I should be on User Emails page
     And there is no records in grid
-    When I follow "Compose"
+    When I click "Compose"
     And fill form with:
       | Subject | Test mail for me              |
       | To      | John                          |

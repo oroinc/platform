@@ -571,7 +571,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider
         arguments:
             - '@security.authorization_checker'
-            - '@oro_security.token_accessor'
             - '@doctrine'
         tags:
             - { name: layout.data_provider, alias: acl }

@@ -6,6 +6,9 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Prepares transition buttons
+ */
 class TransitionTranslationHelper
 {
     /** @var TranslatorInterface */
@@ -35,7 +38,7 @@ class TransitionTranslationHelper
         if (null !== $buttonTitle) {
             $transition->setButtonTitle($buttonTitle);
         } else {
-            $transition->setButtonTitle($transition->getButtonLabel());
+            $transition->setButtonTitle(null);
         }
 
         $frontendOptions = $transition->getFrontendOptions();

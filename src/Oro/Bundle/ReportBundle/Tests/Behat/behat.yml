@@ -15,7 +15,7 @@ oro_behat_extension:
 
     Add Grouping button:
       selector:
-        locator: '//div[@id="oro_report-grouping-form"]//a[@title="Add"]'
+        locator: '//div[@id="oro_report-grouping-form"]//a[normalize-space(text())="Add"]'
         type: xpath
 
     Show SQL Query:

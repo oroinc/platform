@@ -9,7 +9,7 @@ Feature: Send email form
     Given I login as administrator
     And I click My Emails in user menu
     And there is no records in grid
-    When I follow "Compose"
+    When I click "Compose"
     And fill "Email Form" with:
       | Body | This is very simple test mail |
     And click "Send"
@@ -33,7 +33,7 @@ Feature: Send email form
   Scenario: Send email with email template
     Given I click My Emails in user menu
     And there is no records in grid
-    When I follow "Compose"
+    When I click "Compose"
     And I fill "Email Form" with:
       | Body           | This is simple test mail |
       | To             | Charlie Sheen            |
@@ -74,7 +74,7 @@ Feature: Send email form
 
   Scenario: Check if email templates can be used
     Given I click My Emails in user menu
-    And I follow "Compose"
+    And I click "Compose"
     And fill "Email Form" with:
       | Body           | This is test mail with template error |
       | To             | Charlie Sheen                         |
