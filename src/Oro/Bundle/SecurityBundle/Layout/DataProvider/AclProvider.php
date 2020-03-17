@@ -8,6 +8,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Layout ACL provider Class
+ */
 class AclProvider
 {
     /** @var AuthorizationCheckerInterface */
@@ -41,10 +44,6 @@ class AclProvider
      */
     public function isGranted($attributes, $object = null)
     {
-        if (!$this->tokenAccessor->hasUser()) {
-            return false;
-        }
-
         if (is_object($object)) {
             $class = ClassUtils::getRealClass($object);
             $objectManager = $this->doctrine->getManagerForClass($class);

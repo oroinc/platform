@@ -40,11 +40,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $attributes = 'acme_product_view';
         $expectedResult = true;
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($attributes, null)
@@ -58,11 +53,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $attributes = 'VIEW';
         $entity = 'entity:Acme/DemoBundle/Entity/AcmeEntity';
         $expectedResult = true;
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -82,11 +72,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue(null));
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -125,11 +110,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($attributes, $this->identicalTo($entity))
@@ -164,11 +144,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -207,11 +182,6 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(true));
-
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($attributes, 'entity:' . ClassUtils::getRealClass($entity))
@@ -223,14 +193,12 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedHasNoUser()
     {
         $attributes = 'acme_product_view';
+        $expectedResult = false;
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->with()
-            ->will($this->returnValue(false));
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, null)
+            ->will($this->returnValue($expectedResult));
 
         $this->assertFalse($this->provider->isGranted($attributes));
     }
