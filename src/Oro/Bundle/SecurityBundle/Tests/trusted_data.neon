@@ -10,6 +10,9 @@ trusted_data:
         Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper:
             addOwnershipField:
                 fieldExpr: true
+        Oro\Bundle\SecurityBundle\Acl\Dbal\AclProvider:
+            lookupObjectIdentities:
+                sql: true
     safe_methods:
         Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata:
             getOwnerColumnName: true
