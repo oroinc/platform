@@ -10,6 +10,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
@@ -89,10 +90,10 @@ class AclProvider implements AclProviderInterface
      */
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
-        $sql = $this->getFindChildrenSql($parentOid, $directChildrenOnly);
+        [$sql, $params, $types] = $this->getFindChildrenSql($parentOid, $directChildrenOnly);
 
         $children = array();
-        foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
+        foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
             $children[] = new ObjectIdentity($data['object_identifier'], $data['class_type']);
         }
 
@@ -247,7 +248,7 @@ class AclProvider implements AclProviderInterface
      *
      * @param array $ancestorIds
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getLookupSql(array $ancestorIds)
     {
@@ -283,16 +284,22 @@ class AclProvider implements AclProviderInterface
                 s.id = e.security_identity_id
             )
 
-            WHERE (o.id =
+            WHERE o.id in (?)
 SELECTCLAUSE;
 
-        $sql .= implode(' OR o.id = ', $ancestorIds).')';
-
-        return $sql;
+        return [$sql, [$ancestorIds], [Connection::PARAM_INT_ARRAY]];
     }
 
+    /**
+     * @param array $batch
+     *
+     * @return array [sql, param values, param types]
+     */
     protected function getAncestorLookupSql(array $batch)
     {
+        $parameters = [];
+        $parametersTypes = [];
+
         $sql = <<<SELECTCLAUSE
             SELECT a.ancestor_id
             FROM
@@ -320,33 +327,29 @@ SELECTCLAUSE;
         if (1 === count($types)) {
             $ids = array();
             for ($i = 0; $i < $count; ++$i) {
-                $identifier = (string) $batch[$i]->getIdentifier();
-                $ids[] = $this->connection->quote($identifier);
+                $ids[] = (string) $batch[$i]->getIdentifier();
             }
 
-            $sql .= sprintf(
-                '(o.object_identifier IN (%s) AND c.class_type = %s)',
-                implode(',', $ids),
-                $this->connection->quote($batch[0]->getType())
-            );
+            $sql .= '(o.object_identifier IN (?) AND c.class_type = ?)';
+            $parameters = [$ids, $batch[0]->getType()];
+            $parametersTypes = [Connection::PARAM_STR_ARRAY, ParameterType::STRING];
         } else {
-            $where = '(o.object_identifier = %s AND c.class_type = %s)';
             for ($i = 0; $i < $count; ++$i) {
-                $sql .= sprintf(
-                    $where,
-                    $this->connection->quote($batch[$i]->getIdentifier()),
-                    $this->connection->quote($batch[$i]->getType())
-                );
+                $sql .= '(o.object_identifier = ? AND c.class_type = ?)';
 
                 if ($i + 1 < $count) {
                     $sql .= ' OR ';
                 }
+                $parameters[] = $batch[$i]->getIdentifier();
+                $parametersTypes[] = ParameterType::STRING;
+                $parameters[] = $batch[$i]->getType();
+                $parametersTypes[] = ParameterType::STRING;
             }
         }
 
         $sql .= ')';
 
-        return $sql;
+        return [$sql, $parameters, $parametersTypes];
     }
 
     /**
@@ -356,7 +359,7 @@ SELECTCLAUSE;
      * @param ObjectIdentityInterface $oid
      * @param bool                    $directChildrenOnly
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
     {
@@ -368,18 +371,18 @@ SELECTCLAUSE;
                 INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
                 INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
                 WHERE
-                    a.ancestor_id = %d AND a.object_identity_id != a.ancestor_id
+                    a.ancestor_id = ? AND a.object_identity_id != a.ancestor_id
 FINDCHILDREN;
         } else {
             $query = <<<FINDCHILDREN
                 SELECT o.object_identifier, c.class_type
                 FROM {$this->options['oid_table_name']} o
                 INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-                WHERE o.parent_object_identity_id = %d
+                WHERE o.parent_object_identity_id = ?
 FINDCHILDREN;
         }
 
-        return sprintf($query, $this->retrieveObjectIdentityPrimaryKey($oid));
+        return [$query, [$this->retrieveObjectIdentityPrimaryKey($oid)], [ParameterType::INTEGER]];
     }
 
     /**
@@ -388,7 +391,7 @@ FINDCHILDREN;
      *
      * @param ObjectIdentityInterface $oid
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
     {
@@ -396,16 +399,18 @@ FINDCHILDREN;
             SELECT o.id
             FROM %s o
             INNER JOIN %s c ON c.id = o.class_id
-            WHERE o.object_identifier = %s AND c.class_type = %s
+            WHERE o.object_identifier = ? AND c.class_type = ?
 QUERY;
 
-        return sprintf(
-            $query,
-            $this->options['oid_table_name'],
-            $this->options['class_table_name'],
-            $this->connection->quote((string) $oid->getIdentifier()),
-            $this->connection->quote((string) $oid->getType())
-        );
+        return [
+            sprintf(
+                $query,
+                $this->options['oid_table_name'],
+                $this->options['class_table_name']
+            ),
+            [$oid->getIdentifier(), $oid->getType()],
+            [ParameterType::STRING, ParameterType::STRING]
+        ];
     }
 
     /**
@@ -417,7 +422,8 @@ QUERY;
      */
     final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
     {
-        return $this->connection->executeQuery($this->getSelectObjectIdentityIdSql($oid))->fetchColumn();
+        [$sql, $params, $types] = $this->getSelectObjectIdentityIdSql($oid);
+        return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
 
     /**
@@ -455,10 +461,10 @@ QUERY;
      */
     private function getAncestorIds(array $batch)
     {
-        $sql = $this->getAncestorLookupSql($batch);
+        [$sql, $params, $types] = $this->getAncestorLookupSql($batch);
 
         $ancestorIds = array();
-        foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
+        foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
             // FIXME: skip ancestors which are cached
             // Fix: Oracle returns keys in uppercase
             $ancestorIds[] = reset($data);
@@ -759,18 +765,16 @@ QUERY;
      * @param array $ancestorIds
      * @param array $sids
      *
-     * @return array
+     * @return array [sql, param values, param types]
      */
     private function getLookupSqlBySids(array $ancestorIds, array $sids): array
     {
-        $sql = $this->getLookupSql($ancestorIds);
-        $params = [];
-        $types = [];
+        [$sql, $params, $types] = $this->getLookupSql($ancestorIds);
 
         if (count($sids)) {
             $sidsArray = [];
             foreach ($sids as $sid) {
-                list($identifier) = $this->parseSecurityIdentity($sid);
+                [$identifier] = $this->parseSecurityIdentity($sid);
                 $sidsArray[] = $identifier;
             }
             $sql .= ' AND s.identifier in (?)';
