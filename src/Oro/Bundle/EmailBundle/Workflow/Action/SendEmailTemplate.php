@@ -18,6 +18,7 @@ use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -116,7 +117,7 @@ class SendEmailTemplate extends AbstractSendEmail
         $entity = $this->contextAccessor->getValue($context, $this->options['entity']);
         $template = $this->contextAccessor->getValue($context, $this->options['template']);
         $from = $this->getEmailAddress($context, $this->options['from']);
-        $this->validateAddress($from);
+        $this->validateEmailAddress($from, '"From" email');
 
         $recipientsByGroups = $this->getRecipientsByLanguage($context);
         $entityClass = $this->objectManager->getClassMetadata(get_class($entity))->getName();
@@ -155,11 +156,22 @@ class SendEmailTemplate extends AbstractSendEmail
     }
 
     /**
-     * @param string $email
+     * @deprecated Use validateEmailAddress() instead
      *
-     * @throws \Symfony\Component\Validator\Exception\ValidatorException
+     * @param string $email
+     * @throws ValidatorException if email address is not valid
      */
     protected function validateAddress($email)
+    {
+        return $this->validateEmailAddress($email);
+    }
+
+    /**
+     * @param string $email
+     * @param string $context optional description of what kind of address is being validated
+     * @throws ValidatorException if email address is not valid
+     */
+    protected function validateEmailAddress($email, string $context = '')
     {
         $emailConstraint = new EmailConstraints();
         $emailConstraint->message = 'Invalid email address';
@@ -169,7 +181,12 @@ class SendEmailTemplate extends AbstractSendEmail
                 $emailConstraint
             );
             if ($errorList && $errorList->count() > 0) {
-                throw new ValidatorException($errorList->get(0)->getMessage());
+                if ($errorList instanceof ConstraintViolationList) {
+                    $errorString = \strval($errorList);
+                } else {
+                    $errorString = $errorList->get(0)->getMessage();
+                }
+                throw new ValidatorException(\sprintf("Validating %s (%s):\n%s", $context, $email, $errorString));
             }
         }
     }
@@ -185,7 +202,7 @@ class SendEmailTemplate extends AbstractSendEmail
             if ($email) {
                 $address = $this->getEmailAddress($context, $email);
                 if ($address) {
-                    $this->validateAddress($address);
+                    $this->validateEmailAddress($address, 'Recipient email');
                     $recipients[] = $this->getEmailAddress($context, $address);
                 }
             }
@@ -216,8 +233,9 @@ class SendEmailTemplate extends AbstractSendEmail
     /**
      * @param EmailTemplateCriteria $criteria
      * @param string $language
-     * @throws EntityNotFoundException
      * @return EmailTemplate
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws EntityNotFoundException
      */
     private function getEmailTemplate(EmailTemplateCriteria $criteria, string $language): EmailTemplate
     {
@@ -286,7 +304,9 @@ class SendEmailTemplate extends AbstractSendEmail
         }
 
         if (!is_array($options['recipients'])) {
-            throw new InvalidParameterException('Recipients parameter must be an array');
+            throw new InvalidParameterException(
+                \sprintf('Recipients parameter must be an array, %s given', \gettype($options['recipients']))
+            );
         }
     }
 
