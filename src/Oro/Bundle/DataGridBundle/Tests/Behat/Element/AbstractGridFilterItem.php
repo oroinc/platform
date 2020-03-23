@@ -33,7 +33,11 @@ abstract class AbstractGridFilterItem extends Element
 
     public function reset()
     {
-        $this->find('css', 'span.reset-filter')->click();
+        $element = $this->find('css', 'span.reset-filter');
+        if ($element->isValid() && $element->isVisible()) {
+            $element->click();
+        }
+
         $this->getDriver()->waitForAjax();
     }
 
