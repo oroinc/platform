@@ -3,7 +3,7 @@ const modules = require('dynamic-imports');
 
 function loadModule(name, ...values) {
     if (!modules[name]) {
-        throw new Error('Module "' + name + '" is not found the list of modules');
+        throw new Error(`Module "${name}" is not found in the list of modules used for dynamic-imports`);
     }
     return modules[name]().then(function(module) {
         return values.length === 0 ? module.default : _.pick(module, values);

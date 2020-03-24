@@ -205,6 +205,11 @@ services:
         tags:
             - { name: layout.data_provider, alias: property_accessor }
 
+    oro_layout.layout.data_provider.filtered_image.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\FilteredImageProvider'
+        public: false
+        abstract: true
+
     oro_layout.provider.abstract_form:
         abstract: true
         class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider'

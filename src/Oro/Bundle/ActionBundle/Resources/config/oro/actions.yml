@@ -77,6 +77,8 @@ operations:
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
+            options:
+                ariaLabel: oro.action.delete_entity.aria_label
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm

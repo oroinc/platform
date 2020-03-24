@@ -15,6 +15,10 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
 {
@@ -91,7 +95,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'recipients' => 'some@recipient.com',
                 ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Recipients parameter must be an array',
+                'exceptionMessage' => 'Recipients parameter must be an array, string given',
             ],
             'no to email in one of addresses' => [
                 'options' => [
@@ -272,29 +276,35 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
         $this->action->execute([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     * @expectedExceptionMessage test
-     */
-    public function testExecuteWithInvalidEmail(): void
+    private function mockValidatorViolations(string $violationMessage, bool $listAsInterface = true)
     {
-        $violationListInterface = $this->createMock('Symfony\Component\Validator\ConstraintViolationInterface');
-        $violationListInterface->expects($this->once())
-            ->method('getMessage')
-            ->willReturn('test');
+        if ($listAsInterface) {
+            $violationList = $this->createMock(ConstraintViolationListInterface::class);
+            $violation = $this->createMock(ConstraintViolationInterface::class);
+            $violation->expects($this->once())
+                ->method('getMessage')
+                ->willReturn($violationMessage);
+            $violationList->expects($this->once())
+                ->method('get')
+                ->willReturn($violation);
+        } else {
+            $violationList = $this->createMock(ConstraintViolationList::class);
+            $violationList->expects($this->once())
+                ->method('__toString')
+                ->willReturn($violationMessage);
+        }
 
-        $violationList = $this->createMock('Symfony\Component\Validator\ConstraintViolationList');
         $violationList->expects($this->once())
             ->method('count')
             ->willReturn(1);
-        $violationList->expects($this->once())
-            ->method('get')
-            ->willReturn($violationListInterface);
 
         $this->validator->expects($this->once())
             ->method('validate')
             ->willReturn($violationList);
+    }
 
+    public function testExecuteWithInvalidEmailAndConstraintViolationInterface()
+    {
         $this->localizedTemplateProvider->expects($this->never())
             ->method($this->anything());
 
@@ -311,6 +321,39 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                 'entity' => new \stdClass(),
             ]
         );
+
+        $this->mockValidatorViolations('violation');
+
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage("Validating \"From\" email (invalidemailaddress):\nviolation");
+
+        $this->action->execute([]);
+    }
+
+    public function testExecuteWithInvalidEmailAndConstraintViolationList()
+    {
+        $this->localizedTemplateProvider->expects($this->never())
+            ->method($this->anything());
+
+        $this->emailProcessor->expects($this->never())
+            ->method($this->anything());
+
+        $this->action->initialize(
+            [
+                'from' => 'invalidemailaddress',
+                'to' => 'test@test.com',
+                'template' => 'test',
+                'subject' => 'subject',
+                'body' => 'body',
+                'entity' => new \stdClass(),
+            ]
+        );
+
+        $this->mockValidatorViolations('violation', false);
+
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage("Validating \"From\" email (invalidemailaddress):\nviolation");
+
         $this->action->execute([]);
     }
 

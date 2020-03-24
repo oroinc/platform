@@ -125,7 +125,7 @@ class Select2Entities extends Element implements ClearableInterface
     {
         $driver = $this->getDriver();
         $closeLinks = $this->getParent()->getParent()
-            ->findAll('css', 'a.select2-search-choice-close');
+            ->findAll('css', '.select2-search-choice-close');
 
         if (!$closeLinks) {
             return;
