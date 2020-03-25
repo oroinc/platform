@@ -7,9 +7,7 @@ define(function(require, exports, module) {
 
     const Popper = require('popper');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
-    require('bootstrap-dropdown');
-
-    const Dropdown = $.fn.dropdown.Constructor;
+    const Dropdown = require('bootstrap-dropdown');
     const original = _.clone(Dropdown.prototype);
     const _clearMenus = Dropdown._clearMenus;
 
@@ -27,6 +25,16 @@ define(function(require, exports, module) {
         GRID_SCROLLABLE_CONTAINER
     ].join(',');
     const ESC_KEY_CODE = 27;
+    const ClassName = {
+        DISABLED: 'disabled',
+        SHOW: 'show',
+        DROPUP: 'dropup',
+        DROPRIGHT: 'dropright',
+        DROPLEFT: 'dropleft',
+        MENURIGHT: 'dropdown-menu-right',
+        MENULEFT: 'dropdown-menu-left',
+        POSITION_STATIC: 'position-static'
+    };
 
     config = _.extend({
         displayArrow: true,
@@ -39,6 +47,7 @@ define(function(require, exports, module) {
             Dropdown._isShowing = !$(this._menu).hasClass('show');
 
             original.toggle.call(this);
+            this.syncAriaExpanded();
 
             if (Dropdown._isShowing) {
                 manageFocus.focusTabbable($(this._menu));
@@ -57,13 +66,13 @@ define(function(require, exports, module) {
 
         show: function() {
             original.show.call(this);
-
+            this.syncAriaExpanded();
             this.bindKeepFocusInside();
         },
 
         hide: function() {
             original.hide.call(this);
-
+            this.syncAriaExpanded();
             this.unbindKeepFocusInside();
         },
 
@@ -80,6 +89,10 @@ define(function(require, exports, module) {
 
         unbindKeepFocusInside: function() {
             $(this._menu).off(_events(['keydown']));
+        },
+
+        syncAriaExpanded: function() {
+            this._element.setAttribute('aria-expanded', $(this._menu).hasClass(ClassName.SHOW));
         },
 
         dispose: function() {
@@ -359,4 +372,6 @@ define(function(require, exports, module) {
                 }
             });
         });
+
+    return Dropdown;
 });

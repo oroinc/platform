@@ -19,6 +19,9 @@
     if (launcherMode != '') {
         actionClassNames.push('mode-' +  launcherMode);
     }
+    if (obj.withinDropdown) {
+        actionClassNames.push('dropdown-item');
+    }
     if (links) {
         actionClassNames.push('dropdown-toggle');
     }
@@ -29,7 +32,7 @@
 <% if (links) { %><div class="btn-group"><% } %>
 
 <<%- tagName %>
-    <% if (tagName == "a") { %> href="<%= link %>"<% } %>
+    <% if (tagName === "a") { %> href="<%= link %>" role="button"<% } %>
     class="<%= actionClassNames.join(' ') %>"
     title="<%- title %>"
     <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %>

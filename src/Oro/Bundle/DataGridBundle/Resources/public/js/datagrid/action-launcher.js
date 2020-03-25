@@ -85,6 +85,12 @@ define(function(require, exports, module) {
         attributes: null,
 
         /**
+         * Flag that action launcher belongs to a dropdown and has to be rendered as dropdown-item
+         * @property {boolean}
+         */
+        withinDropdown: false,
+
+        /**
          * Defines map of events => handlers
          * @return {Object}
          */
@@ -127,14 +133,7 @@ define(function(require, exports, module) {
                 throw new TypeError('"action" is required');
             }
 
-            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'allowDefaultAriaLabel',
-                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
-
-            _.extend(
-                this,
-                _.pick(options, 'iconHideText', 'runAction', 'onClickReturnValue', 'links'),
-                _.pick(truthy, Boolean)
-            );
+            this.setOptions(options);
 
             if (!this.launcherMode) {
                 this.launcherMode = this._convertToLauncherMode();
@@ -168,9 +167,22 @@ define(function(require, exports, module) {
             ActionLauncher.__super__.dispose.call(this);
         },
 
+        setOptions: function(options) {
+            const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'allowDefaultAriaLabel',
+                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes', 'withinDropdown');
+
+            _.extend(
+                this,
+                _.pick(options, 'iconHideText', 'runAction', 'onClickReturnValue', 'links'),
+                _.pick(truthy, Boolean)
+            );
+
+            return this;
+        },
+
         getTemplateData: function() {
             const data = _.pick(this, 'icon', 'title', 'label', 'ariaLabel', 'className', 'iconClassName',
-                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName');
+                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName', 'withinDropdown');
 
             if (!data.label) {
                 data.label = this.action.label;
