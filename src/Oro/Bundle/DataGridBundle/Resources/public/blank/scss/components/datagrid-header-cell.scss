@@ -46,6 +46,7 @@
 
     &.action-column {
         width: $datagrid-header-cell-action-column-width;
+        padding: $datagrid-header-cell-action-column-offset-inner;
 
         text-align: $datagrid-header-cell-action-column-text-align;
 

@@ -24,7 +24,7 @@ Feature: Menu Items Translation
     When I click Enable "German (Germany)" in grid
     Then I should see "Language has been enabled" flash message
     When I click Install "German (Germany)" in grid
-    And I click "Install"
+    And I click "Install" in modal window
     Then I should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |

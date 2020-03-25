@@ -80,6 +80,9 @@ oro_behat_extension:
     UiDialog Disabled okButton:
       selector: 'div.ui-dialog-buttonpane button.disabled[type=submit]'
 
+    UiDialog ActionPanel:
+      selector: 'div[role="dialog"] .ui-dialog-buttonpane'
+
     UiWindow:
       selector: 'div.modal'
 
@@ -94,6 +97,9 @@ oro_behat_extension:
 
     UiWindow cancelButton:
       selector: 'div.modal-footer .cancel, div.buttons-equal button.cancel'
+
+    UiWindow ActionPanel:
+      selector: 'div.modal .modal-footer'
 
     ContextSelector:
       selector:

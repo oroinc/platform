@@ -91,7 +91,7 @@ define(function(require) {
                 this.$el.append(this.getTemplateFunction()(this.getTemplateData()));
                 panel.setElement(this.$('[data-action-panel]'));
                 panel.render();
-                panel.$el.children().addClass('dropdown-item').wrap('<li/>');
+                panel.$el.children().wrap('<li/>');
             }
             return this;
         },
@@ -105,12 +105,22 @@ define(function(require) {
 
         enable: function() {
             this.subview('actionsPanel').enable();
-            this.$(this.options.controls).removeClass('disabled');
+            this.$(this.options.controls)
+                .attr({
+                    'tabindex': null,
+                    'aria-disabled': null
+                })
+                .removeClass('disabled');
         },
 
         disable: function() {
             this.subview('actionsPanel').disable();
-            this.$(this.options.controls).addClass('disabled');
+            this.$(this.options.controls)
+                .attr({
+                    'tabindex': -1,
+                    'aria-disabled': true
+                })
+                .addClass('disabled');
         }
     });
 
