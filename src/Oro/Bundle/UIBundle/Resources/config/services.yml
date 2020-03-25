@@ -208,3 +208,8 @@ services:
             - '@translator'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_ui.provider.url_without_front_controller:
+        class: Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider
+        arguments:
+            - '@router'
