@@ -26,7 +26,7 @@ define(function(require) {
         events: {
             'submit': 'onSubmit',
             'reset': 'onReset',
-            'click .remove-attachment': 'onRemoveAttachment'
+            'click [data-role="remove"]': 'onRemoveAttachment'
         },
 
         listen: {
