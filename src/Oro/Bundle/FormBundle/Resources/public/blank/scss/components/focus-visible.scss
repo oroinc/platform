@@ -4,7 +4,8 @@
     .focus-visible {
         box-shadow: $focus-visible-style;
 
-        &[data-skip-focus-decoration] {
+        &[data-skip-focus-decoration],
+        [data-skip-focus-decoration-inner-elements] & {
             box-shadow: none;
         }
     }

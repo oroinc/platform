@@ -6,6 +6,7 @@ define(function(require, exports, module) {
     let config = require('module-config').default(module.id);
 
     const Popper = require('popper');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
     require('bootstrap-dropdown');
 
     const Dropdown = $.fn.dropdown.Constructor;
@@ -25,6 +26,7 @@ define(function(require, exports, module) {
         DIALOG_SCROLLABLE_CONTAINER,
         GRID_SCROLLABLE_CONTAINER
     ].join(',');
+    const ESC_KEY_CODE = 27;
 
     config = _.extend({
         displayArrow: true,
@@ -39,7 +41,10 @@ define(function(require, exports, module) {
             original.toggle.call(this);
 
             if (Dropdown._isShowing) {
-                $(this._menu).focusFirstInput();
+                manageFocus.focusTabbable($(this._menu));
+                this.bindKeepFocusInside();
+            } else {
+                this.unbindKeepFocusInside();
             }
 
             if (this._displayArrow()) {
@@ -48,6 +53,33 @@ define(function(require, exports, module) {
 
             delete Dropdown._togglingElement;
             delete Dropdown._isShowing;
+        },
+
+        show: function() {
+            original.show.call(this);
+
+            this.bindKeepFocusInside();
+        },
+
+        hide: function() {
+            original.hide.call(this);
+
+            this.unbindKeepFocusInside();
+        },
+
+        bindKeepFocusInside: function() {
+            $(this._menu).on(_events(['keydown']), e => {
+                if (e.keyCode === ESC_KEY_CODE) {
+                    this.hide();
+                    this._element.focus();
+                } else {
+                    manageFocus.preventTabOutOfContainer(e, e.currentTarget);
+                }
+            });
+        },
+
+        unbindKeepFocusInside: function() {
+            $(this._menu).off(_events(['keydown']));
         },
 
         dispose: function() {
