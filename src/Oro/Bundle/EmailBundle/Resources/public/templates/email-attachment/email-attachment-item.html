@@ -1,9 +1,9 @@
-<div class="attachment-items">
-    <div data-id="<%- id %>" class="attachment-item">
-        <i class="fa <%- icon %>"></i>
-        <span class="attachment-item__filename" title="<%- fileName %>"><%- fileName %></span>
-        <i class="fa-close btn btn-square-lighter remove-attachment"></i>
-    </div>
+<div data-id="<%- id %>" class="attachment-item">
+    <span class="attachment-item__icon fa <%- icon %>" aria-hidden="true"></span>
+    <span class="attachment-item__filename" title="<%- fileName %>"><%- fileName %></span>
+    <button class="attachment-item__remove btn btn-icon btn-square-lighter" type="button" data-role="remove">
+        <span class="fa-close" aria-hidden="true"></span>
+    </button>
     <input name="<%- inputName %>[<%- cid %>][id]" type="text" value="<%- id %>"/>
     <input name="<%- inputName %>[<%- cid %>][type]" type="text" value="<%- type %>" class="attachment-type"/>
     <input name="<%- inputName %>[<%- cid %>][file]" class="no-uniform" type="file"/>
