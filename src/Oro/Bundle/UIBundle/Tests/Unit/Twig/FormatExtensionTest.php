@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
+use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -17,19 +18,22 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatterManager;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    protected $urlProvider;
+
     /** @var FormatExtension */
     protected $extension;
 
     protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->formatterManager = $this->getMockBuilder(FormatterManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatterManager = $this->createMock(FormatterManager::class);
+        $this->urlProvider = $this->createMock(UrlWithoutFrontControllerProvider::class);
 
         $container = self::getContainerBuilder()
             ->add('translator', $this->translator)
             ->add('oro_ui.formatter', $this->formatterManager)
+            ->add('oro_ui.provider.url_without_front_controller', $this->urlProvider)
             ->getContainer($this);
 
         $this->extension = new FormatExtension($container);
@@ -60,6 +64,20 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
                 [$parameter, $formatterName, $formatterArguments]
             )
         );
+    }
+
+    public function testGenerateUrlWithoutFrontController()
+    {
+        $name = 'some_route_name';
+        $parameters = ['any_route_parameter'];
+        $path = 'some/test/path.png';
+
+        $this->urlProvider->expects($this->once())
+            ->method('generate')
+            ->with($name, $parameters)
+            ->willReturn($path);
+
+        self::assertEquals($path, self::callTwigFunction($this->extension, 'asset_path', [$name, $parameters]));
     }
 
     /**

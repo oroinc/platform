@@ -84,7 +84,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'recipients' => 'some@recipient.com'
                 ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Recipients parameter must be an array',
+                'exceptionMessage' => 'Recipients parameter must be an array, string given',
             ],
             'no to email in one of addresses' => [
                 'options' => [
@@ -302,7 +302,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
     public function testExecuteWithInvalidEmail()
     {
         $this->expectException('\Symfony\Component\Validator\Exception\ValidatorException');
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionMessage("Validating \"From\" email (invalidemailaddress):\nviolation");
         $options = [
             'from' => 'invalidemailaddress',
             'to' => 'test@test.com',
@@ -332,16 +332,9 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
         $violationList->expects($this->once())
             ->method('count')
             ->willReturn(1);
-        $violationListInterface =
-            $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $violationListInterface->expects($this->once())
-            ->method('getMessage')
-            ->willReturn('test');
         $violationList->expects($this->once())
-            ->method('get')
-            ->willReturn($violationListInterface);
+            ->method('__toString')
+            ->willReturn('violation');
         $this->validator->expects($this->once())
             ->method('validate')
             ->willReturn($violationList);
