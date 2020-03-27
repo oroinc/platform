@@ -160,8 +160,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -170,8 +169,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getBody')
-            ->willReturn('[]')
-        ;
+            ->willReturn('[]');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
@@ -182,8 +180,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger
             ->expects($this->once())
             ->method('warning')
-            ->with('Not supported format: "test", using default')
-        ;
+            ->with('Not supported format: "test", using default');
         $this->fileManager
             ->expects($this->once())
             ->method('writeToTmpLocalStorage')
@@ -220,8 +217,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'processorAlias' => 'test',
                 'process' => 'import',
                 'options' => [],
-            ]))
-        ;
+            ]));
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
@@ -233,8 +229,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('runUnique')
             ->with(1)
-            ->willReturn(true)
-            ;
+            ->willReturn(true);
         $this->fileManager
             ->expects($this->once())
             ->method('writeToTmpLocalStorage')
@@ -249,8 +244,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->importHandler
             ->expects($this->once())
             ->method('setImportingFileName')
-            ->with('12345.csv')
-        ;
+            ->with('12345.csv');
         $this->importHandler
             ->expects($this->once())
             ->method('setConfigurationOptions')
@@ -258,14 +252,12 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 Context::OPTION_ENCLOSURE => '|',
                 Context::OPTION_DELIMITER => ';',
                 Context::OPTION_BATCH_SIZE => 100,
-            ])
-        ;
+            ]);
         $this->importHandler
             ->expects($this->once())
             ->method('splitImportFile')
             ->with('test', 'import', $this->writer)
-            ->willReturn(['import_1.csv'])
-        ;
+            ->willReturn(['import_1.csv']);
 
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -282,8 +274,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'processorAlias' => 'test',
                 'process' => 'import',
                 'options' => $options,
-            ]))
-        ;
+            ]));
 
         $message
             ->expects($this->once())
@@ -300,8 +291,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('runUnique')
             ->with(1, 'oro:import:test:test:0')
-            ->willReturn(true)
-            ;
+            ->willReturn(true);
         $this->fileManager
             ->expects($this->once())
             ->method('writeToTmpLocalStorage')
@@ -317,8 +307,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->importHandler
             ->expects($this->once())
             ->method('setImportingFileName')
-            ->with('12345.csv')
-        ;
+            ->with('12345.csv');
         $this->importHandler
             ->expects($this->once())
             ->method('setConfigurationOptions')
@@ -327,14 +316,12 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 Context::OPTION_DELIMITER => ';',
                 Context::OPTION_BATCH_SIZE => 100,
                 'unique_job_slug' => 0,
-            ])
-        ;
+            ]);
         $this->importHandler
             ->expects($this->once())
             ->method('splitImportFile')
             ->with('test', 'import', $this->writer)
-            ->willReturn(['import_1.csv'])
-        ;
+            ->willReturn(['import_1.csv']);
 
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -351,8 +338,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'processorAlias' => 'test',
                 'process' => 'import',
                 'options' => $options,
-            ]))
-        ;
+            ]));
 
         $message
             ->expects($this->once())
@@ -403,7 +389,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                     'body' => [
                         'originFileName' => 'test.csv',
                         'error' => 'The import file could not be imported due to a fatal error. ' .
-                                   'Please check its integrity and try again!',
+                            'Please check its integrity and try again!',
                     ],
                     'recipientUserId' => self::USER_ID,
                     'contentType' => 'text/html',
@@ -507,8 +493,22 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
-                [Topics::IMPORT, $messageData1],
-                [Topics::IMPORT, $messageData2]
+                [
+                    Topics::IMPORT,
+                    $this->callback(function ($messageData) use ($messageData1) {
+                        $this->assertArraySubset($messageData1, $messageData);
+
+                        return true;
+                    })
+                ],
+                [
+                    Topics::IMPORT,
+                    $this->callback(function ($messageData) use ($messageData2) {
+                        $this->assertArraySubset($messageData2, $messageData);
+
+                        return true;
+                    })
+                ]
             );
 
         $dependentContext = $this->createMock(DependentJobContext::class);
@@ -542,12 +542,18 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->importHandler
             ->expects($this->once())
             ->method('splitImportFile')
-            ->willReturn(['chunk_1_12345.csv', 'chunk_2_12345.csv'])
-        ;
+            ->willReturn(['chunk_1_12345.csv', 'chunk_2_12345.csv']);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS, new BeforeImportChunksEvent($messageData));
+            ->with(
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
+                $this->callback(function (BeforeImportChunksEvent $eventData) use ($messageData) {
+                    $this->assertArraySubset($messageData, $eventData->getBody());
+
+                    return true;
+                })
+            );
 
         $message = $this->createMessageMock();
         $message
