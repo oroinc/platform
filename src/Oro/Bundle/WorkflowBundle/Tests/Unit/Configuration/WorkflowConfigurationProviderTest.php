@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationImportsProcesso
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Integration test
@@ -45,9 +46,12 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $fileReader = new YamlFileCachedReader();
 
+        /** @var FileLocatorInterface $fileLocator */
+        $fileLocator = $this->createMock(FileLocatorInterface::class);
+
         $importsProcessor = new WorkflowConfigurationImportsProcessor();
-        $importsProcessor->addImportProcessorFactory(new ResourceFileImportProcessorFactory($fileReader, []));
-        $importsProcessor->addImportProcessorFactory(new WorkflowFileImportProcessorFactory($fileReader));
+        $importsProcessor->addImportProcessorFactory(new ResourceFileImportProcessorFactory($fileReader, $fileLocator));
+        $importsProcessor->addImportProcessorFactory(new WorkflowFileImportProcessorFactory($fileReader, $fileLocator));
         $importsProcessor->addImportProcessorFactory(
             new WorkflowImportProcessorSupervisorFactory($fileReader, $workflowFinderBuilder)
         );

@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 
 class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,13 +14,12 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ResourceFileImportProcessorFactory */
     private $factory;
 
-    /** @var array */
-    private $kernelBundles = ['TestBundle1', 'TestBundle2'];
-
     protected function setUp()
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
-        $this->factory = new ResourceFileImportProcessorFactory($this->reader, $this->kernelBundles);
+        /** @var FileLocatorInterface|\PHPUnit\Framework\MockObject\MockObject $fileLocator */
+        $fileLocator = $this->createMock(FileLocatorInterface::class);
+        $this->factory = new ResourceFileImportProcessorFactory($this->reader, $fileLocator);
     }
 
     /**
