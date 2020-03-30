@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Processor for import parts of workflows from specific file.
@@ -11,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
  * ```
  * imports:
  *     - { resource: './workflow_parts.yml', workflow: "to_import", as: "to_accept", replace: [] }
+ *     - { resource: '@AcmeDemoBundle:workflows/workflow_name/workflow_parts.yml' }
  * workflows:
  *     to_accept:
  *         entity: Entity1
@@ -51,20 +53,25 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
     /** @var string */
     private $file;
 
+    /** @var FileLocatorInterface */
+    private $fileLocator;
+
     /**
      * @param ConfigFileReaderInterface $reader
      * @param string $file relative to current context file path
+     * @param FileLocatorInterface $fileLocator
      */
-    public function __construct(ConfigFileReaderInterface $reader, string $file)
+    public function __construct(ConfigFileReaderInterface $reader, string $file, FileLocatorInterface $fileLocator)
     {
         $this->reader = $reader;
         $this->file = $file;
+        $this->fileLocator = $fileLocator;
     }
 
     /** {@inheritdoc} */
     public function process(array $content, \SplFileInfo $contentSource): array
     {
-        $importFile = new \SplFileInfo($contentSource->getPath() . DIRECTORY_SEPARATOR . $this->file);
+        $importFile = $this->getImportFile($contentSource);
         $importContent = $this->reader->read($importFile);
 
         if ($this->parent) {
@@ -85,5 +92,21 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
     public function setParent(ConfigImportProcessorInterface $parentProcessor)
     {
         $this->parent = $parentProcessor;
+    }
+
+    /**
+     * @param \SplFileInfo
+     *
+     * @return \SplFileInfo
+     */
+    private function getImportFile(\SplFileInfo $contentSource): \SplFileInfo
+    {
+        if ('@' === $this->file[0]) {
+            $fileName = $this->fileLocator->locate($this->file);
+        } else {
+            $fileName = $contentSource->getPath() . DIRECTORY_SEPARATOR . $this->file;
+        }
+
+        return new \SplFileInfo($fileName);
     }
 }
