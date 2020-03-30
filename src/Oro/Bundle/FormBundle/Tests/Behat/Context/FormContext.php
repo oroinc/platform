@@ -618,6 +618,21 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^I should not see any selected option in "([^"]*)" select$/
+     * @param string $field
+     */
+    public function iShouldNotSeeAnySelectedOption(string $field)
+    {
+        try {
+            $selectedOptionText = $this->getSelectedOptionText($field);
+        } catch (ElementNotFoundException $e) {
+            return;
+        }
+
+        self::fail(sprintf('Not expect to find a selected option, but was found "%s".', $selectedOptionText));
+    }
+
+    /**
      * @param string $selectField
      * @param array $optionLabels
      */

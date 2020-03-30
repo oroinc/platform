@@ -6,10 +6,13 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class SortersStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var SortersStateProvider */
     private $provider;
 
@@ -196,10 +199,12 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
+        $user = $this->getEntity(User::class, ['id' => 42]);
+
         $this->tokenAccessor
             ->expects(self::once())
             ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+            ->willReturn($user);
 
         $this->gridViewManager
             ->expects(self::once())
