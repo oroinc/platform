@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
 use Doctrine\DBAL\Connection;
@@ -8,8 +9,11 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
 
+/**
+ * Redeliver orphan messages.
+ */
 class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 {
     /**
@@ -63,12 +67,12 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
-        if (false == $session instanceof DbalSession) {
+        if (false == $session instanceof DbalSessionInterface) {
             throw new \LogicException(sprintf(
                 'Unexpected instance of session. expected:"%s", actual:"%s"',
-                DbalSession::class,
+                DbalSessionInterface::class,
                 is_object($session) ? get_class($session) : gettype($session)
             ));
         }
@@ -88,12 +92,12 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onInterrupted(Context $context)
     {
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
-        if (false == $session instanceof DbalSession) {
+        if (false == $session instanceof DbalSessionInterface) {
             throw new \LogicException(sprintf(
                 'Unexpected instance of session. expected:"%s", actual:"%s"',
-                DbalSession::class,
+                DbalSessionInterface::class,
                 is_object($session) ? get_class($session) : gettype($session)
             ));
         }
@@ -131,10 +135,9 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         }
 
         // redeliver orphan messages
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
         $connection = $session->getConnection();
-        $dbal = $connection->getDBALConnection();
 
         $sql = sprintf(
             'UPDATE %s SET consumer_id=NULL, redelivered=:isRedelivered '.
@@ -142,6 +145,8 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             $connection->getTableName()
         );
 
+        /** @var Connection $dbal */
+        $dbal = $connection->getDBALConnection();
         $dbal->executeUpdate(
             $sql,
             [

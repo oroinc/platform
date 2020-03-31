@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Async\AddEmailAssociationMessageProcessor;
@@ -6,7 +7,7 @@ use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -30,7 +31,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCas
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'targetClass' => 'class',
             'targetId' => 123,
@@ -56,7 +57,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCas
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'emailId' => 1,
             'targetId' => 123,
@@ -82,7 +83,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCas
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'emailId' => 1,
             'targetClass' => 'class',
@@ -114,7 +115,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCas
             ->with([456], 'class', 123)
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $body = [
             'jobId' => 123,
             'emailId' => 456,

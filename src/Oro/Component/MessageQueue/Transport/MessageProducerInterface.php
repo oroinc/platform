@@ -1,22 +1,19 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport;
 
+/**
+ * A client uses a MessageProducer object to send messages to a queue.
+ */
 interface MessageProducerInterface
 {
     /**
-     * @param DestinationInterface $destination
+     * Sends a message to a queue for an unidentified message producer.
+     *
+     * @param QueueInterface $queue
      * @param MessageInterface $message
      *
      * @return void
-     *
-     * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception - if the JMS provider fails to send
-     * the message due to some internal error.
-     *
-     * @throws \Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException - if a client uses
-     * this method with an invalid destination.
-     *
-     * @throws \Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException - if an invalid message
-     * is specified.
      */
-    public function send(DestinationInterface $destination, MessageInterface $message);
+    public function send(QueueInterface $queue, MessageInterface $message): void;
 }

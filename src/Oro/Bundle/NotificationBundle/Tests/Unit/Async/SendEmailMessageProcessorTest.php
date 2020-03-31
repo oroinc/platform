@@ -14,7 +14,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
@@ -64,7 +64,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $sender = From::emailAddress('from@email.com');
-        $message = new NullMessage;
+        $message = new Message();
         $message->setBody(json_encode([
             'toEmail' => 'to@email.com',
             'sender' => $sender->toArray(),
@@ -92,7 +92,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $message->setBody(json_encode([
             'body'    => 'body',
             'toEmail' => 'to@email.com',
@@ -121,7 +121,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $sender = From::emailAddress('from@email.com');
-        $message = new NullMessage;
+        $message = new Message();
         $message->setBody(json_encode([
             'body' => 'body',
             'sender' => $sender->toArray(),
@@ -149,7 +149,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $sender = From::emailAddress('from@email.com');
         $message->setBody(json_encode([
             'sender' => $sender->toArray(),
@@ -185,7 +185,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $sender = From::emailAddress('from@email.com');
         $message->setBody(json_encode([
             'body' => 'Message body',
@@ -220,7 +220,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $sender = From::emailAddress('from@email.com');
         $message->setBody(json_encode([
             'body' => 'Message body',
@@ -274,7 +274,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $sender = From::emailAddress('from@email.com');
         $message->setBody(json_encode([
             'toEmail' => 'to@email.com',
@@ -326,7 +326,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createTemplateEmailMessageSenderMock()
         );
 
-        $message = new NullMessage;
+        $message = new Message();
         $sender = From::emailAddress('from@email.com');
         $message->setBody(json_encode([
             'toEmail' => 'to@email.com',
@@ -359,7 +359,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'userId' => self::USER_ID
         ];
 
-        $message = new NullMessage;
+        $message = new Message();
         $message->setBody(json_encode($messageBody));
 
         $templateEmailMessageSender
@@ -391,7 +391,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'body' => ['body_parameter' => 'value'],
             'userId' => self::USER_ID,
         ];
-        $message = new NullMessage;
+        $message = new Message();
         $message->setBody(json_encode($messageBody));
 
         $logger = $this->createLoggerMock();

@@ -21,7 +21,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\Common\ConfigObject;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 /**
  * @dbIsolationPerTest
@@ -2124,15 +2124,20 @@ class DataAuditTest extends WebTestCase
         $this->assertEquals([], $expects);
     }
 
+    /**
+     * @param bool $withCollections
+     */
     private function processMessages(bool $withCollections = false): void
     {
-        $session = new NullSession();
-
         $processors[] = 'oro_dataaudit.async.audit_changed_entities';
         if ($withCollections) {
             $processors[] = 'oro_dataaudit.async.audit_changed_entities_relations';
         }
         $processors[] = 'oro_dataaudit.async.audit_changed_entities_inverse_relations';
+
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
+        $session = $connection->createSession();
 
         foreach ($processors as $processorId) {
             /** @var AbstractAuditProcessor|TopicSubscriberInterface $processor */

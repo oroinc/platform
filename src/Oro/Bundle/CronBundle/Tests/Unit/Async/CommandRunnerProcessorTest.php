@@ -6,8 +6,8 @@ use Oro\Bundle\CronBundle\Async\CommandRunnerProcessor;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
@@ -40,14 +40,15 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithoutCommand()
     {
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('');
 
         $this->logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid message: empty command');
 
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -59,8 +60,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessInvalidArguments($arguments)
     {
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'command' => 'test:command',
             'arguments' => $arguments
@@ -70,6 +70,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message: "arguments" must be of type array', ['message' => $message]);
 
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -85,8 +87,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $commandName = 'test:command';
         $commandArguments = ['argKey' => 'argVal'];
 
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'command' => $commandName,
             'arguments' => $commandArguments,
@@ -107,6 +108,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects($this->never())
             ->method('runDelayed');
 
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals($expectedResult, $result);
     }
@@ -123,8 +126,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $commandName = 'test:command';
         $commandArguments = ['argKey' => 'argVal'];
 
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'jobId' => $jobId,
             'command' => $commandName,
@@ -145,6 +147,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($jobResult);
 
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals($expectedResult, $result);
     }

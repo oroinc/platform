@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
@@ -11,7 +12,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -75,7 +76,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false)
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -99,7 +100,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $jobUniqueName = 'job_unique_name';
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $jobRunner = $this->createJobRunnerMock();
@@ -157,7 +158,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $messageBody = ['message_body'];
         $jobUniqueName = 'job_unique_name';
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $job = $this->createJob(1);
@@ -279,7 +280,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $messageBody = ['message_body'];
         $jobUniqueName = 'job_unique_name';
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $job = $this->createJob(1);
@@ -389,7 +390,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             'entity' => 'Acme'
         ];
         $jobUniqueName = 'job_unique_name';
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $job = $this->createJob(1);
@@ -524,7 +525,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             'entity' => 'Acme'
         ];
         $jobUniqueName = 'job_unique_name';
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $job = $this->createJob(1);

@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculatorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -57,7 +57,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid message. Job id is missing.');
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(\json_encode([]));
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);
@@ -83,7 +83,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Job was not found. id: "47"');
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(\json_encode(['jobId' => 47]));
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);
@@ -112,7 +112,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical');
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(\json_encode(['jobId' => 47]));
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);

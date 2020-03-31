@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
@@ -11,8 +10,8 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -60,12 +59,15 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('{]');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The malformed json given.');
-        $processor->process($message, new NullSession());
+
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
     }
 
     public function testShouldRejectMessageIfProcessJobIdNotSet()
@@ -83,10 +85,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('{}');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -114,10 +118,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -140,10 +146,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -187,10 +195,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         self::assertEquals(MessageProcessorInterface::ACK, $status);
     }
@@ -231,10 +241,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => $id]));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }
@@ -274,14 +286,17 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects(self::never())
             ->method('commit');
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => $processJobId]));
 
         $logger->expects($this->once())
             ->method('error');
 
         $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $logger);
-        $processor->process($message, new NullSession());
+
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
     }
 
     /**
@@ -298,14 +313,6 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
     private function createEntityManagerMock()
     {
         return $this->createMock(EntityManagerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityRepository
-     */
-    private function createEntityRepositoryMock()
-    {
-        return $this->createMock(EntityRepository::class);
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
@@ -62,7 +62,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
             }))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'entityClass' => 'entity-name',
             'jobId' => 12345,

@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +39,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit\Framework\
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([]));
 
         $processor = new PurgeEmailAttachmentsByIdsMessageProcessor(

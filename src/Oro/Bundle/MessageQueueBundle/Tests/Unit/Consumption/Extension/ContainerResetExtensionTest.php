@@ -8,7 +8,7 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\ChainExtensionAwareClearer;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -61,7 +61,7 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPostReceivedShouldCallClearersForPersistentProcessor()
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => 'test_processor']);
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -82,7 +82,7 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPostReceivedShouldNotCallClearersForPersistentProcessor()
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => 'test_processor']);
 
         $logger = $this->createMock(LoggerInterface::class);

@@ -1,11 +1,12 @@
 <?php
+
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Async;
 
 use Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor;
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -28,7 +29,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['key' => 'value']));
 
         $processor = new SyncEmailsMessageProcessor($this->createMessageProducerMock(), $logger);
@@ -58,7 +59,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo(Topics::SYNC_EMAIL), $this->identicalTo(['id' => 2]))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['ids' => [1,2]]));
 
         $processor = new SyncEmailsMessageProcessor($producer, $logger);

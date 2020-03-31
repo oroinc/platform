@@ -1,11 +1,18 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
-use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
+use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class DbalSession implements SessionInterface
+/**
+ * A Session object for DBAL connection.
+ */
+class DbalSession implements DbalSessionInterface
 {
     /**
      * @var DbalConnection
@@ -23,7 +30,7 @@ class DbalSession implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function createMessage($body = null, array $properties = [], array $headers = [])
+    public function createMessage(string $body = '', array $properties = [], array $headers = []): MessageInterface
     {
         $message = new DbalMessage();
         $message->setBody($body);
@@ -35,37 +42,22 @@ class DbalSession implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return DbalDestination
      */
-    public function createQueue($name)
+    public function createQueue(string $name): QueueInterface
     {
-        return new DbalDestination($name);
+        return new Queue($name);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return DbalDestination
      */
-    public function createTopic($name)
+    public function createConsumer(QueueInterface $queue): MessageConsumerInterface
     {
-        return new DbalDestination($name);
-    }
+        $consumer = new DbalMessageConsumer($this, $queue);
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param DbalDestination $destination
-     */
-    public function createConsumer(DestinationInterface $destination)
-    {
-        InvalidDestinationException::assertDestinationInstanceOf($destination, DbalDestination::class);
-
-        $consumer = new DbalMessageConsumer($this, $destination);
-
-        if (isset($this->connection->getOptions()['polling_interval'])) {
-            $consumer->setPollingInterval($this->connection->getOptions()['polling_interval']);
+        $options = $this->connection->getOptions();
+        if (isset($options['polling_interval'])) {
+            $consumer->setPollingInterval($options['polling_interval']);
         }
 
         return $consumer;
@@ -74,7 +66,7 @@ class DbalSession implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function createProducer()
+    public function createProducer(): MessageProducerInterface
     {
         return new DbalMessageProducer($this->connection);
     }
@@ -82,37 +74,14 @@ class DbalSession implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function declareTopic(DestinationInterface $destination)
-    {
-        // does nothing, installer creates all required tables
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function declareQueue(DestinationInterface $destination)
-    {
-        // does nothing, installer creates all required tables
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function declareBind(DestinationInterface $source, DestinationInterface $target)
+    public function close(): void
     {
     }
 
     /**
-     * {@inheritdoc}
+     * @return ConnectionInterface
      */
-    public function close()
-    {
-    }
-
-    /**
-     * @return DbalConnection
-     */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         return $this->connection;
     }

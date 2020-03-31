@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Client\Message;
@@ -8,7 +9,7 @@ use Oro\Component\MessageQueue\Job\DependentJobMessageProcessor;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\Topics;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -35,7 +36,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['key' => 'value']));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -63,7 +64,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Job was not found. id: "12345"')
         ;
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -95,7 +96,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Expected root job but got child. id: "12345"')
         ;
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -125,7 +126,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $logger = $this->createLoggerMock();
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -166,7 +167,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"')
         ;
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -210,7 +211,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
              'job: "123", dependentJob: "{"topic":"topic-name"}"')
         ;
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -254,7 +255,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $logger = $this->createLoggerMock();
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -302,7 +303,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $logger = $this->createLoggerMock();
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
@@ -343,7 +344,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $logger = $this->createLoggerMock();
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
         $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);

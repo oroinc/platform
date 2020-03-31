@@ -16,5 +16,5 @@ interface MessageToArrayConverterInterface
      *
      * @return array
      */
-    public function convert(MessageInterface $message);
+    public function convert(MessageInterface $message): array;
 }

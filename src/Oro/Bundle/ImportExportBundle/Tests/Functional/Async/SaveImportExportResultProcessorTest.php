@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Job\JobProcessor;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -43,7 +43,7 @@ class SaveImportExportResultProcessorTest extends WebTestCase
             'oro:export:test_export_result_message'
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('abc');
         $message->setBody(JSON::encode([
             'jobId' => $rootJob->getId(),
@@ -65,7 +65,7 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
     public function testProcessSaveJobWithInvalidData():void
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('abc');
         $message->setBody(JSON::encode([]));
 

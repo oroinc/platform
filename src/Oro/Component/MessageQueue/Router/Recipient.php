@@ -1,15 +1,19 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Router;
 
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
+/**
+ * Class Recipient that contains message and queue for routing.
+ */
 class Recipient
 {
     /**
-     * @var DestinationInterface
+     * @var QueueInterface
      */
-    private $destination;
+    private $queue;
     
     /**
      * @var MessageInterface
@@ -17,27 +21,27 @@ class Recipient
     private $message;
 
     /**
-     * @param DestinationInterface $destination
+     * @param QueueInterface $queue
      * @param MessageInterface $message
      */
-    public function __construct(DestinationInterface $destination, MessageInterface $message)
+    public function __construct(QueueInterface $queue, MessageInterface $message)
     {
-        $this->destination = $destination;
+        $this->queue = $queue;
         $this->message = $message;
     }
 
     /**
-     * @return DestinationInterface
+     * @return QueueInterface
      */
-    public function getDestination()
+    public function getQueue(): QueueInterface
     {
-        return $this->destination;
+        return $this->queue;
     }
 
     /**
      * @return MessageInterface
      */
-    public function getMessage()
+    public function getMessage(): MessageInterface
     {
         return $this->message;
     }

@@ -13,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\Routing\Router;
 
@@ -225,7 +225,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             'process' => ProcessorRegistry::TYPE_IMPORT,
         ];
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('test_import_message');
         $message->setBody(json_encode($messageData));
 

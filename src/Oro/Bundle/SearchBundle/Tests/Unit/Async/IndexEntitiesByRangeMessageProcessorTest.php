@@ -8,7 +8,7 @@ use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
@@ -38,8 +38,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
-
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'offset' => 123,
             'limit' => 1000,
@@ -73,8 +72,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
-
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'entityClass' => 'entity-name',
             'limit' => 6789,
@@ -112,8 +110,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $doctrine = $this->createDoctrineMock();
 
-
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'entityClass' => 'entity-name',
             'offset' => 6789,
@@ -156,8 +153,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('getManagerForClass')
         ;
 
-
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'entityClass' => 'entity-name',
             'offset' => 1235,

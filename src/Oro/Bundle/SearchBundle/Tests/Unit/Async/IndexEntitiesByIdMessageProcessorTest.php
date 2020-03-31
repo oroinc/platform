@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\AbstractIndexer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -62,7 +62,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Expected array but got: "NULL"')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
@@ -73,7 +73,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldLogErrorIfNotEnoughDataToBuildJobName()
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['class' => 'class-name']));
 
         $this->logger
@@ -101,7 +101,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('message id');
         $message->setBody(json_encode(['class' => 'class-name', 'entityIds' => ['id']]));
 

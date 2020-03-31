@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
@@ -7,7 +8,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
@@ -50,7 +51,7 @@ class ExportMessageProcessorTest extends WebTestCase
             $rootJob
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('abc');
         $message->setBody(json_encode([
             'jobId' => $childJob->getId(),

@@ -4,13 +4,12 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    public function testGetConfigTreeBuilder(): void
     {
         $factories = [];
         $configuration = new Configuration($factories);
@@ -19,11 +18,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
     }
 
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
         $factories = [
             'dbal' => new DbalTransportFactory(),
-            'null' => new NullTransportFactory(),
         ];
 
         $configuration = new Configuration($factories);
@@ -48,7 +46,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'consumer_process_pattern' => ':consume',
                     'polling_interval' => 1000,
                 ],
-                'null' => [],
             ],
             'client' => [
                 'traceable_producer' => false,
