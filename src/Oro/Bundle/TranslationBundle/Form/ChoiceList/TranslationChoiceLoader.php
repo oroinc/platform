@@ -6,9 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+use Gedmo\Translatable\Hydrator\ORM\ObjectHydrator;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -80,15 +81,15 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
 
         // translation must not be selected separately for each entity
         $entityManager->getConfiguration()->addCustomHydrationMode(
-            TranslationWalker::HYDRATE_OBJECT_TRANSLATION,
-            'Gedmo\\Translatable\\Hydrator\\ORM\\ObjectHydrator'
+            TranslatableSqlWalker::HYDRATE_OBJECT_TRANSLATION,
+            ObjectHydrator::class
         );
 
         // make entity translatable
         $query = $this->resolveQueryBuilder()->getQuery();
         $query->setHint(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            TranslatableSqlWalker::class
         );
         $this->addTranslatableLocaleHint($query, $entityManager);
 
@@ -104,7 +105,7 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
             $this->aclHelper->apply($query, $permission, $options);
         }
 
-        $entities = $query->execute(null, TranslationWalker::HYDRATE_OBJECT_TRANSLATION);
+        $entities = $query->execute(null, TranslatableSqlWalker::HYDRATE_OBJECT_TRANSLATION);
 
         $this->choiceList = $this->factory->createListFromChoices($entities, $value);
 

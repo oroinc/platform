@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -68,7 +68,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode($messageBody));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -98,7 +98,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
         $processor->setWriterChain($writerChain);
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'jobId' => 1,
             'parameters' => ['gridName' => 'grid_name'],
@@ -174,7 +174,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($exportResult);
         $processor->setExportHandler($exportHandler);
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'jobId' => 1,
             'parameters' => ['gridName' => 'grid_name'],

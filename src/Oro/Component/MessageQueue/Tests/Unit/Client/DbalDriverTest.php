@@ -1,252 +1,231 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
+use Oro\Component\MessageQueue\Transport\Queue;
 
 class DbalDriverTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    /** @var DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $session;
+
+    /** @var DbalDriver */
+    private $driver;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
-        new DbalDriver($this->createSessionMock(), new Config('', '', '', '', ''));
-    }
+        $this->session = $this->createMock(DbalSessionInterface::class);
 
-    public function testShouldSendJustCreatedMessageToQueue()
-    {
-        $config = new Config('', '', '', '', '');
-        $queue = new DbalDestination('aQueue');
-
-        $transportMessage = new DbalMessage();
-
-        $producer = $this->createMessageProducer();
-        $producer
-            ->expects(self::once())
-            ->method('send')
-            ->with(self::identicalTo($queue), self::identicalTo($transportMessage))
-        ;
-
-        $session = $this->createSessionStub($transportMessage, $producer);
-
-        $driver = new DbalDriver($session, $config);
-
-        $driver->send($queue, new Message());
-    }
-
-    public function testShouldConvertClientMessageToTransportMessage()
-    {
-        $config = new Config('', '', '', '', '');
-        $queue = new DbalDestination('aQueue');
-
-        $message = new Message();
-        $message->setBody('theBody');
-        $message->setContentType('theContentType');
-        $message->setMessageId('theMessageId');
-        $message->setTimestamp(12345);
-        $message->setHeaders(['theHeaderFoo' => 'theFoo']);
-        $message->setProperties(['thePropertyBar' => 'theBar']);
-
-        $transportMessage = new DbalMessage();
-
-        $producer = $this->createMessageProducer();
-        $producer
-            ->expects(self::once())
-            ->method('send')
-        ;
-
-        $session = $this->createSessionStub($transportMessage, $producer);
-
-        $driver = new DbalDriver($session, $config);
-
-        $driver->send($queue, $message);
-
-        self::assertSame('theBody', $transportMessage->getBody());
-        self::assertSame([
-            'theHeaderFoo' => 'theFoo',
-            'content_type' => 'theContentType',
-            'message_id' => 'theMessageId',
-            'timestamp' => 12345
-        ], $transportMessage->getHeaders());
-        self::assertSame([
-            'thePropertyBar' => 'theBar',
-        ], $transportMessage->getProperties());
-    }
-
-    public function testShouldThrowNotImplementedIfExpirationHeaderIsSet()
-    {
-        $config = new Config('', '', '', '', '');
-        $queue = new DbalDestination('aQueue');
-
-        $message = new Message();
-        $message->setExpire(123);
-
-        $transportMessage = new DbalMessage();
-
-        $producer = $this->createMessageProducer();
-        $producer
-            ->expects(self::never())
-            ->method('send')
-        ;
-
-        $session = $this->createSessionStub($transportMessage, $producer);
-
-        $driver = new DbalDriver($session, $config);
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Expire is not supported by the transport');
-        $driver->send($queue, $message);
+        $config = new Config('oro', '', '', '');
+        $this->driver = new DbalDriver($this->session, $config);
     }
 
     /**
-     * @dataProvider providePriorities
+     * @dataProvider messageDataProvider
+     *
+     * @param Message $message
+     * @param DbalMessage $expectedTransportMessage
      */
-    public function testCorrectlyConvertClientsPriorityToTransportsPriority($clientPriority, $transportPriority)
+    public function testSend(Message $message, DbalMessage $expectedTransportMessage): void
     {
-        $config = new Config('', '', '', '', '');
-        $queue = new DbalDestination('aQueue');
+        $queue = new Queue('queue name');
 
-        $message = new Message();
-        $message->setPriority($clientPriority);
-
-        $transportMessage = new DbalMessage();
-
-        $producer = $this->createMessageProducer();
-        $producer
-            ->expects(self::once())
-            ->method('send')
-        ;
-
-        $session = $this->createSessionStub($transportMessage, $producer);
-
-        $driver = new DbalDriver($session, $config);
-
-        $driver->send($queue, $message);
-
-        self::assertSame($transportPriority, $transportMessage->getPriority());
-    }
-
-    public function testShouldReturnConfigInstance()
-    {
-        $config = new Config('', '', '', '', '');
-
-        $driver = new DbalDriver($this->createSessionMock(), $config);
-        $result = $driver->getConfig();
-
-        self::assertSame($config, $result);
-    }
-
-    public function testAllowCreateTransportMessage()
-    {
-        $config = new Config('', '', '', '', '');
-
-        $message = new DbalMessage();
-
-        $session = $this->createSessionMock();
-        $session
-            ->expects(self::once())
-            ->method('createMessage')
-            ->willReturn($message)
-        ;
-
-        $driver = new DbalDriver($session, $config);
-
-        self::assertSame($message, $driver->createTransportMessage());
-    }
-
-    public function testShouldCreateAndDeclareQueue()
-    {
-        $queue = new DbalDestination('name');
-        $session = $this->createSessionMock();
-        $session
+        $this->session
             ->expects($this->once())
-            ->method('createQueue')
-            ->with('queue')
-            ->will($this->returnValue($queue))
-        ;
-        $driver = new DbalDriver($session, new Config('', '', '', ''));
-        $this->assertSame($queue, $driver->createQueue('queue'));
-    }
+            ->method('createMessage')
+            ->willReturn(new DbalMessage());
 
-    public function testShouldSetDelayHeaderIfSetInClientMessage()
-    {
-        $config = new Config('', '', '', '', '');
-        $queue = new DbalDestination('aQueue');
-
-        $message = new Message();
-        $message->setDelay(123);
-
-        $transportMessage = new DbalMessage();
-
-        $producer = $this->createMessageProducer();
-        $producer
-            ->expects(self::once())
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->once())
             ->method('send')
-        ;
+            ->with($queue, $expectedTransportMessage);
 
-        $session = $this->createSessionStub($transportMessage, $producer);
+        $this->session
+            ->expects($this->once())
+            ->method('createProducer')
+            ->willReturn($producer);
 
-        $driver = new DbalDriver($session, $config);
-
-        $driver->send($queue, $message);
-
-        self::assertSame(123, $transportMessage->getDelay());
+        $this->driver->send($queue, $message);
     }
 
-    public function providePriorities()
+    public function testCreateQueue(): void
+    {
+        $queue = new Queue('queue name');
+
+        $this->session->expects($this->once())
+            ->method('createQueue')
+            ->with('queue name')
+            ->willReturn($queue);
+
+        $result = $this->driver->createQueue('queue name');
+
+        $this->assertEquals($queue, $result);
+    }
+
+    public function testCreateTransportMessage(): void
+    {
+        $transportMessage = $this->getTransportMessage('message id', 'message body');
+        $this->session->expects($this->once())
+            ->method('createMessage')
+            ->willReturn($transportMessage);
+
+        $this->assertEquals($transportMessage, $this->driver->createTransportMessage());
+    }
+
+    public function testGetConfig(): void
+    {
+        $config = new Config(
+            'prefix',
+            'message processor name',
+            'router queue name',
+            'default queue name',
+            'default topic name'
+        );
+
+        $driver = new DbalDriver($this->session, $config);
+
+        $this->assertEquals($config, $driver->getConfig());
+    }
+
+    /**
+     * @return array
+     */
+    public function messageDataProvider(): array
     {
         return [
-            [MessagePriority::VERY_LOW, 0],
-            [MessagePriority::LOW, 1],
-            [MessagePriority::NORMAL, 2],
-            [MessagePriority::HIGH, 3],
-            [MessagePriority::VERY_HIGH, 4],
+            'simple message' => [
+                'message' => $this->getMessage('message id', 'message body'),
+                'expectedTransportMessage' => $this->getTransportMessage(
+                    'message id',
+                    'message body',
+                    [
+                        'content_type' => 'content type',
+                    ],
+                    []
+                )
+            ],
+            'message with timestamp' => [
+                'message' => $this->getMessage('message id', 'message body', 3),
+                'expectedTransportMessage' => $this->getTransportMessage(
+                    'message id',
+                    'message body',
+                    [
+                        'content_type' => 'content type',
+                        'timestamp' => '3',
+                    ],
+                    []
+                )
+            ],
+            'message with delay' => [
+                'message' => $this->getMessage('message id', 'message body', null, 10),
+                'expectedTransportMessage' => $this->getTransportMessage(
+                    'message id',
+                    'message body',
+                    [
+                        'content_type' => 'content type',
+                    ],
+                    [
+                        'delay' => '10',
+                    ]
+                )
+            ],
+            'message with priority' => [
+                'message' => $this->getMessage(
+                    'message id',
+                    'message body',
+                    null,
+                    null,
+                    MessagePriority::VERY_HIGH
+                ),
+                'expectedTransportMessage' => $this->getTransportMessage(
+                    'message id',
+                    'message body',
+                    [
+                        'content_type' => 'content type',
+                        'priority' => '4',
+                    ],
+                    []
+                )
+            ],
+            'full message' => [
+                'message' => $this->getMessage(
+                    'message id',
+                    'message body',
+                    3,
+                    10,
+                    MessagePriority::VERY_HIGH
+                ),
+                'expectedTransportMessage' => $this->getTransportMessage(
+                    'message id',
+                    'message body',
+                    [
+                        'content_type' => 'content type',
+                        'timestamp' => '3',
+                        'priority' => '4',
+                    ],
+                    [
+                        'delay' => '10',
+                    ]
+                )
+            ],
         ];
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
+     * @param string $messageId
+     * @param string $body
+     * @param int|null $timestamp
+     * @param int|null $delay
+     * @param string|null $priority
+     *
+     * @return Message
      */
-    private function createSessionStub($message = null, $messageProducer = null)
-    {
-        $sessionMock = $this->createMock(DbalSession::class);
-        $sessionMock
-            ->expects($this->any())
-            ->method('createMessage')
-            ->willReturn($message)
-        ;
-        $sessionMock
-            ->expects($this->any())
-            ->method('createQueue')
-            ->willReturnCallback(function ($name) {
-                return new DbalDestination($name);
-            })
-        ;
-        $sessionMock
-            ->expects($this->any())
-            ->method('createProducer')
-            ->willReturn($messageProducer)
-        ;
+    private function getMessage(
+        string $messageId,
+        string $body,
+        int $timestamp = null,
+        int $delay = null,
+        string $priority = null
+    ): Message {
+        $message = new Message($body, $priority);
+        $message->setMessageId($messageId);
+        $message->setTimestamp($timestamp);
+        $message->setDelay($delay);
+        $message->setContentType('content type');
 
-        return $sessionMock;
+        return $message;
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageProducer
+     * @param string $messageId
+     * @param string $body
+     * @param array $headers
+     * @param array $properties
+     *
+     * @return DbalMessage
      */
-    private function createMessageProducer()
-    {
-        return $this->createMock(DbalMessageProducer::class);
-    }
+    private function getTransportMessage(
+        string $messageId,
+        string $body,
+        array $headers = [],
+        array $properties = []
+    ): DbalMessage {
+        $message = new DbalMessage();
+        $message->setBody($body);
+        $message->setHeaders($headers);
+        $message->setProperties($properties);
+        $message->setMessageId($messageId);
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(DbalSession::class);
+        return $message;
     }
 }

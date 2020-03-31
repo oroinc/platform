@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\DoctrineUtils\ORM\SqlWalker;
+use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 
 class HintExtensionTest extends WebTestCase
 {
@@ -22,7 +22,7 @@ class HintExtensionTest extends WebTestCase
         $dataGrid = $dataGridManager->getDatagrid('items-grid');
 
         static::assertArrayHasKey(
-            SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
+            PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );
     }
@@ -35,7 +35,7 @@ class HintExtensionTest extends WebTestCase
         $dataGrid = $dataGridManager->getDatagrid('items-values-grid');
 
         static::assertArrayNotHasKey(
-            SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
+            PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );
     }

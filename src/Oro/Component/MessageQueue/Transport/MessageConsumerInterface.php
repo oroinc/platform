@@ -1,22 +1,12 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport;
 
 /**
- * A client uses a MessageConsumer object to receive messages from a destination.
- * A MessageConsumer object is created by passing a Destination object
- * to a message-consumer creation method supplied by a session.
- *
- * @link https://docs.oracle.com/javaee/1.4/api/javax/jms/MessageConsumer.html
+ * A client uses a MessageConsumer object to receive messages from a queue.
  */
 interface MessageConsumerInterface
 {
-    /**
-     * Gets the Queue associated with this queue receiver.
-     *
-     * @return QueueInterface
-     */
-    public function getQueue();
-
     /**
      * Receives the next message that arrives within the specified timeout interval.
      * This call blocks until a message arrives, the timeout expires, or this message consumer is closed.
@@ -26,14 +16,7 @@ interface MessageConsumerInterface
      *
      * @return MessageInterface|null
      */
-    public function receive($timeout = 0);
-
-    /**
-     * Receives the next message if one is immediately available.
-     *
-     * @return MessageInterface|null
-     */
-    public function receiveNoWait();
+    public function receive($timeout = 0): ?MessageInterface;
     
     /**
      * Tell the MQ broker that the message was processed successfully
@@ -42,7 +25,7 @@ interface MessageConsumerInterface
      *
      * @return void
      */
-    public function acknowledge(MessageInterface $message);
+    public function acknowledge(MessageInterface $message): void;
 
     /**
      * Tell the MQ broker that the message was rejected
@@ -52,5 +35,5 @@ interface MessageConsumerInterface
      *
      * @return void
      */
-    public function reject(MessageInterface $message, $requeue = false);
+    public function reject(MessageInterface $message, $requeue = false): void;
 }

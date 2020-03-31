@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -18,8 +19,8 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
@@ -78,10 +79,12 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('[]');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -100,10 +103,12 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody('[}');
 
-        $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
     }
     
     public function testShouldRejectMessageIfIntegrationNotExist()
@@ -126,10 +131,12 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -157,10 +164,12 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -190,11 +199,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('theMessageId');
 
-        $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
 
         $uniqueJobs = $jobRunner->getRunUniqueJobs();
         self::assertCount(1, $uniqueJobs);
@@ -227,11 +238,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('theMessageId');
 
-        $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
 
         $uniqueJobs = $jobRunner->getRunUniqueJobs();
         self::assertCount(1, $uniqueJobs);
@@ -273,11 +286,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $processor->process($message, $session);
     }
 
     public function testShouldRejectMessageIfSyncProcessResultFalse()
@@ -314,11 +329,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
@@ -357,11 +374,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }
@@ -401,11 +420,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }
@@ -452,7 +473,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createLoggerMock()
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(JSON::encode([
             'integration_id' => 'theIntegrationId',
             'connector' => 'theConnection',
@@ -463,7 +484,9 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         ]));
         $message->setMessageId('someId');
 
-        $status = $processor->process($message, new NullSession());
+        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        $status = $processor->process($message, $session);
 
         $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }

@@ -1,13 +1,14 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Router;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Router\RouteRecipientListProcessor;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
@@ -27,10 +28,10 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldProduceRecipientsMessagesAndAckOriginalMessage()
     {
-        $fooRecipient = new Recipient(new NullQueue('aName'), new NullMessage());
-        $barRecipient = new Recipient(new NullQueue('aName'), new NullMessage());
+        $fooRecipient = new Recipient(new Queue('aName'), new Message());
+        $barRecipient = new Recipient(new Queue('aName'), new Message());
 
-        $originalMessage = new NullMessage();
+        $originalMessage = new Message();
 
         $routerMock = $this->createRecipientListRouterMock();
         $routerMock
@@ -44,12 +45,12 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
         $producerMock
             ->expects($this->at(0))
             ->method('send')
-            ->with($this->identicalTo($fooRecipient->getDestination()), $this->identicalTo($fooRecipient->getMessage()))
+            ->with($this->identicalTo($fooRecipient->getQueue()), $this->identicalTo($fooRecipient->getMessage()))
         ;
         $producerMock
             ->expects($this->at(1))
             ->method('send')
-            ->with($this->identicalTo($barRecipient->getDestination()), $this->identicalTo($barRecipient->getMessage()))
+            ->with($this->identicalTo($barRecipient->getQueue()), $this->identicalTo($barRecipient->getMessage()))
         ;
 
         $sessionMock = $this->createSessionMock();

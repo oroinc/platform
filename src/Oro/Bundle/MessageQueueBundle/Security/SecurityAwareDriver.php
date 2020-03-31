@@ -6,6 +6,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SecurityAwareDriver implements DriverInterface
 {
-    const PARAMETER_SECURITY_TOKEN = 'oro.security.token';
+    public const PARAMETER_SECURITY_TOKEN = 'oro.security.token';
 
     /** @var DriverInterface */
     private $driver;
@@ -51,7 +52,7 @@ class SecurityAwareDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function send(QueueInterface $queue, Message $message)
+    public function send(QueueInterface $queue, Message $message): void
     {
         // add the current security token to the message
         // if it exists in the current security context
@@ -94,7 +95,7 @@ class SecurityAwareDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function createTransportMessage()
+    public function createTransportMessage(): MessageInterface
     {
         return $this->driver->createTransportMessage();
     }
@@ -102,7 +103,7 @@ class SecurityAwareDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function createQueue($queueName)
+    public function createQueue(string $queueName): QueueInterface
     {
         return $this->driver->createQueue($queueName);
     }
@@ -110,7 +111,7 @@ class SecurityAwareDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->driver->getConfig();
     }

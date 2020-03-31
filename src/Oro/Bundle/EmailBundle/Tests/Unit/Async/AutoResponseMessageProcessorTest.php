@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -9,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -41,7 +42,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['key' => 'value']));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -77,7 +78,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ;
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['id' => 123, 'jobId' => 4321]));
 
         $jobRunner = $this->createJobRunnerMock();
@@ -142,7 +143,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['id' => 123, 'jobId' => 4321]));
 
         $result = $processor->process($message, $this->createSessionMock());

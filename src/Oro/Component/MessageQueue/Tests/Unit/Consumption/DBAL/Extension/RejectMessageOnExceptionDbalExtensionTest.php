@@ -1,10 +1,11 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -48,7 +49,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
 
     public function testShouldRejectMessage()
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId(123);
 
         $logger = $this->createLoggerMock();

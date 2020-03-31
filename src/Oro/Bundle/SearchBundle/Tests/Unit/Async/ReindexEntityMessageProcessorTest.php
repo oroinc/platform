@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
@@ -9,7 +10,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -68,7 +69,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             }))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('message-id');
         $message->setBody('');
 
@@ -120,7 +121,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             }))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('message-id');
         $message->setBody(json_encode(
             'class-name'
@@ -174,7 +175,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             }))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('message-id');
         $message->setBody(json_encode(
             ['class-name']

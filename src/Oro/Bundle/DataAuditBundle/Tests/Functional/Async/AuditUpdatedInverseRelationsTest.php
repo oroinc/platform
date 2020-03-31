@@ -7,7 +7,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 /**
  * @dbIsolationPerTest
@@ -73,8 +73,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(6);
     }
@@ -101,8 +103,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(2);
 
@@ -143,8 +147,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(2);
 
@@ -188,8 +194,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(3);
 
@@ -265,8 +273,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(4);
 
@@ -323,8 +333,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -339,7 +351,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals("Added: TestAuditDataChild::123", $auditField->getNewValue());
+        $this->assertEquals('Added: TestAuditDataChild::123', $auditField->getNewValue());
         $this->assertEquals(null, $auditField->getOldValue());
     }
 
@@ -365,8 +377,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -381,7 +395,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals("Removed: TestAuditDataChild::123", $auditField->getOldValue());
+        $this->assertEquals('Removed: TestAuditDataChild::123', $auditField->getOldValue());
         $this->assertEquals(null, $auditField->getNewValue());
     }
 
@@ -426,8 +440,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(2);
 
@@ -444,8 +460,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals("Removed: TestAuditDataChild::123", $auditField->getOldValue());
-        $this->assertEquals("Added: TestAuditDataChild::124", $auditField->getNewValue());
+        $this->assertEquals('Removed: TestAuditDataChild::123', $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataChild::124', $auditField->getNewValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -458,8 +474,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals("Removed: TestAuditDataChild::124", $auditField->getOldValue());
-        $this->assertEquals("Added: TestAuditDataChild::123", $auditField->getNewValue());
+        $this->assertEquals('Removed: TestAuditDataChild::124', $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataChild::123', $auditField->getNewValue());
     }
 
     public function testShouldCreateAuditForAddedInverseSideEntityOnManyToManyRelation()
@@ -491,8 +507,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -540,8 +558,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -556,7 +576,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals("Removed: TestAuditDataOwner::123", $auditField->getOldValue());
+        $this->assertEquals('Removed: TestAuditDataOwner::123', $auditField->getOldValue());
         $this->assertEquals(null, $auditField->getNewValue());
     }
 
@@ -619,8 +639,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(2);
 
@@ -637,8 +659,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals("Added: TestAuditDataOwner::124", $auditField->getNewValue());
-        $this->assertEquals("Removed: TestAuditDataOwner::123", $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::124', $auditField->getNewValue());
+        $this->assertEquals('Removed: TestAuditDataOwner::123', $auditField->getOldValue());
 
         $audit = $audits[1];
         $this->assertCount(1, $audit->getFields());
@@ -651,8 +673,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame($audit, $auditField->getAudit());
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('owners', $auditField->getField());
-        $this->assertEquals("Added: TestAuditDataOwner::123", $auditField->getNewValue());
-        $this->assertEquals("Removed: TestAuditDataOwner::124", $auditField->getOldValue());
+        $this->assertEquals('Added: TestAuditDataOwner::123', $auditField->getNewValue());
+        $this->assertEquals('Removed: TestAuditDataOwner::124', $auditField->getOldValue());
     }
 
     public function testShouldTrackChangedEntityIfPartOfCollection()
@@ -678,8 +700,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(2);
 
@@ -722,8 +746,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -758,8 +784,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(1);
 

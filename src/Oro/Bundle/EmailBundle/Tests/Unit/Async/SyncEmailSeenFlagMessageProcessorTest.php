@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -9,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +40,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'seen' => true,
         ]));
@@ -64,7 +65,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'id' => 123,
         ]));
@@ -115,7 +116,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'id' => 123,
             'seen' => true,
@@ -169,7 +170,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new SyncEmailSeenFlagMessageProcessor($doctrine, $flagManager, $logger);
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'id' => 123,
             'seen' => true,
@@ -224,7 +225,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new SyncEmailSeenFlagMessageProcessor($doctrine, $flagManager, $logger);
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'id' => 123,
             'seen' => false,

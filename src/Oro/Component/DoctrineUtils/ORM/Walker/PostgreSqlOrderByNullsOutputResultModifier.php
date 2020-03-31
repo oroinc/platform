@@ -1,29 +1,16 @@
 <?php
 
-namespace Oro\Component\DoctrineUtils\ORM;
+namespace Oro\Component\DoctrineUtils\ORM\Walker;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\Query\AST;
-use Doctrine\ORM\Query\SqlWalker as BaseSqlWalker;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * Align ORDER BY behavior for MySQL and PostgreSQL.
  */
-class SqlWalker extends BaseSqlWalker
+class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultModifier
 {
-    use HookUnionTrait;
-
-    /**
-     * @see https://dev.mysql.com/doc/refman/5.7/en/index-hints.html
-     */
-    const HINT_USE_INDEX = 'oro.use_index';
-    const HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS = 'HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS';
-
-    /**
-     * @var bool
-     */
-    protected $requireOrderByModification = false;
+    public const HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS = 'HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS';
 
     /**
      * @var array|string[]
@@ -36,28 +23,21 @@ class SqlWalker extends BaseSqlWalker
     protected $resolvedColumnAliases = [];
 
     /**
-     * {@inheritdoc}
+     * @return bool
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function walkSelectStatement(AST\SelectStatement $AST)
+    private function isOrderByModificationAllowed(): bool
     {
-        $this->requireOrderByModification = $AST->orderByClause !== null
-            && $this->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform
+        return $this->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform
             && !$this->getQuery()->getHint(self::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS);
-
-        return parent::walkSelectStatement($AST);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function walkFromClause($fromClause)
+    public function walkFromClause($fromClause, string $result)
     {
-        $result = parent::walkFromClause($fromClause);
         $this->saveResolvedTableAliases($fromClause);
-
-        if ($this->getConnection()->getDatabasePlatform() instanceof MySqlPlatform) {
-            return $this->walkMysqlFromResult($result);
-        }
 
         return $result;
     }
@@ -65,23 +45,9 @@ class SqlWalker extends BaseSqlWalker
     /**
      * {@inheritdoc}
      */
-    public function walkSelectClause($selectClause)
+    public function walkSelectClause($selectClause, string $result)
     {
         $this->saveResolvedColumnAliases($selectClause);
-
-        return parent::walkSelectClause($selectClause);
-    }
-
-    /**
-     * @param string $result
-     *
-     * @return string
-     */
-    protected function walkMysqlFromResult($result)
-    {
-        if ($index = $this->getQuery()->getHint(self::HINT_USE_INDEX)) {
-            $result = preg_replace('/(\bFROM\s+\w+\s+\w+)/', '\1 USE INDEX (' . $index . ')', $result);
-        }
 
         return $result;
     }
@@ -94,11 +60,9 @@ class SqlWalker extends BaseSqlWalker
      * @param AST\OrderByItem $orderByItem
      * {@inheritdoc}
      */
-    public function walkOrderByItem($orderByItem)
+    public function walkOrderByItem($orderByItem, string $result)
     {
-        $item = parent::walkOrderByItem($orderByItem);
-
-        if ($this->requireOrderByModification) {
+        if ($this->isOrderByModificationAllowed()) {
             $hasNulls = false;
             $expr = $orderByItem->expression;
             if ($expr instanceof AST\PathExpression) {
@@ -110,14 +74,14 @@ class SqlWalker extends BaseSqlWalker
 
             if ($hasNulls) {
                 if ($orderByItem->isDesc()) {
-                    $item .= ' NULLS LAST';
+                    $result .= ' NULLS LAST';
                 } else {
-                    $item .= ' NULLS FIRST';
+                    $result .= ' NULLS FIRST';
                 }
             }
         }
 
-        return $item;
+        return $result;
     }
 
     /**
@@ -154,7 +118,7 @@ class SqlWalker extends BaseSqlWalker
      */
     private function saveResolvedTableAliases(AST\FromClause $fromClause)
     {
-        if (!$this->requireOrderByModification) {
+        if (!$this->isOrderByModificationAllowed()) {
             return;
         }
 
@@ -204,7 +168,7 @@ class SqlWalker extends BaseSqlWalker
      */
     private function saveResolvedColumnAliases(AST\SelectClause $selectClause)
     {
-        if (!$this->requireOrderByModification) {
+        if (!$this->isOrderByModificationAllowed()) {
             return;
         }
 
@@ -219,15 +183,5 @@ class SqlWalker extends BaseSqlWalker
                 ];
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function walkSubselect($subselect)
-    {
-        $sql = parent::walkSubselect($subselect);
-
-        return $this->hookUnion($sql);
     }
 }

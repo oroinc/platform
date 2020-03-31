@@ -1,36 +1,21 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\DriverFactory;
-use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
-use Oro\Component\MessageQueue\Transport\Null\NullConnection;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
 class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldCreateNullSessionInstance()
-    {
-        $config = new Config('', '', '', '');
-        $connection = new NullConnection();
-
-        $factory = new DriverFactory([NullConnection::class => NullDriver::class]);
-        $driver = $factory->create($connection, $config);
-
-        self::assertInstanceOf(NullDriver::class, $driver);
-        self::assertAttributeInstanceOf(NullSession::class, 'session', $driver);
-        self::assertAttributeSame($config, 'config', $driver);
-    }
-
-    public function testShouldCreateDbalSessionInstance()
+    public function testCreate(): void
     {
         $config = new Config('', '', '', '');
 
+        /** @var Connection|\PHPUnit\Framework\MockObject\MockObject $doctrineConnection */
         $doctrineConnection = $this->createMock(Connection::class);
         $connection = new DbalConnection($doctrineConnection, 'aTableName');
 
@@ -38,32 +23,18 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
         $driver = $factory->create($connection, $config);
 
         self::assertInstanceOf(DbalDriver::class, $driver);
-        self::assertAttributeInstanceOf(DbalSession::class, 'session', $driver);
-        self::assertAttributeSame($config, 'config', $driver);
+        self::assertSame($config, $driver->getConfig());
     }
 
-    public function testShouldThrowExceptionIfUnexpectedConnectionInstance()
+    public function testCreateLogicException(): void
     {
         $factory = new DriverFactory([]);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unexpected connection instance: "Mock_Connection');
-        $factory->create($this->createMock(ConnectionInterface::class), new Config('', '', '', ''));
-    }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|NullSession
-     */
-    protected function createNullSessionMock()
-    {
-        return $this->createMock(NullSession::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|NullConnection
-     */
-    protected function createNullConnectionMock()
-    {
-        return $this->createMock(NullConnection::class);
+        /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection */
+        $connection = $this->createMock(ConnectionInterface::class);
+        $factory->create($connection, new Config('', '', '', ''));
     }
 }

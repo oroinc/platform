@@ -8,8 +8,8 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Oro\Component\MessageQueue\Transport\Message;
 
 /**
  * @dbIsolationPerTest
@@ -44,8 +44,10 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
 
-        $processor->process($message, new NullSession());
+        $processor->process($message, $connection->createSession());
 
         $this->assertStoredAuditCount(0);
     }
@@ -63,8 +65,11 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
 
         /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
+        /** @var ConnectionInterface $connection */
+        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
+        $session = $connection->createSession();
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $processor->process($message, new NullSession()));
+        $this->assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $session));
     }
 
     private function assertStoredAuditCount($expected)
@@ -74,11 +79,11 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
 
     /**
      * @param array $body
-     * @return NullMessage
+     * @return Message
      */
     private function createMessage(array $body)
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode($body));
 
         return $message;

@@ -5,30 +5,38 @@ namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Trait for testing processors with import/export logic.
+ */
 trait MessageProcessTrait
 {
     use MessageQueueExtension;
 
     /**
+     * @param ContainerInterface $container
+     * @param Client $client
+     *
      * @return string
      */
-    protected function processExportMessage(ContainerInterface $container, Client $client)
+    protected function processExportMessage(ContainerInterface $container, Client $client): string
     {
         $sentMessages = $this->getSentMessages();
         $exportMessageData = reset($sentMessages);
         $this->clearMessageCollector();
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('abc');
         $message->setBody(json_encode($exportMessageData['message']));
 
+        $session = $this->createMock(SessionInterface::class);
+
         /** @var ExportMessageProcessor $processor */
         $processor = $container->get('oro_importexport.async.export');
-        $processorResult = $processor->process($message, $this->createSessionInterfaceMock());
+        $processorResult = $processor->process($message, $session);
 
         $this->assertEquals(ExportMessageProcessor::ACK, $processorResult);
 
@@ -61,13 +69,5 @@ trait MessageProcessTrait
         );
 
         return $result->getFile()->getPathname();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionInterfaceMock()
-    {
-        return $this->getMockBuilder(SessionInterface::class)->getMock();
     }
 }

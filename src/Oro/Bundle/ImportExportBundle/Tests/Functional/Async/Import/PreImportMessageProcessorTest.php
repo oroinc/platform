@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class PreImportMessageProcessorTest extends WebTestCase
@@ -46,7 +46,7 @@ class PreImportMessageProcessorTest extends WebTestCase
             'options' => [],
         ];
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('test_import_message');
         $message->setBody(json_encode($messageData));
         $processor = $this->getPreparingHttpImportMessageProcessor();

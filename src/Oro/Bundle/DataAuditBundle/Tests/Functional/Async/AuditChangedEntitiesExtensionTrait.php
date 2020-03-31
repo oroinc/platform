@@ -8,7 +8,7 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 trait AuditChangedEntitiesExtensionTrait
@@ -75,7 +75,7 @@ trait AuditChangedEntitiesExtensionTrait
 
     /**
      * @param array $body
-     * @return NullMessage
+     * @return Message
      */
     private function createDummyMessage(array $body)
     {
@@ -89,7 +89,7 @@ trait AuditChangedEntitiesExtensionTrait
         ], $body);
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode($body));
 
         return $message;

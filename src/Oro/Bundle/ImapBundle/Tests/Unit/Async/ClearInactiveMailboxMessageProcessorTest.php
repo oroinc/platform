@@ -7,7 +7,7 @@ use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
@@ -43,7 +43,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
             ->with($logger)
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setMessageId('12345');
         $message->setBody(JSON::encode([]));
 

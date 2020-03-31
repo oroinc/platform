@@ -9,7 +9,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\Constraint\IsType;
 use Psr\Log\LoggerInterface;
@@ -59,7 +59,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false)
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -97,7 +97,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['jobId' => 1])
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -141,7 +141,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('getFileSystem');
 
-        $result = $this->processor->process(new NullMessage(), $this->createSessionMock());
+        $result = $this->processor->process(new Message(), $this->createSessionMock());
 
         $this->assertEquals(ExportMessageProcessorAbstract::ACK, $result);
         $this->assertArrayNotHasKey('errorLogFile', $job->getData());
@@ -174,7 +174,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->method('write')
             ->with($this->isType(IsType::TYPE_STRING), json_encode($exportResult['errors']));
 
-        $result = $this->processor->process(new NullMessage(), $this->createSessionMock());
+        $result = $this->processor->process(new Message(), $this->createSessionMock());
 
         $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
         $this->assertArrayHasKey('errorLogFile', $job->getData());

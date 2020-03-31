@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\ConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
@@ -15,10 +15,10 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnBeforeReceive()
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $message = new Message();
         $job = new Job();
 
-        $context = new Context(self::createMock(SessionInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
         $context->setMessage($message);
 
@@ -38,9 +38,9 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPreReceived()
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $message = new Message();
 
-        $context = new Context(self::createMock(SessionInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
         $context->setMessage($message);
 
@@ -56,9 +56,9 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPostReceived()
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $message = new DbalMessage();
+        $message = new Message();
 
-        $context = new Context(self::createMock(SessionInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
         $context->setMessage($message);
 

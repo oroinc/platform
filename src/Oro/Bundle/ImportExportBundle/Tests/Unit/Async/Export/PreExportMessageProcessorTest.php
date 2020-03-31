@@ -19,7 +19,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -76,7 +76,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             100
         );
 
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode($messageBody));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -91,7 +91,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $exportHandler = $this->createMock(ExportHandler::class);
         $jobUniqueName = 'oro_importexport.pre_export.test.user_1';
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode([
             'jobName'        => 'test',
             'processor' => ProcessorRegistry::TYPE_EXPORT,

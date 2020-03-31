@@ -128,6 +128,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }
 
+    oro_query_designer.sql_walker.sub_query_limit:
+        class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitOutputResultModifier
+        public: false
+        abstract: true
+        tags:
+            - { name: oro_entity.sql_walker }
+
     oro_query_designer.group_by_helper:
         class: Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 

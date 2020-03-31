@@ -6,10 +6,13 @@ use Oro\Bundle\DataGridBundle\Tests\Unit\Provider\State\AbstractStateProviderTes
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Bundle\FilterBundle\Provider\State\FiltersStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class FiltersStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var FiltersStateProvider */
     private $provider;
 
@@ -178,10 +181,12 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
+        $user = $this->getEntity(User::class, ['id' => 42]);
+
         $this->tokenAccessor
             ->expects(self::once())
             ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+            ->willReturn($user);
 
         $this->gridViewManager
             ->expects(self::once())

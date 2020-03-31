@@ -17,8 +17,8 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -206,7 +206,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $notificationsSettings,
             $doctrine
         );
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'rootImportJobId' => 1,
             'filePath' => 'filePath',

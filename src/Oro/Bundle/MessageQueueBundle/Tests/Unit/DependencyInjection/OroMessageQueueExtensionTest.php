@@ -3,21 +3,19 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Component\MessageQueue\Client\DbalDriver;
-use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Definition;
 
 class OroMessageQueueExtensionTest extends ExtensionTestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $configs = [];
 
@@ -29,23 +27,33 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'prod'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'prod'
+            );
         $container->expects($this->exactly(4))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.redelivery_message_extension', $redeliveryExtension],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.redelivery_message_extension'],
+                ['oro_message_queue.consumption.signal_extension']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $redeliveryExtension,
+                $signalExtension
+            );
         $container->expects($this->never())
             ->method('register');
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded($this->getRequiredParameters());
@@ -53,7 +61,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $this->assertExtensionConfigsLoaded([]);
 
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -72,7 +79,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
     }
 
-    public function testLoadWithDisabledRedelivery()
+    public function testLoadWithDisabledRedelivery(): void
     {
         $configs = ['oro_message_queue' => ['client' => [
             'redelivery' => [
@@ -87,22 +94,31 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'prod'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'prod'
+            );
         $container->expects($this->exactly(3))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.signal_extension']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $signalExtension
+            );
         $container->expects($this->never())
             ->method('register');
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded($this->getRequiredParameters());
@@ -110,7 +126,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $this->assertExtensionConfigsLoaded([]);
 
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -127,7 +142,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
     }
 
-    public function testLoadWithClientConfig()
+    public function testLoadWithClientConfig(): void
     {
         $configs = ['oro_message_queue' => ['client' => [
             'prefix' => 'test_',
@@ -145,23 +160,33 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'prod'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'prod'
+            );
         $container->expects($this->exactly(4))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.redelivery_message_extension', $redeliveryExtension],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.redelivery_message_extension'],
+                ['oro_message_queue.consumption.signal_extension']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $redeliveryExtension,
+                $signalExtension
+            );
         $container->expects($this->never())
             ->method('register');
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded($this->getRequiredParameters());
@@ -171,7 +196,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         ));
         $this->assertExtensionConfigsLoaded([]);
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -190,7 +214,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
     }
 
-    public function testLoadWithClientConfigAndTraceableProducer()
+    public function testLoadWithClientConfigAndTraceableProducer(): void
     {
         $configs = ['oro_message_queue' => ['client' => [
             'prefix' => 'test_',
@@ -211,18 +235,28 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'prod'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'prod'
+            );
         $container->expects($this->exactly(4))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.redelivery_message_extension', $redeliveryExtension],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.redelivery_message_extension'],
+                ['oro_message_queue.consumption.signal_extension']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $redeliveryExtension,
+                $signalExtension
+            );
         $container->expects($this->once())
             ->method('register')
             ->with('oro_message_queue.client.traceable_message_producer', TraceableMessageProducer::class)
@@ -233,7 +267,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             });
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded($this->getRequiredParameters());
@@ -244,7 +278,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         ));
         $this->assertExtensionConfigsLoaded([]);
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -281,23 +314,33 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'prod'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'prod'
+            );
         $container->expects($this->exactly(4))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.redelivery_message_extension', $redeliveryExtension],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.redelivery_message_extension'],
+                ['oro_message_queue.consumption.signal_extension']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $redeliveryExtension,
+                $signalExtension
+            );
         $container->expects($this->never())
             ->method('register');
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded(array_merge(
@@ -308,7 +351,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $this->assertExtensionConfigsLoaded([]);
 
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -327,7 +369,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
     }
 
-    public function testLoadTestEnvironment()
+    public function testLoadTestEnvironment(): void
     {
         $configs = [];
 
@@ -340,24 +382,35 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
             ->method('getParameter')
-            ->will($this->returnValueMap([
-                ['message_queue_transport', 'null'],
-                ['kernel.environment', 'test'],
-            ]));
+            ->withConsecutive(
+                ['message_queue_transport'],
+                ['kernel.environment']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'dbal',
+                'test'
+            );
         $container->expects($this->exactly(5))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-                ['oro_message_queue.consumption.redelivery_message_extension', $redeliveryExtension],
-                ['oro_message_queue.consumption.signal_extension', $signalExtension],
-                ['oro_message_queue.client.buffered_message_producer', $testBufferedMessageProducer],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config'],
+                ['oro_message_queue.consumption.redelivery_message_extension'],
+                ['oro_message_queue.consumption.signal_extension'],
+                ['oro_message_queue.client.buffered_message_producer']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition,
+                $redeliveryExtension,
+                $signalExtension,
+                $testBufferedMessageProducer
+            );
         $container->expects($this->never())
             ->method('register');
 
         $extension = new OroMessageQueueExtension();
-        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DbalTransportFactory());
         $extension->load($configs, $container);
 
         $this->assertParametersLoaded($this->getRequiredParameters());
@@ -368,7 +421,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $this->assertExtensionConfigsLoaded([]);
 
         $this->assertEquals([
-            NullConnection::class => NullDriver::class,
             DbalConnection::class => DbalDriver::class,
             DbalLazyConnection::class => DbalDriver::class,
         ], $driverFactoryDefinition->getArgument(0));
@@ -395,7 +447,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
      * @param string $transport
      * @param string $expectedExceptionMessage
      */
-    public function testLoadInvalidConfigurationException($transport, $expectedExceptionMessage)
+    public function testLoadInvalidConfigurationException($transport, $expectedExceptionMessage): void
     {
         $driverFactoryDefinition = new Definition(\stdClass::class, [[]]);
         $configDefinition = new Definition();
@@ -411,10 +463,14 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
 
         $container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->will($this->returnValueMap([
-                ['oro_message_queue.client.driver_factory', $driverFactoryDefinition],
-                ['oro_message_queue.client.config', $configDefinition],
-            ]));
+            ->withConsecutive(
+                ['oro_message_queue.client.driver_factory'],
+                ['oro_message_queue.client.config']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $driverFactoryDefinition,
+                $configDefinition
+            );
 
         $extension = new OroMessageQueueExtension();
         $extension->load([], $container);
@@ -423,7 +479,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
     /**
      * @return array
      */
-    public function invalidConfigurationDataProvider()
+    public function invalidConfigurationDataProvider(): array
     {
         return [
             'null transport' => [
@@ -444,7 +500,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
     /**
      * @return array
      */
-    private function getRequiredParameters()
+    private function getRequiredParameters(): array
     {
         return [
             // services.yml
@@ -458,9 +514,9 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
     /**
      * @return array
      */
-    private function getRequiredDefinitions()
+    private function getRequiredDefinitions(): array
     {
-        $definitions = [
+        return [
             // services.yml
             'oro_message_queue.consumption.extensions',
             'oro_message_queue.consumption.container_reset_extension',
@@ -490,7 +546,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.log.message_processor_class_provider',
             'oro_message_queue.log.message_to_array_converter',
             'oro_message_queue.log.message_to_array_converter.base',
-            'oro_message_queue.log.message_to_array_converter.dbal',
             'oro_message_queue.log.processor.restore_original_channel',
             'oro_message_queue.log.processor.add_consumer_state',
             'oro_message_queue.log.handler.console',
@@ -522,18 +577,15 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'Oro\\Bundle\\MessageQueueBundle\\Command\\ConsumerHeartbeatCommand',
             'Oro\\Bundle\\MessageQueueBundle\\Command\\TransportConsumeMessagesCommand',
             // defined in extension
-            'oro_message_queue.transport.null.connection',
             'oro_message_queue.consumption.redelivery_message_extension',
             'oro_message_queue.consumption.signal_extension',
         ];
-
-        return $definitions;
     }
 
     /**
      * @return array
      */
-    private function getClientDefinitions()
+    private function getClientDefinitions(): array
     {
         return [
             // client.yml

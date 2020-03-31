@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -12,9 +11,11 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * Provide data grid configuration based on given source (AbstractQueryDesigner instance).
+ */
 class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 {
     /**
@@ -111,7 +112,6 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $this->leftJoins       = null;
 
         $this->config->setDatasourceType(OrmDatasource::TYPE);
-        $this->config->getOrmQuery()->addHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
     }
 
     /**

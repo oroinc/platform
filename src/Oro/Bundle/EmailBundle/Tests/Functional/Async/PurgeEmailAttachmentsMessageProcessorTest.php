@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
@@ -7,7 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
@@ -35,7 +36,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
         $this->assertEquals(3, count($allAttachments));
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['size' => null, 'all' => true]));
         $message->setMessageId('SomeId');
 

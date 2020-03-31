@@ -5,11 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\TransportFactoryInterface;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Component\MessageQueue\Client\DbalDriver;
-use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
@@ -57,7 +55,6 @@ class OroMessageQueueExtension extends Extension
 
             $driverFactory = $container->getDefinition('oro_message_queue.client.driver_factory');
             $driverFactory->replaceArgument(0, [
-                NullConnection::class => NullDriver::class,
                 DbalConnection::class => DbalDriver::class,
                 DbalLazyConnection::class => DbalDriver::class,
             ]);
