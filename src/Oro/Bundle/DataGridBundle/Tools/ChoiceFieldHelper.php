@@ -4,11 +4,14 @@ namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
+/**
+ * Provide label and choices for a given entity
+ */
 class ChoiceFieldHelper
 {
     /** @var DoctrineHelper */
@@ -94,7 +97,7 @@ class ChoiceFieldHelper
 
         $query = $this->aclHelper->apply($queryBuilder);
         if ($translatable) {
-            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslationWalker::class);
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslatableSqlWalker::class);
         }
 
         $result = $query->getResult();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
+namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM\Walker;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -8,8 +8,11 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
-use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
-use Oro\Component\DoctrineUtils\ORM\SqlWalker;
+use Oro\Component\DoctrineUtils\ORM\Walker\MySqlUseIndexOutputResultModifier;
+use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
+use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
+use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
+use Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -33,6 +36,14 @@ class SqlWalkerTest extends OrmTestCase
         $this->em->getConfiguration()->setEntityNamespaces(
             [
                 'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+            ]
+        );
+        $this->em->getConfiguration()->setDefaultQueryHint(
+            OutputResultModifierInterface::HINT_RESULT_MODIFIERS,
+            [
+                MySqlUseIndexOutputResultModifier::class,
+                PostgreSqlOrderByNullsOutputResultModifier::class,
+                UnionOutputResultModifier::class
             ]
         );
     }
@@ -195,7 +206,7 @@ class SqlWalkerTest extends OrmTestCase
 
         $q = $this->em->createQuery('SELECT p.name FROM Test:Person p ORDER BY p.name ASC');
         $q->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
-        $q->setHint(SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, true);
+        $q->setHint(PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, true);
 
         $this->assertEquals('SELECT p0_.name AS name_0 FROM Person p0_ ORDER BY p0_.name ASC', $q->getSQL());
     }
@@ -217,8 +228,8 @@ class SqlWalkerTest extends OrmTestCase
 
         $unionSQL = 'raw sql';
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
-        $query->setHint(HookUnionTrait::$walkerHookUnionKey, "'union_id' = 'union_id'");
-        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_KEY, "'union_id' = 'union_id'");
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_VALUE, $unionSQL);
 
         $this->assertNotContains($unionSQL, $query->getSQL());
     }
@@ -226,24 +237,24 @@ class SqlWalkerTest extends OrmTestCase
     public function testWalkSubselectWithUnionHook()
     {
         $repository = $this->em->getRepository('Test:Group');
-        $subSelect  = $repository->createQueryBuilder('g0_')
+        $subSelect = $repository->createQueryBuilder('g0_')
             ->select('g0_.id')
             ->where('g0_.id = 1');
 
-        $unionHook  = " AND 'union_id' = 'union_id'";
-        $qb         = $repository->createQueryBuilder('g1_');
-        $query      = $qb
+        $unionHook = " AND 'union_id' = 'union_id'";
+        $qb = $repository->createQueryBuilder('g1_');
+        $query = $qb
             ->select('g1_.id')
-            ->where($qb->expr()->in('g1_.id', $subSelect->getQuery()->getDQL().$unionHook))
+            ->where($qb->expr()->in('g1_.id', $subSelect->getQuery()->getDQL() . $unionHook))
             ->getQuery();
 
         $unionSQL = 'raw sql';
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
-        $query->setHint(HookUnionTrait::$walkerHookUnionKey, $unionHook);
-        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_KEY, $unionHook);
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_VALUE, $unionSQL);
 
         $this->assertEquals(
-            'SELECT g0_.id AS id_0 FROM Group g0_ '.
+            'SELECT g0_.id AS id_0 FROM Group g0_ ' .
             'WHERE g0_.id IN (SELECT g1_.id FROM Group g1_ WHERE g1_.id = 1 UNION raw sql)',
             $query->getSQL()
         );
@@ -251,26 +262,26 @@ class SqlWalkerTest extends OrmTestCase
 
     public function testWalkSubselectWithExprAfterUnionHook()
     {
-        $groupRepository  = $this->em->getRepository('Test:Group');
+        $groupRepository = $this->em->getRepository('Test:Group');
         $personRepository = $this->em->getRepository('Test:Person');
-        $subSelect        = $groupRepository->createQueryBuilder('g1_')
+        $subSelect = $groupRepository->createQueryBuilder('g1_')
             ->select('g1_.id')
             ->where('g1_.id = 1');
 
-        $unionHook  = " AND 'union_id' = 'union_id'";
-        $qb         = $personRepository->createQueryBuilder('p0_');
-        $query      = $qb
+        $unionHook = " AND 'union_id' = 'union_id'";
+        $qb = $personRepository->createQueryBuilder('p0_');
+        $query = $qb
             ->select('p0_.id')
-            ->where($qb->expr()->in('p0_.id', $subSelect->getQuery()->getDQL().$unionHook.' AND g1_.id = 2'))
+            ->where($qb->expr()->in('p0_.id', $subSelect->getQuery()->getDQL() . $unionHook . ' AND g1_.id = 2'))
             ->getQuery();
 
         $unionSQL = 'raw sql';
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
-        $query->setHint(HookUnionTrait::$walkerHookUnionKey, $unionHook);
-        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_KEY, $unionHook);
+        $query->setHint(UnionOutputResultModifier::HINT_UNION_VALUE, $unionSQL);
 
         $this->assertEquals(
-            'SELECT p0_.id AS id_0 FROM Person p0_ '.
+            'SELECT p0_.id AS id_0 FROM Person p0_ ' .
             'WHERE p0_.id IN (SELECT g1_.id FROM Group g1_ WHERE g1_.id = 1 AND g1_.id = 2 UNION raw sql)',
             $query->getSQL()
         );

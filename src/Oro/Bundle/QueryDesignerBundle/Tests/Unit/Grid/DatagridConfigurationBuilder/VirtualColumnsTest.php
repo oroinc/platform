@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
@@ -212,13 +211,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'vc3'                                  => 'c5',
                     ]
                 ],
-                'type'         => 'orm',
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
-                ]
+                'type'         => 'orm'
             ],
             'fields_acl' => [
                 'columns' => [
@@ -340,12 +333,6 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                             ],
                             'columnAlias' => 'c2'
                         ],
-                    ]
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
                     ]
                 ]
             ],
@@ -472,12 +459,6 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'column1' => 'c1',
                         'vc1'     => 'c2',
                     ],
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
