@@ -8,7 +8,11 @@ use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 
 /**
- * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
+ * Dynamically applies limit to sub-query which is "hooked" by SubQueryLimitHelper
+ *
+ * @deprecated use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker
+ *             or Oro\Component\DoctrineUtils\ORM\Walker\Walker\TranslatableSqlWalker instead.
+ *             SubQueryLimitOutputResultModifier is used by these walkers by default.
  */
 class SqlWalker extends TranslationWalker
 {
@@ -19,20 +23,27 @@ class SqlWalker extends TranslationWalker
     const WALKER_HOOK_LIMIT_ID = 'walker_hook_limit_id';
 
     /**
+     * @var SubQueryLimitOutputResultModifier
+     */
+    private $outputResultModifier;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($query, $parserResult, array $queryComponents)
+    {
+        parent::__construct($query, $parserResult, $queryComponents);
+        $this->outputResultModifier = new SubQueryLimitOutputResultModifier($query, $parserResult, $queryComponents);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function walkSubselect($subselect)
     {
         $sql = parent::walkSubselect($subselect);
-        $hookIdentifier = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_KEY);
-        $limitValue = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_VALUE);
-        $identifierField = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_ID);
 
-        if ($identifierField && $hookIdentifier && $limitValue && stripos($sql, $hookIdentifier) !== false) {
-            // Remove hook condition from sql
-            $sql = str_ireplace($hookIdentifier, '1<>0', $sql);
-            $sql = "SELECT customTableAlias.$identifierField FROM ($sql LIMIT $limitValue) customTableAlias";
-        }
+        $sql = $this->outputResultModifier->walkSubselect($subselect, $sql);
 
         return $this->hookUnion($sql);
     }

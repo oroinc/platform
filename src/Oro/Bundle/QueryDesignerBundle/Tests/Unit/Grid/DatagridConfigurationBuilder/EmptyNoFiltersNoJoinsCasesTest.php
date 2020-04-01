@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
@@ -67,12 +66,6 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
                     'column_aliases' => [
                         'column1' => 'c1',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -136,12 +129,6 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
                     'column_aliases' => [
                         'column1' => 'c1',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
