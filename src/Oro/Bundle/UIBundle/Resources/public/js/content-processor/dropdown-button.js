@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'jquery-ui',
+    'orotranslation/js/translator',
     'oroui/js/app/views/sticky-element/sticky-element-mixin'
-], function($, _, $ui, stickyElementMixin) {
+], function($, _, __, $ui, stickyElementMixin) {
     'use strict';
 
     /**
@@ -127,10 +128,11 @@ define([
          * @private
          */
         _moreButton: function() {
-            const $button = $('<a href="#"/>');
+            const $button = $('<button></button>');
             $button
                 .attr($.extend({
-                    'role': 'button',
+                    'title': _.__('oro.ui.dropdown_option_title'),
+                    'aria-label': _.__('oro.ui.dropdown_option_aria_label'),
                     'data-toggle': 'dropdown',
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
@@ -151,7 +153,8 @@ define([
          */
         _dropdownMenu: function($buttons) {
             return $('<ul></ul>', {
-                'class': 'dropdown-menu'
+                'class': 'dropdown-menu',
+                'role': 'menu'
             }).append(this._prepareButtons($buttons));
         },
 
@@ -172,6 +175,7 @@ define([
                         const shortText = text.substring(0, self.options.truncateLength);
                         if (shortText !== text) {
                             this.parentNode.setAttribute('title', text);
+                            this.parentNode.setAttribute('aria-label', _.__('oro.ui.dropdown_main_btn_prefix') + ' ' + text);
                             this.nodeValue = shortText + '\u2026';
                         }
                     }
