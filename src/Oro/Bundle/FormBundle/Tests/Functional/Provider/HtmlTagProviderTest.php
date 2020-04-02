@@ -24,7 +24,7 @@ class HtmlTagProviderTest extends WebTestCase
         'tr[align|valign]',
         'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
         'th[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'a[!href|target|title|draggable]',
+        'a[!href|target|title]',
         'dl',
         'dt',
         'div[data-title|data-type]',
