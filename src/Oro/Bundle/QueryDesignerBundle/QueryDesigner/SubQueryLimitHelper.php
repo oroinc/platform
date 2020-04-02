@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -21,29 +20,27 @@ class SubQueryLimitHelper
      */
     public function setLimit(QueryBuilder $queryBuilder, $limit, $fieldName)
     {
-        $uniqueIdentifier = QueryBuilderUtil::generateParameterName(SqlWalker::WALKER_HOOK_LIMIT_KEY);
+        $uniqueIdentifier = QueryBuilderUtil::generateParameterName(
+            SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY
+        );
 
         $walkerHook = "'$uniqueIdentifier' = '$uniqueIdentifier'";
         $queryBuilder->andWhere($walkerHook);
-        $queryBuilder
-            ->getEntityManager()
-            ->getConfiguration()
-            ->setDefaultQueryHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
 
         $queryBuilder
             ->getEntityManager()
             ->getConfiguration()
-            ->setDefaultQueryHint(SqlWalker::WALKER_HOOK_LIMIT_KEY, $walkerHook);
+            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY, $walkerHook);
 
         $queryBuilder
             ->getEntityManager()
             ->getConfiguration()
-            ->setDefaultQueryHint(SqlWalker::WALKER_HOOK_LIMIT_VALUE, $limit);
+            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_VALUE, $limit);
 
         $queryBuilder
             ->getEntityManager()
             ->getConfiguration()
-            ->setDefaultQueryHint(SqlWalker::WALKER_HOOK_LIMIT_ID, $fieldName);
+            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_ID, $fieldName);
 
         return $queryBuilder;
     }

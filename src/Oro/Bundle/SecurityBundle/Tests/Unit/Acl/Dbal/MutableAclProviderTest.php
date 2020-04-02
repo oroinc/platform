@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
@@ -83,22 +84,30 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider deleteSecurityIdentityProvider
      */
-    public function testDeleteSecurityIdentity(SecurityIdentityInterface $sid, $sql)
+    public function testDeleteSecurityIdentity(SecurityIdentityInterface $sid, $parameters)
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with($this->equalTo($sql));
+            ->with(
+                'DELETE FROM acl_security_identities WHERE identifier = ? AND username = ?',
+                $parameters,
+                [ParameterType::STRING, ParameterType::BOOLEAN]
+            );
         $this->provider->deleteSecurityIdentity($sid);
     }
 
     /**
      * @dataProvider updateSecurityIdentityProvider
      */
-    public function testUpdateSecurityIdentity(SecurityIdentityInterface $sid, $oldName, $sql)
+    public function testUpdateSecurityIdentity(SecurityIdentityInterface $sid, $oldName, $parameters)
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with($this->equalTo($sql));
+            ->with(
+                'UPDATE acl_security_identities SET identifier = ? WHERE identifier = ? AND username = ?',
+                $parameters,
+                [ParameterType::STRING, ParameterType::STRING, ParameterType::BOOLEAN]
+            );
         $this->provider->updateSecurityIdentity($sid, $oldName);
     }
 
@@ -118,12 +127,12 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 new UserSecurityIdentity('test', 'Acme\User'),
-                'DELETE FROM acl_security_identities WHERE identifier = \'Acme\User-test\' AND username = 1'
+                ['Acme\User-test', true]
             ],
             [
                 new RoleSecurityIdentity('ROLE_TEST'),
-                'DELETE FROM acl_security_identities WHERE identifier = \'ROLE_TEST\' AND username = 0'
-            ],
+                ['ROLE_TEST', false]
+            ]
         ];
     }
 
@@ -133,14 +142,12 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             [
                 new UserSecurityIdentity('test', 'Acme\User'),
                 'old',
-                'UPDATE acl_security_identities SET identifier = \'Acme\User-test\' WHERE '
-                . 'identifier = \'Acme\User-old\' AND username = 1'
+                ['Acme\User-test', 'Acme\User-old', true]
             ],
             [
                 new RoleSecurityIdentity('ROLE_TEST'),
                 'ROLE_OLD',
-                'UPDATE acl_security_identities SET identifier = \'ROLE_TEST\' WHERE '
-                . 'identifier = \'ROLE_OLD\' AND username = 0'
+                ['ROLE_TEST', 'ROLE_OLD', false]
             ]
         ];
     }
@@ -174,7 +181,11 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             ->with($this->identicalTo($oid));
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with('DELETE FROM acl_classes WHERE class_type = \'Test\\Class\'');
+            ->with(
+                'DELETE FROM acl_classes WHERE class_type = ?',
+                ['Test\Class'],
+                [ParameterType::STRING]
+            );
         $this->connection->expects($this->once())
             ->method('commit');
 

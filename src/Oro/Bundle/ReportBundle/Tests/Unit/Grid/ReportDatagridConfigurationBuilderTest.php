@@ -13,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
@@ -166,12 +165,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                     'column_aliases' => ['sampleColumn' => 'c1'],
                 ],
                 'type' => 'orm',
-                'hints' => [
-                    [
-                        'name' => 'doctrine.customOutputWalker',
-                        'value' => SqlWalker::class,
-                    ],
-                ],
                 'acl_resource' => 'oro_report_view',
             ],
             'options' => ['export' => true, 'entity_pagination' => true],
@@ -294,11 +287,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'type' => 'orm',
                 'hints' => [
-                    0 => [
-                        'name' => 'doctrine.customOutputWalker',
-                        'value' => SqlWalker::class,
-                    ],
-                    1 => 'HINT_TRANSLATABLE',
+                    'HINT_TRANSLATABLE',
                 ],
                 'acl_resource' => 'oro_report_view',
             ],

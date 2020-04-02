@@ -10,7 +10,7 @@ define(function(require) {
         inputName: '',
 
         events: {
-            'click i.fa-close': 'removeClick'
+            'click [data-role="remove"]': 'removeClick'
         },
 
         listen: {

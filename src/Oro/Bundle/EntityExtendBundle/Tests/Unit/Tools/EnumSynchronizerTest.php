@@ -8,7 +8,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -21,6 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -1017,7 +1017,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 [
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
-                    TranslationWalker::class
+                    TranslatableSqlWalker::class
                 ],
                 [
                     TranslatableListener::HINT_TRANSLATABLE_LOCALE,

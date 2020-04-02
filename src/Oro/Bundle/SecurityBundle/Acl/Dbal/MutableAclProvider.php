@@ -10,6 +10,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\Common\PropertyChangedListener;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -119,7 +120,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     public function updateSecurityIdentity(SecurityIdentityInterface $sid, $oldName)
     {
-        $this->connection->executeQuery($this->getUpdateSecurityIdentitySql($sid, $oldName));
+        [$sql, $params, $types] = $this->getUpdateSecurityIdentitySql($sid, $oldName);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -133,7 +135,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $this->connection->beginTransaction();
         try {
             $this->deleteAcl($oid);
-            $this->connection->executeQuery($this->getDeleteClassIdSql($oid->getType()));
+            [$sql, $params, $types] = $this->getDeleteClassIdSql($oid->getType());
+            $this->connection->executeQuery($sql, $params, $types);
 
             $this->connection->commit();
         } catch (\Exception $failed) {
@@ -148,7 +151,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param SecurityIdentityInterface $sid
      * @param string $oldName
-     * @return string
+     *
+     * @return array [sql, param values, param types]
+     *
      * @throws \InvalidArgumentException
      */
     protected function getUpdateSecurityIdentitySql(SecurityIdentityInterface $sid, $oldName)
@@ -169,24 +174,26 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             );
         }
 
-        return sprintf(
-            'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
-            $this->options['sid_table_name'],
-            $this->connection->quote($newIdentifier),
-            $this->connection->quote($oldIdentifier),
-            $this->connection->getDatabasePlatform()->convertBooleans(false)
-        );
+        return [
+            sprintf(
+                'UPDATE %s SET identifier = ? WHERE identifier = ? AND username = ?',
+                $this->options['sid_table_name']
+            ),
+            [$newIdentifier, $oldIdentifier, false],
+            [ParameterType::STRING, ParameterType::STRING, ParameterType::BOOLEAN]
+        ];
     }
 
     /**
      * Constructs the SQL to delete an ACL class.
      *
      * @param string $classType
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteClassIdSql($classType)
     {
-        return preg_replace('/^SELECT id FROM/', 'DELETE FROM', $this->getSelectClassIdSql($classType));
+        [$sql, $params, $types] = $this->getSelectClassIdSql($classType);
+        return [preg_replace('/^SELECT id FROM/', 'DELETE FROM', $sql), $params, $types];
     }
 
     /**
@@ -204,7 +211,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $this->createObjectIdentity($oid);
 
             $pk = $this->retrieveObjectIdentityPrimaryKey($oid);
-            $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $pk));
+            [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $pk);
+            $this->connection->executeQuery($sql, $params, $types);
 
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -271,7 +279,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
     {
-        $this->connection->executeQuery($this->getDeleteSecurityIdentityIdSql($sid));
+        [$sql, $params, $types] = $this->getDeleteSecurityIdentityIdSql($sid);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -523,7 +532,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
             // persist any changes to the acl_object_identities table
             if (count($sets) > 0) {
-                $this->connection->executeQuery($this->getUpdateObjectIdentitySql($acl->getId(), $sets));
+                [$sql, $params, $types] = $this->getUpdateObjectIdentitySql($acl->getId(), $sets);
+                $this->connection->executeQuery($sql, $params, $types);
             }
 
             $this->connection->commit();
@@ -562,7 +572,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
     {
-        $this->connection->executeQuery($this->getUpdateUserSecurityIdentitySql($usid, $oldUsername));
+        [$sql, $params, $types] = $this->getUpdateUserSecurityIdentitySql($usid, $oldUsername);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -570,15 +581,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param int $oidPK
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteAccessControlEntriesSql($oidPK)
     {
-        return sprintf(
-            'DELETE FROM %s WHERE object_identity_id = %d',
-            $this->options['entry_table_name'],
-            $oidPK
-        );
+        return [
+            sprintf(
+                'DELETE FROM %s WHERE object_identity_id = ?',
+                $this->options['entry_table_name']
+            ),
+            [$oidPK],
+            [ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -586,15 +600,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param int $acePK
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteAccessControlEntrySql($acePK)
     {
-        return sprintf(
-            'DELETE FROM %s WHERE id = %d',
-            $this->options['entry_table_name'],
-            $acePK
-        );
+        return [
+            sprintf(
+                'DELETE FROM %s WHERE id = ?',
+                $this->options['entry_table_name']
+            ),
+            [$acePK],
+            [ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -602,15 +619,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param int $pk
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteObjectIdentitySql($pk)
     {
-        return sprintf(
-            'DELETE FROM %s WHERE id = %d',
-            $this->options['oid_table_name'],
-            $pk
-        );
+        return [
+            sprintf(
+                'DELETE FROM %s WHERE id = ?',
+                $this->options['oid_table_name']
+            ),
+            [$pk],
+            [ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -618,15 +638,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param int $pk
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteObjectIdentityRelationsSql($pk)
     {
-        return sprintf(
-            'DELETE FROM %s WHERE object_identity_id = %d',
-            $this->options['oid_ancestors_table_name'],
-            $pk
-        );
+        return [
+            sprintf(
+                'DELETE FROM %s WHERE object_identity_id = ?',
+                $this->options['oid_ancestors_table_name']
+            ),
+            [$pk],
+            [ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -643,7 +666,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param bool        $auditSuccess
      * @param bool        $auditFailure
      *
-     * @return string
+     * @return array [sql, param values, param types]
+     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected function getInsertAccessControlEntrySql(
@@ -671,23 +695,36 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 audit_success,
                 audit_failure
             )
-            VALUES (%d, %s, %s, %d, %d, %d, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 QUERY;
 
-        return sprintf(
-            $query,
-            $this->options['entry_table_name'],
-            $classId,
-            null === $objectIdentityId ? 'NULL' : (int) $objectIdentityId,
-            null === $field ? 'NULL' : $this->connection->quote($field),
-            $aceOrder,
-            $securityIdentityId,
-            $mask,
-            $this->connection->getDatabasePlatform()->convertBooleans($granting),
-            $this->connection->quote($strategy),
-            $this->connection->getDatabasePlatform()->convertBooleans($auditSuccess),
-            $this->connection->getDatabasePlatform()->convertBooleans($auditFailure)
-        );
+        return [
+            sprintf($query, $this->options['entry_table_name']),
+            [
+                $classId,
+                null === $objectIdentityId ? null : (int) $objectIdentityId,
+                $field,
+                $aceOrder,
+                $securityIdentityId,
+                $mask,
+                $granting,
+                $strategy,
+                $auditSuccess,
+                $auditFailure
+            ],
+            [
+                ParameterType::INTEGER,
+                ParameterType::INTEGER,
+                ParameterType::STRING,
+                ParameterType::INTEGER,
+                ParameterType::INTEGER,
+                ParameterType::INTEGER,
+                ParameterType::BOOLEAN,
+                ParameterType::STRING,
+                ParameterType::BOOLEAN,
+                ParameterType::BOOLEAN
+            ]
+        ];
     }
 
     /**
@@ -695,15 +732,18 @@ QUERY;
      *
      * @param string $classType
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getInsertClassSql($classType)
     {
-        return sprintf(
-            'INSERT INTO %s (class_type) VALUES (%s)',
-            $this->options['class_table_name'],
-            $this->connection->quote($classType)
-        );
+        return [
+            sprintf(
+                'INSERT INTO %s (class_type) VALUES (?)',
+                $this->options['class_table_name']
+            ),
+            [$classType],
+            [ParameterType::STRING]
+        ];
     }
 
     /**
@@ -712,16 +752,18 @@ QUERY;
      * @param int $objectIdentityId
      * @param int $ancestorId
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getInsertObjectIdentityRelationSql($objectIdentityId, $ancestorId)
     {
-        return sprintf(
-            'INSERT INTO %s (object_identity_id, ancestor_id) VALUES (%d, %d)',
-            $this->options['oid_ancestors_table_name'],
-            $objectIdentityId,
-            $ancestorId
-        );
+        return [
+            sprintf(
+                'INSERT INTO %s (object_identity_id, ancestor_id) VALUES (?, ?)',
+                $this->options['oid_ancestors_table_name']
+            ),
+            [$objectIdentityId, $ancestorId],
+            [ParameterType::INTEGER, ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -731,22 +773,23 @@ QUERY;
      * @param int    $classId
      * @param bool   $entriesInheriting
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getInsertObjectIdentitySql($identifier, $classId, $entriesInheriting)
     {
         $query = <<<QUERY
               INSERT INTO %s (class_id, object_identifier, entries_inheriting)
-              VALUES (%d, %s, %s)
+              VALUES (?, ?, ?)
 QUERY;
 
-        return sprintf(
-            $query,
-            $this->options['oid_table_name'],
-            $classId,
-            $this->connection->quote($identifier),
-            $this->connection->getDatabasePlatform()->convertBooleans($entriesInheriting)
-        );
+        return [
+            sprintf(
+                $query,
+                $this->options['oid_table_name']
+            ),
+            [$classId, $identifier, $entriesInheriting],
+            [ParameterType::INTEGER, ParameterType::STRING, ParameterType::BOOLEAN]
+        ];
     }
 
     /**
@@ -756,18 +799,20 @@ QUERY;
      *
      * @throws \InvalidArgumentException
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
-        list($identifier, $username) = $this->parseSecurityIdentity($sid);
+        [$identifier, $username] = $this->parseSecurityIdentity($sid);
 
-        return sprintf(
-            'INSERT INTO %s (identifier, username) VALUES (%s, %s)',
-            $this->options['sid_table_name'],
-            $this->connection->quote($identifier),
-            $this->connection->getDatabasePlatform()->convertBooleans($username)
-        );
+        return [
+            sprintf(
+                'INSERT INTO %s (identifier, username) VALUES (?, ?)',
+                $this->options['sid_table_name']
+            ),
+            [$identifier, $username],
+            [ParameterType::STRING, ParameterType::BOOLEAN]
+        ];
     }
 
     /**
@@ -778,22 +823,39 @@ QUERY;
      * @param string $field
      * @param int    $order
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getSelectAccessControlEntryIdSql($classId, $oid, $field, $order)
     {
-        return sprintf(
-            'SELECT id FROM %s WHERE class_id = %d AND %s AND %s AND ace_order = %d',
-            $this->options['entry_table_name'],
-            $classId,
-            null === $oid ?
-                $this->connection->getDatabasePlatform()->getIsNullExpression('object_identity_id')
-                : 'object_identity_id = '.(int) $oid,
-            null === $field ?
-                $this->connection->getDatabasePlatform()->getIsNullExpression('field_name')
-                : 'field_name = '.$this->connection->quote($field),
-            $order
-        );
+        $parameters = [$classId, $order];
+        $parametersTypes = [ParameterType::INTEGER, ParameterType::INTEGER];
+
+        if (null === $oid) {
+            $oidExpression = $this->connection->getDatabasePlatform()->getIsNullExpression('object_identity_id');
+        } else {
+            $oidExpression = 'object_identity_id = ?';
+            $parameters[] = $oid;
+            $parametersTypes[] = ParameterType::INTEGER;
+        }
+
+        if (null === $field) {
+            $fieldExpression = $this->connection->getDatabasePlatform()->getIsNullExpression('field_name');
+        } else {
+            $fieldExpression = 'field_name = ?';
+            $parameters[] = $field;
+            $parametersTypes[] = ParameterType::STRING;
+        }
+
+        return [
+            sprintf(
+                'SELECT id FROM %s WHERE class_id = ? AND ace_order = ? AND %s AND %s',
+                $this->options['entry_table_name'],
+                $oidExpression,
+                $fieldExpression
+            ),
+            $parameters,
+            $parametersTypes
+        ];
     }
 
     /**
@@ -802,15 +864,15 @@ QUERY;
      *
      * @param string $classType
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getSelectClassIdSql($classType)
     {
-        return sprintf(
-            'SELECT id FROM %s WHERE class_type = %s',
-            $this->options['class_table_name'],
-            $this->connection->quote($classType)
-        );
+        return [
+            sprintf('SELECT id FROM %s WHERE class_type = ?', $this->options['class_table_name']),
+            [$classType],
+            [ParameterType::STRING]
+        ];
     }
 
     /**
@@ -820,18 +882,17 @@ QUERY;
      *
      * @throws \InvalidArgumentException
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
-        list($identifier, $username) = $this->parseSecurityIdentity($sid);
+        [$identifier, $username] = $this->parseSecurityIdentity($sid);
 
-        return sprintf(
-            'SELECT id FROM %s WHERE identifier = %s AND username = %s',
-            $this->options['sid_table_name'],
-            $this->connection->quote($identifier),
-            $this->connection->getDatabasePlatform()->convertBooleans($username)
-        );
+        return [
+            sprintf('SELECT id FROM %s WHERE identifier = ? AND username = ?', $this->options['sid_table_name']),
+            [$identifier, $username],
+            [ParameterType::STRING, ParameterType::BOOLEAN]
+        ];
     }
 
     /**
@@ -841,11 +902,12 @@ QUERY;
      *
      * @throws \InvalidArgumentException
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
-        return preg_replace('/^SELECT id FROM/', 'DELETE FROM', $this->getSelectSecurityIdentityIdSql($sid));
+        [$sql, $params, $types] = $this->getSelectSecurityIdentityIdSql($sid);
+        return [preg_replace('/^SELECT id FROM/', 'DELETE FROM', $sql), $params, $types];
     }
 
     /**
@@ -856,7 +918,7 @@ QUERY;
      *
      * @throws \InvalidArgumentException
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
@@ -864,12 +926,15 @@ QUERY;
             throw new \InvalidArgumentException('There are no changes.');
         }
 
-        return sprintf(
-            'UPDATE %s SET %s WHERE id = %d',
-            $this->options['oid_table_name'],
-            implode(', ', $changes),
-            $pk
-        );
+        return [
+            sprintf(
+                'UPDATE %s SET %s WHERE id = ?',
+                $this->options['oid_table_name'],
+                implode(', ', $changes)
+            ),
+            [$pk],
+            [ParameterType::INTEGER]
+        ];
     }
 
     /**
@@ -878,7 +943,7 @@ QUERY;
      * @param UserSecurityIdentity $usid
      * @param string               $oldUsername
      *
-     * @return string
+     * @return array [sql, param values, param types]
      */
     protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
     {
@@ -889,13 +954,14 @@ QUERY;
         $oldIdentifier = $usid->getClass().'-'.$oldUsername;
         $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
 
-        return sprintf(
-            'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
-            $this->options['sid_table_name'],
-            $this->connection->quote($newIdentifier),
-            $this->connection->quote($oldIdentifier),
-            $this->connection->getDatabasePlatform()->convertBooleans(true)
-        );
+        return [
+            sprintf(
+                'UPDATE %s SET identifier = ? WHERE identifier = ? AND username = ?',
+                $this->options['sid_table_name']
+            ),
+            [$newIdentifier, $oldIdentifier, true],
+            [ParameterType::STRING, ParameterType::STRING, ParameterType::BOOLEAN]
+        ];
     }
 
     /**
@@ -931,7 +997,8 @@ QUERY;
     {
         $classId = $this->createOrRetrieveClassId($oid->getType());
 
-        $this->connection->executeQuery($this->getInsertObjectIdentitySql($oid->getIdentifier(), $classId, true));
+        [$sql, $params, $types] = $this->getInsertObjectIdentitySql($oid->getIdentifier(), $classId, true);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -945,13 +1012,15 @@ QUERY;
      */
     private function createOrRetrieveClassId($classType)
     {
-        if (false !== $id = $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn()) {
+        [$sql, $params, $types] = $this->getSelectClassIdSql($classType);
+        if (false !== $id = $this->connection->executeQuery($sql, $params, $types)->fetchColumn()) {
             return $id;
         }
 
-        $this->connection->executeQuery($this->getInsertClassSql($classType));
+        [$insertSql, $insertParams, $insertTypes] = $this->getInsertClassSql($classType);
+        $this->connection->executeQuery($insertSql, $insertParams, $insertTypes);
 
-        return $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn();
+        return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
 
     /**
@@ -966,14 +1035,16 @@ QUERY;
      */
     private function createOrRetrieveSecurityIdentityId(SecurityIdentityInterface $sid)
     {
-        $id = $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn();
+        [$sql, $params, $types] = $this->getSelectSecurityIdentityIdSql($sid);
+        $id = $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
         if (false !== $id) {
             return $id;
         }
 
-        $this->connection->executeQuery($this->getInsertSecurityIdentitySql($sid));
+        [$insertSql, $insertParams, $insertTypes] = $this->getInsertSecurityIdentitySql($sid);
+        $this->connection->executeQuery($insertSql, $insertParams, $insertTypes);
 
-        return $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn();
+        return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
 
     /**
@@ -983,7 +1054,8 @@ QUERY;
      */
     private function deleteAccessControlEntries($oidPK)
     {
-        $this->connection->executeQuery($this->getDeleteAccessControlEntriesSql($oidPK));
+        [$sql, $params, $types] = $this->getDeleteAccessControlEntriesSql($oidPK);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -993,7 +1065,8 @@ QUERY;
      */
     private function deleteObjectIdentity($pk)
     {
-        $this->connection->executeQuery($this->getDeleteObjectIdentitySql($pk));
+        [$sql, $params, $types] = $this->getDeleteObjectIdentitySql($pk);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -1003,7 +1076,8 @@ QUERY;
      */
     private function deleteObjectIdentityRelations($pk)
     {
-        $this->connection->executeQuery($this->getDeleteObjectIdentityRelationsSql($pk));
+        [$sql, $params, $types] = $this->getDeleteObjectIdentityRelationsSql($pk);
+        $this->connection->executeQuery($sql, $params, $types);
     }
 
     /**
@@ -1014,12 +1088,15 @@ QUERY;
     private function regenerateAncestorRelations(AclInterface $acl)
     {
         $pk = $acl->getId();
-        $this->connection->executeQuery($this->getDeleteObjectIdentityRelationsSql($pk));
-        $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $pk));
+        [$sql, $params, $types] = $this->getDeleteObjectIdentityRelationsSql($pk);
+        $this->connection->executeQuery($sql, $params, $types);
+        [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $pk);
+        $this->connection->executeQuery($sql, $params, $types);
 
         $parentAcl = $acl->getParentAcl();
         while (null !== $parentAcl) {
-            $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $parentAcl->getId()));
+            [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $parentAcl->getId());
+            $this->connection->executeQuery($sql, $params, $types);
 
             $parentAcl = $parentAcl->getParentAcl();
         }
@@ -1055,23 +1132,27 @@ QUERY;
 
                     $objectIdentityId = $name === 'classFieldAces' ? null : $ace->getAcl()->getId();
 
-                    $this->connection->executeQuery(
-                        $this->getInsertAccessControlEntrySql(
-                            $classId,
-                            $objectIdentityId,
-                            $field,
-                            $aceOrder,
-                            $sid,
-                            $ace->getStrategy(),
-                            $ace->getMask(),
-                            $ace->isGranting(),
-                            $ace->isAuditSuccess(),
-                            $ace->isAuditFailure()
-                        )
+                    [$sql, $params, $types] = $this->getInsertAccessControlEntrySql(
+                        $classId,
+                        $objectIdentityId,
+                        $field,
+                        $aceOrder,
+                        $sid,
+                        $ace->getStrategy(),
+                        $ace->getMask(),
+                        $ace->isGranting(),
+                        $ace->isAuditSuccess(),
+                        $ace->isAuditFailure()
                     );
-                    $aceId = $this->connection->executeQuery(
-                        $this->getSelectAccessControlEntryIdSql($classId, $objectIdentityId, $field, $aceOrder)
-                    )->fetchColumn();
+                    $this->connection->executeQuery($sql, $params, $types);
+
+                    [$sql, $params, $types] = $this->getSelectAccessControlEntryIdSql(
+                        $classId,
+                        $objectIdentityId,
+                        $field,
+                        $aceOrder
+                    );
+                    $aceId = $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
                     $this->loadedAces[$aceId] = new \SplObjectStorage();
                     $this->loadedAces[$aceId]->attach($ace->getAcl(), $ace);
 
@@ -1103,7 +1184,8 @@ QUERY;
         foreach ($changes[0] as $old) {
             foreach ($old as $ace) {
                 if (!isset($currentIds[$ace->getId()])) {
-                    $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
+                    [$sql, $params, $types] = $this->getDeleteAccessControlEntrySql($ace->getId());
+                    $this->connection->executeQuery($sql, $params, $types);
                     unset($this->loadedAces[$ace->getId()]);
                 }
             }
@@ -1141,23 +1223,27 @@ QUERY;
 
                 $objectIdentityId = $name === 'classAces' ? null : $ace->getAcl()->getId();
 
-                $this->connection->executeQuery(
-                    $this->getInsertAccessControlEntrySql(
-                        $classId,
-                        $objectIdentityId,
-                        null,
-                        $i,
-                        $sid,
-                        $ace->getStrategy(),
-                        $ace->getMask(),
-                        $ace->isGranting(),
-                        $ace->isAuditSuccess(),
-                        $ace->isAuditFailure()
-                    )
+                [$sql, $params, $types] =  $this->getInsertAccessControlEntrySql(
+                    $classId,
+                    $objectIdentityId,
+                    null,
+                    $i,
+                    $sid,
+                    $ace->getStrategy(),
+                    $ace->getMask(),
+                    $ace->isGranting(),
+                    $ace->isAuditSuccess(),
+                    $ace->isAuditFailure()
                 );
-                $aceId = $this->connection->executeQuery(
-                    $this->getSelectAccessControlEntryIdSql($classId, $objectIdentityId, null, $i)
-                )->fetchColumn();
+                $this->connection->executeQuery($sql, $params, $types);
+
+                [$sql, $params, $types] = $this->getSelectAccessControlEntryIdSql(
+                    $classId,
+                    $objectIdentityId,
+                    null,
+                    $i
+                );
+                $aceId = $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
                 $this->loadedAces[$aceId] = new \SplObjectStorage();
                 $this->loadedAces[$aceId]->attach($ace->getAcl(), $ace);
 
@@ -1187,7 +1273,8 @@ QUERY;
 
         foreach ($old as $ace) {
             if (!isset($currentIds[$ace->getId()])) {
-                $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
+                [$sql, $params, $types] = $this->getDeleteAccessControlEntrySql($ace->getId());
+                $this->connection->executeQuery($sql, $params, $types);
                 unset($this->loadedAces[$ace->getId()]);
             }
         }

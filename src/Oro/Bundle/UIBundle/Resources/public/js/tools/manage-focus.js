@@ -8,52 +8,80 @@ export default {
      * @param {jQuery.Element} $container
      * @param {jQuery.Element} [$el=null]
      */
-    focusTabbable: function($container, $el = null) {
-        let $focusableEl = $el;
-
+    focusTabbable($container, $el = null) {
         // 1. An element that was passed
         // 2. First element inside the container matching [autofocus]
         // 3. Tabbable element inside the container
 
-        if (!$focusableEl) {
-            $focusableEl = $container.find('[autofocus]');
+        let $elToFocus = $el !== null ? $el : $container.find('[autofocus]:first');
+
+        if (!$elToFocus.length) {
+            $elToFocus = $(this.getFirstTabbable($container.find(':tabbable').toArray()));
         }
 
-        if (!$focusableEl.length) {
-            $focusableEl = $container.find(':tabbable');
-        }
+        $elToFocus.focus();
+    },
 
-        $focusableEl.eq(0).trigger('focus');
+    /**
+     * Find first tabbable element from array taking in account that in array can be present focusable group of elements
+     * (e.g. radio buttons) state and order of which can impact focusability each others. Param `preferFirstOfGroup`
+     * allows to manage if first or last element of focusable group will be returned.
+     *
+     * @param {Array.<HTMLElement>} elements
+     * @param {boolean} preferFirstOfGroup
+     * @return {HTMLElement|undefined}
+     */
+    getFirstTabbable(elements, preferFirstOfGroup = true) {
+        return elements.find((element, i) => {
+            if ($('input[type=radio]').is(element) && !element.checked) {
+                const name = element.getAttribute('name');
+
+                if ($(`input[type=radio][name='${name}']:checked`).length > 0) {
+                    return false;
+                }
+
+                if (!preferFirstOfGroup) {
+                    if (i < elements.length - 1 && $(`input[type=radio][name='${name}']`).is(elements[i + 1])) {
+                        return false;
+                    }
+                } else if (i > 0 && $(`input[type=radio][name='${name}']`).is(elements[i - 1])) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    },
+
+    getLastTabbable(elements, preferFirstOfGroup = true) {
+        return this.getFirstTabbable(Array.from(elements).reverse(), !preferFirstOfGroup);
     },
 
     /**
      * Prevent tabbing out of container
-     * @param {object} event
+     * @param {object} e
      * @param {DOM.Element|jQuery.Element} container
      */
-    preventTabOutOfContainer(event, container) {
-        const $container = container instanceof $ ? container : $(container);
-
-        if (event.keyCode !== TAB_KEY_CODE || event.isDefaultPrevented()) {
+    preventTabOutOfContainer(e, container) {
+        if (e.keyCode !== TAB_KEY_CODE || e.isDefaultPrevented()) {
             return;
         }
 
-        const $tabbableElements = $container.find(':tabbable');
-        const $firstTabbable = $tabbableElements.first();
-        const $lastTabbable = $tabbableElements.last();
+        const $container = container instanceof $ ? container : $(container);
+        const tabbableElements = $container.find(':tabbable').toArray();
+        let substitutionElement;
 
-        if (
-            (event.target === $lastTabbable[0] || event.target === $container[0]) &&
-            !event.shiftKey
-        ) {
-            $firstTabbable.trigger('focus');
-            event.preventDefault();
-        } else if (
-            (event.target === $firstTabbable[0] || event.target === $container[0]) &&
-            event.shiftKey
-        ) {
-            $lastTabbable.trigger('focus');
-            event.preventDefault();
+        if (e.shiftKey) {
+            if ($container.is(e.target) || this.getFirstTabbable(tabbableElements, false) === e.target) {
+                substitutionElement = this.getLastTabbable(tabbableElements, false);
+            }
+        } else if ($container.is(e.target) || this.getLastTabbable(tabbableElements) === e.target) {
+            substitutionElement = this.getFirstTabbable(tabbableElements);
+        }
+
+        if (substitutionElement) {
+            $(substitutionElement).focus();
+            e.preventDefault();
         }
     }
 };

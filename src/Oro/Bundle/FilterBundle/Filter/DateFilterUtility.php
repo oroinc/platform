@@ -9,6 +9,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Prepare data for Date filter
+ */
 class DateFilterUtility
 {
     /** @var LocaleSettings */
@@ -64,7 +67,7 @@ class DateFilterUtility
             ],
             $data['value']
         );
-        $data['type']  = isset($data['type']) ? $data['type'] : DateRangeFilterType::TYPE_BETWEEN;
+        $data['type']  = $data['type'] ?? DateRangeFilterType::TYPE_BETWEEN;
 
         // values will not be used, so just unset them
         if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
@@ -81,6 +84,7 @@ class DateFilterUtility
             'date_start_original' => $this->getArrayValue($data['value'], 'start_original'),
             'date_end_original'   => $this->getArrayValue($data['value'], 'end_original'),
             'type'                => $data['type'],
+            'in_group'            => $data['in_group'] ?? false,
             'part'                => $this->getArrayValue($data, 'part', DateModifierInterface::PART_VALUE),
             'field'               => $field
         ];
@@ -252,9 +256,7 @@ class DateFilterUtility
      */
     protected function getArrayValue(array $data, $key, $defaultValue = null)
     {
-        return isset($data[$key])
-            ? $data[$key]
-            : $defaultValue;
+        return $data[$key] ?? $defaultValue;
     }
 
     /**
