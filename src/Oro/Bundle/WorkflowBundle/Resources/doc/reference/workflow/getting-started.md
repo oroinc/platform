@@ -394,7 +394,7 @@ WorkflowBundle provides following console commands to work with workflows.
 
 ### oro:workflow:definitions:load
 
-This command loads workflow's configurations from *.yml configuration files to the database. It used
+This command loads workflow's configurations from *.yml configuration files to the database. It is used
 during application installation and update processes. Command has two optional options:
 
 - **--directories** - specifies directories used to find configuration files (multiple values allowed);
