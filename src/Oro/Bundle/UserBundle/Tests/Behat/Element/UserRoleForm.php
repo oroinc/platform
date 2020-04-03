@@ -11,10 +11,11 @@ class UserRoleForm extends Form
      * @param string $entity Entity name e.g. Account, Business Customer, Comment etc.
      * @param string $action e.g. Create, Delete, Edit, View etc.
      * @param string $accessLevel e.g. System, None, User etc.
+     * @param bool $field is field permission should be changed.
      */
-    public function setPermission($entity, $action, $accessLevel)
+    public function setPermission($entity, $action, $accessLevel, $field = false)
     {
-        $entityRows = $this->getEntityRows($entity);
+        $entityRows = $field ? $this->getEntityFieldRows($entity) : $this->getEntityRows($entity);
         $actionRow = $this->getActionRow($entityRows, $action);
         $this->getDriver()->waitForAjax();
         $levels = $actionRow->findAll('css', '.dropdown-menu li a');
@@ -99,5 +100,24 @@ class UserRoleForm extends Form
         self::assertNotCount(0, $entityTrs, sprintf('There is no "%s" entity row', $entity));
 
         return $entityTrs;
+    }
+
+    /**
+     * Find parent div element which contains element div.field-name with text $field.
+     *
+     * @param string $field
+     *
+     * @return NodeElement[]
+     */
+    protected function getEntityFieldRows($field)
+    {
+        $fieldTrs = $this->findAll(
+            'xpath',
+            "//div[contains(@class,'field-name')][text()='$field']"
+            . "/ancestor::div[contains(@class, 'field-permission-container')]"
+        );
+        self::assertNotCount(0, $fieldTrs, sprintf('There is no "%s" field row', $field));
+
+        return $fieldTrs;
     }
 }
