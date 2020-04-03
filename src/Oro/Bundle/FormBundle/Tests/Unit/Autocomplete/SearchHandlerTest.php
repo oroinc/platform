@@ -248,6 +248,10 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         MockHelper::addMockExpectedCalls($this->query, $expectQueryCalls, $this);
 
         $this->logger->expects($this->never())->method('critical');
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($this->query)
+            ->willReturn($this->query);
 
         $actualResult = $this->searchHandler->search($query['query'], $query['page'], $query['perPage']);
         $this->assertEquals($expectedResult, $actualResult);
@@ -597,6 +601,10 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($query)
+            ->willReturn($query);
 
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
@@ -635,6 +643,10 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
 
         $qb->expects($this->once())
             ->method('getQuery')
+            ->willReturn($query);
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($query)
             ->willReturn($query);
 
         $this->logger->expects($this->once())
@@ -684,6 +696,10 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($query)
+            ->willReturn($query);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn($result);
