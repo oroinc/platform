@@ -135,6 +135,11 @@ define(function(require) {
          * @param {Object} options
          */
         createFrontField: function(options) {
+            // According for accessibility if input doesn't linked label
+            if ($(`label[for="${options.dateInputAttrs.id}"]`).length) {
+                delete options.dateInputAttrs['aria-label'];
+            }
+
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
