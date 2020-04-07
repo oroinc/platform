@@ -101,8 +101,10 @@ entity_config:
                         value_type:         integer
                         allowed_type:       [image, multiImage]
                     constraints:
-                        - Type:
-                            type:           int
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:          1
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
@@ -119,8 +121,10 @@ entity_config:
                         value_type:         integer
                         allowed_type:       [image, multiImage]
                     constraints:
-                        - Type:
-                            type:           int
+                        - NotBlank:         ~
+                        - Type:             integer
+                        - Range:
+                              min:          1
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
