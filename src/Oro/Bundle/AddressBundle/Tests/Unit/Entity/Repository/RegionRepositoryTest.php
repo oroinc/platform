@@ -9,6 +9,7 @@ use Doctrine\ORM\Query;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,7 +79,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 [
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
-                    'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                    TranslatableSqlWalker::class
                 ],
                 [
                     TranslatableListener::HINT_TRANSLATABLE_LOCALE,
@@ -133,7 +134,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('setHint')
             ->with(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
-                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                TranslatableSqlWalker::class
             );
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')

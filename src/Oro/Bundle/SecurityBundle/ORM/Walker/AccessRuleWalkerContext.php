@@ -99,6 +99,16 @@ class AccessRuleWalkerContext implements \Serializable
     }
 
     /**
+     * Sets organization id.
+     *
+     * @param int $organizationId
+     */
+    public function setOrganizationId(int $organizationId): void
+    {
+        $this->organizationId = $organizationId;
+    }
+
+    /**
      * Returns true if the additional parameter exists.
      *
      * @param string $key

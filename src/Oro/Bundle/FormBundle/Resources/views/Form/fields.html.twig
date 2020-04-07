@@ -247,6 +247,10 @@
             name: id,
             'data-validation': dateValidation,
             class: 'datepicker-input ' ~ (attribute(attr, 'class') is defined ? attr['class'] : ''),
+            'aria-live': 'assertive',
+            autocomplete: 'off',
+            autocorrect: 'off',
+            autocapitalize: 'off'
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -290,7 +294,11 @@
             id: id,
             name: id,
             class: 'input-small datepicker-input ' ~ attrClass,
-            'data-validation': dateValidation|json_encode(constant('JSON_FORCE_OBJECT'))
+            'data-validation': dateValidation|json_encode(constant('JSON_FORCE_OBJECT')),
+            'aria-live': 'assertive',
+            autocomplete: 'off',
+            autocorrect: 'off',
+            autocapitalize: 'off'
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',

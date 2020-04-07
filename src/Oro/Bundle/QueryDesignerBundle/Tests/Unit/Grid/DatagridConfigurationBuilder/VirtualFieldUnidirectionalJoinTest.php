@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTestCase
@@ -126,13 +125,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                         'vc2' => 'c2',
                     ],
                 ],
-                'type'         => 'orm',
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
-                ]
+                'type'         => 'orm'
             ],
             'fields_acl' => [
                 'columns' => [

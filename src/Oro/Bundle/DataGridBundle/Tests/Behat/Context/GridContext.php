@@ -1169,6 +1169,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function resetFilter($filterName, $filterGridName = 'Grid')
     {
+        $this->spin(function () use ($filterName, $filterGridName) {
+            $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
+            $filterItem->reset();
+            $filterItem->find('css', 'button.reset-filter');
+
+            return !$filterItem || !$filterItem->isValid() || !$filterItem->isVisible();
+        }, 5);
+
         $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterDateTimeItem', $filterName);
         $filterItem->reset();
     }

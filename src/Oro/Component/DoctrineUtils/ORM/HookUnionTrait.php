@@ -7,6 +7,8 @@ use Doctrine\ORM\Query;
 /**
  * Trait can be used to add UNION query to SQL string
  * that can be constructed after walking down AST nodes
+ *
+ * @deprecated UnionOutputResultModifier should be used instead
  */
 trait HookUnionTrait
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class JoinCasesTest extends DatagridConfigurationBuilderTestCase
@@ -61,12 +60,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                         'column1'                   => 'c1',
                         'rc1+' . $en1 . '::column2' => 'c2',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -227,12 +220,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                         $enR1 . '::rc3+'  .$en1 . '::column2'                        => 'c4',
                         'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1' => 'c5',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -345,12 +332,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                                 'value' => 'test'
                             ]
                         ],
-                    ]
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
                     ]
                 ]
             ],

@@ -16,6 +16,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
 /**
+ * Form extension that check access to fields.
+ * It cannot be registered with form.type_extension tag because
+ * this extension should be registered as first extension for all forms.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
@@ -71,6 +75,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     {
         if (!$this->isApplicable($options)) {
             return;
+        }
+
+        // removes 'trash' view fields that can be added to removed fields in finishView method of the form
+        foreach (array_keys($view->children) as $fieldName) {
+            if (!$form->has($fieldName) && !$view->children[$fieldName] instanceof FormView) {
+                unset($view->children[$fieldName]);
+            }
         }
 
         $entity = $this->getEntityByForm($form);
@@ -161,6 +172,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                         }
                     }
                 }
+            } else {
+                $form->remove($fieldName);
             }
         }
 

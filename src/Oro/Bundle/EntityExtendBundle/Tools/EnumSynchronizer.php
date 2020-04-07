@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -15,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -251,7 +251,7 @@ class EnumSynchronizer
             ->getQuery()
             ->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
-                TranslationWalker::class
+                TranslatableSqlWalker::class
             );
 
         $this->addTranslatableLocaleHint($query, $em);

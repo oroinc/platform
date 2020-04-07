@@ -8,6 +8,8 @@ use Doctrine\ORM\Query\AST;
 use Doctrine\ORM\Query\SqlWalker as BaseSqlWalker;
 
 /**
+ * Output SQL walker
+ * @deprecated use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker instead
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class SqlWalker extends BaseSqlWalker

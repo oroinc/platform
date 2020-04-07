@@ -167,10 +167,11 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function ageDataProvider()
     {
-        $oneYearAgo = new \DateTime('-1 year', new \DateTimeZone('UTC'));
+        $isFeb29 = date('md') === '0229';
+        $oneYearAgo = new \DateTime('-1 year' . ($isFeb29 ? ' -1 day' : ''), new \DateTimeZone('UTC'));
         $oneMonthAgo = new \DateTime('-1 month', new \DateTimeZone('UTC'));
         $oneYearTwoMonthAgo = new \DateTime('-1 year -2 months', new \DateTimeZone('UTC'));
-        $tenYearsAgo = new \DateTime('-10 years', new \DateTimeZone('UTC'));
+        $tenYearsAgo = new \DateTime('-10 years' . ($isFeb29 ? ' -1 day' : ''), new \DateTimeZone('UTC'));
         $inFuture = new \DateTime('+1 year', new \DateTimeZone('UTC'));
 
         return [

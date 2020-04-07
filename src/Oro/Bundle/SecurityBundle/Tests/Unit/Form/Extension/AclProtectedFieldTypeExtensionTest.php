@@ -88,6 +88,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     public function testFinishView()
     {
         list($view, $form, $options) = $this->getTestFormAndFormView(true);
+        /** @var $view FormView */
+        $view->children['broken'] = new \stdClass();
+
         $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldViewGranted')
             ->willReturn(false);
@@ -118,6 +121,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
                 'error'
             )
         );
+        $this->assertFalse(isset($view->children['broken']));
     }
 
     public function testFinishViewWithShowRestricted()
@@ -180,6 +184,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('city');
         $form->add('street');
         $form->add('country');
+        $form->add('zip');
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
@@ -196,7 +201,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             'postoffice' => 61000
         ];
 
-        $this->fieldAclHelper->expects(self::exactly(4))
+        $this->fieldAclHelper->expects(self::exactly(5))
             ->method('isFieldModificationGranted')
             ->willReturnCallback(
                 function ($entity, $fieldName) {
@@ -211,6 +216,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
         $event = new FormEvent($form, $data);
         $this->extension->preSubmit($event);
+
+        $this->assertFalse($form->has('zip'));
 
         $this->assertEquals(
             [
