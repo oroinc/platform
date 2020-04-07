@@ -11,13 +11,13 @@ use Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -27,10 +27,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SendEmailTemplate extends AbstractSendEmail
 {
     /** @var array */
-    private $options;
+    protected $options;
 
     /** @var ManagerRegistry */
-    private $registry;
+    protected $registry;
 
     /** @var ValidatorInterface */
     private $validator;
@@ -43,6 +43,9 @@ class SendEmailTemplate extends AbstractSendEmail
 
     /** @var EmailConstraints */
     private $emailConstraint;
+
+    /** @var AggregatedEmailTemplatesSender|null */
+    private $sender;
 
     /**
      * @param ContextAccessor $contextAccessor
@@ -70,6 +73,14 @@ class SendEmailTemplate extends AbstractSendEmail
         $this->validator = $validator;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
         $this->emailOriginHelper = $emailOriginHelper;
+    }
+
+    /**
+     * @param AggregatedEmailTemplatesSender|null $sender
+     */
+    public function setSender(?AggregatedEmailTemplatesSender $sender): void
+    {
+        $this->sender = $sender;
     }
 
     /**
@@ -115,14 +126,37 @@ class SendEmailTemplate extends AbstractSendEmail
         $this->validateEmailAddress($from, '"From" email');
 
         $templateName = $this->contextAccessor->getValue($context, $this->options['template']);
-
         $entity = $this->contextAccessor->getValue($context, $this->options['entity']);
+        $recipients = $this->getRecipientsFromContext($context);
+
+        if ($this->sender) {
+            $emailUsers = $this->sender->send($entity, $recipients, $from, $templateName);
+        } else {
+            $emailUsers = $this->send($entity, $recipients, $from, $templateName);
+        }
+
+        $emailUser = reset($emailUsers);
+        if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
+            $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
+        }
+    }
+
+    /**
+     * @param $entity
+     * @param array $recipients
+     * @param string $from
+     * @param string $templateName
+     *
+     * @return array
+     */
+    private function send($entity, array $recipients, string $from, string $templateName): array
+    {
         $entityClassName = $this->registry->getManagerForClass(\get_class($entity))
             ->getClassMetadata(\get_class($entity))
             ->getName();
 
         $templateCollection = $this->localizedTemplateProvider->getAggregated(
-            $this->getRecipientsFromContext($context),
+            $recipients,
             new EmailTemplateCriteria($templateName, $entityClassName),
             ['entity' => $entity]
         );
@@ -150,17 +184,14 @@ class SendEmailTemplate extends AbstractSendEmail
             }
         }
 
-        $emailUser = reset($emailUsers);
-        if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
-            $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
-        }
+        return $emailUsers;
     }
 
     /**
      * @param mixed $context
      * @return array
      */
-    private function getRecipientsFromContext($context): array
+    protected function getRecipientsFromContext($context): array
     {
         $recipients = [];
         foreach ($this->options['to'] as $email) {
@@ -203,11 +234,7 @@ class SendEmailTemplate extends AbstractSendEmail
         $errorList = $this->validator->validate($email, $this->emailConstraint);
 
         if ($errorList && $errorList->count() > 0) {
-            if ($errorList instanceof ConstraintViolationList) {
-                $errorString = \strval($errorList);
-            } else {
-                $errorString = $errorList->get(0)->getMessage();
-            }
+            $errorString = $errorList->get(0)->getMessage();
             throw new ValidatorException(\sprintf("Validating %s (%s):\n%s", $context, $email, $errorString));
         }
     }

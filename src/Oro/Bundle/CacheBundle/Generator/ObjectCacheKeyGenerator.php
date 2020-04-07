@@ -29,6 +29,6 @@ class ObjectCacheKeyGenerator
     {
         $result = $this->converter->convertToString($object, $scope);
 
-        return md5(get_class($object) . $result);
+        return sha1(get_class($object) . $result);
     }
 }
