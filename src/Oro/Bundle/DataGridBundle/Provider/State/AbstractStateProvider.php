@@ -95,7 +95,7 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
     {
         if (!array_key_exists($gridName, $this->defaultGridView)) {
             $currentUser = $this->tokenAccessor->getUser();
-            if (null === $currentUser) {
+            if (null === $currentUser || !$currentUser->getId()) {
                 return null;
             }
             $this->defaultGridView[$gridName] = $this->gridViewManager->getDefaultView($currentUser, $gridName);

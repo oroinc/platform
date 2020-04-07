@@ -262,7 +262,10 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
             $queryBuilder->setParameter('entityIds', $entityIds);
 
             try {
-                return $queryBuilder->getQuery()->getResult();
+                $query = $queryBuilder->getQuery();
+                return null !== $this->aclHelper
+                    ? $this->aclHelper->apply($query)->getResult()
+                    : $query->getResult();
             } catch (\Exception $exception) {
                 if ($this->logger) {
                     $this->logger->critical($exception->getMessage());

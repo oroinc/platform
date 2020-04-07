@@ -4,75 +4,70 @@ namespace Oro\Component\MessageQueue\Transport;
 
 /**
  * The Message interface is the root interface of all transport messages.
- * Most message-oriented middleware (MOM) products
- * treat messages as lightweight entities that consist of a header and a payload.
- * The header contains fields used for message routing and identification;
+ * Messages consist of a header and a payload.
+ * The header contains fields used for message routing and identification,
  * the payload contains the application data being sent.
- *
- * Within this general form, the definition of a message varies significantly across products.
- *
- * A class implements this interface should be cloneable.
- *
- * @link https://docs.oracle.com/javaee/1.4/api/javax/jms/Message.html
  */
 interface MessageInterface
 {
     /**
      * @return string
      */
-    public function getBody();
+    public function getBody(): string;
 
     /**
      * @param string $body
      *
      * @return void
      */
-    public function setBody($body);
+    public function setBody(string $body): void;
 
     /**
      * @param array $properties
      *
      * @return void
      */
-    public function setProperties(array $properties);
+    public function setProperties(array $properties): void;
 
     /**
      * @return array [name => value, ...]
      */
-    public function getProperties();
+    public function getProperties(): array;
 
     /**
      * @param string $name
-     * @param mixed  $default
+     * @param string $default
      *
-     * @return mixed
+     * @return string
      */
-    public function getProperty($name, $default = null);
+    public function getProperty(string $name, string $default = ''): string;
 
     /**
      * @param array $headers
      *
      * @return void
      */
-    public function setHeaders(array $headers);
+    public function setHeaders(array $headers): void;
 
     /**
      * @return array [name => value, ...]
      */
-    public function getHeaders();
+    public function getHeaders(): array;
 
     /**
      * @param string $name
-     * @param mixed  $default
+     * @param string $default
      *
-     * @return mixed
+     * @return string
      */
-    public function getHeader($name, $default = null);
+    public function getHeader(string $name, string $default = ''): string;
 
     /**
-     * @param boolean $redelivered
+     * @param bool $redelivered
+     *
+     * @return void
      */
-    public function setRedelivered($redelivered);
+    public function setRedelivered(bool $redelivered): void;
 
     /**
      * Gets an indication of whether this message is being redelivered.
@@ -80,9 +75,9 @@ interface MessageInterface
      * when it was sent by a broker to consumer but consumer does not ACK or REJECT it.
      * The broker brings the message back to the queue and mark it as redelivered.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isRedelivered();
+    public function isRedelivered(): bool;
 
     /**
      * Sets the correlation ID for the message.
@@ -93,7 +88,7 @@ interface MessageInterface
      *
      * @return void
      */
-    public function setCorrelationId($correlationId);
+    public function setCorrelationId(string $correlationId): void;
 
     /**
      * Gets the correlation ID for the message.
@@ -102,7 +97,7 @@ interface MessageInterface
      *
      * @return string
      */
-    public function getCorrelationId();
+    public function getCorrelationId(): string;
 
     /**
      * Sets the message ID.
@@ -113,7 +108,7 @@ interface MessageInterface
      *
      * @return void
      */
-    public function setMessageId($messageId);
+    public function setMessageId(string $messageId): void;
 
     /**
      * Gets the message Id.
@@ -123,17 +118,17 @@ interface MessageInterface
      *
      * @return string
      */
-    public function getMessageId();
+    public function getMessageId(): string;
 
     /**
      * Gets the message timestamp.
-     * The JMSTimestamp header field contains the time a message was handed off to a provider to be sent.
+     * The Timestamp header field contains the time a message was handed off to a provider to be sent.
      * It is not the time the message was actually transmitted,
      * because the actual send may occur later due to transactions or other client-side queueing of messages.
      *
      * @return int
      */
-    public function getTimestamp();
+    public function getTimestamp(): int;
 
     /**
      * Sets the message timestamp.
@@ -144,5 +139,43 @@ interface MessageInterface
      *
      * @return void
      */
-    public function setTimestamp($timestamp);
+    public function setTimestamp(int $timestamp): void;
+
+    /**
+     * Gets the message priority.
+     * The Priority header field tells how the message should be prioritised. Larger numbers indicate higher priority.
+     *
+     * @return int
+     */
+    public function getPriority(): int;
+
+    /**
+     * Sets the message priority.
+     * Providers set this field when a message is sent.
+     * This method can be used to change the value for a message that has been received.
+     *
+     * @param int $priority
+     *
+     * @return void
+     */
+    public function setPriority(int $priority): void;
+
+    /**
+     * Gets the message delay.
+     * The Delay property field contains the time that postpones message processing. In seconds.
+     *
+     * @return int
+     */
+    public function getDelay(): int;
+
+    /**
+     * Sets the message delay.
+     * Providers set this field when a message is sent.
+     * This method can be used to change the value for a message that has been received.
+     *
+     * @param int $delay
+     *
+     * @return void
+     */
+    public function setDelay(int $delay): void;
 }

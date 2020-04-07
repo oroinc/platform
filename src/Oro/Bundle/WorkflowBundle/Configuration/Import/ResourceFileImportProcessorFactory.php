@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Produces instance of import processor that corresponds to specific import section matched in config.
@@ -14,17 +15,17 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
     /** @var ConfigFileReaderInterface */
     private $reader;
 
-    /** @var array */
-    private $kernelBundles;
+    /** @var FileLocatorInterface */
+    private $fileLocator;
 
     /**
      * @param ConfigFileReaderInterface $reader
-     * @param array $kernelBundles
+     * @param FileLocatorInterface $fileLocator
      */
-    public function __construct(ConfigFileReaderInterface $reader, array $kernelBundles)
+    public function __construct(ConfigFileReaderInterface $reader, FileLocatorInterface $fileLocator)
     {
         $this->reader = $reader;
-        $this->kernelBundles = $kernelBundles;
+        $this->fileLocator = $fileLocator;
     }
 
     /**
@@ -67,7 +68,7 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
         return new ResourceFileImportProcessor(
             $this->reader,
             $this->getPath($import),
-            $this->kernelBundles,
+            $this->fileLocator,
             $this->ignoreErrors($import)
         );
     }

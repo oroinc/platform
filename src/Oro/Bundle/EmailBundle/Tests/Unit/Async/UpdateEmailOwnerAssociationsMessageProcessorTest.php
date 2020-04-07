@@ -7,7 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -31,7 +31,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'ownerIds' => [1],
         ]));
@@ -56,7 +56,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
             ->with('Got invalid message')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'ownerClass' => 'class',
         ]));
@@ -108,7 +108,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
             'ownerIds' => [1,2],
         ];
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode($body));
         $message->setMessageId('message-id');
 

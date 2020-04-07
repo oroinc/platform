@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\MessageProcessorProxy;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\Message;
 
 class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +36,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getWrappedValueHolderValue')
             ->willReturn($messageProcessor);
 
-        $message = $this->createMock(MessageInterface::class);
+        $message = new Message();
 
         self::assertEquals(
             get_class($messageProcessor),
@@ -61,11 +61,10 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $messageProcessorDelegate = new DelegateMessageProcessor($this->messageProcessorRegistry);
 
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::any())
-            ->method('getProperty')
-            ->with(Config::PARAMETER_PROCESSOR_NAME)
-            ->willReturn('test_processor');
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_PROCESSOR_NAME => 'test_processor'
+        ]);
 
         $this->messageProcessorRegistry->expects(self::once())
             ->method('get')
@@ -96,11 +95,10 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
         $messageProcessorProxy = new MessageProcessorProxy($messageProcessor);
         $messageProcessorDelegate = new DelegateMessageProcessor($this->messageProcessorRegistry);
 
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getProperty')
-            ->with(Config::PARAMETER_PROCESSOR_NAME)
-            ->willReturn('test_processor');
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_PROCESSOR_NAME => 'test_processor'
+        ]);
 
         $this->messageProcessorRegistry->expects(self::once())
             ->method('get')
@@ -120,11 +118,10 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
     {
         $messageProcessorDelegate = new DelegateMessageProcessor($this->messageProcessorRegistry);
 
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getProperty')
-            ->with(Config::PARAMETER_PROCESSOR_NAME)
-            ->willReturn(null);
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_PROCESSOR_NAME => ''
+        ]);
 
         $this->messageProcessorRegistry->expects(self::never())
             ->method('get');
@@ -142,11 +139,10 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
     {
         $messageProcessorDelegate = new DelegateMessageProcessor($this->messageProcessorRegistry);
 
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getProperty')
-            ->with(Config::PARAMETER_PROCESSOR_NAME)
-            ->willReturn('test_processor');
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_PROCESSOR_NAME => 'test_processor'
+        ]);
 
         $this->messageProcessorRegistry->expects(self::once())
             ->method('get')

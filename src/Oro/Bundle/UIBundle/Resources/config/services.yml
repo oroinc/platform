@@ -227,7 +227,6 @@ services:
             - ['setAttribute', ['a', 'data-content', 'Text']]
             - ['setAttribute', ['a', 'tabindex', 'Text']]
             - ['setAttribute', ['a', 'data-placement', 'Enum#top,bottom,left,right']]
-            - ['setAttribute', ['a', 'draggable', 'Enum#true,false']]
             # area attributes
             - ['setAttribute', ['area', 'id', 'ID']]
             - ['setAttribute', ['area', 'name', 'CDATA']]

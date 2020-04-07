@@ -23,7 +23,7 @@ class ChainMessageToArrayConverter implements MessageToArrayConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convert(MessageInterface $message)
+    public function convert(MessageInterface $message): array
     {
         $items = [];
         foreach ($this->converters as $converter) {

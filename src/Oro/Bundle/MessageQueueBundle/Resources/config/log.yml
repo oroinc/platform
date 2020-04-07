@@ -35,12 +35,6 @@ services:
         tags:
             - { name: oro_message_queue.log.message_to_array_converter, priority: 1 }
 
-    oro_message_queue.log.message_to_array_converter.dbal:
-        class: Oro\Component\MessageQueue\Log\Converter\DbalMessageToArrayConverter
-        public: false
-        tags:
-            - { name: oro_message_queue.log.message_to_array_converter }
-
     oro_message_queue.log.processor.restore_original_channel:
         class: Oro\Component\MessageQueue\Log\Processor\RestoreOriginalChannelProcessor
         public: false

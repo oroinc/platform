@@ -5,9 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
 use Oro\Component\MessageQueue\Job\Topics;
+use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuild()
+    public function testBuild(): void
     {
         $addTopicPass = Compiler\AddTopicMetaPass::create()
             ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')
@@ -27,18 +27,15 @@ class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
         $extension->expects($this->once())
             ->method('getAlias')
             ->willReturn('oro_message_queue');
-        $extension->expects($this->exactly(2))
+        $extension->expects($this->once())
             ->method('addTransportFactory')
-            ->withConsecutive(
-                [new NullTransportFactory()],
-                [new DbalTransportFactory()]
-            );
+            ->with(new DbalTransportFactory());
 
         $container = new ContainerBuilder();
         $container->registerExtension($extension);
         $bundle->build($container);
 
-        $this->assertArraySubset([
+        $this->assertEquals([
             new ResolveClassPass(),
             new ResolveInstanceofConditionalsPass(),
             new RegisterEnvVarProcessorsPass(),
@@ -54,6 +51,7 @@ class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
             new Compiler\MakeAnnotationReaderServicesPersistentPass(),
             new Compiler\ProcessorLocatorPass(),
             $addTopicPass,
+            new ExtensionCompilerPass()
         ], $container->getCompilerPassConfig()->getBeforeOptimizationPasses());
     }
 }

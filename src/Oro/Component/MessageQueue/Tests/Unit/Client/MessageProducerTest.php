@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
 use Oro\Component\MessageQueue\Exception\TopicSubscriberNotFoundException;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Util\JSON;
 
 class MessageProducerTest extends \PHPUnit\Framework\TestCase
@@ -59,7 +59,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
             ->with('queue.name')
             ->willReturn($destinationMeta);
 
-        $queue = new NullQueue('prefix.queue.name');
+        $queue = new Queue('prefix.queue.name');
         $this->driver
             ->expects($this->once())
             ->method('createQueue')
@@ -108,8 +108,8 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
                 $destinationMeta2
             );
 
-        $queue1 = new NullQueue('prefix.queue1.name');
-        $queue2 = new NullQueue('prefix.queue2.name');
+        $queue1 = new Queue('prefix.queue1.name');
+        $queue2 = new Queue('prefix.queue2.name');
         $this->driver
             ->expects($this->exactly(2))
             ->method('createQueue')

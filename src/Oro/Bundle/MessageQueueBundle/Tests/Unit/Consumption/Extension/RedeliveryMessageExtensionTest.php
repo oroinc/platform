@@ -7,8 +7,8 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
+use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -40,14 +40,14 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $session = $this->createMock(SessionInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody('test body');
         $message->setHeaders(['test headers']);
         $message->setProperties($properties);
         $message->setMessageId('test message id');
         $message->setRedelivered(true);
 
-        $queue = new NullQueue('oro.default');
+        $queue = new Queue('oro.default');
         $context = new Context($session);
         $context->setLogger($logger);
         $context->setMessage($message);
@@ -84,7 +84,7 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $session = $this->createMock(SessionInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
-        $message = new NullMessage();
+        $message = new TransportMessage();
 
         $context = new Context($session);
         $context->setLogger($logger);

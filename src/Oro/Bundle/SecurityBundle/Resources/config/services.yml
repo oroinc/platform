@@ -590,13 +590,21 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.doctrine_helper'
 
+    # the form extension registered with `oro_security.form.extension.decorator` decorator service
+    # and cannot be registered with form.type_extension tag because
+    # this extension should be registered as first extension for all forms.
     oro_security.form.extension.aclprotected_fields_type:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
             - '@oro_security.form.field_acl_helper'
             - '@logger'
-        tags:
-            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_security.form.extension.decorator:
+        class: Oro\Bundle\SecurityBundle\Form\Extension\AclFormExtension
+        decorates: 'form.extension'
+        arguments:
+            - '@oro_security.form.extension.aclprotected_fields_type'
+            - '@oro_security.form.extension.decorator.inner'
 
     oro_security.acl.extension.field:
         public: false

@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 /**
  * The API manager for dictionaries and enums.
@@ -128,7 +129,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $query = $qb->getQuery();
         $query->setHint(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            TranslatableSqlWalker::class
         );
         $this->addTranslatableLocaleHint($query, $this->getObjectManager());
         $results = $query->getResult();

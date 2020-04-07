@@ -1,11 +1,12 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class DelegateMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -23,13 +24,13 @@ class DelegateMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $processor = new DelegateMessageProcessor($this->createMessageProcessorRegistryMock());
-        $processor->process(new NullMessage(), $this->createTransportSessionMock());
+        $processor->process(new Message(), $this->createTransportSessionMock());
     }
 
     public function testShouldProcessMessage()
     {
         $session = $this->createTransportSessionMock();
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([
             Config::PARAMETER_PROCESSOR_NAME => 'processor-name',
         ]);

@@ -1,11 +1,12 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
@@ -21,7 +22,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
     public function testShouldCreateIndexForEntity()
     {
-        // TODO: BAP-12226 Test should work with different engines not only ORM
         if ($this->getContainer()->getParameter('oro_search.engine') !== 'orm') {
             $this->markTestIncomplete('BAP-12226: This test doesn\'t work with current search engine');
         }
@@ -44,7 +44,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
         $this->assertEmpty($itemIndex);
 
         // test
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'entityClass' => Item::class,
             'offset' => 0,
@@ -78,7 +78,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
         $this->assertEmpty($itemIndex);
 
         // test
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'class' => Item::class,
             'offset' => 100000,

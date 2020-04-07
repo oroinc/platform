@@ -11,7 +11,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -58,7 +58,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo($loggerMessage))
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode($messageBody));
 
         $processor = new ExportMessageProcessor(
@@ -125,7 +125,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportHandler($exportHandler);
 
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'jobId' => 1,
             'jobName' => 'name',

@@ -1,110 +1,101 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
-use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\Queue;
 
 class DbalSessionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
-    {
-        new DbalSession($this->createConnectionMock());
-    }
+    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    public function testShouldCreateMessage()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-        $message = $session->createMessage('body', ['pkey' => 'pval'], ['hkey' => 'hval']);
-
-        $this->assertInstanceOf(DbalMessage::class, $message);
-        $this->assertEquals('body', $message->getBody());
-        $this->assertEquals(['pkey' => 'pval'], $message->getProperties());
-        $this->assertEquals(['hkey' => 'hval'], $message->getHeaders());
-        $this->assertSame(0, $message->getPriority());
-        $this->assertFalse($message->isRedelivered());
-    }
-
-    public function testShouldCreateTopic()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-        $topic = $session->createTopic('topic');
-
-        $this->assertInstanceOf(DbalDestination::class, $topic);
-        $this->assertEquals('topic', $topic->getTopicName());
-    }
-
-    public function testShouldCreateQueue()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-        $queue = $session->createQueue('queue');
-
-        $this->assertInstanceOf(DbalDestination::class, $queue);
-        $this->assertEquals('queue', $queue->getQueueName());
-    }
-
-    public function testShouldCreateMessageProducer()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-
-        $this->assertInstanceOf(DbalMessageProducer::class, $session->createProducer());
-    }
-
-    public function testShouldCreateMessageConsumer()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-
-        $this->assertInstanceOf(DbalMessageConsumer::class, $session->createConsumer(new DbalDestination('')));
-    }
-
-    public function testShouldCreateMessageConsumerAndSetPollingInterval()
-    {
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->exactly(2))
-            ->method('getOptions')
-            ->will($this->returnValue(['polling_interval' => 123456]))
-        ;
-
-        $session = new DbalSession($connection);
-
-        $consumer = $session->createConsumer(new DbalDestination(''));
-
-        $this->assertInstanceOf(DbalMessageConsumer::class, $consumer);
-        $this->assertEquals(123456, $consumer->getPollingInterval());
-    }
-
-    public function testShouldThrowIfDestinationIsInvalidInstanceType()
-    {
-        $this->expectException(InvalidDestinationException::class);
-        $this->expectExceptionMessage(
-            'The destination must be an instance of '.
-            'Oro\Component\MessageQueue\Transport\Dbal\DbalDestination but it is '.
-            'Oro\Component\MessageQueue\Transport\Null\NullQueue.'
-        );
-
-        $session = new DbalSession($this->createConnectionMock());
-
-        $this->assertInstanceOf(DbalMessageConsumer::class, $session->createConsumer(new NullQueue('')));
-    }
-
-    public function testShouldReturnInstanceOfConnection()
-    {
-        $session = new DbalSession($this->createConnectionMock());
-
-        $this->assertInstanceOf(DbalConnection::class, $session->getConnection());
-    }
+    /** @var DbalSession */
+    private $session;
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalConnection
+     * {@inheritdoc}
      */
-    private function createConnectionMock()
+    protected function setUp()
     {
-        return $this->createMock(DbalConnection::class);
+        $this->connection = $this->createMock(DbalConnection::class);
+        $this->session = new DbalSession($this->connection);
+    }
+
+    public function testCreateMessage(): void
+    {
+        $message = $this->session->createMessage(
+            'message body',
+            ['propertyKey' => 'propertyValue'],
+            ['headerKey' => 'headerValue']
+        );
+
+        $expectedMessage = new DbalMessage();
+        $expectedMessage->setBody('message body');
+        $expectedMessage->setProperties(['propertyKey' => 'propertyValue']);
+        $expectedMessage->setHeaders(['headerKey' => 'headerValue']);
+
+        $this->assertEquals($expectedMessage, $message);
+    }
+
+    public function testCreateQueue(): void
+    {
+        $queue = $this->session->createQueue('queue name');
+        $expectedQueue = new Queue('queue name');
+        $this->assertEquals($expectedQueue, $queue);
+    }
+
+    public function testCreateConsumer(): void
+    {
+        $queue = new Queue('queue name');
+
+        $this->connection
+            ->expects($this->once())
+            ->method('getOptions')
+            ->willReturn([]);
+
+        /** @var DbalMessageConsumer $consumer */
+        $consumer = $this->session->createConsumer($queue);
+        $expectedConsumer = new DbalMessageConsumer($this->session, $queue);
+
+        $this->assertInstanceOf(DbalMessageConsumer::class, $consumer);
+        $this->assertEquals($expectedConsumer->getPollingInterval(), $consumer->getPollingInterval());
+    }
+
+    public function testCreateConsumerWithPolingInterval(): void
+    {
+        $queue = new Queue('queue name');
+
+        $this->connection
+            ->expects($this->once())
+            ->method('getOptions')
+            ->willReturn([
+                'polling_interval' => 2000
+            ]);
+
+        /** @var DbalMessageConsumer $consumer */
+        $consumer = $this->session->createConsumer($queue);
+        $expectedConsumer = new DbalMessageConsumer($this->session, $queue);
+        $expectedConsumer->setPollingInterval(2000);
+
+        $this->assertInstanceOf(DbalMessageConsumer::class, $consumer);
+        $this->assertEquals($expectedConsumer->getPollingInterval(), $consumer->getPollingInterval());
+    }
+
+    public function testCreateProducer(): void
+    {
+        $this->session->createProducer();
+        $producer = $this->session->createProducer();
+        $expectedProducer = new DbalMessageProducer($this->connection);
+        $this->assertEquals($expectedProducer, $producer);
+    }
+
+    public function testGetConnection(): void
+    {
+        $this->assertEquals($this->connection, $this->session->getConnection());
     }
 }

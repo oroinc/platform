@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 use Psr\Container\ContainerInterface;
 
 /**
- * The ORM query hints resolver.
+ * Resolve query hints to a registered walkers.
  */
 class QueryHintResolver implements QueryHintResolverInterface
 {
@@ -45,11 +45,14 @@ class QueryHintResolver implements QueryHintResolverInterface
         foreach ($query->getHints() as $hintName => $hintVal) {
             if (false !== $hintVal && isset($this->walkers[$hintName])) {
                 $walker = $this->walkers[$hintName];
-                $added  = $this->addHint(
-                    $query,
-                    $walker['output'] ? Query::HINT_CUSTOM_OUTPUT_WALKER : Query::HINT_CUSTOM_TREE_WALKERS,
-                    $walker['class']
-                );
+                $added = true;
+                if (\is_string($walker['class'])) {
+                    $added = $this->addHint(
+                        $query,
+                        $this->getHintName($walker),
+                        $walker['class']
+                    );
+                }
                 if ($added && isset($walker['hint_provider'])) {
                     /** @var QueryWalkerHintProviderInterface $walkerHintProvider */
                     $walkerHintProvider = $this->walkerHintProviders->get($walker['hint_provider']);
@@ -64,9 +67,9 @@ class QueryHintResolver implements QueryHintResolverInterface
     /**
      * Adds a hint to a query object
      *
-     * @param Query  $query
+     * @param Query $query
      * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return bool TRUE if the hint is added; otherwise, FALSE
      */
@@ -148,5 +151,14 @@ class QueryHintResolver implements QueryHintResolverInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @param array $walker
+     * @return string
+     */
+    private function getHintName(array $walker): string
+    {
+        return $walker['output'] ? Query::HINT_CUSTOM_OUTPUT_WALKER : Query::HINT_CUSTOM_TREE_WALKERS;
     }
 }

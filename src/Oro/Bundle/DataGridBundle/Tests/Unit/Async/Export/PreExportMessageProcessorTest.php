@@ -16,7 +16,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -73,7 +73,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             100
         );
 
-        $message = $this->createNullMessage($messageBody);
+        $message = $this->createTransportMessage($messageBody);
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::REJECT, $result);
@@ -85,7 +85,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnMessageACKOnExportSuccess()
     {
         $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
-        $message = $this->createNullMessage(['format' => 'csv', 'parameters' => ['gridName' => 'grid_name']], 123);
+        $message = $this->createTransportMessage(['format' => 'csv', 'parameters' => ['gridName' => 'grid_name']], 123);
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
@@ -311,11 +311,11 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      * @param array $body
      * @param null $id
      *
-     * @return NullMessage
+     * @return TransportMessage
      */
-    private function createNullMessage($body = [], $id = null): NullMessage
+    private function createTransportMessage($body = [], $id = null): TransportMessage
     {
-        $message = new NullMessage();
+        $message = new TransportMessage();
         $message->setBody(json_encode($body));
         if ($id) {
             $message->setMessageId($id);

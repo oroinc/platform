@@ -124,7 +124,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testVisitMetadataForCachedDefaultView()
     {
-        $user = new User();
+        $user = $this->getEntity(User::class, ['id' => 42]);
         $grid1 = 'test_grid_1';
         $grid2 = 'test_grid_2';
         $view1 = $this->getEntity(GridView::class, ['id' => 'view1']);

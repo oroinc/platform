@@ -1,12 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Transport\Queue;
 
 /**
  * @dbIsolationPerTest
@@ -31,7 +32,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->dropTable('message_queue');
     }
 
-    public function testShouldRemoveRecordIfMessageIsAcknowledged()
+    public function testShouldRemoveRecordIfMessageIsAcknowledged(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -50,7 +51,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $message->setId($id);
 
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $consumer->acknowledge($message);
 
@@ -59,7 +60,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertEmpty($messages);
     }
 
-    public function testShouldRemoveRecordIfMessageIsRejected()
+    public function testShouldRemoveRecordIfMessageIsRejected(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -78,7 +79,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $message->setId($id);
 
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $consumer->reject($message);
 
@@ -87,7 +88,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertEmpty($messages);
     }
 
-    public function testShouldRemoveRecordAndCreateNewOneIfMessageIsRequeued()
+    public function testShouldRemoveRecordAndCreateNewOneIfMessageIsRequeued(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -112,7 +113,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $message->setId($id);
 
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $consumer->reject($message, true);
 
@@ -124,7 +125,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertTrue((bool) $messages[0]['redelivered']);
     }
 
-    public function testShouldReceiveMessage()
+    public function testShouldReceiveMessage(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -141,7 +142,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         // test
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $message = $consumer->receive();
 
@@ -150,7 +151,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertEquals('message', $message->getBody());
     }
 
-    public function testShouldReceiveMessageWithHighestPriorityFirst()
+    public function testShouldReceiveMessageWithHighestPriorityFirst(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -173,7 +174,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         // test
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $message = $consumer->receive();
 
@@ -187,7 +188,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertEquals(5, $message->getPriority());
     }
 
-    public function testShouldReceiveMessagesWithSamePriorityInIncomeOrder()
+    public function testShouldReceiveMessagesWithSamePriorityInIncomeOrder(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -210,7 +211,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         // test
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $message = $consumer->receive();
 
@@ -224,31 +225,7 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->assertEquals(5, $message->getPriority());
     }
 
-    public function testShouldNotReceiveDelayedMessageIfDelayedUntilTimeInTheFuture()
-    {
-        $connection = $this->createConnection('message_queue');
-        $dbal = $connection->getDBALConnection();
-
-        $dbal->insert('message_queue', [
-            'delayed_until' => time() + 9999,
-            'queue' => 'default',
-            'priority' => 1,
-        ]);
-        $id = (int) $dbal->lastInsertId('message_queue_id_seq');
-
-        //guard
-        $this->assertGreaterThan(0, $id);
-
-        // test
-        $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
-
-        $message = $consumer->receiveNoWait();
-
-        $this->assertEmpty($message);
-    }
-
-    public function testShouldReceiveDelayedMessageIfDelayedUntilTimeInThePast()
+    public function testShouldReceiveDelayedMessageIfDelayedUntilTimeInThePast(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -265,7 +242,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         // test
         $session = new DbalSession($connection);
-        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $message = $consumer->receive();
 

@@ -21,6 +21,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manager for working with Grid Views
+ */
 class GridViewManager
 {
     const DEFAULT_VIEW_KEY = 'default_view';
@@ -187,7 +190,7 @@ class GridViewManager
         if (!isset($this->cacheData[$cacheKey])) {
             $systemViews = $this->getSystemViews($gridName);
             $gridViews = [];
-            if ($user instanceof UserInterface) {
+            if ($user instanceof UserInterface && $user->getId()) {
                 /** @var GridViewRepository $repository */
                 $repository = $this->getRepository($this->gridViewClassName);
 

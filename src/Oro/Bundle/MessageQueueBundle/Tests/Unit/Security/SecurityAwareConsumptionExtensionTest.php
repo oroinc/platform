@@ -7,7 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -43,7 +43,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPreReceivedShouldNotSetSecurityTokenForSecurityAgnosticProcessor()
     {
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([
             Config::PARAMETER_PROCESSOR_NAME              => 'security_agnostic_processor',
             SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => 'serialized'
@@ -65,7 +65,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $serializedToken = 'serialized';
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
 
         $context = new Context($this->createMock(SessionInterface::class));
@@ -93,7 +93,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $serializedToken = 'serialized';
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
 
         $context = new Context($this->createMock(SessionInterface::class));
@@ -115,7 +115,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPreReceivedShouldDoNothingIdMessageDoesNotContainSecurityToken()
     {
-        $message = new NullMessage();
+        $message = new Message();
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);

@@ -67,6 +67,11 @@ services:
         arguments:
             - '%kernel.bundles%'
 
+    oro_workflow.configuration.resource_file_locator:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileLocator
+        arguments:
+            - '@file_locator'
+
     oro_workflow.configuration.workflow_config_finder.builder:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder
         arguments:
@@ -82,12 +87,13 @@ services:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory
         arguments:
             - '@oro_workflow.configuration.reader.yaml'
-            - '%kernel.bundles%'
+            - '@oro_workflow.configuration.resource_file_locator'
 
     oro_workflow.configuration.import_processor_factory.workflow_file:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory
         arguments:
             - '@oro_workflow.configuration.reader.yaml'
+            - '@oro_workflow.configuration.resource_file_locator'
 
     oro_workflow.configuration.import_processor_factory.workflow_import_supervisor:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory

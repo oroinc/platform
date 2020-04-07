@@ -15,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -186,7 +186,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         static::getContainer()
             ->get('oro_importexport.async.import')
             ->process(
-                $this->createNullMessage($importValidateMessageData),
+                $this->createTransportMessage($importValidateMessageData),
                 $this->createSessionInterfaceMock()
             );
 
@@ -230,11 +230,11 @@ abstract class AbstractImportExportTest extends WebTestCase
     /**
      * @param array $messageData
      *
-     * @return NullMessage
+     * @return TransportMessage
      */
-    protected function createNullMessage(array $messageData): NullMessage
+    protected function createTransportMessage(array $messageData): TransportMessage
     {
-        $message = new NullMessage();
+        $message = new TransportMessage();
 
         $message->setMessageId('abc');
         $message->setBody(json_encode($messageData));
@@ -379,7 +379,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $processorResult = static::getContainer()
             ->get($processorServiceName)
             ->process(
-                $this->createNullMessage($messageData),
+                $this->createTransportMessage($messageData),
                 $this->createSessionInterfaceMock()
             );
 

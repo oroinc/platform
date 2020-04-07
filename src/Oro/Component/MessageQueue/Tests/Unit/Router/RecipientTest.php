@@ -1,27 +1,31 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Router;
 
 use Oro\Component\MessageQueue\Router\Recipient;
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\Queue;
 
 class RecipientTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldAllowGetMessageSetInConstructor()
+    public function testGetQueue(): void
     {
-        $message = $this->createMock(MessageInterface::class);
+        $queue = new Queue('queue name');
+        $message = new Message();
+        $message->setBody('message body');
 
-        $recipient = new Recipient($this->createMock(DestinationInterface::class), $message);
+        $recipient = new Recipient($queue, $message);
 
         $this->assertSame($message, $recipient->getMessage());
     }
 
-    public function testShouldAllowGetDestinationSetInConstructor()
+    public function testGetMessage(): void
     {
-        $destination = $this->createMock(DestinationInterface::class);
+        $queue = new Queue('queue name');
+        $message = new Message();
 
-        $recipient = new Recipient($destination, $this->createMock(MessageInterface::class));
+        $recipient = new Recipient($queue, $message);
 
-        $this->assertSame($destination, $recipient->getDestination());
+        $this->assertSame($queue, $recipient->getQueue());
     }
 }

@@ -188,6 +188,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             $parentMessageId,
             $jobName,
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
+                $body['options']['importVersion'] = time();
                 $this->dispatchBeforeChunksEvent($body);
 
                 foreach ($files as $key => $file) {

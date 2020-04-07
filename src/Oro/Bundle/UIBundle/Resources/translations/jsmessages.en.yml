@@ -80,8 +80,8 @@ oro:
                 more: "More"
         datepicker:
             today: Today
-            prev: Prev
-            next: Next
+            prev: 'Switch to previous month'
+            next: 'Switch to next month'
             close: Close
             wk: Wk
             aria_label: 'Select date ...'

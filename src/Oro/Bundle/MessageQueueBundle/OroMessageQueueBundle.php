@@ -16,7 +16,6 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerService
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\NullTransportFactory;
 use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -46,7 +45,6 @@ class OroMessageQueueBundle extends Bundle
 
         /** @var OroMessageQueueExtension $extension */
         $extension = $container->getExtension('oro_message_queue');
-        $extension->addTransportFactory(new NullTransportFactory());
         $extension->addTransportFactory(new DbalTransportFactory());
 
         $addTopicPass = AddTopicMetaPass::create()

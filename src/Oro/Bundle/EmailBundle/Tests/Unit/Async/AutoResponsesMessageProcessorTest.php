@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Async\AutoResponsesMessageProcessor;
@@ -7,7 +8,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -37,7 +38,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $logger
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(['key' => 'value']));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -60,7 +61,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
         ;
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode(
             ['ids' => [1]]
         ));

@@ -7,9 +7,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
+use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,7 +38,7 @@ class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())->method('setHint')->with(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
-            TranslationWalker::class
+            TranslatableSqlWalker::class
         );
         $query->expects($this->once())->method('execute')->willReturn($countries);
 

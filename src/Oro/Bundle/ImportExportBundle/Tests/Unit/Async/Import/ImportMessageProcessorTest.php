@@ -15,8 +15,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -174,7 +174,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createMock(PostponedRowsHandler::class)
         );
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setBody(json_encode([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',

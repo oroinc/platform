@@ -7,8 +7,8 @@ use Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Bundle\ProductBundle\Entity\ProductImage;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
@@ -30,12 +30,18 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
     protected $processor;
 
     /**
+     * @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $session;
+
+    /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->imageRemovalManager = $this->createMock(ImageRemovalManagerInterface::class);
+        $this->session = $this->createMock(SessionInterface::class);
 
         $this->processor = new ImageRemoveMessageProcessor(
             $this->logger,
@@ -50,8 +56,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
 
         $images = [
             [
@@ -75,14 +80,13 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $session)
+            $this->processor->process($message, $this->session)
         );
     }
 
     public function testProcessException()
     {
-        $session = new NullSession();
-        $message = new NullMessage();
+        $message = new Message();
 
         $images = [
             [
@@ -112,7 +116,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $session)
+            $this->processor->process($message, $this->session)
         );
     }
 }

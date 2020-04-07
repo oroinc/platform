@@ -213,7 +213,7 @@ services:
                 name: oro_entity.query_hint
                 hint: oro_translation.translatable
                 alias: HINT_TRANSLATABLE
-                output_walker: Gedmo\Translatable\Query\TreeWalker\TranslationWalker
+                output_walker: Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker
 
     oro_translation.event_listener.translation:
         class: Oro\Bundle\TranslationBundle\EventListener\TranslationListener
