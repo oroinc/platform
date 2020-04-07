@@ -11,6 +11,7 @@ doctrine:
                 password: '%database_password%'
                 options:  '%database_driver_options%'
                 charset:  '%database_charset%'
+                server_version: '%database_version%'
             session:
                 driver:   '%database_driver%'
                 host:     '%database_host%'
@@ -20,6 +21,7 @@ doctrine:
                 password: '%database_password%'
                 options:  '%database_driver_options%'
                 charset:  '%database_charset%'
+                server_version: '%database_version%'
             config:
                 driver:   '%database_driver%'
                 host:     '%database_host%'
@@ -29,6 +31,7 @@ doctrine:
                 password: '%database_password%'
                 options:  '%database_driver_options%'
                 charset:  '%database_charset%'
+                server_version: '%database_version%'
     orm:
         default_entity_manager:      default
         auto_generate_proxy_classes: '%kernel.debug%'
