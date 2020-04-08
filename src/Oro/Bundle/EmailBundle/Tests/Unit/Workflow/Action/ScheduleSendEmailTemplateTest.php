@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
+use Oro\Bundle\EmailBundle\Workflow\Action\ScheduleSendEmailTemplate;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
+class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $contextAccessor;
@@ -39,13 +40,19 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
     private $sender;
 
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProducer;
+
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    /** @var SendEmailTemplate */
+    /** @var ScheduleSendEmailTemplate */
     private $action;
 
     protected function setUp(): void
@@ -59,17 +66,21 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->sender = $this->createMock(AggregatedEmailTemplatesSender::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->action = new SendEmailTemplate(
+        $this->action = new ScheduleSendEmailTemplate(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
             $this->entityNameResolver,
             $this->validator,
-            $this->sender
+            $this->sender,
+            $this->doctrineHelper,
+            $this->messageProducer
         );
 
         $this->action->setLogger($this->logger);
@@ -102,9 +113,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ],
             'no from email' => [
                 'options' => [
-                    'to' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'to' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'from' => ['name' => 'Test'],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -117,9 +126,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ],
             'no to email' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['name' => 'Test'],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -127,19 +134,15 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ],
             'recipients in not an array' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'recipients' => 'some@recipient.com',
                 ],
                 'exceptionName' => InvalidParameterException::class,
-                'exceptionMessage' => 'Recipients parameter must be an array, string given',
+                'exceptionMessage' => 'Recipients parameter must be an array',
             ],
             'no to email in one of addresses' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['test@test.com', ['name' => 'Test']],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -314,9 +317,6 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithInvalidEmail(): void
     {
-        $this->sender->expects($this->never())
-            ->method($this->anything());
-
         $this->emailProcessor->expects($this->never())
             ->method($this->anything());
 
@@ -343,10 +343,9 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
      * @dataProvider executeOptionsDataProvider
      *
      * @param array $options
-     * @param string|object $recipient
      * @param array $expected
      */
-    public function testExecute(array $options, $recipient, array $expected): void
+    public function testExecute(array $options, array $expected): void
     {
         $context = [];
 
@@ -358,9 +357,13 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        if (!$recipient instanceof EmailHolderInterface) {
-            $recipient = new EmailAddressDTO($recipient);
-        }
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(\stdClass::class);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(42);
 
         $emailEntity = $this->createMock(Email::class);
 
@@ -369,16 +372,18 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ->method('getEmail')
             ->willReturn($emailEntity);
 
-        $this->sender->expects($this->once())
+        $this->messageProducer->expects($this->once())
             ->method('send')
-            ->with(new \stdClass(), [$recipient], $expected['from'], 'test')
+            ->with(
+                Topics::SEND_EMAIL_TEMPLATE,
+                [
+                    'from' => $expected['from'],
+                    'templateName' => $options['template'],
+                    'recipients' =>  $expected['to'],
+                    'entity' => [\stdClass::class, 42]
+                ]
+            )
             ->willReturn([$emailUserEntity]);
-
-        if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
-                ->method('setValue')
-                ->with($context, $options['attribute'], $emailEntity);
-        }
 
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -405,14 +410,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                'test@test.com',
                 [
                     'from' => 'test@test.com',
                     'to' => ['test@test.com'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'simple with name' => [
                 [
@@ -421,14 +422,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'extended' => [
                 [
@@ -443,14 +440,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'extended with name formatting' => [
                 [
@@ -465,14 +458,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"_Formatted" <test@test.com>',
                 [
                     'from' => '"_Formatted" <test@test.com>',
                     'to' => ['"_Formatted" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'with recipients' => [
                 [
@@ -481,14 +470,10 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                $recipient,
                 [
                     'from' => 'test@test.com',
                     'to' => ['recipient@test.com'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
         ];
     }

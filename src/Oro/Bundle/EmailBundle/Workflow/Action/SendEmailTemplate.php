@@ -2,22 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO;
-use Oro\Bundle\EmailBundle\Model\EmailTemplate;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
-use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -27,19 +21,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SendEmailTemplate extends AbstractSendEmail
 {
     /** @var array */
-    private $options;
-
-    /** @var ManagerRegistry */
-    private $registry;
+    protected $options;
 
     /** @var ValidatorInterface */
     private $validator;
 
-    /** @var LocalizedTemplateProvider */
-    private $localizedTemplateProvider;
-
-    /** @var EmailOriginHelper */
-    private $emailOriginHelper;
+    /** @var AggregatedEmailTemplatesSender */
+    private $sender;
 
     /** @var EmailConstraints */
     private $emailConstraint;
@@ -49,27 +37,21 @@ class SendEmailTemplate extends AbstractSendEmail
      * @param Processor $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
      * @param EntityNameResolver $entityNameResolver
-     * @param ManagerRegistry $registry
      * @param ValidatorInterface $validator
-     * @param LocalizedTemplateProvider $localizedTemplateProvider
-     * @param EmailOriginHelper $emailOriginHelper
+     * @param AggregatedEmailTemplatesSender $sender
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
         EntityNameResolver $entityNameResolver,
-        ManagerRegistry $registry,
         ValidatorInterface $validator,
-        LocalizedTemplateProvider $localizedTemplateProvider,
-        EmailOriginHelper $emailOriginHelper
+        AggregatedEmailTemplatesSender $sender
     ) {
         parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
 
-        $this->registry = $registry;
         $this->validator = $validator;
-        $this->localizedTemplateProvider = $localizedTemplateProvider;
-        $this->emailOriginHelper = $emailOriginHelper;
+        $this->sender = $sender;
     }
 
     /**
@@ -117,38 +99,8 @@ class SendEmailTemplate extends AbstractSendEmail
         $templateName = $this->contextAccessor->getValue($context, $this->options['template']);
 
         $entity = $this->contextAccessor->getValue($context, $this->options['entity']);
-        $entityClassName = $this->registry->getManagerForClass(\get_class($entity))
-            ->getClassMetadata(\get_class($entity))
-            ->getName();
 
-        $templateCollection = $this->localizedTemplateProvider->getAggregated(
-            $this->getRecipientsFromContext($context),
-            new EmailTemplateCriteria($templateName, $entityClassName),
-            ['entity' => $entity]
-        );
-
-        $emailUsers = [];
-        foreach ($templateCollection as $localizedTemplateDTO) {
-            $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
-
-            $emailModel = new Email();
-            $emailModel->setFrom($from);
-            $emailModel->setTo($localizedTemplateDTO->getEmails());
-            $emailModel->setSubject($emailTemplate->getSubject());
-            $emailModel->setBody($emailTemplate->getContent());
-            $emailModel->setType($emailTemplate->getType() === EmailTemplate::CONTENT_TYPE_HTML ? 'html' : 'text');
-
-            try {
-                $emailOrigin = $this->emailOriginHelper->getEmailOrigin(
-                    $emailModel->getFrom(),
-                    $emailModel->getOrganization()
-                );
-
-                $emailUsers[] = $this->emailProcessor->process($emailModel, $emailOrigin);
-            } catch (\Swift_SwiftException $exception) {
-                $this->logger->error('Workflow send email template action.', ['exception' => $exception]);
-            }
-        }
+        $emailUsers = $this->sender->send($entity, $this->getRecipientsFromContext($context), $from, $templateName);
 
         $emailUser = reset($emailUsers);
         if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
@@ -160,7 +112,7 @@ class SendEmailTemplate extends AbstractSendEmail
      * @param mixed $context
      * @return array
      */
-    private function getRecipientsFromContext($context): array
+    protected function getRecipientsFromContext($context): array
     {
         $recipients = [];
         foreach ($this->options['to'] as $email) {
@@ -192,11 +144,7 @@ class SendEmailTemplate extends AbstractSendEmail
         $errorList = $this->validator->validate($email, $this->emailConstraint);
 
         if ($errorList && $errorList->count() > 0) {
-            if ($errorList instanceof ConstraintViolationList) {
-                $errorString = \strval($errorList);
-            } else {
-                $errorString = $errorList->get(0)->getMessage();
-            }
+            $errorString = $errorList->get(0)->getMessage();
             throw new ValidatorException(\sprintf("Validating %s (%s):\n%s", $context, $email, $errorString));
         }
     }

@@ -208,6 +208,9 @@ services:
         arguments:
             - '@oro_action.helper.context'
 
+    Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider:
+        alias: oro_action.provider.button_search_context
+
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
         public: true
@@ -217,6 +220,9 @@ services:
             - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_action }
+
+    Oro\Bundle\ActionBundle\Provider\ButtonProvider:
+        alias: oro_action.provider.button
 
     oro_action.provider.button.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'

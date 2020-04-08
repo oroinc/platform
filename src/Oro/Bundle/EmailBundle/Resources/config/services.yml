@@ -541,14 +541,23 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
-            - '@doctrine'
             - '@validator'
-            - '@oro_email.provider.localized_template'
-            - '@oro_email.tools.email_origin_helper'
+            - '@oro_email.sender.aggregated_email_templates'
         calls:
             - [setLogger, ['@logger']]
         tags:
             - { name: oro_action.action, alias: send_email_template }
+
+    oro_email.workflow.action.schedule_send_email_template:
+        parent: oro_email.workflow.action.send_email_template
+        class: Oro\Bundle\EmailBundle\Workflow\Action\ScheduleSendEmailTemplate
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_message_queue.client.message_producer'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: oro_action.action, alias: schedule_send_email_template }
 
     oro_email.helper.datagrid.emails:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
@@ -1271,3 +1280,24 @@ services:
         class: 'Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory'
         arguments:
             - '@oro_security.encoder.default'
+
+    oro_email.sender.aggregated_email_templates:
+        class: 'Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.provider.localized_template'
+            - '@oro_email.tools.email_origin_helper'
+            - '@oro_email.mailer.processor'
+        calls:
+            - [setLogger, ['@logger']]
+
+    oro_email.async.send_email_template:
+        class: 'Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor'
+        arguments:
+            - '@validator'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.sender.aggregated_email_templates'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

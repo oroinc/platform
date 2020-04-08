@@ -32,6 +32,6 @@ class ObjectCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
             ->with($object, 'someScope')
             ->willReturn($expectedString);
         $cacheKey = $this->generator->generate($object, 'someScope');
-        self::assertEquals(md5(get_class($object) . $expectedString), $cacheKey);
+        self::assertEquals(sha1(get_class($object) . $expectedString), $cacheKey);
     }
 }
