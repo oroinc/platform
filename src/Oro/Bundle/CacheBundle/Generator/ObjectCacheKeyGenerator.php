@@ -25,10 +25,10 @@ class ObjectCacheKeyGenerator
      * @param string $scope
      * @return string
      */
-    public function generate($object, string $scope)
+    public function generate($object, string $scope): string
     {
         $result = $this->converter->convertToString($object, $scope);
 
-        return md5(get_class($object) . $result);
+        return sha1(get_class($object) . $result);
     }
 }
