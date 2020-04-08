@@ -3,29 +3,24 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO;
-use Oro\Bundle\EmailBundle\Model\DTO\LocalizedTemplateDTO;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EmailBundle\Model\EmailTemplate;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
+use Oro\Bundle\EmailBundle\Workflow\Action\ScheduleSendEmailTemplate;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -33,12 +28,45 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
+class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
+
+    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailProcessor;
+
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
+
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
+
+    /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizedTemplateProvider;
+
+    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailOriginHelper;
+
     /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
     private $sender;
 
-    /** @var SendEmailTemplate */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProducer;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    protected $dispatcher;
+
+    /** @var ScheduleSendEmailTemplate */
     private $action;
 
     protected function setUp(): void
@@ -54,16 +82,12 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->localizedTemplateProvider = $this->createMock(LocalizedTemplateProvider::class);
         $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
 
-        $this->sender = $this->createMock(AggregatedEmailTemplatesSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->objectManager = $this->createMock(ObjectManager::class);
-        $this->objectRepository = $this->createMock(EmailTemplateRepository::class);
-        $this->emailTemplate = $this->createMock(EmailTemplate::class);
-
-        $this->action = new SendEmailTemplate(
+        $this->action = new ScheduleSendEmailTemplate(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
@@ -71,29 +95,12 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             $this->registry,
             $this->validator,
             $this->localizedTemplateProvider,
-            $this->emailOriginHelper
+            $this->emailOriginHelper,
+            $this->messageProducer
         );
 
         $this->action->setLogger($this->logger);
         $this->action->setDispatcher($this->dispatcher);
-
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($this->objectManager);
-
-        $this->objectManager
-            ->method('getRepository')
-            ->willReturn($this->objectRepository);
-
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->any())
-            ->method('getName')
-            ->willReturn(\stdClass::class);
-
-        $this->objectManager->expects($this->any())
-            ->method('getClassMetadata')
-            ->with(\stdClass::class)
-            ->willReturn($classMetadata);
     }
 
     /**
@@ -122,9 +129,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ],
             'no from email' => [
                 'options' => [
-                    'to' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'to' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'from' => ['name' => 'Test'],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -137,9 +142,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ],
             'no to email' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['name' => 'Test'],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -147,9 +150,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ],
             'recipients in not an array' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'recipients' => 'some@recipient.com',
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -157,9 +158,7 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ],
             'no to email in one of addresses' => [
                 'options' => [
-                    'from' => 'test@test.com',
-                    'template' => 'test',
-                    'entity' => new \stdClass(),
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['test@test.com', ['name' => 'Test']],
                 ],
                 'exceptionName' => InvalidParameterException::class,
@@ -310,33 +309,6 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
     }
 
     /**
-     * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
-     *
-     * @expectedException \Doctrine\ORM\EntityNotFoundException
-     */
-    public function testExecuteWithoutTemplateEntity(): void
-    {
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->willThrowException(new EntityNotFoundException());
-
-        $this->emailProcessor->expects($this->never())
-            ->method('process');
-
-        $this->action->initialize(
-            [
-                'from' => 'test@test.com',
-                'to' => 'test@test.com',
-                'template' => 'test',
-                'subject' => 'subject',
-                'body' => 'body',
-                'entity' => new \stdClass(),
-            ]
-        );
-        $this->action->execute([]);
-    }
-
-    /**
      * @param string $violationMessage
      */
     private function mockValidatorViolations(string $violationMessage)
@@ -386,58 +358,13 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
         $this->action->execute([]);
     }
 
-    public function testExecuteWithProcessException(): void
-    {
-        $rcpt = new EmailAddressDTO('test@test.com');
-
-        $dto = new LocalizedTemplateDTO($this->emailTemplate);
-        $dto->addRecipient($rcpt);
-
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->with([$rcpt], new EmailTemplateCriteria('test', \stdClass::class), ['entity' => new \stdClass()])
-            ->willReturn([$dto]);
-
-        $this->emailTemplate->expects($this->once())
-            ->method('getType')
-            ->willReturn('plain/text');
-
-        $emailOrigin = new TestEmailOrigin();
-        $this->emailOriginHelper->expects($this->once())
-            ->method('getEmailOrigin')
-            ->with('test@test.com', null)
-            ->willReturn($emailOrigin);
-
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
-            ->willThrowException(new \Swift_SwiftException('The email was not delivered.'));
-
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with('Workflow send email template action.');
-
-        $this->action->initialize(
-            [
-                'from' => 'test@test.com',
-                'to' => 'test@test.com',
-                'template' => 'test',
-                'subject' => 'subject',
-                'body' => 'body',
-                'entity' => new \stdClass(),
-            ]
-        );
-        $this->action->execute([]);
-    }
-
     /**
      * @dataProvider executeOptionsDataProvider
      *
      * @param array $options
-     * @param string|object $recipient
      * @param array $expected
      */
-    public function testExecuteWhenNoSender(array $options, $recipient, array $expected): void
+    public function testExecute(array $options, array $expected): void
     {
         $context = [];
 
@@ -449,27 +376,21 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                 }
             );
 
-        if (!$recipient instanceof EmailHolderInterface) {
-            $recipient = new EmailAddressDTO($recipient);
-        }
+        $entityManager = $this->createMock(EntityManager::class);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
 
-        $dto = new LocalizedTemplateDTO($this->emailTemplate);
-        $dto->addRecipient(is_object($recipient) ? $recipient : new EmailAddressDTO($recipient));
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects($this->any())
+            ->method('getIdentifierValues')
+            ->with($options['entity'])
+            ->willReturn(['id' => 42]);
 
-        $this->localizedTemplateProvider->expects($this->once())
-            ->method('getAggregated')
-            ->with([$recipient], new EmailTemplateCriteria('test', \stdClass::class), ['entity' => new \stdClass()])
-            ->willReturn([$dto]);
-
-        $this->emailTemplate->expects($this->once())
-            ->method('getType')
-            ->willReturn('plain/text');
-        $this->emailTemplate->expects($this->once())
-            ->method('getSubject')
-            ->willReturn($expected['subject']);
-        $this->emailTemplate->expects($this->once())
-            ->method('getContent')
-            ->willReturn($expected['body']);
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(\stdClass::class)
+            ->willReturn($classMetadata);
 
         $emailEntity = $this->createMock(Email::class);
 
@@ -478,77 +399,19 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
             ->method('getEmail')
             ->willReturn($emailEntity);
 
-        $emailOrigin = new TestEmailOrigin();
-        $this->emailOriginHelper->expects($this->once())
-            ->method('getEmailOrigin')
-            ->with($expected['from'], null)
-            ->willReturn($emailOrigin);
-
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
-            ->with(
-                (new Email())
-                    ->setFrom($expected['from'])
-                    ->setSubject($expected['subject'])
-                    ->setBody($expected['body'])
-                    ->setTo($expected['to'])
-                    ->setType('text'),
-                $emailOrigin
-            )
-            ->willReturn($emailUserEntity);
-
-        if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
-                ->method('setValue')
-                ->with($context, $options['attribute'], $emailEntity);
-        }
-
-        $this->action->initialize($options);
-        $this->action->execute($context);
-    }
-
-    /**
-     * @dataProvider executeOptionsDataProvider
-     *
-     * @param array $options
-     * @param string|object $recipient
-     * @param array $expected
-     */
-    public function testExecute(array $options, $recipient, array $expected): void
-    {
-        $context = [];
-
-        $this->entityNameResolver->expects($this->any())
-            ->method('getName')
-            ->willReturnCallback(
-                static function () {
-                    return '_Formatted';
-                }
-            );
-
-        if (!$recipient instanceof EmailHolderInterface) {
-            $recipient = new EmailAddressDTO($recipient);
-        }
-
-        $emailEntity = $this->createMock(Email::class);
-
-        $emailUserEntity = $this->createMock(EmailUser::class);
-        $emailUserEntity->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($emailEntity);
-
-        $this->sender->expects($this->once())
+        $this->messageProducer->expects($this->once())
             ->method('send')
-            ->with(new \stdClass(), [$recipient], $expected['from'], 'test')
+            ->with(
+                Topics::SEND_EMAIL_TEMPLATE,
+                [
+                    'from' => $expected['from'],
+                    'templateName' => $options['template'],
+                    'recipients' =>  $expected['to'],
+                    'entity' => [\stdClass::class, 42]
+                ]
+            )
             ->willReturn([$emailUserEntity]);
 
-        if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
-                ->method('setValue')
-                ->with($context, $options['attribute'], $emailEntity);
-        }
-
-        $this->action->setSender($this->sender);
         $this->action->initialize($options);
         $this->action->execute($context);
     }
@@ -574,14 +437,10 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                'test@test.com',
                 [
                     'from' => 'test@test.com',
                     'to' => ['test@test.com'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'simple with name' => [
                 [
@@ -590,14 +449,10 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'extended' => [
                 [
@@ -612,14 +467,10 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'extended with name formatting' => [
                 [
@@ -634,14 +485,10 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                '"_Formatted" <test@test.com>',
                 [
                     'from' => '"_Formatted" <test@test.com>',
                     'to' => ['"_Formatted" <test@test.com>'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
             'with recipients' => [
                 [
@@ -650,14 +497,10 @@ class SendEmailTemplateTest extends AbstractSendEmailTemplateTest
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
-                $recipient,
                 [
                     'from' => 'test@test.com',
                     'to' => ['recipient@test.com'],
-                    'subject' => 'Test subject',
-                    'body' => 'Test body',
                 ],
-                'de',
             ],
         ];
     }

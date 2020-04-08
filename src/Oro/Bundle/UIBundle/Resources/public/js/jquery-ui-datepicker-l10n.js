@@ -25,6 +25,7 @@ define(function(require) {
         dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
         // ["Su","Mo","Tu","We","Th","Fr","Sa"] Column headings for days starting at Sunday
         dayNamesMin: localeSettings.getCalendarDayOfWeekNames('narrow', true),
+        weekDay: 'dddd Do',
         weekHeader: __('oro.ui.datepicker.wk'), // Column header for week of the year
         // See format options on parseDate
         dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
