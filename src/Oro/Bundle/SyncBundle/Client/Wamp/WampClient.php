@@ -59,17 +59,41 @@ class WampClient extends GosClient
 
         $this->verifyResponse($response);
 
-        $payload = json_decode($this->read());
+        $payload = json_decode($this->read(), true);
+        if (isset($payload[0], $payload[1])) {
+            if ((int)$payload[0] !== Protocol::MSG_WELCOME) {
+                throw new BadResponseException('WAMP Server did not send welcome message.');
+            }
 
-        if ((int)$payload[0] !== Protocol::MSG_WELCOME) {
-            throw new BadResponseException('WAMP Server did not send welcome message.');
+            $this->sessionId = $payload[1];
+            $this->connected = true;
         }
 
-        $this->sessionId = $payload[1];
-
-        $this->connected = true;
-
         return $this->sessionId;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Taken from the 1.0 version of WAMP client of GeniusesOfSymfony/WebSocketPhpClient.
+     *
+     * @throws BadResponseException
+     */
+    protected function read(): string
+    {
+        $streamBody = stream_get_contents($this->socket, stream_get_meta_data($this->socket)['unread_bytes']);
+        if (false === $streamBody) {
+            throw new BadResponseException('The stream buffer could not be read.');
+        }
+
+        $startPos = strpos($streamBody, '[');
+        $endPos = strpos($streamBody, ']');
+
+        if (false === $startPos || false === $endPos) {
+            throw new BadResponseException('Could not extract response body from stream.');
+        }
+
+        return substr($streamBody, $startPos, $endPos);
     }
 
     /**
