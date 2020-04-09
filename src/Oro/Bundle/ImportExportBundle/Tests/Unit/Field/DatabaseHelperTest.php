@@ -118,12 +118,12 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($found, $this->helper->find(self::TEST_CLASS, $identifier));
     }
 
-    public function testFindObjectFromEnotherOrganization()
+    public function testFindObjectFromAnotherOrganization()
     {
         $entityOrganization = new TestOrganization();
         $entityOrganization->setId(2);
         $entity = new TestEntity();
-        $entity->getOrganization($entityOrganization);
+        $entity->setOrganization($entityOrganization);
         $identifier = 1;
         $entity->setId($identifier);
 
@@ -158,6 +158,37 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($metadata);
 
         $this->assertNull($this->helper->find(self::TEST_CLASS, $identifier));
+    }
+
+    public function testFindObjectFromAnotherOrganizationWithoutLimitations(): void
+    {
+        $currentOrganization = new TestOrganization();
+        $currentOrganization->setId(1);
+
+        $entityOrganization = new TestOrganization();
+        $entityOrganization->setId(2);
+
+        $identifier = 42;
+
+        $entity = new TestEntity();
+        $entity->setId($identifier);
+        $entity->setOrganization($entityOrganization);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntity')
+            ->with(self::TEST_CLASS, $identifier)
+            ->willReturn($entity);
+
+        $this->tokenAccessor->expects($this->never())
+            ->method($this->anything());
+
+        $this->fieldHelperService->expects($this->never())
+            ->method('getObjectValue');
+
+        $this->ownershipMetadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        $this->assertSame($entity, $this->helper->find(self::TEST_CLASS, $identifier, false));
     }
 
     public function testGetIdentifier()
@@ -239,6 +270,24 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($fieldName));
 
         $this->helper->resetIdentifier($entity);
+    }
+
+    public function testGetOwnerFieldName(): void
+    {
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(\stdClass::class)
+            ->willReturn(
+                new OwnershipMetadata(
+                    'USER',
+                    'owner',
+                    'owner_id',
+                    'organization',
+                    'organization_id'
+                )
+            );
+
+        $this->assertEquals('owner', $this->helper->getOwnerFieldName(\stdClass::class));
     }
 
     /**

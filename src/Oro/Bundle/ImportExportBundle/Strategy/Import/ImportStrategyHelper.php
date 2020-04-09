@@ -122,15 +122,18 @@ class ImportStrategyHelper
     /**
      * @param ContextInterface $context
      * @param object $entity
+     * @param bool $suppressErrorOutput
      * @return bool
      */
-    public function checkEntityOwnerPermissions(ContextInterface $context, $entity)
+    public function checkEntityOwnerPermissions(ContextInterface $context, $entity, bool $suppressErrorOutput = false)
     {
         if (!$this->ownerChecker->isOwnerCanBeSet($entity)) {
-            $error = $this->translator->trans(
-                'oro.importexport.import.errors.wrong_owner'
-            );
-            $this->addValidationErrors([$error], $context);
+            if (!$suppressErrorOutput) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.wrong_owner'
+                );
+                $this->addValidationErrors([$error], $context);
+            }
 
             return false;
         }
