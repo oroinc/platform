@@ -551,6 +551,18 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->helper->checkEntityOwnerPermissions($context, $entity));
     }
 
+    public function testCheckEntityOwnerCanBeSet(): void
+    {
+        $entity = new \stdClass();
+
+        $this->ownerChecker->expects($this->once())
+            ->method('isOwnerCanBeSet')
+            ->with($entity)
+            ->willReturn(true);
+
+        $this->assertTrue($this->helper->checkEntityOwnerCanBeSet($entity));
+    }
+
     public function testCheckImportedEntityFieldsAclGrantedForNewEntity()
     {
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */

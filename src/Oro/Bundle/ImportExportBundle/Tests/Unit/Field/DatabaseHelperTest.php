@@ -102,6 +102,25 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testFindEntity()
+    {
+        $entity = new \stdClass();
+        $identifier = 1;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntity')
+            ->with(self::TEST_CLASS, $identifier)
+            ->will($this->returnValue($entity));
+
+        $this->tokenAccessor->expects($this->never())
+            ->method('getOrganization');
+
+        $found = $this->helper->findEntity(self::TEST_CLASS, $identifier);
+        $this->assertEquals($entity, $found);
+
+        $this->assertSame($found, $this->helper->findEntity(self::TEST_CLASS, $identifier));
+    }
+
     public function testFind()
     {
         $entity = new \stdClass();
@@ -118,12 +137,12 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($found, $this->helper->find(self::TEST_CLASS, $identifier));
     }
 
-    public function testFindObjectFromEnotherOrganization()
+    public function testFindObjectFromAnotherOrganization()
     {
         $entityOrganization = new TestOrganization();
         $entityOrganization->setId(2);
         $entity = new TestEntity();
-        $entity->getOrganization($entityOrganization);
+        $entity->setOrganization($entityOrganization);
         $identifier = 1;
         $entity->setId($identifier);
 
@@ -239,6 +258,24 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($fieldName));
 
         $this->helper->resetIdentifier($entity);
+    }
+
+    public function testGetOwnerFieldName(): void
+    {
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(\stdClass::class)
+            ->willReturn(
+                new OwnershipMetadata(
+                    'USER',
+                    'owner',
+                    'owner_id',
+                    'organization',
+                    'organization_id'
+                )
+            );
+
+        $this->assertEquals('owner', $this->helper->getOwnerFieldName(\stdClass::class));
     }
 
     /**
