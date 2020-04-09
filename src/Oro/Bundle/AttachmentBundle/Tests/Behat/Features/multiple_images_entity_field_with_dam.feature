@@ -20,6 +20,8 @@ Feature: Multiple Images entity field with DAM
     And I fill form with:
       | Label                   | Custom Images |
       | File Size (MB)          | 10           |
+      | Thumbnail Width         | 64           |
+      | Thumbnail Height        | 64           |
       | Maximum Number Of Files | 3            |
       | Use DAM                 | Yes          |
       | File Applications       | [default]    |
