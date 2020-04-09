@@ -249,6 +249,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     {
         $entityName = ClassUtils::getClass($entity);
         $fields = $this->fieldHelper->getFields($entityName, true);
+        $ownerFieldName = $this->databaseHelper->getOwnerFieldName($entityName);
 
         foreach ($fields as $field) {
             if ($this->fieldHelper->isRelation($field)) {
@@ -266,7 +267,20 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 if ($this->fieldHelper->isSingleRelation($field)) {
                     // single relation
                     $relationEntity = $this->getObjectValue($entity, $fieldName);
-                    if ($relationEntity) {
+                    $ownerEntity = null;
+
+                    if ($relationEntity && $ownerFieldName === $fieldName) {
+                        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($relationEntity);
+                        if ($identifier) {
+                            $ownerEntity = $this->databaseHelper->find(
+                                $this->doctrineHelper->getEntityClass($relationEntity),
+                                $identifier,
+                                false
+                            );
+                        }
+                    }
+
+                    if ($relationEntity && !$ownerEntity) {
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
                         $relationEntity = $this->processEntity(
                             $relationEntity,
@@ -277,7 +291,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             true
                         );
                     }
-                    $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, $ownerEntity ?: $relationEntity);
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
                     // multiple relation
                     $relationCollection = $this->getObjectValue($entity, $fieldName);

@@ -1,58 +1,12 @@
 Transition Actions
-=======================
+==================
 
 Table of Contents
 -----------------
- - [Add Custom Action](#add-custom-action)
- - [Configuration Syntax](#configuration-syntax)
+
  - [Create Related Entity](#create-related-entity)
  - [Start Workflow](#start-workflow)
  - [Transit Workflow](#transit-workflow)
-
-Add Custom Action
-----------------------
-
-To add custom action add a service to DIC with tag "oro_action.action", for example:
-
-```
-services:
-    Oro\Component\Action\Action\CloseWorkflow:
-        tags:
-            - { name: oro_action.action, alias: close_workflow }
-```
-
-Symbol "|" in alias can be used to have several aliases. Note that service class must implement
-Oro\Component\Action\Action\ActionInterface.
-
-Configuration Syntax
---------------------
-
-Each action can be optionally configured with condition. It allows to implement more sufficient logic in
-transitions definitions. If condition is not satisfied action won't be executed.
-
-If flag "break_on_failure" is specified action throws an exception on error, otherwise logs error using standard
-logger.
-
-See syntax examples:
-
-**Full Configuration Example**
-
-```
-- @alias_of_action:
-    conditions:
-        # optional condition configuration
-    parameters:
-        - some_parameters: some_value
-        # other parameters of action
-    break_on_failure: boolean # by default false
-```
-
-**Short Configuration Example**
-```
-- @alias_of_action:
-    - some_parameters: some_value
-    # other parameters of action
-```
 
 
 Create Related Entity

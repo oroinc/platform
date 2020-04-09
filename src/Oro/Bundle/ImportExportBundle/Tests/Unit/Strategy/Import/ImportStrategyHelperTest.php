@@ -551,6 +551,26 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->helper->checkEntityOwnerPermissions($context, $entity));
     }
 
+    public function testCheckEntityOwnerPermissionsDeniedWhenSuppressErrors(): void
+    {
+        $context = $this->createMock(ContextInterface::class);
+        $context
+            ->method('getReadOffset')
+            ->willReturn(1);
+
+        $entity = new \stdClass();
+
+        $this->ownerChecker->expects($this->once())
+            ->method('isOwnerCanBeSet')
+            ->with($entity)
+            ->willReturn(false);
+
+        $context->expects($this->never())
+            ->method('addError');
+
+        $this->assertFalse($this->helper->checkEntityOwnerPermissions($context, $entity, true));
+    }
+
     public function testCheckImportedEntityFieldsAclGrantedForNewEntity()
     {
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
