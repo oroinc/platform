@@ -61,7 +61,7 @@ class WampClient extends GosClient
 
         $payload = json_decode($this->read());
 
-        if ((int)$payload[0] !== Protocol::MSG_WELCOME) {
+        if (empty($payload) || (int)$payload[0] !== Protocol::MSG_WELCOME) {
             throw new BadResponseException('WAMP Server did not send welcome message.');
         }
 
