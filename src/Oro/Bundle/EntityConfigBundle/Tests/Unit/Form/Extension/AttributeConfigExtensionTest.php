@@ -99,18 +99,13 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
         $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
         $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
-        $attributeTypeBuilder->expects($this->exactly(4))
-            ->method('remove')
-            ->withConsecutive(
-                ['searchable'],
-                ['filterable'],
-                ['filter_by'],
-                ['sortable']
-            );
 
         $this->builder->add($attributeTypeBuilder);
+        $this->assertTrue($this->builder->has('attribute'));
 
         $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+
+        $this->assertFalse($this->builder->has('attribute'));
     }
 
     /**

@@ -290,7 +290,10 @@ class Processor
     {
         /** @var EmailAttachmentModel $emailAttachmentModel */
         foreach ($model->getAttachments() as $emailAttachmentModel) {
-            $attachment      = $emailAttachmentModel->getEmailAttachment();
+            $attachment = $emailAttachmentModel->getEmailAttachment();
+            if (!$attachment) {
+                continue;
+            }
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -312,6 +315,9 @@ class Processor
         /** @var EmailAttachmentModel $emailAttachmentModel */
         foreach ($model->getAttachments() as $emailAttachmentModel) {
             $attachment = $emailAttachmentModel->getEmailAttachment();
+            if (!$attachment) {
+                continue;
+            }
 
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);

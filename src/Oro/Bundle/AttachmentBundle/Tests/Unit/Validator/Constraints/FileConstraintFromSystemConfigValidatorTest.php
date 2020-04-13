@@ -3,9 +3,8 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -49,14 +48,18 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
     /**
      * @dataProvider validateDataProvider
      *
-     * @param Constraint $constraint
+     * @param FileConstraintFromSystemConfig $constraint
      * @param int $expectedMaxSize
      * @param array $expectedMimeTypes
      */
-    public function testValidate(Constraint $constraint, int $expectedMaxSize, array $expectedMimeTypes): void
-    {
+    public function testValidate(
+        FileConstraintFromSystemConfig $constraint,
+        int $expectedMaxSize,
+        array $expectedMimeTypes
+    ): void {
         $this->fileConstraintsProvider
-            ->method('getMaxSize')
+            ->method('getMaxSizeByConfigPath')
+            ->with($constraint->maxSizeConfigPath)
             ->willReturn(self::MAX_SIZE);
 
         $this->fileConstraintsProvider
@@ -81,22 +84,31 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
     {
         return [
             'maxsize and mime types are not specified in constraint' => [
-                new File(),
+                new FileConstraintFromSystemConfig(),
                 self::MAX_SIZE,
                 self::MIME_TYPES,
             ],
             'maxSize is specified in constraint' => [
-                new File(['maxSize' => self::MAX_SIZE2]),
+                new FileConstraintFromSystemConfig(['maxSize' => self::MAX_SIZE2]),
                 self::MAX_SIZE2,
                 self::MIME_TYPES,
             ],
             'maxSize, mimeTypes are specified in constraint' => [
-                new File(['maxSize' => self::MAX_SIZE2, 'mimeTypes' => self::MIME_TYPES2]),
+                new FileConstraintFromSystemConfig(['maxSize' => self::MAX_SIZE2, 'mimeTypes' => self::MIME_TYPES2]),
+                self::MAX_SIZE2,
+                self::MIME_TYPES2,
+            ],
+            'maxSize, mimeTypes and maxSizeConfigPath are specified in constraint' => [
+                new FileConstraintFromSystemConfig([
+                    'maxSize' => self::MAX_SIZE2,
+                    'mimeTypes' => self::MIME_TYPES2,
+                    'maxSizeConfigPath' => 'config.max_size'
+                ]),
                 self::MAX_SIZE2,
                 self::MIME_TYPES2,
             ],
             'mimeTypes is specified in constraint' => [
-                new File(['mimeTypes' => self::MIME_TYPES2]),
+                new FileConstraintFromSystemConfig(['mimeTypes' => self::MIME_TYPES2]),
                 self::MAX_SIZE,
                 self::MIME_TYPES2,
             ],

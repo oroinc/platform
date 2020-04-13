@@ -8,6 +8,9 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+/**
+ * Form block type.
+ */
 class FormType extends AbstractType
 {
     const NAME = 'form';
@@ -52,13 +55,13 @@ class FormType extends AbstractType
             'form',
             'additional_block_prefixes',
             'instance_name',
+            'render_rest',
         ]);
 
         $this->addBlockType($builder, 'form_end', $options, [
             'form',
             'additional_block_prefixes',
             'instance_name',
-            'render_rest',
         ]);
     }
 

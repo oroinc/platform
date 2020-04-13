@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -74,6 +74,11 @@ class EmailModelBuilder
     private $htmlTagHelper;
 
     /**
+     * @var FileConstraintsProvider
+     */
+    private $fileConstraintsProvider;
+
+    /**
      * @param EmailModelBuilderHelper $emailModelBuilderHelper
      * @param EntityManager $entityManager
      * @param ConfigManager $configManager
@@ -82,6 +87,7 @@ class EmailModelBuilder
      * @param Factory $factory
      * @param RequestStack $requestStack
      * @param HtmlTagHelper $htmlTagHelper
+     * @param FileConstraintsProvider $fileConstraintsProvider
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
@@ -91,16 +97,18 @@ class EmailModelBuilder
         EmailAttachmentProvider $emailAttachmentProvider,
         Factory $factory,
         RequestStack $requestStack,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        FileConstraintsProvider $fileConstraintsProvider
     ) {
-        $this->helper               = $emailModelBuilderHelper;
-        $this->entityManager        = $entityManager;
-        $this->configManager        = $configManager;
+        $this->helper = $emailModelBuilderHelper;
+        $this->entityManager = $entityManager;
+        $this->configManager = $configManager;
         $this->activityListProvider = $activityListProvider;
         $this->emailAttachmentProvider = $emailAttachmentProvider;
         $this->factory = $factory;
         $this->requestStack = $requestStack;
         $this->htmlTagHelper = $htmlTagHelper;
+        $this->fileConstraintsProvider = $fileConstraintsProvider;
     }
 
     /**
@@ -248,7 +256,7 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel  $emailModel
+     * @param EmailModel $emailModel
      * @param EmailEntity $parentEmailEntity
      */
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
@@ -280,7 +288,7 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel  $emailModel
+     * @param EmailModel $emailModel
      * @param EmailEntity $parentEmailEntity
      */
     protected function initReplyAllFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
@@ -419,7 +427,7 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel  $emailModel
+     * @param EmailModel $emailModel
      * @param EmailEntity $emailEntity
      */
     protected function applyEntityDataFromEmail(EmailModel $emailModel, EmailEntity $emailEntity)
@@ -447,7 +455,7 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel  $emailModel
+     * @param EmailModel $emailModel
      * @param EmailEntity $emailEntity
      */
     protected function applyAttachments(EmailModel $emailModel, EmailEntity $emailEntity)
@@ -476,11 +484,11 @@ class EmailModelBuilder
         $attachments = [];
 
         if ($emailModel->getParentEmailId()) {
-            $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+            $parentEmail = $this->entityManager->getRepository(EmailEntity::class)
                 ->find($emailModel->getParentEmailId());
             $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
             $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
-            $attachments = array_merge($attachments, $threadAttachments);
+            $attachments = $threadAttachments;
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
             $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
@@ -493,6 +501,9 @@ class EmailModelBuilder
             }
         }
 
+        $attachments = $this->filterAttachmentsByEmailMaxFileSize($attachments);
+        $attachments = $this->filterAttachmentsByMimeTypes($attachments);
+
         $emailModel->setAttachmentsAvailable($attachments);
     }
 
@@ -503,20 +514,54 @@ class EmailModelBuilder
      */
     protected function filterAttachmentsByName($attachments)
     {
-        $collection = new ArrayCollection($attachments);
         $fileNames = [];
 
-        $filtered = $collection->filter(function ($entry) use (&$fileNames) {
-            /** @var EmailAttachment $entry */
-            if (in_array($entry->getFileName(), $fileNames)) {
-                return false;
-            } else {
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use (&$fileNames) {
+                if (\in_array($entry->getFileName(), $fileNames, true)) {
+                    return false;
+                }
+
                 $fileNames[] = $entry->getFileName();
 
                 return true;
             }
-        });
+        );
+    }
 
-        return $filtered->toArray();
+    /**
+     * @param array $attachments
+     * @return array
+     */
+    private function filterAttachmentsByEmailMaxFileSize(array $attachments): array
+    {
+        $maxFileSize = (float)$this->fileConstraintsProvider->getMaxSizeByConfigPath('oro_email.attachment_max_size');
+        if ($maxFileSize === 0.0) {
+            return $attachments;
+        }
+
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use ($maxFileSize) {
+                return $entry->getFileSize() <= $maxFileSize;
+            }
+        );
+    }
+
+    /**
+     * @param array $attachments
+     * @return array
+     */
+    private function filterAttachmentsByMimeTypes(array $attachments): array
+    {
+        $mimeTypes = $this->fileConstraintsProvider->getMimeTypes();
+
+        return array_filter(
+            $attachments,
+            static function (EmailAttachment $entry) use ($mimeTypes) {
+                return \in_array($entry->getMimeType(), $mimeTypes, true);
+            }
+        );
     }
 }

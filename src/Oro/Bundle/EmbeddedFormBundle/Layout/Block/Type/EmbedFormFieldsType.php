@@ -70,6 +70,7 @@ class EmbedFormFieldsType extends AbstractFormType
                 'form_group_prefix' => function (Options $options, $value) {
                     return null === $value ? $options['form_prefix'] . ':group_' : $value;
                 },
+                'render_rest' => true,
             ]
         );
         $resolver->setDefined(['form_data']);
@@ -90,7 +91,7 @@ class EmbedFormFieldsType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['form_data']);
+        BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'render_rest']);
         parent::buildView($view, $block, $options);
     }
 

@@ -61,6 +61,7 @@ class Configuration implements ConfigurationInterface
                 'show_recent_emails_in_user_bar' => ['value' => true],
                 'attachment_sync_enable' => ['value' => true],
                 'attachment_sync_max_size' => ['value' => 50],
+                'attachment_max_size' => ['value' => 10],
                 'attachment_preview_limit' => ['value' => 8],
                 'sanitize_html' => ['value' => false],
                 'threads_grouping' => ['value' => true],

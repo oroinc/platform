@@ -114,16 +114,6 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeSortable($this->attribute));
     }
 
-    public function testIsAttributeVisible()
-    {
-        $this->attributeConfig->expects($this->once())
-            ->method('is')
-            ->with('visible')
-            ->willReturn(true);
-
-        $this->assertTrue($this->provider->isAttributeVisible($this->attribute));
-    }
-
     /**
      * @param ConfigInterface $config
      * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject

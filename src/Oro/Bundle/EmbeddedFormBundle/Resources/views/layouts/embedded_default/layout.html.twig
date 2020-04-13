@@ -12,6 +12,9 @@
 
 {% block embed_form_fields_widget %}
     {{ block_widget(block) }}
+    {% if render_rest %}
+        {{ form_rest(form) }}
+    {% endif %}
 {% endblock %}
 
 {% block embed_form_end_widget %}

@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Reorganizes form fields on the attribute configuration page
+ */
 class AttributeConfigExtension extends AbstractTypeExtension
 {
     use AttributeConfigExtensionApplicableTrait;
@@ -69,17 +72,14 @@ class AttributeConfigExtension extends AbstractTypeExtension
             return;
         }
 
-        $attribute = $builder->get('attribute');
-
         $attributeType = $this->attributeTypeRegistry->getAttributeType($configModel);
         if (!$attributeType) {
-            $attribute->remove('searchable');
-            $attribute->remove('filterable');
-            $attribute->remove('filter_by');
-            $attribute->remove('sortable');
+            $builder->remove('attribute');
 
             return;
         }
+
+        $attribute = $builder->get('attribute');
 
         if (!$attributeType->isSearchable($configModel)) {
             $attribute->remove('searchable');

@@ -43,6 +43,7 @@ class FileConstraintFromSystemConfigValidator extends ConstraintValidator
     }
 
     /**
+     * @param FileConstraintFromSystemConfig $constraint
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint): void
@@ -51,8 +52,9 @@ class FileConstraintFromSystemConfigValidator extends ConstraintValidator
             $constraint->mimeTypes = $this->fileConstraintsProvider->getMimeTypes();
         }
 
-        if (empty($constraint->maxSize)) {
-            $constraint->maxSize = $this->fileConstraintsProvider->getMaxSize();
+        if (empty($constraint->maxSize) && $constraint->maxSizeConfigPath) {
+            $constraint->maxSize = $this->fileConstraintsProvider
+                ->getMaxSizeByConfigPath($constraint->maxSizeConfigPath);
         }
 
         $this->fileValidator->validate($value, $constraint);

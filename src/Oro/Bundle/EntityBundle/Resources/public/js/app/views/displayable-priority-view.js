@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         render: function() {
-            this._setPriorityDisabledStateByElement($('input[data-field="is_displayable"]'));
+            this._setPriorityDisabledStateByElement($('select[data-field="is_displayable"]'));
 
             return DisplayablePriorityView.__super__.render.call(this);
         },

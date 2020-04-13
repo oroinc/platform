@@ -184,6 +184,19 @@ system_configuration:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
                 required: false
 
+        oro_email.attachment_max_size:
+            data_type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            search_type: text
+            priority: 60
+            options:
+                label: oro.email.system_configuration.attachment.max_size.label
+                tooltip: oro.email.system_configuration.attachment.max_size.tooltip
+                required: true
+                constraints:
+                    - NotBlank: ~
+                    - GreaterThanOrEqual: 0
+
         oro_email.attachment_sync_enable:
             data_type: boolean
             type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
@@ -274,6 +287,7 @@ system_configuration:
                                             - oro_email.default_button_reply
                                     attachment_configuration:
                                         children:
+                                            - oro_email.attachment_max_size
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
                                             - oro_email.attachment_preview_limit

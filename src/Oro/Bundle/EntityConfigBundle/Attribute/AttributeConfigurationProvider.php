@@ -97,16 +97,6 @@ class AttributeConfigurationProvider implements AttributeConfigurationProviderIn
 
     /**
      * @param FieldConfigModel $attribute
-     *
-     * @return bool
-     */
-    public function isAttributeVisible(FieldConfigModel $attribute)
-    {
-        return $this->getConfig($attribute)->is('visible');
-    }
-
-    /**
-     * @param FieldConfigModel $attribute
      * @param string $scope
      *
      * @return ConfigInterface

@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Constraints\File;
  */
 class FileConstraintFromSystemConfig extends File
 {
+    /** @var string */
+    public $maxSizeConfigPath = 'oro_attachment.maxsize';
+
     /**
      * {@inheritdoc}
      */

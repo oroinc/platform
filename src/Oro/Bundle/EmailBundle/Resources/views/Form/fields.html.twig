@@ -111,7 +111,8 @@
             'id': attachment.id,
             'type': attachment.type,
             'fileName': attachment.fileName,
-            'icon': attachment.icon
+            'icon': attachment.icon,
+            'errors': attachment.errors
         } %}
         {% set entityAttachmentsArray = entityAttachmentsArray|merge([entityAttachmentArray]) %}
     {% endfor %}

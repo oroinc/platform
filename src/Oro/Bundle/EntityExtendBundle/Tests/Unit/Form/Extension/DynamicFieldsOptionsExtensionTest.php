@@ -16,7 +16,6 @@ class DynamicFieldsOptionsExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                'dynamic_fields_disabled' => false,
                 'dynamic_fields_ignore_exception' => false,
                 'is_dynamic_field' => false
             ],
