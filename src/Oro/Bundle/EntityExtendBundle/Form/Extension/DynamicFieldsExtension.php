@@ -12,6 +12,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -184,7 +185,11 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        parent::configureOptions($resolver);
+        $resolver->setDefaults(
+            [
+                'dynamic_fields_disabled' => false,
+            ]
+        );
     }
 
     /**
@@ -293,6 +298,6 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
      */
     public static function getExtendedTypes(): array
     {
-        return [];
+        return [FormType::class];
     }
 }
