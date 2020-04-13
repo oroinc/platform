@@ -139,6 +139,15 @@ class ImportStrategyHelper
     }
 
     /**
+     * @param object $entity
+     * @return bool
+     */
+    public function checkEntityOwnerCanBeSet($entity): bool
+    {
+        return $this->ownerChecker->isOwnerCanBeSet($entity);
+    }
+
+    /**
      * @param ContextInterface $context
      * @param object $entity
      * @param object|null $existingEntity

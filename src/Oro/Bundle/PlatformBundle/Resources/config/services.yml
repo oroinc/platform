@@ -151,3 +151,17 @@ services:
         class: Oro\Bundle\PlatformBundle\EventListener\MaintenancePropagationListener
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1024 }
+
+    oro_platform.maintenance_listener:
+        decorates: lexik_maintenance.listener
+        decoration_priority: 100
+        parent: lexik_maintenance.listener
+        class: Oro\Bundle\PlatformBundle\EventListener\MaintenanceListener
+
+    oro_platform.decorator.maintenance_listener:
+        decorates: lexik_maintenance.listener
+        class: Oro\Bundle\PlatformBundle\EventListener\MaintenanceListenerDecorator
+        arguments:
+            - '@oro_platform.decorator.maintenance_listener.inner'
+            - '@lexik_maintenance.driver.factory'
+            - '@router_listener'

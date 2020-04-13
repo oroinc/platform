@@ -12,6 +12,9 @@ use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Transform attachment entity to model
+ */
 class EmailAttachmentTransformer
 {
     /**
@@ -59,15 +62,17 @@ class EmailAttachmentTransformer
      */
     public function entityToModel(AttachmentEntity $attachmentEntity)
     {
+        $mimeType = $attachmentEntity->getContentType();
         $attachmentModel = $this->factory->getEmailAttachment();
 
         $attachmentModel->setEmailAttachment($attachmentEntity);
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($attachmentEntity->getId());
         $attachmentModel->setFileSize($attachmentEntity->getSize());
+        $attachmentModel->setMimeType($mimeType);
         $attachmentModel->setModified($attachmentEntity->getEmailBody()->getCreated());
         $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentEntity));
-        if ($this->manager->isImageType($attachmentEntity->getContentType())) {
+        if ($this->manager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
                 $this->emailAttachmentManager->getResizedImageUrl(
                     $attachmentEntity,
@@ -87,15 +92,17 @@ class EmailAttachmentTransformer
      */
     public function oroToModel(AttachmentOro $attachmentOro)
     {
+        $mimeType = $attachmentOro->getFile()->getMimeType();
         $attachmentModel = $this->factory->getEmailAttachment();
 
         $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
         $attachmentModel->setId($attachmentOro->getId());
         $attachmentModel->setFileName($attachmentOro->getFile()->getOriginalFilename());
         $attachmentModel->setFileSize($attachmentOro->getFile()->getFileSize());
+        $attachmentModel->setMimeType($mimeType);
         $attachmentModel->setModified($attachmentOro->getCreatedAt());
         $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentOro->getFile()));
-        if ($this->manager->isImageType($attachmentOro->getFile()->getMimeType())) {
+        if ($this->manager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
                 $this->manager->getResizedImageUrl(
                     $attachmentOro->getFile(),

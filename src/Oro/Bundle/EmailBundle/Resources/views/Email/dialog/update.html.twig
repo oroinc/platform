@@ -31,7 +31,7 @@
             {% endif %}
             <div class="form-container">
                 <form id="{{ form.vars.id}}" name="{{ form.vars.name }}"
-                      method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
+                      method="post" action="{{ app.request.uri|url_add_query_parameters({entityId: entity.entityId}) }}" enctype="multipart/form-data">
                     {% set emailEditorOptions = {
                         entityId: entity.entityId,
                         to: entity.to,
@@ -75,6 +75,7 @@
                             </div>
                         </div>
 
+                        {# To transfer data from php attachment model to JS modify oro_email_attachments_row Form block widget. See: "Form/fields.html.twig" #}
                         {% set emailAttachmentOptions = {
                             popupTriggerButton: '.attach-file',
                             uploadNewButton: '.upload-new',

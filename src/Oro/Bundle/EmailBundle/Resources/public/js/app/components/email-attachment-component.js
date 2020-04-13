@@ -72,6 +72,8 @@ define(function(require) {
             if (this.$popupSelectButton.length && this.$popupContentEl.length) {
                 this.bindEvents();
             }
+            this.$form = options._sourceElement.closest('form');
+            this.applyAttachmentValidation();
         },
 
         /**
@@ -83,7 +85,18 @@ define(function(require) {
             }
             this.$uploadNewButton.off('.' + this.cid);
             this.$popupSelectButton.off('.' + this.cid);
+            this.$form.off('.' + this.cid);
             return EmailAttachmentComponent.__super__.dispose.call(this);
+        },
+
+        applyAttachmentValidation: function() {
+            const self = this;
+            this.$form.on('submit.' + this.cid, function(event) {
+                if (self.$form.find('.attachment-item__errors').length > 0) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
         },
 
         /**

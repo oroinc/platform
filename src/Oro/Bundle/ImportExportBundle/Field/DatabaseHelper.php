@@ -164,6 +164,27 @@ class DatabaseHelper
      * @param int|string $identifier
      * @return object|null
      */
+    public function findEntity($entityName, $identifier)
+    {
+        $storageKey = $this->getStorageKey(
+            [
+                $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName) => $identifier,
+                'without_limitations' => true,
+            ]
+        );
+
+        if (empty($this->entities[$entityName][$storageKey])) {
+            $this->entities[$entityName][$storageKey] = $this->doctrineHelper->getEntity($entityName, $identifier);
+        }
+
+        return $this->entities[$entityName][$storageKey];
+    }
+
+    /**
+     * @param string $entityName
+     * @param int|string $identifier
+     * @return object|null
+     */
     public function find($entityName, $identifier)
     {
         $storageKey = $this->getStorageKey(
@@ -177,6 +198,7 @@ class DatabaseHelper
         $entity = $this->doctrineHelper->getEntity($entityName, $identifier);
 
         if ($entity && $this->shouldBeAddedOrganizationLimits($entityName)) {
+            /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
             $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
             $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
             /** @var FieldHelper $fieldHelper */
@@ -281,6 +303,18 @@ class DatabaseHelper
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $identifierField = $this->getIdentifierFieldName($entityName);
         $entityManager->getClassMetadata($entityName)->setIdentifierValues($entity, [$identifierField => null]);
+    }
+
+    /**
+     * @param $entityName
+     * @return string|null
+     */
+    public function getOwnerFieldName($entityName): ?string
+    {
+        /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
+        $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
+
+        return $ownershipMetadataProvider->getMetadata($entityName)->getOwnerFieldName();
     }
 
     /**
