@@ -117,6 +117,11 @@ oro:
             show_recent_emails_in_user_bar:
                 label: Show recent emails
 
+            attachment:
+                max_size:
+                    label: Maximum Attachment Size, Mb
+                    tooltip: Maximum attachment size, Mb. Attachments with exceeding size will not be uploaded. To unlimit size set to 0.
+
             attachment_sync:
                 enable:
                     label: Enable attachment sync

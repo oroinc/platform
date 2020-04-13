@@ -38,12 +38,15 @@ define(function(require) {
             $(this.listSelector).html('');
 
             this.$el.hide();
-            this.collection.map(this.collectionAdd, this);
+            this.showHideAttachmentRow();
         },
 
         collectionAdd: function(model) {
-            if (!model.get('id')) {
-                this.getItemView(model).fileSelect();
+            if (!model.get('id') && !model.get('fileName')) {
+                const itemView = this.getItemView(model);
+                if (typeof itemView !== 'undefined') {
+                    itemView.fileSelect();
+                }
             } else {
                 this.showHideAttachmentRow();
             }

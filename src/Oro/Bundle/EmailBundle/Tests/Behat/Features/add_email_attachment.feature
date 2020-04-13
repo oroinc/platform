@@ -5,26 +5,65 @@ Feature: Add email attachment
   As a user
   I want to be able to attach a file to an email
 
-  Scenario: Attach a file to email
+  Scenario: Email attachment MIME type validation
     Given I login as administrator
     And I click My Emails in user menu
     And I click "Compose"
     And I fill "Email Form" with:
       | To      | John Doe   |
+      | Subject | Test MIME type email |
+    When I attach "text.txt" file to email
+    Then I should see "text.txt"
+    When I click "Send"
+    Then I should see "The mime type of the file is invalid (\"text/plain\"). Allowed mime types are \"application/msword\", \"application/vnd.ms-excel\", \"application/pdf\", \"application/zip\", \"image/gif\", \"image/jpeg\", \"image/png\"."
+    And I close ui dialog
+
+  Scenario: Email attachment max file size validation
+    Given I go to System / Configuration
+    And I follow "System Configuration/General Setup/Email Configuration" on configuration sidebar
+    And uncheck "Use default" for "Maximum Attachment Size, Mb" field
+    Then I fill in "Maximum Attachment Size, Mb" with "0.001"
+    And I save form
+    Then I should see "Configuration saved" flash message
+
+    When I click My Emails in user menu
+    And I click "Compose"
+    And I fill "Email Form" with:
+      | To      | John Doe   |
+      | Subject | Test Max Size email |
+    And I attach "attachment1.png" file to email
+    Then I should see "attachment1.png"
+    When I click "Send"
+    Then I should see "The file is too large (22588 bytes). Allowed maximum size is 1048 bytes."
+    When I click "Send"
+    Then I should see "The file is too large (22588 bytes). Allowed maximum size is 1048 bytes."
+    And I close ui dialog
+
+  Scenario: Attach a file to email
+    Given I go to System / Configuration
+    And I follow "System Configuration/General Setup/Email Configuration" on configuration sidebar
+    And check "Use default" for "Maximum Attachment Size, Mb" field
+    And I save form
+    Then I should see "Configuration saved" flash message
+
+    When I click My Emails in user menu
+    And I click "Compose"
+    And I fill "Email Form" with:
+      | To      | John Doe   |
       | Subject | Test email |
-    When I attach "attachment1.txt" file to email
-    Then I should see "attachment1.txt"
+    And I attach "attachment1.png" file to email
+    Then I should see "attachment1.png"
     When I click "Send"
     Then I should see "The email was sent" flash message
     When I click on Test email in grid
     Then I should see "1 Attachment"
-    And I should see " atta..1.txt"
+    And I should see " atta..1.png"
 
   Scenario: Attach a file to email's reply
     When I click "Reply"
-    And I attach "attachment2.txt" file to email
-    Then I should see "attachment2.txt"
+    And I attach "attachment2.png" file to email
+    Then I should see "attachment2.png"
     When I click "Send"
     Then I should see "The email was sent" flash message
     Then I should see "1 Attachment"
-    And I should see " atta..2.txt"
+    And I should see " atta..2.png"

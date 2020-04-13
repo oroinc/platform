@@ -138,7 +138,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             new TwigFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
             new TwigFilter(
                 'merge_recursive',
-                ['Oro\Component\PhpUtils\ArrayUtil', 'arrayMergeRecursiveDistinct']
+                [ArrayUtil::class, 'arrayMergeRecursiveDistinct']
             ),
             new TwigFilter('uniqid', 'uniqid'),
             new TwigFilter('floor', 'floor'),
@@ -148,7 +148,8 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             }),
             new TwigFilter('oro_preg_replace', [$this, 'pregReplace']),
             new TwigFilter('oro_sort_by', [$this, 'sortBy']),
-            new TwigFilter('url_decode', 'urldecode')
+            new TwigFilter('url_decode', 'urldecode'),
+            new TwigFilter('url_add_query_parameters', [$this, 'urlAddQueryParameters']),
         ];
     }
 
@@ -533,6 +534,32 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         }
 
         return $subject;
+    }
+
+    /**
+     * @param string $url
+     * @param array $parameters
+     * @return string
+     */
+    public function urlAddQueryParameters(string $url, array $parameters): string
+    {
+        $urlParts = parse_url($url);
+        $queryParameters = [];
+        if (isset($urlParts['query'])) {
+            parse_str($urlParts['query'], $queryParameters);
+        }
+
+        $queryParameters = ArrayUtil::arrayMergeRecursiveDistinct($queryParameters, $parameters);
+        $urlParts['query'] = http_build_query($queryParameters);
+
+        return sprintf(
+            '%s%s%s%s%s',
+            isset($urlParts['scheme'])? $urlParts['scheme'] . '://' : '',
+            $urlParts['host'] ?? '',
+            isset($urlParts['port']) ? ':' . $urlParts['port'] : '',
+            $urlParts['path'] ?? '',
+            $urlParts['query'] ? '?' . $urlParts['query']: ''
+        );
     }
 
     /**

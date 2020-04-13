@@ -215,16 +215,16 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'content'           => ['b' => 'c'],
+                'content' => ['b' => 'c'],
                 'additionalContent' => ['a' => 'b'],
-                'keys'              => ['a', 'b', 'c'],
-                'expected'          => ['a' => 'b', 'b' => 'c']
+                'keys' => ['a', 'b', 'c'],
+                'expected' => ['a' => 'b', 'b' => 'c']
             ],
             [
-                'content'           => ['b' => 'c'],
+                'content' => ['b' => 'c'],
                 'additionalContent' => null,
-                'keys'              => null,
-                'expected'          => ['b' => 'c']
+                'keys' => null,
+                'expected' => ['b' => 'c']
             ],
         ];
     }
@@ -243,27 +243,27 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function prepareJsTemplateContentProvider()
     {
         return [
-            'null'                                  => [
+            'null' => [
                 null,
                 null,
             ],
-            'empty'                                 => [
+            'empty' => [
                 '',
                 '',
             ],
-            'no script, no js template'             => [
+            'no script, no js template' => [
                 '<div>test</div>',
                 '<div>test</div>',
             ],
-            'no script, with js template'           => [
+            'no script, with js template' => [
                 '<div><%= test %></div>',
                 '<div><%= test %></div>',
             ],
-            'with script, no js template'           => [
+            'with script, no js template' => [
                 '<script type="text/javascript">var a = 1;</script>',
                 '<% print("<sc" + "ript") %> type="text/javascript">var a = 1;<% print("</sc" + "ript>") %>',
             ],
-            'js template inside script'             => [
+            'js template inside script' => [
                 '<script type="text/javascript">var a = "<%= var %>";</script>',
                 '<% print("<sc" + "ript") %> type="text/javascript">'
                 . 'var a = "<% print("<" + "%") %>= var <% print("%" + ">") %>";'
@@ -307,25 +307,25 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'pattern 1' => [
-                'expected'    => 'aaaaa aaaaaabbccccccccaaaaad d d d d d d ddde',
-                'subject'     => 'aaaaa   aaaaaabbccccccccaaaaad d d d   d      d d ddde',
-                'pattern'     => '/(\s){2,}/',
+                'expected' => 'aaaaa aaaaaabbccccccccaaaaad d d d d d d ddde',
+                'subject' => 'aaaaa   aaaaaabbccccccccaaaaad d d d   d      d d ddde',
+                'pattern' => '/(\s){2,}/',
                 'replacement' => '$1',
-                'limit'       => -1
+                'limit' => -1
             ],
             'pattern 2' => [
-                'expected'    => '-asd-',
-                'subject'     => '------------asd----------',
-                'pattern'     => '/(-){2,}/',
+                'expected' => '-asd-',
+                'subject' => '------------asd----------',
+                'pattern' => '/(-){2,}/',
                 'replacement' => '$1',
-                'limit'       => -1,
+                'limit' => -1,
             ],
             'pattern 3' => [
-                'expected'    => '-asd-',
-                'subject'     => '-asd----------',
-                'pattern'     => '/(-){2,}/',
+                'expected' => '-asd-',
+                'subject' => '-asd----------',
+                'pattern' => '/(-){2,}/',
                 'replacement' => '$1',
-                'limit'       => 1,
+                'limit' => 1,
             ],
         ];
     }
@@ -350,59 +350,59 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function addUrlQueryProvider()
     {
         return [
-            'no request'                                                 => [
+            'no request' => [
                 'expected' => 'http://test.url/',
-                'source'   => 'http://test.url/',
+                'source' => 'http://test.url/',
             ],
-            'no query params'                                            => [
+            'no query params' => [
                 'expected' => 'http://test.url/',
-                'source'   => 'http://test.url/',
-                'query'    => [],
+                'source' => 'http://test.url/',
+                'query' => [],
             ],
-            'no query params without host'                               => [
+            'no query params without host' => [
                 'expected' => '/',
-                'source'   => '/',
-                'query'    => [],
+                'source' => '/',
+                'query' => [],
             ],
-            'same query params'                                          => [
+            'same query params' => [
                 'expected' => 'http://test.url/?foo=1#bar',
-                'source'   => 'http://test.url/?foo=1#bar',
-                'query'    => ['foo' => 1],
+                'source' => 'http://test.url/?foo=1#bar',
+                'query' => ['foo' => 1],
             ],
-            'same query params without host'                             => [
+            'same query params without host' => [
                 'expected' => '/?foo=1#bar',
-                'source'   => '/?foo=1#bar',
-                'query'    => ['foo' => 1],
+                'source' => '/?foo=1#bar',
+                'query' => ['foo' => 1],
             ],
-            'only new query params'                                      => [
+            'only new query params' => [
                 'expected' => 'http://test.url/?foo=1#bar',
-                'source'   => 'http://test.url/#bar',
-                'query'    => ['foo' => 1],
+                'source' => 'http://test.url/#bar',
+                'query' => ['foo' => 1],
             ],
-            'only new query params without host'                         => [
+            'only new query params without host' => [
                 'expected' => '/?foo=1#bar',
-                'source'   => '/#bar',
-                'query'    => ['foo' => 1],
+                'source' => '/#bar',
+                'query' => ['foo' => 1],
             ],
-            'existing and new query params'                              => [
+            'existing and new query params' => [
                 'expected' => 'http://test.url/?baz=2&foo=1#bar',
-                'source'   => 'http://test.url/?foo=1#bar',
-                'query'    => ['baz' => 2],
+                'source' => 'http://test.url/?foo=1#bar',
+                'query' => ['baz' => 2],
             ],
-            'existing and new query params without host'                 => [
+            'existing and new query params without host' => [
                 'expected' => '/?baz=2&foo=1#bar',
-                'source'   => '/?foo=1#bar',
-                'query'    => ['baz' => 2],
+                'source' => '/?foo=1#bar',
+                'query' => ['baz' => 2],
             ],
-            'existing and new query params without host with path'       => [
+            'existing and new query params without host with path' => [
                 'expected' => '/path/?baz=2&foo=1#bar',
-                'source'   => '/path/?foo=1#bar',
-                'query'    => ['baz' => 2],
+                'source' => '/path/?foo=1#bar',
+                'query' => ['baz' => 2],
             ],
             'existing and new query params without host with short path' => [
                 'expected' => '/path?baz=2&foo=1#bar',
-                'source'   => '/path?foo=1#bar',
-                'query'    => ['baz' => 2],
+                'source' => '/path?foo=1#bar',
+                'query' => ['baz' => 2],
             ],
         ];
     }
@@ -430,64 +430,64 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function isUrlLocalProvider()
     {
         return [
-            'same page'                    => [
+            'same page' => [
                 'expected' => true,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'http',
-                    'SERVER_NAME'    => 'test.url',
-                    'SERVER_PORT'    => 80,
-                    'REQUEST_URI'    => '/info',
+                    'SERVER_NAME' => 'test.url',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_URI' => '/info',
                 ],
                 'link_url' => 'http://test.url/info',
             ],
-            'different path'               => [
+            'different path' => [
                 'expected' => true,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'http',
-                    'SERVER_NAME'    => 'test.url',
-                    'SERVER_PORT'    => 80,
-                    'REQUEST_URI'    => '/contact',
+                    'SERVER_NAME' => 'test.url',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_URI' => '/contact',
                 ],
                 'link_url' => 'http://test.url/info',
             ],
-            'different host'               => [
+            'different host' => [
                 'expected' => false,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'http',
-                    'SERVER_NAME'    => 'test.com',
-                    'SERVER_PORT'    => 80,
-                    'REQUEST_URI'    => '/info',
+                    'SERVER_NAME' => 'test.com',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_URI' => '/info',
                 ],
                 'link_url' => 'http://test.url/info',
             ],
-            'different port'               => [
+            'different port' => [
                 'expected' => false,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'http',
-                    'SERVER_NAME'    => 'test.url',
-                    'SERVER_PORT'    => 80,
-                    'REQUEST_URI'    => '/info',
+                    'SERVER_NAME' => 'test.url',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_URI' => '/info',
                 ],
                 'link_url' => 'http://test.url:8080/info',
             ],
             'link from secure to insecure' => [
                 'expected' => false,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'https',
-                    'SERVER_NAME'    => 'test.url',
-                    'SERVER_PORT'    => 443,
-                    'REQUEST_URI'    => '/contact',
-                    'HTTPS'          => 'on',
+                    'SERVER_NAME' => 'test.url',
+                    'SERVER_PORT' => 443,
+                    'REQUEST_URI' => '/contact',
+                    'HTTPS' => 'on',
                 ],
                 'link_url' => 'http://test.url/info',
             ],
             'link from insecure to secure' => [
                 'expected' => true,
-                'server'   => [
+                'server' => [
                     'REQUEST_SCHEME' => 'http',
-                    'SERVER_NAME'    => 'test.url',
-                    'SERVER_PORT'    => 80,
-                    'REQUEST_URI'    => '/contact',
+                    'SERVER_NAME' => 'test.url',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_URI' => '/contact',
                 ],
                 'link_url' => 'https://test.url/info',
             ],
@@ -555,7 +555,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     ['name' => 'b'],
                 ],
                 [
-                    'property'     => 'name',
+                    'property' => 'name',
                     'sorting-type' => 'string'
                 ]
             ]
@@ -582,7 +582,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     ['name' => 'b'],
                 ],
                 [
-                    'property'     => 'name',
+                    'property' => 'name',
                     'sorting-type' => 'string-case'
                 ]
             ]
@@ -656,7 +656,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 [],
                 [
                     'participants' => ['echo123'],
-                    'name'         => 'call',
+                    'name' => 'call',
                 ],
                 UiExtension::SKYPE_BUTTON_TEMPLATE
             ],
@@ -664,12 +664,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 'echo123',
                 [
                     'participants' => ['test'],
-                    'name'         => 'chat',
-                    'template'     => 'test_template'
+                    'name' => 'chat',
+                    'template' => 'test_template'
                 ],
                 [
                     'participants' => ['test'],
-                    'name'         => 'chat',
+                    'name' => 'chat',
                 ],
                 'test_template'
             ]
@@ -738,5 +738,40 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             $url,
             self::callTwigFunction($this->extension, 'oro_default_page', [$this->environment])
         );
+    }
+
+    /**
+     * @dataProvider urlAddQueryParametersDataProvider
+     * @param string $url
+     * @param array $parameters
+     * @param string $expected
+     */
+    public function testUrlAddQueryParameters(string $url, array $parameters, string $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'url_add_query_parameters', [$url, $parameters])
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function urlAddQueryParametersDataProvider()
+    {
+        return [
+            ['http://example.com/test', [], 'http://example.com/test'],
+            [
+                'https://example.com:8080/test',
+                ['hello' => 2, 'second' => 'abc'],
+                'https://example.com:8080/test?hello=2&second=abc'
+            ],
+            [
+                'https://example.com:8080/test?hello=1&third=def',
+                ['hello' => 2, 'second' => 'abc'],
+                'https://example.com:8080/test?hello=2&third=def&second=abc'
+            ],
+            ['/test', ['hello' => 2, 'second' => 'abc'], '/test?hello=2&second=abc'],
+        ];
     }
 }

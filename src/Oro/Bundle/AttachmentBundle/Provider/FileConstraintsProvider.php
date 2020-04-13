@@ -124,8 +124,18 @@ class FileConstraintsProvider
      */
     public function getMaxSize(): int
     {
-        $maxFileSize = (int)$this->systemConfigManager
-                ->get('oro_attachment.maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
+        return $this->getMaxSizeByConfigPath('oro_attachment.maxsize');
+    }
+
+    /**
+     * Gets max allowed file size from system config.
+     *
+     * @return int
+     */
+    public function getMaxSizeByConfigPath(string $maxSizeConfigPath): int
+    {
+        $maxFileSize = (float)$this->systemConfigManager
+                ->get($maxSizeConfigPath) * AttachmentConfiguration::BYTES_MULTIPLIER;
 
         return (int)$maxFileSize;
     }
@@ -141,7 +151,7 @@ class FileConstraintsProvider
     {
         $entityConfig = $this->attachmentEntityConfigProvider->getEntityConfig($entityClass);
         if ($entityConfig) {
-            $maxFileSize = (int)$entityConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
+            $maxFileSize = (float)$entityConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
         }
 
         if (empty($maxFileSize)) {
@@ -163,7 +173,7 @@ class FileConstraintsProvider
     {
         $entityFieldConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
         if ($entityFieldConfig) {
-            $maxFileSize = (int)$entityFieldConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
+            $maxFileSize = (float)$entityFieldConfig->get('maxsize') * AttachmentConfiguration::BYTES_MULTIPLIER;
         }
 
         if (empty($maxFileSize)) {

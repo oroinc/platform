@@ -114,6 +114,8 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attachmentEntity, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
         $this->assertEquals('fa-class', $attachmentModel->getIcon());
+        $this->assertEquals('image/jpeg', $attachmentModel->getMimeType());
+        $this->assertEquals(12, $attachmentModel->getFileSize());
     }
 
     public function testOroToModel()
@@ -153,6 +155,8 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
         $this->assertEquals('fa-class', $attachmentModel->getIcon());
+        $this->assertEquals('image/jpeg', $attachmentModel->getMimeType());
+        $this->assertEquals(100, $attachmentModel->getFileSize());
     }
 
     public function testOroToEntity()

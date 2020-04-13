@@ -394,6 +394,21 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10 * Configuration::BYTES_MULTIPLIER, $this->provider->getMaxSize());
     }
 
+    public function testGetMaxSizeByConfigPath(): void
+    {
+        $key = 'oro_attachment.maxsize_key';
+        $this->systemConfigManager
+            ->expects($this->once())
+            ->method('get')
+            ->with($key, '', false, null)
+            ->willReturn(0.03);
+
+        $this->assertEquals(
+            (int)(0.03 * Configuration::BYTES_MULTIPLIER),
+            $this->provider->getMaxSizeByConfigPath($key)
+        );
+    }
+
     public function testGetMaxSizeForEntityWhenNoEntityConfig(): void
     {
         $this->attachmentEntityConfigProvider
