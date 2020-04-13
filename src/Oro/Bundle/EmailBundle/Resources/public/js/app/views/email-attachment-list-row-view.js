@@ -50,7 +50,7 @@ define(function(require) {
                 data.fileName = data.fileName.substr(0, 7) + '..' + data.fileName.substr(data.fileName.length - 7);
             }
             if ('fileSize' in data) {
-                data.fileSize = numeral(data.fileSize).format('b');
+                data.fileSize = numeral(data.fileSize).format('0.00b');
             }
             if ('modified' in data) {
                 data.modified = datetime.formatDateTime(data.modified.date);

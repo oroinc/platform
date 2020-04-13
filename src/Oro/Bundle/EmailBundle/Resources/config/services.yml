@@ -112,6 +112,7 @@ services:
             - '@oro_email.form.factory'
             - '@request_stack'
             - '@oro_ui.html_tag_helper'
+            - '@oro_attachment.provider.file_constraints'
 
     Oro\Bundle\EmailBundle\Builder\EmailModelBuilder:
         alias: 'oro_email.email.model.builder'

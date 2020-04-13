@@ -17,7 +17,8 @@ define(function(require) {
             preview: '',
             icon: '',
             checked: false, // whether file is checked for attaching to an email
-            visible: true
+            visible: true,
+            errors: []
         },
 
         /**

@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Model for Email Attachment
+ */
 class EmailAttachment
 {
     const TYPE_ATTACHMENT       = 1; // oro attachment (OroAttachmentBundle)
@@ -55,6 +58,16 @@ class EmailAttachment
      * @var string
      */
     protected $icon;
+
+    /**
+     * @var string
+     */
+    protected $mimeType;
+
+    /**
+     * @var array
+     */
+    protected $errors = [];
 
     /**
      * @return int
@@ -112,7 +125,9 @@ class EmailAttachment
     public function setEmailAttachment($emailAttachment)
     {
         $this->emailAttachment = $emailAttachment;
-        $this->setFileName($this->emailAttachment->getFileName());
+        if ($this->emailAttachment) {
+            $this->setFileName($this->emailAttachment->getFileName());
+        }
 
         return $this;
     }
@@ -235,5 +250,51 @@ class EmailAttachment
     public function getIcon()
     {
         return $this->icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType(): string
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param string $mimeType
+     * @return $this
+     */
+    public function setMimeType($mimeType)
+    {
+        $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param array $errors
+     * @return $this
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    /**
+     * @param string $errorMessage
+     */
+    public function addError(string $errorMessage)
+    {
+        $this->errors[] = $errorMessage;
     }
 }

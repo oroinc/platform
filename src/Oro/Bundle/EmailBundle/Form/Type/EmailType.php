@@ -7,15 +7,18 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -185,6 +188,31 @@ class EmailType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'fillFormByTemplate']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
+    }
+
+    /**
+     * @param PostSubmitEvent $event
+     */
+    public function postSubmit(PostSubmitEvent $event)
+    {
+        $form = $event->getForm();
+        if ($form->isValid()) {
+            return;
+        }
+
+        // Add validation errors to attachments model.
+        /** @var Form $attachmentForm */
+        foreach ($event->getForm()->get('attachments') as $attachmentForm) {
+            /** @var EmailAttachment $emailAttachment */
+            $emailAttachment = $attachmentForm->getData();
+            if (!$emailAttachment) {
+                continue;
+            }
+            foreach ($attachmentForm->getErrors(true) as $error) {
+                $emailAttachment->addError($error->getMessage());
+            }
+        }
     }
 
     /**
@@ -196,7 +224,8 @@ class EmailType extends AbstractType
         $data = $event->getData();
         if (null === $data ||
             is_array($data) && empty($data['entityClass']) ||
-            is_object($data) && null === $data->getEntityClass()) {
+            is_object($data) && null === $data->getEntityClass()
+        ) {
             return;
         }
 
