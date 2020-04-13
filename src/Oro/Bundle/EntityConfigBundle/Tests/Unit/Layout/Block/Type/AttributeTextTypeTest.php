@@ -13,8 +13,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeTextTypeTest extends BlockTypeTestCase
 {
-    /** @var AttributeConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject $attributeManager */
+    /** @var AttributeConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigurationProvider;
+
+    /** @var AttributeTextType */
+    private $attributeTextType;
 
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
@@ -26,10 +29,10 @@ class AttributeTextTypeTest extends BlockTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $attributeTextType = new AttributeTextType($this->attributeConfigurationProvider);
+        $this->attributeTextType = new AttributeTextType($this->attributeConfigurationProvider);
 
         $layoutFactoryBuilder
-            ->addType($attributeTextType);
+            ->addType($this->attributeTextType);
 
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
     }
@@ -38,7 +41,6 @@ class AttributeTextTypeTest extends BlockTypeTestCase
     {
         $attribute = new FieldConfigModel('attributeFieldName', 'string');
         $attribute->setEntity(new EntityConfigModel('attributeClassName'));
-
 
         $this->attributeConfigurationProvider->expects($this->once())
             ->method('getAttributeLabel')
@@ -61,10 +63,24 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         $this->assertEquals('attributeClassName', $view->vars['className']);
         $this->assertEquals('attribute_label', $view->vars['label']);
         $this->assertEquals('=data["property_accessor"].getValue(entity, fieldName)', $view->vars['value']);
-        $this->assertEquals(
-            '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value !== null',
-            $view->vars['visible']
+        $this->assertEquals('=value !== null', $view->vars['visible']);
+    }
+
+    public function testSetDefaultVisible(): void
+    {
+        $this->attributeTextType->setDefaultVisible('=value === null');
+
+        $view = $this->getBlockView(
+            AttributeTextType::NAME,
+            [
+                'entity' => new Expression('context["entity"]'),
+                'fieldName' => 'attributeFieldName',
+                'className' => 'attributeClassName',
+            ]
         );
+
+
+        $this->assertEquals('=value === null', $view->vars['visible']);
     }
 
     public function testGetParent()

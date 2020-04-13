@@ -126,34 +126,3 @@ entity_config:
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
-                enabled:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
-                        options:
-                            choices:
-                                No: 0
-                                Yes: 1
-                            placeholder: false
-                            block: attribute
-                            label: oro.entity_config.entity_config.attribute.field.items.enabled
-                visible:
-                    options:
-                        value_type: boolean
-                        default_value: true
-                        indexed: true
-                    grid:
-                        type: boolean
-                        label: oro.entity_config.entity_config.attribute.field.items.visible
-                        renderable: true
-                    form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
-                        options:
-                            choices:
-                                No: 0
-                                Yes: 1
-                            placeholder: false
-                            block: attribute
-                            label: oro.entity_config.entity_config.attribute.field.items.visible

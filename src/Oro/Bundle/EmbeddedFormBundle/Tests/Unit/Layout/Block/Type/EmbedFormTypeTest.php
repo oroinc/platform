@@ -48,6 +48,7 @@ class EmbedFormTypeTest extends BlockTypeTestCase
                     'embed_form_fields',
                     [
                         'form_name'         => 'test_form',
+                        'render_rest'       => true,
                         'form_prefix'       => 'test_prefix',
                         'form_field_prefix' => 'test_field_prefix',
                         'form_group_prefix' => 'test_group_prefix',
@@ -64,7 +65,6 @@ class EmbedFormTypeTest extends BlockTypeTestCase
                     'embed_form_end',
                     [
                         'form_name'   => 'test_form',
-                        'render_rest' => true,
                         'instance_name' => '',
                         'additional_block_prefixes' => [],
                     ],

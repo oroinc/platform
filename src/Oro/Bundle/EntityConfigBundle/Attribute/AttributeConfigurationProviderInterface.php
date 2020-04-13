@@ -57,11 +57,4 @@ interface AttributeConfigurationProviderInterface
      * @return bool
      */
     public function isAttributeSortable(FieldConfigModel $attribute);
-
-    /**
-     * @param FieldConfigModel $attribute
-     *
-     * @return bool
-     */
-    public function isAttributeVisible(FieldConfigModel $attribute);
 }

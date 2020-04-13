@@ -11,18 +11,21 @@ use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Adds extended fields to a form based on the configuration for an entity/field.
  */
-class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements ServiceSubscriberInterface
+class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -179,6 +182,18 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'dynamic_fields_disabled' => false,
+            ]
+        );
+    }
+
+    /**
      * @param array $options
      *
      * @return bool
@@ -284,6 +299,6 @@ class DynamicFieldsExtension extends DynamicFieldsOptionsExtension implements Se
      */
     public static function getExtendedTypes(): array
     {
-        return [];
+        return [FormType::class];
     }
 }

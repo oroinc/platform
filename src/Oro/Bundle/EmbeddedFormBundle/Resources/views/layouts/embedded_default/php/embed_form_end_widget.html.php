@@ -1,6 +1,6 @@
 <?php //@codingStandardsIgnoreFile?>
 <?php
-    if ($view['render_rest']) {
+    if ($render_rest) {
         echo $view['form']->end($form);
     } else {
         echo '</form>';

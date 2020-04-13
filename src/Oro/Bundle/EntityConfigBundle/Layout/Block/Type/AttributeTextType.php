@@ -22,12 +22,23 @@ class AttributeTextType extends AbstractType
     /** @var AttributeConfigurationProviderInterface */
     protected $attributeConfigurationProvider;
 
+    /** @var string */
+    protected $defaultVisible = '=value !== null';
+
     /**
      * @param AttributeConfigurationProviderInterface $attributeConfigurationProvider
      */
     public function __construct(AttributeConfigurationProviderInterface $attributeConfigurationProvider)
     {
         $this->attributeConfigurationProvider = $attributeConfigurationProvider;
+    }
+
+    /**
+     * @param string $defaultVisible
+     */
+    public function setDefaultVisible(string $defaultVisible): void
+    {
+        $this->defaultVisible = $defaultVisible;
     }
 
     /**
@@ -56,7 +67,7 @@ class AttributeTextType extends AbstractType
         $resolver->setDefaults(
             [
                 'value' => '=data["property_accessor"].getValue(entity, fieldName)',
-                'visible' => '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value !== null'
+                'visible' => $this->defaultVisible
             ]
         );
     }
