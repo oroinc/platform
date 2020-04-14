@@ -78,7 +78,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $chain->getMetadata('stdClass');
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals($metadataFromMockProvider2, $result);
     }
 
@@ -92,7 +92,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $chain->getMetadata('stdClass');
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals($metadata, $result);
     }
 

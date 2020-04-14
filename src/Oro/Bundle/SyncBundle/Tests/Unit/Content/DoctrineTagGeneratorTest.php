@@ -247,7 +247,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $result = $reflection->invoke($this->generator, $testData, $metadata);
 
-        $this->assertInternalType('array', $result, 'Should always return array');
+        $this->assertIsArray($result, 'Should always return array');
         $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');
     }
 

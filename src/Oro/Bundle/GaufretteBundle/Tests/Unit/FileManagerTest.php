@@ -249,7 +249,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $stream = $this->fileManager->getStream($fileName, false);
 
-        $this->assertInternalType('resource', $stream);
+        $this->assertIsResource($stream);
         $this->assertSame($file, $stream);
 
         fclose($file);

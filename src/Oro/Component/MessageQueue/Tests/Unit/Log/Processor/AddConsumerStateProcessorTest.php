@@ -244,7 +244,7 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $record = call_user_func($this->processor, ['message' => 'test', 'extra' => []]);
 
         $this->assertArrayHasKey('elapsed_time', $record['extra']);
-        $this->assertInternalType('string', $record['extra']['elapsed_time']);
+        $this->assertIsString($record['extra']['elapsed_time']);
         $this->assertContains(' ms', $record['extra']['elapsed_time']);
     }
 }

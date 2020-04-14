@@ -320,7 +320,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
     protected function assertAttributeOptions($actualOptions, $label, $type, array $options = [])
     {
         $this->assertNotNull($actualOptions);
-        $this->assertInternalType('array', $actualOptions);
+        $this->assertIsArray($actualOptions);
         $this->assertArrayHasKey('label', $actualOptions);
         $this->assertArrayHasKey('type', $actualOptions);
         $this->assertArrayHasKey('options', $actualOptions);

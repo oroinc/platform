@@ -122,11 +122,11 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
 
         $key = '@'.CurrentStepNameIsEqual::NAME;
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey($key, $result);
 
         $resultSection = $result[$key];
-        $this->assertInternalType('array', $resultSection);
+        $this->assertIsArray($resultSection);
         $this->assertArrayHasKey('parameters', $resultSection);
         $this->assertContains($stdClass, $resultSection['parameters']);
     }

@@ -40,8 +40,8 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['update']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['delete']);
 
         // the "metadata" section is returned only if datagrid data is requested by AJAX,
         // during datagrid initialization the metadata is not returned together with data
@@ -112,15 +112,15 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['update']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['delete']);
 
         // the "metadata" section should be returned together with data
         // if datagrid data is requested by AJAX
         $this->assertArrayHasKey('metadata', $data);
         $this->assertArrayHasKey('massActions', $data['metadata']);
         $this->assertArrayHasKey('delete', $data['metadata']['massActions']);
-        $this->assertInternalType('array', $data['metadata']['massActions']['delete']);
+        $this->assertIsArray($data['metadata']['massActions']['delete']);
     }
 
     /**

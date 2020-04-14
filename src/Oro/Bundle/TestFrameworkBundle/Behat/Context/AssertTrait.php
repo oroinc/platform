@@ -939,15 +939,25 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a variable is of a given type.
+     * Asserts that a variable is an array.
      *
-     * @param string $expected
      * @param mixed  $actual
      * @param string $message
      */
-    public static function assertInternalType($expected, $actual, $message = '')
+    public static function assertIsArray($actual, $message = '')
     {
-        Assert::assertInternalType($expected, $actual, $message);
+        Assert::assertIsArray($actual, $message);
+    }
+
+    /**
+     * Asserts that a variable is a string.
+     *
+     * @param mixed  $actual
+     * @param string $message
+     */
+    public static function assertIsString($actual, $message = '')
+    {
+        Assert::assertIsString($actual, $message);
     }
 
     /**

@@ -36,7 +36,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->provider->getMetadataFor(new \stdClass());
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 
@@ -70,7 +70,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         }
 
         $result = $this->provider->getMetadataFor($object);
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals($expectedResult, $result);
     }
 

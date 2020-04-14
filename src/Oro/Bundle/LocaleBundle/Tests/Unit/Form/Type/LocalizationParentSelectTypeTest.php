@@ -89,9 +89,9 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedParentId, $formView->vars['configs']['entityId']);
 
         $this->assertArrayHasKey('grid_parameters', $formView->vars);
-        $this->assertInternalType('array', $formView->vars['grid_parameters']);
+        $this->assertIsArray($formView->vars['grid_parameters']);
         $this->assertArrayHasKey('ids', $formView->vars['grid_parameters']);
-        $this->assertInternalType('array', $formView->vars['grid_parameters']['ids']);
+        $this->assertIsArray($formView->vars['grid_parameters']['ids']);
         $this->assertEquals($expectedIds, $formView->vars['grid_parameters']['ids']);
     }
 

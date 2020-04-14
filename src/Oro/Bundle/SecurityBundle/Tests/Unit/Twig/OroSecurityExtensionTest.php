@@ -71,7 +71,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
         $result = self::callTwigFunction($this->extension, 'get_enabled_organizations', []);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(1, $result);
         $this->assertSame($organization, $result[0]);
     }

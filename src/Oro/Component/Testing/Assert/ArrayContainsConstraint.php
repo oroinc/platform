@@ -78,7 +78,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     protected function matchArrayContains(array $expected, $actual, array $path)
     {
-        if (!$this->isInternalType('array', $actual, $path)) {
+        if (!$this->isArray($actual, $path)) {
             return;
         }
 
@@ -199,16 +199,15 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     }
 
     /**
-     * @param string   $expectedType
      * @param array    $value
      * @param string[] $path
      *
      * @return bool
      */
-    protected function isInternalType($expectedType, $value, array $path)
+    protected function isArray($value, array $path)
     {
         try {
-            \PHPUnit\Framework\Assert::assertInternalType($expectedType, $value);
+            \PHPUnit\Framework\Assert::assertIsArray($value);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 

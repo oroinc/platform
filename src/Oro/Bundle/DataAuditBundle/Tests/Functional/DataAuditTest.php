@@ -150,7 +150,7 @@ class DataAuditTest extends WebTestCase
         $this->assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertInternalType('resource', $owner->getBinaryProperty());
+        $this->assertIsResource($owner->getBinaryProperty());
     }
 
     public function testBlob()
@@ -170,7 +170,7 @@ class DataAuditTest extends WebTestCase
         $this->assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertInternalType('resource', $owner->getBlobProperty());
+        $this->assertIsResource($owner->getBlobProperty());
     }
 
     public function testBoolean()

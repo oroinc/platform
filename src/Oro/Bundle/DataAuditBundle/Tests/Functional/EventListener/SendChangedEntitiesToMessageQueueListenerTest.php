@@ -140,24 +140,24 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         /** @var Message $message */
         $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
 
-        self::assertInstanceOf(Message::class, $message);
+        $this->assertInstanceOf(Message::class, $message);
 
         $body = $message->getBody();
 
-        self::assertArrayHasKey('timestamp', $body);
-        self::assertArrayHasKey('transaction_id', $body);
+        $this->assertArrayHasKey('timestamp', $body);
+        $this->assertArrayHasKey('transaction_id', $body);
 
-        self::assertArrayHasKey('entities_updated', $body);
-        self::assertInternalType('array', $body['entities_updated']);
+        $this->assertArrayHasKey('entities_updated', $body);
+        $this->assertIsArray($body['entities_updated']);
 
-        self::assertArrayHasKey('entities_deleted', $body);
-        self::assertInternalType('array', $body['entities_deleted']);
+        $this->assertArrayHasKey('entities_deleted', $body);
+        $this->assertIsArray($body['entities_deleted']);
 
-        self::assertArrayHasKey('entities_inserted', $body);
-        self::assertInternalType('array', $body['entities_inserted']);
+        $this->assertArrayHasKey('entities_inserted', $body);
+        $this->assertIsArray($body['entities_inserted']);
 
-        self::assertArrayHasKey('collections_updated', $body);
-        self::assertInternalType('array', $body['collections_updated']);
+        $this->assertArrayHasKey('collections_updated', $body);
+        $this->assertIsArray($body['collections_updated']);
     }
 
     public function testShouldSendMessageWithVeryLowPriority()

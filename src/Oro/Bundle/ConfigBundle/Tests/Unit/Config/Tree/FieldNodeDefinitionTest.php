@@ -64,7 +64,7 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
         // should set default definition values
         $this->assertEquals(0, $node->getPriority());
-        $this->assertInternalType('array', $node->getOptions());
+        $this->assertIsArray($node->getOptions());
     }
 
     public function testPropertyPathIsApplied()

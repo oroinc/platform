@@ -44,7 +44,7 @@ class ChainMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $chain->addProvider($provider2);
 
         $result = $chain->getMetadataFor($object);
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals($metadataFromStubProvider + $metadataFromMockProvider, $result);
     }
 

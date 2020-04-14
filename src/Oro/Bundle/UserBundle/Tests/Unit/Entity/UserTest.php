@@ -373,7 +373,7 @@ class UserTest extends AbstractUserTest
     public function testGetEmailFields()
     {
         $user = $this->getUser();
-        $this->assertInternalType('array', $user->getEmailFields());
+        $this->assertIsArray($user->getEmailFields());
         $this->assertEquals(['email'], $user->getEmailFields());
     }
 

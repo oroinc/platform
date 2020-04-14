@@ -44,7 +44,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->subscriber->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
     }
 

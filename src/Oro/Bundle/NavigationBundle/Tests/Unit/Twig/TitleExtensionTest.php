@@ -217,7 +217,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->extension->getTokenParsers();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(1, $result);
     }
 

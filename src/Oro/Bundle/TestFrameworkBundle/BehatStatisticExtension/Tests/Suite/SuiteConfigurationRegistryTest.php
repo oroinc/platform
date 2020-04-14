@@ -191,10 +191,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->generateSetsDividedByCount(8);
 
-        $this->assertInternalType(
-            'array',
-            $suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0')
-        );
+        $this->assertIsArray($suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0'));
     }
 
     public function testFilterConfiguration()

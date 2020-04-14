@@ -28,7 +28,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     {
         $configs = $this->merger->mergeConfiguration($rawConfig);
 
-        $this->assertInternalType('array', $configs);
+        $this->assertIsArray($configs);
         $this->assertEquals($expected, $configs);
     }
 

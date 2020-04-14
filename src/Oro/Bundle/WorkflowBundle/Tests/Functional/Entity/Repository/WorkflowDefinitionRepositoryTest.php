@@ -127,14 +127,14 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
     {
         $result = $this->repository->getAllRelatedEntityClasses();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
         $this->assertContains(Item::class, $result);
 
         $result = $this->repository->getAllRelatedEntityClasses(true);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
         $this->assertContains(Item::class, $result);

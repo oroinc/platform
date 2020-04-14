@@ -54,9 +54,9 @@ class CronCommandTest extends WebTestCase
 
         $message = $messages[0];
 
-        $this->assertInternalType('array', $message);
+        $this->assertIsArray($message);
         $this->assertArrayHasKey('message', $message);
-        $this->assertInternalType('array', $message['message']);
+        $this->assertIsArray($message['message']);
         $this->assertArrayHasKey('command', $message['message']);
         $this->assertArrayHasKey('arguments', $message['message']);
     }

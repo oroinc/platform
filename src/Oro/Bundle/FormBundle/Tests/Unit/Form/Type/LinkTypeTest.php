@@ -18,7 +18,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParent()
     {
-        $this->assertInternalType('string', $this->type->getParent());
+        $this->assertIsString($this->type->getParent());
     }
 
     public function testConfigureOptions()

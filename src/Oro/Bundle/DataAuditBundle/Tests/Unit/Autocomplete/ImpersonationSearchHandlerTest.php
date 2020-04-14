@@ -33,13 +33,13 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityName()
     {
-        $this->assertInternalType('string', $this->searchHandler->getEntityName());
+        $this->assertIsString($this->searchHandler->getEntityName());
         $this->assertSame(Impersonation::class, $this->searchHandler->getEntityName());
     }
 
     public function testGetProperties()
     {
-        $this->assertInternalType('array', $this->searchHandler->getProperties());
+        $this->assertIsArray($this->searchHandler->getProperties());
         $this->assertArraySubset(['ipAddress', 'token', 'ipAddressToken'], $this->searchHandler->getProperties());
     }
 

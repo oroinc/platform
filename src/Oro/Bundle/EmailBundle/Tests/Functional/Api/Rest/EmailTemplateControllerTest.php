@@ -134,7 +134,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('body', $data);
         $this->assertArrayHasKey('subject', $data);
         $this->assertArrayHasKey('type', $data);
@@ -163,7 +163,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('body', $data);
         $this->assertArrayHasKey('subject', $data);
         $this->assertArrayHasKey('type', $data);
@@ -185,7 +185,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 404);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('message', $data);
     }
 
@@ -205,7 +205,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 422);
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertArrayHasKey('reason', $data);
     }
 }

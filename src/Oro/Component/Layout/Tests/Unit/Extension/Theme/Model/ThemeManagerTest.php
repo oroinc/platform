@@ -50,8 +50,8 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($manager->getThemeNames());
         $this->assertEmpty($manager->getAllThemes());
 
-        $this->assertInternalType('array', $manager->getThemeNames());
-        $this->assertInternalType('array', $manager->getAllThemes());
+        $this->assertIsArray($manager->getThemeNames());
+        $this->assertIsArray($manager->getAllThemes());
 
         $this->assertFalse($manager->hasTheme('unknown'));
     }

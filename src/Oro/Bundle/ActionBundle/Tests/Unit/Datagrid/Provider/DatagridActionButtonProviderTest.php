@@ -133,7 +133,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
             $this->provider->applyActions($config);
             $options = $config->offsetGetOr('options');
 
-            $this->assertInternalType('array', $options);
+            $this->assertIsArray($options);
             $this->assertArrayHasKey('urlParams', $options);
             $this->assertArrayHasKey('originalRoute', $options['urlParams']);
             $this->assertEquals(self::TEST_ROUTE, $options['urlParams']['originalRoute']);

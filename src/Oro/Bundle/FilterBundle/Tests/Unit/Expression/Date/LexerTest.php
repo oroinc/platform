@@ -37,7 +37,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->lexer->tokenize($input);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(count($expectedTokens), $result);
 
         foreach ($result as $key => $token) {

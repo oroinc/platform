@@ -51,8 +51,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
     {
         $entityIds = $this->getEntityIdsByWorkflow();
         $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
-        $this->assertInternalType(
-            'array',
+        $this->assertIsArray(
             $this->repository->findAllByEntityMetadata(
                 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
                 $entityId

@@ -57,7 +57,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->searchHandler->search('test', 1, 10);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('more', $result);
         $this->assertArrayHasKey('results', $result);
         $this->assertFalse($result['more']);
@@ -110,7 +110,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
             $byId
         );
 
-        $this->assertInternalType('array', $searchResult);
+        $this->assertIsArray($searchResult);
         $this->assertArrayHasKey('more', $searchResult);
         $this->assertArrayHasKey('results', $searchResult);
 

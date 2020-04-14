@@ -49,7 +49,7 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
 
         $fileLocator = $extension->getPackagePaths();
         $this->assertInstanceOf(FileLocatorInterface::class, $fileLocator);
-        $this->assertInternalType('string', $fileLocator->locate($fileToLocate));
+        $this->assertIsString($fileLocator->locate($fileToLocate));
     }
 
     /**
