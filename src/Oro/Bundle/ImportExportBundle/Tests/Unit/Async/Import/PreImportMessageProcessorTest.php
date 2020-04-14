@@ -202,7 +202,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = $this->createMessageMock();
         $message->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $userId = 1;
 
@@ -279,7 +279,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -343,7 +343,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -563,7 +563,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
