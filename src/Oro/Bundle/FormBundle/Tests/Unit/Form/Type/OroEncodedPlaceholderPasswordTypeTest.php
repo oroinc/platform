@@ -84,33 +84,23 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         static::assertSame('****', $view->vars['value']);
     }
 
-    /**
-     * @dataProvider browserAutocompleteDataProvider
-     *
-     * @param bool $state
-     * @param array $expected
-     */
-    public function testBuildViewWithAutocompleteAttribute($state, $expected)
+    public function testBuildViewWithAutocompleteAttribute()
     {
-        $form = $this->factory->create(
+        $formDisabledAutocomplete = $this->factory->create(
             OroEncodedPlaceholderPasswordType::class,
             null,
-            ['browser_autocomplete' => $state]
+            ['browser_autocomplete' => false]
         );
-        $view = $form->createView();
+        $viewDisabledAutocomplete = $formDisabledAutocomplete->createView();
+        $this->assertSame('new-password', $viewDisabledAutocomplete->vars['attr']['autocomplete']);
 
-        static::assertArraySubset($expected, $view->vars['attr']);
-    }
-
-    /**
-     * @return array
-     */
-    public function browserAutocompleteDataProvider()
-    {
-        return [
-            'autocomplete disabled' => [false, ['autocomplete' => 'new-password']],
-            'autocomplete enabled' => [true, []],
-        ];
+        $formEnabledAutocomplete = $this->factory->create(
+            OroEncodedPlaceholderPasswordType::class,
+            null,
+            ['browser_autocomplete' => true]
+        );
+        $viewEnabledAutocomplete = $formEnabledAutocomplete->createView();
+        $this->assertEmpty($viewEnabledAutocomplete->vars['attr']);
     }
 
     public function testConfigureOptions()

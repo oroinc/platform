@@ -40,7 +40,12 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     public function testGetProperties()
     {
         $this->assertIsArray($this->searchHandler->getProperties());
-        $this->assertArraySubset(['ipAddress', 'token', 'ipAddressToken'], $this->searchHandler->getProperties());
+
+        $properties = $this->searchHandler->getProperties();
+
+        $this->assertSame('ipAddress', $properties[0]);
+        $this->assertSame('token', $properties[1]);
+        $this->assertSame('ipAddressToken', $properties[2]);
     }
 
     public function testConvertItemInvalidType()

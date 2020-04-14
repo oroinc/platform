@@ -151,7 +151,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
         $actualOptions = $form->getConfig()->getOptions();
 
-        $this->assertArraySubset($expected, $actualOptions);
+        foreach ($expected as $key => $expectedValue) {
+            $this->assertEquals($expectedValue, $actualOptions[$key]);
+        }
+
         $this->assertArrayHasKey('constraints', $actualOptions);
         $this->assertNotEmpty($actualOptions['constraints']);
         $this->assertContains(new NotBlankFilters(), $actualOptions['constraints'], '', false, false);

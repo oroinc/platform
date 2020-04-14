@@ -25,17 +25,15 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
         ]));
 
         /** @var ActionConfiguration $options */
-        $options = $this->action->
-        getOptions();
-        $this->assertArraySubset([
-            'handler' => 'oro_translation.mass_action.reset_translation_handler',
-            'route' => 'oro_translation_mass_reset',
-            'frontend_handle' => 'ajax',
-            'route_parameters' => [],
-            'data_identifier' => 'id',
-            'allowedRequestTypes' => ['POST'],
-            'requestType' => 'POST'
-        ], $options->toArray(), true);
+        $options = $this->action->getOptions()->toArray();
+
+        $this->assertSame('oro_translation.mass_action.reset_translation_handler', $options['handler']);
+        $this->assertSame('oro_translation_mass_reset', $options['route']);
+        $this->assertSame('ajax', $options['frontend_handle']);
+        $this->assertSame([], $options['route_parameters']);
+        $this->assertSame('id', $options['data_identifier']);
+        $this->assertSame(['POST'], $options['allowedRequestTypes']);
+        $this->assertSame('POST', $options['requestType']);
     }
 
     public function testRequiredOptions()
@@ -58,8 +56,12 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
             'route_parameters' => ['param1' => 'value1', 'param2' => 'value2'],
             'frontend_handle' => 'test-frontend-handler',
         ];
-
         $this->action->setOptions(ActionConfiguration::create($customOptions));
-        $this->assertArraySubset($customOptions, $this->action->getOptions()->toArray(), true);
+
+        $options = $this->action->getOptions()->toArray();
+
+        foreach ($customOptions as $key => $expectedValue) {
+            $this->assertSame($expectedValue, $options[$key]);
+        }
     }
 }

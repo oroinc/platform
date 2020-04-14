@@ -145,7 +145,7 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(OroPlaceholderPasswordType::class);
         $view = $form->createView();
         // Autocomplete must be disabled by default
-        $this->assertArraySubset(['autocomplete' => 'off'], $view->vars['attr']);
+        $this->assertSame('off', $view->vars['attr']['autocomplete']);
     }
 
     /**
@@ -157,7 +157,7 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(OroPlaceholderPasswordType::class, null, $options);
         $view = $form->createView();
         // Value from options must be used by default
-        $this->assertArraySubset(['autocomplete' => 'new-password'], $view->vars['attr']);
+        $this->assertSame('new-password', $view->vars['attr']['autocomplete']);
     }
 
     /**

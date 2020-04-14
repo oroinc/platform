@@ -401,12 +401,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(TranslatableEntityType::class, null, ['class' => self::TEST_CLASS]);
 
-        $this->assertArraySubset(
-            [
-                'class' => self::TEST_CLASS,
-                'choice_value' => 'testId'
-            ],
-            $form->getConfig()->getOptions()
-        );
+        $options = $form->getConfig()->getOptions();
+
+        $this->assertSame(self::TEST_CLASS, $options['class']);
+        $this->assertSame('testId', $options['choice_value']);
     }
 }

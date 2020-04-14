@@ -27,7 +27,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
      * {@inheritdoc}
      */
     protected function tearDown(): void
-{
+    {
         $this->removeDir($this->kernel->getCacheDir());
         $this->removeDir($this->kernel->getLogDir());
 
