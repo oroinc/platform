@@ -48,6 +48,6 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function toString(): string
     {
-        return 'messages ' . $this->exporter->export($this->messages);
+        return 'messages ' . $this->exporter()->export($this->messages);
     }
 }

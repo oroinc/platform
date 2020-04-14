@@ -43,7 +43,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
             'getter %s for property %s returns the previously set value %s',
             $this->getterName,
             $this->propertyName,
-            $this->exporter->export($this->testValue)
+            $this->exporter()->export($this->testValue)
         );
     }
     /**
@@ -56,7 +56,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
             $this->getterName,
             $this->propertyName,
             get_class($other),
-            $this->exporter->export($this->testValue)
+            $this->exporter()->export($this->testValue)
         );
     }
 
