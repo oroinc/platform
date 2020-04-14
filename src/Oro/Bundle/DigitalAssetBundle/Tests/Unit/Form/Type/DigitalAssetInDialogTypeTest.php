@@ -301,14 +301,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
     protected function getValidators(): array
     {
         $fileConstraintFromSystemConfigValidator = $this->createMock(FileConstraintFromSystemConfigValidator::class);
-        $fileConstraintFromSystemConfigValidator
-            ->method('validate')
-            ->willReturn(new ConstraintViolationList());
-
         $digitalAssetSourceFileMimeTypeValidator = $this->createMock(DigitalAssetSourceFileMimeTypeValidator::class);
-        $digitalAssetSourceFileMimeTypeValidator
-            ->method('validate')
-            ->willReturn(new ConstraintViolationList());
 
         return [
             NotBlank::class => new NotBlank(),

@@ -126,12 +126,12 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array       $body
-     * @param string|null $messageId
+     * @param array $body
+     * @param string $messageId
      *
      * @return MessageInterface
      */
-    private function getMessage(array $body, $messageId = null)
+    private function getMessage(array $body, string $messageId = '')
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
