@@ -199,7 +199,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->prePersist();
         $this->assertInstanceOf('DateTime', $this->workflowItem->getCreated());
 
-        $this->assertEquals(time(), $this->workflowItem->getCreated()->getTimestamp(), '', 5);
+        $this->assertEqualsWithDelta(time(), $this->workflowItem->getCreated()->getTimestamp(), 5);
     }
 
     public function testUpdatedAndPreUpdate()
@@ -208,7 +208,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->preUpdate();
         $this->assertInstanceOf('DateTime', $this->workflowItem->getUpdated());
 
-        $this->assertEquals(time(), $this->workflowItem->getUpdated()->getTimestamp(), '', 5);
+        $this->assertEqualsWithDelta(time(), $this->workflowItem->getUpdated()->getTimestamp(), 5);
     }
 
     public function testGetAddTransitionRecords()

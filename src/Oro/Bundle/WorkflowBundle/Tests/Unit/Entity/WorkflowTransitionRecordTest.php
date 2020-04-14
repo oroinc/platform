@@ -78,6 +78,6 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->transitionRecord->getTransitionDate());
         $this->transitionRecord->prePersist();
         $this->assertInstanceOf('\DateTime', $this->transitionRecord->getTransitionDate());
-        $this->assertEquals(time(), $this->transitionRecord->getTransitionDate()->getTimestamp(), '', 5);
+        $this->assertEqualsWithDelta(time(), $this->transitionRecord->getTransitionDate()->getTimestamp(), 5);
     }
 }
