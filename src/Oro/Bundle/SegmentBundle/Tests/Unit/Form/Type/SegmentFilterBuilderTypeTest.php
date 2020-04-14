@@ -157,7 +157,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
         $this->assertArrayHasKey('constraints', $actualOptions);
         $this->assertNotEmpty($actualOptions['constraints']);
-        $this->assertContains(new NotBlankFilters(), $actualOptions['constraints'], '', false, false);
+        $this->assertGreaterThan(
+            0,
+            \array_reduce($actualOptions['constraints'], function ($carry, $item) {
+                return \is_a($item, NotBlankFilters::class) ? $carry + 1 : 0;
+            })
+        );
     }
 
     /**
