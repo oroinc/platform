@@ -128,13 +128,13 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $operationAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(true);
-        $operationAvailable->expects($this->once())
+        $operationAvailable->expects($this->any())
             ->method('getDefinition')->willReturn(new OperationDefinition());
 
         $operationNotAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationNotAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(false);
-        $operationNotAvailable->expects($this->once())
+        $operationNotAvailable->expects($this->any())
             ->method('getDefinition')->willReturn(new OperationDefinition());
 
         return [
