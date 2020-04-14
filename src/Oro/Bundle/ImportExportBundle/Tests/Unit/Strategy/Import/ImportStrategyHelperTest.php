@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
@@ -777,8 +777,10 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCurrentRowNumberWhenBatchContextInterface(): void
     {
-        /** @var ContextInterface|BatchContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->getMockBuilder([ContextInterface::class, BatchContextInterface::class])->getMock();
+        /** @var Context|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->getMockBuilder(Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $context
             ->expects($this->once())
             ->method('getReadOffset')
