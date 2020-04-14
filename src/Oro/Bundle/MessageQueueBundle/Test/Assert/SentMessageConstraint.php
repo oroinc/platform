@@ -29,7 +29,6 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function __construct(array $message, bool $isSubJobMessage = false, bool $canonicalize = false)
     {
-        parent::__construct();
         $this->message = $message;
         $this->isSubJobMessage = $isSubJobMessage;
         $this->canonicalize = $canonicalize;

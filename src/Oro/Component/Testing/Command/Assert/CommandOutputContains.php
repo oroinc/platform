@@ -15,8 +15,6 @@ class CommandOutputContains extends Constraint
 
     public function __construct(string $expectedText)
     {
-        parent::__construct();
-
         $this->expectedText = $expectedText;
     }
 

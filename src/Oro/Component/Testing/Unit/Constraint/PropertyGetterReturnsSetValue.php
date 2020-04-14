@@ -30,7 +30,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
      */
     public function __construct($propertyName, $testValue)
     {
-        parent::__construct();
         $this->propertyName = $propertyName;
         $this->testValue = $testValue;
     }

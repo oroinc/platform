@@ -22,7 +22,6 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function __construct(array $expected, $strict = true)
     {
-        parent::__construct();
         $this->expected = $expected;
         $this->strict = $strict;
     }
