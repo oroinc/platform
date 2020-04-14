@@ -978,7 +978,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * Example: When I choose "Value" in the Test filter
      *
-     * @When /^(?:|I )choose "(?P<value>[\w\s\,\.\_\%]+)" in the (?P<filterName>[\w\s]+) filter$/
+     * @When /^(?:|I )choose "(?P<value>(?:[^"]|\\")*)" in the (?P<filterName>[\w\s]+) filter$/
      *
      * @param string $filterName
      * @param string $value

@@ -249,6 +249,7 @@ datagrids:
 
     user-email-grid:
         extends: email-grid
+        extended_entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailUser'
         source:
             skip_acl_apply: true
 
@@ -493,6 +494,7 @@ datagrids:
                 - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:
+        extended_entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailTemplate'
         acl_resource: oro_email_emailtemplate_index
         source:
             type: orm

@@ -14,6 +14,7 @@ use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
  * @ORM\Table("oro_notification_email_notif")
  * @ORM\Entity()
  * @Config(
+ *      routeName="oro_notification_emailnotification_index",
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",

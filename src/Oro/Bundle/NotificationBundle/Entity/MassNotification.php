@@ -6,11 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * MassNotification
+ * Mass Notification entity.
  *
  * @ORM\Table("oro_notification_mass_notif")
  * @ORM\Entity()
  * @Config(
+ *      routeName="oro_notification_massnotification_index",
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
