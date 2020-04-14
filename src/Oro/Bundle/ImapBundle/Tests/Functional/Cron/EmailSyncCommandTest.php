@@ -103,7 +103,7 @@ class EmailSyncCommandTest extends WebTestCase
         ];
         $result = $this->runCommand('oro:cron:imap-sync', []);
         foreach ($expectedList as $expected) {
-            $this->assertContains($expected, $result);
+            static::assertStringContainsString($expected, $result);
         }
     }
 
@@ -112,7 +112,7 @@ class EmailSyncCommandTest extends WebTestCase
         $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:imap-sync', []);
 
-        $this->assertContains('The email feature is disabled. The command will not run.', $result);
+        static::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
     }
 
     /**
@@ -148,7 +148,7 @@ class EmailSyncCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:imap-sync', $params);
         foreach ($expectedList as $expected) {
-            $this->assertContains($expected, $result);
+            static::assertStringContainsString($expected, $result);
         }
 
         $listRepo = $this->getContainer()->get('doctrine')->getRepository('OroEmailBundle:Email');

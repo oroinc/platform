@@ -245,6 +245,6 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertArrayHasKey('elapsed_time', $record['extra']);
         $this->assertIsString($record['extra']['elapsed_time']);
-        $this->assertContains(' ms', $record['extra']['elapsed_time']);
+        static::assertStringContainsString(' ms', $record['extra']['elapsed_time']);
     }
 }

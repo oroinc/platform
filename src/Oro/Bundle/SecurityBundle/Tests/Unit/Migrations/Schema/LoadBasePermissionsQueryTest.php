@@ -64,7 +64,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
                     $index = array_search($params, $data, true);
 
                     $this->assertTrue($index !== false);
-                    $this->assertContains('INSERT INTO oro_security_permission', $query);
+                    static::assertStringContainsString('INSERT INTO oro_security_permission', $query);
 
                     unset($data[$index]);
                 }

@@ -83,7 +83,7 @@ class WidgetControllerTest extends WebTestCase
 
         if ($expected) {
             foreach ($expected as $item) {
-                $this->assertContains($item, $crawler->html());
+                static::assertStringContainsString($item, $crawler->html());
             }
         } else {
             $this->assertEmpty($crawler);
@@ -138,7 +138,7 @@ class WidgetControllerTest extends WebTestCase
 
         $crawler = $this->client->submit($form);
 
-        $this->assertContains($expectedMessage, $crawler->html());
+        static::assertStringContainsString($expectedMessage, $crawler->html());
         $this->assertEntityFields($entity, $expectedData);
     }
 

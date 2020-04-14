@@ -61,6 +61,6 @@ class ReportValidationTest extends WebTestCase
         $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $expectedMessage = $this->getContainer()->get('translator.default')->trans('Report saved');
-        $this->assertContains($expectedMessage, $this->client->getResponse()->getContent());
+        static::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
     }
 }

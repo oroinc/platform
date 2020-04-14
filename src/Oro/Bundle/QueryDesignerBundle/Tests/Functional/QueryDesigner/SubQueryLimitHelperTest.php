@@ -38,7 +38,7 @@ class SubQueryLimitHelperTest extends WebTestCase
             'id',
             $testQb->getQuery()->getHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_ID)
         );
-        $this->assertContains(
+        static::assertStringContainsString(
             SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY,
             $testQb->getQuery()->getHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY)
         );

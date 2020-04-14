@@ -2118,7 +2118,7 @@ class DataAuditTest extends WebTestCase
             $this->assertNotEmpty($expect);
 
             foreach ((array)$expect as $contains) {
-                $this->assertContains($contains, $audit['data']);
+                static::assertStringContainsString($contains, $audit['data']);
             }
         }
         $this->assertEquals([], $expects);

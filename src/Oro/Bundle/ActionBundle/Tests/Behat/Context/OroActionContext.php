@@ -35,10 +35,10 @@ class OroActionContext extends OroFeatureContext implements OroPageObjectAware, 
      */
     public function iShouldSeeAvailablePageActions(TableNode $table)
     {
-        $actions = $this->getActionLabels();
+        $actions = $this->getActionLabels(true);
 
         foreach ($table->getRows() as $row) {
-            self::assertContains($row[0], $actions, '', true);
+            static::assertContains(\strtolower($row[0]), $actions);
         }
     }
 
@@ -52,21 +52,18 @@ class OroActionContext extends OroFeatureContext implements OroPageObjectAware, 
         $actions = $this->getActionLabels();
 
         foreach ($table->getRows() as $row) {
-            self::assertNotContains($row[0], $actions, '', true);
+            static::assertNotContains(\strtolower($row[0]), $actions);
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getActionLabels()
+    protected function getActionLabels(bool $lowercase = false): array
     {
         /** @var PageActionButtonsContainerElement $actionsContainer */
         $actionsContainer = $this->elementFactory->createElement('PageActionButtonsContainer');
         $actions = $actionsContainer->getPageActions();
 
-        return array_map(function (Element $action) {
-            return $action->getText();
+        return array_map(function (Element $action) use ($lowercase) {
+            return ($lowercase ? \strtolower($action->getText()) : $action->getText());
         }, $actions);
     }
 }

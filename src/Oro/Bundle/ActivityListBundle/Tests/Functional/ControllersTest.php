@@ -33,8 +33,8 @@ class ControllersTest extends WebTestCase
         $activity1 = $this->getReference('test_activity_1');
         /** @var TestActivity $activity2 */
         $activity2 = $this->getReference('test_activity_2');
-        $this->assertContains($activity1->getMessage(), $content);
-        $this->assertContains($activity2->getMessage(), $content);
+        static::assertStringContainsString($activity1->getMessage(), $content);
+        static::assertStringContainsString($activity2->getMessage(), $content);
         $this->assertCount(1, $crawler->filter('div.widget-content.activity-list'));
     }
 }

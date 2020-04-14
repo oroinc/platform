@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ConstraintViolationList;
 
 class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 {
@@ -224,7 +223,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        $this->assertContains('This value should not be blank', (string)$form->getErrors(true, false));
+        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     public function testSubmitWhenNoTitle(): void
@@ -252,7 +251,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        $this->assertContains('This value should not be blank', (string)$form->getErrors(true, false));
+        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     /**

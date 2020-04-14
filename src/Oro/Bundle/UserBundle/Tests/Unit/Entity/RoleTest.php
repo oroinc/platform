@@ -74,7 +74,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $secondRole->unserialize($serializedString);
         /** @var Organization $unserializedOrganization */
         $unserializedOrganization = $secondRole->getOrganization();
-        
+
         $this->assertInstanceOf(Organization::class, $unserializedOrganization);
         $this->assertEquals($isEnabled, $unserializedOrganization->isEnabled());
         $this->assertEquals($name, $unserializedOrganization->getName());
@@ -94,6 +94,6 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $secondRole->unserialize($serializedString);
 
         $this->assertEquals($label, $secondRole->getLabel());
-        $this->assertContains($role, $secondRole->getRole());
+        static::assertStringContainsString($role, $secondRole->getRole());
     }
 }

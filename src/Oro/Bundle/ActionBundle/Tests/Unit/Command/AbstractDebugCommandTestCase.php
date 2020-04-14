@@ -76,7 +76,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
 
         $outputContent = implode("\n", $this->output->messages);
         foreach ($expected as $message) {
-            $this->assertContains($message, $outputContent);
+            static::assertStringContainsString($message, $outputContent);
         }
     }
 

@@ -147,7 +147,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
                     $index = array_search($params, $data, true);
 
                     $this->assertTrue($index !== false);
-                    $this->assertContains(
+                    static::assertStringContainsString(
                         (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
                         $query
                     );

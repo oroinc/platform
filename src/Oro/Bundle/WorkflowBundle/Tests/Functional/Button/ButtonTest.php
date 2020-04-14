@@ -74,10 +74,10 @@ class ButtonTest extends WebTestCase
             $notExpected = array_diff($allItems, $expected);
         }
         foreach ($expected as $item) {
-            $this->assertContains($item, $crawler->html());
+            static::assertStringContainsString($item, $crawler->html());
         }
         foreach ($notExpected as $item) {
-            $this->assertNotContains($item, $crawler->html());
+            static::assertStringNotContainsString($item, $crawler->html());
         }
     }
 

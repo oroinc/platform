@@ -430,9 +430,9 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         }
 
         $actual = $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
-        $this->assertNotContains("'", $actual);
-        $this->assertNotContains(',', $actual);
-        $this->assertNotContains($year, $actual);
+        $this->assertStringNotContainsString("'", $actual);
+        $this->assertStringNotContainsString(',', $actual);
+        $this->assertStringNotContainsString($year, $actual);
     }
 
     public function formatDayDataProvider()

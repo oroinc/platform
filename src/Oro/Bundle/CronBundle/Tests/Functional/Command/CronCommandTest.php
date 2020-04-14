@@ -27,8 +27,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('Scheduling run for command ', $result);
-        $this->assertContains('All commands scheduled', $result);
+        static::assertStringContainsString('Scheduling run for command ', $result);
+        static::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldRunAndNotScheduleIfNotCommandDue()
@@ -38,8 +38,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        $this->assertContains('Skipping not due command', $result);
-        $this->assertContains('All commands scheduled', $result);
+        static::assertStringContainsString('Skipping not due command', $result);
+        static::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldSendMessageIfCommandDue()
@@ -80,7 +80,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('The feature that enables this command is turned off', $result);
+        static::assertStringContainsString('The feature that enables this command is turned off', $result);
     }
 
     /**

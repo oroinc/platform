@@ -27,7 +27,7 @@ class ImportCommandTest extends WebTestCase
             ]
         );
 
-        $this->assertContains('The --email option is required.', $result);
+        static::assertStringContainsString('The --email option is required.', $result);
     }
 
     public function testInvalidEmail()
@@ -40,7 +40,10 @@ class ImportCommandTest extends WebTestCase
             ]
         );
 
-        $this->assertContains('Invalid email. There is no user with not_existing@example.com email!', $result);
+        static::assertStringContainsString(
+            'Invalid email. There is no user with not_existing@example.com email!',
+            $result
+        );
     }
 
     public function testImport()
@@ -56,7 +59,7 @@ class ImportCommandTest extends WebTestCase
             ]
         );
 
-        $this->assertContains('Scheduled successfully.', $result);
+        static::assertStringContainsString('Scheduled successfully.', $result);
 
         $sentMessage = $this->getSentMessage(Topics::PRE_IMPORT);
 

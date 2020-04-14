@@ -30,7 +30,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 0 topics', $output);
+        static::assertStringContainsString('Found 0 topics', $output);
     }
 
     public function testShouldShowMessageFoundTwoTopics()
@@ -44,7 +44,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 2 topics', $output);
+        static::assertStringContainsString('Found 2 topics', $output);
     }
 
     public function testShouldShowInfoAboutTopics()
@@ -58,12 +58,12 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('fooTopic', $output);
-        $this->assertContains('fooDescription', $output);
-        $this->assertContains('fooSubscriber', $output);
-        $this->assertContains('barTopic', $output);
-        $this->assertContains('barDescription', $output);
-        $this->assertContains('barSubscriber', $output);
+        static::assertStringContainsString('fooTopic', $output);
+        static::assertStringContainsString('fooDescription', $output);
+        static::assertStringContainsString('fooSubscriber', $output);
+        static::assertStringContainsString('barTopic', $output);
+        static::assertStringContainsString('barDescription', $output);
+        static::assertStringContainsString('barSubscriber', $output);
     }
 
     /**

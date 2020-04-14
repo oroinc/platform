@@ -21,7 +21,7 @@ class CleanupCommandTest extends WebTestCase
     public function testCommandOutput($expectedContent, $params, $rowsCount)
     {
         $result = $this->runCommand('oro:cron:integration:cleanup', $params);
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
         $totalRows = $this->getContainer()->get('doctrine')->getRepository('OroIntegrationBundle:Status')->findAll();
         $this->assertCount($rowsCount, $totalRows);
     }

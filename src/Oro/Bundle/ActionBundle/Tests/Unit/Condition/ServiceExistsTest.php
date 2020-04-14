@@ -63,7 +63,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->serviceExists->compile('$factoryAccessor');
 
-        $this->assertContains('$factoryAccessor->create(\'service_exists\'', $result);
+        static::assertStringContainsString('$factoryAccessor->create(\'service_exists\'', $result);
     }
 
     public function testSetContextAccessor()

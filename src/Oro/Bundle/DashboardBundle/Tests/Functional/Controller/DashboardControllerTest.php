@@ -35,7 +35,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard', $html);
+        static::assertStringContainsString('Test Dashboard', $html);
     }
 
     /**
@@ -60,7 +60,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard Update', $html);
+        static::assertStringContainsString('Test Dashboard Update', $html);
     }
 
     /**
@@ -75,7 +75,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard Update', $crawler->html());
+        static::assertStringContainsString('Test Dashboard Update', $crawler->html());
     }
 
     /**

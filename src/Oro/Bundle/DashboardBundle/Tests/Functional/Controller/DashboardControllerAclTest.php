@@ -29,7 +29,7 @@ class DashboardControllerAclTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains(
+        static::assertStringContainsString(
             'Quick Launchpad',
             $result->getContent()
         );

@@ -450,7 +450,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         if (!$expectedValid) {
             $constraint = new EmailFolders();
 
-            $this->assertContains($constraint->message, (string)$form->getErrors());
+            static::assertStringContainsString($constraint->message, (string)$form->getErrors());
         }
 
         $this->assertInstanceOf(UserEmailOrigin::class, $form->getData());

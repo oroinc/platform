@@ -44,9 +44,9 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
         );
 
         if ($expected) {
-            $this->assertContains($action, $crawler->html());
+            static::assertStringContainsString($action, $crawler->html());
         } else {
-            $this->assertNotContains($action, $crawler->html());
+            static::assertStringNotContainsString($action, $crawler->html());
         }
     }
 

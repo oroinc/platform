@@ -205,7 +205,7 @@ class ImportExportTest extends WebTestCase
         $errors = $this->client->getCrawler()->filter('.import-errors')->html();
 
         foreach ((array)$errorMessages as $message) {
-            $this->assertContains($message, $errors);
+            static::assertStringContainsString($message, $errors);
         }
     }
 

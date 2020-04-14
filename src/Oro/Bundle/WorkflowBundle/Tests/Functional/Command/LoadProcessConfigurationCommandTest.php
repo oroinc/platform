@@ -39,7 +39,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         foreach ($expectedMessages as $message) {
-            $this->assertContains($message, $result);
+            static::assertStringContainsString($message, $result);
         }
 
         $definitions = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();

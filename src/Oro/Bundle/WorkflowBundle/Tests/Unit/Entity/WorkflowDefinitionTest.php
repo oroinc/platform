@@ -351,8 +351,8 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $jsonContent = $serializer->serialize($this->workflowDefinition, 'json');
 
         $this->assertJson($jsonContent);
-        $this->assertNotContains('restrictions', $jsonContent);
-        $this->assertNotContains($restrictionAttribute, $jsonContent);
-        $this->assertContains($definitionName, $jsonContent);
+        static::assertStringNotContainsString('restrictions', $jsonContent);
+        static::assertStringNotContainsString($restrictionAttribute, $jsonContent);
+        static::assertStringContainsString($definitionName, $jsonContent);
     }
 }

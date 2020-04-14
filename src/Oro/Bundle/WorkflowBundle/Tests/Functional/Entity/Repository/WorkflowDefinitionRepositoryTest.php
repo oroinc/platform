@@ -119,8 +119,8 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $workflows = $this->getWorkflowNames($this->repository->findActive());
 
         $this->assertGreaterThanOrEqual(2, count($workflows));
-        $this->assertContains('test_active_flow1', $workflows);
-        $this->assertContains('test_active_flow2', $workflows);
+        $this->assertContainsEquals('test_active_flow1', $workflows);
+        $this->assertContainsEquals('test_active_flow2', $workflows);
     }
 
     public function testGetAllRelatedEntityClasses()
@@ -129,16 +129,16 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
         $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
-        $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertContains(Item::class, $result);
+        $this->assertContainsEquals(WorkflowAwareEntity::class, $result);
+        $this->assertContainsEquals(Item::class, $result);
 
         $result = $this->repository->getAllRelatedEntityClasses(true);
 
         $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
-        $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertContains(Item::class, $result);
-        $this->assertNotContains(Item2::class, $result);
+        $this->assertContainsEquals(WorkflowAwareEntity::class, $result);
+        $this->assertContainsEquals(Item::class, $result);
+        $this->assertNotContainsEquals(Item2::class, $result);
     }
 
     public function testInvalidateCache()

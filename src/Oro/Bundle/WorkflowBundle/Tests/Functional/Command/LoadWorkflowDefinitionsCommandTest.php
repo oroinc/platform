@@ -164,7 +164,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {
-            $this->assertContains($message, $result);
+            static::assertStringContainsString($message, $result);
         }
     }
 

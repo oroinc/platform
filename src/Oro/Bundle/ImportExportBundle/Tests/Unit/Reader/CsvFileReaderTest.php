@@ -272,7 +272,7 @@ class CsvFileReaderTest extends TestCase
             ->willReturnCallback(function (array $messages, $context) {
                 $message = reset($messages);
 
-                $this->assertContains('Expecting to get 3 columns, actually got 2.', $message);
+                static::assertStringContainsString('Expecting to get 3 columns, actually got 2.', $message);
             });
 
         $this->reader->read($stepExecution);

@@ -28,7 +28,7 @@ class SyncCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:cron:integration:sync', ['--help']);
 
-        $this->assertContains("Usage: oro:cron:integration:sync [options]", $result);
+        static::assertStringContainsString("Usage: oro:cron:integration:sync [options]", $result);
     }
 
     public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()
@@ -38,7 +38,7 @@ class SyncCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
-        $this->assertContains('Schedule sync for "Foo Integration" integration.', $result);
+        static::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
         $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
@@ -65,7 +65,7 @@ class SyncCommandTest extends WebTestCase
             'barConnectorOption=barValue',
         ]);
 
-        $this->assertContains('Schedule sync for "Foo Integration" integration.', $result);
+        static::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
         $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
@@ -108,7 +108,7 @@ class SyncCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
-        $this->assertContains('Schedule sync for "Foo Integration" integration.', $result);
+        static::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
         $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
         $this->assertCount(1, $traces);

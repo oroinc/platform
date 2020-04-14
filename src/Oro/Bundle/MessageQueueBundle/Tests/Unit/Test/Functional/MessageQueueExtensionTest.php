@@ -180,8 +180,8 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessageSent('test topic', 'test message');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
@@ -205,8 +205,8 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessageSent('test topic');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
@@ -236,8 +236,8 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesSent($topic, [$message1, 'another message']);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
@@ -258,11 +258,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesSent($topic, [$message2]);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -304,11 +304,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesCount($topic, 1);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -349,11 +349,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertCountMessages($topic, 1);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -393,11 +393,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesEmpty($topic);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 1 matches expected size 0',
                 $exception->getMessage()
             );
@@ -423,11 +423,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertEmptyMessages($topic);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 1 matches expected size 0',
                 $exception->getMessage()
             );
@@ -449,7 +449,10 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertAllMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that exactly all messages were sent', $exception->getMessage());
+            static::assertStringContainsString(
+                'Failed asserting that exactly all messages were sent',
+                $exception->getMessage()
+            );
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');

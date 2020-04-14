@@ -25,7 +25,7 @@ class LanguageControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_language_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('oro-translation-language-grid', $crawler->html());
+        static::assertStringContainsString('oro-translation-language-grid', $crawler->html());
 
         $languages = $this->getContainer()->get('oro_translation.provider.language')->getAvailableLanguages();
 

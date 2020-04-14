@@ -25,8 +25,8 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('My Web Store Introduction', $content);
-        $this->assertContains('Thank you for signing up to My Web Store!', $content);
+        static::assertStringContainsString('My Web Store Introduction', $content);
+        static::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testItems()
@@ -61,7 +61,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('From', $content);
+        static::assertStringContainsString('From', $content);
     }
 
     public function testBody()
@@ -71,7 +71,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('Thank you for signing up to My Web Store!', $content);
+        static::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testActivity()

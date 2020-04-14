@@ -22,7 +22,7 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
         $response = $this->post(['entity' => 'users'], $data, [], false);
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertContains('This username is already registered by another user. '
+        static::assertStringContainsString('This username is already registered by another user. '
             . 'Please provide unique username. Source: usernameLowercase.', $response->getContent());
 
         self::assertEmpty($this->findUser($data['data']['attributes']['email']));

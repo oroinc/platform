@@ -130,7 +130,7 @@ class ItemControllerTest extends WebTestCase
      */
     protected function assertDataGrid(Crawler $crawler, $gridName)
     {
-        $this->assertContains($gridName, $crawler->html());
+        static::assertStringContainsString($gridName, $crawler->html());
 
         $container = $crawler->filter(sprintf('div[data-page-component-name="%s"]', $gridName));
 
@@ -159,7 +159,7 @@ class ItemControllerTest extends WebTestCase
         $container = $node->parents()->parents()->html();
 
         foreach ($operations as $operation) {
-            $this->assertContains(
+            static::assertStringContainsString(
                 $router->generate('oro_action_operation_execute', ['operationName' => $operation]),
                 $container
             );

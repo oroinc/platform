@@ -82,7 +82,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->condition->compile('$factoryAccessor');
 
-        $this->assertContains('$factoryAccessor->create(\'has_property\'', $result);
+        static::assertStringContainsString('$factoryAccessor->create(\'has_property\'', $result);
     }
 
     /**

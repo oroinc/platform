@@ -47,7 +47,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Template saved", $crawler->html());
+        static::assertStringContainsString("Template saved", $crawler->html());
     }
 
     /**

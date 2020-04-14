@@ -398,7 +398,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $this->deleteImportExportFile($exportedFilename);
 
         if (empty($skippedColumns)) {
-            static::assertContains(
+            static::assertStringContainsString(
                 $this->getFileContent($expectedCsvFilePath),
                 $exportFileContent
             );

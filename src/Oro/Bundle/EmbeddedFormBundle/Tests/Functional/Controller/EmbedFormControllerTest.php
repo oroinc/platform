@@ -44,7 +44,7 @@ class EmbedFormControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains($feedbackForm->getSuccessMessage(), $result->getContent());
+        static::assertStringContainsString($feedbackForm->getSuccessMessage(), $result->getContent());
     }
 
     public function testSubmitPageIsRenderedSuccessfully()

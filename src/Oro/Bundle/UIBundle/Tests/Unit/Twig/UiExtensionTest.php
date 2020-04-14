@@ -633,7 +633,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                             $options['options']['participants']
                         );
                         \PHPUnit\Framework\TestCase::assertArrayHasKey('element', $options['options']);
-                        \PHPUnit\Framework\TestCase::assertContains(
+                        \PHPUnit\Framework\TestCase::assertStringContainsString(
                             'skype_button_' . md5($username),
                             $options['options']['element']
                         );

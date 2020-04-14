@@ -25,7 +25,7 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for user 'admin@example.com' is successfully set to 'debug' till";
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
@@ -54,7 +54,7 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for global scope is set to 'warning' till";
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
@@ -82,7 +82,7 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', $params);
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
     }
 
     /**
@@ -114,6 +114,6 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
-        $this->assertContains('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
+        static::assertStringContainsString('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
     }
 }

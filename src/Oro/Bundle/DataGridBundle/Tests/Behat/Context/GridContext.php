@@ -1602,10 +1602,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->waitForAjax();
         $element = $this->elementFactory->createElement('Modal');
-        self::assertContains(
+        static::assertStringContainsString(
             $message,
             $element->getText(),
-            sprintf('Confirmation dialogue does not contains text %s', $message)
+            \sprintf('Confirmation dialogue does not contains text %s', $message)
         );
     }
 

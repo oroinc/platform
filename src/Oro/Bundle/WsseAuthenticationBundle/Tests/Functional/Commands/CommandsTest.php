@@ -155,7 +155,7 @@ class CommandsTest extends WebTestCase
         ]);
 
         $this->assertFalse($nonceCache->has($this->getNonce($header[4][1])));
-        $this->assertContains('Deleted nonce cache', $commandTester->getDisplay());
+        static::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
 
         return $header;
     }

@@ -610,10 +610,10 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iShouldSeeThatOptionIsSelected($label, $field)
     {
         $selectedOptionText = $this->getSelectedOptionText($field);
-        self::assertContains(
+        static::assertStringContainsString(
             $label,
             $selectedOptionText,
-            sprintf(
+            \sprintf(
                 'Selected option with label "%s" doesn\'t contain text "%s" !',
                 $selectedOptionText,
                 $label

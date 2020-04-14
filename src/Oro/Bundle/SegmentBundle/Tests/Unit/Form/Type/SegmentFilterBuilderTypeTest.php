@@ -257,7 +257,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
-        $this->assertContains($segmentName, $submittedData->getName());
+        static::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }
 
@@ -300,7 +300,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertNull($submittedData->getOwner());
         $this->assertNull($submittedData->getOrganization());
-        $this->assertContains($segmentName, $submittedData->getName());
+        static::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }
 
@@ -337,7 +337,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $form->submit($data);
         /** @var Segment $submittedData */
         $submittedData = $form->getData();
-        $this->assertContains($segmentName, $submittedData->getName());
+        static::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertInstanceOf(Segment::class, $submittedData);
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }

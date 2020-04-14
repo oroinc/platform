@@ -35,7 +35,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 0 destinations', $output);
+        static::assertStringContainsString('Found 0 destinations', $output);
     }
 
     public function testShouldShowMessageFoundTwoDestinations()
@@ -49,7 +49,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 2 destinations', $output);
+        static::assertStringContainsString('Found 2 destinations', $output);
     }
 
     public function testShouldShowInfoAboutDestinations()
@@ -63,12 +63,12 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('aFooClientName', $output);
-        $this->assertContains('aFooDestinationName', $output);
-        $this->assertContains('fooSubscriber', $output);
-        $this->assertContains('aBarClientName', $output);
-        $this->assertContains('aBarDestinationName', $output);
-        $this->assertContains('barSubscriber', $output);
+        static::assertStringContainsString('aFooClientName', $output);
+        static::assertStringContainsString('aFooDestinationName', $output);
+        static::assertStringContainsString('fooSubscriber', $output);
+        static::assertStringContainsString('aBarClientName', $output);
+        static::assertStringContainsString('aBarDestinationName', $output);
+        static::assertStringContainsString('barSubscriber', $output);
     }
 
     /**

@@ -46,7 +46,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
 
-        $this->assertContains('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
+        static::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**
@@ -66,7 +66,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {
-            $this->assertContains($message, $result);
+            static::assertStringContainsString($message, $result);
         }
 
         $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();

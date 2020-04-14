@@ -123,6 +123,6 @@ class EmailNotificationControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        $this->assertContains("Email notification rule saved", $html);
+        static::assertStringContainsString("Email notification rule saved", $html);
     }
 }

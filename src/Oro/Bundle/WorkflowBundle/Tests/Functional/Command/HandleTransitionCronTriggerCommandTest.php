@@ -39,7 +39,7 @@ class HandleTransitionCronTriggerCommandTest extends WebTestCase
         );
 
         $this->assertNotEmpty($result);
-        $this->assertContains(
+        static::assertStringContainsString(
             sprintf(
                 'Transition cron trigger #%d of workflow "%s" successfully finished',
                 $trigger->getId(),

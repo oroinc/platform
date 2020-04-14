@@ -29,7 +29,7 @@ class ResetMenuUpdatesCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:navigation:menu:reset', $params);
         $totalRows = $this->getContainer()->get('doctrine')->getRepository('OroNavigationBundle:MenuUpdate')->findAll();
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
         $this->assertCount($rowsCount, $totalRows);
     }
 

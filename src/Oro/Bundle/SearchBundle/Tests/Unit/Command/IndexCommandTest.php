@@ -94,6 +94,6 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
             'identifiers' => ['id'],
         ]);
 
-        $this->assertContains('Started index update for entities.', $tester->getDisplay());
+        static::assertStringContainsString('Started index update for entities.', $tester->getDisplay());
     }
 }

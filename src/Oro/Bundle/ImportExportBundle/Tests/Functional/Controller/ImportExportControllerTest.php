@@ -288,9 +288,9 @@ class ImportExportControllerTest extends WebTestCase
         $response = $this->client->getResponse();
 
         static::assertResponseStatusCodeEquals($response, 200);
-        static::assertContains('Cancel', $response->getContent());
-        static::assertContains('Validate', $response->getContent());
-        static::assertContains('Import file', $response->getContent());
+        static::assertStringContainsString('Cancel', $response->getContent());
+        static::assertStringContainsString('Validate', $response->getContent());
+        static::assertStringContainsString('Import file', $response->getContent());
     }
 
     public function testImportValidateExportTemplateFormAction(): void
@@ -434,6 +434,6 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertCount(2, $result);
         $this->assertTrue($result['success']);
-        $this->assertContains('message', $result);
+        static::assertContainsEquals('message', $result);
     }
 }
