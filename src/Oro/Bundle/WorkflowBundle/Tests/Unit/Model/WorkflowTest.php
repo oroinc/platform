@@ -296,17 +296,27 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testTransitNotAllowedTransition(): void
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
-        $this->expectExceptionMessage(
-            'Step "stepOne" of workflow "test" doesn\'t have allowed transition "transition".'
-        );
-        $workflowStep = new WorkflowStep();
-        $workflowStep->setName('stepOne');
+        $workflowName = 'testWorkflow';
+        $stepName = 'stepOne';
 
-        $workflowItem = $this->createMock(WorkflowItem::class);
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
+            $stepName,
+            $workflowName
+        ));
+
+        $workflowStep = new WorkflowStep();
+        $workflowStep->setName($stepName);
+
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)
+            ->onlyMethods(['getCurrentStep'])
+            ->getMock();
         $workflowItem->expects($this->any())
             ->method('getCurrentStep')
             ->willReturn($workflowStep);
+        $workflowItem->setWorkflowName($workflowName);
 
         $step = $this->getStepMock($workflowStep->getName());
         $step->expects($this->once())
@@ -316,7 +326,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $transition = $this->getTransitionMock('transition');
 
-        $workflow = $this->createWorkflow('test');
+        $workflow = $this->createWorkflow($workflowName);
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getStepManager()->setSteps(array($step));
         $workflow->transit($workflowItem, 'transition');
