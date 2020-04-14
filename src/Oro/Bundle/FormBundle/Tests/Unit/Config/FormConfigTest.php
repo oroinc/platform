@@ -107,7 +107,7 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
         // NOTE: do not change default Error Handler or restore it
 
         /** test getSubBlock Exception */
-        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+        $this->expectException(\ErrorException::class);
         $this->expectExceptionMessage('Undefined index: testBlock');
         $this->formConfig->getBlock('testBlock');
     }
