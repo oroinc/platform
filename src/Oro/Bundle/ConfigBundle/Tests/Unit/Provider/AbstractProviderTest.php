@@ -465,7 +465,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
         $provider->setFeatureChecker($featureChecker);
         $tree = $this->getNodeNamesTree($provider->getTree());
-        $this->assertEquals($expected, $tree, '', 0.0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, $tree);
     }
 
     public function testGetJsTree()
