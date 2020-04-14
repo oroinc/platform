@@ -1,0 +1,29 @@
+Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm:
+  embedded_form_entity:
+    title: 'New Embedded Form'
+    css: ''
+    formType: 'Oro\\Bundle\\MagentoContactUsBundle\\Form\\Type\\ContactRequestType'
+    successMessage: ''
+    owner: '@organization'
+
+Oro\Bundle\TagBundle\Entity\Tag:
+  tag_entity:
+    name: 'New Tag'
+    owner: '@admin'
+    organization: '@organization'
+
+Oro\Bundle\TagBundle\Entity\Taxonomy:
+  taxonomy_entity:
+    name: 'New Taxonomy'
+    backgroundColor: 'l7'
+    owner: '@admin'
+    organization: '@organization'
+
+Oro\Bundle\SegmentBundle\Entity\Segment:
+  segment_entity:
+    name: 'New Segment'
+    type: '@segment_dynamic_type'
+    entity: 'Oro\Bundle\CustomerBundle\Entity\CustomerUser'
+    definition: ''
+    organization: '@organization'
+    owner: '@business_unit'

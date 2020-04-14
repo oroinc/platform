@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Index(name="email_entity_name_idx", columns={"entityName"})})
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository")
  * @Config(
+ *      routeName="oro_email_emailtemplate_index",
  *      defaultValues={
  *          "ownership"={
  *              "owner_type"="USER",
