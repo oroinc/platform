@@ -47,7 +47,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
             'expected' => true
         ];
 
-        yield 'empty configuration' => [
+        yield 'non-empty nodes configuration' => [
             'configuration' => [
                 WorkflowConfiguration::NODE_TRANSITIONS => [
                     'test_transition' => [

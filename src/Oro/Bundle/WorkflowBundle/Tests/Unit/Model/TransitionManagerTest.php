@@ -92,18 +92,6 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
             'transitions' => [$transition, $startTransition, $defaultStartTransition],
             'expected' => $startTransition
         ];
-
-        yield 'string name and start transition' => [
-            'name' => 'test_start_transition',
-            'transitions' => [$transition, $startTransition, $defaultStartTransition],
-            'expected' => $startTransition
-        ];
-
-        yield 'string name and start transition' => [
-            'name' => 'test_start_transition',
-            'transitions' => [$transition, $startTransition, $defaultStartTransition],
-            'expected' => $startTransition
-        ];
     }
 
     public function testSetTransitions()
