@@ -47,7 +47,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
     public function testTransformFailsWhenValueInNotAnArray()
     {
         $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+        $this->expectExceptionMessage('Expected argument of type "object", "string" given');
 
         $transformer = new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
         $transformer->transform('invalid value');

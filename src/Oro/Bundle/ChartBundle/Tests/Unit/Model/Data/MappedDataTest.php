@@ -11,8 +11,8 @@ class MappedDataTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
         $this->expectExceptionMessage(
             'Neither the property "unknownProperty" nor one of the methods "getUnknownProperty()",'
-            . ' "isUnknownProperty()", "hasUnknownProperty()", "__get()" or "__call()" exist and have public access'
-            . ' in class "dataSourceClassName".'
+            . ' "unknownProperty()", "isUnknownProperty()", "hasUnknownProperty()", "__get()" exist'
+            .' and have public access in class "'
         );
 
         $mapping = array('label' => 'unknownProperty');
