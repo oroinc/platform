@@ -38,7 +38,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
      */
     protected $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->executor = new PostProcessStepExecutor();
 

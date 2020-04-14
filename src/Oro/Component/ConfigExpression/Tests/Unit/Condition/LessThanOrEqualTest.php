@@ -11,7 +11,7 @@ class LessThanOrEqualTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\LessThanOrEqual */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\LessThanOrEqual();
         $this->condition->setContextAccessor(new ContextAccessor());

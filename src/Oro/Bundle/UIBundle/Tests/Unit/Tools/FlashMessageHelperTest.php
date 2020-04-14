@@ -22,7 +22,7 @@ class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FlashMessageHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);
         $this->translator = $this->createMock(TranslatorInterface::class);

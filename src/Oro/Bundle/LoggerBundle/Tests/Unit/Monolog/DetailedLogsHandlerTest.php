@@ -26,7 +26,7 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config = $this->createMock(ConfigManager::class);
         $this->loggerCache = $this->createMock(CacheProvider::class);

@@ -22,7 +22,7 @@ class LanguageCodeFormatterTest extends TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 

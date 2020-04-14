@@ -29,7 +29,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = self::createMock(Router::class);
         $this->router->expects(self::any())->method('generate')->willReturn('generated-url');

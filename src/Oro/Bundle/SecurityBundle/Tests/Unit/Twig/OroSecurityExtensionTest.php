@@ -33,7 +33,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OroSecurityExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

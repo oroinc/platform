@@ -23,7 +23,7 @@ class OperationTypeTest extends FormIntegrationTestCase
     /** @var OperationType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requiredAttributesListener = new RequiredAttributesListener();
 
@@ -34,7 +34,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formType, $this->operationManager, $this->requiredAttributesListener);
     }

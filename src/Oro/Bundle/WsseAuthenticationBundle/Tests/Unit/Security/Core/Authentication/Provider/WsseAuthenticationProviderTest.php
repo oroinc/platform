@@ -45,7 +45,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $token;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userProvider = $this->createMock(UserProviderInterface::class);
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);

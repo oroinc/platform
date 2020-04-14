@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Form\ChoiceList\TranslationChoiceLoader;
 
 class TranslationChoiceLoaderTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([LoadAddressTypeData::class]);

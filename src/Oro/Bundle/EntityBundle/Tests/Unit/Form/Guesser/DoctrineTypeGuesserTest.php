@@ -24,7 +24,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -40,7 +40,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->managerRegistry);
         unset($this->entityConfigProvider);

@@ -16,7 +16,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->packages = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()

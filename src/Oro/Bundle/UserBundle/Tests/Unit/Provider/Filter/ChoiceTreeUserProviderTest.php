@@ -15,7 +15,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()

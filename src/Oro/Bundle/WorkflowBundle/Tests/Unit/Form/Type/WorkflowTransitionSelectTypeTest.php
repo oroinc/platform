@@ -29,7 +29,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowTransitionSelectType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);

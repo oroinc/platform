@@ -29,7 +29,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendedAssociationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->associationManager = $this->createMock(AssociationManager::class);

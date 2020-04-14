@@ -28,7 +28,7 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userAgentProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgentProvider')
             ->disableOriginalConstructor()

@@ -18,7 +18,7 @@ class CheckboxTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new CheckboxType();
     }

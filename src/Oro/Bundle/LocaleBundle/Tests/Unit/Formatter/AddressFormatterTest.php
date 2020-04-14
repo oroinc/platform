@@ -26,7 +26,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
      */
     protected $addressFormatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -53,7 +53,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->localeSettings, $this->nameFormatter, $this->addressFormatter);
     }

@@ -18,7 +18,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataGridManager = $this->getMockBuilder(Manager::class)->disableOriginalConstructor()->getMock();
         $this->contextConfigurator = new DatagridConfigContextConfigurator($this->dataGridManager);

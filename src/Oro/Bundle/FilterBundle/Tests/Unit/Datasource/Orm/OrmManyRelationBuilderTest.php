@@ -23,7 +23,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /** @var int */
     protected $paramIndex;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

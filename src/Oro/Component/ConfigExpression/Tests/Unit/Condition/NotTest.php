@@ -10,7 +10,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\Not */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Not();
     }

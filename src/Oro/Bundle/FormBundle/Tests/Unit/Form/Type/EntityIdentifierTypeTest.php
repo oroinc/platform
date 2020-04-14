@@ -31,7 +31,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      */
     private $entitiesToIdsTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType')
             ->setMethods(array('createEntitiesToIdsTransformer'))

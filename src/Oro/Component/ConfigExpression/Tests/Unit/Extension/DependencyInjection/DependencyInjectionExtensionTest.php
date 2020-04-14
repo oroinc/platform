@@ -15,7 +15,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  array */
     protected $serviceIds;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceIds = ['test' => 'expression_service'];
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');

@@ -21,7 +21,7 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
     /** @var PhoneProviderPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->phoneProvider = $this->container->setDefinition(

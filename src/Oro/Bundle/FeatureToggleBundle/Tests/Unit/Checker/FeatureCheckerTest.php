@@ -20,7 +20,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationManager = $this->createMock(ConfigurationManager::class);
     }
@@ -28,7 +28,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->configurationManager);
     }

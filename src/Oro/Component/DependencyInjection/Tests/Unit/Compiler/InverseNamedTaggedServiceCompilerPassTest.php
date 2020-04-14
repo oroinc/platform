@@ -17,7 +17,7 @@ class InverseNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\TestC
     /** @var ContainerBuilder */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
     }

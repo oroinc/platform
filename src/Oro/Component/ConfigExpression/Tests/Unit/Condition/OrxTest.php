@@ -10,7 +10,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\Orx */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Orx();
     }

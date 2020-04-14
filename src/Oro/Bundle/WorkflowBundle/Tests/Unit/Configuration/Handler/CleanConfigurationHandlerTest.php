@@ -15,7 +15,7 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var CleanConfigurationHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
 

@@ -10,7 +10,7 @@ class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AclPermissionType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new AclPermissionType();
     }

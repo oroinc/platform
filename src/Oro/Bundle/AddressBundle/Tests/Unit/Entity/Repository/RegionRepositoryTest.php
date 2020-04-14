@@ -40,7 +40,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $testRegions = ['one', 'two', 'three'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translatableListener = $this->createMock(TranslatableListener::class);
         $this->eventManager = $this->createMock(EventManager::class);

@@ -13,7 +13,7 @@ class RelationCalculatorTest extends WebTestCase
      */
     protected $relationCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->relationCalculator = $this->getContainer()->get('oro_importexport.data_converter.relation_calculator');

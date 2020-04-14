@@ -30,7 +30,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry        = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

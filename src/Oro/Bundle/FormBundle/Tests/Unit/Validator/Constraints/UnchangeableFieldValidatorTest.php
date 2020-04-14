@@ -20,7 +20,7 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->em = $this->createMock(EntityManagerInterface::class);

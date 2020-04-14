@@ -10,7 +10,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
 {
     private $widgetItemsLoadDataListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->widgetItemsLoadDataListener = new WidgetItemsLoadDataListener();
     }

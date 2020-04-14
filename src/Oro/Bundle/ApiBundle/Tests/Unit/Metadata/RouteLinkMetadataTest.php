@@ -14,7 +14,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
     }

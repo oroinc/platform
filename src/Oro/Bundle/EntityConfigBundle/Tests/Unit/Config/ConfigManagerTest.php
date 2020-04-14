@@ -59,7 +59,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->configProvider->expects($this->any())

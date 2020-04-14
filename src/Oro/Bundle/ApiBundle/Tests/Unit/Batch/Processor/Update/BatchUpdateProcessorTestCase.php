@@ -14,7 +14,7 @@ class BatchUpdateProcessorTestCase extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateContext */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new BatchUpdateContext();
         $this->context->setAction(ApiAction::UPDATE_LIST);

@@ -13,7 +13,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
      */
     protected $locale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -21,7 +21,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

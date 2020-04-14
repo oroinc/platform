@@ -21,7 +21,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
@@ -32,7 +32,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         $this->function->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->registry, $this->function);
     }

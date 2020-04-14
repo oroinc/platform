@@ -24,7 +24,7 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
      */
     private $connector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->gridManagerLink = $this->createMock(ServiceLink::class);
         $this->connector = new DatagridExportConnector($this->gridManagerLink);

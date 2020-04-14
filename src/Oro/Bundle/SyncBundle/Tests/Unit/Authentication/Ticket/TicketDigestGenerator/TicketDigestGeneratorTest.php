@@ -22,7 +22,7 @@ class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     private $ticketDigestGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->passwordEncoder = $this->createMock(PasswordEncoderInterface::class);
         $this->secret = 'sampleSecret';

@@ -17,7 +17,7 @@ class UTCDateTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // class has private constructor
         $this->type = $this->getMockBuilder(UTCDateType::class)

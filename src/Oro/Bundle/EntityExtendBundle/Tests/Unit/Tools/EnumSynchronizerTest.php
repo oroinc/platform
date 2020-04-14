@@ -48,7 +48,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EnumSynchronizer */
     protected $synchronizer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);

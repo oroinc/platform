@@ -47,7 +47,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var UiExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

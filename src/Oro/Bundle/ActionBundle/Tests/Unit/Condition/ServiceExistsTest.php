@@ -26,7 +26,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
      */
     protected $propertyPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
 

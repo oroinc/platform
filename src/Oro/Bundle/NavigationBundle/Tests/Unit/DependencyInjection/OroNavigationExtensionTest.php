@@ -12,7 +12,7 @@ class OroNavigationExtensionTest extends ExtensionTestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new OroNavigationExtension();
     }

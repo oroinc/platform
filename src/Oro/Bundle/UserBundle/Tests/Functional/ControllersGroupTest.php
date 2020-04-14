@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Form;
 
 class ControllersGroupTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);

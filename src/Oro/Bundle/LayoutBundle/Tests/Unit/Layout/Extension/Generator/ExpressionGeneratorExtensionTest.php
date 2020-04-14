@@ -16,7 +16,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionGeneratorExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expressionLanguage = $this->createMock(ExpressionLanguage::class);
 

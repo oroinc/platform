@@ -9,7 +9,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var AliasCollection */
     protected $aliasCollection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aliasCollection = new AliasCollection();
     }

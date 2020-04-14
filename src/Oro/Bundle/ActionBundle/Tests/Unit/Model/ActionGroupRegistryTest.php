@@ -20,7 +20,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider =
             $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');

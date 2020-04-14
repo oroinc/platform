@@ -13,7 +13,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
     /** @var OroSimpleColorPickerType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

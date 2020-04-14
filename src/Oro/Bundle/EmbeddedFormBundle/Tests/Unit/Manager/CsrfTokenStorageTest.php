@@ -22,7 +22,7 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfTokenStorage */
     protected $csrfTokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenCache = $this->createMock(CacheInterface::class);
         $this->sessionIdProvider = $this->createMock(SessionIdProviderInterface::class);

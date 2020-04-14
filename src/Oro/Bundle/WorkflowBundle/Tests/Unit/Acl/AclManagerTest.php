@@ -30,7 +30,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflowRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

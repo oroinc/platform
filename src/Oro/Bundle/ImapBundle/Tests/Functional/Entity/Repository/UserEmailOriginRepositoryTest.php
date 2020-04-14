@@ -20,7 +20,7 @@ class UserEmailOriginRepositoryTest extends WebTestCase
     /** @var DoctrineHelper */
     protected $doctrineHeler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->doctrineHeler = $this->getContainer()->get('oro_entity.doctrine_helper');

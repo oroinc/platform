@@ -24,7 +24,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     protected $typeFormatters = ['test_format_type' => ['test_type' => 'test_formatter']];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->formatter = new FormatterProvider($this->container, $this->formatters, $this->typeFormatters);

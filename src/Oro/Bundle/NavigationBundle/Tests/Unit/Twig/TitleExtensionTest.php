@@ -24,7 +24,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->titleService = $this->createMock(TitleServiceInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);

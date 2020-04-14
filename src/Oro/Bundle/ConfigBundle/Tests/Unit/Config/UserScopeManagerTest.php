@@ -20,7 +20,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $securityContext;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

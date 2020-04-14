@@ -15,7 +15,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /** @var Count */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();

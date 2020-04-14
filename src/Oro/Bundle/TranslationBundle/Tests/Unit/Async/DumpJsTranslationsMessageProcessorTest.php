@@ -22,7 +22,7 @@ class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $logger = new NullLogger();
         $this->dumper = $this->createMock(JsTranslationDumper::class);

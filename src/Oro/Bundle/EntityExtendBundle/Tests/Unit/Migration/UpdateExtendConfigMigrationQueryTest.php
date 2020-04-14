@@ -16,7 +16,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $temporaryFilePath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()

@@ -25,7 +25,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     /** @var SetTotalCountHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

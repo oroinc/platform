@@ -17,14 +17,14 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->subscriber = new CommentLifecycleListener($this->tokenAccessor);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->tokenAccessor);
         unset($this->subscriber);

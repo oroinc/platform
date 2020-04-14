@@ -21,7 +21,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mapper = new GedmoTranslationMapper();
         $this->form = $this->createMock(FormInterface::class);

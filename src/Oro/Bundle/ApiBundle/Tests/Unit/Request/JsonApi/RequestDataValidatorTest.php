@@ -13,7 +13,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var RequestDataValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

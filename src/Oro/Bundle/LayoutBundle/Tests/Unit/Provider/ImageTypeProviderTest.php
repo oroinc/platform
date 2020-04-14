@@ -24,7 +24,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $themeManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->themeManager = $this->prophesize('Oro\Component\Layout\Extension\Theme\Model\ThemeManager');
         $this->provider = new ImageTypeProvider($this->themeManager->reveal());

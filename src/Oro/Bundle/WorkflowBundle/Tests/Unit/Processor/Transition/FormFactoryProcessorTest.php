@@ -19,7 +19,7 @@ class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var FormFactoryProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->context = $this->createMock(TransitionContext::class);

@@ -22,7 +22,7 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraintViolation;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this
             ->createMock(ValidatorInterface::class);

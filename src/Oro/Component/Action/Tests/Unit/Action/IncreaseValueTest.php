@@ -21,7 +21,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
     /** @var IncreaseValue */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

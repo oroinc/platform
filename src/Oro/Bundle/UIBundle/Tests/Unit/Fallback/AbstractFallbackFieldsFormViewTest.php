@@ -43,7 +43,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
      */
     protected $scrollData;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->requestStack = $this->createMock(RequestStack::class);

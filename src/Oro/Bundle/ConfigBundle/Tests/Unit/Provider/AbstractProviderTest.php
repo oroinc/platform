@@ -87,7 +87,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
      */
     abstract protected function getFilePath($fileName);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -116,7 +116,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $this->searchProvider = $this->createMock(ChainSearchProvider::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->authorizationChecker, $this->translator);

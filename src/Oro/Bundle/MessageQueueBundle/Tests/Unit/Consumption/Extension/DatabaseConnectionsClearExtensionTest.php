@@ -28,7 +28,7 @@ class DatabaseConnectionsClearExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->extension = new DatabaseConnectionsClearExtension($this->container, $this->connections);

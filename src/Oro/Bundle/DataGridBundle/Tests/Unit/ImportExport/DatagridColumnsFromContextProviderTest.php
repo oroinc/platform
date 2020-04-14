@@ -26,7 +26,7 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagridManager = $this->createMock(Manager::class);
         $this->columnsStateProvider = $this->createMock(DatagridStateProviderInterface::class);

@@ -18,7 +18,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     /** @var NormalizeParentEntityId */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

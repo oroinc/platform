@@ -20,7 +20,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationDomainProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(TranslationKeyRepository::class)
             ->disableOriginalConstructor()
@@ -43,7 +43,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new TranslationDomainProvider($registry, $this->cache);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider, $this->repository, $this->cache);
     }

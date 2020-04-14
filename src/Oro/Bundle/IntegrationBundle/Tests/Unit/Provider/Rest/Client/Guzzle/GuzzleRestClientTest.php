@@ -26,7 +26,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
      */
     protected $defaultOptions = array('default' => 'value');
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sourceClient = $this->getMockBuilder('Guzzle\Http\Client')
             ->disableOriginalConstructor()

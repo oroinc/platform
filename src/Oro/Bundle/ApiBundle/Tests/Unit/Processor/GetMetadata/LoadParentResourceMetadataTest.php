@@ -19,7 +19,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
     /** @var LoadParentResourceMetadata */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

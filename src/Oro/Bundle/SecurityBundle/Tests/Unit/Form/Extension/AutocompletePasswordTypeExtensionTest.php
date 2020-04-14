@@ -11,7 +11,7 @@ class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AutocompletePasswordTypeExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AutocompletePasswordTypeExtension();
     }

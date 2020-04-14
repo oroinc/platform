@@ -12,12 +12,12 @@ class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcePathProvidersPass */
     protected $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pass = new ResourcePathProvidersPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->pass);
     }

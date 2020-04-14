@@ -47,7 +47,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $expression;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();

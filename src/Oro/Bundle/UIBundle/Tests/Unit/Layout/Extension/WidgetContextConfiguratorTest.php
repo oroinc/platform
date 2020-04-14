@@ -15,7 +15,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
         $this->contextConfigurator = new WidgetContextConfigurator($this->requestStack);

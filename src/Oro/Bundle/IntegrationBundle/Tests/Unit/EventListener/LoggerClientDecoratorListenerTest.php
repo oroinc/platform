@@ -24,7 +24,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->listener = new LoggerClientDecoratorListener();
@@ -74,7 +74,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->logger, $this->listener);
     }

@@ -23,7 +23,7 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->themeRegistry = new ThemeRegistry($this->themeSettings);
     }

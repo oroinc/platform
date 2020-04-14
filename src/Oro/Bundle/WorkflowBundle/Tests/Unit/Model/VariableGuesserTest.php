@@ -28,7 +28,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * Test setup.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $formRegistry = $this->createMock(FormRegistry::class);
         $managerRegistry = $this->createMock(ManagerRegistry::class);

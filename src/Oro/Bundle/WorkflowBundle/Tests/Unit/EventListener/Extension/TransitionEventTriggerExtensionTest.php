@@ -26,7 +26,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,7 +57,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -16,7 +16,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected static $warmupCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(false);
@@ -37,7 +37,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         };
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 

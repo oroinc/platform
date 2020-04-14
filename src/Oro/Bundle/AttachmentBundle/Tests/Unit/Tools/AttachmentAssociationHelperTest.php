@@ -17,7 +17,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentAssociationHelper */
     protected $attachmentAssociationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

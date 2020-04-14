@@ -15,7 +15,7 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Type();
         $this->condition->setContextAccessor(new ContextAccessor());

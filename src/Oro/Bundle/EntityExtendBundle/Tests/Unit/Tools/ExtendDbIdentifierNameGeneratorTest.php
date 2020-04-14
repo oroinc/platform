@@ -9,7 +9,7 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }

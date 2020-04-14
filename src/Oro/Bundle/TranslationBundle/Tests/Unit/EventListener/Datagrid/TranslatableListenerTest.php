@@ -20,7 +20,7 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new TranslatableListener();
     }

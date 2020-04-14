@@ -39,7 +39,7 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)
@@ -66,7 +66,7 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OperationExtension($container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->extension,

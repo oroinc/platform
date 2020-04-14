@@ -12,13 +12,13 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
     protected $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
         $this->connection->expects($this->any())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->connection);
     }

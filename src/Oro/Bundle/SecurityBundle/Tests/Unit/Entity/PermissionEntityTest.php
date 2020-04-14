@@ -9,12 +9,12 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionEntity */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new PermissionEntity();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->object);
     }

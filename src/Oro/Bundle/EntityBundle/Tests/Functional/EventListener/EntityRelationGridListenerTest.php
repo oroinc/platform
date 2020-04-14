@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityRelationGridListenerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadExtendedRelationsData::class]);
@@ -34,11 +34,11 @@ class EntityRelationGridListenerTest extends WebTestCase
                 'field_name' => $fieldName,
             ]
         ], []);
-        
+
         $json = $this->getJsonResponseContent($response, 200);
         $this->assertEquals(count($testEntities), $json['options']['totalRecords']);
     }
-    
+
     public function relationsProvider()
     {
         return [

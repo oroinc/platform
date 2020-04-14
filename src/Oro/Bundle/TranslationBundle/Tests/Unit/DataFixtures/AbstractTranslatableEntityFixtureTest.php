@@ -11,7 +11,7 @@ class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
      */
     protected $fixture;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fixture =
             $this->getMockBuilder('Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture')
@@ -19,7 +19,7 @@ class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
                 ->getMockForAbstractClass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->fixture);
     }

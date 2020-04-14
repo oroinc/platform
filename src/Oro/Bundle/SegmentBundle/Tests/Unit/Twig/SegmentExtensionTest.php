@@ -18,7 +18,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentExtension */
     private $segmentExtension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 

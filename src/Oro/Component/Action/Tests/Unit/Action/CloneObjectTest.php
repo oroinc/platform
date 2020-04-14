@@ -15,7 +15,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
     /** @var ContextAccessor */
     protected $contextAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->action = new CloneObject($this->contextAccessor);
@@ -27,7 +27,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->action);
     }

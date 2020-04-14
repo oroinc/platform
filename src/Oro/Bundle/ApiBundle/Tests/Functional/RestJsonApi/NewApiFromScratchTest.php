@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NewApiFromScratchTest extends RestJsonApiTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

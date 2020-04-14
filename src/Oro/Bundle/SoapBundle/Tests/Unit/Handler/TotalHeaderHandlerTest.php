@@ -36,7 +36,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->optimizer = $this->createMock(CountQueryBuilderOptimizer::class);
         $this->optimizer->expects($this->any())->method('getCountQueryBuilder')
@@ -61,7 +61,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($configuration));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->handler, $this->optimizer, $this->em);
     }

@@ -41,7 +41,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflow;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $attributeNormalizer = $this->createMock(AttributeNormalizer::class);
         $serializer = $this->createMock(WorkflowAwareSerializer::class);

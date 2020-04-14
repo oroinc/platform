@@ -26,7 +26,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->type = new LocalizedFallbackValueCollectionType($this->registry);

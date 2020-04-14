@@ -28,7 +28,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
     }

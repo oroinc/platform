@@ -25,7 +25,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchEnumFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 

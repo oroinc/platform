@@ -66,7 +66,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $secondResultRecordId;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initMockObjects();
         $this->setUpMockObjects();

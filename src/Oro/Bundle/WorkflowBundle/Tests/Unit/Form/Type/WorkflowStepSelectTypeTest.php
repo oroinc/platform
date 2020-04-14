@@ -36,7 +36,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MessageCatalogueInterface */
     protected $translatorCatalogue;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 

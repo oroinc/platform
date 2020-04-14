@@ -12,7 +12,7 @@ class FormInitListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new FormInitListener();
     }

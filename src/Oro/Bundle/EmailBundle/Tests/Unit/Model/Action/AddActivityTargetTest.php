@@ -27,7 +27,7 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 

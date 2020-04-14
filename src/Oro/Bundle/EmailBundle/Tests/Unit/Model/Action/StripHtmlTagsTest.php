@@ -17,7 +17,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagHelper */
     protected $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 

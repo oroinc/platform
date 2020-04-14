@@ -18,7 +18,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var DataAccessor */
     protected $dataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->context  = new LayoutContext();

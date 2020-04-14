@@ -18,7 +18,7 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $taggableHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
             ->disableOriginalConstructor()->getMock();
@@ -28,7 +28,7 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new TagSubscriber($this->manager, $this->taggableHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->subscriber);
         unset($this->taggableHelper);

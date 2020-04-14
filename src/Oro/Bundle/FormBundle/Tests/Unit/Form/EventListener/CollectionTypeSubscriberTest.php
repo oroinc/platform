@@ -18,7 +18,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * SetUp test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new CollectionTypeSubscriber();
     }

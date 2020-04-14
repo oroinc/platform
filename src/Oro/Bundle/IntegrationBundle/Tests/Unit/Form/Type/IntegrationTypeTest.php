@@ -13,7 +13,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
     /** @var  FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->builder  = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()->getMock();
@@ -27,7 +27,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new IntegrationType($defaultUserOwnerFS, $integrationFS);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type, $this->builder);
     }

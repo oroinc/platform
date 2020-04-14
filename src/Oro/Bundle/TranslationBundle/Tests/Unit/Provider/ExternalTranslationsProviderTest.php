@@ -26,7 +26,7 @@ class ExternalTranslationsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceProvider = $this->createMock(TranslationServiceProvider::class);
 

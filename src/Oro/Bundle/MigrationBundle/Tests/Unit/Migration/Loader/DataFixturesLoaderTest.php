@@ -22,7 +22,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fixtureRepo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
 

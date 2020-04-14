@@ -30,7 +30,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->prophesize(ConfigManager::class);
         $this->subscriber = new ConfigSubscriber($this->configManager->reveal());

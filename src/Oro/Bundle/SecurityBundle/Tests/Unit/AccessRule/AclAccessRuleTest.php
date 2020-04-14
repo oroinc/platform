@@ -27,7 +27,7 @@ class AclAccessRuleTest extends TestCase
     /** @var MockObject */
     private $ownershipMetadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);

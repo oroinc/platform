@@ -31,7 +31,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classMethodNameChecker = $this->createMock(ClassMethodNameChecker::class);
         $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);

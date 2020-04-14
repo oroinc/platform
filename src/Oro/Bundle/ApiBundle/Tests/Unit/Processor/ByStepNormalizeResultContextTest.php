@@ -9,7 +9,7 @@ class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
     /** @var ByStepNormalizeResultContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new ByStepNormalizeResultContext();
     }

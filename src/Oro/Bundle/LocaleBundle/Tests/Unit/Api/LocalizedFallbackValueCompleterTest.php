@@ -11,7 +11,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
     /** @var LocalizedFallbackValueCompleter */
     private $localizedFallbackValueCompleter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

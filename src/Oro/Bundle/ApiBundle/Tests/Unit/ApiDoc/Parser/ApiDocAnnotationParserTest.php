@@ -9,7 +9,7 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocAnnotationParser */
     private $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new ApiDocAnnotationParser();
     }

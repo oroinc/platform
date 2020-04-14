@@ -34,7 +34,7 @@ class ChannelDeleteManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()->getMock();

@@ -22,7 +22,7 @@ abstract class AbstractExtensionCompilerPassTest extends \PHPUnit\Framework\Test
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()

@@ -41,7 +41,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -132,7 +132,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $entity->getData());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->registry, $this->action);
     }

@@ -35,7 +35,7 @@ class CopyTaggingTest extends \PHPUnit\Framework\TestCase
      */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tagManager = $this->createMock(TagManager::class);
         $this->taggableHelper = $this->createMock(TaggableHelper::class);

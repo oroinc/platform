@@ -22,7 +22,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultExclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->firstExclusionProvider = $this->createMock(ExclusionProviderInterface::class);

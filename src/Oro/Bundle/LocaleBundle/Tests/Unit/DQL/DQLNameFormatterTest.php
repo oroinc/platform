@@ -16,7 +16,7 @@ class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var DQLNameFormatter */
     protected $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()->getMock();
@@ -24,7 +24,7 @@ class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new DQLNameFormatter($this->nameFormatter);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formatter, $this->nameFormatter);
     }

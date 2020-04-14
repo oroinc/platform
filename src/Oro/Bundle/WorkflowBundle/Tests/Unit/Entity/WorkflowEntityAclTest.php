@@ -14,12 +14,12 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityAcl;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAcl = new WorkflowEntityAcl();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entityAcl);
     }

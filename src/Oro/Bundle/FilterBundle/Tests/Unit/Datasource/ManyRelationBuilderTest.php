@@ -12,7 +12,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $childBuilder1;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->childBuilder1 = $this->createMock('Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface');
 

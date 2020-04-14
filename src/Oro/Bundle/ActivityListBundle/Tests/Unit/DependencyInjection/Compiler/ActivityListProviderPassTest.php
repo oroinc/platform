@@ -20,7 +20,7 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListProviderPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->chainProvider = $this->container->register('oro_activity_list.provider.chain')

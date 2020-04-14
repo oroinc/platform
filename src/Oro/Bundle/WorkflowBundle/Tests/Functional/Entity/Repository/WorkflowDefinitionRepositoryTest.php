@@ -32,7 +32,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
     /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
@@ -44,7 +44,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->activityScopeProvider->setCurrentTestActivity(null);
         $this->repository->invalidateCache();

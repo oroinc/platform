@@ -29,7 +29,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 

@@ -44,7 +44,7 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WsseAuthenticationListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->responseEvent = $this->createMock(GetResponseEvent::class);
         $this->request = $this->getMockForAbstractClass(Request::class);

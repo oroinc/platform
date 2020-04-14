@@ -25,7 +25,7 @@ class TranslationStatisticProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationStatisticProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache            = $this->createMock('Doctrine\Common\Cache\Cache');
         $this->adapter          = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter')
@@ -45,7 +45,7 @@ class TranslationStatisticProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->cache, $this->adapter, $this->packagesProvider, $this->provider);
     }

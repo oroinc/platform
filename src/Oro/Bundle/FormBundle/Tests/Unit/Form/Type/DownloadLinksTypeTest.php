@@ -17,7 +17,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()
@@ -25,7 +25,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
         $this->type        = new DownloadLinksType($this->assetHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type, $this->assetHelper);
     }

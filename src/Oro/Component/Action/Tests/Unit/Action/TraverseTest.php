@@ -21,7 +21,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurableAction = $this->getMockBuilder('Oro\Component\Action\Action\Configurable')
             ->disableOriginalConstructor()

@@ -32,7 +32,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
     /** @var FlushData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

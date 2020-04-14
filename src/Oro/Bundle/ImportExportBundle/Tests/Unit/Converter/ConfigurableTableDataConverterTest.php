@@ -236,7 +236,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $fieldProvider = $this->createMock(EntityFieldProvider::class);

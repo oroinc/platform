@@ -42,7 +42,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $tokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->response = new Response();
         $this->request  = Request::create(self::TEST_URL);

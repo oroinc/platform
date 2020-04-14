@@ -30,7 +30,7 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

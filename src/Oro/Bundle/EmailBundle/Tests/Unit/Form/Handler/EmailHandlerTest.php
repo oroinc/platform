@@ -32,7 +32,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var Email */
     protected $model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(Form::class);
 

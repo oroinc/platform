@@ -12,7 +12,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\Blank */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Blank();
         $this->condition->setContextAccessor(new ContextAccessor());

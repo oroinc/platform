@@ -40,7 +40,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */
     private $filterFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

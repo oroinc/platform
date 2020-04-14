@@ -17,7 +17,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     /** @var Translator */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $statement = $this->createMock(Statement::class);
         $statement->expects($this->any())

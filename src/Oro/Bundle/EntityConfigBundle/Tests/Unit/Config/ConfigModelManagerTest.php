@@ -40,7 +40,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigModelManager */
     protected $configModelManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

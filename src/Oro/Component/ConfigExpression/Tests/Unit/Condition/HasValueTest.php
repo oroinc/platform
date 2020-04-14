@@ -11,7 +11,7 @@ class HasValueTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\HasValue */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\HasValue();
         $this->condition->setContextAccessor(new ContextAccessor());

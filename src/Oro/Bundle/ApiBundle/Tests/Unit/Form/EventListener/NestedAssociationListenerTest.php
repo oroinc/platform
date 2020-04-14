@@ -16,7 +16,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NestedAssociationListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = new EntityDefinitionFieldConfig();
         $targetConfig = $config->createAndSetTargetEntity();

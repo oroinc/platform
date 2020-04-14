@@ -38,7 +38,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListFinishMessageProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->operationManager = $this->createMock(AsyncOperationManager::class);

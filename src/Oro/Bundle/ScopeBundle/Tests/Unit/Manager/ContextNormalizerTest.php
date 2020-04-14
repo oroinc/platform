@@ -18,7 +18,7 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var  ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $scopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);

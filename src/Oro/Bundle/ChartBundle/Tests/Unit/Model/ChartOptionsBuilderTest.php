@@ -11,7 +11,7 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ChartOptionsBuilder();
     }

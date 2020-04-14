@@ -24,7 +24,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = new NotBlankFiltersValidator();
 

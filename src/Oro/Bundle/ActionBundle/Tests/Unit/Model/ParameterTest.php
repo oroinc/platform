@@ -12,12 +12,12 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     /** @var Parameter */
     protected $parameter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parameter = new Parameter('test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroupDefinition);
     }

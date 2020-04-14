@@ -16,7 +16,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /** @var Criteria */
     private $criteria;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

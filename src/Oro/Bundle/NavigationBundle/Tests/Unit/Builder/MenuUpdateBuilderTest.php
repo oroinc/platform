@@ -21,7 +21,7 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuUpdateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $menuUpdateProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()

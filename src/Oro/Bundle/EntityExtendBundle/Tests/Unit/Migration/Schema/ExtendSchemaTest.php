@@ -35,7 +35,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())

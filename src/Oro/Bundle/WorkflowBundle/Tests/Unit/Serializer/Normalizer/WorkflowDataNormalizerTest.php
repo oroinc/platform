@@ -35,7 +35,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attributeNormalizer = $this->createMock(AttributeNormalizer::class);
         $this->serializer = $this->createMock(WorkflowAwareSerializer::class);

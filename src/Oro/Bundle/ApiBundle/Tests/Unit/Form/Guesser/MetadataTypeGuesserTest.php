@@ -37,7 +37,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataTypeGuesser */
     private $typeGuesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 

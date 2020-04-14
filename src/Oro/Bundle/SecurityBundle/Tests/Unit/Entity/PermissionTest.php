@@ -11,12 +11,12 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
     /** @var Permission */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new Permission();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->object);
     }

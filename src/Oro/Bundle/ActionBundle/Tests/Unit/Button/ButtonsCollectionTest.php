@@ -15,13 +15,13 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchContext;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->collection = new ButtonsCollection();
         $this->searchContext = $this->getMockBuilder(ButtonSearchContext::class)->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->collection, $this->searchContext);
     }

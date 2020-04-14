@@ -12,7 +12,7 @@ class ReportControllerTest extends WebTestCase
     private const TEST_REPORT = 'Test user report';
     private const UPDATED_TEST_REPORT = 'Updated test user report';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }

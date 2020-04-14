@@ -29,7 +29,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
     /** @var array|WorkflowDefinition[] */
     protected $definitions = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 

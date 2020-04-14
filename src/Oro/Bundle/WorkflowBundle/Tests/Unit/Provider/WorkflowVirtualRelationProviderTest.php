@@ -24,7 +24,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entitiesWithWorkflowCache = $this->createMock(Cache::class);

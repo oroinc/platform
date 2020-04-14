@@ -16,7 +16,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

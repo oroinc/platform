@@ -11,12 +11,12 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new SyncProcessorRegistry();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->registry);
     }

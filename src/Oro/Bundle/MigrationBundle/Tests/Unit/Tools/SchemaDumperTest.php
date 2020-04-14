@@ -22,7 +22,7 @@ class SchemaDumperTest extends \PHPUnit\Framework\TestCase
      */
     protected $twig;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
         $this->schema = new Schema();

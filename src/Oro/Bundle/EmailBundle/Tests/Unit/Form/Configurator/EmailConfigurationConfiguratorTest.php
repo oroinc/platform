@@ -34,7 +34,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     private static $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         self::$encryptor = $this->createMock(SymmetricCrypterInterface::class);

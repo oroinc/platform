@@ -21,7 +21,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $calculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->templateManager = $this
             ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')

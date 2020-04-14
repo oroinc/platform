@@ -21,7 +21,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $nameStrategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider =
             $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface')

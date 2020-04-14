@@ -17,7 +17,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EnumTypeHelper */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

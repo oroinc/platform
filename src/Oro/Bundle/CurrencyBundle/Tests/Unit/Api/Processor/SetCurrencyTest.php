@@ -22,7 +22,7 @@ class SetCurrencyTest extends TypeTestCase
     /** @var SetCurrency */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

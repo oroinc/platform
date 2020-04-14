@@ -13,14 +13,14 @@ class ScopeCollectionTypeTest extends FormIntegrationTestCase
     /** @var ScopeCollectionType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new ScopeCollectionType();
 
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formType);
 

@@ -21,7 +21,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
     /** @var WsseEntryPoint */
     private $entryPoint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->request = $this->createMock(Request::class);

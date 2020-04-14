@@ -19,7 +19,7 @@ class StringFilterTest extends WebTestCase
     /** @var StringFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserData::class]);

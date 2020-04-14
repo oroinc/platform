@@ -30,7 +30,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ParentLocalizationSearchHandler */
     protected $searchHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
             ->disableOriginalConstructor()

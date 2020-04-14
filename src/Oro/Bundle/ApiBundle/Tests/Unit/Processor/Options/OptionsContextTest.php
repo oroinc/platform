@@ -11,7 +11,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
     /** @var OptionsContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new OptionsContext(
             $this->createMock(ConfigProvider::class),

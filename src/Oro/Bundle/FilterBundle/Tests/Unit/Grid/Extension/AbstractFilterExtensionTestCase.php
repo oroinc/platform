@@ -43,7 +43,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridParameters;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(RawConfigurationProvider::class);
         $this->filterBag = new FilterBagStub();

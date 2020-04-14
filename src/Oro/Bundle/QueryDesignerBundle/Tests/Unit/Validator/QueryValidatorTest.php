@@ -42,7 +42,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);
         $this->gridBuilder = $this->createMock(Builder::class);

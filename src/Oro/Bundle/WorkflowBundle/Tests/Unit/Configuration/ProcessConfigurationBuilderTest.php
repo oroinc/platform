@@ -19,12 +19,12 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ProcessConfigurationBuilder();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->builder);
     }

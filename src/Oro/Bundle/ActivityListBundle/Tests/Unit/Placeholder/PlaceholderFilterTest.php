@@ -33,7 +33,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderFilter */
     private $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->activityListProvider = $this->createMock(ActivityListChainProvider::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);

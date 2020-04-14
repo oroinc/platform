@@ -24,7 +24,7 @@ class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
      */
     protected $contextRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

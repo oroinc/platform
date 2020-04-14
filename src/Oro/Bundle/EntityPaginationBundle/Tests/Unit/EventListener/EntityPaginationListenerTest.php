@@ -30,7 +30,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

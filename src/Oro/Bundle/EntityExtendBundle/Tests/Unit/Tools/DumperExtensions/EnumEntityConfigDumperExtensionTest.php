@@ -33,7 +33,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendEntityConfigProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

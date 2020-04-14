@@ -15,7 +15,7 @@ class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateGridHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityProvider')
             ->disableOriginalConstructor()

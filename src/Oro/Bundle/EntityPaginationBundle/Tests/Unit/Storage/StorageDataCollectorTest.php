@@ -43,7 +43,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
      */
     protected $collector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
             ->disableOriginalConstructor()

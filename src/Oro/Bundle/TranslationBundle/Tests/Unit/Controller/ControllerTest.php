@@ -27,7 +27,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->templating = $this->createMock(EngineInterface::class);

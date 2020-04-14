@@ -11,7 +11,7 @@ class SetSuccessResponseStatusCodeTest extends OptionsProcessorTestCase
     /** @var SetSuccessResponseStatusCode */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

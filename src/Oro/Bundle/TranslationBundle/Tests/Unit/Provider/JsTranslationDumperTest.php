@@ -33,7 +33,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationControllerMock = $this->createMock(Controller::class);
         $this->routerMock = $this->createMock(Router::class);

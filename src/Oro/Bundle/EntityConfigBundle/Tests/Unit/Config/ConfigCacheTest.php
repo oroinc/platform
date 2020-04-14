@@ -39,7 +39,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigCache */
     private $configCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheProvider::class);
         $this->modelCache = $this->createMock(CacheProvider::class);

@@ -18,7 +18,7 @@ class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
     /** @var AclGroupProvidersPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->chainProvider = $this->container->register('oro_security.acl.group_provider.chain');

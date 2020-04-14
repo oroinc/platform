@@ -14,7 +14,7 @@ class SearchRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchRegistry */
     private $searchRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchHandler = $this->createMock(SearchHandlerInterface::class);
 

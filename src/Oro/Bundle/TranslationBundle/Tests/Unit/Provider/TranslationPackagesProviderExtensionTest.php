@@ -24,7 +24,7 @@ class TranslationPackagesProviderExtensionTest extends \PHPUnit\Framework\TestCa
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(WritableRepositoryInterface::class);
 

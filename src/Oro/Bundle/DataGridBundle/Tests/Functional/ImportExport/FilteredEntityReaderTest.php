@@ -13,7 +13,7 @@ class FilteredEntityReaderTest extends WebTestCase
     /** @var FilteredEntityReader */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->setSecurityToken();

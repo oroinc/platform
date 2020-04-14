@@ -18,7 +18,7 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerMetadataProvidersPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->chainProvider = $this->container->register('oro_security.owner.metadata_provider.chain');

@@ -21,7 +21,7 @@ class DateRangeFilterTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);

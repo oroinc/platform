@@ -19,7 +19,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder(MenuFactory::class)
             ->setMethods(['getRouteInfo', 'processRoute'])

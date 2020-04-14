@@ -44,7 +44,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
     /** @var EmailRenderer */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);

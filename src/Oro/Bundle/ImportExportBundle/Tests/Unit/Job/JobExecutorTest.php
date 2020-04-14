@@ -42,7 +42,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var JobExecutor */
     protected $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

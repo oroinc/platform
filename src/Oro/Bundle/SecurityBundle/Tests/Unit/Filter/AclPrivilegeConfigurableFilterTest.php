@@ -17,7 +17,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var ConfigurablePermissionProvider|\PHPUnit\Framework\MockObject\MockObject $permissionProvider */
         $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);

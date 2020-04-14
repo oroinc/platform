@@ -11,7 +11,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\NotHasValue */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\NotHasValue();
         $this->condition->setContextAccessor(new ContextAccessor());

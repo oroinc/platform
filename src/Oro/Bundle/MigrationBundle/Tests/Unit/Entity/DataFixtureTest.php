@@ -11,7 +11,7 @@ class DataFixtureTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataFixtureEntity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataFixtureEntity = new DataFixture();
     }

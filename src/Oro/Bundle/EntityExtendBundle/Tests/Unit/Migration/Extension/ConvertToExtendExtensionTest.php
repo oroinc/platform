@@ -33,7 +33,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  Schema|\PHPUnit\Framework\MockObject\MockObject */
     protected $schema;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadataHelper =
             $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')

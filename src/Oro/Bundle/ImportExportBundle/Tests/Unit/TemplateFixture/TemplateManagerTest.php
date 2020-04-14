@@ -13,7 +13,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateManager */
     protected $templateManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRegistry     =
             $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry')

@@ -35,7 +35,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()

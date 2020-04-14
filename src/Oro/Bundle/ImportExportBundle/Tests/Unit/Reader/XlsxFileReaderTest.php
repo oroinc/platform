@@ -24,7 +24,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     protected $importHelper;
 
     /** {@inheritdoc} */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);

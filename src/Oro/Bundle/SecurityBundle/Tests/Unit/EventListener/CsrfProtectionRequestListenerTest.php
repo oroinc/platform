@@ -21,7 +21,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfProtectionRequestListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->csrfRequestManager = $this->createMock(CsrfRequestManager::class);
 

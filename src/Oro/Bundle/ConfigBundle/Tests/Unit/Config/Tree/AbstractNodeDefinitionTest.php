@@ -12,7 +12,7 @@ class AbstractNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractNodeDefinition */
     protected $node;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->node = $this->getMockForAbstractClass(
             'Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition',
@@ -20,7 +20,7 @@ class AbstractNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->node);
     }

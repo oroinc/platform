@@ -15,7 +15,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
             ->disableOriginalConstructor()

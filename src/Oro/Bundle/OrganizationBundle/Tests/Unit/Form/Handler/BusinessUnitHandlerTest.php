@@ -44,7 +44,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $ownerTreeProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()

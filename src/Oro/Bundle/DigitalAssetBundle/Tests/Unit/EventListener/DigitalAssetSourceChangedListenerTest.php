@@ -24,7 +24,7 @@ class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DigitalAssetSourceChangedListener */
     private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->fileReflector = $this->createMock(FileReflector::class);

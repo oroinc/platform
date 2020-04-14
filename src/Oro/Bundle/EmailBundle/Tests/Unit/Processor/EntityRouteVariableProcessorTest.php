@@ -26,7 +26,7 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRouteVariableProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->urlProvider = $this->createMock(UrlProvider::class);

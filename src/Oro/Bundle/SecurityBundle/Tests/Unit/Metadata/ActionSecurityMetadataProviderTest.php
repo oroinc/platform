@@ -16,7 +16,7 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ActionSecurityMetadataProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
 

@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     /** @var Router */
     protected $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestQuery = $this->createMock(ParameterBag::class);
         $this->request = $this->createMock(Request::class);

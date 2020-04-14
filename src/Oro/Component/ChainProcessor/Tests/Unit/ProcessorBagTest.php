@@ -15,7 +15,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessorBag */
     protected $processorBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $processorRegistry->expects(self::any())

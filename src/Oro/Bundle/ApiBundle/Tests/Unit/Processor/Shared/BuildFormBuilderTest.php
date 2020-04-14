@@ -36,7 +36,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var BuildFormBuilder */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

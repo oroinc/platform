@@ -21,7 +21,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
     /** @var LoadExtendedAssociation */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

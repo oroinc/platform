@@ -17,7 +17,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
     /** @var RecognizeAssociationType */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

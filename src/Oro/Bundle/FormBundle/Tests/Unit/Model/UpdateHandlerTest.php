@@ -71,7 +71,7 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
 

@@ -9,7 +9,7 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class AbstractScopeProviderTestCase extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);

@@ -17,7 +17,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
      */
     private $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()

@@ -64,7 +64,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
         $this->entityConfigProvider = new ConfigProviderMock($configManager, 'entity');

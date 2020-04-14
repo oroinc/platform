@@ -17,7 +17,7 @@ class GroupManagerTest extends \PHPUnit\Framework\TestCase
 
     private $group;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

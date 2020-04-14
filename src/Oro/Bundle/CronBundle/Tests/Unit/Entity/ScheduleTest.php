@@ -9,12 +9,12 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
     /** @var Schedule */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new Schedule();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->object);
     }

@@ -40,7 +40,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     /** @var ActionData */
     protected $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->definition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationDefinition')
             ->disableOriginalConstructor()

@@ -33,7 +33,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     /** @var BuildFormBuilder */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -33,7 +33,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extendableCondition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->flashBag = $this->createMock(FlashBag::class);

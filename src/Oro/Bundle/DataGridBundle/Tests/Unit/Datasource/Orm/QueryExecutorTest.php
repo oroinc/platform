@@ -19,7 +19,7 @@ class QueryExecutorTest extends OrmTestCase
     /** @var QueryExecutor */
     private $queryExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadataDriver = new AnnotationDriver(
             new AnnotationReader(),

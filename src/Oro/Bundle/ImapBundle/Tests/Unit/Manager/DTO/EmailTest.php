@@ -21,7 +21,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /** @var Email */
     private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->message = $this->createMock(Message::class);
 

@@ -21,7 +21,7 @@ class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 

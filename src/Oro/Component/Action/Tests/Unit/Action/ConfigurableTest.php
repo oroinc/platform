@@ -27,7 +27,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
      */
     protected $testContext = array(1, 2, 3);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
             ->disableOriginalConstructor()
@@ -36,7 +36,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
         $this->configurableAction = new Configurable($this->assembler);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->configurableAction, $this->assembler);
     }

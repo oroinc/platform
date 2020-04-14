@@ -30,7 +30,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeFamily */
     private $attributeFamily;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()

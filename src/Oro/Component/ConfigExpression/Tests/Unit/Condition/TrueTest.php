@@ -9,7 +9,7 @@ class TrueTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\TrueCondition */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\TrueCondition();
     }

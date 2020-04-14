@@ -22,7 +22,7 @@ class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryFilterFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
         $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);

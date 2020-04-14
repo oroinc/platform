@@ -9,7 +9,7 @@ class MutableEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MutableEntityOverrideProvider */
     private $entityOverrideProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity1' => 'Test\Entity2']);
     }

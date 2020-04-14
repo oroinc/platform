@@ -41,7 +41,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AddressTypeTranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $addressTypeTranslationRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->countryRepository = $this->createMock(CountryRepository::class);
         $this->countryTranslationRepository = $this->createMock(CountryTranslationRepository::class);

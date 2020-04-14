@@ -66,7 +66,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

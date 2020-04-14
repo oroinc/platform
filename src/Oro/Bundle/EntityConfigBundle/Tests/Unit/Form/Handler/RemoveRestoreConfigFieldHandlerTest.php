@@ -58,7 +58,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);

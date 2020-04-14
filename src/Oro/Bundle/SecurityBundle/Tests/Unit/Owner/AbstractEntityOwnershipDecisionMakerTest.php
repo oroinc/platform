@@ -22,7 +22,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
      */
     protected $decisionMaker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 

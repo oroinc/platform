@@ -14,12 +14,12 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $pager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pager = new IndexerPager();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->pager);
     }

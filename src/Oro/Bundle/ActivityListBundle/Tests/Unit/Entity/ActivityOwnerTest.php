@@ -18,12 +18,12 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new ActivityOwner();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

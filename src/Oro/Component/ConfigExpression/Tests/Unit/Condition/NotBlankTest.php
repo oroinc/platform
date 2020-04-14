@@ -12,7 +12,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\NotBlank */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\NotBlank();
         $this->condition->setContextAccessor(new ContextAccessor());

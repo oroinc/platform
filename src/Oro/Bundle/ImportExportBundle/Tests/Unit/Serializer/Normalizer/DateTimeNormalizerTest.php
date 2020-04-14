@@ -14,7 +14,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var  LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

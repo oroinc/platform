@@ -18,7 +18,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
     /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadTestActivitiesForScopes::class]);

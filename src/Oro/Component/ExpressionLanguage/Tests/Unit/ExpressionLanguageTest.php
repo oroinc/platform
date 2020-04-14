@@ -16,7 +16,7 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
      */
     protected $expressionLanguage;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->expressionLanguage = new ExpressionLanguage();
     }

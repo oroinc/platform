@@ -14,7 +14,7 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ConnectionChecker */
     protected $checker;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->client = $this->createMock(WebsocketClientInterface::class);
         $this->checker = new ConnectionChecker($this->client);

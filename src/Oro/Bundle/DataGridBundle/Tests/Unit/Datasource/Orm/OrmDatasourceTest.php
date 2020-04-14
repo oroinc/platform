@@ -39,7 +39,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $queryExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(YamlProcessor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -22,7 +22,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
     use SearchExtensionTrait;
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

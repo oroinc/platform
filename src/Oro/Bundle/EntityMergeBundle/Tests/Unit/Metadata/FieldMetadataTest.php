@@ -29,7 +29,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
      */
     protected $fieldMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = array('foo' => 'bar');
         $this->doctrineMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')

@@ -28,7 +28,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
      */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -37,7 +37,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action, $this->eventDispatcher, $this->container);
     }

@@ -28,7 +28,7 @@ abstract class AbstractDuplicatorPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $filterId = 'testFilter';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()

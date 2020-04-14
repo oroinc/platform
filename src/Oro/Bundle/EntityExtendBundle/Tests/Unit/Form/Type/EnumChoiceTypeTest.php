@@ -10,7 +10,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     /** @var EnumChoiceType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

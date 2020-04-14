@@ -12,12 +12,12 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var PhpLayoutUpdateGenerator */
     protected $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new PhpLayoutUpdateGenerator();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->generator);
     }

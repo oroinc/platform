@@ -14,7 +14,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
     /** @var InitializeTarget */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new InitializeTarget();

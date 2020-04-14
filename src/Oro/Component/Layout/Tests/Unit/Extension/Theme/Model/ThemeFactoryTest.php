@@ -15,12 +15,12 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new ThemeFactory(new PropertyAccessor());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->factory);
     }

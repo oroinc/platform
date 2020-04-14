@@ -64,7 +64,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     /** @var Organization */
     private $currentOrg;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);

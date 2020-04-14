@@ -27,7 +27,7 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserEmailConfigHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->configManager = $this->createMock(ConfigManager::class);

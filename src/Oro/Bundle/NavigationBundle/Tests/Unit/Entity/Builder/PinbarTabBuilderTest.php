@@ -27,7 +27,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var PinbarTabBuilder */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->pinbarTabUrlNormalizer = $this->createMock(PinbarTabUrlNormalizer::class);

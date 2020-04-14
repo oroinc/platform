@@ -18,7 +18,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
      */
     private $workflowManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);

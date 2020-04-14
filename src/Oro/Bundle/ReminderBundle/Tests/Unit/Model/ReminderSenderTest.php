@@ -16,7 +16,7 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
      */
     protected $sender;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorRegistry')
             ->disableOriginalConstructor()

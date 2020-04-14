@@ -22,14 +22,14 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->getTempDir('XlsxFileWriterTest');
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->writer = new XlsxFileWriter($this->contextRegistry);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->writer->close();
     }

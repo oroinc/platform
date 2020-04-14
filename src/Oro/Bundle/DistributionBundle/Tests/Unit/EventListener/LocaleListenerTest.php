@@ -44,7 +44,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

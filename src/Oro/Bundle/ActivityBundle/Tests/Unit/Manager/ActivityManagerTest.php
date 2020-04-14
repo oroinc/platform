@@ -48,7 +48,7 @@ class ActivityManagerTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

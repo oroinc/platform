@@ -27,7 +27,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityWriter */
     protected $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

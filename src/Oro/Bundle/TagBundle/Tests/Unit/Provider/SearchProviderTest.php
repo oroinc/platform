@@ -21,7 +21,7 @@ class SearchProviderTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $securityProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager    = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -49,7 +49,7 @@ class SearchProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entityManager);
         unset($this->mapper);

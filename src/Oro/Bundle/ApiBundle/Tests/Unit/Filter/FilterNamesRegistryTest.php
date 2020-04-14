@@ -19,7 +19,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
     private $secondProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(FilterNames::class);
         $this->firstProvider = $this->createMock(FilterNames::class);

@@ -102,7 +102,7 @@ class HtmlTagProviderTest extends WebTestCase
     '<source></source><sub></sub><sup></sup><time></time><tfoot></tfoot><var></var><video></video>' .
     '<aside></aside>';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->htmlTagProvider = $this->getContainer()->get('oro_form.provider.html_tag_provider');

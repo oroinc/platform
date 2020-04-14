@@ -47,7 +47,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->createMock(ManagerInterface::class);
         $this->nameStrategy = $this->createMock(NameStrategyInterface::class);

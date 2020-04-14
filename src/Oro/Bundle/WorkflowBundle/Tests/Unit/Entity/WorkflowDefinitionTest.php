@@ -24,12 +24,12 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflowDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowDefinition = new WorkflowDefinition();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowDefinition);
     }

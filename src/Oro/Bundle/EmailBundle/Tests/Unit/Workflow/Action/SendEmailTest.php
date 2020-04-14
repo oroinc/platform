@@ -52,7 +52,7 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
      */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
         $this->emailProcessor = $this->createMock(Processor::class);

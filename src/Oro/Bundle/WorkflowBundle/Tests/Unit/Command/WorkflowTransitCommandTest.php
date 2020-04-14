@@ -32,7 +32,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repo = $this->createMock(EntityRepository::class);
 
@@ -50,7 +50,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->repo,

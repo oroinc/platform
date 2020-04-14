@@ -36,7 +36,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry      = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -51,7 +51,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = new DoctrineHelper($this->registry);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->registry, $this->em, $this->classMetadata, $this->doctrineHelper);
     }

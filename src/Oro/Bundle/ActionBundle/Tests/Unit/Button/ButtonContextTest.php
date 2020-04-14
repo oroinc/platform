@@ -15,7 +15,7 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->buttonContext = new ButtonContext();
     }
@@ -23,7 +23,7 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->buttonContext);
     }

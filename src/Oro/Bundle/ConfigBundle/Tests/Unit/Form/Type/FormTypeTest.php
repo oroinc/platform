@@ -22,7 +22,7 @@ class FormTypeTest extends TypeTestCase
     /** @var FormType */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(['__construct', 'preSubmit'])

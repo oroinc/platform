@@ -19,7 +19,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestRoutes */
     private $secondProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(RestRoutes::class);
         $this->firstProvider = $this->createMock(RestRoutes::class);

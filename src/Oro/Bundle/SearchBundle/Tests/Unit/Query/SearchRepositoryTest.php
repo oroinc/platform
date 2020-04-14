@@ -18,7 +18,7 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $mappingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(QueryFactoryInterface::class);
         $this->mappingProvider = $this->getMockBuilder(AbstractSearchMappingProvider::class)

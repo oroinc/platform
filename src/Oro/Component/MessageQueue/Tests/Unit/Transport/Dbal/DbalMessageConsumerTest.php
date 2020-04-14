@@ -33,7 +33,7 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbal = $this->createMock(Connection::class);
         $this->connection = $this->createMock(DbalConnection::class);

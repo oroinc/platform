@@ -33,7 +33,7 @@ class TranslatorTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadStrategyLanguages::class]);
@@ -53,7 +53,7 @@ class TranslatorTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->resources as $resource) {
             if (is_file($resource)) {

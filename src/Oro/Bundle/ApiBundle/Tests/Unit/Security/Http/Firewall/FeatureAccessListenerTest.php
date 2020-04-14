@@ -15,7 +15,7 @@ class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureAccessListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 

@@ -19,7 +19,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
     /** @var LoadFromConfigBag */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CollectSubresourcesContext();
         $this->context->getRequestType()->add(RequestType::REST);

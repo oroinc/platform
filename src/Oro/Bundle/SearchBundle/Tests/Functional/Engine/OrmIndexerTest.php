@@ -17,7 +17,7 @@ class OrmIndexerTest extends WebTestCase
 {
     use SearchExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -26,7 +26,7 @@ class OrmIndexerTest extends WebTestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->clearIndexTextTable();
     }

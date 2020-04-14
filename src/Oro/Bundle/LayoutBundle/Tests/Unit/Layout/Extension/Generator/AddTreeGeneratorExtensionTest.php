@@ -14,7 +14,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AddTreeGeneratorExtension();
     }

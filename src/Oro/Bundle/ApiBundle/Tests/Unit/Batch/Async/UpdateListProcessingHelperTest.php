@@ -27,7 +27,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListProcessingHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->producer = $this->createMock(MessageProducerInterface::class);

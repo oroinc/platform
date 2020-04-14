@@ -16,7 +16,7 @@ class CommandsTest extends WebTestCase
 {
     const FIREWALL_NAME = 'wsse_secured';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData;
 
 class MailboxTypeTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadUserData::class, LoadAllRolesData::class]);

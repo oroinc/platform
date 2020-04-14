@@ -41,7 +41,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $eventListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
         $this->em = $this->createMock(EntityManager::class);

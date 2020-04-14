@@ -12,7 +12,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\HasProperty */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\HasProperty();
         $this->condition->setContextAccessor(new ContextAccessor());

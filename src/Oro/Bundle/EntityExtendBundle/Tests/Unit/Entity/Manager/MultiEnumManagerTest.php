@@ -23,7 +23,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()

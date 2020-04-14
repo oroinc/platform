@@ -38,7 +38,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->setMethods([

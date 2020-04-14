@@ -14,7 +14,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new StepAssembler();
     }

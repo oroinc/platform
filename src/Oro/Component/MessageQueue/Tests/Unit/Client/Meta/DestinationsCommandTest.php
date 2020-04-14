@@ -15,7 +15,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
     /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
 

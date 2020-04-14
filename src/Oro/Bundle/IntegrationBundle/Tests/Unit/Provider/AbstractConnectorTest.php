@@ -26,7 +26,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
     /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $transportMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stepExecutionMock = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Entity\\StepExecution')
             ->setMethods(['getExecutionContext', 'getJobExecution'])
@@ -50,7 +50,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
         $this->transportMock     = $this->createMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->transportMock, $this->stepExecutionMock);
     }

@@ -29,7 +29,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     /** @var OwnerTreeListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);

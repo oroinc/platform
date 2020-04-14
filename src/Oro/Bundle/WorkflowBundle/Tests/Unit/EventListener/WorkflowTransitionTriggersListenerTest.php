@@ -26,7 +26,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionTriggersAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = $this->getMockBuilder(WorkflowTransitionTriggersAssembler::class)
             ->disableOriginalConstructor()->getMock();

@@ -16,7 +16,7 @@ class GoogleResourceOwnerTest extends \PHPUnit\Framework\TestCase
     /** @var GoogleResourceOwner */
     private $googleResourceOwner;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->cm = $this->createMock(ConfigManager::class);
 

@@ -17,7 +17,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()->getMock();
@@ -25,7 +25,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new TranslationProcessor($this->translationHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translationHelper, $this->processor);
     }

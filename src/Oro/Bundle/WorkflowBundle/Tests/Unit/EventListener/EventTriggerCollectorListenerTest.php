@@ -23,7 +23,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EventTriggerCollectorListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->createMock(EventTriggerExtensionInterface::class);
 

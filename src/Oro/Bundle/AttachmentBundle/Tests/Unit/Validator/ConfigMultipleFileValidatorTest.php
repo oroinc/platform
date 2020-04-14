@@ -24,7 +24,7 @@ class ConfigMultipleFileValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->constraintsProvider = $this->createMock(FileConstraintsProvider::class);

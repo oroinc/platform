@@ -20,7 +20,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var PhpConfigCacheAccessor */
     private $accessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PhpConfigCacheAccessor');
         $this->cache = new ConfigCache($this->cacheFile, false);

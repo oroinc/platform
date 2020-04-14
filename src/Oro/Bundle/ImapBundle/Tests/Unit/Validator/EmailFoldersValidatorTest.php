@@ -20,7 +20,7 @@ class EmailFoldersValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailFoldersValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailFolders();
 

@@ -26,7 +26,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -43,7 +43,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->registry, $this->action);
     }

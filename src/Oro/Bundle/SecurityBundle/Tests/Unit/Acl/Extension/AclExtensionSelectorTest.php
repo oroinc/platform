@@ -26,7 +26,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $objectIdAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
 

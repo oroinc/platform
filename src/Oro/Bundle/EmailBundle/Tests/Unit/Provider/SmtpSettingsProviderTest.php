@@ -53,7 +53,7 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->crypter = new DefaultCrypter();
         $this->settings['oro_email']['smtp_settings_password']['value'] = $this->crypter->encryptData(

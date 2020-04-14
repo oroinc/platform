@@ -18,7 +18,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
     /** @var PersistIncludedEntities */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

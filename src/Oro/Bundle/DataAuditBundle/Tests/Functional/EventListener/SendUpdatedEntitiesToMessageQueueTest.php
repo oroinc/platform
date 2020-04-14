@@ -14,7 +14,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -32,7 +32,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
         $bazOwner->setStringProperty('aString');
 
         $em->flush();
-        
+
         $message = $this->getFirstEntitiesChangedMessage();
         $this->assertEntitiesUpdatedInMessageCount(3, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);
@@ -183,7 +183,7 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
     {
         $date = new \DateTime('2010-11-12 00:01:02+0000');
         $sameDate = clone $date;
-        
+
         $owner = $this->createOwner();
         $owner->setDateProperty($date);
 

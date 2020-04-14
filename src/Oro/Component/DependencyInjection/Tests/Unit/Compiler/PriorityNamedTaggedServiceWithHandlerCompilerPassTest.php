@@ -17,7 +17,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
     /** @var ContainerBuilder */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
     }

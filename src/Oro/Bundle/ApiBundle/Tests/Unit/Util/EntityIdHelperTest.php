@@ -14,7 +14,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->entityIdHelper = new EntityIdHelper();

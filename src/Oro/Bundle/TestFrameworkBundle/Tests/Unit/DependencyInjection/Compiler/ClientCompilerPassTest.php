@@ -19,7 +19,7 @@ class ClientCompilerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerBuilder::class);
 

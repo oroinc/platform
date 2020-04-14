@@ -23,7 +23,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityNameResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()

@@ -14,12 +14,12 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
     /** @var BasePerson */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BasePerson();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

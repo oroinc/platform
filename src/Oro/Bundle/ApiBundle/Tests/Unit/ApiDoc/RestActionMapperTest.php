@@ -17,7 +17,7 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     /** @var RestActionMapper */
     private $actionMapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $routes = new RestRoutes(
             self::ITEM_ROUTE,

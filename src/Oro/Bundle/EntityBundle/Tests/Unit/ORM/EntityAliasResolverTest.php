@@ -27,7 +27,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAliasResolver */
     private $entityAliasResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
         $this->cache = $this->createMock(Cache::class);

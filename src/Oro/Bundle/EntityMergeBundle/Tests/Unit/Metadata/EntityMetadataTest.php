@@ -23,7 +23,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
      */
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = array('foo' => 'bar');
         $this->doctrineMetadata = $this->createDoctrineMetadata();

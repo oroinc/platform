@@ -26,7 +26,7 @@ class MultiEnumFilterTest extends OrmTestCase
     /** @var MultiEnumFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

@@ -22,7 +22,7 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
     /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $datasource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->createMock(FormFactoryInterface::class);

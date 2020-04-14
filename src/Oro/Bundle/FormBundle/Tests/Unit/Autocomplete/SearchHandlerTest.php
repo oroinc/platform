@@ -94,7 +94,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->indexer = $this->getMockBuilder(Indexer::class)
             ->setMethods(['simpleSearch'])

@@ -70,7 +70,7 @@ class SegmentFilterTest extends OrmTestCase
     /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $subqueryLimitHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -197,7 +197,7 @@ class SegmentFilterTest extends OrmTestCase
         return $classMetaData;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formFactory, $this->dynamicSegmentQueryBuilder, $this->filter);
     }

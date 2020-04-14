@@ -23,7 +23,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configKey = 'test';
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);

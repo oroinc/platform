@@ -42,7 +42,7 @@ class EmailSyncCommandTest extends WebTestCase
     /** @var SearchStringManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchStringManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

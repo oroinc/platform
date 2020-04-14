@@ -14,7 +14,7 @@ class ParentActionAvailabilityCheckTest extends GetSubresourceProcessorTestCase
     /** @var ParentActionAvailabilityCheck */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -14,7 +14,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyConfigContainer */
     protected $configContainer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configContainer = new PropertyConfigContainer([]);
     }

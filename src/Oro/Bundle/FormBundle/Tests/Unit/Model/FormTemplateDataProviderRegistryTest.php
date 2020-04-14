@@ -14,7 +14,7 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var FormTemplateDataProviderRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(FormTemplateDataProviderInterface::class);
         $providers = new ServiceLocator([

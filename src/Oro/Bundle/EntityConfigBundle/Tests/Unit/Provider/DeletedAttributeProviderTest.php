@@ -27,7 +27,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configModelManager = $this->getMockBuilder(ConfigModelManager::class)
             ->disableOriginalConstructor()
@@ -86,7 +86,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
             []
         );
     }
-    
+
     public function testRemoveAttributeValues()
     {
         $attributeFamily = new AttributeFamily();

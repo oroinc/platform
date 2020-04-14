@@ -19,7 +19,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
      */
     protected $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var \Symfony\Component\Templating\EngineInterface $templatingEngine */
         $this->phpEngine = $this->createMock('Symfony\Component\Templating\EngineInterface');

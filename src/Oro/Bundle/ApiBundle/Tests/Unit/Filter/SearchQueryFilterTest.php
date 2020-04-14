@@ -27,7 +27,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
         $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);

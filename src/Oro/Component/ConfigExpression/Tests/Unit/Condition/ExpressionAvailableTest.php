@@ -17,7 +17,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionAvailable */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(FactoryWithTypesInterface::class);
         $this->factory->expects($this->any())
@@ -31,7 +31,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->condition = new ExpressionAvailable($this->factory, self::NAME);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->condition, $this->factory);
     }

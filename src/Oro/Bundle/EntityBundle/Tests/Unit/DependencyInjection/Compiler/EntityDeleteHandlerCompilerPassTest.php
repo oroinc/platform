@@ -15,7 +15,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDeleteHandlerCompilerPass */
     private $compiler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new EntityDeleteHandlerCompilerPass();
     }

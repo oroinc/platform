@@ -37,7 +37,7 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 

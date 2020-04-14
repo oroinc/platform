@@ -20,7 +20,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflowManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
             ->disableOriginalConstructor()
@@ -34,7 +34,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowManager);
         unset($this->action);

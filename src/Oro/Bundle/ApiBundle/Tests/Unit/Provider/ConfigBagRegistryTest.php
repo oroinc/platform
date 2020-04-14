@@ -23,7 +23,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultConfigBag = $this->createMock(ConfigBagInterface::class);
         $this->firstConfigBag = $this->createMock(ConfigBag::class);

@@ -15,7 +15,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->setMethods(['getManager'])

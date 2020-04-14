@@ -37,7 +37,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessSchedulePolicy */
     protected $schedulePolicy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -76,7 +76,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

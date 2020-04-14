@@ -26,7 +26,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $sharedContexts = [OroMainContext::class];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = $this->getTempDir('behat');
         mkdir($this->tempDir . '/bundle1/Tests/Behat', 0777, true);

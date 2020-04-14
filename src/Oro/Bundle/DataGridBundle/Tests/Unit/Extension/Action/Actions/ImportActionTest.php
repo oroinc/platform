@@ -13,7 +13,7 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->action = new ImportAction();
     }

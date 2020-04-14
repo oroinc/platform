@@ -25,7 +25,7 @@ class AttributeGroupGridListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
             ->disableOriginalConstructor()

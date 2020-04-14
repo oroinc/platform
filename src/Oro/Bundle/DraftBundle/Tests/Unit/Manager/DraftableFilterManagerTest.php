@@ -16,7 +16,7 @@ class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
     /** @var DraftableFilterManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 

@@ -23,7 +23,7 @@ class ImapConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCa
     /** @var ImapConnectionConfigurationValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new ImapConnectionConfiguration();
 

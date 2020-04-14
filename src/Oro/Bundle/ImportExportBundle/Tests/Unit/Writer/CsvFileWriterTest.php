@@ -23,7 +23,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
@@ -37,7 +37,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer = new CsvFileWriter($this->contextRegistry);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->writer->close();
     }

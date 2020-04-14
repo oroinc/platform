@@ -25,7 +25,7 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsDumper = $this->createMock(JsTranslationDumper::class);
         $this->input = $this->createMock(InputInterface::class);
@@ -37,7 +37,7 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->jsDumper, $this->input, $this->output, $this->command);
     }

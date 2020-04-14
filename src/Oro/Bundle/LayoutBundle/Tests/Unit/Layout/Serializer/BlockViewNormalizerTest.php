@@ -17,7 +17,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewNormalizer */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->createMock(Serializer::class);
 

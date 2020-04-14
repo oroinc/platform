@@ -28,7 +28,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
     /** @var OrmMetadataFactoryClearer */
     private $clearer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);
 

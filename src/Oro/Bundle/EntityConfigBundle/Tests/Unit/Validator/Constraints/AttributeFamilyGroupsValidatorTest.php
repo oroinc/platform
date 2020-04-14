@@ -24,7 +24,7 @@ class AttributeFamilyGroupsValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
             ->getMock();

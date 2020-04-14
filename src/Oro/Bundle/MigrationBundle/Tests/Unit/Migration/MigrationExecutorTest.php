@@ -18,7 +18,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     /** @var MigrationExecutor */
     protected $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

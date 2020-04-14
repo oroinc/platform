@@ -19,7 +19,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(ActionProcessorInterface::class);
 

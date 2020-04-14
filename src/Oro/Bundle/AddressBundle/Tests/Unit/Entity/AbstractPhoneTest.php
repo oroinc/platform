@@ -11,12 +11,12 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
      */
     protected $phone;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->phone = $this->createPhone();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->phone);
     }

@@ -15,7 +15,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     /** @var EntityManager */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

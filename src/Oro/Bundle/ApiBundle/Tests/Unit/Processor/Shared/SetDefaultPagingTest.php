@@ -19,7 +19,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
     /** @var SetDefaultPaging */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

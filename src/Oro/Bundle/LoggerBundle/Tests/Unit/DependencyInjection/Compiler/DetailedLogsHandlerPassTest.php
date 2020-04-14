@@ -22,7 +22,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $containerBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->compilerPass = new DetailedLogsHandlerPass();

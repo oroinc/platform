@@ -33,7 +33,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldHelper = $this->createMock(FieldHelper::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

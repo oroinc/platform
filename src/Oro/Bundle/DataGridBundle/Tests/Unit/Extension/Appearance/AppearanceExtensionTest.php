@@ -20,7 +20,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $manager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager')
             ->disableOriginalConstructor()

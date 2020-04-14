@@ -21,7 +21,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
      */
     private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
 

@@ -14,7 +14,7 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ResourceFileImportProcessorFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
         /** @var FileLocatorInterface|\PHPUnit\Framework\MockObject\MockObject $fileLocator */

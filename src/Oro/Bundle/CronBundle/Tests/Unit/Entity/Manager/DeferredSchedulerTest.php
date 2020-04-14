@@ -33,7 +33,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var SchedulesByArgumentsFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $schedulesByArgumentsFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scheduleManager = $this->getMockBuilder(ScheduleManager::class)
             ->disableOriginalConstructor()

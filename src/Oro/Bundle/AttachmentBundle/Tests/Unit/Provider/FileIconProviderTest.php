@@ -16,7 +16,7 @@ class FileIconProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileIconProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new FileIconProvider(self::FILE_ICONS);
     }

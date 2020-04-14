@@ -21,7 +21,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

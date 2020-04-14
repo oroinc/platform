@@ -24,7 +24,7 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityNameResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
             ->disableOriginalConstructor()

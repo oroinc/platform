@@ -28,7 +28,7 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FieldsTransformer */
     private $fieldsTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->repository = $this->createMock(AuditFieldRepository::class);

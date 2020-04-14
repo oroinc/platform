@@ -19,7 +19,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineMetadata = new DoctrineMetadata();
     }

@@ -33,7 +33,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->action = new DuplicateEntity($this->contextAccessor);
@@ -42,7 +42,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDuplicatorFactory($this->getDuplicateFactory());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }

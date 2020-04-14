@@ -20,7 +20,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var FormContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 

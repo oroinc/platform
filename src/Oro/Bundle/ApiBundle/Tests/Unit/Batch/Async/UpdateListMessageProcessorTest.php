@@ -83,7 +83,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListMessageProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->jobStorage = $this->createMock(JobStorage::class);

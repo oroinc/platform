@@ -13,7 +13,7 @@ class DashboardControllerAclTest extends WebTestCase
      */
     protected $dashboardManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(['Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData']);

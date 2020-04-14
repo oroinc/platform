@@ -6,7 +6,7 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 class PdoMysqlTest extends AbstractPdoTest
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

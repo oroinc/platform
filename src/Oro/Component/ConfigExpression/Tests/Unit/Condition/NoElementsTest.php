@@ -12,7 +12,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
     /** @var NoElements */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new NoElements();
         $this->condition->setContextAccessor(new ContextAccessor());

@@ -15,7 +15,7 @@ class LayoutTest extends LayoutTestCase
     /** @var LayoutRendererRegistry */
     protected $rendererRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->renderer         = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->rendererRegistry = new LayoutRendererRegistry();

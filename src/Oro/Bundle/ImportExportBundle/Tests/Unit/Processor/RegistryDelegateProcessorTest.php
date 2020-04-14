@@ -29,7 +29,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
         $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');

@@ -21,7 +21,7 @@ class CsvFileReaderTest extends TestCase
     /** @var ImportStrategyHelper|MockObject */
     protected $importHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);
@@ -52,7 +52,7 @@ class CsvFileReaderTest extends TestCase
         while (($dataRow = $this->reader->read($stepExecution)) !== null) {
             $data[] = $dataRow;
         }
-        
+
         $this->assertNull($this->reader->getHeader()); //ensured that previous data was cleared
         $this->assertEquals($expected, $data);
     }

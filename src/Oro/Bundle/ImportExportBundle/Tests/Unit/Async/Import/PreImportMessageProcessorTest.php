@@ -102,7 +102,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);

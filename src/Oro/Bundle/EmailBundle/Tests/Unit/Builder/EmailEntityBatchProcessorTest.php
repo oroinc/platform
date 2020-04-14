@@ -31,7 +31,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcher */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ownerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()

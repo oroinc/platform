@@ -43,7 +43,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /** @var Context */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

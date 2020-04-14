@@ -12,13 +12,13 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigLayoutUpdateGenerator */
     protected $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $expressionValidator = $this->createMock(ExpressionValidator::class);
         $this->generator = new ConfigLayoutUpdateGenerator($expressionValidator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->generator);
     }

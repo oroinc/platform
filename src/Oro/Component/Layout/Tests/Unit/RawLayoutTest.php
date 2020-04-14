@@ -17,7 +17,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     /** @var RawLayout */
     protected $rawLayout;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayout = new RawLayout();
     }

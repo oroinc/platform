@@ -16,7 +16,7 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
     /** @var ChainAdditionalEmailAssociationProvider */
     private $chainProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(AdditionalEmailAssociationProviderInterface::class);
         $this->provider2 = $this->createMock(AdditionalEmailAssociationProviderInterface::class);

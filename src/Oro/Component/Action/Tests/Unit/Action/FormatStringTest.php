@@ -34,7 +34,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
      */
     protected $expectedString = 'some "first" test "second" string';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new FormatString(new ContextAccessor());
 
@@ -45,7 +45,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }

@@ -10,7 +10,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutContext */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new LayoutContext();
     }

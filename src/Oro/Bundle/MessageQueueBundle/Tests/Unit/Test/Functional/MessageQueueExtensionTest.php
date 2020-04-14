@@ -32,7 +32,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         self::tearDownAfterClass();
         $this->initClient();
@@ -41,7 +41,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::$container = null;
         self::$messageCollector = null;

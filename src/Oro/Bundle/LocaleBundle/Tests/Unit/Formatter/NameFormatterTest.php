@@ -19,7 +19,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
      */
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -29,7 +29,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new NameFormatter($this->localeSettings);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->localeSettings);
         unset($this->formatter);

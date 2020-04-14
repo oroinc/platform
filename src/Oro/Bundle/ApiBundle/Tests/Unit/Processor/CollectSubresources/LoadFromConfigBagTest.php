@@ -46,7 +46,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var LoadFromConfigBag */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

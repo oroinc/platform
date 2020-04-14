@@ -15,7 +15,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $topicRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->topicRegistry = $this->createMock(TopicMetaRegistry::class);
 

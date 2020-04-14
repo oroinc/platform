@@ -28,7 +28,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')

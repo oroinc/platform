@@ -78,7 +78,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     /** @var MockObject */
     private $aclHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()
@@ -147,7 +147,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->classMetadata);
         unset($this->ormConfiguration);

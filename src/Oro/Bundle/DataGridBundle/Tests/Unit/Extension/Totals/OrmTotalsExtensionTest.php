@@ -43,7 +43,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->translator->expects($this->any())

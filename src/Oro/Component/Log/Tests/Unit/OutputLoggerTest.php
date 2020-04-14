@@ -11,7 +11,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
     protected $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->output = $this->createMock('Symfony\Component\Console\Output\OutputInterface');
     }

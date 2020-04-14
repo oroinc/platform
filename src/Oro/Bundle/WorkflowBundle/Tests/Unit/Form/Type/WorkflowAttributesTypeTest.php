@@ -57,7 +57,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createWorkflowRegistryMock();
         $this->attributeGuesser = $this->createAttributeGuesserMock();

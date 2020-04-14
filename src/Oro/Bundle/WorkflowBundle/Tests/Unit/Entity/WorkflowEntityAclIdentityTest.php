@@ -15,12 +15,12 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
      */
     protected $aclIdentity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclIdentity = new WorkflowEntityAclIdentity();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->aclIdentity);
     }

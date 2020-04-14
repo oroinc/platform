@@ -17,7 +17,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $meta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()

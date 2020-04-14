@@ -12,7 +12,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
      */
     protected $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

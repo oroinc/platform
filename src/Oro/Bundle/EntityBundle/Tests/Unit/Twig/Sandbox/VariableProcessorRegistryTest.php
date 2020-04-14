@@ -17,7 +17,7 @@ class VariableProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor1 = $this->createMock(VariableProcessorInterface::class);
         $processors = new ServiceLocator([

@@ -17,7 +17,7 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineParamConverterDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->paramConverter = $this->createMock(ParamConverterInterface::class);
 

@@ -11,7 +11,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAliasProvider */
     private $entityAliasProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configCache = $this->createMock(ConfigCache::class);
         $configCache->expects(self::once())

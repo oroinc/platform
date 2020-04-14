@@ -20,7 +20,7 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|OroDataCacheManager */
     private $dataCacheManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataCacheManager = self::createMock(OroDataCacheManager::class);
         $this->baseCommandExecutor = self::createMock(BaseCommandExecutor::class);

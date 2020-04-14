@@ -24,7 +24,7 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
      */
     protected $contextRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

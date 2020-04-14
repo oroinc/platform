@@ -30,7 +30,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AsyncOperationDeleteHandler */
     private $deleteHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $extension = new EntityDeleteHandlerExtension();
         $extensionRegistry = $this->createMock(EntityDeleteHandlerExtensionRegistry::class);

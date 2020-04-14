@@ -34,7 +34,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
     /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineTypeMappingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistry::class);
 

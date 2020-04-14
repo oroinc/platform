@@ -21,7 +21,7 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
      */
     protected $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->templateManager = $this
             ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')

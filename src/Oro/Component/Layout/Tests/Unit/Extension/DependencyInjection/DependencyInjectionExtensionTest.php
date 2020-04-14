@@ -13,7 +13,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyInjectionExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->extension = new DependencyInjectionExtension(

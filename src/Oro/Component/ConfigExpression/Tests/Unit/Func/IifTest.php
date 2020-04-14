@@ -12,7 +12,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Iif */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new Func\Iif();
         $this->function->setContextAccessor(new ContextAccessor());

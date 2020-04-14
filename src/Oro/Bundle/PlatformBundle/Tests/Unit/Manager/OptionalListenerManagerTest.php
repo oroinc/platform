@@ -22,7 +22,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $testListeners;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->testListeners = [
             'test.listener1',

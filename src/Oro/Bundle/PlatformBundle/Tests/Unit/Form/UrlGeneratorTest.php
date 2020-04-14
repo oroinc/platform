@@ -18,7 +18,7 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->packageProvider = $this->getMockBuilder('Oro\Bundle\PlatformBundle\Provider\PackageProvider')
             ->disableOriginalConstructor()

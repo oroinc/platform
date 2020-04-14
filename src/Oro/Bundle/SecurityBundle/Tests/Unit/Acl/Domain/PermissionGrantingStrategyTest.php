@@ -62,7 +62,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionGrantingStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->createMock(AclExtensionInterface::class);
         $this->configureTestAclExtension();

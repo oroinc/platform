@@ -19,7 +19,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     /** @var AssignActiveUser */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
@@ -30,7 +30,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->tokenStorage);
         unset($this->action);

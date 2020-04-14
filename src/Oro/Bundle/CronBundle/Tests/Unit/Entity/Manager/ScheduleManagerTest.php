@@ -22,7 +22,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ScheduleManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->schedulesByArgumentsFilter = $this->createMock(SchedulesByArgumentsFilterInterface::class);
@@ -34,7 +34,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->manager, $this->registry);
     }

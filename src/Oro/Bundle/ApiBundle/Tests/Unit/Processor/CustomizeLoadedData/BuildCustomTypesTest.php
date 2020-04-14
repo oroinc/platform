@@ -25,7 +25,7 @@ class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
     /** @var BuildCustomTypes */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CustomizeLoadedDataContext();
         $this->associationManager = $this->createMock(AssociationManager::class);

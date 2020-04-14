@@ -12,7 +12,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
     /** @var ResetTranslationsMassAction */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new ResetTranslationsMassAction();
     }

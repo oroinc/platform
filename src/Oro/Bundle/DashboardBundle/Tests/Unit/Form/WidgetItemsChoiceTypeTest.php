@@ -10,7 +10,7 @@ class WidgetItemsChoiceTypeTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetItemsChoiceType */
     protected $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetItemsChoiceType();
     }

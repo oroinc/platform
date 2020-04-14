@@ -30,7 +30,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
     /** @var DictionaryEntityRouteOptionsResolver */
     protected $routeOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);

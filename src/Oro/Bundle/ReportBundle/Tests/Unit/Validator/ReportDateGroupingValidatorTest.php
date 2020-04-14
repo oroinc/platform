@@ -25,7 +25,7 @@ class ReportDateGroupingValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)->getMock();
         $this->reportDateGroupingValidator = new ReportDateGroupingValidator();

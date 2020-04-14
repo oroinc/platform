@@ -14,7 +14,7 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
      */
     protected $transport;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clientFactory = $this->createMock(
             'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\RestClientFactoryInterface'

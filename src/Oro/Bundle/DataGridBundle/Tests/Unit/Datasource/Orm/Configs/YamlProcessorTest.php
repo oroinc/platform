@@ -20,7 +20,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()

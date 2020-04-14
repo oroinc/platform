@@ -18,7 +18,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     /** @var PermissionConfigurationProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -26,7 +26,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             ->get('oro_security.configuration.provider.permission_configuration');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->provider->warmUpCache();
         $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();

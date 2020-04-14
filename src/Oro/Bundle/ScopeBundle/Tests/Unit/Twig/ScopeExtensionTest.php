@@ -20,7 +20,7 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $scopeExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
         $this->scopeExtension = new ScopeExtension($this->propertyAccessor);

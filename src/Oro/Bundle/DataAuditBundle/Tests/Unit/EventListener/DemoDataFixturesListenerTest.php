@@ -14,7 +14,7 @@ class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DemoDataFixturesListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
 

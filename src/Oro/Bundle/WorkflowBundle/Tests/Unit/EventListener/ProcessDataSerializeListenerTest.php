@@ -27,7 +27,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
         $this->listener = new ProcessDataSerializeListener(new ServiceLink($this->serializer));

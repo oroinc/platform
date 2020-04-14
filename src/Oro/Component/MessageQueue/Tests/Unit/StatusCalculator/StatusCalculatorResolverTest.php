@@ -31,7 +31,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryCalculator = $this->createMock(QueryCalculator::class);
         $this->collectionCalculator = $this->createMock(CollectionCalculator::class);
@@ -45,7 +45,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->queryCalculator);
         unset($this->collectionCalculator);

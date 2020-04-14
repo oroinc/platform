@@ -9,7 +9,7 @@ class DateModifierProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DateModifierProvider */
     protected $dateModifierProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateModifierProvider = new DateModifierProvider();
     }

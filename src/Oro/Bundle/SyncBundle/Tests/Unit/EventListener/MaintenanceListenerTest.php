@@ -29,7 +29,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $publisher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);

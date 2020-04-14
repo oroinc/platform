@@ -19,7 +19,7 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $driver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
         $this->driver = $this->createMock(DriverInterface::class);

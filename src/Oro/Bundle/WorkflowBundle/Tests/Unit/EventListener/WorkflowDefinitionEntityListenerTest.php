@@ -25,7 +25,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entitiesWithWorkflowsCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()

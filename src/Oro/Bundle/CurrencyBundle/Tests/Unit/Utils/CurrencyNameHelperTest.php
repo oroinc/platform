@@ -21,7 +21,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
     private $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = $this->createMock(NumberFormatter::class);
     }

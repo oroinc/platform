@@ -29,7 +29,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityWidgetProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->activityManager = $this->createMock(ActivityManager::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

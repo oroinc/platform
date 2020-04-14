@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class CleanupCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(['Oro\Bundle\BatchBundle\Tests\Functional\Fixture\LoadJobExecutionData']);

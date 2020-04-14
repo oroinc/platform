@@ -15,7 +15,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
     /** @var ExtendDbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
     private $nameGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
 

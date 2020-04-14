@@ -9,7 +9,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var RequestDataAccessor */
     private $requestDataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestDataAccessor = new RequestDataAccessor();
     }

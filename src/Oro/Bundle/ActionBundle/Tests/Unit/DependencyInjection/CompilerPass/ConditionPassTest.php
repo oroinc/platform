@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass;
 
 class ConditionPassTest extends AbstractPassTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

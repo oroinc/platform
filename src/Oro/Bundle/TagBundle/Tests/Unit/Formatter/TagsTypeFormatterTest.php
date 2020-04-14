@@ -9,7 +9,7 @@ class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var TagsTypeFormatter */
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = new TagsTypeFormatter();
     }

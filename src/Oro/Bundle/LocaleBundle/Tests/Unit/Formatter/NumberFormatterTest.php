@@ -29,7 +29,7 @@ class NumberFormatterTest extends TestCase
      */
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 

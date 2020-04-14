@@ -13,7 +13,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationKeySourceInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $keySource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new TranslationKeyGenerator();
 

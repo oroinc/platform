@@ -32,7 +32,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stepManager = $this->getMockBuilder(StepManager::class)
             ->disableOriginalConstructor()

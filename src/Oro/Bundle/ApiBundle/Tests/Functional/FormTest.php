@@ -21,12 +21,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->switchToDefaultFormExtension();
         $this->setMetadataAccessor();

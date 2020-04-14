@@ -15,7 +15,7 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeProviderPass */
     private $compiler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new ScopeProviderPass();
     }

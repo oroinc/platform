@@ -9,7 +9,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var KeyObjectCollection */
     private $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->collection = new KeyObjectCollection();
     }

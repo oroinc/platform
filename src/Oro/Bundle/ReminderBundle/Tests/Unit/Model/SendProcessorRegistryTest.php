@@ -19,7 +19,7 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SendProcessorRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processors = [];
         $this->processors[self::FOO_METHOD] = $this->getMockProcessor(self::FOO_LABEL);

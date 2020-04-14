@@ -22,7 +22,7 @@ class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = $this->createMock('Oro\\Bundle\\EmbeddedFormBundle\\Validator\\Constraints\\NoTags');
         $this->context = $this->createMock(ExecutionContextInterface::class);

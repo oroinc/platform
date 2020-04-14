@@ -44,7 +44,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
     /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $aclGroupProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

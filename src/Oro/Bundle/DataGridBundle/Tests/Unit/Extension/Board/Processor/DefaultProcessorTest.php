@@ -26,7 +26,7 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);

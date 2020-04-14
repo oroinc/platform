@@ -26,7 +26,7 @@ class ExtendTableTest extends TestCase
     /** @var ExtendTable */
     private $table;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendOptionsManager = $this->createMock(ExtendOptionsManager::class);
 

@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class LoadProcessConfigurationCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

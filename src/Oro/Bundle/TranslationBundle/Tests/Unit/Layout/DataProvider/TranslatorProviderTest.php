@@ -13,13 +13,13 @@ class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorProvider */
     protected $translatorProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock('Symfony\Component\Translation\Translator');
         $this->translatorProvider = new TranslatorProvider($this->translator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator, $this->translatorProvider);
     }

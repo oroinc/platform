@@ -20,7 +20,7 @@ class WorkflowManagerRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 

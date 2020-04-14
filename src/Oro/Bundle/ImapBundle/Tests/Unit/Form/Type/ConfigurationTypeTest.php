@@ -54,7 +54,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $smtpSettingsChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
 
@@ -147,7 +147,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->encryptor);

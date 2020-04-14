@@ -32,7 +32,7 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchEntityFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 

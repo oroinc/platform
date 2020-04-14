@@ -9,7 +9,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\AbstractComposite */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = $this->getMockForAbstractClass(
             'Oro\Component\ConfigExpression\Condition\AbstractComposite'

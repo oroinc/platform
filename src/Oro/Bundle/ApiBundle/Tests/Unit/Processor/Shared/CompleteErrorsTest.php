@@ -19,7 +19,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
     /** @var CompleteErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

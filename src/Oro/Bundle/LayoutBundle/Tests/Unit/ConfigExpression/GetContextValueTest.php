@@ -10,7 +10,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /** @var GetContextValue */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new GetContextValue();
         $this->function->setContextAccessor(new ContextAccessor());

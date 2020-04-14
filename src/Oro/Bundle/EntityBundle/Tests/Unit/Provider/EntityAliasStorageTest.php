@@ -12,7 +12,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAliasStorage */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage = new EntityAliasStorage();
     }

@@ -18,7 +18,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
  */
 class NavigationListenerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

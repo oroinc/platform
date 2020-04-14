@@ -27,7 +27,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AdditionalEmailAssociationProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);

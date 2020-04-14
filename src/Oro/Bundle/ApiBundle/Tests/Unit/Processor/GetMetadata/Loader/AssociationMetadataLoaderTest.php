@@ -29,7 +29,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var AssociationMetadataLoader */
     private $associationMetadataLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 

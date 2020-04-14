@@ -15,7 +15,7 @@ use Oro\Bundle\UIBundle\Route\Router;
  */
 class AttributeFamilyControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);

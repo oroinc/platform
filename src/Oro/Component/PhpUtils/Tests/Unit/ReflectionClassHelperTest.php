@@ -9,14 +9,14 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ReflectionClassHelper */
     protected $utils;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->utils = new ReflectionClassHelper(
             'Oro\Component\PhpUtils\Tests\Unit\Stubs\StubInterface'
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->utils);
     }

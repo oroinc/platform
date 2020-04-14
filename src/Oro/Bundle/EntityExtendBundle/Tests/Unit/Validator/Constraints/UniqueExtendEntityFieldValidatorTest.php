@@ -21,7 +21,7 @@ class UniqueExtendEntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

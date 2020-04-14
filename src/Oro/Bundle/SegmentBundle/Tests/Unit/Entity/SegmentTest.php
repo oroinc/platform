@@ -16,12 +16,12 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
     /** @var Segment */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new Segment();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

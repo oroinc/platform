@@ -23,7 +23,7 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
 

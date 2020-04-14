@@ -10,7 +10,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
     /** @var ReadonlyResourceStream */
     private $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resource = fopen(__DIR__ . '/../Fixtures/test.txt', 'rb');
         $this->stream = new ReadonlyResourceStream($resource);

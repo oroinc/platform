@@ -10,7 +10,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
     /** @var FixFieldNaming */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

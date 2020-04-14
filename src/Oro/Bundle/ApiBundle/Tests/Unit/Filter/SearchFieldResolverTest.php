@@ -9,7 +9,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
     /** @var SearchFieldResolver */
     private $fieldResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldResolver = new SearchFieldResolver(
             [

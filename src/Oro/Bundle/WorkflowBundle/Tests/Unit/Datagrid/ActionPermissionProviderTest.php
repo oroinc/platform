@@ -18,7 +18,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
         $this->configurationChecker = $this->createMock(ConfigurationChecker::class);

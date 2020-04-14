@@ -27,7 +27,7 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ControllerListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classAuthorizationChecker = $this->createMock(ClassAuthorizationChecker::class);
         $this->logger = $this->createMock(LoggerInterface::class);

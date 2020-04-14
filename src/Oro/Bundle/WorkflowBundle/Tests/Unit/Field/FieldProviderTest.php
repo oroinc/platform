@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldProviderTest extends EntityFieldProviderTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -30,7 +30,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
      */
     protected $parameterBinder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagrid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 

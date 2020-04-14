@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData;
 
 class BusinessUnitTest extends RestJsonApiTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([

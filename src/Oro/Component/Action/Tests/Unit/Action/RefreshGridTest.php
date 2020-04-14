@@ -16,7 +16,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
     /** @var RefreshGrid */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
@@ -24,7 +24,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action, $this->eventDispatcher);
     }

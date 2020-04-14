@@ -14,7 +14,7 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new UpdateDoctrineEventHandlersPass();
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')

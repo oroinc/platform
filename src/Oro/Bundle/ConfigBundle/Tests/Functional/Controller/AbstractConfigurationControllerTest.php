@@ -12,7 +12,7 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
      */
     abstract protected function getRequestUrl(array $parameters);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }

@@ -25,7 +25,7 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);

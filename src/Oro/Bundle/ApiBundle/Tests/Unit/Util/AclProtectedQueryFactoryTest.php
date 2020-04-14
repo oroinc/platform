@@ -24,7 +24,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
     /** @var AclProtectedQueryFactory */
     private $queryFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

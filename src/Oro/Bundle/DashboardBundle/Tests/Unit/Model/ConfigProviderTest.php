@@ -22,7 +22,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('DachboardConfigurationProvider');
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

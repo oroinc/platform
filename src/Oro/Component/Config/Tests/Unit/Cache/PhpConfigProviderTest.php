@@ -15,7 +15,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PhpConfigProvider');
         self::assertFileNotExists($this->cacheFile);

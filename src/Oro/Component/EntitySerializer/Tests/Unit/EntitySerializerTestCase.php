@@ -38,7 +38,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     /** @var EntitySerializer */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

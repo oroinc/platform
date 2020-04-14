@@ -26,7 +26,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $exportHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);

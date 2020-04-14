@@ -44,7 +44,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->formProvider = $this->createMock(FormProvider::class);
@@ -383,7 +383,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('operation execution error', $result->getExceptionMessage());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->handler,

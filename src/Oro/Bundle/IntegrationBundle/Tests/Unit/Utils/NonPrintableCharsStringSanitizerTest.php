@@ -11,7 +11,7 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
      */
     private $sanitizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sanitizer = new NonPrintableCharsStringSanitizer();
     }

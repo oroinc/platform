@@ -22,7 +22,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $scopeType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
             ->disableOriginalConstructor()

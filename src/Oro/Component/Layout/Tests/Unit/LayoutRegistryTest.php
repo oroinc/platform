@@ -17,7 +17,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());

@@ -22,7 +22,7 @@ class ImportExportTest extends WebTestCase
     /** @var array|FieldConfigModel[] */
     protected $fields;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 

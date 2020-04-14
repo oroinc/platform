@@ -14,7 +14,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('ConfigCache');
         self::assertFileNotExists($this->cacheFile);

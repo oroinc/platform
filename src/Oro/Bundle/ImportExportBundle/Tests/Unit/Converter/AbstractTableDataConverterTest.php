@@ -45,7 +45,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $dataConverter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter')
             ->getMockForAbstractClass();
@@ -59,7 +59,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->dataConverter = $dataConverter;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->dataConverter);
     }

@@ -19,7 +19,7 @@ class OroLanguageUpdateCommandTest extends WebTestCase
     /** @var  ExternalTranslationsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $externalTranslationsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadLanguages::class]);

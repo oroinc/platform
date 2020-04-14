@@ -14,7 +14,7 @@ class FormHandlerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandlerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler1 = $this->createMock(FormHandlerInterface::class);
         $handlers = new ServiceLocator([

@@ -28,7 +28,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $testPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adapter = $this->createMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
         $this->dumper  = $this->createMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper');

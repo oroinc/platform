@@ -16,7 +16,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /** @var CompleteObjectDefinitionHelper */
     private $completeObjectDefinitionHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

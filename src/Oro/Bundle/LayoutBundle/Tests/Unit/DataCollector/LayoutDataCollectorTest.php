@@ -21,7 +21,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutDataCollector */
     protected $dataCollector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextHolder = $this->createMock(LayoutContextHolder::class);
 

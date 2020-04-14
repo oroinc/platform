@@ -12,7 +12,7 @@ class SegmentControllerTest extends WebTestCase
     private const TEST_SEGMENT = 'Test user segment';
     private const UPDATED_TEST_SEGMENT = 'Updated test user segment';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }

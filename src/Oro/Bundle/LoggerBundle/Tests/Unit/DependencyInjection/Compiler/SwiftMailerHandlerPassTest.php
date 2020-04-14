@@ -14,7 +14,7 @@ class SwiftMailerHandlerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new SwiftMailerHandlerPass();
     }

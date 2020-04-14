@@ -19,7 +19,7 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new CopyValues(new ContextAccessor());
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)

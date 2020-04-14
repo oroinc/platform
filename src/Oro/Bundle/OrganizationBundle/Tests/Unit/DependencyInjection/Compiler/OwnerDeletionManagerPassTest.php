@@ -14,7 +14,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerDeletionManagerPass */
     private $compiler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new OwnerDeletionManagerPass();
     }

@@ -24,13 +24,13 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $triggerConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->definitionConfiguration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
         $this->triggerConfiguration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->definitionConfiguration, $this->triggerConfiguration);
     }

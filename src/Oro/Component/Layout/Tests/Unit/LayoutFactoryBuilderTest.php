@@ -29,7 +29,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutFactoryBuilder */
     protected $layoutFactoryBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expressionProcessor = $this
             ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')

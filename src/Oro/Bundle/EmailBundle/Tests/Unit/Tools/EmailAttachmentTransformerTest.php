@@ -43,7 +43,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $emailAttachmentTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()

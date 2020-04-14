@@ -12,7 +12,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FormatterManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $formatters = new ServiceLocator([
             'test_default_format_name' => function () {

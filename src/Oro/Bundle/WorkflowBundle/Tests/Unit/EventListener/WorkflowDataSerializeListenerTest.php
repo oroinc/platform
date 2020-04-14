@@ -32,7 +32,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->createMock(WorkflowAwareSerializer::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

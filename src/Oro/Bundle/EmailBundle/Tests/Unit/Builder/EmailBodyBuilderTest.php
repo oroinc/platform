@@ -17,7 +17,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

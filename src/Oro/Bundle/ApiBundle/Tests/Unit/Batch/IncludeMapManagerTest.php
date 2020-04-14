@@ -33,7 +33,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /** @var IncludeMapManager */
     private $includeMapManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();
         $this->fileManager = $this->createMock(FileManager::class);

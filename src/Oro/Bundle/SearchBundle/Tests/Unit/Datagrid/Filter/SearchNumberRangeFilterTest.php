@@ -24,7 +24,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
         $formFactory = $this->createMock(FormFactoryInterface::class);

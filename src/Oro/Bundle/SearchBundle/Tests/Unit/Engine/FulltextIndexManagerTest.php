@@ -22,7 +22,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $indexManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this
             ->getMockBuilder('Doctrine\DBAL\Connection')

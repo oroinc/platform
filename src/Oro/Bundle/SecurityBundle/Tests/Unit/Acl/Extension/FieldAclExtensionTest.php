@@ -104,7 +104,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

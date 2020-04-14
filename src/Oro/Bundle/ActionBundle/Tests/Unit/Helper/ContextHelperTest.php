@@ -23,7 +23,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ContextHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
@@ -38,7 +38,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new ContextHelper($this->doctrineHelper, $propertyAccessor, $this->requestStack);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->helper, $this->doctrineHelper, $this->requestStack);
     }

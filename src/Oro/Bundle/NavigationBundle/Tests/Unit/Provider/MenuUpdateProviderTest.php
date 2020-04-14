@@ -33,7 +33,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $menuUpdateProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->menuItem = $this->createMock(ItemInterface::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);

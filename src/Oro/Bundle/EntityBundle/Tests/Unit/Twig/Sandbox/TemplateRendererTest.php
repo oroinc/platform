@@ -49,7 +49,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateRenderer */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->getMockBuilder(Environment::class)
             ->setMethods(['createTemplate'])

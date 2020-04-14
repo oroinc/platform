@@ -9,7 +9,7 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutRendererRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRendererRegistry();
     }

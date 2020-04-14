@@ -9,7 +9,7 @@ class DecimalToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var DecimalToStringTransformer */
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new DecimalToStringTransformer();
     }

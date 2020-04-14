@@ -16,7 +16,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this
             ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')

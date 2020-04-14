@@ -20,7 +20,7 @@ class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
 

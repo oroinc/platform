@@ -18,7 +18,7 @@ class SyncCommandTest extends WebTestCase
 {
     use MessageQueueExtension, EntityTrait;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);

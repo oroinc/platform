@@ -16,7 +16,7 @@ class ImageEncodedFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this
             ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')

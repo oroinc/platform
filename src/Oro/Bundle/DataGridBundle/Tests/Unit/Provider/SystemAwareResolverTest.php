@@ -17,7 +17,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * setup mock and test object
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())

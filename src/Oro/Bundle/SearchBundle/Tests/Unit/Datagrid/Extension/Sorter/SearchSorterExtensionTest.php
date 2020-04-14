@@ -17,7 +17,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

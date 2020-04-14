@@ -17,7 +17,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $searchStringManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Imap')
             ->disableOriginalConstructor()

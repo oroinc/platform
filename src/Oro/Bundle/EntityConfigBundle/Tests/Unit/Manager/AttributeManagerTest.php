@@ -44,7 +44,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

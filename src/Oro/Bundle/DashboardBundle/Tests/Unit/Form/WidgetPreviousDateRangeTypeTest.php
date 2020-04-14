@@ -10,7 +10,7 @@ class WidgetPreviousDateRangeTypeTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetPreviousDateRangeType */
     protected $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetPreviousDateRangeType();
     }

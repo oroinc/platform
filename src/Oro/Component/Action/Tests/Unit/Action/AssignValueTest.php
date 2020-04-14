@@ -17,7 +17,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
      */
     protected $contextAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
             ->disableOriginalConstructor()

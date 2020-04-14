@@ -19,7 +19,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateRendererConfigProvider */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->variablesProvider = $this->createMock(VariablesProvider::class);
         $this->cache = $this->createMock(Cache::class);

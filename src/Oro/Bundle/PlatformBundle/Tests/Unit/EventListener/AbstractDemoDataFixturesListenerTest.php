@@ -6,7 +6,7 @@ use Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener;
 
 class AbstractDemoDataFixturesListenerTest extends AbstractDataFixturesListenerTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -29,7 +29,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->matcher = $this->createMock(Matcher::class);
         $this->router = $this->createMock(Router::class);

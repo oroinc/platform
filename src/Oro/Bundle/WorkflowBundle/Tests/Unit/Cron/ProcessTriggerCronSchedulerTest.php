@@ -16,7 +16,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTriggerCronScheduler */
     protected $processCronScheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deferredScheduler = $this->getMockBuilder(DeferredScheduler::class)
             ->disableOriginalConstructor()

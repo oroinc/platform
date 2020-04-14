@@ -11,7 +11,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadata */
     private $classMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classMetadata = new EntityMetadata(DemoEntity::class);
         $this->classMetadata->mode = ConfigModel::MODE_DEFAULT;

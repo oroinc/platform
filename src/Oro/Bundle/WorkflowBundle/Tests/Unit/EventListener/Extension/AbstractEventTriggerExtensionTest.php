@@ -36,7 +36,7 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\Test
     /** @var array */
     protected $triggers;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 
@@ -45,7 +45,7 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\Test
         $this->triggerCache = $this->getMockBuilder(EventTriggerCache::class)->disableOriginalConstructor()->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->extension, $this->doctrineHelper, $this->triggerCache, $this->entityManager, $this->triggers);
     }

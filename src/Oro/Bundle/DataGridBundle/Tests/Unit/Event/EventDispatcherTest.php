@@ -19,13 +19,13 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $realDispatcherMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->realDispatcherMock = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->dispatcher         = new EventDispatcher($this->realDispatcherMock);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->realDispatcherMock, $this->dispatcher);
     }

@@ -15,13 +15,13 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyMapper */
     protected $propertyMapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mockContextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')->getMock();
         $this->propertyMapper = new PropertyMapper($this->mockContextAccessor);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->mockContextAccessor, $this->propertyMapper);
     }

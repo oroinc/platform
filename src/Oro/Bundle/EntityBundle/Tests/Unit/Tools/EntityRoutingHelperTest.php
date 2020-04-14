@@ -19,7 +19,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
             ->disableOriginalConstructor()

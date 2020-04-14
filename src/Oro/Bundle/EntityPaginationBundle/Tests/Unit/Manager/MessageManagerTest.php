@@ -34,7 +34,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
 

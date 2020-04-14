@@ -15,7 +15,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
     /** @var BuildExtensionsPass */
     private $buildExtensionsPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->buildExtensionsPass = new BuildExtensionsPass();
     }

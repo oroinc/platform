@@ -49,7 +49,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);

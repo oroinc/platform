@@ -24,7 +24,7 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var QueryModifierRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryModifier1 = $this->createMock(QueryModifierInterface::class);
         $this->queryModifier2 = $this->createMock(QueryModifierInterface::class);

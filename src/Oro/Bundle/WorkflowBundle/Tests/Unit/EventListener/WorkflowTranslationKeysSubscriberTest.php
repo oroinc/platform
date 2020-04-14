@@ -18,7 +18,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationKeysSubscriber */
     private $translationKeysSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationManager = $this->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()

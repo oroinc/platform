@@ -60,7 +60,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     protected $indexer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->dqlNameFormatter = $this->createMock(DQLNameFormatter::class);

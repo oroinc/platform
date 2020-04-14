@@ -15,7 +15,7 @@ class DeleteMassActionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new DeleteMassAction();
     }

@@ -18,7 +18,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var PasswordComplexity */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->violationBuilder = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
             ->disableOriginalConstructor()
@@ -244,7 +244,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
         return $configProvider;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->violationBuilder, $this->constraint);
     }

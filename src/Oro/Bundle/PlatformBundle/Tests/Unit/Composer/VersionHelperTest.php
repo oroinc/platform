@@ -19,7 +19,7 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
     /** @var WritableRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $repo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(LocalRepositoryFactory::class);
         $this->repo = $this->createMock(WritableRepositoryInterface::class);

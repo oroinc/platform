@@ -31,7 +31,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();

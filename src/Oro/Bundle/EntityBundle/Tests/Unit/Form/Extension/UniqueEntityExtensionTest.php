@@ -43,7 +43,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()

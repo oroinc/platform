@@ -23,7 +23,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyPathSecurityHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this
             ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');

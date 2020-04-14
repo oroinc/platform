@@ -33,7 +33,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
      */
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->repository = $this->createMock(ReminderRepository::class);

@@ -22,7 +22,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAggregationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);
 

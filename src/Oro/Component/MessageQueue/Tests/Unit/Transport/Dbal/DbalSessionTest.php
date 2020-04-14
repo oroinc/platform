@@ -20,7 +20,7 @@ class DbalSessionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(DbalConnection::class);
         $this->session = new DbalSession($this->connection);

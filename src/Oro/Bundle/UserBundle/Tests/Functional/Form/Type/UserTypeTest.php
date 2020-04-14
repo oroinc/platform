@@ -19,7 +19,7 @@ class UserTypeTest extends WebTestCase
     const FIRST_NAME = 'John';
     const LAST_NAME = 'Doe';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -193,7 +193,7 @@ class UserTypeTest extends WebTestCase
     protected function getUserRoleRepository()
     {
         $class = Role::class;
-        
+
         return $this->getManager($class)->getRepository($class);
     }
 

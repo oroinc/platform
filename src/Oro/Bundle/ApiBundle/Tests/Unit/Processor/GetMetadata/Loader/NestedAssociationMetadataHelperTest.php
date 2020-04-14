@@ -22,7 +22,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var NestedAssociationMetadataHelper */
     private $nestedAssociationMetadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = $this->createMock(MetadataHelper::class);
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);

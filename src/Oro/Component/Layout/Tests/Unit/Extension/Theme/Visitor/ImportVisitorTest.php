@@ -37,7 +37,7 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);
         $this->dependencyInitializer = $this->createMock(DependencyInitializer::class);

@@ -43,7 +43,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionProvider = $this->createMock(DatagridActionProviderInterface::class);
         $this->actionFactory = $this->createMock(ActionFactory::class);

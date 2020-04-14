@@ -11,7 +11,7 @@ class ClassMethodNameCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMethodNameChecker */
     protected $checker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->checker = new ClassMethodNameChecker();
     }

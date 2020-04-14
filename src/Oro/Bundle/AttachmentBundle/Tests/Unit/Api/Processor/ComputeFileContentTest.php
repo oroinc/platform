@@ -22,7 +22,7 @@ class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
     /** @var ComputeFileContent */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()

@@ -25,7 +25,7 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayPagerExtension */
     protected $arrayPagerExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pager = $this->createMock(ArrayPager::class);
         $this->config = $this->createMock(DatagridConfiguration::class);

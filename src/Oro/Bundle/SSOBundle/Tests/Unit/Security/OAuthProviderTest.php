@@ -40,7 +40,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationGuesserInterface */
     private $organizationGuesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userProvider = $this->createMock(OAuthAwareUserProviderInterface::class);
         $this->resourceOwnerMap = $this->createMock(ResourceOwnerMap::class);

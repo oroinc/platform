@@ -22,7 +22,7 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PlaceholderConfigurationProvider');
 

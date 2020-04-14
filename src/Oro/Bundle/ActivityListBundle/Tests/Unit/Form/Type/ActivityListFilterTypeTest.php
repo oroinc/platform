@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ActivityListFilterTypeTest extends TypeTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,7 +55,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
 
         $form = $this->factory->create(ActivityListFilterType::class);
         $form->submit($formData);
-        
+
         $this->assertTrue($form->isValid());
         $this->assertTrue($form->isSynchronized());
     }

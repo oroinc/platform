@@ -40,7 +40,7 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
     /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $executionContext;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
 

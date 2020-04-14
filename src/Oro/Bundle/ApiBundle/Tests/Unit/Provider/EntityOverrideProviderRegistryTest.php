@@ -22,7 +22,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->firstProvider = $this->createMock(EntityOverrideProviderInterface::class);

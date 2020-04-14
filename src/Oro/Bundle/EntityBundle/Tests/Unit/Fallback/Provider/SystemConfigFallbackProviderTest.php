@@ -30,7 +30,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $configInterface;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->systemConfigFallbackProvider = new SystemConfigFallbackProvider($this->configManager);

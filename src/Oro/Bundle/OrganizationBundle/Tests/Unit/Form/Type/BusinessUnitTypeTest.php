@@ -29,7 +29,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     /** @var BusinessUnitType */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

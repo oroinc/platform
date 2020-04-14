@@ -9,7 +9,7 @@ class ActionTest extends \PHPUnit\Framework\TestCase
     /** @var Action */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new Action('test_action', ['arg1']);
     }

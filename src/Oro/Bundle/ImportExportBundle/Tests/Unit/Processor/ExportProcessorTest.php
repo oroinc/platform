@@ -17,7 +17,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
             ->setMethods(array('getOption'))

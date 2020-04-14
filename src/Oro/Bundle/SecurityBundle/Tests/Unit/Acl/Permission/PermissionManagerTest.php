@@ -39,7 +39,7 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();

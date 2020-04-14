@@ -22,7 +22,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     private $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

@@ -21,7 +21,7 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
      */
     private $aliceReferenceResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->aliceReferenceResolver = new AliceReferenceResolver($this->registry);

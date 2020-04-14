@@ -41,7 +41,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MappingConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->cache = $this->createMock(Cache::class);

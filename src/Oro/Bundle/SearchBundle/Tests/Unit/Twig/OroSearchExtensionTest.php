@@ -9,7 +9,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $twigService = $this->createMock(Environment::class);
         $this->extension = new OroSearchExtension($twigService, 'testLayout.html.twig');

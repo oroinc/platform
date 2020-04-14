@@ -16,7 +16,7 @@ class EnumValueRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var EnumValueRepository */
     protected $repo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -32,7 +32,7 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $mailboxManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()

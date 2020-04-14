@@ -35,7 +35,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $extendConfig;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

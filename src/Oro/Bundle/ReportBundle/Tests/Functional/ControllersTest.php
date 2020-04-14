@@ -15,7 +15,7 @@ class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -24,7 +24,7 @@ class ControllersTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->getDatagridQueryCollector()->disable();

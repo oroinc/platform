@@ -21,7 +21,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ReindexCommand */
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->asyncIndexer = $this->createMock(IndexerInterface::class);

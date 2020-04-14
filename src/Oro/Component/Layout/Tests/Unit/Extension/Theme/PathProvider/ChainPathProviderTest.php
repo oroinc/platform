@@ -9,12 +9,12 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainPathProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new ChainPathProvider();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider);
     }

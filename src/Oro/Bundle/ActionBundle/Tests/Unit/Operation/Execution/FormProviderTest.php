@@ -24,7 +24,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = OperationExecutionType::class;
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
@@ -80,7 +80,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $this->formProvider->getOperationExecutionForm($operation, $actionData);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->formProvider,

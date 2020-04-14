@@ -26,7 +26,7 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainDocumentationProvider */
     private $chainProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(DocumentationProviderInterface::class);
         $this->provider2 = $this->createMock(DocumentationProviderInterface::class);

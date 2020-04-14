@@ -22,7 +22,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TooltipFormExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->translator = $this->createMock(Translator::class);

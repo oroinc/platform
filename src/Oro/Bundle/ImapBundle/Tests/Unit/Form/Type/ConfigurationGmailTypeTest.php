@@ -28,7 +28,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->setMethods(['getOrganization'])

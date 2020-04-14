@@ -14,7 +14,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
     /** @var InCurrencyList */
     private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new InCurrencyList(new CurrencyListProviderStub());
     }

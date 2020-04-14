@@ -10,7 +10,7 @@ class EventTriggerCacheClearerTest extends \PHPUnit\Framework\TestCase
     /** @var EventTriggerCacheClearer */
     private $clearer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clearer = new EventTriggerCacheClearer();
     }

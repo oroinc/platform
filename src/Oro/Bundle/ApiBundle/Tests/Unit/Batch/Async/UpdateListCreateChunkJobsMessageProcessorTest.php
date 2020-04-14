@@ -37,7 +37,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
     /** @var UpdateListCreateChunkJobsMessageProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->jobStorage = $this->createMock(JobStorage::class);

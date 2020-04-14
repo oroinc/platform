@@ -27,7 +27,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')

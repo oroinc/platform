@@ -31,7 +31,7 @@ class DataAuditTest extends WebTestCase
 {
     use MessageQueueAssertTrait, AuditChangedEntitiesExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $token = new UsernamePasswordOrganizationToken(

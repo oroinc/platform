@@ -12,7 +12,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
      */
     protected $optionResolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionResolver = new OptionsResolver();
     }

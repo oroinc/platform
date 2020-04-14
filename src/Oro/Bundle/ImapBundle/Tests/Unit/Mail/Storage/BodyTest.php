@@ -13,7 +13,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
     /** @var Body */
     private $body;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
             ->disableOriginalConstructor()

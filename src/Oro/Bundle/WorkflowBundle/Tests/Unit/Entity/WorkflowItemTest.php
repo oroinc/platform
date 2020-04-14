@@ -22,12 +22,12 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflowItem;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowItem = new WorkflowItem();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowItem);
     }

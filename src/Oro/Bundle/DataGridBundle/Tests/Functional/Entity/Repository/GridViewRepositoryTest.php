@@ -13,7 +13,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
     /** @var GridViewRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

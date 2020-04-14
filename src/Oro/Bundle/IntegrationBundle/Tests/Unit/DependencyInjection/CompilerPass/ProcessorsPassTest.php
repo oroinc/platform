@@ -14,12 +14,12 @@ class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pass = new ProcessorsPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->pass);
     }

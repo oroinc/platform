@@ -43,7 +43,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRepository
             = $this->getMockBuilder(WorkflowDefinitionRepository::class)
@@ -80,7 +80,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new WorkflowRegistry($this->doctrineHelper, $this->assembler, $this->filters);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->entityRepository,

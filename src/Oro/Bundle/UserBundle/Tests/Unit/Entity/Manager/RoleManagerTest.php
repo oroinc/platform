@@ -17,7 +17,7 @@ class RoleManagerTest extends \PHPUnit\Framework\TestCase
 
     private $role;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

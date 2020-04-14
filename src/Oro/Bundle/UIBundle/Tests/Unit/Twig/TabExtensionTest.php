@@ -32,7 +32,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TabExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->menuExtension = $this->getMockBuilder(MenuExtension::class)

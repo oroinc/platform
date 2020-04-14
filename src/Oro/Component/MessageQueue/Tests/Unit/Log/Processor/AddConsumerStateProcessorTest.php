@@ -24,7 +24,7 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var AddConsumerStateProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
 

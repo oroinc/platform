@@ -23,7 +23,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
     /** @var RunActionGroup */
     protected $actionGroup;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
@@ -35,7 +35,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->actionGroup->setDispatcher($this->eventDispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroup, $this->eventDispatcher, $this->mockActionGroupRegistry);
     }

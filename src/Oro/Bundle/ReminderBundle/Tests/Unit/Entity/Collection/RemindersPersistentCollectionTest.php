@@ -20,7 +20,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
      */
     protected $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Entity\\Repository\\ReminderRepository')
             ->disableOriginalConstructor()

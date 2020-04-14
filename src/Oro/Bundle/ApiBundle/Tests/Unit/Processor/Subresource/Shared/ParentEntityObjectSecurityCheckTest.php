@@ -15,7 +15,7 @@ class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTes
     /** @var ParentEntityObjectSecurityCheck */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

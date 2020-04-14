@@ -15,7 +15,7 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
 
     protected $cacheDir;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

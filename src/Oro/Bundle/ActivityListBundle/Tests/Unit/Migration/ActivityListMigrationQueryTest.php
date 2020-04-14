@@ -34,7 +34,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->schema                = new Schema();
         $this->activityListExtension = new ActivityListExtension();

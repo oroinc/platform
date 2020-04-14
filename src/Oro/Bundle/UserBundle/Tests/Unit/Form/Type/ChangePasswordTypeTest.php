@@ -20,7 +20,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     /** @var PasswordFieldOptionsProvider */
     protected $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
         $this->type = new ChangePasswordType($this->subscriber, $this->optionsProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->subscriber, $this->type);
     }

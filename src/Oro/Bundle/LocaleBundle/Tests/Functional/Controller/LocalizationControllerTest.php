@@ -29,7 +29,7 @@ class LocalizationControllerTest extends WebTestCase
     /** @var LocalizationManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadLocalizationData::class]);

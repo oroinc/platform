@@ -53,7 +53,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->placeholderProvider = $this->getMockBuilder(PlaceholderProvider::class)

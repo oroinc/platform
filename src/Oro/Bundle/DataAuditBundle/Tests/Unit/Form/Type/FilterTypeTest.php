@@ -19,7 +19,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $factory;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -62,7 +62,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
         $form = $this->factory->create(AuditFilterType::class);
         $form->submit($formData);
-        
+
         $this->assertTrue($form->isValid());
         $this->assertTrue($form->isSynchronized());
     }

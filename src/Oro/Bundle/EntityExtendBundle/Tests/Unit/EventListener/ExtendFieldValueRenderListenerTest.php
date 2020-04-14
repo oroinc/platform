@@ -33,7 +33,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassNameHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManger = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

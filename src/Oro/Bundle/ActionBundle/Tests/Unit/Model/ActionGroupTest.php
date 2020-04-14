@@ -28,7 +28,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     /** @var ActionData */
     protected $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
@@ -52,7 +52,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->data = new ActionData();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroup, $this->actionFactory, $this->conditionFactory, $this->data);
     }

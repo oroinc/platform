@@ -28,7 +28,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessFactory')
             ->disableOriginalConstructor()

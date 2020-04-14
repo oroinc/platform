@@ -18,7 +18,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|CacheState */
     protected $cacheState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filePath = $this->getTempDir('InterruptConsumptionExtensionTest')
             . DIRECTORY_SEPARATOR
@@ -27,7 +27,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->cacheState = $this->createMock(CacheState::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $directory = dirname($this->filePath);
 

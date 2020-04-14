@@ -14,7 +14,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var IncludedEntityData */
     private $entityData;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityData = $this->createMock(IncludedEntityData::class);
 

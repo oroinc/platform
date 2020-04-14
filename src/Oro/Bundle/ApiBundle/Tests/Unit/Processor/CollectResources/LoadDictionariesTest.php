@@ -15,7 +15,7 @@ class LoadDictionariesTest extends \PHPUnit\Framework\TestCase
     /** @var LoadDictionaries */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dictionaryProvider = $this->createMock(ChainDictionaryValueListProvider::class);
 

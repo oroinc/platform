@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailControllerWithNonAdminEmailsTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([LoadEmailData::class]);

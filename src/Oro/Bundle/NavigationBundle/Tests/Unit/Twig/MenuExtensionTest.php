@@ -36,7 +36,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
         $this->helper = $this->createMock(Helper::class);

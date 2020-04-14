@@ -11,7 +11,7 @@ class HandleDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
     /** @var HandleDefaultValueForFieldsFilter */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

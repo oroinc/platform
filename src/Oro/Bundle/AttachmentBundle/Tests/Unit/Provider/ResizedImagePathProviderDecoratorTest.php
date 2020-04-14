@@ -11,7 +11,7 @@ class ResizedImagePathProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerResizedImagePathProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerResizedImagePathProvider = $this->createMock(ResizedImagePathProviderInterface::class);
     }

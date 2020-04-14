@@ -10,7 +10,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityReferenceToStringTransformer */
     protected $transformer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

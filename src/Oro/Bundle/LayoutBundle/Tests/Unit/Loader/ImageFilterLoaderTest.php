@@ -40,7 +40,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->imageTypeProvider = $this->prophesize(ImageTypeProvider::class);
         $this->filterConfig = $this->prophesize(FilterConfiguration::class);

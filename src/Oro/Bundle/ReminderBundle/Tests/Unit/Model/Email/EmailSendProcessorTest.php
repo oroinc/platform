@@ -35,7 +35,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailNotificationManager = $this
             ->getMockBuilder(EmailNotificationManager::class)

@@ -24,7 +24,7 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
     /** @var JobStorage */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->handler = $this->createMock(UniqueJobHandler::class);

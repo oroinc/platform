@@ -13,7 +13,7 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
      */
     protected $mapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mapper = new AuditEntityMapper();
     }

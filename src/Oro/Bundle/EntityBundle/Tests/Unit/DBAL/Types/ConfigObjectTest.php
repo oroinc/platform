@@ -19,7 +19,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
      */
     protected $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!Type::hasType(ConfigObjectType::TYPE)) {
             Type::addType(ConfigObjectType::TYPE, 'Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType');

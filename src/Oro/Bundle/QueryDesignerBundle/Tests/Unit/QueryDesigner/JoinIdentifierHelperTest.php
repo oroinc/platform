@@ -11,7 +11,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /** @var JoinIdentifierHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->helper = new JoinIdentifierHelper(self::ROOT_ENTITY);
     }

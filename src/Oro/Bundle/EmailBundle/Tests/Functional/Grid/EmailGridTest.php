@@ -23,7 +23,7 @@ class EmailGridTest extends AbstractDatagridTestCase
      */
     protected $metadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class EmailGridTest extends AbstractDatagridTestCase
         $this->metadataFactory = $this->getContainer()->get('oro_entity_extend.orm.metadata_factory');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

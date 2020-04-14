@@ -28,7 +28,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * Set up test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->node = $this->createMock(Node::class);
         $this->compiler = $this->createMock(Compiler::class);

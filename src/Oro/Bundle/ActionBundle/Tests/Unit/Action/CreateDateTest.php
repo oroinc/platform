@@ -28,7 +28,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
      */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -48,7 +48,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->localeSettings, $this->action);
     }

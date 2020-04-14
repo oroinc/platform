@@ -15,7 +15,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectIdentityFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new ObjectIdentityFactory(
             TestHelper::get($this)->createAclExtensionSelector()

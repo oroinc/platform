@@ -23,7 +23,7 @@ class EntityMergerTest extends \PHPUnit\Framework\TestCase
      */
     protected $steps;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->steps = array(
             $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface'),

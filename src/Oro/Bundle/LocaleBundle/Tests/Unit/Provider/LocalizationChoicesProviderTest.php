@@ -30,7 +30,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationChoicesProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);

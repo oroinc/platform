@@ -20,7 +20,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
      */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()

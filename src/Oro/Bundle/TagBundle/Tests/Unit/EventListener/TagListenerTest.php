@@ -20,12 +20,12 @@ class TagListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $resource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = new Taggable(['id' => self::TEST_ID]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listener);
         unset($this->resource);

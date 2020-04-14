@@ -35,7 +35,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
 
@@ -116,7 +116,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->encryptor);

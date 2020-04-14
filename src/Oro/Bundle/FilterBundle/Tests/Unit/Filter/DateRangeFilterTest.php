@@ -23,7 +23,7 @@ class DateRangeFilterTest extends OrmTestCase
     /** @var DateRangeFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->dateFilterUtility = $this->createMock(DateFilterUtility::class);

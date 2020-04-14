@@ -51,8 +51,8 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
 
     /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailOriginHelper;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

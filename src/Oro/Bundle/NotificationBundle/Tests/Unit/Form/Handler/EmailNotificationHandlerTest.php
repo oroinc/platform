@@ -28,7 +28,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailNotificationHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);
 

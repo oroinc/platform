@@ -25,7 +25,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
     /** @var Block */
     protected $block;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayout  = new RawLayout();
         $this->typeHelper = $this->createMock('Oro\Component\Layout\BlockTypeHelperInterface');

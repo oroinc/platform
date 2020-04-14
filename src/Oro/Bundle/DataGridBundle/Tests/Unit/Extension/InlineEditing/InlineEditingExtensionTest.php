@@ -29,7 +29,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditingExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = $this->createMock(InlineEditColumnOptionsGuesser::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);

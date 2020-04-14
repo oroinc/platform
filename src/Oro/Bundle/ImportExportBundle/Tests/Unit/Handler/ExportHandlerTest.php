@@ -62,7 +62,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
     private $exportHandler;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);

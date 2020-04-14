@@ -28,7 +28,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $platform = $platform = $this->getMockBuilder(AbstractPlatform::class)
             ->setMethods(['convertBooleans'])

@@ -21,7 +21,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 

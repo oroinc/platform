@@ -12,7 +12,7 @@ class HasElementsTest extends \PHPUnit\Framework\TestCase
     /** @var HasElements */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new HasElements();
         $this->condition->setContextAccessor(new ContextAccessor());

@@ -26,7 +26,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition */
     private $iterableResultFactoryRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionsPass = new ActionsPass(self::FACTORY_SERVICE_ID, self::TAG_NAME);
 

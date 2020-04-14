@@ -26,7 +26,7 @@ class DictionaryTest extends OrmTestCase
     /** @var DictionaryFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

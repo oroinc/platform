@@ -66,7 +66,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     protected $massActionDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->createMock(Manager::class);
         $this->massActionParametersParser = $this->createMock(MassActionParametersParser::class);

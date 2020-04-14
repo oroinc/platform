@@ -18,7 +18,7 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listener = new AttachmentGridListener(['entityId']);
     }

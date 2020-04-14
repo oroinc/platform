@@ -31,7 +31,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

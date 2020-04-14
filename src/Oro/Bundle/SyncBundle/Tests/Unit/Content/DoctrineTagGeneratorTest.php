@@ -30,7 +30,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
     protected $uow;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -69,7 +69,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new DoctrineTagGenerator($doctrine, $entityClassResolver);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->em, $this->resolver, $this->generator);
     }

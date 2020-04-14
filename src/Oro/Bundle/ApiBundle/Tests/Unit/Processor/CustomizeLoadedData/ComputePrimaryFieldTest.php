@@ -14,7 +14,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
     /** @var ComputePrimaryField */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CustomizeLoadedDataContext();
         $this->processor = new ComputePrimaryField(

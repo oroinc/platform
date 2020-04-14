@@ -22,7 +22,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
     /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestAuthorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);

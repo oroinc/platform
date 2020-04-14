@@ -25,7 +25,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private const TIMEZONE = 'Asia/Tokyo';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = self::createMock(LocaleSettings::class);

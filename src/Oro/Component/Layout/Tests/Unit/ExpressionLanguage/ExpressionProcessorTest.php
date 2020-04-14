@@ -24,7 +24,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expressionLanguage = new ExpressionLanguage();
 
@@ -191,7 +191,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
         $values['label_attr']['enabled'] = '=true';
-        
+
         $initialVars = $values;
 
         $this->processor->processExpressions($values, $context, $data, false, null);
@@ -217,7 +217,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $values['label_attr']['enabled'] = '=true';
 
         $this->processor->processExpressions($values, $context, $data, false, 'json');
-        
+
         $trueExprJson = __DIR__.'/Fixtures/true_expression.json';
 
         $this->assertJsonStringEqualsJsonFile(

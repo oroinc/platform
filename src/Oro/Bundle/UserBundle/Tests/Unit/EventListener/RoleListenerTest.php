@@ -19,14 +19,14 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceLink = $this->createMock(ServiceLink::class);
 
         $this->listener = new RoleListener($this->serviceLink);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->serviceLink, $this->listener);
     }

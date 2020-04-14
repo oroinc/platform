@@ -13,7 +13,7 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
     /** @var SingleObjectIterableResultDecorator */
     protected $iterableResultDecorator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->iterableResult = $this->getMockBuilder('Doctrine\ORM\Internal\Hydration\IterableResult')
             ->disableOriginalConstructor()

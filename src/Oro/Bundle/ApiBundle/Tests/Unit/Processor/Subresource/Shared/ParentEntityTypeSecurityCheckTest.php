@@ -21,7 +21,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

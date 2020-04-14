@@ -15,7 +15,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $containerBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializerDefinition = $this->createMock(Definition::class);
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);

@@ -22,7 +22,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     /** @var CompositeIdentifierFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
 

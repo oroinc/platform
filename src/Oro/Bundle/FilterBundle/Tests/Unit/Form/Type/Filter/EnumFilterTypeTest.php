@@ -19,7 +19,7 @@ class EnumFilterTypeTest extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

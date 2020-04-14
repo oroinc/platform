@@ -19,7 +19,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRepositoryCompilerPass */
     protected $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()

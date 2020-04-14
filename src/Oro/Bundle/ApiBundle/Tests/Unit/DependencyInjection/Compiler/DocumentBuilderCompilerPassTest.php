@@ -21,7 +21,7 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new DocumentBuilderCompilerPass();

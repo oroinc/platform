@@ -28,7 +28,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $widgetConfigVisibilityFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()

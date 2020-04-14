@@ -13,12 +13,12 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
      */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = new WorkflowDataSerializer();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->serializer);
     }

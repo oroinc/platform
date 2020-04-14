@@ -9,7 +9,7 @@ class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MergeSorterConfigHelper */
     private $mergeSorterConfigHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mergeSorterConfigHelper = new MergeSorterConfigHelper();
     }

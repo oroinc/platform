@@ -50,7 +50,7 @@ class UserImpersonationTest extends WebTestCase
     }
 
     //region Setup and helpers
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->client->useHashNavigation(true);

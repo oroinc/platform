@@ -11,7 +11,7 @@ class DummyEncoderTest extends \PHPUnit\Framework\TestCase
      */
     protected $encoder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encoder = new DummyEncoder();
     }

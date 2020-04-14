@@ -18,7 +18,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = new OroKernelStub('env', false);
     }
@@ -26,8 +26,8 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
-    {
+    protected function tearDown(): void
+{
         $this->removeDir($this->kernel->getCacheDir());
         $this->removeDir($this->kernel->getLogDir());
 

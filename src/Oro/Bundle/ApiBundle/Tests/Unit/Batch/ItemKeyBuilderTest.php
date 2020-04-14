@@ -9,7 +9,7 @@ class ItemKeyBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ItemKeyBuilder */
     private $itemKeyBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();
     }

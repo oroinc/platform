@@ -18,7 +18,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MassNotificationListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
 

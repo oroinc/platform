@@ -17,7 +17,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $widgetProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock('Oro\Bundle\UIBundle\Provider\ObjectIdAccessorInterface');
         $this->widgetProvider   = $this->getMockBuilder('Oro\Bundle\UIBundle\Twig\TabExtension')

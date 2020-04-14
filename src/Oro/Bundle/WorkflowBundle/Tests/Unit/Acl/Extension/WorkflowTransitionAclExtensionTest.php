@@ -49,7 +49,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);

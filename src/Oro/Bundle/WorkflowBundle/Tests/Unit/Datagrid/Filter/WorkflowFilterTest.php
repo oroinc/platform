@@ -22,7 +22,7 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);

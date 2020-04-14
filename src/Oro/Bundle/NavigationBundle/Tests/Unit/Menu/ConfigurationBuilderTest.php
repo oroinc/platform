@@ -28,7 +28,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resolver = new SystemAwareResolver();
 

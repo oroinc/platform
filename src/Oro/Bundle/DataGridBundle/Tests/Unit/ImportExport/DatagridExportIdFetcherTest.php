@@ -30,7 +30,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     /** @var QueryExecutorInterface */
     protected $queryExecutor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

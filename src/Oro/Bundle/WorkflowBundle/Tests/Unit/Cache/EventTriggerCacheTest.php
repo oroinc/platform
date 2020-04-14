@@ -33,7 +33,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         'SecondEntity' => [ProcessTrigger::EVENT_DELETE],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
 

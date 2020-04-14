@@ -26,7 +26,7 @@ class AuditFieldRepositoryTest extends WebTestCase
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->repository = $this->getContainer()->get('doctrine')

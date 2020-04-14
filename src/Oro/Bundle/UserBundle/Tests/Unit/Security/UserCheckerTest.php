@@ -22,7 +22,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $flashBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);

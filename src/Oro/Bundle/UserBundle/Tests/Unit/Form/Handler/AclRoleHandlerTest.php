@@ -24,7 +24,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AclRoleHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = $this->createMock(FormFactory::class);
         $aclCache = $this->createMock(AclCacheInterface::class);

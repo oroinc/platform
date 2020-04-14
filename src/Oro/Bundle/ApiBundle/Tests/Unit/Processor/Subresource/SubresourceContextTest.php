@@ -29,7 +29,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
     /** @var SubresourceContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

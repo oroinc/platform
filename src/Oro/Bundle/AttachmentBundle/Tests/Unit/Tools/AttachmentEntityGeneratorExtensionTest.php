@@ -10,7 +10,7 @@ class AttachmentEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentEntityGeneratorExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AttachmentEntityGeneratorExtension();
     }

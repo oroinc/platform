@@ -22,7 +22,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
     /** @var WorkflowDefinitionScopesRegistryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
             ->disableOriginalConstructor()->getMock();

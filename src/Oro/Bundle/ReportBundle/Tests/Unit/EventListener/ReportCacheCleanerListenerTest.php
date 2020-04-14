@@ -18,7 +18,7 @@ class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var  ReportCacheCleanerListener */
     protected $reportListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->lifecycleEventArgs = $this->getMockBuilder(LifecycleEventArgs::class)
             ->disableOriginalConstructor()->getMock();

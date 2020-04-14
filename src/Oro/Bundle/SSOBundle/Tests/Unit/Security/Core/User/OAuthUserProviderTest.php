@@ -21,7 +21,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OAuthUserProvider */
     private $oauthProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->cm = $this->createMock(ConfigManager::class);

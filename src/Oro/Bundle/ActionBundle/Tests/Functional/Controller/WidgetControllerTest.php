@@ -27,7 +27,7 @@ class WidgetControllerTest extends WebTestCase
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -38,7 +38,7 @@ class WidgetControllerTest extends WebTestCase
         $this->entityId = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)->getId();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->getContainer()->get('oro_action.tests.provider.button.extension')
             ->setDecoratedExtension(null);

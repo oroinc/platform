@@ -21,7 +21,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
     /** @var \PHPUnit\Framework\MockObject\MockObject|UserCheckerInterface */
     private $userChecker;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');

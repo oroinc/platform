@@ -15,7 +15,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayoutBuilder = new RawLayoutBuilder();
     }

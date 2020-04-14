@@ -9,7 +9,7 @@ class SortersConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var SortersConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new SortersConfigExtra();
     }

@@ -22,7 +22,7 @@ class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

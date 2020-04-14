@@ -10,7 +10,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var DataContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new DataContextConfigurator();
     }

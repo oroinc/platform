@@ -16,7 +16,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
     /** @var FormContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);

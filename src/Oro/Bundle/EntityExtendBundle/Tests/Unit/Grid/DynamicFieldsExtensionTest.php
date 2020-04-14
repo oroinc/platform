@@ -36,7 +36,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     /** @var SelectedFieldsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $selectedFieldsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

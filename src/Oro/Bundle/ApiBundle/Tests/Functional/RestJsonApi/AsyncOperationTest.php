@@ -16,7 +16,7 @@ class AsyncOperationTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/async_operations.yml']);

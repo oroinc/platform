@@ -9,7 +9,7 @@ class JsRoutingDumpCommandTest extends WebTestCase
     /** @var string */
     private $filenamePrefix;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->filenamePrefix = $this->getContainer()->getParameter('oro_navigation.js_routing_filename_prefix');

@@ -51,7 +51,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected $propertyConfigContainer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigId = new EntityConfigId(self::SCOPE, self::CLASS_NAME);
 

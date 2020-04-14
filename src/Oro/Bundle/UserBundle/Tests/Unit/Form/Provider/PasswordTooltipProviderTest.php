@@ -12,7 +12,7 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(TranslatorInterface::class)
             ->disableOriginalConstructor()
@@ -111,7 +111,7 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
         return $configProvider;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator);
     }

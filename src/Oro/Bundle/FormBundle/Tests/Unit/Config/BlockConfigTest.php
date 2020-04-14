@@ -67,13 +67,13 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         )
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reportingLevel = error_reporting(E_ALL);
         $this->blockConfig = new BlockConfig($this->blockCode);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         error_reporting($this->reportingLevel);
     }

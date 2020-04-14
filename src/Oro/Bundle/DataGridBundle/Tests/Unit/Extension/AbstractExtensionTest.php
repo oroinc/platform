@@ -15,7 +15,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\AbstractExtension');
         $this->extension->setParameters(new ParameterBag());

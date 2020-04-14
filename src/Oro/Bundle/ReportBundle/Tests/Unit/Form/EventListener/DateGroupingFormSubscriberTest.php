@@ -32,7 +32,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected $dateForm;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateGroupingFormSubscriber = new DateGroupingFormSubscriber();
         $this->event = $this->getMockBuilder(FormEvent::class)

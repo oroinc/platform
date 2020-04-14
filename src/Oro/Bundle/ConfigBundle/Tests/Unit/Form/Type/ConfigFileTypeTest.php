@@ -38,14 +38,14 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
      */
     protected $httpFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = $this->prophesize(ConfigFileDataTransformer::class);
         $this->formType = new ConfigFileType($this->transformer->reveal());
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->formType);

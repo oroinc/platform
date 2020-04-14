@@ -27,7 +27,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildAfter')
             ->disableOriginalConstructor()
@@ -40,7 +40,7 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new CellSelectionListener();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->event, $this->datagrid, $this->datasource, $this->listener);
     }
@@ -53,21 +53,21 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnBuildAfter(array $config, array $expectedConfig)
     {
         $config = DatagridConfiguration::create($config);
-    
+
         $this->event->expects($this->once())
             ->method('getDatagrid')
             ->will($this->returnValue($this->datagrid));
-    
+
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($this->datasource));
-    
+
         $this->datagrid->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($config));
-    
+
         $this->listener->onBuildAfter($this->event);
-    
+
         $this->assertEquals($expectedConfig, $config->toArray());
     }
 

@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class TargetManyToManyExtraLazyWithOrphanRemovalTest extends AbstractTargetManyToManyCollectionTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([

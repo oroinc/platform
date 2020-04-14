@@ -12,7 +12,7 @@ class StepHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new StepHandler();
     }

@@ -17,7 +17,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var OptionValueBagNormalizer */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new OptionValueBagNormalizer();
         $this->serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);

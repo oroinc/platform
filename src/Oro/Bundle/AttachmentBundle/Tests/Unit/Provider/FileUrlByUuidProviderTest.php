@@ -27,7 +27,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileUrlByUuidProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
         $this->cache = $this->createMock(CacheProvider::class);

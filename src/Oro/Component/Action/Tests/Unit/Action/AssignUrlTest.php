@@ -20,7 +20,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
             ->disableOriginalConstructor()
@@ -38,7 +38,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->router, $this->action);
     }

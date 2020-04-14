@@ -29,7 +29,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);

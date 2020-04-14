@@ -16,7 +16,7 @@ class NumberRangeFilterTest extends NumberFilterTest
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

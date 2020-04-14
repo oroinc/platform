@@ -31,7 +31,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
     /** @var AttributeConfigExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

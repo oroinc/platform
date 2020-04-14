@@ -14,7 +14,7 @@ class ActionAvailabilityCheckTest extends GetListProcessorTestCase
     /** @var ActionAvailabilityCheck */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

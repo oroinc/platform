@@ -23,7 +23,7 @@ class EmailNotificationControllerTest extends WebTestCase
     /** @var  Registry */
     protected $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);

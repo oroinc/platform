@@ -21,7 +21,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = $this->getMockBuilder(LanguageCodeFormatter::class)
             ->disableOriginalConstructor()
@@ -33,7 +33,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formatter, $this->type);
     }

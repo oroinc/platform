@@ -11,7 +11,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
      */
     protected $widget;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->widget = new Widget();
     }

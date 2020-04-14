@@ -15,7 +15,7 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var FilterFieldsConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new FilterFieldsConfigExtra(self::FIELD_FILTERS);
     }

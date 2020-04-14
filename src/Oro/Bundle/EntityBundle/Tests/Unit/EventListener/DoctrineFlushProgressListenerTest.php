@@ -12,7 +12,7 @@ class DoctrineFlushProgressListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineFlushProgressListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new DoctrineFlushProgressListener();
     }

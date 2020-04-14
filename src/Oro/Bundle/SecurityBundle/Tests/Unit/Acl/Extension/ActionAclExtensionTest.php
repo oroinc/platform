@@ -16,7 +16,7 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionAclExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataProvider = $this->createMock(ActionSecurityMetadataProvider::class);
 

@@ -11,7 +11,7 @@ class CheckRequestTypeTest extends GetListProcessorTestCase
     /** @var CheckRequestType */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new CheckRequestType();

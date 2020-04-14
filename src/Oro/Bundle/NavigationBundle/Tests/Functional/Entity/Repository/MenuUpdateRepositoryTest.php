@@ -17,7 +17,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
     /** @var  MenuUpdateRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->client->useHashNavigation(true);

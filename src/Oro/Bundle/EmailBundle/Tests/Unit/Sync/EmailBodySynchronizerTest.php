@@ -31,7 +31,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodySynchronizer */
     protected $synchronizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger   = $this->createMock('Psr\Log\LoggerInterface');
         $this->selector = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector')

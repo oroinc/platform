@@ -20,7 +20,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         'oro.user.gender.female.translated' => Gender::FEMALE,
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -39,7 +39,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->genderProvider = new GenderProvider($translator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->genderProvider);
     }

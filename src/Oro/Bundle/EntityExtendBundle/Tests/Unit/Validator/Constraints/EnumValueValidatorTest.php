@@ -28,7 +28,7 @@ class EnumValueValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(ExecutionContextInterface::class);
 

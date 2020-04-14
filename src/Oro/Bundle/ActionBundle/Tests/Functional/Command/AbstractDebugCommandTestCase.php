@@ -10,7 +10,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     /** @var FactoryWithTypesInterface */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->factory = $this->getContainer()->get($this->getFactoryServiceId());

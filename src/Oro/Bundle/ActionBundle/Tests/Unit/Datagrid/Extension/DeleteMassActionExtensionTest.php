@@ -32,7 +32,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
@@ -48,7 +48,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->extension,

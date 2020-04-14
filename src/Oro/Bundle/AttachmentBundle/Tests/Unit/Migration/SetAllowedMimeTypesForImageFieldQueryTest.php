@@ -43,7 +43,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
      */
     private $updateAttachmentOptionQuery;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->logger = $this->createMock(LoggerInterface::class);

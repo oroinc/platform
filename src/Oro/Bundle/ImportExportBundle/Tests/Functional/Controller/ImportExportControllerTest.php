@@ -29,7 +29,7 @@ class ImportExportControllerTest extends WebTestCase
      */
     private $existingFiles = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -41,7 +41,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->existingFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $tempFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
         $diffFiles = array_diff($tempFiles, $this->existingFiles);

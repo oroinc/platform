@@ -19,7 +19,7 @@ class DuplicateFilterTest extends WebTestCase
     /** @var DuplicateFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->filter = $this->getContainer()->get('oro_filter.duplicate_filter');

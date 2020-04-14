@@ -20,7 +20,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var ValueTransformer */
     private $valueTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataTransformerRegistry = $this->createMock(DataTransformerRegistry::class);
         $this->dataTransformer = $this->createMock(DataTransformerInterface::class);

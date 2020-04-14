@@ -12,8 +12,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -30,7 +30,7 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
         $em->remove($barOwner);
         $em->remove($bazOwner);
         $em->flush();
-        
+
         $message = $this->getFirstEntitiesChangedMessage();
         $this->assertEntitiesDeletedInMessageCount(3, $message);
         $this->assertEntitiesInsertedInMessageCount(0, $message);

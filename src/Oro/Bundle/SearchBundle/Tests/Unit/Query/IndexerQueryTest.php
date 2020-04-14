@@ -32,7 +32,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
     protected $criteria;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchIndexer = $this->createPartialMock(
             Indexer::class,
@@ -63,7 +63,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->searchIndexer, $this->innerQuery, $this->query);
     }

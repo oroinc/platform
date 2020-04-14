@@ -20,7 +20,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigApiManager */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ProviderInterface::class);
         $this->configManager  = $this->getMockBuilder(ConfigManager::class)

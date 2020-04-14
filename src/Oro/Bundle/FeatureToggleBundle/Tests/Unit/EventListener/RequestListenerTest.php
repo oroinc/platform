@@ -19,7 +19,7 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $featureChecker;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
         $this->listener = new RequestListener($this->featureChecker);
@@ -42,7 +42,7 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
         $event->method('isMasterRequest')->willReturn(true);
-        
+
         $this->listener->onRequest($event);
     }
 
@@ -60,7 +60,7 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
         $event->method('isMasterRequest')->willReturn(true);
-        
+
         $this->listener->onRequest($event);
     }
 

@@ -84,7 +84,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var FormOptionsConfigurationAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigurationAssembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
             ->disableOriginalConstructor()

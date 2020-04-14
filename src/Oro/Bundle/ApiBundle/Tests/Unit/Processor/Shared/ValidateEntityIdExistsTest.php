@@ -12,7 +12,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
     /** @var ValidateEntityIdExists */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

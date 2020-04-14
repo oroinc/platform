@@ -10,7 +10,7 @@ class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var SimpleArrayFormatter */
     private $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())

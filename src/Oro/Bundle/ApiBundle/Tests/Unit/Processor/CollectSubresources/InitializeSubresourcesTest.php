@@ -37,7 +37,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     /** @var InitializeSubresources */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

@@ -68,7 +68,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 

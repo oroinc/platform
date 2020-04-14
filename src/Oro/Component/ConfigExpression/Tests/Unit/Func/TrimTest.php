@@ -12,7 +12,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Trim */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new Func\Trim();
         $this->function->setContextAccessor(new ContextAccessor());

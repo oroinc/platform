@@ -11,7 +11,7 @@ class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var AddApiDocViewAnnotationHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new AddApiDocViewAnnotationHandler('additional_view', 'existing_view');
     }

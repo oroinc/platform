@@ -17,7 +17,7 @@ class ListContextTest extends \PHPUnit\Framework\TestCase
     /** @var ListContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

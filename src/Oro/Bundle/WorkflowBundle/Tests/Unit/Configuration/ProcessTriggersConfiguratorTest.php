@@ -41,7 +41,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationBuilder = $this->createMock(
             'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'

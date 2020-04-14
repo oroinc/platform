@@ -44,7 +44,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(Router::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

@@ -15,7 +15,7 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
     /** @var TranslationPackageProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

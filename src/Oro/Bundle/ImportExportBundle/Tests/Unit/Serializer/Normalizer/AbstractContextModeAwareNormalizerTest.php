@@ -11,7 +11,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = $this
             ->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer')

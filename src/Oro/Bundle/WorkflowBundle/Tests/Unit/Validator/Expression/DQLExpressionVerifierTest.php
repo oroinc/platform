@@ -12,12 +12,12 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionVerifierInterface */
     protected $verifier;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new DQLExpressionVerifier();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->verifier);
     }

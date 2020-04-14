@@ -10,7 +10,7 @@ class FileConfigTypeTest extends \PHPUnit\Framework\TestCase
     /** @var FileConfigType */
     protected $type;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

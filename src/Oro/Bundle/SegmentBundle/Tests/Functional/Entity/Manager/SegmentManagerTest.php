@@ -25,7 +25,7 @@ class SegmentManagerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([
@@ -36,7 +36,7 @@ class SegmentManagerTest extends WebTestCase
         $this->manager = self::getContainer()->get('oro_segment.segment_manager');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
         parent::tearDown();

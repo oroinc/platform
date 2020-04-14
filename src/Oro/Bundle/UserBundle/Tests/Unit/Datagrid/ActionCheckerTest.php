@@ -14,7 +14,7 @@ class ActionCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ActionChecker */
     protected $actionChecker;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->actionChecker = new ActionChecker($this->tokenAccessor);

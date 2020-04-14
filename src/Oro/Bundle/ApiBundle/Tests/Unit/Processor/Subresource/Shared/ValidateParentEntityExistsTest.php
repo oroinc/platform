@@ -10,7 +10,7 @@ class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
     /** @var ValidateParentEntityExists */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

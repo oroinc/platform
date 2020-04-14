@@ -24,7 +24,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $directory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->process = $this
             ->getMockBuilder('Symfony\Component\Process\Process')

@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $bundle1 = new FirstEngineBundle();
         $bundle2 = new SecondEngineBundle();

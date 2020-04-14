@@ -16,7 +16,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
      */
     protected $contextAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
         $this->condition       = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\AbstractComparison')

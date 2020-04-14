@@ -36,7 +36,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraints = ['constraints'];
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->prophesize(DoctrineHelper::class);
         $this->validator = $this->prophesize(ValidatorInterface::class);

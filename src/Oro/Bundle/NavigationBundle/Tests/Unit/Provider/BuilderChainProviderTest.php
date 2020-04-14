@@ -26,7 +26,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MenuManipulator */
     private $manipulator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(MenuFactory::class);
         $this->loader = $this->getMockBuilder(ArrayLoader::class)

@@ -17,7 +17,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->resolver = new KeyTemplateParametersResolver($this->translator);
@@ -26,7 +26,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator, $this->workflowManager, $this->transitionManager, $this->workflow, $this->resolver);
     }

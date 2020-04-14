@@ -45,7 +45,7 @@ class BlockFactoryTest extends LayoutTestCase
     /** @var BlockFactory */
     protected $blockFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());

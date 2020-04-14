@@ -10,7 +10,7 @@ class PropertyConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyConfigBag */
     protected $propertyConfigBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyConfigBag = new PropertyConfigBag(['scope1' => ['key' => 'value']]);
     }

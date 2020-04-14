@@ -15,7 +15,7 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
      */
     private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new OroPlaceholderPasswordType();
         parent::setUp();

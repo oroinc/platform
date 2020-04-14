@@ -44,7 +44,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ReportDatagridConfigurationBuilder */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);

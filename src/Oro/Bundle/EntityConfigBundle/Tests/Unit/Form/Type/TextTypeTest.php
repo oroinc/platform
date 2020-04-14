@@ -11,7 +11,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
     /** @var TextType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

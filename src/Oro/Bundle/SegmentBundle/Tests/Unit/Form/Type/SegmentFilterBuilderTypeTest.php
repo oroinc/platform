@@ -42,7 +42,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
      */
     private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

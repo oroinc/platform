@@ -18,7 +18,7 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);
         $this->requestWatcher = new RequestWatcher($this->bufferedProducer);

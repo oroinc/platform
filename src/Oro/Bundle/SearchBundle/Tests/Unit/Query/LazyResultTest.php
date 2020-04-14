@@ -31,7 +31,7 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
     /** @var LazyResult */
     protected $result;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->elements = [
             new Item(

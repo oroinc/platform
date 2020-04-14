@@ -37,7 +37,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
      */
     protected $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
             ->disableOriginalConstructor()

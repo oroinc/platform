@@ -24,7 +24,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileManager */
     protected $fileManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->filesystem = $this->getMockBuilder(Filesystem::class)
             ->disableOriginalConstructor()

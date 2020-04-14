@@ -10,7 +10,7 @@ class AbstractConditionTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\AbstractCondition|\PHPUnit\Framework\MockObject\MockObject */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\AbstractCondition')
             ->setMethods(['isConditionAllowed'])

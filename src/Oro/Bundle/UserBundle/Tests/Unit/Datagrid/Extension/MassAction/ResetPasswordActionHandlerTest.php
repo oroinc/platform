@@ -20,7 +20,7 @@ class ResetPasswordActionHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var int */
     protected $methodCalls;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $tokenAccessor->expects($this->atLeastOnce())

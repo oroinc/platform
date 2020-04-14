@@ -21,7 +21,7 @@ class MigrationContainerTest extends \PHPUnit\Framework\TestCase
     /** @var MigrationContainer */
     private $migrationContainer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parameterBag = $this->createMock(ParameterBagInterface::class);
         $this->publicContainer = $this->createMock(DependencyInjectionContainer::class);

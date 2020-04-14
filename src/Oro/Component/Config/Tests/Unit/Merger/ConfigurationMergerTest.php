@@ -13,7 +13,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationMerger */
     protected $merger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->merger = new ConfigurationMerger([self::BUNDLE1, self::BUNDLE2, self::BUNDLE3]);
     }

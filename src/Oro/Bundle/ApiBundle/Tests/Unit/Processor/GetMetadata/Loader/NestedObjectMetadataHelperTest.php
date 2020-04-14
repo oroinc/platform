@@ -22,7 +22,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var NestedObjectMetadataHelper */
     private $nestedObjectMetadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = $this->createMock(MetadataHelper::class);
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);

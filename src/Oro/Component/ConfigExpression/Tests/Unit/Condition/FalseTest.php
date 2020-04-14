@@ -9,7 +9,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\FalseCondition */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\FalseCondition();
     }

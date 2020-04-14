@@ -21,7 +21,7 @@ class AuthenticationFailureListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AuthenticationFailureListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new AuthenticationFailureListener($this->providerKey, $this->messageKey);
     }

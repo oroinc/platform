@@ -27,7 +27,7 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
     /** @var DirectMailer */
     private $mailer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->baseMailer = $this->getMailerMock();
         $this->container = $this->createMock(ContainerInterface::class);

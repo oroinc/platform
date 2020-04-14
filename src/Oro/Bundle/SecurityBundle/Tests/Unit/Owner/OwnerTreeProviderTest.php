@@ -63,7 +63,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);

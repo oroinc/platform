@@ -16,12 +16,12 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
      */
     protected $actionBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listAction = new TreeExecutor();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listAction);
     }

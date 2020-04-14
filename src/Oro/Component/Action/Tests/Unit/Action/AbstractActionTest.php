@@ -19,7 +19,7 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = $this->getMockBuilder('Oro\Component\Action\Action\AbstractAction')
             ->setConstructorArgs(array(new ContextAccessor()))
@@ -30,7 +30,7 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }

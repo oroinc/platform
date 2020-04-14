@@ -17,7 +17,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->helper = new TransitionWidgetHelper($this->doctrineHelper);
@@ -26,7 +26,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->doctrineHelper,

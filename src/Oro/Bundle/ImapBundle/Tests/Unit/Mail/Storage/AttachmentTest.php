@@ -16,7 +16,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     /** @var Attachment */
     private $attachment;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
             ->disableOriginalConstructor()

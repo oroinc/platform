@@ -15,7 +15,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
     /** @var EntityTitleProvider */
     private $entityTitleProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

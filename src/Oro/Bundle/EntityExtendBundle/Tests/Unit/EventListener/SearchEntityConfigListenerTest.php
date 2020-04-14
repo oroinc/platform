@@ -31,7 +31,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SearchEntityConfigListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchMappingProvider = $this->getMockBuilder(SearchMappingProvider::class)
             ->disableOriginalConstructor()

@@ -33,7 +33,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
@@ -56,7 +56,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->repo, $this->processHandler, $this->managerRegistry, $this->input, $this->output, $this->command);
     }

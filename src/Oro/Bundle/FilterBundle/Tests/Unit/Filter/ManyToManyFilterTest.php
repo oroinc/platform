@@ -9,7 +9,7 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
 {
     protected $manyToManyfilter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
         $filterUtility = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\FilterUtility')

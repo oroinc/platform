@@ -44,7 +44,7 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFallbackResolver */
     protected $resolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->formProvider = $this->createMock(SystemConfigurationFormProvider::class);

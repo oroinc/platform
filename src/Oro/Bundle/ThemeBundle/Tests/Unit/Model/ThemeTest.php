@@ -12,7 +12,7 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
      */
     protected $theme;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->theme = new Theme('test');
     }

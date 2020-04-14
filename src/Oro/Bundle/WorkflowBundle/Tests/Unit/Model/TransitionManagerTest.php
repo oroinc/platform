@@ -12,7 +12,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionManager */
     protected $transitionManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transitionManager = new TransitionManager();
     }

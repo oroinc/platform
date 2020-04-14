@@ -21,7 +21,7 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $tokenizer = new CommandArgsTokenizer();
         $tokenizer->addNormalizer(new CommandArgsNormalizer());

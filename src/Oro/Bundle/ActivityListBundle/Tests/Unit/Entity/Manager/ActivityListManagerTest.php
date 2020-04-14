@@ -59,7 +59,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);

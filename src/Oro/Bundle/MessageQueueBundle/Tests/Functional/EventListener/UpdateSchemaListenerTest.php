@@ -8,12 +8,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
 

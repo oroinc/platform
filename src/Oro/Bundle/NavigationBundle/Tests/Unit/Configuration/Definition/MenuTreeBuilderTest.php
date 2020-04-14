@@ -10,7 +10,7 @@ class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuTreeBuilder */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new MenuTreeBuilder();
     }

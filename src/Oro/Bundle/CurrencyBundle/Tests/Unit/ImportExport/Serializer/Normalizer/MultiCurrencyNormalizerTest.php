@@ -18,7 +18,7 @@ class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter  = $this->createMock(NumberFormatter::class);
         $this->normalizer = new MultiCurrencyNormalizer($this->formatter);

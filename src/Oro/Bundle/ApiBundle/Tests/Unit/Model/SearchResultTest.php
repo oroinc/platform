@@ -13,7 +13,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|SearchQueryInterface */
     private $query;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->query = $this->createMock(SearchQueryInterface::class);
     }

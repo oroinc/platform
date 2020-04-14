@@ -18,7 +18,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
 

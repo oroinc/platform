@@ -10,7 +10,7 @@ class QueueCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var QueueCollection */
     private $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->collection = new QueueCollection();
     }

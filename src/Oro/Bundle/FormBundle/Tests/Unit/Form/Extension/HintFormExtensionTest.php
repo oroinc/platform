@@ -12,7 +12,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->getMockBuilder(Form::class)->disableOriginalConstructor()->getMock();
     }
@@ -66,7 +66,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('toolbar', $view->vars);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->form);
     }

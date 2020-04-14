@@ -11,7 +11,7 @@ class DataProviderDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     protected $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decorator = new DataProviderDecorator(new \ArrayObject(), ['offset']);
     }

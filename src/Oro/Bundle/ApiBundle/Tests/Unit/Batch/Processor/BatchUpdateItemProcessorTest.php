@@ -79,7 +79,7 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
         return $createdProcessors;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
