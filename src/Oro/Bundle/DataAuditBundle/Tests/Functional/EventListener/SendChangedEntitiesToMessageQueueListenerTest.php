@@ -979,7 +979,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $em->flush();
@@ -1010,7 +1010,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $entity->setStringProperty('new string');
