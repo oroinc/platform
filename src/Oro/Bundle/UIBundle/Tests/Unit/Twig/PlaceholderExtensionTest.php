@@ -117,13 +117,14 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot render placeholder item with keys "bar", "bar". Expects "template" or "action" key.
-     */
     //@codingStandardsIgnoreEnd
     public function testRenderPlaceholderFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot render placeholder item with keys "bar", "bar". Expects "template" or "action" key.'
+        );
+
         $this->placeholderProvider->expects($this->once())
             ->method('getPlaceholderItems')
             ->with(self::INVALID_PLACEHOLDER_NAME, [])

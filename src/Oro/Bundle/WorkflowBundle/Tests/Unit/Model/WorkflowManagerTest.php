@@ -513,12 +513,11 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($workflowData, $actualWorkflowItem->getData()->getValues());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException
-     * @expectedExceptionMessage Workflow "test_workflow" can not be started because it belongs to
-     */
     public function testStartWorkflowRecordGroupException(): void
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException::class);
+        $this->expectExceptionMessage('Workflow "test_workflow" can not be started because it belongs to');
+
         $entity = new EntityStub(1);
         $transition = $this->createStartTransition('test_transition');
         $workflowItem = new WorkflowItem();

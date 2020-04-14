@@ -154,11 +154,9 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $service->loadTranslatesFromFile($path, 'en');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDownloadException()
     {
+        $this->expectException(\RuntimeException::class);
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
             [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]

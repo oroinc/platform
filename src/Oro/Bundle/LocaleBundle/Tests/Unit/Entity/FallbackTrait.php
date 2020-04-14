@@ -57,7 +57,7 @@ trait FallbackTrait
 
         // test logic exception
         $badValues = new ArrayCollection([$value1, $value1]);
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $object->$method($badValues, $localization1);
     }
 }

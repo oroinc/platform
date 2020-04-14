@@ -118,12 +118,11 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Unknown entity: "stdClass"; key: "test1".
-     */
     public function testFillEntityData()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Unknown entity: "stdClass"; key: "test1".');
+
         $entityKey = 'test1';
         $entity    = new \stdClass();
 

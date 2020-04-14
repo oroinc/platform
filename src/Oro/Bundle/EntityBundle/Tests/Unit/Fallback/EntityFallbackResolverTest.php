@@ -6,6 +6,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackProviderNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
@@ -15,6 +17,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub\FallbackContainingEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -23,22 +26,22 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_FALLBACK = 'testFallback';
 
-    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigBag|MockObject */
     protected $configBag;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     protected $entityConfigProvider;
 
-    /** @var SystemConfigurationFormProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var SystemConfigurationFormProvider|MockObject */
     protected $formProvider;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|MockObject */
     protected $configManager;
 
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigInterface|MockObject */
     protected $configInterface;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     protected $doctrineHelper;
 
     /** @var EntityFallbackResolver */
@@ -110,12 +113,11 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackTypeException
-     * @expectedExceptionMessage Invalid fallback data type 'invalidType' provided.
-     */
     public function testGetTypeThrowsExceptionOnInvalidType()
     {
+        $this->expectException(InvalidFallbackTypeException::class);
+        $this->expectExceptionMessage("Invalid fallback data type 'invalidType' provided.");
+
         $this->setDefaultConfigInterfaceMock();
         $entityConfig = $this->getEntityConfiguration();
         $entityConfig[EntityFieldFallbackValue::FALLBACK_TYPE] = 'invalidType';
@@ -177,7 +179,7 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testIsFallbackSupported()
     {
-        /** @var SystemConfigFallbackProvider|\PHPUnit\Framework\MockObject\MockObject $provider */
+        /** @var SystemConfigFallbackProvider|MockObject $provider */
         $provider = $this->createMock(SystemConfigFallbackProvider::class);
         $provider->expects($this->once())
             ->method('isFallbackSupported')
@@ -238,14 +240,13 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entityConfig[EntityFieldFallbackValue::FALLBACK_LIST], $result);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException
-     * @expectedExceptionMessage You must define the fallback configuration 'nonExistentConfig' for class 'stdClass', field 'testProperty'
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetFallbackConfigThrowsExceptionIfNoConfigWithName()
     {
+        $this->expectException(FallbackFieldConfigurationMissingException::class);
+        $this->expectExceptionMessage(
+            "You must define the fallback configuration 'nonExistentConfig' for class 'stdClass', field 'testProperty'"
+        );
+
         $this->setDefaultConfigInterfaceMock();
         $entityConfig = $this->getEntityConfiguration();
         $this->configInterface->expects($this->any())
@@ -256,12 +257,13 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
         $resolver->getFallbackConfig(new \stdClass(), 'testProperty', 'nonExistentConfig');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\FallbackProviderNotFoundException
-     * @expectedExceptionMessage Fallback provider for fallback with identification key "nonExistent" not found.
-     */
     public function testGetFallbackProviderThrowsException()
     {
+        $this->expectException(FallbackProviderNotFoundException::class);
+        $this->expectExceptionMessage(
+            'Fallback provider for fallback with identification key "nonExistent" not found.'
+        );
+
         $resolver = $this->getEntityFallbackResolver([]);
         $resolver->getFallbackProvider('nonExistent');
     }
@@ -400,12 +402,11 @@ class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['test'], $resolver->getFallbackValue($entity, 'testProperty'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException
-     * @expectedExceptionMessage Invalid fallback key "nonExistentProvider" provided
-     */
     public function testGetFallbackValueThrowsInvalidKeyException()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\Fallback\InvalidFallbackKeyException::class);
+        $this->expectExceptionMessage('Invalid fallback key "nonExistentProvider" provided');
+
         $fallbackValue = new EntityFieldFallbackValue();
         $fallbackValue->setFallback('nonExistentProvider');
         $entity = new FallbackContainingEntity($fallbackValue);

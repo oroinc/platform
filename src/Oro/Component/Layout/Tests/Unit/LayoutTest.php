@@ -48,12 +48,11 @@ class LayoutTest extends LayoutTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The layout renderer named "unknown" was not found.
-     */
     public function testRenderByUnknownRenderer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The layout renderer named "unknown" was not found.');
+
         $view   = new BlockView();
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setRenderer('unknown')->render();

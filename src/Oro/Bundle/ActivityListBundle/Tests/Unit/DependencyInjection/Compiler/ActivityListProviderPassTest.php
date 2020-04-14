@@ -42,14 +42,13 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "class" is required for "oro_activity_list.provider" tag. Service: "provider_1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWithoutNameAttribute()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "class" is required for "oro_activity_list.provider" tag. Service: "provider_1".'
+        );
+
         $this->container->setDefinition('provider_1', new Definition())
             ->addTag('oro_activity_list.provider');
 

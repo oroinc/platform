@@ -52,11 +52,9 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDriverException()
     {
+        $this->expectException(\RuntimeException::class);
         $this->connection->expects($this->once())
             ->method('getParams')
             ->willReturn([

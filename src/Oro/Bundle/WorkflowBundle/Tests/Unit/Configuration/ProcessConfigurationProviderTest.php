@@ -35,11 +35,9 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         unset($this->definitionConfiguration, $this->triggerConfiguration);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $bundles = array(new IncorrectConfigurationBundle());
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,

@@ -38,12 +38,11 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
         ], $options->toArray(), true);
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage "data_identifier"
-     */
     public function testRequiredOptions()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('"data_identifier"');
+
         $this->action->setOptions(ActionConfiguration::create([
             ConfigObject::NAME_KEY => 'test-config',
         ]));

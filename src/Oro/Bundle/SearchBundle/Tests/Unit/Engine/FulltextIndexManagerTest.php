@@ -74,12 +74,11 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->indexManager->createIndexes());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Driver "pdo_pgsql" not found
-     */
     public function testGetQueryForUnknownDriver()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Driver "pdo_pgsql" not found');
+
         $this->connection
             ->expects($this->once())
             ->method('getParams')

@@ -100,7 +100,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $extension = $this->getExtensionMock([$button]);
         $this->collection->consume($extension, $this->searchContext);
 
-        $this->expectException('Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException');
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'Map callback should return `%s` as result got `%s` instead.',

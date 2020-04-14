@@ -31,12 +31,11 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new SearchStringFilter($formFactory, $filterUtility);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid filter datasource adapter provided');
+
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->filter->apply($ds, ['type' => TextFilterType::TYPE_EQUAL, 'value' => 'bar']);
     }

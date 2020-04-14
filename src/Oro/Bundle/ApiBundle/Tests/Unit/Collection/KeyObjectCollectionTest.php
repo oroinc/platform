@@ -24,59 +24,55 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->add(new \stdClass(), 'key', 'data');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $object argument of type "object", "NULL" given.
-     */
     public function testShouldAddThrowExceptionIfObjectIsNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $object argument of type "object", "NULL" given.');
+
         $this->collection->add(null, 'key');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $object argument of type "object", "string" given.
-     */
     public function testShouldAddThrowExceptionForNotObject()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $object argument of type "object", "string" given.');
+
         $this->collection->add('test', 'key');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "NULL" given.
-     */
     public function testShouldAddThrowExceptionForNullKey()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "NULL" given.');
+
         $this->collection->add(new \stdClass(), null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "stdClass" given.
-     */
     public function testShouldAddThrowExceptionIfKeyIsObject()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "stdClass" given.');
+
         $this->collection->add(new \stdClass(), new \stdClass());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected $key argument of type "scalar", "array" given.
-     */
     public function testShouldAddThrowExceptionIfKeyIsArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "array" given.');
+
         $this->collection->add(new \stdClass(), []);
     }
 
     /**
      * @dataProvider             blankKeyProvider
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $key argument should not be a blank string.
      */
     public function testShouldAddThrowExceptionForBlankKey($key)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $key argument should not be a blank string.');
+
         $this->collection->add(new \stdClass(), $key);
     }
 

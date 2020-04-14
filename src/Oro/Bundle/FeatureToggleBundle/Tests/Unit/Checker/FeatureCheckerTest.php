@@ -33,12 +33,11 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         unset($this->configurationManager);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The strategy "wrong_strategy" is not supported.
-     */
     public function testInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The strategy "wrong_strategy" is not supported.');
+
         new FeatureChecker($this->configurationManager, [], 'wrong_strategy');
     }
 

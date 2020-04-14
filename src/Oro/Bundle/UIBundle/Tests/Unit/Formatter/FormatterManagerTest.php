@@ -41,12 +41,11 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test_value', $this->manager->format(null, 'test_format_name'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\UIBundle\Exception\InvalidFormatterException
-     * @expectedExceptionMessage The formatter "not_existing_formatter" does not exist.
-     */
     public function testFormatByNotExistingFormatter()
     {
+        $this->expectException(\Oro\Bundle\UIBundle\Exception\InvalidFormatterException::class);
+        $this->expectExceptionMessage('The formatter "not_existing_formatter" does not exist.');
+
         $this->manager->format('test_value', 'not_existing_formatter');
     }
 

@@ -57,11 +57,9 @@ class LoadConfigurationSectionTest extends GetProcessorTestCase
         $this->assertSame($section, $this->context->getResult());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testProcessForUnknownSection()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $scope = 'scope';
         $sectionId = 'unknown';
 

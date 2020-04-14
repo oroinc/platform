@@ -24,12 +24,11 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Serializer must implement
-     */
     public function testSetInvalidSerializer()
     {
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Serializer must implement');
+
         $this->normalizer->setSerializer($this->createMock('Symfony\Component\Serializer\SerializerInterface'));
     }
 

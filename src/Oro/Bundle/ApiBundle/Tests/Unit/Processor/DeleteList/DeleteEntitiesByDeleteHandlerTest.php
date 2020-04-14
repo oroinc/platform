@@ -65,12 +65,13 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         self::assertEquals([$entity], $this->context->getResult());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The result property of the context should be array or Traversable, "stdClass" given.
-     */
     public function testProcessForNotArrayResult()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The result property of the context should be array or Traversable, "stdClass" given.'
+        );
+
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
         $config = new EntityDefinitionConfig();
@@ -144,12 +145,11 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage test exception
-     */
     public function testProcessWithExceptionFromDeleteHandler()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('test exception');
+
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
         $config = new EntityDefinitionConfig();

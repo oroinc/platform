@@ -26,22 +26,19 @@ class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The documentation resource "test_doc.txt" must be a Markdown document.
-     */
     public function testGetDocumentationForNotMarkdownFile()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The documentation resource "test_doc.txt" must be a Markdown document.');
+
         $documentationProvider = new DocumentationProvider('test_doc.txt', $this->getFileLocator());
 
         $documentationProvider->getDocumentation(new RequestType([RequestType::REST]));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Exception\FileLocatorFileNotFoundException
-     */
     public function testGetDocumentationForNotExistingFile()
     {
+        $this->expectException(\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException::class);
         $documentationProvider = new DocumentationProvider('not_existing.md', $this->getFileLocator());
 
         $documentationProvider->getDocumentation(new RequestType([RequestType::REST]));

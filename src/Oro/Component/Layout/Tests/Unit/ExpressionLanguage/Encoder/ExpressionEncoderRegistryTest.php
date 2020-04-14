@@ -26,12 +26,11 @@ class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->encoder, $this->encoderRegistry->get('test'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The expression encoder for "unknown" formatting was not found.
-     */
     public function testGetEncoderThrowsExceptionIfEncoderDoesNotExist()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The expression encoder for "unknown" formatting was not found.');
+
         $this->encoderRegistry->get('unknown');
     }
 }

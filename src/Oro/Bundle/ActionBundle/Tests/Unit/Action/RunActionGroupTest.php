@@ -152,12 +152,11 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Uninitialized action execution.
-     */
     public function testExecuteActionWithoutInitialization()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Uninitialized action execution.');
+
         $this->actionGroup->execute([]);
     }
 

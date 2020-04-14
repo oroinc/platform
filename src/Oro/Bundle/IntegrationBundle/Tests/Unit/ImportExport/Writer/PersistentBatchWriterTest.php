@@ -127,7 +127,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
         if ($couldBeSkipped) {
             $context = $this->getCouldBeSkippedExpects($stepExecution);
         } else {
-            $this->expectException('Exception');
+            $this->expectException(\Exception::class);
         }
 
         $writer = $this->getWriter();
@@ -177,7 +177,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
             ->with($stepExecution)
             ->will($this->returnValue($context));
 
-        $this->expectException('Akeneo\Bundle\BatchBundle\Item\InvalidItemException');
+        $this->expectException(\Akeneo\Bundle\BatchBundle\Item\InvalidItemException::class);
 
         return $context;
     }

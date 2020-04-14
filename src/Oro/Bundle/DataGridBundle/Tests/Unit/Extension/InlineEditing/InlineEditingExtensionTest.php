@@ -80,7 +80,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => true]]);
 
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->extension->processConfigs($config);
     }
 

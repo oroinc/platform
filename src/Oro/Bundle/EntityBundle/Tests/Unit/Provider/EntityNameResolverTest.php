@@ -51,12 +51,11 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         return new EntityNameResolver($providers, $defaultFormat, $configProvider);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The unknown representation format "other".
-     */
     public function testGetNameForUndefinedFormat()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unknown representation format "other".');
+
         $this->entityNameResolver->getName(new \stdClass(), 'other');
     }
 
@@ -140,12 +139,11 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entityNameResolver->getName(new \stdClass(), 'full', 'en_US'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The unknown representation format "other".
-     */
     public function testGetNameDQLForUndefinedFormat()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unknown representation format "other".');
+
         $this->entityNameResolver->getNameDQL('Test\Entity', 'alias', 'other');
     }
 

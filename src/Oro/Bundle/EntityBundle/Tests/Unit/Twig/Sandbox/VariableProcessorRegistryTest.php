@@ -40,12 +40,11 @@ class VariableProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->registry->has('unknown'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown variable processor with alias "unknown"
-     */
     public function testGetForUnknownProcessor()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown variable processor with alias "unknown"');
+
         $this->registry->get('unknown');
     }
 }

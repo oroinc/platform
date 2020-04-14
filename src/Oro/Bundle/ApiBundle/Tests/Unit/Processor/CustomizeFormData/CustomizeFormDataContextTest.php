@@ -278,11 +278,9 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasResult());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testRemoveResult()
     {
+        $this->expectException(\BadMethodCallException::class);
         $this->context->removeResult();
     }
 

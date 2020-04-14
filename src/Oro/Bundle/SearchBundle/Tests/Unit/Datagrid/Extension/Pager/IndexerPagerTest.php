@@ -34,12 +34,11 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($indexerQuery, 'query', $this->pager);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Indexer query must be set
-     */
     public function testInit()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Indexer query must be set');
+
         $this->pager->init();
     }
 

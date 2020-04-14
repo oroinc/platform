@@ -64,12 +64,11 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\SerializerException
-     * @expectedExceptionMessage Cannot deserialize data of process job. Serializer is not available.
-     */
     public function testGetDataWithSerializationFails()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\SerializerException::class);
+        $this->expectExceptionMessage('Cannot deserialize data of process job. Serializer is not available.');
+
         $this->entity->setSerializedData('serialized_data');
         $this->entity->getData();
     }
@@ -168,21 +167,19 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getEntityHash());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Process trigger must be defined for process jo
-     */
     public function testSetEntityIdNoTrigger()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Process trigger must be defined for process jo');
+
         $this->entity->setEntityId(1);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Process definition must be defined for process jo
-     */
     public function testSetEntityIdNoDefinition()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Process definition must be defined for process jo');
+
         $this->entity->setProcessTrigger(new ProcessTrigger());
         $this->entity->setEntityId(1);
     }

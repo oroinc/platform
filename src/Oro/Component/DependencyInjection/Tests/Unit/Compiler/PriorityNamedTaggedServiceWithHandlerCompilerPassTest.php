@@ -22,11 +22,9 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
         $this->container = new ContainerBuilder();
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
     public function testProcessWhenNoServiceAndItIsRequired()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
 

@@ -34,12 +34,11 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($targetContext, $this->context->getTargetContext());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target processor is not defined.
-     */
     public function testProcessWhenTargetProcessorIsNotSet()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target processor is not defined.');
+
         $this->processor->process($this->context);
     }
 

@@ -38,12 +38,11 @@ class StoreRequestDataTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The target file name was not set to the context.
-     */
     public function testProcessWithoutFileName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The target file name was not set to the context.');
+
         $resource = fopen(__DIR__ . '/../../Fixtures/Entity/User.php', 'rb');
 
         $this->fileManager->expects(self::never())

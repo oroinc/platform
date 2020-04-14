@@ -95,11 +95,9 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToPHPValue($source, $this->platform));
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Types\ConversionException
-     */
     public function testConvertToPHPValueException()
     {
+        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);
     }
 }

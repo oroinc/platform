@@ -84,7 +84,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
         $this->translationManager->expects($this->never())->method('flush');
 
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);
@@ -105,7 +105,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
         $this->translationManager->expects($this->never())->method('flush');
 
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);

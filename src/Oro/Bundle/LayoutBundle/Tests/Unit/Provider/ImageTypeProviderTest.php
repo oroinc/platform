@@ -46,11 +46,9 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testInvalidConfig()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->themeManager->getAllThemes()->willReturn([
             $this->prepareTheme('theme1', [
                 'main' => ['Main', 1, ['non_existing_dimension']],

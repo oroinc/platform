@@ -205,12 +205,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForOrganizationInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForOrganizationInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new Organization());
     }
 
@@ -226,12 +226,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForBusinessUnitInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForBusinessUnitInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new BusinessUnit());
     }
 
@@ -247,12 +247,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForUserInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new User());
     }
 
@@ -272,12 +272,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForOrganizationOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForOrganizationOwnedInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
             TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
@@ -301,12 +301,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForUserOwnedInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
             TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
@@ -326,12 +326,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      *
      * @param int $mask
      */
     public function testValidateMaskForRootInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 

@@ -90,12 +90,11 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Cannot transit workflow, instance of "stdClass" doesn't have workflow item.
-     */
     public function testExecuteFailsWhenThereIsNoWorkflowItem()
     {
+        $this->expectException(\Oro\Component\Action\Exception\ActionException::class);
+        $this->expectExceptionMessage('Cannot transit workflow, instance of "stdClass" doesn\'t have workflow item.');
+
         $expectedEntity = new \stdClass();
         $context = new ItemStub();
         $context->test = $expectedEntity;

@@ -35,12 +35,11 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->templateManager);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of fixture reader must contain "entityName".
-     */
     public function testInitializeFromContextExceptionNoOption()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of fixture reader must contain "entityName".');
+
         $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
             ->method('hasOption')

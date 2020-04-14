@@ -41,12 +41,11 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals([$gridname], 'gridNames', $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Gridname parameter must be specified
-     */
     public function testInitializeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Gridname parameter must be specified');
+
         $this->action->initialize([]);
     }
 

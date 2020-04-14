@@ -29,21 +29,17 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame('value2', $this->requestDataAccessor->getValue($requestData, '0.0.key2'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
-     */
     public function testGetValueForNotExistingIndex()
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchIndexException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->getValue($requestData, 'key2');
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
     public function testGetValueWhenValueWithinPathIsNotArray()
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->getValue($requestData, 'key1.key2');
@@ -78,11 +74,9 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
     public function testSetValueWhenValueWithinPathIsNotArray()
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->setValue($requestData, 'key1.key2', 'val');

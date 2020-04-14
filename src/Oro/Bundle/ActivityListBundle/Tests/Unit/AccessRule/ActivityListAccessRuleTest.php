@@ -49,14 +49,13 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->rule->isApplicable($criteria));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @codingStandardsIgnoreStart
-     * @expectedExceptionMessage The "activityListActivityOwnerTableAlias" option was not set to ActivityListAccessRule access rule.
-     * @codingStandardsIgnoreEnd
-     */
     public function testProcessWithoutActivityOwnerTableAliasOption()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'The "activityListActivityOwnerTableAlias" option was not set to ActivityListAccessRule access rule.'
+        );
+
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $this->rule->process($criteria);
     }

@@ -67,12 +67,11 @@ class ArrayToStringTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
     public function testTransformFailsWhenUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
         $transformer = $this->createTestTransfomer();
         $transformer->transform('');
     }
@@ -144,12 +143,11 @@ class ArrayToStringTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "array" given
-     */
     public function testReverseTransformFailsWhenUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "array" given');
+
         $this->createTestTransfomer()->reverseTransform(array());
     }
 

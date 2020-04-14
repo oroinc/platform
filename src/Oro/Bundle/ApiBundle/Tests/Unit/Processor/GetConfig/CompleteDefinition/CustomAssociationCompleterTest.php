@@ -316,12 +316,11 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "target_type" option cannot be configured for "Test\Class::association1".
-     */
     public function testCompleteExtendedAssociationWithCustomTargetType()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "target_type" option cannot be configured for "Test\Class::association1".');
+
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
         $config = $this->createConfigObject([
@@ -346,12 +345,11 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "depends_on" option cannot be configured for "Test\Class::association1".
-     */
     public function testCompleteExtendedAssociationWithCustomDependsOn()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "depends_on" option cannot be configured for "Test\Class::association1".');
+
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
         $config = $this->createConfigObject([

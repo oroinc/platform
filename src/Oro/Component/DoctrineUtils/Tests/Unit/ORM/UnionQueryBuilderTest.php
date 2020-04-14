@@ -148,23 +148,21 @@ class UnionQueryBuilderTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Query\QueryException
-     * @expectedExceptionMessage At least one sub-query should be added.
-     */
     public function testGetQueryBuilderWhenNoSubQueries()
     {
+        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectExceptionMessage('At least one sub-query should be added.');
+
         $qb = new UnionQueryBuilder($this->em);
 
         $qb->getQueryBuilder();
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Query\QueryException
-     * @expectedExceptionMessage At least one select expression should be added.
-     */
     public function testGetQueryBuilderWhenNoSelectExpr()
     {
+        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectExceptionMessage('At least one select expression should be added.');
+
         $qb = new UnionQueryBuilder($this->em);
 
         $subQb = $this->em->getRepository(Entity\Group::class)

@@ -75,12 +75,11 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Entity foo_entity with identifier 100 does not exist.
-     */
     public function testDenormalizeContextWithNonExistentEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Entity foo_entity with identifier 100 does not exist.');
+
         $entities = ['foo_entity' => 'FooEntity'];
         $context = ['foo_entity' => 100];
         $scopeType = 'custom_scope_type';

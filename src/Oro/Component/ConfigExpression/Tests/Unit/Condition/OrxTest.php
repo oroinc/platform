@@ -59,12 +59,11 @@ class OrxTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have at least one element.
-     */
     public function testInitializeEmpty()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have at least one element.');
+
         $this->condition->initialize([]);
     }
 

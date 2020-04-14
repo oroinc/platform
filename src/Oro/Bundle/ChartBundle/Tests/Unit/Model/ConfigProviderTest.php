@@ -127,12 +127,11 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->configurationProvider->hasChartConfig('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Can't find configuration for chart: unknown
-     */
     public function testGetChartConfigForUnknownChart()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for chart: unknown");
+
         $this->configurationProvider->getChartConfig('unknown');
     }
 }

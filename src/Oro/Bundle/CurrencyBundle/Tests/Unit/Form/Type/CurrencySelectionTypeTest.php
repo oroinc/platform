@@ -234,30 +234,27 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         return $choices;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The option "currencies_list" must be null or not empty array.
-     */
     public function testInvalidTypeOfCurrenciesListOption()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectExceptionMessage('The option "currencies_list" must be null or not empty array.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => 'string']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Found unknown currencies: CUR, TST.
-     */
     public function testUnknownCurrency()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectExceptionMessage('Found unknown currencies: CUR, TST.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => ['CUR', 'TST']]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The option "additional_currencies" must be null or array.
-     */
     public function testInvalidTypeOfAdditionalCurrenciesOption()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectExceptionMessage('The option "additional_currencies" must be null or array.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['additional_currencies' => 'string']);
     }
 

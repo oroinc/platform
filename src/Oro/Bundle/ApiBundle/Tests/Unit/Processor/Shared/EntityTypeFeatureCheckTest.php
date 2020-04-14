@@ -23,11 +23,9 @@ class EntityTypeFeatureCheckTest extends GetListProcessorTestCase
         $this->processor = new EntityTypeFeatureCheck($this->featureChecker);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testProcessDisabled()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $className = 'Test\Class';
 
         $this->featureChecker->expects(self::once())

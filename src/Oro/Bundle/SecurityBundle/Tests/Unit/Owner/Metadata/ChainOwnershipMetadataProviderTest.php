@@ -141,12 +141,11 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organizationClass, $chain->getOrganizationClass());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException
-     * @expectedExceptionMessage Supported provider not found in chain
-     */
     public function testGetUserClassWhenSupportedProviderNotFound()
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectExceptionMessage('Supported provider not found in chain');
+
         $provider = $this->getMetadataProviderMock(false);
         $provider->expects($this->never())
             ->method('getUserClass');
@@ -157,12 +156,11 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $chain->getUserClass();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException
-     * @expectedExceptionMessage Supported provider not found in chain
-     */
     public function testGetBusinessUnitClassWhenSupportedProviderNotFound()
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectExceptionMessage('Supported provider not found in chain');
+
         $provider = $this->getMetadataProviderMock(false);
         $provider->expects($this->never())
             ->method('getBusinessUnitClass');
@@ -173,12 +171,11 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $chain->getBusinessUnitClass();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException
-     * @expectedExceptionMessage Supported provider not found in chain
-     */
     public function testGetOrganizationClassWhenSupportedProviderNotFound()
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectExceptionMessage('Supported provider not found in chain');
+
         $provider = $this->getMetadataProviderMock(false);
         $provider->expects($this->never())
             ->method('getOrganizationClass');
@@ -262,12 +259,11 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $chain->stopProviderEmulation();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Provider with "alias" alias not registered
-     */
     public function testEmulationNotSupported()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Provider with "alias" alias not registered');
+
         $chain = new ChainOwnershipMetadataProvider();
         $chain->startProviderEmulation('alias');
     }

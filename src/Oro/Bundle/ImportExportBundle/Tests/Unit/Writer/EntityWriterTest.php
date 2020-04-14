@@ -186,12 +186,11 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([$item]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage entityName not resolved
-     */
     public function testMissingClassName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('entityName not resolved');
+
         /** @var StepExecution $stepExecution */
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()

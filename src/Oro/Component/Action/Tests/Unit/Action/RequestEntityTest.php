@@ -67,7 +67,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->action->initialize($options);
@@ -122,12 +122,11 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
-     */
     public function testExecuteNotManageableEntity()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "\stdClass" is not manageable.');
+
         $options = array(
             'class' => '\stdClass',
             'identifier' => 1,

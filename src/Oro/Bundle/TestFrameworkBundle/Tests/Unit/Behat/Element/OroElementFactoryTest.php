@@ -9,12 +9,11 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 
 class OroElementFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Could not find element with "\w+" name/
-     */
     public function testCreateElementException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Could not find element with "\w+" name/');
+
         $this->getElementFactory()->createElement('someElement');
     }
 

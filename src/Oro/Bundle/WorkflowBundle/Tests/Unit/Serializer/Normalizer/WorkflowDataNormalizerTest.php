@@ -81,15 +81,17 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         return new WorkflowDataNormalizer($attributeNormalizers);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider normalizeDirectionDataProvider
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\SerializerException
-     * @expectedExceptionMessage Cannot get Workflow. Serializer must implement Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer
      */
-    // @codingStandardsIgnoreEnd
     public function testNormalizeExceptionCantGetWorkflow($direction)
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\SerializerException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Cannot get Workflow. Serializer must implement %s',
+            \Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer::class
+        ));
+
         $data = new WorkflowData();
         $normalizer = $this->getWorkflowDataNormalizer();
         if ($direction == 'normalization') {

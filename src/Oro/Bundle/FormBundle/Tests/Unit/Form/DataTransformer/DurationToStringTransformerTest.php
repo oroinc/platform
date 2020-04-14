@@ -36,22 +36,20 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "scalar", "array" given
-     */
     public function testTransformFailsWhenUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "scalar", "array" given');
+
         $transformer = $this->createTestTransformer();
         $transformer->transform([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Duration too long to convert.
-     */
     public function testTransformFailsWithBigNumbers()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Duration too long to convert.');
+
         $transformer = $this->createTestTransformer();
         $transformer->transform(PHP_INT_MAX);
     }
@@ -183,11 +181,9 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testReverseTransformFailsWhenUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->createTestTransformer()->reverseTransform(array());
     }
 

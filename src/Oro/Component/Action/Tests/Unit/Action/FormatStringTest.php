@@ -173,12 +173,11 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $context->$attributePath);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Argument parameter must be traversable
-     */
     public function testNotTraversableArguments()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Argument parameter must be traversable');
+
         $options = array(
             'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
             'string' => $this->testString,

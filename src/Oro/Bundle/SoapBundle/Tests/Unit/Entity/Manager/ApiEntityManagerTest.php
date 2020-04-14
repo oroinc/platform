@@ -176,12 +176,11 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($result, $queryBuilder);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage xpected instance of \DateTime
-     */
     public function testGetEntityIdIncorrectInstance()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('xpected instance of \DateTime');
+
         $manager = $this->createApiEntityManager('\DateTime');
         $manager->getEntityId(new Entity());
     }

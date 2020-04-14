@@ -96,7 +96,7 @@ class NoTagsValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldFailWithInvalidValue($value, $exceptionMessage)
     {
-        $this->expectException('Symfony\\Component\\Validator\\Exception\\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage($exceptionMessage);
         $this->validator->validate($value, $this->constraint);
     }

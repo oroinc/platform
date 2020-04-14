@@ -22,11 +22,9 @@ class PriorityNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\Test
         $this->container = new ContainerBuilder();
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
     public function testProcessWhenNoServiceAndItIsRequired()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME, ['alias' => 'item1']);
 
@@ -72,12 +70,13 @@ class PriorityNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\Test
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "alias" is required for "test_tag" tag. Service: "tagged_service_1".
-     */
     public function testProcessWithoutNameAttribute()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "alias" is required for "test_tag" tag. Service: "tagged_service_1".'
+        );
+
         $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
         $this->container->setDefinition('tagged_service_1', new Definition())

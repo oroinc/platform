@@ -88,12 +88,11 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The document builder service "document_builder1" should be non shared.
-     */
     public function testProcessWhenDocumentBuilderIsShared()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
+        $this->expectExceptionMessage('The document builder service "document_builder1" should be non shared.');
+
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
         $documentBuilder1->addTag(
             'oro.api.document_builder',

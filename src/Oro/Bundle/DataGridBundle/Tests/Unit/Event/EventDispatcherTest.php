@@ -93,7 +93,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     }
     public function testDispatchException()
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
         );

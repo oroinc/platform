@@ -33,12 +33,12 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeException(array $options)
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -82,12 +82,11 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Cannot evaluate value of "someValue", constant is not exist.
-     */
     public function testExecuteIncorrectUnknownConstant()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Cannot evaluate value of "someValue", constant is not exist.');
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
@@ -99,12 +98,11 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.
-     */
     public function testExecuteIncorrectNoClass()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.');
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
@@ -116,12 +114,13 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "assign_constant_value" expects a string in parameter "value", array is given.
-     */
     public function testExecuteException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "assign_constant_value" expects a string in parameter "value", array is given.'
+        );
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 

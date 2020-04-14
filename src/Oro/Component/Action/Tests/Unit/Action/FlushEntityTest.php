@@ -55,7 +55,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEntityManagerCalled($entity, $flushException);
 
         if ($flushException) {
-            $this->expectException('\Exception');
+            $this->expectException(\Exception::class);
             $this->expectExceptionMessage('Flush exception');
         }
 

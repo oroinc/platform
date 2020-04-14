@@ -224,11 +224,9 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($ownerTree);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testValidateForInvalidConstraintType()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate($this->testEntity, $this->createMock(Constraint::class));
     }
 

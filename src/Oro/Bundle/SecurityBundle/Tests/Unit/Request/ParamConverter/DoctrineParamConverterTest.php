@@ -77,7 +77,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($isGranted));
 
         if ($isGranted === -1) {
-            $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+            $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
             $this->expectExceptionMessage('You do not get EDIT permission for this object');
             $this->requestAuthorizationChecker->expects($this->any())
                 ->method('getRequestAcl')

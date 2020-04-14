@@ -37,39 +37,35 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         unset($this->contextAccessor, $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Class name parameter is required
-     */
     public function testInitializeExceptionNoClassName()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Class name parameter is required');
+
         $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute name parameter is required');
+
         $this->action->initialize(['class' => 'stdClass']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     */
     public function testInitializeExceptionInvalidAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize(['class' => 'stdClass', 'attribute' => 'string']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object data must be an array.
-     */
     public function testExceptionInvalidData()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object data must be an array.');
+
         $this->action->initialize(
             ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
         );
@@ -77,12 +73,11 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->execute(new ItemStub());
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object constructor arguments must be an array.
-     */
     public function testInitializeExceptionInvalidArguments()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object constructor arguments must be an array.');
+
         $this->action->initialize(
             ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'arguments' => 'string_value']
         );

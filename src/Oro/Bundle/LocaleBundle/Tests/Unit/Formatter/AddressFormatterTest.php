@@ -172,12 +172,11 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot get address format for "CA"
-     */
     public function testGetAddressFormatFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot get address format for "CA"');
+
         $this->localeSettings->expects($this->once())
             ->method('getCountry')
             ->will($this->returnValue(LocaleConfiguration::DEFAULT_COUNTRY));

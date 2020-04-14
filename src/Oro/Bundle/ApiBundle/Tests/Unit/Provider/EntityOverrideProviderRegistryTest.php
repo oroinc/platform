@@ -44,12 +44,11 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an entity override provider for the request "rest,another".
-     */
     public function testGetEntityOverrideProviderForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an entity override provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getEntityOverrideProvider($requestType);

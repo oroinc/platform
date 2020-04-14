@@ -6,24 +6,22 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
 {
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The "columns" definition does not exist.
-     */
     public function testEmpty()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition does not exist.');
+
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode([]));
         $builder = $this->createDatagridConfigurationBuilder($model);
         $builder->getConfiguration();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The "columns" definition must not be empty.
-     */
     public function testEmptyColumns()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition must not be empty.');
+
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode(['columns' => []]));
         $builder = $this->createDatagridConfigurationBuilder($model);

@@ -125,12 +125,11 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->reader->read());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Reader must be configured with source
-     */
     public function testReadFailsWhenNoSourceIterator()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Reader must be configured with source');
+
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
@@ -281,14 +280,13 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
+        );
+
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
@@ -491,12 +489,11 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->reader->getIds($entityName, $options));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Not supported entity (entityName) with composite primary key.
-     */
     public function testGetIdsCompositeKey()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Not supported entity (entityName) with composite primary key.');
+
         $entityName = 'entityName';
         $options = [];
 

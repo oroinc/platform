@@ -20,12 +20,12 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */
     public function testAssembleRequiredOptionException($configuration)
     {
+        $this->expectException(\Oro\Component\Action\Exception\AssemblerException::class);
         $this->assembler->assemble($configuration, null);
     }
 

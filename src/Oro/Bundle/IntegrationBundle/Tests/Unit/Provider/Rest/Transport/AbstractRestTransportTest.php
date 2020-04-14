@@ -66,12 +66,11 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedClient, $this->transport->getClient());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage REST Transport isn't configured properly.
-     */
     public function testGetClientFails()
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage("REST Transport isn't configured properly.");
+
         $this->transport->getClient();
     }
 }

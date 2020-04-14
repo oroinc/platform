@@ -178,14 +178,15 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getUnseenEmailUIDs($startDate);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot parse email message. Subject: Subject. Error: It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned. Values: "XThrId1", "XThrId2".
-     */
-    // @codingStandardsIgnoreEnd
     public function testConvertToEmailWithUnexpectedMultiValueHeader()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse email message. Subject: Subject. Error:'
+            . ' It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned.'
+            . ' Values: "XThrId1", "XThrId2".'
+        );
+
         $msg = $this->getMessageMock(
             [
                 $this->getHeader('UID', '123'),

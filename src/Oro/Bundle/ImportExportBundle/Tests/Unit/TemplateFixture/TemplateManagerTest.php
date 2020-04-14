@@ -162,7 +162,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
 
-        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
         $this->expectExceptionMessage(
             sprintf('The repository "%s" cannot be added to the frozen registry.', get_class($anotherRepository))
         );

@@ -120,12 +120,11 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unknown color schema: "unknown".
-     */
     public function testConfigureOptionsForUnknownColorSchema()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unknown color schema: "unknown".');
+
         $resolver = $this->getOptionsResolver();
         $this->formType->configureOptions($resolver);
 

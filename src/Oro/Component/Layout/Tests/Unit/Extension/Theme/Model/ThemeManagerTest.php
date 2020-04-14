@@ -56,12 +56,11 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($manager->hasTheme('unknown'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unable to retrieve definition for theme "unknown"
-     */
     public function testTryingToGetUnknownThemeModel()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unable to retrieve definition for theme "unknown"');
+
         $manager = $this->createManager();
 
         $manager->getTheme('unknown');
@@ -81,12 +80,11 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($themeMock, $manager->getTheme('base'), 'Should instantiate model once');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The theme name must not be empty.
-     */
     public function testGetThemeShouldThrowExceptionIfThemeNameIsEmpty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The theme name must not be empty.');
+
         $manager = $this->createManager();
         $manager->getTheme('');
     }

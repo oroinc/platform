@@ -66,12 +66,11 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Translation::SCOPE_UI, $translation->getScope());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Incorrect record format
-     */
     public function testDenormalizeEmpty()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Incorrect record format');
+
         $this->normalizer->denormalize([], Translation::class);
     }
 

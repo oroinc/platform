@@ -72,12 +72,11 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a document builder for the request "another".
-     */
     public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a document builder for the request "another".');
+
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api']
         ]);

@@ -100,55 +100,55 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Both the first and the last groups must be specified for the "test" action and these groups must be equal. First Group: "". Last Group: "".
-     */
-    // @codingStandardsIgnoreEnd
     public function testBothFirstAndLastGroupsAreNotSet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Both the first and the last groups must be specified for the "test" action and these groups must be equal.'
+            . ' First Group: "". Last Group: "".'
+        );
+
         $context = new ByStepNormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
         $this->processor->process($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Both the first and the last groups must be specified for the "test" action and these groups must be equal. First Group: "". Last Group: "group1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testFirstGroupIsNotSet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Both the first and the last groups must be specified for the "test" action and these groups must be equal.'
+            . ' First Group: "". Last Group: "group1".'
+        );
+
         $context = new ByStepNormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
         $context->setLastGroup('group1');
         $this->processor->process($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Both the first and the last groups must be specified for the "test" action and these groups must be equal. First Group: "group1". Last Group: "".
-     */
-    // @codingStandardsIgnoreEnd
     public function testLastGroupIsNotSet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Both the first and the last groups must be specified for the "test" action and these groups must be equal.'
+            . ' First Group: "group1". Last Group: "".'
+        );
+
         $context = new ByStepNormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
         $context->setFirstGroup('group1');
         $this->processor->process($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Both the first and the last groups must be specified for the "test" action and these groups must be equal. First Group: "group1". Last Group: "group2".
-     */
-    // @codingStandardsIgnoreEnd
     public function testFirstGroupIsNotEqualLastGroup()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Both the first and the last groups must be specified for the "test" action and these groups must be equal.'
+            . ' First Group: "group1". Last Group: "group2".'
+        );
+
         $context = new ByStepNormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
         $context->setFirstGroup('group1');

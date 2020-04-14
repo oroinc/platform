@@ -157,7 +157,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             });
 
         if ($exceptionMessage) {
-            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException');
+            $this->expectException(\Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException::class);
             $this->expectExceptionMessage($exceptionMessage);
         }
 

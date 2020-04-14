@@ -71,38 +71,35 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected transition argument type is string or Transition
-     */
     public function testIsTransitionAllowedArgumentException(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected transition argument type is string or Transition');
+
         $workflowItem = $this->createMock(WorkflowItem::class);
 
         $workflow = $this->createWorkflow();
         $workflow->isTransitionAllowed($workflowItem, 1);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected transition argument type is string or Transition
-     */
     public function testTransitAllowedArgumentException(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected transition argument type is string or Transition');
+
         $workflowItem = $this->createMock(WorkflowItem::class);
 
         $workflow = $this->createWorkflow();
         $workflow->transit($workflowItem, 1);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException
-     * @expectedExceptionMessage Step "test_step" of workflow "test_workflow" doesn't have allowed transition "test_transition".
-     */
-    // @codingStandardsIgnoreEnd
     public function testIsTransitionAllowedStepHasNoAllowedTransitionException(): void
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectExceptionMessage(
+            'Step "test_step" of workflow "test_workflow" doesn\'t have allowed transition "test_transition".'
+        );
+
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');
 
@@ -297,12 +294,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException
-     * @expectedTransitionMessage Step "stepOne" of workflow "test" doesn't have allowed transition "transition".
-     */
     public function testTransitNotAllowedTransition(): void
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectExceptionMessage(
+            'Step "stepOne" of workflow "test" doesn\'t have allowed transition "transition".'
+        );
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('stepOne');
 
@@ -386,12 +383,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->transit($workflowItem, 'transition', $errors);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow "test" does not have step entity "stepTwo"
-     */
     public function testTransitException(): void
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow "test" does not have step entity "stepTwo"');
+
         $workflowStepOne = new WorkflowStep();
         $workflowStepOne->setName('stepOne');
 
@@ -658,12 +654,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array($secondTransition), $actualTransitions->getValues());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\UnknownStepException
-     * @expectedExceptionMessage Step "unknown_step" not found
-     */
     public function testGetAllowedTransitionsUnknownStepException(): void
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\UnknownStepException::class);
+        $this->expectExceptionMessage('Step "unknown_step" not found');
+
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('unknown_step');
 

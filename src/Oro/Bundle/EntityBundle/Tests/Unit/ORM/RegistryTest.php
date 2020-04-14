@@ -200,11 +200,9 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\ORMException
-     */
     public function testGetAliasNamespaceForUnknownAlias()
     {
+        $this->expectException(\Doctrine\ORM\ORMException::class);
         $manager1 = $this->getManagerMock();
 
         $this->container->expects(self::once())

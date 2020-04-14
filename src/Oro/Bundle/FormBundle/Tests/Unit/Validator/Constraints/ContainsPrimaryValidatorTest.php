@@ -9,12 +9,13 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 
 class ContainsPrimaryValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array or Traversable and ArrayAccess", "boolean" given
-     */
     public function testValidateException()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "array or Traversable and ArrayAccess", "boolean" given'
+        );
+
         $constraint = $this->createMock('Symfony\Component\Validator\Constraint');
         $validator = new ContainsPrimaryValidator();
         $validator->validate(false, $constraint);

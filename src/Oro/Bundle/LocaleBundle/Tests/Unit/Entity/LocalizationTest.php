@@ -136,12 +136,11 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultTitle, $entity->getDefaultTitle());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage There must be only one localized fallback value for "default" localization.
-     */
     public function testGetDefaultTitleException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('There must be only one localized fallback value for "default" localization.');
+
         $titles = [$this->createLocalizedValue('test1', true), $this->createLocalizedValue('test2', true)];
         $entity = new Localization();
 

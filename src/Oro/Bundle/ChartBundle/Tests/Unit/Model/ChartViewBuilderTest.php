@@ -132,24 +132,22 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($expectedOptions, 'options', $this->builder);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have "name" key.
-     */
     public function testSetOptionsWithoutName()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have "name" key.');
+
         $options = array('foo' => 'bar');
 
         $this->assertEquals($this->builder, $this->builder->setOptions($options));
         $this->assertAttributeEquals($options, 'options', $this->builder);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have "data_schema" key with array.
-     */
     public function testSetOptionsWithoutDataSchema()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have "data_schema" key with array.');
+
         $options = array('name' => 'foo', 'data_schema' => 'foo');
 
         $this->assertEquals($this->builder, $this->builder->setOptions($options));
@@ -271,12 +269,11 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($transformedData, 'data', $chartView);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Config of chart "chart_name" must have "template" key.
-     */
     public function testGetViewFailsWhenConfigDontHaveTemplate()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Config of chart "chart_name" must have "template" key.');
+
         $chartName = 'chart_name';
 
         $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
@@ -292,21 +289,19 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             ->getView();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setOptions() was not called.
-     */
     public function testGetViewFailsWhenOptionsNotSet()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\BadMethodCallException::class);
+        $this->expectExceptionMessage("Can't build result when setOptions() was not called.");
+
         $this->builder->getView();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setData() was not called.
-     */
     public function testGetViewFailsWhenDataNotSet()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\BadMethodCallException::class);
+        $this->expectExceptionMessage("Can't build result when setData() was not called.");
+
         $chartName = 'foo';
 
         $options = array('name' => $chartName);

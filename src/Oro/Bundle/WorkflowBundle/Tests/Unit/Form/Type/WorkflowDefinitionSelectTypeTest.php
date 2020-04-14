@@ -132,13 +132,13 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider incorrectOptionsDataProvider
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Either "workflow_name" or "workflow_entity_class" must be set
-     *
      * @param $options
      */
     public function testNormalizersException(array $options)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
+
         $this->factory->create(WorkflowDefinitionSelectType::class, null, $options);
     }
 

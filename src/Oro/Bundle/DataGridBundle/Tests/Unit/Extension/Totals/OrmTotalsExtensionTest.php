@@ -107,7 +107,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                 ]
             ]
         );
-        $this->expectException('\Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage(
             'Total row "wrong_total_row" definition in "test_grid" datagrid config does not exist'
         );

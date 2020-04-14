@@ -26,12 +26,11 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSearchableValue()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSearchableValue($this->attribute, 42.42, $this->localization);
     }
 

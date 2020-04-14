@@ -39,12 +39,11 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->accessor);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot add accessor to itself.
-     */
     public function testAddFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot add accessor to itself.');
+
         $this->accessor->add($this->accessor);
     }
 
@@ -135,12 +134,11 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->accessor->getValue($entity, $metadata));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot find accessor for "test" field.
-     */
     public function testGetValueFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot find accessor for "test" field.');
+
         $this->accessor->add($foo = $this->createAccessor('foo'));
 
         $entity = $this->createTestEntity(1);

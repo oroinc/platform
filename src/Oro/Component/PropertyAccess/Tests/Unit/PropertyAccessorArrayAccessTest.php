@@ -73,10 +73,10 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($collection, $path);
     }
 

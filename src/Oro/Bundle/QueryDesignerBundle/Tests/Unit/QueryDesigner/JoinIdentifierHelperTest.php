@@ -70,12 +70,11 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot get parent join identifier for root table.
-     */
     public function testGetParentJoinIdentifierForRootJoinId()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot get parent join identifier for root table.');
+
         $this->helper->getParentJoinIdentifier('');
     }
 

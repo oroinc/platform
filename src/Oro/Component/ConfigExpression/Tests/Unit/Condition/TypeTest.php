@@ -21,12 +21,11 @@ class TypeTest extends \PHPUnit\Framework\TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "left" must be property path
-     */
     public function testInitializeWithException()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "left" must be property path');
+
         $this->condition->initialize([1, 2]);
     }
 

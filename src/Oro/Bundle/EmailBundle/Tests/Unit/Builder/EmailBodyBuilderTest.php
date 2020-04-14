@@ -35,19 +35,15 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $body->getTextBody());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetEmptyEmailBody()
     {
+        $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->getEmailBody();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAddEmailAttachmentWithoutBody()
     {
+        $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->addEmailAttachment(
             'test',
             'content',

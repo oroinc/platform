@@ -239,11 +239,9 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     */
     public function testGetSecretException(): void
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
         $noApiKeyUser = $this->createMock(\Oro\Bundle\UserBundle\Entity\User::class);
         $noApiKeyUser
             ->expects(self::once())

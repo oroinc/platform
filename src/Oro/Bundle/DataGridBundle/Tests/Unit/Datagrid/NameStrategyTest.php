@@ -74,7 +74,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
      */
     public function testParseGridNameFails($expectedMessage, $name)
     {
-        $this->expectException('Oro\\Bundle\\DataGridBundle\\Exception\\InvalidArgumentException');
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->parseGridName($name);
     }
@@ -84,7 +84,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
      */
     public function testParseGridScopeFails($expectedMessage, $name)
     {
-        $this->expectException('Oro\\Bundle\\DataGridBundle\\Exception\\InvalidArgumentException');
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->parseGridScope($name);
     }
@@ -94,7 +94,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildGridFullNameFails($expectedMessage, $name, $gridName, $gridScope)
     {
-        $this->expectException('Oro\\Bundle\\DataGridBundle\\Exception\\InvalidArgumentException');
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->buildGridFullName($gridName, $gridScope);
     }

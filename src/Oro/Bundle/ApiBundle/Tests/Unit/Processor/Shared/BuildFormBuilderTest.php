@@ -99,12 +99,13 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity object must be added to the context before creation of the form builder.
-     */
     public function testProcessWhenNoEntity()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The entity object must be added to the context before creation of the form builder.'
+        );
+
         $this->formFactory->expects(self::never())
             ->method('createNamedBuilder');
 

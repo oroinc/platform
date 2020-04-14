@@ -216,21 +216,19 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($query, $this->chainProvider->getVirtualRelationQuery($className, $fieldName));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A query for relation "testField" in class "stdClass" was not found.
-     */
     public function testGetVirtualRelationQueryException()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A query for relation "testField" in class "stdClass" was not found.');
+
         $this->chainProvider->getVirtualRelationQuery('stdClass', 'testField');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A query for relation "testField" in class "stdClass" was not found.
-     */
     public function testGetVirtualRelationQueryWithoutChildProviders()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A query for relation "testField" in class "stdClass" was not found.');
+
         $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
         $chainProvider->getVirtualRelationQuery('stdClass', 'testField');
     }

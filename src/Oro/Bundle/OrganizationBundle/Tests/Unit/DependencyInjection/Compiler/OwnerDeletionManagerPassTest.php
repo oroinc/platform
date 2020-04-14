@@ -47,14 +47,14 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "entity" is required for "oro_organization.owner_assignment_checker" tag. Service: "checker2".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenCheckerDoesNotHaveEntityTagAttribute()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "entity" is required for "oro_organization.owner_assignment_checker" tag.'
+            . ' Service: "checker2".'
+        );
+
         $container = new ContainerBuilder();
         $container->register(
             'oro_organization.owner_deletion_manager',
@@ -69,14 +69,16 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The service "checker2" must not have the tag "oro_organization.owner_assignment_checker" and the entity "Test\Entity1" because there is another service ("checker1") with this tag and entity. Use a decoration of "checker1" service to extend it or create a compiler pass for the dependency injection container to override "checker1" service completely.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenCheckerIsDuplicated()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The service "checker2" must not have the tag "oro_organization.owner_assignment_checker"'
+            . ' and the entity "Test\Entity1" because there is another service ("checker1") with this tag and entity.'
+            . ' Use a decoration of "checker1" service to extend it or create a compiler pass'
+            . ' for the dependency injection container to override "checker1" service completely.'
+        );
+
         $container = new ContainerBuilder();
         $container->register(
             'oro_organization.owner_deletion_manager',

@@ -58,13 +58,13 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
             $this->abstract->getSid($src)
         );
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->abstract->getSid(new \stdClass());
     }
 
     public function testNoBaseAclManager()
     {
-        $this->expectException('Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException');
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException::class);
         $this->abstract->getSid('ROLE_TEST');
     }
 }

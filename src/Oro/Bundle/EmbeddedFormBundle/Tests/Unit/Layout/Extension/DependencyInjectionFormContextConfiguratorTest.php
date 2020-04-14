@@ -22,12 +22,11 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
         $this->contextConfigurator = new DependencyInjectionFormContextConfigurator($this->container);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage formServiceId should be specified.
-     */
     public function testConfigureContextWithoutForm()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('formServiceId should be specified.');
+
         $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);
     }

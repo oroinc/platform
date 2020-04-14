@@ -31,12 +31,11 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFieldName, $this->doctrineMetadata->getFieldName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "fieldName" not exists
-     */
     public function testGetFieldNameFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "fieldName" not exists');
+
         $this->doctrineMetadata->getFieldName();
     }
 

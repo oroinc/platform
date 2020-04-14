@@ -8,7 +8,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldValidateConstructParameters()
     {
-        $this->expectException('\Oro\Component\Layout\Exception\UnexpectedTypeException');
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'
@@ -27,7 +27,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testAppendShouldValidateParameter()
     {
-        $this->expectException('\Oro\Component\Layout\Exception\UnexpectedTypeException');
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'

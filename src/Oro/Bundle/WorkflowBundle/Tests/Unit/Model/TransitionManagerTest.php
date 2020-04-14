@@ -172,22 +172,20 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transitionManager->getStartTransitions());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected transition argument type is string or Transition, but stdClass given
-     */
     public function testExtractTransitionException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected transition argument type is string or Transition, but stdClass given');
+
         $transition = new \stdClass();
         $this->transitionManager->extractTransition($transition);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException
-     * @expectedExceptionMessage Transition "test" is not exist in workflow.
-     */
     public function testExtractTransitionStringUnknown()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectExceptionMessage('Transition "test" is not exist in workflow.');
+
         $transition = 'test';
         $this->transitionManager->extractTransition($transition);
     }

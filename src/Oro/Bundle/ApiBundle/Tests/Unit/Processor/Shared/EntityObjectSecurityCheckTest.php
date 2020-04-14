@@ -49,12 +49,11 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access by "VIEW" permission to the entity.
-     */
     public function testProcessWhenAccessDenied()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access by "VIEW" permission to the entity.');
+
         $entity = new Product();
         $config = new EntityDefinitionConfig();
 
@@ -86,11 +85,9 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testProcessWhenAccessDeniedByAclResource()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $entity = new Product();
         $config = new EntityDefinitionConfig();
         $config->setAclResource('test_acl_resource');

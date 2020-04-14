@@ -62,12 +62,11 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         $this->listAction->execute($context);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage TEST
-     */
     public function testBreakOnFailureEnabledException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('TEST');
+
         $actionError = $this->getExceptionAction();
         $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMockForAbstractClass();

@@ -218,14 +218,14 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" item cannot be added as a child to "logo" item (block type: logo) because only container blocks can have children.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddChildToNotContainer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'The "header" item cannot be added as a child to "logo" item (block type: logo)'
+            . ' because only container blocks can have children.'
+        );
+
         $this->context->resolve();
 
         $this->layoutManipulator
@@ -417,11 +417,9 @@ class BlockFactoryTest extends LayoutTestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testBuildViewShouldFailWhenUsingNonProcessedExpressions()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->context = new LayoutContext(
             ['expressions_evaluate' => false, 'title' => 'test title'],
             ['expressions_evaluate', 'title']
@@ -438,11 +436,9 @@ class BlockFactoryTest extends LayoutTestCase
         $this->getLayoutView();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->context = new LayoutContext(
             ['expressions_evaluate' => true, 'expressions_evaluate_deferred' => true, 'title' => 'test title'],
             ['expressions_evaluate', 'expressions_evaluate_deferred', 'title']

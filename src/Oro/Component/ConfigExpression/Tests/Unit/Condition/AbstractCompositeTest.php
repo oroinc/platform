@@ -24,34 +24,33 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($operands, 'operands', $this->condition);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have at least one element
-     */
     public function testInitializeFailsWithEmptyElements()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have at least one element');
+
         $this->condition->initialize([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid type of option "0". Expected "Oro\Component\ConfigExpression\ExpressionInterface", "string" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testInitializeFailsWithScalarElement()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Invalid type of option "0". Expected "%s", "string" given.',
+            \Oro\Component\ConfigExpression\ExpressionInterface::class
+        ));
+
         $this->condition->initialize(['anything']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid type of option "0". Expected "Oro\Component\ConfigExpression\ExpressionInterface", "stdClass" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testInitializeFailsWithWrongInstanceElement()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Invalid type of option "0". Expected "%s", "stdClass" given.',
+            \Oro\Component\ConfigExpression\ExpressionInterface::class
+        ));
+
         $this->condition->initialize([new \stdClass]);
     }
 }

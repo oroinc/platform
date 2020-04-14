@@ -38,21 +38,21 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('relationship', $this->context->get('actionType'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage The action type is not set yet.
-     */
     public function testGetActionTypeWhenItDoesNotSet()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('The action type is not set yet.');
+
         $this->context->getActionType();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The action type must be one of item, list, subresource, relationship. Given: another.
-     */
     public function testSetInvalidActionType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The action type must be one of item, list, subresource, relationship. Given: another.'
+        );
+
         $this->context->setActionType('another');
     }
 

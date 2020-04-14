@@ -42,20 +42,16 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($accessor->getOwner($obj));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOwnerNull()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
         $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this));
         $accessor->getOwner(null);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOwnerNoGetOwnerAndNoOwnerField()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider);
 
@@ -65,11 +61,9 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getOwner($obj);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOrganizationWrongObject()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider);
         $accessor->getOrganization('not_an_object');

@@ -146,12 +146,11 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->merge($data);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot find merge strategy for "test" field.
-     */
     public function testMergeFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot find merge strategy for "test" field.');
+
         $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();

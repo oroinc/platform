@@ -14,12 +14,11 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected only one form extension.
-     */
     public function testConstructorWithSeveralFormExtensions()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected only one form extension.');
+
         $extensions = [
             $this->createMock(FormExtensionInterface::class),
             $this->createMock(FormExtensionInterface::class)
@@ -32,14 +31,14 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected type of form extension is "Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension"
-     */
-    // @codingStandardsIgnoreEnd
     public function testConstructorWithUnexpectedFormExtensions()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Expected type of form extension is "%s"',
+            \Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension::class
+        ));
+
         $extensions = [
             $this->createMock(FormExtensionInterface::class)
         ];
@@ -207,14 +206,13 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in API.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeShouldThrowExceptionForNotKnownApiFormType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in API.'
+        );
+
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $resolvedTypeFactory = $this->createMock(ResolvedFormTypeFactoryInterface::class);
         $formRegistry = new SwitchableFormRegistry([$extension], $resolvedTypeFactory, new FormExtensionState());

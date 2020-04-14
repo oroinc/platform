@@ -64,10 +64,10 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
     /**
      * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
      *
-     * @expectedException \Doctrine\ORM\EntityNotFoundException
      */
     public function testExecuteWithoutTemplateEntity(): void
     {
+        $this->expectException(\Doctrine\ORM\EntityNotFoundException::class);
         $this->localizedTemplateProvider->expects($this->once())
             ->method('getAggregated')
             ->willThrowException(new EntityNotFoundException());

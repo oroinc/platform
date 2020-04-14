@@ -47,11 +47,9 @@ class EnumValueValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([Constraint::CLASS_CONSTRAINT], $this->constraint->getTargets());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testNotEnumValueOrArray()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate(new \stdClass(), $this->constraint);
     }
 

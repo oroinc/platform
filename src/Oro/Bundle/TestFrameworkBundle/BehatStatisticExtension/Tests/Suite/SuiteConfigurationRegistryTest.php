@@ -176,13 +176,12 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Suite with 'Acme0' name does not configured
-     * @expectedExceptionMessage Configured suites: 'AcmeSuite3, AcmeSuite5'
-     */
     public function testNotExistentSuiteConfigException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Suite with 'Acme0' name does not configured");
+        $this->expectExceptionMessage("Configured suites: 'AcmeSuite3, AcmeSuite5'");
+
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->getSuiteConfig('Acme0');
     }
@@ -204,12 +203,11 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('AcmeSuite0', $suiteConfigRegistry->getSuites());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Suite set with "Non existent" name does not registered
-     */
     public function testNotExistentSuiteSetException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Suite set with "Non existent" name does not registered');
+
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->getSet('Non existent');
     }

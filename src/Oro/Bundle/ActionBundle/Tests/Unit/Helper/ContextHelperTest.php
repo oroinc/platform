@@ -158,12 +158,11 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getActionParameters($context));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Master Request is not defined
-     */
     public function testGetActionParametersException()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Master Request is not defined');
+
         $this->helper->getActionParameters([]);
     }
 

@@ -54,12 +54,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         return $this->registry;
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" already exists
-     */
     public function testRegisterProcessorFails()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" already exists');
+
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'processor_alias';
@@ -132,12 +131,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($processor, $this->registry->getProcessor($type, $alias));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" is not exist
-     */
     public function testGetProcessorFails()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" is not exist');
+
         $this->registry->getProcessor('import', 'processor_alias');
     }
 
@@ -212,12 +210,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Processor with type "import" and alias "foo_alias" is not exist
-     */
     public function testGetProcessorEntityNameFails()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "foo_alias" is not exist');
+
         $type = ProcessorRegistry::TYPE_IMPORT;
         $alias = 'foo_alias';
         $this->registry->getProcessorEntityName($type, $alias);

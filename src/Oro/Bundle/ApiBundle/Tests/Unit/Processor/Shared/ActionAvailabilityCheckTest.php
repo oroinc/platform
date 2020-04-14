@@ -23,11 +23,9 @@ class ActionAvailabilityCheckTest extends GetListProcessorTestCase
         $this->processor = new ActionAvailabilityCheck($this->resourcesProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException
-     */
     public function testProcessWhenActionIsExcluded()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
         $entityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())

@@ -238,13 +238,16 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider owningEntityNamesDataProvider
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $owningEntityNames must contains "organization", "business_unit" and "user" keys.
      *
      * @param array $owningEntityNames
      */
     public function testInvalidOwningEntityNames(array $owningEntityNames)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The $owningEntityNames must contains "organization", "business_unit" and "user" keys.'
+        );
+
         $provider = new OwnershipMetadataProvider(
             $owningEntityNames,
             $this->configManager,

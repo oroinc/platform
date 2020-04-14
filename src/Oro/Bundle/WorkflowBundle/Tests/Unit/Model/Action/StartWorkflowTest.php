@@ -201,12 +201,11 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         return $workflowItem;
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Entity value must be an object
-     */
     public function testExecuteEntityNotAnObject()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Entity value must be an object');
+
         $options = array(
             'name' => 'acmeWorkflow',
             'attribute' => new PropertyPath('workflowItem'),

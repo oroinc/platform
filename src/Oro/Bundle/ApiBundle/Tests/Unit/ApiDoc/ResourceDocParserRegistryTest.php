@@ -72,12 +72,11 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a resource documentation parser for the request "another".
-     */
     public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a resource documentation parser for the request "another".');
+
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api']
         ]);

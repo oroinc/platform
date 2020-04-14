@@ -94,12 +94,11 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($workflowItem, $aclIdentity->getWorkflowItem());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Value of attribute "attribute" must be an object
-     */
     public function testUpdateAclIdentitiesNotAnObjectException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Value of attribute "attribute" must be an object');
+
         $workflowName = 'test_workflow';
 
         $step = new WorkflowStep();

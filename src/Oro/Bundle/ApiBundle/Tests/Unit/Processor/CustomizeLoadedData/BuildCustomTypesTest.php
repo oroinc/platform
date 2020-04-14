@@ -150,12 +150,11 @@ class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "field1.field11" property path is not supported.
-     */
     public function testProcessNestedObjectWithNotSupportedPropertyPath()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The "field1.field11" property path is not supported.');
+
         $config = new EntityDefinitionConfig();
         $nestedObjectFieldConfig = $config->addField('nestedObjectField');
         $nestedObjectFieldConfig->setDataType('nestedObject');
@@ -344,12 +343,11 @@ class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unsupported type of extended association: unknown.
-     */
     public function testProcessForUnsupportedExtendedAssociation()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unsupported type of extended association: unknown.');
+
         $data = [
             'association1' => null,
             'association2' => ['id' => 2]

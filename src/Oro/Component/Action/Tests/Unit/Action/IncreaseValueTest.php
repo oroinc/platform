@@ -42,48 +42,43 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($options, 'options', $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute parameter is required.
-     */
     public function testInitializeNoParametersException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute parameter is required.');
+
         $this->action->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be defined.
-     */
     public function testInitializeNoAttributeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be defined.');
+
         $this->action->initialize(['test' => 'test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     */
     public function testInitializeInvalidAttributeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize(['attribute' => 'test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be integer.
-     */
     public function testInitializeInvalidValueExceptionWithString()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be integer.');
+
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => 'string']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be integer.
-     */
     public function testInitializeInvalidValueExceptionWithPropertyPath()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be integer.');
+
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => new PropertyPath('test2')]);
     }
 

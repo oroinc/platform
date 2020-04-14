@@ -80,14 +80,14 @@ class DetailedLogsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->isHandling(['level' => Logger::WARNING]));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Trying to execute method `Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler::write` which requires Handler to be set.
-     */
-    // @codingStandardsIgnoreEnd
     public function testHandleException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Trying to execute method `Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler::write`'
+            . ' which requires Handler to be set.'
+        );
+
         $this->configureMethods();
 
         $record = [

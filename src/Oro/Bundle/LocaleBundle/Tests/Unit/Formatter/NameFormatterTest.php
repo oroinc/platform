@@ -85,12 +85,11 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot get name format for "fr_CA"
-     */
     public function testGetNameFormatFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot get name format for "fr_CA"');
+
         $this->localeSettings->expects($this->once())
             ->method('getLocale')
             ->will($this->returnValue(LocaleConfiguration::DEFAULT_LOCALE));

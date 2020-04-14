@@ -32,11 +32,9 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testEmptyCacheDirException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $this->getLoader($generator);
     }

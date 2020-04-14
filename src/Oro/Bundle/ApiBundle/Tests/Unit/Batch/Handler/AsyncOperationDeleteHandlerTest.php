@@ -90,12 +90,11 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->deleteHandler->delete($operation);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException
-     * @expectedExceptionMessage Failed to delete all files related to the asynchronous operation.
-     */
     public function testHandleDeleteWhenExceptionOccurredOnFindFiles()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
+        $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
+
         $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
 
         $exception = new \Exception('fail');
@@ -123,12 +122,11 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->deleteHandler->delete($operation);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException
-     * @expectedExceptionMessage Failed to delete all files related to the asynchronous operation.
-     */
     public function testHandleDeleteWhenExceptionOccurredOnDeleteFiles()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
+        $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
+
         $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
 
         $exception = new \Exception('fail');

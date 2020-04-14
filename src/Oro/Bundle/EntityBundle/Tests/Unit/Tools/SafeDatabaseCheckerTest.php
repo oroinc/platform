@@ -101,12 +101,11 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testTablesExistShouldRethrowUnexpectedException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
+
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
@@ -215,12 +214,11 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testGetTableNameShouldRethrowUnexpectedException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
+
         $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $doctrine->expects($this->once())
@@ -279,12 +277,11 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage unexpected
-     */
     public function testGetAllMetadataShouldRethrowUnexpectedException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('unexpected');
+
         $om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $om->expects($this->once())

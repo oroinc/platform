@@ -18,12 +18,11 @@ class ContextRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($context, $helper->getFromRequest($request, $keys));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Context must contain only allowed keys: user, organization
-     */
     public function testGetFromRequestWithExtraKeys()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Context must contain only allowed keys: user, organization');
+
         $request = new Request();
         $context = ['user' => 5, 'organization' => 23, 'product' => 3];
         $request->query->set('context', $context);
@@ -33,12 +32,11 @@ class ContextRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($context, $helper->getFromRequest($request, $keys));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Context must contain only allowed keys: user, organization
-     */
     public function testGetFromRequestWithNotEnoughKeys()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Context must contain only allowed keys: user, organization');
+
         $request = new Request();
         $context = ['user' => 5];
         $request->query->set('context', $context);

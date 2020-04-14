@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\BlockViewNotFoundException;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
@@ -210,12 +211,13 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(json_encode(['block1' => 'Test block 1']), $responseEvent->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
-     */
     public function testShouldThrowExceptionIfBothLayoutAndTemplateAreUsed()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'The @Template() annotation cannot be used together with the @Layout() annotation.'
+        );
+
         $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => new LayoutAnnotation([]), '_template' => new Template([])],
             []
@@ -223,12 +225,13 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "unknown" does not exist.
-     */
     public function testShouldThrowExceptionForMissingVarsInAnnotation()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Failed to resolve the context variables. Reason: The option "unknown" does not exist.'
+        );
+
         $this->setupLayoutExpectations();
 
         $responseEvent = $this->createResponseForControllerResultEvent(
@@ -238,14 +241,13 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required2" is missing.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Failed to resolve the context variables. Reason: The required option "required2" is missing.'
+        );
+
         $this->setupLayoutExpectations();
 
         $attributes    = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
@@ -254,14 +256,13 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The required option "required1" is missing.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Failed to resolve the context variables. Reason: The required option "required1" is missing.'
+        );
+
         $this->setupLayoutExpectations();
 
         $attributes = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
@@ -272,17 +273,19 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @dataProvider             getNotEmptyAnnotationDataProvider
      *
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The empty @Layout() annotation must be used when the controller returns an instance of "Oro\Component\Layout\Layout".
      * @param array $options
      */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty(array $options)
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The empty @Layout() annotation must be used when the controller returns an instance of "%s".',
+            \Oro\Component\Layout\Layout::class
+        ));
+
         $attributes = ['_layout' => new LayoutAnnotation($options)];
         $layout = $this->createMock(Layout::class);
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $layout);

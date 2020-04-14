@@ -306,33 +306,27 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testHandleWithInvalidQueryValueThrowException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();
         $context->set('query', false);
 
         $this->handler->handle($context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testHandleWithInvalidTotalCountValueThrowException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();
         $context->set('totalCount', 22);
 
         $this->handler->handle($context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testHandleWithInvalidTotalCountCallbackThrowException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();
         $context->set(
             'totalCount',

@@ -57,12 +57,11 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLabel, $this->genderProvider->getLabelByName(Gender::MALE));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown gender with name "alien"
-     */
     public function testGetLabelByNameUnknownGender()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown gender with name "alien"');
+
         $this->genderProvider->getLabelByName('alien');
     }
 }

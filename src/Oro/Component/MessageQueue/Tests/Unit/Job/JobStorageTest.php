@@ -39,14 +39,15 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(JobEntity::class, get_class($job));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected job instance of "Oro\Component\MessageQueue\Tests\Unit\Mock\JobEntity", given "Oro\Component\MessageQueue\Job\Job".
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowIfGotUnexpectedJobInstance()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Expected job instance of "%s", given "%s".',
+            \Oro\Component\MessageQueue\Tests\Unit\Mock\JobEntity::class,
+            \Oro\Component\MessageQueue\Job\Job::class
+        ));
+
         $this->storage->saveJob(new Job());
     }
 
@@ -133,12 +134,11 @@ class JobStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Is not possible to create new job with lock, only update is allowed
-     */
     public function testShouldThrowIfTryToSaveNewEntityWithLock()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Is not possible to create new job with lock, only update is allowed');
+
         $this->storage->saveJob(
             new JobEntity(),
             function () {

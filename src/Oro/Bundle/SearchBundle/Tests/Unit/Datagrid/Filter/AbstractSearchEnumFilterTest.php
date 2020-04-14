@@ -37,12 +37,11 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
         $this->dictionaryManager = $this->createMock(DictionaryApiEntityManager::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testApplyExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid filter datasource adapter provided');
+
         $this->filter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 

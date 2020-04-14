@@ -42,20 +42,17 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->close();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of CSV writer must contain "filePath".
-     */
     public function testSetStepExecutionNoFileException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of CSV writer must contain "filePath".');
+
         $this->writer->setStepExecution($this->getMockStepExecution([]));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     */
     public function testUnknownFileException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
         $this->writer->setStepExecution(
             $this->getMockStepExecution(
                 [

@@ -186,7 +186,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $fromB->setParent($parent);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/Recursion met\. ' .
             'File `([^`]+)` tries to import workflow `B` for `A` that currently imports it too in `([^`]+)`/'
         );

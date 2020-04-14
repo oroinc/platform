@@ -41,12 +41,11 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterByAlias('exist_alias'));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The formatter is not found by "non_exist_alias" alias.
-     */
     public function testGetFormatterByAliasWithNotExistsAlias()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The formatter is not found by "non_exist_alias" alias.');
+
         $this->formatter->getFormatterByAlias('non_exist_alias');
     }
 

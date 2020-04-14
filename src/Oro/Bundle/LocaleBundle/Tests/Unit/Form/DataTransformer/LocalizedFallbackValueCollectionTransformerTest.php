@@ -30,12 +30,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Value class must extend AbstractLocalizedFallbackValue
-     */
     public function testConstructWithInvalidValueClass()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value class must extend AbstractLocalizedFallbackValue');
+
         new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             'string',
@@ -328,12 +327,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array or Traversable", "DateTime" given
-     */
     public function testTransformUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
+
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             'text',
@@ -342,12 +340,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->transform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array or Traversable", "DateTime" given
-     */
     public function testTransformUnexpectedTypeMultifield()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
+
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             ['text'],
@@ -356,12 +353,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->transform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testReverseTransformUnexpectedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             'text',
@@ -370,12 +366,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->reverseTransform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testReverseTransformUnexpectedTypeMultifield()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             ['text'],
@@ -384,12 +379,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->reverseTransform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Undefined localization with ID=1
-     */
     public function testReverseTransformNoLocalization()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Undefined localization with ID=1');
+
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->registry,
             'text',

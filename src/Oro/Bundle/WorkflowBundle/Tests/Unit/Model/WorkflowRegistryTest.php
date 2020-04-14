@@ -145,12 +145,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals([self::WORKFLOW_NAME => $workflow], 'workflowByName', $this->registry);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "test_workflow" not found
-     */
     public function testGetWorkflowAndFilteredItem()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "test_workflow" not found');
+
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
@@ -166,12 +165,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getWorkflow(self::WORKFLOW_NAME);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "test_workflow" not found
-     */
     public function testGetWorkflowNoUpdatedEntity()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "test_workflow" not found');
+
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
@@ -495,12 +493,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         return $this->createWorkflowFromDefinition($workflowDefinition);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "not_existing_workflow" not found
-     */
     public function testGetWorkflowNotFoundException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "not_existing_workflow" not found');
+
         $workflowName = 'not_existing_workflow';
 
         $this->entityRepository->expects($this->once())

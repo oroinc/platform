@@ -27,12 +27,11 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->compositeFormatter->addFormatter('test', $this->formatter);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find formatter for "unknown" API view.
-     */
     public function testFormatForViewWithUnknownFormatter()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find formatter for "unknown" API view.');
+
         $data = ['key' => 'value'];
 
         $this->docViewDetector->expects(self::once())
@@ -42,12 +41,11 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->compositeFormatter->format($data);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find formatter for "unknown" API view.
-     */
     public function testFormatOneForViewWithUnknownFormatter()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find formatter for "unknown" API view.');
+
         $data = $this->createMock(ApiDoc::class);
 
         $this->docViewDetector->expects(self::once())

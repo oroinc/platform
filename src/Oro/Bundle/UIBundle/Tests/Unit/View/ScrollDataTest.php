@@ -263,32 +263,29 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $this->scrollData->getData());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Block 0 is not defined
-     */
     public function testAddSubBlockException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Block 0 is not defined');
+
         $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
         $this->scrollData->addSubBlock(0);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Block 0 is not defined
-     */
     public function testAddSubBlockDataNoBlockException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Block 0 is not defined');
+
         $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Subblock 0 is not defined
-     */
     public function testAddSubBlockDataNoSubBlockException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Subblock 0 is not defined');
+
         $this->scrollData->setData([ScrollData::DATA_BLOCKS => [0 => [ScrollData::SUB_BLOCKS => []]]]);
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
@@ -734,12 +731,11 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->scrollData->isEmptyBlock('not_empty_named_block'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Block with id "someId" has not been found
-     */
     public function testGetBlockWhenNoBlockExists()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Block with id "someId" has not been found');
+
         $this->scrollData->setData([ScrollData::DATA_BLOCKS => []]);
         $this->scrollData->getBlock('someId');
     }

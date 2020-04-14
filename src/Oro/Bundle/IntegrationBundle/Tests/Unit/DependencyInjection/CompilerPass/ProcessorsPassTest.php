@@ -52,12 +52,11 @@ class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
         $this->pass->process($containerBuilder);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\LogicException
-     * @expectedExceptionMessage Could not retrieve type attribute for "testId"
-     */
     public function testProcessException()
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve type attribute for "testId"');
+
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();

@@ -273,14 +273,15 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Argument must be instance of "Oro\Bundle\EmailBundle\Entity\Email", "Oro\Bundle\ActivityListBundle\Entity\ActivityList" given
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetGroupedEntitiesWithWrongEntityPassed()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Argument must be instance of "%s", "%s" given',
+            \Oro\Bundle\EmailBundle\Entity\Email::class,
+            \Oro\Bundle\ActivityListBundle\Entity\ActivityList::class
+        ));
+
         $entity = new ActivityList();
         $this->emailActivityListProvider->getGroupedEntities($entity, EmailAddress::class, 1);
     }

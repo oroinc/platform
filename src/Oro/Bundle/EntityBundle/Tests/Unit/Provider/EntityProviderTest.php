@@ -154,11 +154,9 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     */
     public function testGetEnabledEntityWhenEntityIsNotAccessibleYet()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
         $entityConfig = $this->getEntityConfig(

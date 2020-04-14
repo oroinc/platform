@@ -23,11 +23,9 @@ class AssertNotHasErrorsTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException
-     */
     public function testProcessWithErrorsInContext()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException::class);
         $this->context->addError(Error::createValidationError('some error'));
         $this->processor->process($this->context);
     }

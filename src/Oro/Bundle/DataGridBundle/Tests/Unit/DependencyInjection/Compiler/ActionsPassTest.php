@@ -61,12 +61,11 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The service "action1" should not be shared.
-     */
     public function testProcessSharedAction()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The service "action1" should not be shared.');
+
         $this->container->register('action1')
             ->setShared(true)
             ->addTag(self::TAG_NAME, ['type' => 'type1']);

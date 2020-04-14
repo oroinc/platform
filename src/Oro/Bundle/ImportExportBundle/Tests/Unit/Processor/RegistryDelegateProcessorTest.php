@@ -162,12 +162,11 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of processor must contain "processorAlias" options.
-     */
     public function testProcessFailsWhenNoConfigurationProvided()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of processor must contain "processorAlias" options.');
+
         $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
 
         $stepExecution = $this->getMockStepExecution(array());
@@ -190,12 +189,11 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->createMock(\stdClass::class));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Step execution entity must be injected to processor.
-     */
     public function testProcessFailsWhenNoStepExecution()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Step execution entity must be injected to processor.');
+
         $this->processor->process($this->createMock(\stdClass::class));
     }
 

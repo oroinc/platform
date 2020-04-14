@@ -25,11 +25,9 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new RequestListener($this->featureChecker);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testWhenRouteFeatureDisabled()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $this->featureChecker
             ->expects($this->once())
             ->method('isResourceEnabled')

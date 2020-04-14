@@ -37,12 +37,11 @@ class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($namespace, $import->getNamespace());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Import id should be provided, array with "root, namespace" keys given
-     */
     public function testCreateFromArrayException()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Import id should be provided, array with "root, namespace" keys given');
+
         LayoutUpdateImport::createFromArray([
             ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
             ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'namespace',

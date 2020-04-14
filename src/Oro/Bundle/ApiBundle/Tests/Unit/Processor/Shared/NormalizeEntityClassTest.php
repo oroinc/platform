@@ -95,11 +95,10 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         self::assertSame('Test\Class', $this->context->getClassName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException
-     */
     public function testProcessForNotAccessibleEntityType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException::class);
+
         $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())

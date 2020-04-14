@@ -39,39 +39,35 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the parameter "prm1", given "NULL".
-     */
     public function testBuildQueryStringWithNullParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "NULL".');
+
         QueryStringUtil::buildQueryString(['prm1' => null]);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the parameter "prm1", given "integer".
-     */
     public function testBuildQueryStringWithNotStringScalarParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "integer".');
+
         QueryStringUtil::buildQueryString(['prm1' => 0]);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the parameter "prm1", given "array".
-     */
     public function testBuildQueryStringWithArrayParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "array".');
+
         QueryStringUtil::buildQueryString(['prm1' => []]);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the parameter "prm1", given "stdClass".
-     */
     public function testBuildQueryStringWithObjectParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "stdClass".');
+
         QueryStringUtil::buildQueryString(['prm1' => new \stdClass()]);
     }
 

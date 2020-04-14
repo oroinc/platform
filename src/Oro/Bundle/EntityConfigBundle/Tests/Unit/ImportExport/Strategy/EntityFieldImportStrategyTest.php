@@ -118,17 +118,13 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($this->fieldTypeProvider, $this->getProperty($strategy, 'fieldTypeProvider'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     */
     public function testProcessWrongType()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
         $field = new \stdClass();
         $this->strategy->process($field);
     }
 
-    /**
-     */
     public function testProcess()
     {
         $entity = new FieldConfigModel('testFieldName', 'integer');

@@ -82,11 +82,10 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
      *
      * @param array $options
      * @param string $exceptionMessage
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testNormalizersException(array $options, $exceptionMessage)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->factory->create(WorkflowDefinitionNotificationSelectType::class, null, $options);

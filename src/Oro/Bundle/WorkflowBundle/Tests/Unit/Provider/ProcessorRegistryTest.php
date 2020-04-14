@@ -54,12 +54,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultProcessor, $this->registry->getProcessorForIntegration($channelTwo));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Default sync processor was not set
-     */
     public function testRegistryException()
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Default sync processor was not set');
+
         $channelOne = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
             ->disableOriginalConstructor()
             ->getMock();

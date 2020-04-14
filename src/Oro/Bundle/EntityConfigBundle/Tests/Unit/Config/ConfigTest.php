@@ -73,7 +73,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('default', $config->get('nonExistKey', false, 'default'));
         $this->assertEquals([], $config->get('nonExistKey', false, []));
 
-        $this->expectException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
         $config->get('nonExistKey', true);
     }
 

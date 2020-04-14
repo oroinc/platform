@@ -117,13 +117,15 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
     }
 
     //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You must tag at least one service as "oro_importexport.normalizer" to use the import export Serializer service
-     */
     // @codingStandardIgnoreEnd
     public function testProcessFailsWhenNoNormalizers()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'You must tag at least one service as "oro_importexport.normalizer"'
+            . ' to use the import export Serializer service'
+        );
+
         $this->containerBuilder->expects($this->once())
             ->method('getDefinition')
             ->with('oro_importexport.serializer')
@@ -139,13 +141,14 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
     }
 
     //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage You must tag at least one service as "serializer.encoder" to use the import export Serializer service
-     */
     // @codingStandardIgnoreEnd
     public function testProcessFailsWhenNoEncoders()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'You must tag at least one service as "serializer.encoder" to use the import export Serializer service'
+        );
+
         $this->containerBuilder->expects($this->once())
             ->method('getDefinition')
             ->with('oro_importexport.serializer')

@@ -440,12 +440,11 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A class name must be set in the context before a configuration is loaded.
-     */
     public function testLoadConfigNoClassName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A class name must be set in the context before a configuration is loaded.');
+
         $this->context->getConfig();
     }
 
@@ -525,11 +524,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfigOf('undefined'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetConfigOfUndefinedSection()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
 
@@ -875,21 +872,19 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($configExtras, $this->context->getConfigExtras());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".
-     */
     public function testSetInvalidConfigExtras()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".');
+
         $this->context->setConfigExtras(['test']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "test" config extra already exists.
-     */
     public function testAddDuplicateConfigExtra()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "test" config extra already exists.');
+
         $configExtras = [new TestConfigExtra('test')];
         $this->context->setConfigExtras($configExtras);
 
@@ -1216,32 +1211,31 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->getMetadataExtras());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "action" metadata extra already exists.
-     */
     public function testActionMetadataExtrasCannotBeOverridden()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "action" metadata extra already exists.');
+
         $action = 'test_action';
         $this->context->setAction($action);
         $this->context->addMetadataExtra(new ActionMetadataExtra('other_action'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
-     */
     public function testSetInvalidMetadataExtras()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".'
+        );
+
         $this->context->setMetadataExtras(['test']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "test" metadata extra already exists.
-     */
     public function testAddDuplicateMetadataExtra()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "test" metadata extra already exists.');
+
         $metadataExtras = [new TestMetadataExtra('test')];
         $this->context->setMetadataExtras($metadataExtras);
 
@@ -1322,11 +1316,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getCriteria());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetAllEntities()
     {
+        $this->expectException(\LogicException::class);
         $this->context->getAllEntities();
     }
 

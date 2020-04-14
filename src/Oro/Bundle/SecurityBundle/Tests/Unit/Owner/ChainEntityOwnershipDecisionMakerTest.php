@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
+use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
 use Oro\Bundle\SecurityBundle\Owner\ChainEntityOwnershipDecisionMaker;
 
 class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
@@ -102,12 +103,11 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException
-     * @expectedExceptionMessage Not found supported ownership decision maker in chain
-     */
     public function testNotFoundSupportedOwnershipDecisionMakerException()
     {
+        $this->expectException(NotFoundSupportedOwnershipDecisionMakerException::class);
+        $this->expectExceptionMessage('Not found supported ownership decision maker in chain');
+
         $maker = $this->getOwnershipDecisionMakerMock(false);
         $chain = new ChainEntityOwnershipDecisionMaker();
         $chain->addOwnershipDecisionMaker($maker);

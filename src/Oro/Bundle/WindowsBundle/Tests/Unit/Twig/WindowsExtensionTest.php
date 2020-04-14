@@ -197,12 +197,11 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Not caught exception.
-     */
     public function testRenderFragmentWithGenericException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Not caught exception.');
+
         $cleanUrl = '/foo/bar';
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
 

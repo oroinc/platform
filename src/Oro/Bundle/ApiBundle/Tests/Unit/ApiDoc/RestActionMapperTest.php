@@ -130,12 +130,11 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unsupported API action "unknown".
-     */
     public function testGetMethodForUnknownAction()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unsupported API action "unknown".');
+
         $this->actionMapper->getMethod('unknown');
     }
 }

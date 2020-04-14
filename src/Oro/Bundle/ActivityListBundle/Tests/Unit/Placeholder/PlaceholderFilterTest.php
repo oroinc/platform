@@ -286,11 +286,9 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testIsAllowedButtonWithUnknownPageConstant()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $entity = new TestTarget(1);
 
         $config = new Config(

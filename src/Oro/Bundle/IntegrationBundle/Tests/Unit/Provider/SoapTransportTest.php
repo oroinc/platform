@@ -84,20 +84,20 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
     /**
      * Test init method errors
      *
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
      */
     public function testInitErrors()
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException::class);
         $this->transport->init($this->transportEntity);
     }
 
     /**
      * @dataProvider exceptionProvider
      *
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException
      */
     public function testMultipleAttemptException($header, $attempt, $code)
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException::class);
         $this->soapClientMock->expects($this->any())
             ->method('__getLastResponseHeaders')
             ->will($this->returnValue($header));

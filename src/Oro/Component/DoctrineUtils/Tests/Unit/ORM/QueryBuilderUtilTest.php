@@ -245,14 +245,14 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases: root_alias1, root_alias1.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            "Can't get single root alias for the given query."
+            . " Reason: the query has several root aliases: root_alias1, root_alias1."
+        );
+
         $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
@@ -262,14 +262,13 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootAlias($qb);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has no any root aliases.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            "Can't get single root alias for the given query. Reason: the query has no any root aliases."
+        );
+
         $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
@@ -304,14 +303,14 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root entity for the given query. Reason: the query has several root entities: Test\Entity1, Test\Entity1.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            "Can't get single root entity for the given query."
+            . " Reason: the query has several root entities: Test\Entity1, Test\Entity1."
+        );
+
         $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
@@ -321,14 +320,13 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootEntity($qb);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root entity for the given query. Reason: the query has no any root entities.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootEntityWhenQueryHasNoRootEntity()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            "Can't get single root entity for the given query. Reason: the query has no any root entities."
+        );
+
         $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
@@ -609,27 +607,21 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::checkField('tEs_T_01a.tEs_T_01a');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidFieldWithoutAlias()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidAliasPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//.field');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('alias.0_some//');
     }
 
@@ -648,35 +640,27 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a.tEs_T_01a');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidFieldWithoutAlias()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidAliasPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//.field');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidNestedFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.field.0_some//');
     }
 

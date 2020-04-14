@@ -79,11 +79,9 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         $this->adapter->upload($files, $mode);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUploadError()
     {
+        $this->expectException(\Exception::class);
         $mode = 'add';
         $files = [
             'some/path/to/file.yml' => 'api/path/test.yml',

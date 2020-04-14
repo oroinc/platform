@@ -142,11 +142,9 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($view));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException
-     */
     public function testNormalizeShouldFailOnBlockViewInVars()
     {
+        $this->expectException(\Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException::class);
         $view = new BlockView();
         $view->vars = [
             'foo' => new BlockView()

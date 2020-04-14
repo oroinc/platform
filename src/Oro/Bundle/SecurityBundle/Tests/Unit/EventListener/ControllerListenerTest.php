@@ -62,11 +62,9 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testAccessDenied()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $event = new FilterControllerEvent(
             $this->createMock(HttpKernelInterface::class),
             [new TestDomainObject(), $this->methodName],

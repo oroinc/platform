@@ -45,7 +45,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
@@ -63,7 +63,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             100
         );
     }
-    
+
     public function testShouldRejectMessageIfGetMessageBodyReturnFalse(): void
     {
         $message = new Message();
@@ -109,12 +109,11 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Security token is null
-     */
     public function testShouldThrowExceptionOnGetUserIfTokenIsNull(): void
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Security token is null');
+
         $messageBody = ['message_body'];
         $jobUniqueName = 'job_unique_name';
         $message = new Message();
@@ -181,13 +180,14 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidUserTypeProvider
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported user type
      *
      * @param mixed $user
      */
     public function testShouldThrowExceptionOnGetUserIfUserTypeInvalid($user): void
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported user type');
+
         $messageBody = ['message_body'];
         $jobUniqueName = 'job_unique_name';
         $message = new Message();

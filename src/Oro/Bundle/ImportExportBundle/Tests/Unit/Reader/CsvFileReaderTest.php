@@ -57,22 +57,20 @@ class CsvFileReaderTest extends TestCase
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of reader must contain "filePath".
-     */
     public function testSetStepExecutionNoFileException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of reader must contain "filePath".');
+
         $context = $this->getContextWithOptionsMock([]);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage File "unknown_file.csv" does not exists.
-     */
     public function testUnknownFileException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File "unknown_file.csv" does not exists.');
+
         $context = $this->getContextWithOptionsMock(['filePath' => 'unknown_file.csv']);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
@@ -252,12 +250,13 @@ class CsvFileReaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Akeneo\Bundle\BatchBundle\Item\InvalidItemException
-     * @expectedExceptionMessage Expecting to get 3 columns, actually got 2.
      * Message also contains additional rows info but it is not possible to add it in annotation
      */
     public function testReadError()
     {
+        $this->expectException(\Akeneo\Bundle\BatchBundle\Item\InvalidItemException::class);
+        $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
+
         $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
         $stepExecution = $this->getMockStepExecution($context);
         $this->reader->setStepExecution($stepExecution);
@@ -280,12 +279,13 @@ class CsvFileReaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Akeneo\Bundle\BatchBundle\Item\InvalidItemException
-     * @expectedExceptionMessage Expecting to get 3 columns, actually got 2.
      * Message also contains additional rows info but it is not possible to add it in annotation
      */
     public function testReadErrorWithinSplitProcess()
     {
+        $this->expectException(\Akeneo\Bundle\BatchBundle\Item\InvalidItemException::class);
+        $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
+
         $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
         $this->reader->initializeByContext($context);
 

@@ -169,12 +169,11 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteEntityNotManageable()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
         $options = array(
             CloneEntity::OPTION_KEY_TARGET     => new \stdClass(),
             CloneEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()

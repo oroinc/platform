@@ -25,11 +25,11 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider failingOptionsDataProvider
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
      * @param array $options
      */
     public function testInitializeException(array $options)
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
         $this->condition->initialize($options);
     }
 

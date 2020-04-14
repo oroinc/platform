@@ -55,11 +55,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException
-     */
     public function testGetFilePathWhenProtocolIsNotConfigured()
     {
+        $this->expectException(\Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException::class);
         $this->fileManager->setProtocol('');
         $this->fileManager->getFilePath('test.txt');
     }
@@ -201,12 +199,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($file, $this->fileManager->getFile($fileName, false));
     }
 
-    /**
-     * @expectedException \Gaufrette\Exception\FileNotFound
-     * @expectedExceptionMessage  The file "testFile.txt" was not found.
-     */
     public function testGetStreamWhenFileDoesNotExist()
     {
+        $this->expectException(\Gaufrette\Exception\FileNotFound::class);
+        $this->expectExceptionMessage('The file "testFile.txt" was not found.');
+
         $fileName = 'testFile.txt';
 
         $this->filesystem->expects($this->once())
@@ -379,12 +376,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($content, $resultStream->read(100));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\GaufretteBundle\Exception\FlushFailedException
-     * @expectedExceptionMessage Failed to flush data to the "test2.txt" file.
-     */
     public function testWriteToStorageWhenFlushFailed()
     {
+        $this->expectException(\Oro\Bundle\GaufretteBundle\Exception\FlushFailedException::class);
+        $this->expectExceptionMessage('Failed to flush data to the "test2.txt" file.');
+
         $content = 'Test data';
         $fileName = 'test2.txt';
 

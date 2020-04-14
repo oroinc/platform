@@ -176,12 +176,13 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dataArray['params'], $this->titleService->getParams());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Object of type stdClass used for "foo" title param don't have __toString() method.
-     */
     public function testSetParamsObjectWithoutToString()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Object of type stdClass used for "foo" title param don\'t have __toString() method.'
+        );
+
         $this->titleService->setParams(
             [
                 'foo' => new \stdClass(),

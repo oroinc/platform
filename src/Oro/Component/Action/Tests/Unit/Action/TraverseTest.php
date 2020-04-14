@@ -77,7 +77,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $message)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($message);
         $this->configurableAction->expects($this->never())->method('initialize');
         $this->action->initialize($options);

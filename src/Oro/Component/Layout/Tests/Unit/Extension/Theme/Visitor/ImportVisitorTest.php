@@ -315,12 +315,11 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $updates);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Imports statement should be an array, string given
-     */
     public function testWalkUpdatesWithNonArrayImports()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('Imports statement should be an array, string given');
+
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 

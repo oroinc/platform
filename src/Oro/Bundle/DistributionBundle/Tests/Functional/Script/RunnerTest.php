@@ -70,12 +70,11 @@ class RunnerTest extends WebTestCase
         $this->assertNull($runner->runInstallScripts($package));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     * @expectedExceptionMessage The command
-     */
     public function testThrowExceptionWhenProcessFailed()
     {
+        $this->expectException(\Symfony\Component\Process\Exception\ProcessFailedException::class);
+        $this->expectExceptionMessage('The command');
+
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
         $logger->expects($this->once())
@@ -115,12 +114,11 @@ class RunnerTest extends WebTestCase
         $this->assertNull($runner->runUninstallScripts($package));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     * @expectedExceptionMessage The command
-     */
     public function testThrowExceptionWhenProcessFailedDuringUninstalling()
     {
+        $this->expectException(\Symfony\Component\Process\Exception\ProcessFailedException::class);
+        $this->expectExceptionMessage('The command');
+
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
         $logger->expects($this->once())
@@ -160,12 +158,11 @@ class RunnerTest extends WebTestCase
         $this->assertNull($runner->runUpdateScripts($package, 'any version'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     * @expectedExceptionMessage The command
-     */
     public function testThrowExceptionWhenProcessFailedDuringUpdating()
     {
+        $this->expectException(\Symfony\Component\Process\Exception\ProcessFailedException::class);
+        $this->expectExceptionMessage('The command');
+
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
         $logger->expects($this->once())

@@ -46,12 +46,11 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException
-     * @expectedExceptionMessage Option "label" is required
-     */
     public function testCreateOperationWithMissedRequiredOptions()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException::class);
+        $this->expectExceptionMessage('Option "label" is required');
+
         $this->assembler->createOperation('test', []);
     }
 

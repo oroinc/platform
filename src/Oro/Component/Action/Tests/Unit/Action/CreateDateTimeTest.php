@@ -37,40 +37,37 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
         unset($this->contextAccessor, $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "attribute" name parameter is required
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Option "attribute" name parameter is required');
+
         $this->action->initialize(array());
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "attribute" must be valid property definition.
-     */
     public function testInitializeExceptionInvalidAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Option "attribute" must be valid property definition.');
+
         $this->action->initialize(array('attribute' => 'string'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "time" must be a string, boolean given.
-     */
     public function testInitializeExceptionInvalidTime()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Option "time" must be a string, boolean given.');
+
         $this->action->initialize(array('attribute' => new PropertyPath('test_attribute'), 'time' => true));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage
-     * Option "timezone" must be a PropertyPath or string or instance of DateTimeZone, boolean given.
-     */
     public function testInitializeExceptionInvalidTimezone()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Option "timezone" must be a PropertyPath or string or instance of DateTimeZone, boolean given.'
+        );
+
         $this->action->initialize(array('attribute' => new PropertyPath('test_attribute'), 'timezone' => true));
     }
 

@@ -85,12 +85,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         return $config;
     }
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "/included/0" element should be an array.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidElement()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The "/included/0" element should be an array.');
+
         $includedData = [
             null
         ];
@@ -99,12 +98,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "/included/0" element should have "data" property.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidSchema()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The "/included/0" element should have "data" property.');
+
         $includedData = [
             ['type' => 'testType', 'id' => 'testId']
         ];
@@ -113,12 +111,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data" property of "/included/0" element should be an array.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidDataElement()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The "data" property of "/included/0" element should be an array.');
+
         $includedData = [
             [
                 'data' => null

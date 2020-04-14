@@ -142,12 +142,11 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($this->in, $this->out);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Could not read notfoundpath file
-     */
     public function testExecuteNoFileFound()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Could not read notfoundpath file');
+
         $this->in->expects($this->any())->method('getOption')->will(
             $this->returnValueMap(
                 [

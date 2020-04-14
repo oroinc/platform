@@ -101,12 +101,11 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $visitors);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\SyntaxException
-     * @expectedExceptionMessage Syntax error: invalid conditions. some error at "conditions"
-     */
     public function testInvalidConditions()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
+        $this->expectExceptionMessage('Syntax error: invalid conditions. some error at "conditions"');
+
         $visitors = new VisitorCollection();
 
         $this->expressionLanguage->expects($this->once())

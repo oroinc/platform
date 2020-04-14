@@ -141,7 +141,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/Expected repository of type ".*IdentityAwareTranslationRepositoryInterface"/'
         );
 
@@ -181,7 +181,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Expected repository of type ".*TranslationRepositoryInterface"/');
+        $this->expectExceptionMessageMatches('/Expected repository of type ".*TranslationRepositoryInterface"/');
 
         $listener = new TranslatorCatalogueListener($this->configureRegistry($manager));
 

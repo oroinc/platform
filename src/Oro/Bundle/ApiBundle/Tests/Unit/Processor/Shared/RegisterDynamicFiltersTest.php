@@ -924,12 +924,11 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testProcessForSelfIdentifiableFilterWhenSearchFilterKeyThrowsUnexpectedException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
         $primaryEntityFilters = $this->getFiltersConfig();
 

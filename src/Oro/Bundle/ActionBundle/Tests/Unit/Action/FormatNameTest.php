@@ -41,21 +41,19 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object parameter is required
-     */
     public function testInitializeExceptionNoObject()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object parameter is required');
+
         $this->action->initialize(array('attribute' => $this->getPropertyPath()));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute name parameter is required');
+
         $this->action->initialize(array('object' => new \stdClass()));
     }
 

@@ -97,12 +97,11 @@ class DuplicateEntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The entity "Test\Entity3" must be configurable.
-     */
     public function testSaveAliasForNotConfigurableEntity()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The entity "Test\Entity3" must be configurable.');
+
         $this->expectInitializeAliases();
 
         $this->duplicateResolver->saveAlias(

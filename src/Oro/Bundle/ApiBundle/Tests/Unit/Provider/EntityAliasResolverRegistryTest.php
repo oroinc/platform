@@ -44,12 +44,11 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an entity alias resolver for the request "rest,another".
-     */
     public function testGetEntityAliasResolverForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an entity alias resolver for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getEntityAliasResolver($requestType);

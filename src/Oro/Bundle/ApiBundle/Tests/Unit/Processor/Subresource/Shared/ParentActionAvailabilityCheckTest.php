@@ -23,11 +23,9 @@ class ParentActionAvailabilityCheckTest extends GetSubresourceProcessorTestCase
         $this->processor = new ParentActionAvailabilityCheck($this->resourcesProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException
-     */
     public function testProcessWhenActionIsExcluded()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
         $parentEntityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())

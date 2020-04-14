@@ -477,12 +477,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Computed conditions cannot be mixed with uncomputed.
-     */
     public function testComputedWithUnComputedRestrictionsTogetherShouldReturnExceptionWhenRestrictionsAreMixed()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Computed conditions cannot be mixed with uncomputed.');
+
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
             ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')

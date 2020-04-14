@@ -36,12 +36,11 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertEquals('form', $options['form_name']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "field_path" is missing.
-     */
     public function testResolveOptionsWithoutFieldName()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "field_path" is missing.');
+
         $this->resolveOptions(EmbedFormFieldType::NAME, []);
     }
 
@@ -68,26 +67,25 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: test_form.
-     */
     public function testGetBlockViewWithoutForm()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: test_form.');
+
         $this->getBlockView(
             EmbedFormFieldType::NAME,
             ['form_name' => 'test_form', 'field_path' => 'firstName']
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testBuildViewWithInvalidForm()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
+            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface::class
+        ));
+
         $formName = 'test_form';
 
         $this->context->getResolver()->setDefined([$formName]);
@@ -121,11 +119,9 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     */
     public function testGetBlockViewForInvisibleField()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
         $formName = 'test_form';
         $formPath = 'firstName';
 

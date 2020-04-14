@@ -89,12 +89,11 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The malformed json given.
-     */
     public function testShouldThrowIfMessageBodyInvalidJson()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The malformed json given.');
+
         $processor = new SyncIntegrationProcessor(
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
@@ -110,7 +109,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
-    
+
     public function testShouldRejectMessageIfIntegrationNotExist()
     {
         $entityManagerMock = $this->createEntityManagerStub();

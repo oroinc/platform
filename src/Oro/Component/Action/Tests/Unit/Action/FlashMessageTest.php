@@ -59,12 +59,11 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Message parameter is required
-     */
     public function testInitializeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Message parameter is required');
+
         $options = [];
         $this->action->initialize($options);
     }

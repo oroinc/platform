@@ -249,12 +249,11 @@ class DateRangeFilterTest extends WebTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsafe value passed createdAt is NULL; DELETE * FROM oro_user;
-     */
     public function testFilterWithInvalidFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsafe value passed createdAt is NULL; DELETE * FROM oro_user;');
+
         $filterFormData = [
             'type'  => DateRangeFilterType::TYPE_EQUAL,
             'part' =>  DateModifierInterface::PART_VALUE,

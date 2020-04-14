@@ -28,30 +28,29 @@ class EnumValueRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $name must not be empty.
-     */
     public function testCreateEnumValueWithNullName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$name must not be empty.');
+
         $this->repo->createEnumValue(null, 1, false);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $name must not be empty.
-     */
     public function testCreateEnumValueWithEmptyName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$name must not be empty.');
+
         $this->repo->createEnumValue('', 1, false);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $id length must be less or equal 32 characters. id: 123456789012345678901234567890123.
-     */
     public function testCreateEnumValueWithTooLongId()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            '$id length must be less or equal 32 characters. id: 123456789012345678901234567890123.'
+        );
+
         $this->repo->createEnumValue(
             'Test Value 1',
             1,

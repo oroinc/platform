@@ -19,11 +19,9 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
         $this->manyToManyfilter = new ManyToManyFilter($formFactory, $filterUtility);
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
+        $this->expectException(\LogicException::class);
         $ds = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $this->manyToManyfilter->apply($ds, ['type' => FilterUtility::TYPE_EMPTY]);
     }

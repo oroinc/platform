@@ -98,12 +98,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \ErrorException
-     * @expectedExceptionMessage Test error
-     */
     public function testHandleErrors()
     {
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Test error');
+
         trigger_error('Test error', E_USER_ERROR);
     }
 }

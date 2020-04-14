@@ -154,7 +154,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $resultMenu = $this->manager->getMenu('test', ['subItem']);
         $this->assertEquals($subItem, $resultMenu);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->manager->getMenu('test', ['bad_item']);
     }
 

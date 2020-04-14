@@ -23,21 +23,19 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Method name parameter is required
-     */
     public function testInitializeNoMethod()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Method name parameter is required');
+
         $this->action->initialize(array());
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object must be valid property definition
-     */
     public function testInitializeInvalidObject()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object must be valid property definition');
+
         $this->action->initialize(
             array(
                 'method' => 'do',

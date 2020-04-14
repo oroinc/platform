@@ -54,7 +54,7 @@ class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
             $this->manager->getSid($src)
         );
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->manager->getSid(new \stdClass());
     }
 }

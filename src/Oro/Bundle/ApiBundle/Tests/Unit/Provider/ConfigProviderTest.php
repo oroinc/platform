@@ -26,12 +26,11 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider = new ConfigProvider($this->processor);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty.
-     */
     public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty.');
+
         $this->configProvider->getConfig('', '1.2', new RequestType([]));
     }
 
@@ -252,14 +251,13 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->getConfig($className, $version, $requestType, $extras);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot build the configuration of "Test\Class" because this causes the circular dependency.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfCircularDependencyDetected()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot build the configuration of "Test\Class" because this causes the circular dependency.'
+        );
+
         $className = 'Test\Class';
         $version = '1.2';
         $requestType = new RequestType(['test_request']);

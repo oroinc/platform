@@ -31,31 +31,28 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target processor is not defined.
-     */
     public function testProcessWhenNoTargetProcessor()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target processor is not defined.');
+
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target context is not defined.
-     */
     public function testProcessWhenNoTargetContext()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target context is not defined.');
+
         $this->context->setTargetProcessor($this->createMock(ActionProcessorInterface::class));
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target first group is not defined.
-     */
     public function testProcessWhenNoFirstGroupInTargetContext()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target first group is not defined.');
+
         $targetContext = $this->getTargetContext();
 
         $this->context->setTargetProcessor($this->createMock(ActionProcessorInterface::class));
@@ -63,12 +60,11 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target last group is not defined.
-     */
     public function testProcessWhenNoLastGroupInTargetContext()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target last group is not defined.');
+
         $targetContext = $this->getTargetContext();
         $targetContext->setFirstGroup('group1');
 

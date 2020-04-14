@@ -92,7 +92,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         if (false === @preg_match($message, $exception)) {
             $this->expectExceptionMessage($message);
         } else {
-            $this->expectExceptionMessageRegExp($message);
+            $this->expectExceptionMessageMatches($message);
         }
 
         $configuration = [

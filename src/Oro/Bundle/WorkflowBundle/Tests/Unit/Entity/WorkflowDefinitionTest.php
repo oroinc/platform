@@ -194,12 +194,11 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->workflowDefinition->isForceAutostart());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow "test" does not contain step "start_step"
-     */
     public function testStartStepNoStep()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow "test" does not contain step "start_step"');
+
         $this->workflowDefinition->setName('test');
         $this->assertNull($this->workflowDefinition->getStartStep());
         $startStep = new WorkflowStep();

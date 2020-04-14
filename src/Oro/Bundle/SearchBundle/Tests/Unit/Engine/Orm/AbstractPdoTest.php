@@ -12,12 +12,11 @@ abstract class AbstractPdoTest extends \PHPUnit\Framework\TestCase
     /** @var BaseDriver */
     protected $driver;
 
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
-     * @expectedExceptionMessage Unsupported operator "test"
-     */
     public function testAddFilteringFieldException()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError::class);
+        $this->expectExceptionMessage('Unsupported operator "test"');
+
         $this->driver->addFilteringField(
             42,
             [

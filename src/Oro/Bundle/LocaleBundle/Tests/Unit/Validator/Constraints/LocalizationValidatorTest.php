@@ -89,18 +89,19 @@ class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($localization1, $this->constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "string" given
-     */
     public function testUnexpectedValue()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "string" given'
+        );
+
         $this->validator->validate('test', $this->constraint);
     }
 
     public function testUnexpectedClass()
     {
-        $this->expectException('\Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );

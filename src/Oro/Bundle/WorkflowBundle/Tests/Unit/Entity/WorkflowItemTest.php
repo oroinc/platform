@@ -123,12 +123,11 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data, $workflowItem->getData());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Cannot deserialize data of workflow item. Serializer is not available.
-     */
     public function testGetDataWithSerializationFails()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Cannot deserialize data of workflow item. Serializer is not available.');
+
         /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
@@ -231,12 +230,11 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entity, $this->workflowItem->getEntity());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow item entity can not be changed
-     */
     public function testSetEntityException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow item entity can not be changed');
+
         $this->workflowItem->setEntity(new \stdClass());
         $this->workflowItem->setEntity(new \stdClass());
     }
@@ -248,12 +246,11 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entityId, $this->workflowItem->getEntityId());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow item entity ID can not be changed
-     */
     public function testSetEntityIdException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow item entity ID can not be changed');
+
         $this->workflowItem->setEntityId(1);
         $this->workflowItem->setEntityId(2);
     }
@@ -353,12 +350,11 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(get_class($entityClass), $this->workflowItem->getEntityClass());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow item entity CLASS can not be changed
-     */
     public function testSetEntityClassException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow item entity CLASS can not be changed');
+
         $this->workflowItem->setEntityClass('stdClass');
         $this->workflowItem->setEntityClass('test');
     }

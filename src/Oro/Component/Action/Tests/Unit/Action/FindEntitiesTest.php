@@ -54,7 +54,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->function->initialize($options);
@@ -111,12 +111,11 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
-     */
     public function testExecuteNotManageableEntity()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "\stdClass" is not manageable.');
+
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with('\stdClass')

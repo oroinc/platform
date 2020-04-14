@@ -222,12 +222,11 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A query for field "testField" in class "testClass" was not found.
-     */
     public function testGetVirtualFieldQueryWithoutChildProviders()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A query for field "testField" in class "testClass" was not found.');
+
         $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
         $chainProvider->getVirtualFieldQuery('testClass', 'testField');
     }

@@ -94,12 +94,11 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($isGranted);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Can't get entity manager for class stdClass
-     */
     public function testIisGrantedByPropertyPathOnWrongClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Can't get entity manager for class stdClass");
+
         $this->helper->isGrantedByPropertyPath(new \stdClass(), 'somePath', 'EDIT');
     }
 }

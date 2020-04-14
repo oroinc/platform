@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
 use Oro\Component\Layout\Action;
+use Oro\Component\Layout\Exception\CircularReferenceException;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
@@ -132,12 +133,13 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\CircularReferenceException
-     * @expectedExceptionMessage Circular reference "first > second > third > first" on expression "true == first".
-     */
     public function testProcessExpressionsWithCircularReference()
     {
+        $this->expectException(CircularReferenceException::class);
+        $this->expectExceptionMessage(
+            'Circular reference "first > second > third > first" on expression "true == first".'
+        );
+
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
         $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
@@ -150,12 +152,11 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
-     */
     public function testProcessExpressionsWithDataKey()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"data" and "context" should not be used as value keys.');
+
         $context = new LayoutContext();
         $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
         $values['data'] = 'test';
@@ -163,12 +164,11 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
-     */
     public function testProcessExpressionsWithContextKey()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"data" and "context" should not be used as value keys.');
+
         $context = new LayoutContext();
         $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
         $values['context'] = 'test';

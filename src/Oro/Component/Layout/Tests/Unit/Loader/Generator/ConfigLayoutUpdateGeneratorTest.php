@@ -52,7 +52,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     public function testShouldValidateData($data, $exception = false)
     {
         if (false !== $exception) {
-            $this->expectException('\Oro\Component\Layout\Exception\SyntaxException');
+            $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
             $this->expectExceptionMessage($exception);
         }
 

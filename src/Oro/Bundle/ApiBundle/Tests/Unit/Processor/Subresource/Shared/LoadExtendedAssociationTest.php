@@ -73,12 +73,11 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported type of extended association: invalidType.
-     */
     public function testProcessForInvalidTypeOfExtendedAssociation()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported type of extended association: invalidType.');
+
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:invalidType');

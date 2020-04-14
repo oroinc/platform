@@ -84,12 +84,11 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "grid_config" value must be a string, but "array" given.
-     */
     public function testConfigureContextIfInvalidDataArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "grid_config" value must be a string, but "array" given.');
+
         $context = new LayoutContext();
         $context['grid_config'] = [['grid_name']];
         $this->contextConfigurator->configureContext($context);

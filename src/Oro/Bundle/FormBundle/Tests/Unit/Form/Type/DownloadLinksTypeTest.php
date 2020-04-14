@@ -30,12 +30,11 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
         unset($this->type, $this->assetHelper);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "source" is missing.
-     */
     public function testConfigureOptionsWithoutSource()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "source" is missing.');
+
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([]);

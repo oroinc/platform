@@ -41,13 +41,15 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage $doctrineMetadata must be an array of "Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata", but "stdClass" given.
-     */
     //@codingStandardsIgnoreEnd
     public function testCreateEntityMetadataFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            '$doctrineMetadata must be an array of "%s", but "stdClass" given.',
+            \Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata::class
+        ));
+
         $options = array('foo' => 'bar');
         $doctrineMetadata = new \stdClass();
 
@@ -79,13 +81,15 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     //@codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage $doctrineMetadata must be an array of "Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata", but "stdClass" given.
-     */
     //@codingStandardsIgnoreEnd
     public function testCreateFieldMetadataFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            '$doctrineMetadata must be an array of "%s", but "stdClass" given.',
+            \Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata::class
+        ));
+
         $options = array('foo' => 'bar');
         $doctrineMetadata = new \stdClass();
 

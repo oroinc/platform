@@ -26,11 +26,9 @@ class QueueCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->has('queue'));
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     */
     public function testGetShouldThrowExceptionIfQueueIsNotAdded()
     {
+        $this->expectException(\OutOfBoundsException::class);
         $this->collection->get('queue');
     }
 

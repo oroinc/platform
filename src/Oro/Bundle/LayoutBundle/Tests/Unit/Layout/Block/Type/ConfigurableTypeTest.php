@@ -33,30 +33,27 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         $this->assertSetOptionException($this->type);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Name of block type does not configured
-     */
     public function testGetNameException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Name of block type does not configured');
+
         (new ConfigurableType())->getName();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Name of block type should be a string, array given
-     */
     public function testSetNameExceptionType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Name of block type should be a string, array given');
+
         $this->type->setName([]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Name of parent block type should be a string, array given
-     */
     public function testSetParentExceptionType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Name of parent block type should be a string, array given');
+
         $this->type->setParent([]);
     }
 

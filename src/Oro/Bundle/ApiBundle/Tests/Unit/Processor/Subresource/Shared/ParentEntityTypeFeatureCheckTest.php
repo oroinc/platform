@@ -23,11 +23,9 @@ class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
         $this->processor = new ParentEntityTypeFeatureCheck($this->featureChecker);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testProcessDisabled()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $parentClassName = 'Test\Class';
 
         $this->featureChecker->expects(self::once())

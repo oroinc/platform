@@ -344,11 +344,10 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEmpty($actualEmailTemplates);
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\NoResultException
-     */
     public function testFindOneLocalizedWhenNoResult(): void
     {
+        $this->expectException(\Doctrine\ORM\NoResultException::class);
+
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 
         self::assertNull($this->getRepository()->findWithLocalizations(

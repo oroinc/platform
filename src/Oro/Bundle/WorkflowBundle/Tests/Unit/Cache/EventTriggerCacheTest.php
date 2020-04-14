@@ -63,12 +63,11 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->testTriggerData, $this->cache->build());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Event trigger cache provider is not defined
-     */
     public function testBuildNoProvider()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Event trigger cache provider is not defined');
+
         $this->cache->build();
     }
 
@@ -92,33 +91,30 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Event trigger cache provider is not defined
-     */
     public function testHasTriggerNoProvider()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Event trigger cache provider is not defined');
+
         $this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Event trigger class name is not defined
-     */
     public function testNoTriggerClassNameException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Event trigger class name is not defined');
+
         $this->cache->setProvider($this->prepareProvider([]));
         $this->cache->setTriggerClassName(null);
 
         $this->cache->build();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid repository
-     */
     public function testInvalidTriggerRepository()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid repository');
+
         $this->cache->setProvider($this->prepareProvider([]));
         $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
 

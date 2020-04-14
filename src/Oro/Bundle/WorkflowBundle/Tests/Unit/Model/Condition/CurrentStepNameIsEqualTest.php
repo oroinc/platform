@@ -39,12 +39,11 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(CurrentStepNameIsEqual::NAME, $this->condition->getName());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing "step_name" option
-     */
     public function testInitializeInvalid()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing "step_name" option');
+
         $this->assertInstanceOf(
             'Oro\Component\ConfigExpression\Condition\AbstractCondition',
             $this->condition->initialize([])

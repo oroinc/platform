@@ -294,26 +294,25 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: test_form.
-     */
     public function testGetBlockViewWithoutForm()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: test_form.');
+
         $this->getBlockView(
             EmbedFormStartType::NAME,
             ['form_name' => 'test_form']
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetBlockViewWithInvalidForm()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
+            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface::class
+        ));
+
         $formName = 'test_form';
 
         $this->context->getResolver()->setDefined([$formName]);

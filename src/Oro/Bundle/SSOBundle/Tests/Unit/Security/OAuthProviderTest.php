@@ -69,22 +69,20 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->oauthProvider->supports($token));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Token Factory is not set in OAuthProvider.
-     */
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectExceptionMessage('Token Factory is not set in OAuthProvider.');
+
         $token = new OAuthToken('token');
         $this->oauthProvider->authenticate($token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Organization Guesser is not set in OAuthProvider.
-     */
     public function testAuthenticateIfOrganizationGuesserIsNotSet()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectExceptionMessage('Organization Guesser is not set in OAuthProvider.');
+
         $this->oauthProvider->setTokenFactory($this->tokenFactory);
 
         $token = new OAuthToken('token');

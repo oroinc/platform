@@ -90,7 +90,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $errors = new ArrayCollection();
 
         if ($exceptionMessage) {
-            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException');
+            $this->expectException(\Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException::class);
             $this->expectExceptionMessage($exceptionMessage);
         }
 

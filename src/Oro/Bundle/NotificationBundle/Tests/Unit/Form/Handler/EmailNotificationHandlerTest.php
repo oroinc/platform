@@ -44,12 +44,11 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new EmailNotificationHandler($registry);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument data should be instance of EmailNotification entity
-     */
     public function testProcessException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Argument data should be instance of EmailNotification entity');
+
         $this->handler->process(new \stdClass(), $this->form, $this->request);
     }
 

@@ -9,20 +9,20 @@ class SearchQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider valueProviderForInvalidArguments
-     * @expectedException \InvalidArgumentException
      */
     public function testValueInvalidArguments($value, $match)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $query = $this->createSearchQuery();
         $query->value($value, $match);
     }
 
     /**
      * @dataProvider itemProviderForInvalidArguments
-     * @expectedException \InvalidArgumentException
      */
     public function testItemInvalidArguments($name, $value, $match)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $query = $this->createSearchQuery();
         $query->item($name, $value, $match);
     }

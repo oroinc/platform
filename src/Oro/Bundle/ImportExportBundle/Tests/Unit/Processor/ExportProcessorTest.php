@@ -29,12 +29,11 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new ExportProcessor();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Serializer must be injected.
-     */
     public function testProcess()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('Serializer must be injected.');
+
         $entity = $this->createMock(\stdClass::class);
 
         $this->processor->setImportExportContext($this->context);
@@ -139,14 +138,14 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of processor contains invalid "queryBuilder" option. "Doctrine\ORM\QueryBuilder" type is expected, but "stdClass" is given
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetImportExportContextFailsWithInvalidQueryBuilder()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Configuration of processor contains invalid "queryBuilder" option.'
+            . ' "Doctrine\ORM\QueryBuilder" type is expected, but "stdClass" is given'
+        );
+
         $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue(new \stdClass()));
 

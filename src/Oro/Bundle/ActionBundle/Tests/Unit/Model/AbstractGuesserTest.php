@@ -59,12 +59,11 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->setDoctrineTypeMappingProvider($this->doctrineTypeMappingProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\AttributeException
-     * @expectedExceptionMessage Can't get entity manager for class RootClass
-     */
     public function testGuessMetadataAndFieldNoEntityManagerException()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\AttributeException::class);
+        $this->expectExceptionMessage("Can't get entity manager for class RootClass");
+
         $rootClass = 'RootClass';
 
         $this->managerRegistry->expects($this->once())

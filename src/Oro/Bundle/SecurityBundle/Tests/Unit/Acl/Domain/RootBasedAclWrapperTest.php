@@ -345,11 +345,9 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSerialize()
     {
+        $this->expectException(\LogicException::class);
         $obj = new RootBasedAclWrapper(
             $this->acl,
             new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())
@@ -357,11 +355,9 @@ class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
         $obj->serialize();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testUnserialize()
     {
+        $this->expectException(\LogicException::class);
         $obj = new RootBasedAclWrapper(
             $this->acl,
             new RootAclWrapper($this->rootAcl, new SecurityIdentityToStringConverter())

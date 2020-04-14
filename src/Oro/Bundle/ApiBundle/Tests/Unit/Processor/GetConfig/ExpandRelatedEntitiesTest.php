@@ -66,14 +66,13 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
-     * @expectedExceptionMessage Requested unsupported operation "expand_related_entities" when building config for "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessForDisabledInclusion()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectExceptionMessage(
+            'Requested unsupported operation "expand_related_entities" when building config for "Test\Class".'
+        );
+
         $config = [
             'disable_inclusion' => true
         ];

@@ -116,12 +116,11 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Segment id not found in "oro_segment_grid_" gridName.
-     */
     public function testDoNotProcessInvalidSegmentGridName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Segment id not found in "oro_segment_grid_" gridName.');
+
         $this->provider->getConfiguration(Segment::GRID_PREFIX);
     }
 }

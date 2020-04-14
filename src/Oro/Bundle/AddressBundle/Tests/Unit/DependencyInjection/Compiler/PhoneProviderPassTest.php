@@ -45,14 +45,13 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "class" is required for "oro_address.phone_provider" tag. Service: "provider1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessNoClass()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "class" is required for "oro_address.phone_provider" tag. Service: "provider1".'
+        );
+
         $this->container->register('provider1')
             ->addTag('oro_address.phone_provider');
 

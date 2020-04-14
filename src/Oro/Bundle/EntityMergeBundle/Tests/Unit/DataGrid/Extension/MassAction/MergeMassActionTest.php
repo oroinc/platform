@@ -101,12 +101,11 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Trying to get name of unnamed object
-     */
     public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Trying to get name of unnamed object');
+
         $this->target->setOptions(ActionConfiguration::create(array()));
     }
 }

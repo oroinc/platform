@@ -67,12 +67,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage The target type of an association is not specified.
-     */
     public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('The target type of an association is not specified.');
+
         $filterValues = [
             'filter[target]' => new FilterValue('target', '123')
         ];
@@ -82,12 +81,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage The target type of an association is not specified.
-     */
     public function testSearchFilterKeyWhenAssociationTargetIsEmpty()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('The target type of an association is not specified.');
+
         $filterValues = [
             'filter[target.]' => new FilterValue('target.', '123')
         ];
@@ -97,12 +95,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage Replace "type" placeholder with the target type of an association.
-     */
     public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('Replace "type" placeholder with the target type of an association.');
+
         $filterValues = [
             'filter[target.type]' => new FilterValue('target.type', '123')
         ];
@@ -180,12 +177,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An association with "users" is not supported.
-     */
     public function testApplyFilterWhenAssociationTargetIsNotSupported()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('An association with "users" is not supported.');
+
         $filterValue = new FilterValue('target.users', '123');
         $requestType = new RequestType([RequestType::REST]);
         $associationOwnerClass = 'Test\OwnerClass';

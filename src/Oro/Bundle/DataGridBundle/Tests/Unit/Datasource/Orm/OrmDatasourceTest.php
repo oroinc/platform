@@ -220,12 +220,11 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->datasource->bindParameters($parameters, $append);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method is not allowed when datasource is not processed.
-     */
     public function testBindParametersFailsWhenDatagridIsEmpty()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method is not allowed when datasource is not processed.');
+
         $this->datasource->bindParameters(['foo']);
     }
 

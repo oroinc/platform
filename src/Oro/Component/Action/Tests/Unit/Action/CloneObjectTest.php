@@ -32,50 +32,45 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         unset($this->contextAccessor, $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Target parameter is required
-     */
     public function testInitializeExceptionNoTargetObject()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Target parameter is required');
+
         $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required.
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute name parameter is required.');
+
         $this->action->initialize(['target' => new \stdClass()]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     */
     public function testInitializeExceptionInvalidAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize(['target' => new \stdClass(), 'attribute' => 'string']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object data must be an array.
-     */
     public function testInitializeExceptionInvalidData()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object data must be an array.');
+
         $this->action->initialize(
             ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Ignored properties should be a sequence.
-     */
     public function testInitializeExceptionInvalidIgnoredProperties()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Ignored properties should be a sequence.');
+
         $this->action->initialize(
             ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath(), 'ignore' => 'string_value']
         );

@@ -56,12 +56,11 @@ class CheckRequestTypeTest extends GetListProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException
-     * @expectedExceptionMessage Request's "Content-Type" header should not contain any media type parameters.
-     */
     public function testJsonApiContentTypeWithMediaType()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException::class);
+        $this->expectExceptionMessage('Request\'s "Content-Type" header should not contain any media type parameters.');
+
         $this->context->getRequestHeaders()->set('Content-Type', 'application/vnd.api+json; charset=UTF-8');
         $this->processor->process($this->context);
     }
@@ -88,14 +87,14 @@ class CheckRequestTypeTest extends GetListProcessorTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Not supported "Accept" header. It contains the JSON:API content type and all instances of that are modified with media type parameters.
-     */
-    // @codingStandardsIgnoreEnd
     public function testJsonApiContentTypeAndJsonApiAcceptWithMediaType()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException::class);
+        $this->expectExceptionMessage(
+            'Not supported "Accept" header. It contains the JSON:API content type'
+            . ' and all instances of that are modified with media type parameters.'
+        );
+
         $this->context->getRequestHeaders()->set('Content-Type', 'application/vnd.api+json');
         $this->context->getRequestHeaders()->set('Accept', 'application/vnd.api+json; charset=UTF-8');
         $this->processor->process($this->context);

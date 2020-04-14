@@ -36,12 +36,11 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object data must be an array.
-     */
     public function testInitializeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object data must be an array.');
+
         $options = array(
             'data' => 'test'
         );
@@ -70,21 +69,18 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Context must be instance of WorkflowItem
-     */
     public function testExecuteExceptionInterface()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Context must be instance of WorkflowItem');
+
         $context = new \stdClass();
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     */
     public function testExecuteExceptionNotManaged()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
         $relatedEntity = '\stdClass';
         $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
@@ -105,12 +101,11 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($workflowItem);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Can't create related entity \stdClass.
-     */
     public function testExecuteSaveException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\ActionException::class);
+        $this->expectExceptionMessage("Can't create related entity \stdClass.");
+
         $relatedEntity = '\stdClass';
         $entity = new \stdClass();
         $entity->test = null;

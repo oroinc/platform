@@ -72,11 +72,9 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testTransformForNotObject()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->transformer->transform('invalid_value');
     }
 

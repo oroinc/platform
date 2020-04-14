@@ -41,12 +41,12 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeExceptions(array $options)
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -75,14 +75,13 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($integration, 'integration', $this->action);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectEntity()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.'
+        );
+
         $context = new \stdClass();
         $context->attr = 'test';
         $context->integration = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
@@ -97,14 +96,14 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "populate_channel_owner" expects Oro\Bundle\IntegrationBundle\Entity\Channel in parameter "integration", stdClass is given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectIntegration()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Action "populate_channel_owner" expects %s in parameter "integration", stdClass is given.',
+            \Oro\Bundle\IntegrationBundle\Entity\Channel::class
+        ));
+
         $context = new \stdClass();
         $context->attr = new \stdClass();
         $context->integration = new \stdClass();

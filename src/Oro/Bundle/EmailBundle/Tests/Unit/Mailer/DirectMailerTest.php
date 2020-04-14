@@ -228,11 +228,9 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->mailer->send($message, $failedRecipients));
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testSendWithException()
     {
+        $this->expectException(\Exception::class);
         $message = new \Swift_Message();
         $failedRecipients = [];
         $transport = $this->createMock(\Swift_Transport::class);
@@ -311,11 +309,9 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(\Swift_Transport_EsmtpTransport::class, $smtpTransport);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EmailBundle\Exception\NotSupportedException
-     */
     public function testRegisterPlugin()
     {
+        $this->expectException(\Oro\Bundle\EmailBundle\Exception\NotSupportedException::class);
         $plugin = $this->createMock(\Swift_Events_EventListener::class);
         $this->mailer->registerPlugin($plugin);
     }

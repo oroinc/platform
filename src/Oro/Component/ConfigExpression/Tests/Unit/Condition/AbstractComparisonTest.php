@@ -118,12 +118,11 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals('bar', 'right', $this->condition);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "right" is required.
-     */
     public function testInitializeFailsWithEmptyRightOption()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "right" is required.');
+
         $this->condition->initialize(
             [
                 'foo'  => 'bar',
@@ -132,12 +131,11 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "left" is required.
-     */
     public function testInitializeFailsWithEmptyLeftOption()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "left" is required.');
+
         $this->condition->initialize(
             [
                 'right' => 'foo',
@@ -146,12 +144,11 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 elements, but 0 given.
-     */
     public function testInitializeFailsWithInvalidOptionsCount()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
+
         $this->condition->initialize([]);
     }
 

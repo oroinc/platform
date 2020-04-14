@@ -414,14 +414,14 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: . Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.
-     */
-    // @codingStandardsIgnoreEnd
     public function testDuplicateAdd()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: .'
+            . ' Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.'
+        );
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')

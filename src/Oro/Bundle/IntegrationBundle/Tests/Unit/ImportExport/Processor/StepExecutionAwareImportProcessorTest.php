@@ -41,12 +41,11 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
         $this->processor->setImportExportContext($this->context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing ContextRegistry
-     */
     public function testSetStepExecutionWithoutContextRegistry()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing ContextRegistry');
+
         $this->processor->setStepExecution($this->stepExecution);
     }
 

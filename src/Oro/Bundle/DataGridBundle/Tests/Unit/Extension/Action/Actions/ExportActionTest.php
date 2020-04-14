@@ -40,12 +40,11 @@ class ExportActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage There is no option "exportProcessor" for action "test_name"
-     */
     public function testSetOptionsWithoutExportProcessor()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('There is no option "exportProcessor" for action "test_name"');
+
         $this->assertSame(
             $this->action,
             $this->action->setOptions(ActionConfiguration::create([

@@ -30,13 +30,14 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute and value parameters are required.
      * @dataProvider invalidOptionsNumberDataProvider
      * @param array $options
      */
     public function testInitializeExceptionParametersCount($options)
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute and value parameters are required.');
+
         $this->action->initialize($options);
     }
 
@@ -52,13 +53,14 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
      * @dataProvider invalidOptionsAttributeDataProvider
      * @param array $options
      */
     public function testInitializeExceptionInvalidAttribute($options)
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize($options);
     }
 
@@ -70,21 +72,19 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be defined.
-     */
     public function testInitializeExceptionNoAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be defined.');
+
         $this->action->initialize(array('some' => 'test', 'value' => 'test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be defined.
-     */
     public function testInitializeExceptionNoValue()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be defined.');
+
         $this->action->initialize(array('attribute' => 'test', 'unknown' => 'test'));
     }
 

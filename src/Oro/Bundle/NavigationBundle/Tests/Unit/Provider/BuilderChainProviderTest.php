@@ -56,22 +56,20 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($chainProvider->has($notExistingMenuName, $options));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Menu alias was not set.
-     */
     public function testGetException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Menu alias was not set.');
+
         $chainProvider = $this->getBuilderChainProvider([], []);
         $chainProvider->get('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Menu alias was not set.
-     */
     public function testHasException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Menu alias was not set.');
+
         $chainProvider = $this->getBuilderChainProvider([], []);
         $chainProvider->has('');
     }

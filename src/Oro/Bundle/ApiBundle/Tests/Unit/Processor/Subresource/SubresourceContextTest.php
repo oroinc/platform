@@ -168,12 +168,13 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".
-     */
     public function testSetInvalidParentConfigExtras()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".'
+        );
+
         $this->context->setParentConfigExtras(['test']);
     }
 
@@ -352,14 +353,13 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentConfig());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The parent entity class name must be set in the context before a configuration is loaded.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadParentConfigWhenNoParentClassName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The parent entity class name must be set in the context before a configuration is loaded.'
+        );
+
         $this->context->getParentConfig();
     }
 
@@ -454,12 +454,13 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
-     */
     public function testSetInvalidParentMetadataExtras()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".'
+        );
+
         $this->context->setParentMetadataExtras(['test']);
     }
 

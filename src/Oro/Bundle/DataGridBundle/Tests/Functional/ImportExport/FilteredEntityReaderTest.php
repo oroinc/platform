@@ -66,12 +66,11 @@ class FilteredEntityReaderTest extends WebTestCase
         $this->assertCount(3, $ids);
     }
 
-    /**
-     * @expectedExceptionMessage Reader must be configured with source
-     * @expectedException \LogicException
-     */
     public function testInternalReadMethodCalled(): void
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Reader must be configured with source');
+
         $this->reader->read();
     }
 }

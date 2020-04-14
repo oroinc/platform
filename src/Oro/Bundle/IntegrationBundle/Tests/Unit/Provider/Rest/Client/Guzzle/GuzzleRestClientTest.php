@@ -205,12 +205,11 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
-     * @expectedExceptionMessage Exception message
-     */
     public function testPerformRequestThrowException()
     {
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException::class);
+        $this->expectExceptionMessage('Exception message');
+
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
@@ -312,7 +311,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
             ->method('getReasonPhrase')
             ->will($this->returnValue($reasonPhrase));
 
-        $this->expectException('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException');
+        $this->expectException(\Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException::class);
         $this->expectExceptionMessage(
             "Unsuccessful response" . PHP_EOL .
             "[status code] $statusCode" . PHP_EOL .

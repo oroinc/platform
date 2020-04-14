@@ -36,12 +36,11 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($targetProcessor, $this->context->getTargetProcessor());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target action is not defined.
-     */
     public function testProcessWhenTargetActionIsNotSet()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target action is not defined.');
+
         $this->processor->process($this->context);
     }
 

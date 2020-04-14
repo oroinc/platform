@@ -6,11 +6,9 @@ use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemIdTransformer;
 
 class TreeItemIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testTransformFailsOnUnsupportedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new TreeItemIdTransformer([]);
         $transformer->transform((object)[]);
     }

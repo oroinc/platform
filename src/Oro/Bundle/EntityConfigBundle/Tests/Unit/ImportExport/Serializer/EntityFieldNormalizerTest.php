@@ -94,13 +94,13 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeExceptionDataProvider
      *
-     * @@expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Data doesn't contains entity id
-     *
      * @param array $data
      */
     public function testDenormalizeException(array $data)
     {
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Data doesn't contains entity id");
+
         $this->normalizer->denormalize($data, null);
     }
 

@@ -37,12 +37,11 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->registry->has('unknown'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown provider with alias "unknown".
-     */
     public function testGetForUnknownProvider()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown provider with alias "unknown".');
+
         $this->registry->get('unknown');
     }
 }

@@ -211,12 +211,11 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($windowState, $this->manager->getWindowsState($windowStateId));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Wrong $windowId type
-     */
     public function testFilterId()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Wrong $windowId type');
+
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
@@ -228,11 +227,9 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getWindowsState('bbb');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testUserEmptyToken()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn(null);
@@ -240,11 +237,9 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getWindowsState(42);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testUserEmptyUser()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')

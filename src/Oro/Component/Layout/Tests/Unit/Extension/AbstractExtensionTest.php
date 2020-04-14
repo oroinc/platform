@@ -23,12 +23,11 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The block type "unknown" can not be loaded by this extension.');
+
         $extension = $this->getAbstractExtension();
         $extension->getType('unknown');
     }
@@ -126,46 +125,42 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(is_object($extension->getDataProvider('test')));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The data provider "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownDataProvider()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
+
         $extension = $this->getAbstractExtension();
         $extension->getDataProvider('unknown');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\BlockTypeExtensionInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadInvalidBlockTypeExtensions()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Component\Layout\BlockTypeExtensionInterface", "integer" given.'
+        );
+
         $extension = new AbstractExtensionStub([], [123], [], [], []);
         $extension->hasTypeExtensions('test');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\LayoutUpdateInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadInvalidLayoutUpdates()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Component\Layout\LayoutUpdateInterface", "integer" given.'
+        );
+
         $extension = new AbstractExtensionStub([], [], ['test' => [123]], [], []);
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "layout item id" argument type. Expected "string", "integer" given.
-     */
     public function testLoadLayoutUpdatesWithInvalidId()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Invalid "layout item id" argument type. Expected "string", "integer" given.');
+
         $extension = new AbstractExtensionStub(
             [],
             [],
@@ -178,14 +173,11 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "layout updates for item "test"" argument type. Expected "array",
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadLayoutUpdatesWithInvalidFormatOfReturnedData()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Invalid "layout updates for item "test"" argument type. Expected "array",');
+
         $extension = new AbstractExtensionStub(
             [],
             [],
@@ -198,24 +190,24 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\ContextConfiguratorInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadInvalidContextConfigurators()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Component\Layout\ContextConfiguratorInterface", "integer" given.'
+        );
+
         $extension = new AbstractExtensionStub([], [], [], [123], []);
         $extension->hasContextConfigurators();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.
-     */
     public function testLoadInvalidBlockTypes()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.'
+        );
+
         $extension = new AbstractExtensionStub([123], [], [], [], []);
         $extension->hasType('test');
     }

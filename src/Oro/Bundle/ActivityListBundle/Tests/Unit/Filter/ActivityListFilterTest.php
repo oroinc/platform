@@ -89,11 +89,9 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
+        $this->expectException(\LogicException::class);
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->activityListFilter->apply($ds, []);
     }

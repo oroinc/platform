@@ -33,12 +33,11 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->converter, $this->registry->getFormatConverter('test'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Format converter with name "not_existing" is not exist
-     */
     public function testGetFormatConverterNotExistsException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
+
         $this->registry->getFormatConverter('not_existing');
     }
 

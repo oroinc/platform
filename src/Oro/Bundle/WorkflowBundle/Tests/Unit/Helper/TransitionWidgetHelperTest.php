@@ -58,11 +58,10 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
      * @param null|mixed $entityId
      *
      * @dataProvider getOrCreateEntityReferenceDataProvider
-     *
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
     public function testGetOrCreateEntityReferenceException($entityClass, $entityId = null)
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         if ($entityId) {
             $this->doctrineHelper->expects($this->once())
                 ->method('getEntityReference')

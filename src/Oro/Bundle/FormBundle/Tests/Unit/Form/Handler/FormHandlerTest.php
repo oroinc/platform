@@ -102,12 +102,11 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($entity, $this->form, $this->request));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test flush exception
-     */
     public function testHandleUpdateWorksWhenFormFlushFailed()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test flush exception');
+
         $entity = (object)[];
         $this->form->expects($this->once())
             ->method('setData')

@@ -83,12 +83,11 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($configuration, $this->processor->handle($configuration));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Workflow configuration for handler must contain valid `name` node.
-     */
     public function testHandleIncorrectConfigFormatException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Workflow configuration for handler must contain valid `name` node.');
+
         $this->processor->handle([]);
     }
 

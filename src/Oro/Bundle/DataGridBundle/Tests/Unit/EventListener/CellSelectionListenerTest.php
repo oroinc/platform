@@ -185,12 +185,11 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBuildAfter($this->event);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage cellSelection options `columnName`, `selector` are required
-     */
     public function testOnBuildAfterException()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('cellSelection options `columnName`, `selector` are required');
+
         $config = DatagridConfiguration::create([
             'options' => [
                 'cellSelection' => [

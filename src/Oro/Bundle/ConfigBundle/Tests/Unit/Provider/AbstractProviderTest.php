@@ -138,12 +138,11 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException
-     * @expectedExceptionMessage Config API section "undefined.sub_section" is not defined.
-     */
     public function testGetApiTreeForUndefinedSection()
     {
+        $this->expectException(\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('Config API section "undefined.sub_section" is not defined.');
+
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
 
         $provider->getApiTree('undefined.sub_section');

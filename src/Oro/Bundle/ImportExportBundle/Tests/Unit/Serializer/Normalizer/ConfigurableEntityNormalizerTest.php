@@ -114,14 +114,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Serializer must implement "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface" and "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface"
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetSerializerException()
     {
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Serializer must implement "%s" and "%s"',
+            \Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface::class,
+            \Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface::class
+        ));
+
         $serializer = $this->createMock(\Symfony\Component\Serializer\Serializer::class);
         $this->normalizer->setSerializer($serializer);
     }

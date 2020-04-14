@@ -78,7 +78,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
                 ->method('getFieldNames')
                 ->will($this->returnValue([]));
 
-        $this->expectException('\Exception');
+        $this->expectException(\Exception::class);
         $this->choiceHelper->guessLabelField($metadata, 'column_name');
     }
 

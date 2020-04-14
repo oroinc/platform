@@ -18,11 +18,10 @@ abstract class AbstractDriverTest extends WebTestCase
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testOnlyItemIsAccepted()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $entityManager = $this->getContainer()->get('doctrine')->getManager('search');
         $classMetadata = $entityManager->getClassMetadata('Oro\Bundle\SearchBundle\Entity\IndexText');
 

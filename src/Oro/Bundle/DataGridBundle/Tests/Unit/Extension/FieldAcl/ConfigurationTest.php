@@ -14,22 +14,20 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration = new Configuration();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unrecognized option "a" under "fields_acl"
-     */
     public function testValidateWrongArrayData()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Unrecognized option "a" under "fields_acl"');
+
         $config = ['fields_acl' => ['a' => 'b']];
         $this->validateConfiguration($this->configuration, $config);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid type for path "fields_acl
-     */
     public function testValidateWrongNonArrayData()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "fields_acl');
+
         $config = ['fields_acl' => 's'];
         $this->validateConfiguration($this->configuration, $config);
     }

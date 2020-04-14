@@ -57,12 +57,11 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '456'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The primary entity identifier must be set before.
-     */
     public function testShouldSetPrimaryEntityThrowExceptionIfPrimaryEntityIdIsNotSetYet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The primary entity identifier must be set before.');
+
         $this->collection->setPrimaryEntity(new \stdClass(), null);
     }
 

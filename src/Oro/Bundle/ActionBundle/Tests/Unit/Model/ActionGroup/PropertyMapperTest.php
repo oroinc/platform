@@ -77,12 +77,11 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Parameters map must be array or implements \Traversable interface
-     */
     public function testNonTraversableAssertionException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parameters map must be array or implements \Traversable interface');
+
         /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroupExecutionArgs $mockExecutionArgs */
         $mockExecutionArgs = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs')
             ->disableOriginalConstructor()->getMock();

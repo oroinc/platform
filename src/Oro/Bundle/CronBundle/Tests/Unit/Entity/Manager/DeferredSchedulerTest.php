@@ -161,7 +161,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($this->scheduleClass)
             ->willReturn(null);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Please provide manageable schedule entity class');
 
         $this->deferredScheduler->flush();

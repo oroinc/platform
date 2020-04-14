@@ -39,12 +39,11 @@ class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
         $this->processor = new StepExecutionAwareExportProcessor();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing ContextRegistry
-     */
     public function testSetStepExecutionWithoutContextRegistry()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing ContextRegistry');
+
         $this->processor->setStepExecution($this->stepExecution);
     }
 

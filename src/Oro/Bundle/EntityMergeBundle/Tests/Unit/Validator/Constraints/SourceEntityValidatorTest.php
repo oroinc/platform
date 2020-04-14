@@ -40,7 +40,7 @@ class SourceEntityValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidArgument($value, $expectedExceptionMessage)
     {
-        $this->expectException('Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException');
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         $constraint = $this

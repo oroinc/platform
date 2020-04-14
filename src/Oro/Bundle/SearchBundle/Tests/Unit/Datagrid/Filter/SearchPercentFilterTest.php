@@ -35,12 +35,11 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
         $this->datasource = $this->createMock(SearchFilterDatasourceAdapter::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid filter datasource adapter provided');
+
         /** @var FilterDatasourceAdapterInterface $ds */
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
 

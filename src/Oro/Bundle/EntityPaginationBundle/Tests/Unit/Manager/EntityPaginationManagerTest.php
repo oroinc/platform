@@ -117,12 +117,11 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Scope "wrong_scope" is not available.
-     */
     public function testGetPermissionException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Scope "wrong_scope" is not available.');
+
         EntityPaginationManager::getPermission(self::WRONG_SCOPE);
     }
 

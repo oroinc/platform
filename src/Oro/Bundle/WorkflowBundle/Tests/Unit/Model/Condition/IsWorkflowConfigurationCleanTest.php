@@ -30,21 +30,19 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(IsWorkflowConfigurationClean::NAME, $this->condition->getName());
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 element, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
+
         $this->condition->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "workflow" is required.
-     */
     public function testInitializeFailsWhenOptionNotExpressionInterface()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "workflow" is required.');
+
         $this->condition->initialize([1 => 'anything']);
     }
 

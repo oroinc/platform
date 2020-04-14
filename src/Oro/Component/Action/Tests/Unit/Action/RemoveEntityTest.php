@@ -43,12 +43,12 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeException(array $options)
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -70,24 +70,24 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertAttributeEquals($target, 'target', $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "remove_entity" expects reference to entity as parameter, string is given.
-     */
     public function testExecuteNotObjectException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "remove_entity" expects reference to entity as parameter, string is given.'
+        );
+
         $context = new \stdClass();
         $target = 'test';
         $this->action->initialize([$target]);
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteNotManageableException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
         $context = new \stdClass();
         $context->test = new \stdClass();
         $target = new PropertyPath('test');

@@ -174,12 +174,14 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
     /**
      * always_empty can not be changed. It always "true"
-     *
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage  The option "always_empty" with value false is invalid. Accepted values are: true.
      */
     public function testAlwaysEmptyCanNotBeSetToFalse()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectExceptionMessage(
+            'The option "always_empty" with value false is invalid. Accepted values are: true.'
+        );
+
         $this->factory->create(OroPlaceholderPasswordType::class, null, ['always_empty' => false]);
     }
 

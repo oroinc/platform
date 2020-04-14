@@ -35,12 +35,11 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         self::assertNull($reference->getEntity());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage An entity cannot be set to "null" reference object.
-     */
     public function testShouldNotBePossibleToSetEntityForNullReference()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('An entity cannot be set to "null" reference object.');
+
         $reference = new EntityReference();
         $reference->setEntity(new \stdClass());
     }
@@ -68,12 +67,11 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testId', $reference->getId());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The entity is not loaded yet. Call "setEntity" method before.
-     */
     public function testShouldThrowExceptionIfEntityIsNotLoadedYet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The entity is not loaded yet. Call "setEntity" method before.');
+
         $reference = new EntityReference('Test\Class', 'testId');
         $reference->getEntity();
     }
@@ -107,34 +105,32 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         self::assertNull($reference->getEntity());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "null or instance of Test\Class", "integer" given.
-     */
     public function testShouldSetEntityThrowExceptionIfNotObjectPassed()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "null or instance of Test\Class", "integer" given.');
+
         $reference = new EntityReference('Test\Class', 'testId');
         $reference->setEntity(123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "null or instance of stdClass", "Oro\Bundle\DataAuditBundle\Model\EntityReference" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldSetEntityThrowExceptionIfInvalidEntityTypePassed()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Expected argument of type "null or instance of stdClass", "%s" given.',
+            \Oro\Bundle\DataAuditBundle\Model\EntityReference::class
+        ));
+
         $reference = new EntityReference(get_class(new \stdClass()), 'testId');
         $reference->setEntity(new EntityReference());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The entity is already loaded.
-     */
     public function testShouldNotBePossibleToChangeAlreadySetEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The entity is already loaded.');
+
         $entity = new \stdClass();
         $reference = new EntityReference(get_class($entity), 'testId');
         $reference->setEntity($entity);

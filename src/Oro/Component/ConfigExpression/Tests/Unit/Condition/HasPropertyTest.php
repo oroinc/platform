@@ -39,34 +39,27 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate(['object' => $object, 'property' => 'foo']));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "object" is required.
-     */
-    // @codingStandardsIgnoreEnd
     public function testInitializeFailsWhenOptionOneNotDefined()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "object" is required.');
+
         $this->condition->initialize([2 => 'anything', 3 => 'anything']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "property" is required.
-     */
-    // @codingStandardsIgnoreEnd
     public function testInitializeFailsWhenOptionTwoNotDefined()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "property" is required.');
+
         $this->condition->initialize([0 => 'anything', 3 => 'anything']);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
+
         $this->condition->initialize([]);
     }
 

@@ -61,12 +61,11 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The result property of the context should be an object, "string" given.
-     */
     public function testProcessForNotObjectResult()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The result property of the context should be an object, "string" given.');
+
         $entity = 'test';
         $entityClass = 'Test\Entity';
         $config = new EntityDefinitionConfig();
