@@ -4,11 +4,13 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Entity manager for email activity suggestions API (old)
+ */
 class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
     /** @var TokenStorageInterface|null */
