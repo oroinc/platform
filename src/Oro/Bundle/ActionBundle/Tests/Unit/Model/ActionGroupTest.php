@@ -205,11 +205,11 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createActionGroup(\PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects, ActionData $data)
+    protected function createActionGroup(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects, ActionData $data)
     {
         /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
@@ -219,13 +219,13 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @param bool $returnValue
      * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCondition(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects,
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
         $returnValue
     ) {

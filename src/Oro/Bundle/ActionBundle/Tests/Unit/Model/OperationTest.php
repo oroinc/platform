@@ -504,12 +504,12 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createAction(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data
     ) {
         /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -525,13 +525,13 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @param bool $returnValue
      * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCondition(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
         $returnValue
     ) {
