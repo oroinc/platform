@@ -10,6 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,6 +37,8 @@ class OroApiBundle extends Bundle
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function build(ContainerBuilder $container)
     {
@@ -98,6 +101,31 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
             'oro_api.complete_definition_helper.custom_data_type',
             'oro.api.custom_data_type_completer'
+        ));
+        $container->addCompilerPass(new Compiler\ChunkSizeProviderCompilerPass());
+        $container->addCompilerPass(new Compiler\CleanupAsyncOperationCompilerPass());
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.batch.file_splitter_registry',
+            'oro.api.batch.file_splitter'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.batch.chunk_file_classifier_registry',
+            'oro.api.batch.chunk_file_classifier'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.batch.data_encoder_registry',
+            'oro.api.batch.data_encoder'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.batch.include_accessor_registry',
+            'oro.api.batch.include_accessor'
+        ));
+        $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(
+            'oro_api.batch.flush_data_handler_factory_registry',
+            'oro.api.batch.flush_data_handler_factory',
+            function (array $attributes, string $serviceId): array {
+                return [$serviceId, $this->getAttribute($attributes, 'class')];
+            }
         ));
         $container->addCompilerPass(new LoadApplicableCheckersCompilerPass(
             'oro_api.processor_bag',

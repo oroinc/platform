@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
@@ -26,6 +27,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
@@ -37,6 +41,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         parent::setUp();
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->container = $this->createMock(ContainerInterface::class);
 
         $this->processor = new BuildFormBuilder(
@@ -44,7 +49,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 $this->formFactory,
                 $this->createMock(PropertyAccessorInterface::class),
                 $this->container
-            )
+            ),
+            $this->doctrineHelper
         );
     }
 
@@ -232,6 +238,11 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $metadata = new EntityMetadata();
         $metadata->addField($this->createFieldMetadata('field1'));
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getClass')
+            ->with(self::identicalTo($data))
+            ->willReturn($parentEntityClass);
 
         $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
@@ -702,6 +713,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 $this->createMock(PropertyAccessorInterface::class),
                 $this->container
             ),
+            $this->doctrineHelper,
             true
         );
         $this->processor->process($this->context);

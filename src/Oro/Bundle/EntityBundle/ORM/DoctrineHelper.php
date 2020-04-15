@@ -11,21 +11,22 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides utility methods to work with manageable doctrine ORM entities.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DoctrineHelper
+class DoctrineHelper implements ResetInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var ShortMetadataProvider
-     */
+    /** @var ShortMetadataProvider */
     private $shortMetadataProvider;
+
+    /** @var array */
+    private $entityClasses = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -36,24 +37,67 @@ class DoctrineHelper
     }
 
     /**
-     * Gets a real class name for an entity.
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->entityClasses = [];
+    }
+
+    /**
+     * Gets the real class name for the given entity (even if its a proxy).
      *
-     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     * @param object $entity An entity object
+     *
+     * @return string
+     */
+    public function getClass($entity)
+    {
+        return $this->getRealClass(get_class($entity));
+    }
+
+    /**
+     * Gets the real class name of the given entity class name that could be a proxy.
+     *
+     * @param string $className An entity class name or entity proxy class name
+     *
+     * @return string
+     */
+    public function getRealClass($className)
+    {
+        if (isset($this->entityClasses[$className])) {
+            return $this->entityClasses[$className];
+        }
+        $realClassName = ClassUtils::getRealClass($className);
+        $this->entityClasses[$className] = $realClassName;
+
+        return $realClassName;
+    }
+
+    /**
+     * Gets the real class name for the given entity, entity class name, entity proxy class name or entity type.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name, entity proxy class name or entity type
      *
      * @return string
      */
     public function getEntityClass($entityOrClass)
     {
         if (is_object($entityOrClass)) {
-            return ClassUtils::getClass($entityOrClass);
+            return $this->getClass($entityOrClass);
         }
-
         if (strpos($entityOrClass, ':') !== false) {
-            list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
-            return $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+            if (isset($this->entityClasses[$entityOrClass])) {
+                return $this->entityClasses[$entityOrClass];
+            }
+            [$namespaceAlias, $simpleClassName] = explode(':', $entityOrClass, 2);
+            $realEntityClass = $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+            $this->entityClasses[$entityOrClass] = $realEntityClass;
+
+            return $realEntityClass;
         }
 
-        return ClassUtils::getRealClass($entityOrClass);
+        return $this->getRealClass($entityOrClass);
     }
 
     /**

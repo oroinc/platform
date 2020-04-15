@@ -46,13 +46,18 @@ api:
             filters:
                 fields:
                     name: ~
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
             filters:
                 fields:
                     name: ~
             sorters:
                 fields:
+                    name: ~
                     position: ~
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
             fields:

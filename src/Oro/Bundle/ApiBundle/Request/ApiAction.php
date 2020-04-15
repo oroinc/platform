@@ -11,6 +11,7 @@ final class ApiAction
     public const GET                 = 'get';
     public const GET_LIST            = 'get_list';
     public const UPDATE              = 'update';
+    public const UPDATE_LIST         = 'update_list';
     public const CREATE              = 'create';
     public const DELETE              = 'delete';
     public const DELETE_LIST         = 'delete_list';

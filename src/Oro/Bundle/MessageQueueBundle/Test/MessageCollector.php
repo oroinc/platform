@@ -68,6 +68,26 @@ class MessageCollector implements MessageProducerInterface
     }
 
     /**
+     * Removes all collected messages for the given topic.
+     *
+     * @param string $topic
+     *
+     * @return self
+     */
+    public function clearTopicMessages($topic)
+    {
+        $filteredTraces = [];
+        foreach ($this->sentMessages as $trace) {
+            if ($topic !== $trace['topic']) {
+                $filteredTraces[] = $trace;
+            }
+        }
+        $this->sentMessages = $filteredTraces;
+
+        return $this;
+    }
+
+    /**
      * Removes all collected messages.
      *
      * @return self

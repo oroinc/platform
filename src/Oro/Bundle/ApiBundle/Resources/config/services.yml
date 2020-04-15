@@ -285,6 +285,7 @@ services:
             - '@oro_api.entity_alias_resolver_registry'
             - '@oro_api.resources.cache_warmer'
             - '@nelmio_api_doc.extractor.api_doc_extractor'
+            - '@oro_api.config_provider'
         calls:
             - [addResettableService, ['@oro_api.rest.chain_routing_options_resolver']]
             - [addResettableService, ['@oro_api.resources_provider']]
@@ -571,6 +572,13 @@ services:
         arguments:
             - '@oro_api.rest.error_handling_body_listener.inner'
 
+    oro_api.rest.update_list_body_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\UpdateListBodyListenerDecorator
+        decorates: 'fos_rest.body_listener'
+        arguments:
+            - '@oro_api.rest.update_list_body_listener.inner'
+            - '@oro_api.rest.routes'
+
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ChainApiDocAnnotationHandler
         arguments:
@@ -817,3 +825,243 @@ services:
         class: Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener
         arguments:
             - '@security.token_storage'
+
+    oro_api.batch.async.operation_manager:
+        class: Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager
+        arguments:
+            - '@doctrine'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.error_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list_processing_helper:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper
+        arguments:
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.dependent_job_service'
+            - '@oro_api.batch.file_splitter_registry'
+            - '@oro_api.batch.chunk_file_classifier_registry'
+            - '@oro_api.batch.include_accessor_registry'
+            - '@oro_api.batch.include_map_manager'
+            - '@oro_api.batch.file_manager.source_data'
+            - '@oro_api.batch.file_manager'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_api.batch.async.operation_manager'
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@oro_api.batch.file_name_provider'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list.create_chunk_jobs:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.job.storage'
+            - '@oro_api.batch.async.operation_manager'
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list.start_chunk_jobs:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListStartChunkJobsMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.storage'
+            - '@oro_api.batch.async.operation_manager'
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list.process_chunk:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessChunkMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.update_handler'
+            - '@oro_api.batch.data_encoder_registry'
+            - '@oro_api.batch.retry_helper'
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_api.batch.file_lock_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.async.update_list.finish:
+        class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListFinishMessageProcessor
+        arguments:
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@oro_api.batch.async.operation_manager'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.include_map_manager'
+            - '@oro_api.batch.file_name_provider'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.job_event_listener:
+        class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\MessageQueueBundle\Entity\Job, event: preFlush }
+
+    oro_api.batch.retry_helper:
+        class: Oro\Bundle\ApiBundle\Batch\RetryHelper
+
+    oro_api.batch.file_manager.source_data:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'api_source_data'
+
+    oro_api.batch.file_manager:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'api'
+
+    oro_api.batch.file_lock_manager:
+        class: Oro\Bundle\ApiBundle\Batch\FileLockManager
+        arguments:
+            - '@doctrine'
+            - 'batch'
+
+    oro_api.batch.include_map_manager:
+        class: Oro\Bundle\ApiBundle\Batch\IncludeMapManager
+        arguments:
+            - '@oro_api.batch.item_key_builder'
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_api.batch.file_lock_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.error_manager:
+        class: Oro\Bundle\ApiBundle\Batch\ErrorManager
+        arguments:
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_api.batch.file_lock_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    oro_api.batch.item_key_builder:
+        class: Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder
+
+    oro_api.batch.update_handler:
+        class: Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateHandler
+        arguments:
+            - '@oro_api.batch_update.processor'
+            - '@oro_api.batch_update_item.processor'
+
+    oro_api.batch.flush_data_handler_factory_registry:
+        class: Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactoryRegistry
+        arguments:
+            - [] # factories
+            - ~ # service locator
+
+    oro_api.batch.flush_data_handler_factory:
+        class: Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactory
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.batch.flush_data_handler_factory, priority: -250 }
+
+    oro_api.batch.file_name_provider:
+        class: Oro\Bundle\ApiBundle\Batch\FileNameProvider
+
+    oro_api.batch.chunk_size_provider:
+        class: Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider
+        arguments:
+            - 1 # injected the value of the "oro_api.batch_api.chunk_size" configuration option
+            - [] # injected the value of the "oro_api.batch_api.chunk_size_per_entity" configuration option
+            - 1 # injected the value of the "oro_api.batch_api.included_data_chunk_size" configuration option
+            - [] # injected the value of the "oro_api.batch_api.included_data_chunk_size_per_entity" configuration option
+
+    oro_api.batch.file_splitter_registry:
+        class: Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterRegistry
+        arguments:
+            - [] # splitters
+            - ~ # service locator
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.batch.file_splitter.json_api:
+        class: Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter
+        calls:
+            - [ setHeaderSectionName, [ 'jsonapi' ] ]
+            - [ setSectionNamesToSplit, [ ['data', 'included'] ] ]
+            # it is replaced with a value returned by oro_api.batch.chunk_size_provider::getIncludedDataChunkSize()
+            - [ setChunkSizePerSection, [ {'included': 1000} ] ]
+        tags:
+            - { name: oro.api.batch.file_splitter, requestType: json_api }
+
+    oro_api.batch.chunk_file_classifier_registry:
+        class: Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifierRegistry
+        arguments:
+            - [] # classifiers
+            - ~ # service locator
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.batch.chunk_file_classifier.json_api:
+        class: Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifier
+        arguments:
+            - 'data'
+            - 'included'
+        tags:
+            - { name: oro.api.batch.chunk_file_classifier, requestType: json_api }
+
+    oro_api.batch.data_encoder_registry:
+        class: Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderRegistry
+        arguments:
+            - [] # encoders
+            - ~ # service locator
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.batch.data_encoder.json_api:
+        class: Oro\Bundle\ApiBundle\Batch\Encoder\JsonDataEncoder
+        calls:
+            - [ setHeaderSectionName, [ 'jsonapi' ] ]
+        tags:
+            - { name: oro.api.batch.data_encoder, requestType: json_api }
+
+    oro_api.batch.include_accessor_registry:
+        class: Oro\Bundle\ApiBundle\Batch\IncludeAccessor\IncludeAccessorRegistry
+        arguments:
+            - [] # accessors
+            - ~ # service locator
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.batch.include_accessor.json_api:
+        class: Oro\Bundle\ApiBundle\Batch\IncludeAccessor\JsonApiIncludeAccessor
+        arguments:
+            - '@oro_api.batch.item_key_builder'
+        tags:
+            - { name: oro.api.batch.include_accessor, requestType: json_api }
+
+    oro_api.batch.delete_handler.async_operation:
+        class: Oro\Bundle\ApiBundle\Batch\Handler\AsyncOperationDeleteHandler
+        parent: oro_entity.delete_handler
+        arguments:
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_api.batch.file_manager'
+            - '@logger'
+        tags:
+            - { name: oro_entity.delete_handler, entity: Oro\Bundle\ApiBundle\Entity\AsyncOperation }
+            - { name: monolog.logger, channel: api }

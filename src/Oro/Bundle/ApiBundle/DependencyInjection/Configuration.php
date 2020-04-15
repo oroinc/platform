@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -32,18 +33,19 @@ class Configuration implements ConfigurationInterface
         $node = $rootNode->children();
         $this->appendOptions($node);
         $this->appendConfigFilesNode($node);
-        $this->appendApiDocViewsNode($node);
-        $this->appendApiDocCacheNode($node);
         $this->appendConfigExtensionsNode($node);
+        $this->appendApiDocCacheNode($node);
+        $this->appendApiDocViewsNode($node);
         $this->appendActionsNode($node);
-        $this->appendFilterOperatorsNode($node);
         $this->appendFiltersNode($node);
+        $this->appendFilterOperatorsNode($node);
         $this->appendFormTypesNode($node);
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
         $this->appendCorsNode($node);
         $this->appendFeatureDependedFirewalls($node);
+        $this->appendBatchApiNode($node);
 
         return $treeBuilder;
     }
@@ -658,6 +660,103 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue([])
                         ->end()
                     ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendBatchApiNode(NodeBuilder $node)
+    {
+        $batchApiNode = $node
+            ->arrayNode('batch_api')
+                ->info('The Batch API configuration.')
+                ->addDefaultsIfNotSet()
+                ->children();
+        $batchApiNode
+            ->arrayNode('async_operation')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->integerNode('lifetime')
+                        ->info('The number of days asynchronous operations are stored in the system.')
+                        ->min(1)
+                        ->defaultValue(30)
+                    ->end()
+                    ->integerNode('cleanup_process_timeout')
+                        ->info(
+                            'The maximum number of seconds that the asynchronous operations cleanup process'
+                            . ' can spend in one run.'
+                        )
+                        ->min(60) // 1 minute
+                        ->defaultValue(3600) // 1 hour
+                    ->end()
+                ->end()
+            ->end()
+            ->integerNode('chunk_size')
+                ->info('The default maximum number of entities that can be saved in a chunk.')
+                ->min(1)
+                ->defaultValue(100)
+            ->end()
+            ->integerNode('included_data_chunk_size')
+                ->info('The default maximum number of included entities that can be saved in a chunk.')
+                ->min(1)
+                ->defaultValue(50)
+            ->end();
+
+        $chunkSizePerEntityNode = $batchApiNode
+            ->arrayNode('chunk_size_per_entity')
+                ->info(
+                    'The maximum number of entities of a specific type that can be saved in a chunk.'
+                    . "\n"
+                    . 'The null value can be used to revert already configured chunk size'
+                    . ' for a specific entity type and use the default chunk size for it.'
+                )
+                ->example(['Oro\Bundle\UserBundle\Entity\User' => 10]);
+        $this->configureChunkSizePerEntity($chunkSizePerEntityNode);
+
+        $includedDataChunkSizePerEntityNode = $batchApiNode
+            ->arrayNode('included_data_chunk_size_per_entity')
+                ->info(
+                    'The maximum number of included entities that can be saved in a chunk'
+                    . ' for a specific primary entity type.'
+                    . "\n"
+                    . 'The null value can be used to revert already configured chunk size'
+                    . ' for a specific entity type and use the default chunk size for it.'
+                )
+                ->example(['Oro\Bundle\UserBundle\Entity\User' => 20]);
+        $this->configureChunkSizePerEntity($includedDataChunkSizePerEntityNode);
+    }
+
+    /**
+     * @param ArrayNodeDefinition $node
+     */
+    private function configureChunkSizePerEntity(ArrayNodeDefinition $node)
+    {
+        $node
+            ->useAttributeAsKey('name')
+            ->normalizeKeys(false)
+            ->validate()
+                ->always(function ($value) {
+                    $toRemove = [];
+                    foreach ($value as $className => $chunkSize) {
+                        if (null === $chunkSize) {
+                            $toRemove[] = $className;
+                        }
+                    }
+                    foreach ($toRemove as $className) {
+                        unset($value[$className]);
+                    }
+
+                    return $value;
+                })
+            ->end()
+            ->prototype('scalar')
+                ->validate()
+                    ->ifTrue(function ($value) {
+                        return null !== $value && !is_int($value);
+                    })
+                    ->thenInvalid('Expected int or NULL.')
                 ->end()
             ->end();
     }

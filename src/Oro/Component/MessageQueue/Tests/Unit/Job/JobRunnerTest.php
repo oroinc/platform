@@ -1313,6 +1313,14 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
         });
     }
 
+    public function testGetJobRunnerForChildJob()
+    {
+        $rootJob = $this->getEntity(Job::class, ['id' => 1]);
+        $jobRunnerForChildJob = $this->jobRunner->getJobRunnerForChildJob($rootJob);
+        $this->assertInstanceOf(JobRunner::class, $jobRunnerForChildJob);
+        $this->assertNotSame($this->jobRunner, $jobRunnerForChildJob);
+    }
+
     /**
      * @return array
      */

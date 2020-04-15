@@ -71,7 +71,7 @@ class SearchResult
     }
 
     /**
-     * Gets aggregated data collected during the query execution.
+     * Gets aggregated data collected when execution the query.
      * Format for the "count" function: [aggregating name => ['value' => field value, 'count' => count value], ...]
      * Format for mathematical functions: [aggregating name => aggregated value, ...]
      *

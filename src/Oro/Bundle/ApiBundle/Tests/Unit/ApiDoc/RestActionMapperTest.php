@@ -54,7 +54,8 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
                     ApiAction::OPTIONS,
                     ApiAction::GET_LIST,
                     ApiAction::DELETE_LIST,
-                    ApiAction::CREATE
+                    ApiAction::CREATE,
+                    ApiAction::UPDATE_LIST
                 ]
             ],
             [
@@ -116,6 +117,7 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
             [ApiAction::DELETE, Request::METHOD_DELETE],
             [ApiAction::DELETE_LIST, Request::METHOD_DELETE],
             [ApiAction::UPDATE, Request::METHOD_PATCH],
+            [ApiAction::UPDATE_LIST, Request::METHOD_PATCH],
             [ApiAction::CREATE, Request::METHOD_POST],
             [ApiAction::GET_SUBRESOURCE, Request::METHOD_GET],
             [ApiAction::UPDATE_SUBRESOURCE, Request::METHOD_PATCH],

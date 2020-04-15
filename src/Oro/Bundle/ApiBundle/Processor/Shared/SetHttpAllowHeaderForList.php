@@ -19,6 +19,7 @@ class SetHttpAllowHeaderForList extends SetHttpAllowHeader
         return [
             Request::METHOD_OPTIONS => ApiAction::OPTIONS,
             Request::METHOD_GET     => ApiAction::GET_LIST,
+            Request::METHOD_PATCH   => ApiAction::UPDATE_LIST,
             Request::METHOD_POST    => ApiAction::CREATE,
             Request::METHOD_DELETE  => ApiAction::DELETE_LIST
         ];

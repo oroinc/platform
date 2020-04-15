@@ -39,7 +39,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
             ['entity' => $this->entityType]
         );
 
-        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testTryToGetListOptionsOnDisabledFeature()

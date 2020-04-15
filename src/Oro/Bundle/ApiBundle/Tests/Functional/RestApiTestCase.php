@@ -262,6 +262,52 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     /**
+     * Sends PATCH request for a list of entities.
+     *
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
+     *
+     * @return Response
+     */
+    protected function cpatch(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = $this->getRequestData($parameters);
+        $content = null;
+        if ($parameters) {
+            $content = json_encode($parameters, JSON_PRETTY_PRINT);
+        }
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl('oro_rest_api_list', $routeParameters),
+            [],
+            $server,
+            $content
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = self::extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_ACCEPTED,
+                $entityType,
+                'patch list'
+            );
+            self::assertResponseContentTypeEquals($response, $this->getResponseContentType());
+        }
+
+        return $response;
+    }
+
+    /**
      * Sends PATCH request for a single entity.
      *
      * @param array        $routeParameters

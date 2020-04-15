@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceCont
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\UpdateRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
+use Oro\Bundle\ApiBundle\Processor\UpdateList\UpdateListContext;
 use Oro\Component\ChainProcessor\AbstractParameterBag;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -167,6 +168,27 @@ abstract class RequestActionHandler
         $this->preparePrimaryContext($context, $request);
         $context->setId($this->getRequestParameter($request, 'id'));
         $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "PATCH /api/{entity}" request,
+     * that updates or creates a list of entities of the given type.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleUpdateList(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiAction::UPDATE_LIST);
+        /** @var UpdateListContext $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $context->setRequestData($request->getContent(true));
 
         $processor->process($context);
 

@@ -37,6 +37,9 @@ class CacheManager
     /** @var ApiDocExtractor */
     private $apiDocExtractor;
 
+    /** @var ConfigProvider */
+    private $configProvider;
+
     /** @var ResetInterface[] */
     private $resettableServices = [];
 
@@ -49,6 +52,7 @@ class CacheManager
      * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
      * @param ResourcesCacheWarmer        $resourcesCacheWarmer
      * @param ApiDocExtractor             $apiDocExtractor
+     * @param ConfigProvider              $configProvider
      */
     public function __construct(
         array $configKeys,
@@ -58,7 +62,8 @@ class CacheManager
         ConfigCacheWarmer $configCacheWarmer,
         EntityAliasResolverRegistry $entityAliasResolverRegistry,
         ResourcesCacheWarmer $resourcesCacheWarmer,
-        ApiDocExtractor $apiDocExtractor
+        ApiDocExtractor $apiDocExtractor,
+        ConfigProvider $configProvider
     ) {
         $this->configKeys = $configKeys;
         $this->apiDocViews = $apiDocViews;
@@ -68,6 +73,7 @@ class CacheManager
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesCacheWarmer = $resourcesCacheWarmer;
         $this->apiDocExtractor = $apiDocExtractor;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -161,14 +167,19 @@ class CacheManager
     public function warmUpApiDocCache($view = null)
     {
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
-            if ($view) {
-                $this->apiDocExtractor->warmUp($view);
-                $this->resetServices();
-            } else {
-                foreach ($this->apiDocViews as $currentView => $expr) {
-                    $this->apiDocExtractor->warmUp($currentView);
+            $this->configProvider->disableFullConfigsCache();
+            try {
+                if ($view) {
+                    $this->apiDocExtractor->warmUp($view);
                     $this->resetServices();
+                } else {
+                    foreach ($this->apiDocViews as $currentView => $expr) {
+                        $this->apiDocExtractor->warmUp($currentView);
+                        $this->resetServices();
+                    }
                 }
+            } finally {
+                $this->configProvider->enableFullConfigsCache();
             }
         }
     }

@@ -89,7 +89,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::once())
             ->method('handle')
             ->with($event);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(true);
@@ -189,7 +189,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = new TokenStorage();
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(true);
@@ -226,7 +226,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = new TokenStorage();
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(true);
@@ -262,7 +262,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener = $this->createMock(BaseContextListener::class);
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(false);

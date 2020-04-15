@@ -18,7 +18,7 @@ class NormalizeResultContext extends ApiContext
     private $errors;
 
     /**
-     * Whether any error happened during the processing of an action.
+     * Whether any error occurred when processing an action.
      *
      * @return bool
      */
@@ -28,7 +28,7 @@ class NormalizeResultContext extends ApiContext
     }
 
     /**
-     * Gets all errors happened during the processing of an action.
+     * Gets all errors occurred when processing an action.
      *
      * @return Error[]
      */

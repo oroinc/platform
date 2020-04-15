@@ -44,7 +44,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
         self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
     }
 
-    public function testTryToGetTestEntityForUserWitoutPermissionsToUserEntity()
+    public function testTryToGetTestEntityForUserWithoutPermissionsToUserEntity()
     {
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',
@@ -75,7 +75,7 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToGetTestEntityForUserWitoutPermissionsToMainEntity()
+    public function testTryToGetTestEntityForUserWithoutPermissionsToMainEntity()
     {
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',

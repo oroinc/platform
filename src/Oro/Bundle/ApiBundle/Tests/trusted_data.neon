@@ -30,6 +30,9 @@ trusted_data:
         Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery:
             process:
                 targetAssociationName: true
+        Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager:
+            updateOperation:
+                fieldName: true
 
     safe_methods:
         Oro\Bundle\ApiBundle\Util\DoctrineHelper:

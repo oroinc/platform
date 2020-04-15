@@ -150,6 +150,16 @@ class JobRunner
     }
 
     /**
+     * @param Job $rootJob
+     *
+     * @return JobRunner
+     */
+    public function getJobRunnerForChildJob(Job $rootJob)
+    {
+        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
+    }
+
+    /**
      * @param Job $job
      */
     private function throwIfJobIsStale($job)
@@ -160,16 +170,6 @@ class JobRunner
                 $job->getId()
             ));
         }
-    }
-
-    /**
-     * @param Job $rootJob
-     *
-     * @return JobRunner
-     */
-    private function getJobRunnerForChildJob(Job $rootJob)
-    {
-        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
     }
 
     /**
