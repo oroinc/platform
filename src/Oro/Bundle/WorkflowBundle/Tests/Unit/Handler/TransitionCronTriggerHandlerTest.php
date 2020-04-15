@@ -76,10 +76,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessException()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Trigger should be instance of Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger, ' .
-            'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger instace given'
-        );
+        $this->expectExceptionMessage(\sprintf(
+            'Cron trigger should be an instance of %s, %s instance given',
+            TransitionCronTrigger::class,
+            TransitionEventTrigger::class
+        ));
 
         $trigger = new TransitionEventTrigger();
 

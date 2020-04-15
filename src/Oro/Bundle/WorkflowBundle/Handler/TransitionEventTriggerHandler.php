@@ -10,6 +10,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
+/**
+ * This handler performs the actual processing of transition trigger messages produced by transition event triggers
+ */
 class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
 {
     /** @var WorkflowManager */
