@@ -18,7 +18,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->themeManager = $this->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
+        $this->themeManager = $this->getMockBuilder(ThemeManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -164,7 +164,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
     {
-        $theme = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
+        $theme = $this->createMock(Theme::class);
         $theme->expects($this->any())->method('getParentTheme')->willReturn($parent);
         $theme->expects($this->any())->method('getDirectory')->willReturn($directory);
         $theme->expects($this->any())->method('getPageTemplate')

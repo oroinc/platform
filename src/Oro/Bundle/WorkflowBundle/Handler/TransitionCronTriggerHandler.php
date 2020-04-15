@@ -14,6 +14,9 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
+/**
+ * This handler performs the actual processing of transition trigger messages produced by transition cron triggers
+ */
 class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
 {
     /** @var WorkflowManager */
@@ -22,9 +25,7 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     /** @var TransitionCronTriggerHelper */
     private $helper;
 
-    /**
-     * @var FeatureChecker
-     */
+    /** * @var FeatureChecker */
     private $featureChecker;
 
     /**
@@ -53,7 +54,7 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
         if (!$trigger instanceof TransitionCronTrigger) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Trigger should be instance of %s, %s instace given',
+                    'Cron trigger should be an instance of %s, %s instance given',
                     TransitionCronTrigger::class,
                     ClassUtils::getClass($trigger)
                 )
