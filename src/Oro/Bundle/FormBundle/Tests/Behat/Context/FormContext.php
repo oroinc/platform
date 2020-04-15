@@ -772,4 +772,15 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             throw $failureException;
         }
     }
+
+    /**
+     * @When /^(?:|I )upload "(?P<fileName>.*)" file to "(?P<fileElement>.*)"/
+     * @param string $fileName
+     * @param string $element
+     */
+    public function iUploadFileToElement(string $fileName, string $element)
+    {
+        $uploadFile = $this->createElement($element);
+        $uploadFile->setValue($fileName);
+    }
 }
