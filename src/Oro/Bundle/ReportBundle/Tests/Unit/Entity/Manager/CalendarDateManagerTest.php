@@ -39,6 +39,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleCalendarDatesWithoutAppending()
     {
+        $timezone = new \DateTimeZone('UTC');
         $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -48,8 +49,8 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManager')
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
-        $startDate = new \DateTime('first day of january');
-        $endDate = new \DateTime('tomorrow');
+        $startDate = new \DateTime('first day of january', $timezone);
+        $endDate = new \DateTime('tomorrow', $timezone);
         $entityManager
             ->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
             ->method('persist')
@@ -99,6 +100,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleCalendarDatesWithEmptyTable()
     {
+        $timezone = new \DateTimeZone('UTC');
         $repository = $this->getMockBuilder(CalendarDateRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -122,8 +124,8 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManager')
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
-        $startDate = new \DateTime('first day of january');
-        $endDate = new \DateTime('tomorrow');
+        $startDate = new \DateTime('first day of january', $timezone);
+        $endDate = new \DateTime('tomorrow', $timezone);
         $entityManager
             ->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
             ->method('persist')
