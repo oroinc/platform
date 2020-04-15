@@ -4,10 +4,12 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
 use Gaufrette\File;
 use Gaufrette\Filesystem;
+use Gaufrette\Stream;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Symfony\Component\Filesystem\Exception\IOException;
 
@@ -377,6 +379,39 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($content, $resultStream->read(100));
     }
 
+    /**
+     * @expectedException \Oro\Bundle\GaufretteBundle\Exception\FlushFailedException
+     * @expectedExceptionMessage Failed to flush data to the "test2.txt" file.
+     */
+    public function testWriteToStorageWhenFlushFailed()
+    {
+        $content = 'Test data';
+        $fileName = 'test2.txt';
+
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects($this->once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects($this->once())
+            ->method('write')
+            ->with($content);
+        $resultStream->expects($this->once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects($this->once())
+            ->method('close');
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        $this->fileManager->writeToStorage($content, $fileName);
+    }
+
     public function testWriteFileToStorage()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
@@ -421,8 +456,45 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $resultStream->seek(0);
         $this->assertStringEqualsFile($localFilePath, $resultStream->read(100));
         $this->assertTrue($result);
-        // double check if input stream is closed
+        // test that the input stream is closed
         $this->assertFalse($srcStream->cast(1));
+    }
+
+    public function testWriteStreamToStorageWhenFlushFailed()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/test.txt';
+        $fileName = 'test2.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects($this->once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects($this->once())
+            ->method('write')
+            ->with(file_get_contents($localFilePath));
+        $resultStream->expects($this->once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects($this->once())
+            ->method('close');
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects($this->once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        try {
+            $this->fileManager->writeStreamToStorage($srcStream, $fileName);
+            $this->fail('Expected FlushFailedException');
+        } catch (FlushFailedException $e) {
+            self::assertEquals('Failed to flush data to the "test2.txt" file.', $e->getMessage());
+            // test that the input stream is closed
+            $this->assertFalse($srcStream->cast(1));
+        }
     }
 
     public function testWriteStreamToStorageWithEmptyStreamAndAvoidWriteEmptyStream()
@@ -442,7 +514,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
 
         $this->assertFalse($result);
-        // double check if input stream is closed
+        // test that the input stream is closed
         $this->assertFalse($srcStream->cast(1));
     }
 
@@ -468,7 +540,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $resultStream->seek(0);
         $this->assertEmpty($resultStream->read(100));
         $this->assertTrue($result);
-        // double check if input stream is closed
+        // test that the input stream is closed
         $this->assertFalse($srcStream->cast(1));
     }
 
@@ -494,7 +566,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $resultStream->seek(0);
         $this->assertStringEqualsFile($localFilePath, $resultStream->read(100));
         $this->assertTrue($result);
-        // double check if input stream is closed
+        // test that the input stream is closed
         $this->assertFalse($srcStream->cast(1));
     }
 
@@ -515,7 +587,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testStreamWriteToTemporaryFile()
+    public function testWriteStreamToTemporaryFile()
     {
         $content = 'Test data';
 

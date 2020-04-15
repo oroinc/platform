@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Handler;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityIdMetadataAdapter;
@@ -66,7 +65,7 @@ class UnidirectionalAssociationHandler
         RequestType $requestType
     ): void {
         $entity = $form->getData();
-        $metadata = new EntityIdMetadataAdapter(ClassUtils::getClass($entity), $config);
+        $metadata = new EntityIdMetadataAdapter($this->doctrineHelper->getClass($entity), $config);
         foreach ($unidirectionalAssociations as $fieldName => $targetAssociationName) {
             $fieldForm = $form->get($fieldName);
             if (!FormUtil::isSubmittedAndValid($fieldForm)) {
@@ -159,7 +158,7 @@ class UnidirectionalAssociationHandler
         RequestType $requestType
     ): void {
         $entity = $form->getData();
-        $metadata = new EntityIdMetadataAdapter(ClassUtils::getClass($entity), $config);
+        $metadata = new EntityIdMetadataAdapter($this->doctrineHelper->getClass($entity), $config);
         foreach ($unidirectionalAssociations as $fieldName => $targetAssociationName) {
             $fieldForm = $form->get($fieldName);
             if (!FormUtil::isSubmittedAndValid($fieldForm)) {
@@ -208,7 +207,7 @@ class UnidirectionalAssociationHandler
         string $targetEntityClass,
         string $targetAssociationName
     ): void {
-        list($targetAssociationAdder, $targetAssociationRemover) = $this->getAdderAndRemover(
+        [$targetAssociationAdder, $targetAssociationRemover] = $this->getAdderAndRemover(
             $targetEntityClass,
             $targetAssociationName
         );

@@ -101,7 +101,10 @@
 
                         <fieldset class="form">
                             <div class="control-group-container import-file">
-                                {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
+                                {{ form_row(form.file, {
+                                    'label': 'oro.importexport.import.file',
+                                    'attr': {'data-validation-ignore-onblur': true}
+                                }) }}
                             </div>
                             <div class="control-group-container" {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
                                 {{ form_row(form.processorAlias, {

@@ -34,7 +34,7 @@ class CorsRequestTest extends RestJsonApiTestCase
             ]
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, POST, DELETE');
         self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
@@ -201,7 +201,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeaderNotExists($response, 'Access-Control-Max-Age');
         self::assertResponseHeader($response, 'Access-Control-Allow-Credentials', 'true');
-        self::assertResponseHeader($response, 'Allow', 'OPTIONS, GET, POST, DELETE');
+        self::assertResponseHeader($response, 'Allow', 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testOptionsAsCorsButNotPreflightRequestForItem()
@@ -332,7 +332,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         self::assertResponseHeaderNotExists($response, 'Access-Control-Expose-Headers');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Max-Age');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Credentials');
-        self::assertResponseHeader($response, 'Allow', 'OPTIONS, GET, POST, DELETE');
+        self::assertResponseHeader($response, 'Allow', 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testOptionsAsNotCorsRequestForItem()

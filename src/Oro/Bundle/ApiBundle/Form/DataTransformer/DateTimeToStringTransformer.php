@@ -186,7 +186,11 @@ class DateTimeToStringTransformer implements DataTransformerInterface
             $value .= ':00';
         }
 
-        return $this->convertToDateTime((new \DateTime())->setTimestamp(0)->format('Y-m-d\T') . $value . 'Z');
+        // Setting the timezone is important, otherwise timestamp 0 produces
+        // "1969-12-31" in GMT-x timezones, and "1970-01-01" in GMT+x timezones.
+        $beginningOfTime = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->setTimestamp(0);
+
+        return $this->convertToDateTime($beginningOfTime->format('Y-m-d\T') . $value . 'Z');
     }
 
     /**

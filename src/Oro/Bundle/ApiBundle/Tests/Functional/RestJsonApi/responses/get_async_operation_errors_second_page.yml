@@ -1,0 +1,19 @@
+data:
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-3'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/2/attributes/lastname
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-4'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/3/attributes/description

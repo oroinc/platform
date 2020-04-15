@@ -58,6 +58,8 @@ class RequestHandler
                 return $this->actionHandler->handleGetList($request);
             case Request::METHOD_POST:
                 return $this->actionHandler->handleCreate($request);
+            case Request::METHOD_PATCH:
+                return $this->actionHandler->handleUpdateList($request);
             case Request::METHOD_DELETE:
                 return $this->actionHandler->handleDeleteList($request);
             case Request::METHOD_OPTIONS:

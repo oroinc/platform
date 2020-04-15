@@ -62,7 +62,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -95,7 +95,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -140,7 +140,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -185,7 +185,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);

@@ -22,7 +22,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * Collects errors occurred during submit of forms for primary and included entities
+ * Collects errors occurred when submitting forms for primary and included entities
  * and adds them into the context.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

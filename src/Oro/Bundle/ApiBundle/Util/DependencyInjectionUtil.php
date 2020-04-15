@@ -15,7 +15,7 @@ class DependencyInjectionUtil
     /** the name of DIC tag for API processors */
     public const PROCESSOR_TAG = 'oro.api.processor';
 
-    /** the name of DIC parameter that is used to share ApiBundle configuration during building of DIC */
+    /** the name of DIC parameter that is used to share ApiBundle configuration when building DIC */
     private const API_BUNDLE_CONFIG_PARAMETER_NAME = 'oro_api.bundle_config';
 
     private const REQUEST_TYPE = ApiContext::REQUEST_TYPE;

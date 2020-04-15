@@ -15,6 +15,8 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
  */
 abstract class AbstractFileReader extends AbstractReader implements ClosableInterface
 {
+    public const DEFAULT_ENCODING = 'UTF-8';
+
     /** @var \SplFileInfo */
     protected $fileInfo;
 
@@ -90,6 +92,9 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
         $this->validateHeader();
         $this->validateColumnCount($data);
 
+        $this->convertEncoding($this->header);
+        $this->convertEncoding($data);
+
         return array_combine($this->header, $data);
     }
 
@@ -161,5 +166,26 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
 
             throw new InvalidItemException($errorMessage, $data);
         }
+    }
+
+    /**
+     * @param array $data
+     */
+    protected function convertEncoding(array &$data): void
+    {
+        foreach ($data as $key => $item) {
+            if (is_string($item) && !$this->validateEncoding($item)) {
+                $data[$key] = mb_convert_encoding($item, self::DEFAULT_ENCODING);
+            }
+        }
+    }
+
+    /**
+     * @param string $item
+     * @return bool
+     */
+    protected function validateEncoding(string $item): bool
+    {
+        return (boolean)mb_detect_encoding($item, self::DEFAULT_ENCODING, true);
     }
 }

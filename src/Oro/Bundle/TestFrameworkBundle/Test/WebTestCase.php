@@ -904,7 +904,7 @@ abstract class WebTestCase extends BaseWebTestCase
         return [
             'PHP_AUTH_USER' => $userName,
             'PHP_AUTH_PW' => $userPassword,
-            'PHP_AUTH_ORGANIZATION' => $userOrganization
+            'HTTP_PHP_AUTH_ORGANIZATION' => $userOrganization
         ];
     }
 

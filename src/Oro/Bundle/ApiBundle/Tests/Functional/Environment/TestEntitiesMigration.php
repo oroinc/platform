@@ -74,6 +74,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['name'], 'UNIQ_75FB65965E237E06');
         $table->addIndex(['business_unit_owner_id']);
         $table->addIndex(['organization_id']);
         $table->addForeignKeyConstraint(

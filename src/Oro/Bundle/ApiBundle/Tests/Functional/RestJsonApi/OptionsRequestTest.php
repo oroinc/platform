@@ -25,7 +25,7 @@ class OptionsRequestTest extends RestJsonApiTestCase
             $this->getListRouteName(),
             ['entity' => $entityType]
         );
-        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testOptionsMethodForToOneRelationshipRoute()

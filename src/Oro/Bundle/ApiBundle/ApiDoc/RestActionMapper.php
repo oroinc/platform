@@ -42,7 +42,8 @@ class RestActionMapper
                     ApiAction::OPTIONS,
                     ApiAction::GET_LIST,
                     ApiAction::DELETE_LIST,
-                    ApiAction::CREATE
+                    ApiAction::CREATE,
+                    ApiAction::UPDATE_LIST
                 ];
             case $this->routes->getSubresourceRouteName():
                 return [
@@ -104,6 +105,7 @@ class RestActionMapper
             case ApiAction::UPDATE:
             case ApiAction::UPDATE_SUBRESOURCE:
             case ApiAction::UPDATE_RELATIONSHIP:
+            case ApiAction::UPDATE_LIST:
                 return Request::METHOD_PATCH;
             case ApiAction::CREATE:
             case ApiAction::ADD_SUBRESOURCE:

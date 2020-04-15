@@ -1,0 +1,73 @@
+data:
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-1'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/0/attributes/title
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-2'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/1/attributes/name
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-3'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/2/attributes/lastname
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-4'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/3/attributes/description
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-5'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/3/attributes/name
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-6'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/3/attributes/name
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-7'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/1/attributes/title
+    -
+        type: asyncoperationerrors
+        id: '{operationId}-2-8'
+        attributes:
+            status: 400
+            title: 'not blank constraint'
+            detail: 'This value should not be blank.'
+            source:
+                pointer: /data/1/attributes/name

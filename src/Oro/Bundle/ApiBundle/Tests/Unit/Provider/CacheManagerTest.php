@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
@@ -27,12 +28,16 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCacheWarmer */
     private $resourcesCacheWarmer;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
+
     protected function setUp()
     {
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
         $this->configCacheWarmer = $this->createMock(ConfigCacheWarmer::class);
         $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
         $this->resourcesCacheWarmer = $this->createMock(ResourcesCacheWarmer::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
     }
 
     /**
@@ -52,7 +57,8 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
             $this->configCacheWarmer,
             $this->entityAliasResolverRegistry,
             $this->resourcesCacheWarmer,
-            $apiDocExtractor
+            $apiDocExtractor,
+            $this->configProvider
         );
     }
 
@@ -316,6 +322,10 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
         $cacheManager->addResettableService($resettableService);
 
+        $this->configProvider->expects(self::at(0))
+            ->method('disableFullConfigsCache');
+        $this->configProvider->expects(self::at(1))
+            ->method('enableFullConfigsCache');
         $apiDocExtractor->expects(self::exactly(2))
             ->method('warmUp')
             ->withConsecutive(['view1'], ['view2']);
@@ -332,6 +342,10 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
         $cacheManager->addResettableService($resettableService);
 
+        $this->configProvider->expects(self::at(0))
+            ->method('disableFullConfigsCache');
+        $this->configProvider->expects(self::at(1))
+            ->method('enableFullConfigsCache');
         $apiDocExtractor->expects(self::once())
             ->method('warmUp')
             ->with('view1');

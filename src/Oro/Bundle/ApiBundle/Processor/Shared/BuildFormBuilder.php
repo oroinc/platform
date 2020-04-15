@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -21,18 +21,26 @@ use Symfony\Component\Form\FormBuilderInterface;
 class BuildFormBuilder implements ProcessorInterface
 {
     /** @var FormHelper */
-    protected $formHelper;
+    private $formHelper;
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var bool */
-    protected $enableFullValidation;
+    private $enableFullValidation;
 
     /**
-     * @param FormHelper $formHelper
-     * @param bool       $enableFullValidation
+     * @param FormHelper     $formHelper
+     * @param DoctrineHelper $doctrineHelper
+     * @param bool           $enableFullValidation
      */
-    public function __construct(FormHelper $formHelper, bool $enableFullValidation = false)
-    {
+    public function __construct(
+        FormHelper $formHelper,
+        DoctrineHelper $doctrineHelper,
+        bool $enableFullValidation = false
+    ) {
         $this->formHelper = $formHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->enableFullValidation = $enableFullValidation;
     }
 
@@ -130,7 +138,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (\is_object($entity)) {
             $parentResourceClass = $config->getParentResourceClass();
             if ($parentResourceClass) {
-                $entityClass = ClassUtils::getClass($entity);
+                $entityClass = $this->doctrineHelper->getClass($entity);
                 if ($entityClass !== $dataClass && $entityClass === $parentResourceClass) {
                     $dataClass = $parentResourceClass;
                 }

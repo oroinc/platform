@@ -29,6 +29,9 @@ class ConfigProvider implements ResetInterface
     /** @var array */
     private $processing = [];
 
+    /** @var bool */
+    private $fullConfigsCacheDisabled = false;
+
     /**
      * @param ActionProcessorInterface $processor
      */
@@ -79,15 +82,15 @@ class ConfigProvider implements ResetInterface
             ));
         }
 
-        if (!$identifierFieldsOnly) {
-            return $this->loadConfig($className, $version, $requestType, $extras, false, $cacheKey);
+        if (!$identifierFieldsOnly && $this->fullConfigsCacheDisabled) {
+            return $this->loadConfig($className, $version, $requestType, $extras, $identifierFieldsOnly, $cacheKey);
         }
 
         if (\array_key_exists($cacheKey, $this->cache)) {
             return clone $this->cache[$cacheKey];
         }
 
-        $config = $this->loadConfig($className, $version, $requestType, $extras, true, $cacheKey);
+        $config = $this->loadConfig($className, $version, $requestType, $extras, $identifierFieldsOnly, $cacheKey);
         $this->cache[$cacheKey] = $config;
 
         return clone $config;
@@ -99,6 +102,16 @@ class ConfigProvider implements ResetInterface
     public function reset()
     {
         $this->cache = [];
+    }
+
+    public function enableFullConfigsCache(): void
+    {
+        $this->fullConfigsCacheDisabled = false;
+    }
+
+    public function disableFullConfigsCache(): void
+    {
+        $this->fullConfigsCacheDisabled = true;
     }
 
     /**
@@ -145,7 +158,7 @@ class ConfigProvider implements ResetInterface
 
         $config = $this->buildResult($context);
 
-        if ($identifierFieldsOnly) {
+        if ($identifierFieldsOnly || !$this->fullConfigsCacheDisabled) {
             $definition = $config->getDefinition();
             if (null !== $definition) {
                 $definition->setKey($this->buildConfigKey($className, $extras));

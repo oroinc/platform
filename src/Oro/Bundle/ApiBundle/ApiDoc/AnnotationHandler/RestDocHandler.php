@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
@@ -108,14 +109,19 @@ class RestDocHandler implements HandlerInterface
             $this->setDocumentation($annotation, $config);
             $this->setStatusCodes($annotation, $config);
 
-            $metadata = $context->getMetadata();
-            if (null !== $metadata) {
-                if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-                    $this->handleIdentifier($annotation, $route, $context, $config, $metadata, $associationName);
+            if (ApiAction::UPDATE_LIST === $action) {
+                $context = $this->contextProvider->getContext($action, AsyncOperation::class, null, $route);
+                $this->setOutput($annotation, $action, $context->getConfig(), $context->getMetadata());
+            } else {
+                $metadata = $context->getMetadata();
+                if (null !== $metadata) {
+                    if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                        $this->handleIdentifier($annotation, $route, $context, $config, $metadata, $associationName);
+                    }
+                    $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
+                    $this->setInputMetadata($annotation, $action, $config, $metadata);
+                    $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
                 }
-                $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-                $this->setInputMetadata($annotation, $action, $config, $metadata);
-                $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
             }
         }
     }
@@ -255,11 +261,26 @@ class RestDocHandler implements HandlerInterface
                 }
             }
 
-            ApiDocAnnotationUtil::setOutput(
-                $annotation,
-                $this->getDirectionValue($action, 'output', $config, $metadata)
-            );
+            $this->setOutput($annotation, $action, $config, $metadata);
         }
+    }
+
+    /**
+     * @param ApiDoc                 $annotation
+     * @param string                 $action
+     * @param EntityDefinitionConfig $config
+     * @param EntityMetadata         $metadata
+     */
+    private function setOutput(
+        ApiDoc $annotation,
+        $action,
+        EntityDefinitionConfig $config,
+        EntityMetadata $metadata
+    ) {
+        ApiDocAnnotationUtil::setOutput(
+            $annotation,
+            $this->getDirectionValue($action, 'output', $config, $metadata)
+        );
     }
 
     /**

@@ -257,7 +257,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccurs($withLogger)
+    public function testWhenExceptionOccurs(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -320,7 +320,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -362,9 +362,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         if (null !== $logger) {
             $logger->expects(self::never())
-                ->method('error');
+                ->method('info');
             $logger->expects(self::once())
-                ->method('info')
+                ->method('error')
                 ->with(
                     'An exception occurred in "processor1" processor.',
                     [
@@ -384,7 +384,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccurs($withLogger)
+    public function testWhenErrorOccurs(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -449,7 +449,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessor($withLogger)
+    public function testWhenErrorOccursInLastProcessor(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -512,7 +512,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -578,7 +578,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -672,7 +672,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndHasInitialErrors($withLogger)
+    public function testWhenExceptionOccursAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -737,7 +737,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors($withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -781,9 +781,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         if (null !== $logger) {
             $logger->expects(self::never())
-                ->method('error');
+                ->method('info');
             $logger->expects(self::once())
-                ->method('info')
+                ->method('error')
                 ->with(
                     'An exception occurred in "processor1" processor.',
                     [
@@ -803,7 +803,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndHasInitialErrors($withLogger)
+    public function testWhenErrorOccursAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -873,7 +873,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndHasInitialErrors($withLogger)
+    public function testWhenErrorOccursInLastProcessorAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -941,7 +941,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors($withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1012,7 +1012,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabledAndHasInitialErrors($withLogger)
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1081,7 +1081,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroup($withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1135,7 +1135,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1169,9 +1169,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 
         if (null !== $logger) {
             $logger->expects(self::never())
-                ->method('error');
+                ->method('info');
             $logger->expects(self::once())
-                ->method('info')
+                ->method('error')
                 ->with(
                     'An exception occurred in "processor10" processor.',
                     [
@@ -1191,7 +1191,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroup($withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1240,7 +1240,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {
@@ -1290,7 +1290,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenInternalPhpErrorOccursAndHasInitialErrors($withLogger)
+    public function testWhenInternalPhpErrorOccursAndHasInitialErrors(bool $withLogger)
     {
         $logger = null;
         if ($withLogger) {

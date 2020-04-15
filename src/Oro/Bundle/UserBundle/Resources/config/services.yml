@@ -67,11 +67,16 @@ services:
     oro_user.security.login_attempts_log_subscriber:
         class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsLogSubscriber
         arguments:
+            - '@oro_user.security.login_attempts_handler'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_user.security.login_attempts_handler:
+        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsHandler
+        arguments:
             - '@oro_user.manager'
             - '@oro_user.provider.user_logging_info_provider'
             - '@monolog.logger.oro_account_security'
-        tags:
-            - { name: kernel.event_subscriber }
 
     oro_user.user_menu:
         class: Oro\Bundle\UserBundle\Menu\UserMenuBuilder

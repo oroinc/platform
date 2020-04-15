@@ -24,6 +24,7 @@ services:
             - '@oro_segment.query_builder_registry'
             - '@oro_query_designer.query_designer.subquery_limit_helper'
             - '@oro_segment.segment_manager.cache'
+            - '@oro_security.acl_helper'
         calls:
             - ['setLogger', ['@?logger']]
 

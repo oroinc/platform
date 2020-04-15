@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Represents an error happened during the processing of an API action.
+ * Represents an error occurred when processing an API action.
  */
 class Error
 {

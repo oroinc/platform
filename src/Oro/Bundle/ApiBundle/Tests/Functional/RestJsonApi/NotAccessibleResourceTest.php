@@ -327,7 +327,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'OPTIONS, POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -372,7 +372,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -507,7 +507,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
@@ -1092,22 +1092,11 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
-    public function testPatchMethodForListPrimaryResourceRoute()
-    {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
-        );
-        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-    }
-
     public function testOptionsMethodForListPrimaryResourceRoute()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options($this->getListRouteName(), ['entity' => $entityType]);
-        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testHeadMethodForListPrimaryResourceRoute()
@@ -1117,7 +1106,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             'HEAD',
             $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, POST, DELETE');
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 

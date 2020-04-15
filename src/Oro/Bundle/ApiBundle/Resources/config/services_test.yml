@@ -45,6 +45,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: create, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
@@ -66,6 +67,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize }
             - { name: oro.api.processor, action: create, group: initialize }
             - { name: oro.api.processor, action: update, group: initialize }
+            - { name: oro.api.processor, action: update_list, group: initialize }
             - { name: oro.api.processor, action: get_subresource, group: initialize }
             - { name: oro.api.processor, action: get_relationship, group: initialize }
             - { name: oro.api.processor, action: delete_relationship, group: initialize }
@@ -203,6 +205,7 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: create, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -255 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -255 }
@@ -212,6 +215,11 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: -255 }
             - { name: oro.api.processor, action: options, group: initialize, priority: -255 }
+
+    oro_api.tests.initialize_shared_data_for_batch_update:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\InitializeSharedDataForBatchUpdate
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: -255 }
 
     oro_api.tests.assert_shared_data_exist_in_context:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertSharedDataExistInContext
@@ -238,3 +246,31 @@ services:
             - { name: oro.api.processor, action: customize_loaded_data, priority: 255 }
             - { name: oro.api.processor, action: customize_loaded_data, collection: true, priority: 255 }
             - { name: oro.api.processor, action: customize_form_data, priority: 255 }
+
+    oro_api.tests.assert_shared_data_exist_in_batch_update_item_context:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertSharedDataExistInBatchUpdateItemContext
+        tags:
+            - { name: oro.api.processor, action: batch_update_item, group: initialize, priority: 255 }
+
+    oro_api.tests.batch_update_exception_controller:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BatchUpdateExceptionController
+        public: true
+
+    oro_api.tests.throw_exception_in_batch_update:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\ThrowExceptionInBatchUpdate
+        arguments:
+            - '@oro_api.tests.batch_update_exception_controller'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: 255 }
+            - { name: oro.api.processor, action: batch_update, group: finalize, priority: 255 }
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -255 }
+            - { name: oro.api.processor, action: batch_update, group: save_errors, priority: 40 }
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, priority: -255 }
+
+    oro_api.tests.throw_exception_in_batch_update.before_flush:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\ThrowExceptionInBatchUpdate
+        arguments:
+            - '@oro_api.tests.batch_update_exception_controller'
+            - 'before_flush'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: 255 }

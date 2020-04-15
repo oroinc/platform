@@ -29,7 +29,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getManageableEntityClass')
             ->willReturnCallback(function ($className) {
                 return $className;

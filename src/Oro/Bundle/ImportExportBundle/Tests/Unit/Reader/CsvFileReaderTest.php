@@ -221,7 +221,17 @@ class CsvFileReaderTest extends TestCase
                     [],
                     ['after_new1', 'after_new2', 'after_new3'],
                 ]
-            ]
+            ],
+            [
+                ['filePath' => __DIR__ . '/fixtures/import_iso_8859_1.csv'],
+                [
+                    [
+                        'field_one' => '1',
+                        'field_two' => "Associ? ? Nom d'utilisateur",
+                        "Associ? ? Nom d'utilisateur" => '3',
+                    ]
+                ]
+            ],
         ];
     }
 
