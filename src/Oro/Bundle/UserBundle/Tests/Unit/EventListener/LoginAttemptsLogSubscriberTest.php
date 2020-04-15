@@ -77,7 +77,6 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->createMock(UsernamePasswordToken::class);
         $token->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
-        $token->expects($this->atLeastOnce())->method('getProviderKey')->willReturn('main');
 
         $event = new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class));
 
@@ -94,26 +93,6 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects($this->once())
             ->method('notice')
             ->with(LoginAttemptsLogSubscriber::UNSUCCESSFUL_LOGIN_MESSAGE, $userInfo);
-
-        $this->subscriber->onAuthenticationFailure($event);
-    }
-
-    public function testOnAuthenticationFailureWithWrongProviderName()
-    {
-        $user = 'some wrong username';
-
-        $token = $this->createMock(UsernamePasswordToken::class);
-        $token->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
-        $token->expects($this->atLeastOnce())->method('getProviderKey')->willReturn('frontend');
-
-        $event = new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class));
-
-        $this->userManager->expects($this->once())
-            ->method('findUserByUsernameOrEmail')
-            ->with($user)
-            ->willReturn(null);
-
-        $this->logger->expects($this->never())->method('notice');
 
         $this->subscriber->onAuthenticationFailure($event);
     }
