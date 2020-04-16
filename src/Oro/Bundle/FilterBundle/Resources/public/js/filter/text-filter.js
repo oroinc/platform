@@ -303,7 +303,7 @@ define(function(require, exports, module) {
             this.$(this.criteriaSelector).css({
                 marginLeft: 'auto',
                 visibility: 'visible'
-            });
+            }).removeAttr('aria-hidden');
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -349,7 +349,7 @@ define(function(require, exports, module) {
             this.$(this.criteriaSelector).css({
                 marginLeft: '-9999px',
                 visibility: 'hidden'
-            });
+            }).attr('aria-hidden', true);
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
