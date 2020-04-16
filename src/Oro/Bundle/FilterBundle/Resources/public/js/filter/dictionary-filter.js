@@ -55,7 +55,7 @@ define(function(require) {
          */
         criteriaValueSelectors: {
             type: 'input[type="hidden"]:last',
-            value: '.select-values-autocomplete'
+            value: 'input.select-values-autocomplete'
         },
 
         filterParams: null,
