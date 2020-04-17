@@ -215,7 +215,7 @@ class QueueConsumer
                 'time_taken' => $executionTime
             ];
             $this->addMemoryUsageInfo($loggerContext);
-            $logger->notice('Message processed: {status}. Execution time: {time_taken} ms', $loggerContext);
+            $logger->info('Message processed: {status}. Execution time: {time_taken} ms', $loggerContext);
 
             $extension->onPostReceived($context);
         } else {
