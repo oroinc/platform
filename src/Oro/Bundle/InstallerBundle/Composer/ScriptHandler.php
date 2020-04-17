@@ -58,7 +58,8 @@ class ScriptHandler
                 'private' => true,
             ];
         }
-        $filesystem->dumpFile('package.json', json_encode($packageJson, JSON_PRETTY_PRINT));
+        $filesystem
+            ->dumpFile('package.json', json_encode($packageJson, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . "\n");
 
         if (!$filesystem->exists('package-lock.json')) {
             // Creates lock file, installs assets.
