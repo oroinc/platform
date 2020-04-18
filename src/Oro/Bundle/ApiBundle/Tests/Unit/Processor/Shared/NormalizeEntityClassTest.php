@@ -37,6 +37,24 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->processor->process($this->context);
 
+        self::assertNull($this->context->getClassName());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWhenClassIsEmpty()
+    {
+        $this->context->setClassName('');
+        $this->processor->process($this->context);
+
+        self::assertSame('', $this->context->getClassName());
         self::assertEquals(
             [
                 Error::createValidationError(
@@ -50,27 +68,27 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
 
     public function testProcessWhenClassAlreadyNormalized()
     {
-        $this->context->setClassName('Test\Class');
-
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
+        $this->context->setClassName('Test\Class');
         $this->processor->process($this->context);
     }
 
     public function testProcess()
     {
-        $this->context->setClassName('test');
+        $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(true);
 
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
 
         self::assertSame('Test\Class', $this->context->getClassName());
@@ -81,29 +99,31 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
      */
     public function testProcessForNotAccessibleEntityType()
     {
-        $this->context->setClassName('test');
+        $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(false);
 
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
     }
 
     public function testProcessForInvalidEntityType()
     {
-        $this->context->setClassName('test');
+        $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willThrowException(new \Exception('some error'));
 
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getClassName());

@@ -22,10 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
 class NormalizeEntityClass implements ProcessorInterface
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
     /**
      * @param ValueNormalizer   $valueNormalizer
@@ -46,12 +46,10 @@ class NormalizeEntityClass implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$entityClass) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::ENTITY_TYPE,
-                    'The entity class must be set in the context.'
-                )
-            );
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                'The entity class must be set in the context.'
+            ));
 
             return;
         }
@@ -66,17 +64,13 @@ class NormalizeEntityClass implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (null !== $normalizedEntityClass) {
-            $context->setClassName($normalizedEntityClass);
-        } else {
-            $context->setClassName(null);
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::ENTITY_TYPE,
-                    sprintf('Unknown entity type: %s.', $entityClass),
-                    Response::HTTP_NOT_FOUND
-                )
-            );
+        $context->setClassName($normalizedEntityClass);
+        if (null === $normalizedEntityClass) {
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                sprintf('Unknown entity type: %s.', $entityClass),
+                Response::HTTP_NOT_FOUND
+            ));
         }
     }
 
@@ -85,9 +79,9 @@ class NormalizeEntityClass implements ProcessorInterface
      * @param string      $version
      * @param RequestType $requestType
      *
-     * @return string
+     * @return string|null
      */
-    protected function getEntityClass($entityType, $version, RequestType $requestType)
+    private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
     {
         $entityClass = ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
@@ -95,9 +89,10 @@ class NormalizeEntityClass implements ProcessorInterface
             $requestType,
             false
         );
-        if (null !== $entityClass
-            && !$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
-        ) {
+        if (!$entityClass) {
+            return null;
+        }
+        if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
             throw new ResourceNotAccessibleException();
         }
 

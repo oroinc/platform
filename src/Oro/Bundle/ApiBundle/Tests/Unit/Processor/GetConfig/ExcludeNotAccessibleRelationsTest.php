@@ -178,7 +178,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
         $this->resourcesProvider->expects(self::exactly(2))
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->willReturnMap(
                 [
                     ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
@@ -245,7 +245,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
         $this->resourcesProvider->expects(self::once())
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(false);
 
@@ -414,7 +414,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
         $this->resourcesProvider->expects(self::exactly(2))
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->willReturnMap([
                 ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
                 ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), true]
@@ -530,7 +530,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ]
             );
         $this->resourcesProvider->expects(self::exactly(2))
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->willReturnMap(
                 [
                     ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
@@ -656,7 +656,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->with('Test\Association1Target')
             ->willReturn('Test\Association1SubstituteTarget');
         $this->resourcesProvider->expects(self::once())
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->with('Test\Association1SubstituteTarget', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(true);
 
@@ -778,7 +778,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 ['Test\Association1Target1', 'Test\Association1SubstituteTarget1']
             ]);
         $this->resourcesProvider->expects(self::exactly(2))
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->willReturnMap([
                 ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
                 [

@@ -15,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ActionAvailabilityCheck implements ProcessorInterface
 {
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
     /**
      * @param ResourcesProvider $resourcesProvider
@@ -37,7 +37,7 @@ class ActionAvailabilityCheck implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (in_array($context->getAction(), $excludeActions, true)) {
+        if (\in_array($context->getAction(), $excludeActions, true)) {
             throw new ActionNotAllowedException();
         }
     }

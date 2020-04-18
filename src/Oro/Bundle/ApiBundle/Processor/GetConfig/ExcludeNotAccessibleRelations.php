@@ -186,14 +186,14 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
         $targetClass = $this->resolveEntityClass($targetMetadata->name, $entityOverrideProvider);
-        if ($this->resourcesProvider->isResourceAccessible($targetClass, $version, $requestType)) {
+        if ($this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType)) {
             return true;
         }
         if (!$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
-            foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
-                $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);
-                if ($this->resourcesProvider->isResourceAccessible($inheritedEntityClass, $version, $requestType)) {
+            foreach ($targetMetadata->subClasses as $subClass) {
+                $subClass = $this->resolveEntityClass($subClass, $entityOverrideProvider);
+                if ($this->resourcesProvider->isResourceAccessibleAsAssociation($subClass, $version, $requestType)) {
                     return true;
                 }
             }

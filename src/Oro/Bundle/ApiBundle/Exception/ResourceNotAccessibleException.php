@@ -10,10 +10,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ResourceNotAccessibleException extends NotFoundHttpException
 {
     /**
-     * {@inheritdoc}
+     * @param string $message
      */
-    public function __construct()
+    public function __construct(string $message = 'The resource is not accessible.')
     {
-        parent::__construct('The resource is not accessible.');
+        parent::__construct($message);
     }
 }

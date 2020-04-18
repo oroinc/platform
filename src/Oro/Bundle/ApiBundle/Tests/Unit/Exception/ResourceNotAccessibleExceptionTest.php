@@ -11,4 +11,11 @@ class ResourceNotAccessibleExceptionTest extends \PHPUnit\Framework\TestCase
         $exception = new ResourceNotAccessibleException();
         self::assertEquals('The resource is not accessible.', $exception->getMessage());
     }
+
+    public function testShouldSetCustomMessage()
+    {
+        $message = 'some message';
+        $exception = new ResourceNotAccessibleException($message);
+        self::assertEquals($message, $exception->getMessage());
+    }
 }
