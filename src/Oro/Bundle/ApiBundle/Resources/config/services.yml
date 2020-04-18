@@ -292,6 +292,7 @@ services:
             - [addResettableService, ['@oro_api.config_provider']]
             - [addResettableService, ['@oro_api.metadata_provider']]
             - [addResettableService, ['@oro_api.value_normalizer']]
+            - [addResettableService, ['@oro_api.config_bag_registry']]
             - [addResettableService, ['@oro_api.api_doc.filters_sorter_registry']]
 
     oro_api.config_bag_registry:
