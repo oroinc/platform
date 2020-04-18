@@ -122,7 +122,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     public function updateSecurityIdentity(SecurityIdentityInterface $sid, $oldName)
     {
         [$sql, $params, $types] = $this->getUpdateSecurityIdentitySql($sid, $oldName);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -136,7 +136,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         try {
             $this->deleteAcl($oid);
             [$sql, $params, $types] = $this->getDeleteClassIdSql($oid->getType());
-            $this->connection->executeQuery($sql, $params, $types);
+            $this->connection->executeUpdate($sql, $params, $types);
 
             $this->connection->commit();
         } catch (\Exception $failed) {
@@ -213,7 +213,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
             $pk = $this->retrieveObjectIdentityPrimaryKey($oid);
             [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $pk);
-            $this->connection->executeQuery($sql, $params, $types);
+            $this->connection->executeUpdate($sql, $params, $types);
 
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -281,7 +281,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
     {
         [$sql, $params, $types] = $this->getDeleteSecurityIdentityIdSql($sid);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -534,7 +534,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             // persist any changes to the acl_object_identities table
             if (count($sets) > 0) {
                 [$sql, $params, $types] = $this->getUpdateObjectIdentitySql($acl->getId(), $sets);
-                $this->connection->executeQuery($sql, $params, $types);
+                $this->connection->executeUpdate($sql, $params, $types);
             }
 
             $this->connection->commit();
@@ -574,7 +574,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
     {
         [$sql, $params, $types] = $this->getUpdateUserSecurityIdentitySql($usid, $oldUsername);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -1000,7 +1000,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $classId = $this->createOrRetrieveClassId($oid->getType());
 
         [$sql, $params, $types] = $this->getInsertObjectIdentitySql($oid->getIdentifier(), $classId, true);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -1020,7 +1020,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         [$insertSql, $insertParams, $insertTypes] = $this->getInsertClassSql($classType);
-        $this->connection->executeQuery($insertSql, $insertParams, $insertTypes);
+        $this->connection->executeUpdate($insertSql, $insertParams, $insertTypes);
 
         return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
@@ -1044,7 +1044,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         [$insertSql, $insertParams, $insertTypes] = $this->getInsertSecurityIdentitySql($sid);
-        $this->connection->executeQuery($insertSql, $insertParams, $insertTypes);
+        $this->connection->executeUpdate($insertSql, $insertParams, $insertTypes);
 
         return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
@@ -1057,7 +1057,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     private function deleteAccessControlEntries($oidPK)
     {
         [$sql, $params, $types] = $this->getDeleteAccessControlEntriesSql($oidPK);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -1068,7 +1068,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     private function deleteObjectIdentity($pk)
     {
         [$sql, $params, $types] = $this->getDeleteObjectIdentitySql($pk);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -1079,7 +1079,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     private function deleteObjectIdentityRelations($pk)
     {
         [$sql, $params, $types] = $this->getDeleteObjectIdentityRelationsSql($pk);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
     }
 
     /**
@@ -1091,14 +1091,14 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     {
         $pk = $acl->getId();
         [$sql, $params, $types] = $this->getDeleteObjectIdentityRelationsSql($pk);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
         [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $pk);
-        $this->connection->executeQuery($sql, $params, $types);
+        $this->connection->executeUpdate($sql, $params, $types);
 
         $parentAcl = $acl->getParentAcl();
         while (null !== $parentAcl) {
             [$sql, $params, $types] = $this->getInsertObjectIdentityRelationSql($pk, $parentAcl->getId());
-            $this->connection->executeQuery($sql, $params, $types);
+            $this->connection->executeUpdate($sql, $params, $types);
 
             $parentAcl = $parentAcl->getParentAcl();
         }
@@ -1146,7 +1146,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                         $ace->isAuditSuccess(),
                         $ace->isAuditFailure()
                     );
-                    $this->connection->executeQuery($sql, $params, $types);
+                    $this->connection->executeUpdate($sql, $params, $types);
 
                     [$sql, $params, $types] = $this->getSelectAccessControlEntryIdSql(
                         $classId,
@@ -1187,7 +1187,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             foreach ($old as $ace) {
                 if (!isset($currentIds[$ace->getId()])) {
                     [$sql, $params, $types] = $this->getDeleteAccessControlEntrySql($ace->getId());
-                    $this->connection->executeQuery($sql, $params, $types);
+                    $this->connection->executeUpdate($sql, $params, $types);
                     unset($this->loadedAces[$ace->getId()]);
                 }
             }
@@ -1237,7 +1237,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                     $ace->isAuditSuccess(),
                     $ace->isAuditFailure()
                 );
-                $this->connection->executeQuery($sql, $params, $types);
+                $this->connection->executeUpdate($sql, $params, $types);
 
                 [$sql, $params, $types] = $this->getSelectAccessControlEntryIdSql(
                     $classId,
@@ -1276,7 +1276,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         foreach ($old as $ace) {
             if (!isset($currentIds[$ace->getId()])) {
                 [$sql, $params, $types] = $this->getDeleteAccessControlEntrySql($ace->getId());
-                $this->connection->executeQuery($sql, $params, $types);
+                $this->connection->executeUpdate($sql, $params, $types);
                 unset($this->loadedAces[$ace->getId()]);
             }
         }
