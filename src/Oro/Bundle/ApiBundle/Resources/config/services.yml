@@ -292,6 +292,7 @@ services:
             - [addResettableService, ['@oro_api.config_provider']]
             - [addResettableService, ['@oro_api.metadata_provider']]
             - [addResettableService, ['@oro_api.value_normalizer']]
+            - [addResettableService, ['@oro_api.api_doc.filters_sorter_registry']]
 
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
@@ -644,6 +645,7 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
             - '@oro_api.api_doc.data_type_converter'
+            - '@oro_api.api_doc.filters_sorter_registry'
 
     oro_api.rest.doc_handler.status_codes:
         class: Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocStatusCodesHandler
@@ -660,6 +662,20 @@ services:
         arguments:
             - [] # default mapping. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
             - [] # view mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
+
+    oro_api.api_doc.filters_sorter_registry:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterRegistry
+        arguments:
+            - [] # sorters
+            - ~ # service locator
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.api_doc.filters_sorter.json_api:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Sorter\ByTemplateFiltersSorter
+        arguments:
+            - ['filter', 'fields', 'include', 'meta', 'page', 'sort']
+        tags:
+            - { name: oro.api.filters_sorter, requestType: json_api }
 
     oro_api.api_doc.security_context:
         class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext

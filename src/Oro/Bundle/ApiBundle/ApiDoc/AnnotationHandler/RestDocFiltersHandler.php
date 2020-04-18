@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterRegistry;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;
@@ -29,19 +30,25 @@ class RestDocFiltersHandler
     /** @var ApiDocDataTypeConverter */
     private $dataTypeConverter;
 
+    /** @var FiltersSorterRegistry */
+    private $sorterRegistry;
+
     /**
      * @param RestDocViewDetector     $docViewDetector
      * @param ValueNormalizer         $valueNormalizer
      * @param ApiDocDataTypeConverter $dataTypeConverter
+     * @param FiltersSorterRegistry   $sorterRegistry
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ValueNormalizer $valueNormalizer,
-        ApiDocDataTypeConverter $dataTypeConverter
+        ApiDocDataTypeConverter $dataTypeConverter,
+        FiltersSorterRegistry $sorterRegistry
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->valueNormalizer = $valueNormalizer;
         $this->dataTypeConverter = $dataTypeConverter;
+        $this->sorterRegistry = $sorterRegistry;
     }
 
     /**
@@ -80,8 +87,13 @@ class RestDocFiltersHandler
     private function sortFilters(ApiDoc $annotation)
     {
         $filters = $annotation->getFilters();
-        if (!empty($filters)) {
-            ksort($filters);
+        if (count($filters) > 1) {
+            $sorter = $this->sorterRegistry->getSorter($this->docViewDetector->getRequestType());
+            if (null === $sorter) {
+                ksort($filters);
+            } else {
+                $filters = $sorter->sortFilters($filters);
+            }
             ApiDocAnnotationUtil::setFilters($annotation, $filters);
         }
     }
