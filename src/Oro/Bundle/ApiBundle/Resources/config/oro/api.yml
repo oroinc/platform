@@ -3,6 +3,9 @@ api:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
             alias:        entityidentifier
             plural_alias: entityidentifiers
+        Oro\Bundle\ApiBundle\Batch\Model\BatchError:
+            alias:        asyncoperationerror
+            plural_alias: asyncoperationerrors
 
     entities:
         Oro\Bundle\ApiBundle\Model\EntityIdentifier:
@@ -19,4 +22,66 @@ api:
                 id:
                     data_type: string
             # this entity does not have own API resource
+            actions: false
+
+        Oro\Bundle\ApiBundle\Entity\AsyncOperation:
+            documentation_resource: '@OroApiBundle/Resources/doc/api/async_operation.md'
+            fields:
+                entityType:
+                    data_type: entityType
+                    property_path: entityClass
+                summary:
+                    depends_on: [ status ]
+                hasErrors:
+                    exclude: true
+                jobId:
+                    exclude: true
+                dataFileName:
+                    exclude: true
+                actionName:
+                    exclude: true
+            actions:
+                get:
+                    description: Get asynchronous operation
+                get_list: false
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+            subresources:
+                owner:
+                    actions:
+                        get_relationship: false
+                        get_subresource: false
+                organization:
+                    actions:
+                        get_relationship: false
+                        get_subresource: false
+                errors:
+                    target_class: Oro\Bundle\ApiBundle\Batch\Model\BatchError
+                    target_type: collection
+                    actions:
+                        get_subresource:
+                            description: Get errors occurred when processing an asynchronous operation
+                            disable_fieldset: true
+                            disable_inclusion: true
+                            disable_sorting: true
+
+        Oro\Bundle\ApiBundle\Batch\Model\BatchError:
+            documentation_resource: '@OroApiBundle/Resources/doc/api/async_operation.md'
+            disable_meta_properties: true
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: string
+                status:
+                    data_type: string
+                    property_path: statusCode
+                title:
+                    data_type: string
+                detail:
+                    data_type: string
+                source:
+                    data_type: object
+            # this entity is accessible only via "errors" sub-resource of the asynchronous operation resource
             actions: false

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -292,9 +291,10 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         if ($this->hasReferenceRepository()) {
             $idReferences = [];
             $doctrine = self::getContainer()->get('doctrine');
+            $doctrineHelper = $this->getDoctrineHelper();
             $references = $this->getReferenceRepository()->getReferences();
             foreach ($references as $referenceId => $entity) {
-                $entityClass = ClassUtils::getClass($entity);
+                $entityClass = $doctrineHelper->getClass($entity);
                 $entityType = $this->getEntityType($entityClass, false);
                 if ($entityType) {
                     $em = $doctrine->getManagerForClass($entityClass);

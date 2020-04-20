@@ -28,3 +28,9 @@ oro_api:
         allow_credentials: true
         allow_origins:
             - 'https://api.test.com'
+
+    batch_api:
+        chunk_size_per_entity:
+            Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: 3
+        included_data_chunk_size_per_entity:
+            Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: 5

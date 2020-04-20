@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
@@ -249,6 +252,7 @@ class ResourcesProvider implements ResetInterface
      * @param string      $cacheKey
      *
      * @return ApiResource[]
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function loadResources(string $version, RequestType $requestType, string $cacheKey): array
     {
@@ -274,12 +278,14 @@ class ResourcesProvider implements ResetInterface
             }
         }
         if (!$isResourcesMemoryCacheInitialized) {
+            // load data
             /** @var CollectResourcesContext $context */
             $context = $this->processor->createContext();
             $context->setVersion($version);
             $context->getRequestType()->set($requestType);
             $this->processor->process($context);
 
+            // prepare loaded data
             /** @var ApiResource[] $resources */
             $resources = array_values($context->getResult()->toArray());
             $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
@@ -295,15 +301,39 @@ class ResourcesProvider implements ResetInterface
                 }
             }
 
-            $this->resourcesCache->saveResources(
-                $version,
-                $requestType,
+            // add data to memory cache here because they can be requested by isResourceWithoutIdentifier method
+            $this->addResourcesToMemoryCache(
+                $cacheKey,
                 $resources,
                 $accessibleResources,
                 $excludedActions
             );
+
+            // exclude "update_list" action for resources without identifier
+            $actionsConfig = $context->get(AddExcludedActions::ACTIONS_CONFIG_KEY);
+            foreach ($resources as $resource) {
+                $entityClass = $resource->getEntityClass();
+                if (!\in_array(ApiAction::UPDATE_LIST, $resource->getExcludedActions(), true)
+                    && !$this->isActionEnabledInConfig($actionsConfig, $entityClass, ApiAction::UPDATE_LIST)
+                    && $this->isResourceWithoutIdentifier($entityClass, $version, $requestType)
+                ) {
+                    $resource->addExcludedAction(ApiAction::UPDATE_LIST);
+                    $excludedActions[$entityClass] = $resource->getExcludedActions();
+                }
+            }
+
+            // add data to memory cache
             $this->addResourcesToMemoryCache(
                 $cacheKey,
+                $resources,
+                $accessibleResources,
+                $excludedActions
+            );
+
+            // save data to the cache
+            $this->resourcesCache->saveResources(
+                $version,
+                $requestType,
                 $resources,
                 $accessibleResources,
                 $excludedActions
@@ -388,5 +418,26 @@ class ResourcesProvider implements ResetInterface
     private function getCacheKey(string $version, RequestType $requestType): string
     {
         return $version . (string)$requestType;
+    }
+
+    /**
+     * @param ActionsConfig[] $actionsConfig
+     * @param string          $entityClass
+     * @param string          $action
+     *
+     * @return bool
+     */
+    private function isActionEnabledInConfig(array $actionsConfig, string $entityClass, string $action): bool
+    {
+        if (!isset($actionsConfig[$entityClass])) {
+            return false;
+        }
+
+        $actionConfig = $actionsConfig[$entityClass]->getAction($action);
+        if (null === $actionConfig || !$actionConfig->hasExcluded()) {
+            return false;
+        }
+
+        return !$actionConfig->isExcluded();
     }
 }

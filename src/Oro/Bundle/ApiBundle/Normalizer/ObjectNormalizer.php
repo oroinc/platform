@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
@@ -199,7 +198,7 @@ class ObjectNormalizer
             throw new RuntimeException(sprintf(
                 'The exclusion policy must be "%s". Object type: "%s".',
                 ConfigUtil::EXCLUSION_POLICY_ALL,
-                ClassUtils::getClass($object)
+                $this->doctrineHelper->getClass($object)
             ));
         }
 
@@ -326,7 +325,7 @@ class ObjectNormalizer
                     } else {
                         throw new RuntimeException(sprintf(
                             'The entity "%s" does not have an identifier.',
-                            ClassUtils::getClass($value)
+                            $this->doctrineHelper->getClass($value)
                         ));
                     }
                 }
@@ -393,7 +392,7 @@ class ObjectNormalizer
     {
         return $object instanceof EntityIdentifier
             ? $object->getClass()
-            : ClassUtils::getClass($object);
+            : $this->doctrineHelper->getClass($object);
     }
 
     /**

@@ -1,0 +1,169 @@
+services:
+    oro_api.batch_update.processor:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\BatchUpdateProcessor
+        arguments:
+            - '@oro_api.processor_bag'
+            - batch_update
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: api }
+
+    #
+    # initialize
+    #
+
+    oro_api.batch_update.json_api.load_data_from_file:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\JsonApi\LoadDataFromFile
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, requestType: json_api, priority: -10 }
+
+    oro_api.batch_update.load_included_data:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\LoadIncludedData
+        arguments:
+            - '@oro_api.batch.include_accessor_registry'
+            - '@oro_api.batch.include_map_manager'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: -30 }
+
+    oro_api.batch_update.initialize_processed_item_statuses:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\InitializeProcessedItemStatuses
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: -50 }
+
+    oro_api.batch_update.add_included_data:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\AddIncludedData
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: -100 }
+
+    oro_api.batch_update.update_relationships_to_processed_included_entities:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\UpdateRelationshipsToProcessedIncludedEntities
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: initialize, priority: -110 }
+
+    #
+    # finalize
+    #
+
+    #
+    # save_data
+    #
+
+    oro_api.batch_update.convert_model_to_entity:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\ConvertModelToEntity
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: 150 }
+
+    oro_api.batch_update.persist_included_entities:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\PersistIncludedEntities
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: 10 }
+
+    oro_api.batch_update.flush_data:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\FlushData
+        arguments:
+            - '@oro_api.batch.flush_data_handler_factory_registry'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -10 }
+
+    oro_api.batch_update.collect_processed_included_entities:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\CollectProcessedIncludedEntities
+        arguments:
+            - '@oro_api.batch.include_map_manager'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -20 }
+
+    oro_api.batch_update.unlock_included_data:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\UnlockIncludedData
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -30 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the include index is unlocked even if an error occurred
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, failedGroup: save_data, priority: 255 }
+
+    oro_api.batch_update.update_summary_counters_after_flush:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\UpdateSummaryCounters
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -40 }
+
+    oro_api.batch_update.remove_entity_mapper:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\RemoveEntityMapper
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the entity mapper is removed from the context even if an error occurred
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, failedGroup: save_data, priority: 250 }
+
+    oro_api.batch_update.clear_flush_data_handler:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\ClearFlushDataHandler
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the flush data handler is cleared from the context even if an error occurred
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, failedGroup: save_data, priority: 250 }
+
+    #
+    # save_errors
+    #
+
+    oro_api.batch_update.json_api.complete_errors:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\CompleteErrors
+        arguments:
+            - '@oro_api.error_completer_registry'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_errors, requestType: json_api, priority: 100 }
+
+    oro_api.batch_update.json_api.complete_item_error_paths:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\JsonApi\CompleteItemErrorPaths
+        arguments:
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+            - { name: oro.api.processor, action: batch_update, group: save_errors, requestType: json_api, priority: 90 }
+
+    oro_api.batch_update.normalize_errors:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\NormalizeErrors
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_errors, priority: 80 }
+
+    oro_api.batch_update.update_summary_error_counter:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\UpdateSummaryErrorCounter
+        arguments:
+            - '@oro_api.batch.retry_helper'
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_errors, priority: 50 }
+
+    oro_api.batch_update.save_errors:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\SaveErrors
+        arguments:
+            - '@oro_api.batch.error_manager'
+            - '@oro_api.batch.retry_helper'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+            - { name: oro.api.processor, action: batch_update, group: save_errors, priority: -10 }
+
+    oro_api.batch_update.clear_batch_items:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\ClearBatchItems
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: save_errors, priority: -200 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the batch items are removed from the context even if an error occurred
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, failedGroup: save_data, priority: 240 }
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, failedGroup: save_errors, priority: 240 }
+
+    #
+    # normalize_result
+    #
+
+    oro_api.batch_update.check_for_unexpected_errors:
+        class: Oro\Bundle\ApiBundle\Batch\Processor\Update\CheckForUnexpectedErrors
+        tags:
+            - { name: oro.api.processor, action: batch_update, group: normalize_result, priority: 200 }

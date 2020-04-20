@@ -48,6 +48,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('services_api.yml');
         $loader->load('data_transformers.yml');
         $loader->load('filters.yml');
         $loader->load('form.yml');
@@ -66,12 +67,15 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.delete_list.yml');
         $loader->load('processors.create.yml');
         $loader->load('processors.update.yml');
+        $loader->load('processors.update_list.yml');
         $loader->load('processors.get_subresource.yml');
         $loader->load('processors.change_subresource.yml');
         $loader->load('processors.get_relationship.yml');
         $loader->load('processors.delete_relationship.yml');
         $loader->load('processors.add_relationship.yml');
         $loader->load('processors.update_relationship.yml');
+        $loader->load('processors.batch_update.yml');
+        $loader->load('processors.batch_update_item.yml');
         $loader->load('processors.not_allowed.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');

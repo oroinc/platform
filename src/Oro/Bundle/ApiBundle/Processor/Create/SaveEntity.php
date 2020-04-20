@@ -58,6 +58,7 @@ class SaveEntity implements ProcessorInterface
         }
 
         $em->persist($entity);
+
         try {
             $em->flush();
         } catch (UniqueConstraintViolationException $e) {

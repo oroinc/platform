@@ -20,4 +20,5 @@ final class ApiActionGroup
     public const NORMALIZE_DATA      = 'normalize_data';
     public const NORMALIZE_INPUT     = 'normalize_input';
     public const NORMALIZE_RESULT    = 'normalize_result';
+    public const SAVE_ERRORS         = 'save_errors';
 }

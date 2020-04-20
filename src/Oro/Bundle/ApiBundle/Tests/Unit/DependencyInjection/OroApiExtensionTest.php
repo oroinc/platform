@@ -1570,4 +1570,153 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             $apiConfig['api_firewalls']
         );
     }
+
+    public function testDefaultBatchApiConfiguration()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load([], $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'async_operation'                     => [
+                    'lifetime'                => 30,
+                    'cleanup_process_timeout' => 3600
+                ],
+                'chunk_size'                          => 100,
+                'chunk_size_per_entity'               => [],
+                'included_data_chunk_size'            => 50,
+                'included_data_chunk_size_per_entity' => []
+            ],
+            $apiConfig['batch_api']
+        );
+    }
+
+    public function testBatchApiConfiguration()
+    {
+        $container = $this->getContainer();
+
+        $configs = [
+            [
+                'batch_api' => [
+                    'chunk_size'               => 200,
+                    'included_data_chunk_size' => 2000
+                ]
+            ],
+            [
+                'batch_api' => [
+                    'async_operation'                     => [
+                        'lifetime' => 40
+                    ],
+                    'chunk_size_per_entity'               => [
+                        'Test\Entity1' => 10,
+                        'Test\Entity2' => null,
+                        'Test\Entity3' => null,
+                        'Test\Entity4' => 40
+                    ],
+                    'included_data_chunk_size_per_entity' => [
+                        'Test\Entity1' => 100,
+                        'Test\Entity2' => null,
+                        'Test\Entity3' => null,
+                        'Test\Entity4' => 400
+                    ]
+                ]
+            ],
+            [
+                'batch_api' => [
+                    'async_operation'                     => [
+                        'cleanup_process_timeout' => 3800
+                    ],
+                    'chunk_size_per_entity'               => [
+                        'Test\Entity1' => 15,
+                        'Test\Entity3' => 35,
+                        'Test\Entity5' => 50
+                    ],
+                    'included_data_chunk_size_per_entity' => [
+                        'Test\Entity1' => 150,
+                        'Test\Entity3' => 350,
+                        'Test\Entity5' => 500
+                    ]
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load($configs, $container);
+
+        $apiConfig = DependencyInjectionUtil::getConfig($container);
+        self::assertEquals(
+            [
+                'async_operation'                     => [
+                    'lifetime'                => 40,
+                    'cleanup_process_timeout' => 3800
+                ],
+                'chunk_size'                          => 200,
+                'chunk_size_per_entity'               => [
+                    'Test\Entity1' => 15,
+                    'Test\Entity3' => 35,
+                    'Test\Entity4' => 40,
+                    'Test\Entity5' => 50
+                ],
+                'included_data_chunk_size'            => 2000,
+                'included_data_chunk_size_per_entity' => [
+                    'Test\Entity1' => 150,
+                    'Test\Entity3' => 350,
+                    'Test\Entity4' => 400,
+                    'Test\Entity5' => 500
+                ]
+            ],
+            $apiConfig['batch_api']
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid configuration for path "oro_api.batch_api.chunk_size_per_entity.Test\Entity1": Expected int or NULL.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize()
+    {
+        $container = $this->getContainer();
+
+        $configs = [
+            [
+                'batch_api' => [
+                    'chunk_size_per_entity' => [
+                        'Test\Entity1' => '123'
+                    ]
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load($configs, $container);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid configuration for path "oro_api.batch_api.included_data_chunk_size_per_entity.Test\Entity1": Expected int or NULL.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize()
+    {
+        $container = $this->getContainer();
+
+        $configs = [
+            [
+                'batch_api' => [
+                    'included_data_chunk_size_per_entity' => [
+                        'Test\Entity1' => '123'
+                    ]
+                ]
+            ]
+        ];
+
+        $extension = new OroApiExtension();
+        $extension->load($configs, $container);
+    }
 }

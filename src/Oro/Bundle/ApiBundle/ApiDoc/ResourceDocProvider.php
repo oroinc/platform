@@ -38,6 +38,105 @@ class ResourceDocProvider
             'description'   => 'Update {name}',
             'documentation' => 'Update an entity'
         ],
+        ApiAction::UPDATE_LIST           => [
+            'description'   => 'Create or update a list of {name}',
+            // @codingStandardsIgnoreStart
+            'documentation' => <<<MARKDOWN
+Create or update a list of {singular_name|lower} records.
+
+The request is processed asynchronously, and the details of the corresponding asynchronous operation
+are returned in the response.
+
+**Note:** *The server may process records in any order regardless of the order
+in which they are specified in the request.*
+
+The input data for each record is the same as for the API resources to create or update
+a single {singular_name|lower} record.
+
+Example:
+
+```JSON
+{
+   "data": [
+      {
+          "type":"entityType",
+          "attributes": {...},
+          "relationships": {...}
+      },
+      {
+          "type":"entityType",
+          "attributes": {...},
+          "relationships": {...}
+       }
+   ]
+}
+```
+
+Use the **update** meta property to mark the records that should be updated.
+See [Creating and Updating Related Resources with Primary API Resource](https://doc.oroinc.com/api/create-update-related-resources/#creating-and-updating-related-resources-with-primary-api-resource)
+for more details about this meta property.
+
+Example:
+
+```JSON
+{
+   "data": [
+      {
+          "meta": {"update": true},
+          "type":"entityType",
+          "id": "1",
+          "attributes": {...},
+          "relationships": {...}
+      },
+      {
+          "meta": {"update": true},
+          "type":"entityType",
+          "id": "2",
+          "attributes": {...},
+          "relationships": {...}
+       }
+   ]
+}
+```
+
+The related entities can be created or updated when processing primary entities.
+The list of related entities should be specified in the **included** section
+that must be placed at the root level, the same as the **data** section.
+
+Example:
+
+```JSON
+{
+   "data": [
+      {
+          "type":"entityType",
+          "attributes": {...},
+          "relationships": {
+              "relation": {
+                  "data": {
+                      "type":"entityType1",
+                      "id": "included_entity_1"
+                  }
+              },
+              ...
+          }
+      },
+      ...
+   ],
+   "included": [
+       {
+          "type":"entityType1",
+          "id": "included_entity_1",
+          "attributes": {...},
+          "relationships": {...}
+      },
+      ...
+   ]
+}
+```
+MARKDOWN
+        // @codingStandardsIgnoreEnd
+        ],
         ApiAction::GET_SUBRESOURCE     => [
             'description'   => 'Get {association}',
             'documentation' => [

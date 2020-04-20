@@ -37,6 +37,9 @@ class CacheManager
     /** @var ApiDocExtractor */
     private $apiDocExtractor;
 
+    /** @var ConfigProvider */
+    private $configProvider;
+
     /** @var ResetInterface[] */
     private $resettableServices = [];
 
@@ -68,6 +71,14 @@ class CacheManager
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
         $this->resourcesCacheWarmer = $resourcesCacheWarmer;
         $this->apiDocExtractor = $apiDocExtractor;
+    }
+
+    /**
+     * @param ConfigProvider $configProvider
+     */
+    public function setConfigProvider(ConfigProvider $configProvider): void
+    {
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -161,13 +172,22 @@ class CacheManager
     public function warmUpApiDocCache($view = null)
     {
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
-            if ($view) {
-                $this->apiDocExtractor->warmUp($view);
-                $this->resetServices();
-            } else {
-                foreach ($this->apiDocViews as $currentView => $expr) {
-                    $this->apiDocExtractor->warmUp($currentView);
+            if (null !== $this->configProvider) {
+                $this->configProvider->disableFullConfigsCache();
+            }
+            try {
+                if ($view) {
+                    $this->apiDocExtractor->warmUp($view);
                     $this->resetServices();
+                } else {
+                    foreach ($this->apiDocViews as $currentView => $expr) {
+                        $this->apiDocExtractor->warmUp($currentView);
+                        $this->resetServices();
+                    }
+                }
+            } finally {
+                if (null !== $this->configProvider) {
+                    $this->configProvider->enableFullConfigsCache();
                 }
             }
         }
