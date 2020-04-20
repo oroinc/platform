@@ -31,22 +31,31 @@ class LoadAccessibleResources implements ProcessorInterface
         /** @var CollectResourcesContext $context */
 
         $accessibleResources = $context->getAccessibleResources();
-        if (!empty($accessibleResources)) {
-            // the accessible resources are already built
+        if ($accessibleResources) {
+            // accessible resources are already built
             return;
         }
 
+        $accessibleAsAssociationResources = $context->getAccessibleAsAssociationResources();
         $entityOverrideProvider = $this->entityOverrideProviderRegistry
             ->getEntityOverrideProvider($context->getRequestType());
         $resources = $context->getResult();
         foreach ($resources as $resource) {
-            $entityClass = $resource->getEntityClass();
-            if (!\in_array(ApiAction::GET, $resource->getExcludedActions(), true)
-                && null === $entityOverrideProvider->getSubstituteEntityClass($entityClass)
-            ) {
-                $accessibleResources[] = $entityClass;
+            $excludedActions = $resource->getExcludedActions();
+            if (!\in_array(ApiAction::GET, $excludedActions, true)) {
+                $entityClass = $resource->getEntityClass();
+                if (null === $entityOverrideProvider->getSubstituteEntityClass($entityClass)) {
+                    $accessibleResources[] = $entityClass;
+                    $accessibleAsAssociationResources[] = $entityClass;
+                }
+            } elseif (!\in_array(ApiAction::GET_LIST, $excludedActions, true)) {
+                $entityClass = $resource->getEntityClass();
+                if (null === $entityOverrideProvider->getSubstituteEntityClass($entityClass)) {
+                    $accessibleResources[] = $entityClass;
+                }
             }
         }
         $context->setAccessibleResources($accessibleResources);
+        $context->setAccessibleAsAssociationResources($accessibleAsAssociationResources);
     }
 }

@@ -43,8 +43,17 @@ class NormalizeEntityClass implements ProcessorInterface
         /** @var BatchUpdateItemContext $context */
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || false !== strpos($entityClass, '\\')) {
-            // an entity class does not exist in the context or it is already normalized
+        if (!$entityClass) {
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                'The entity class must be set in the context.'
+            ));
+
+            return;
+        }
+
+        if (false !== strpos($entityClass, '\\')) {
+            // the entity class is already normalized
             return;
         }
 
@@ -53,16 +62,12 @@ class NormalizeEntityClass implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType()
         );
-        if (null !== $normalizedEntityClass) {
-            $context->setClassName($normalizedEntityClass);
-        } else {
-            $context->setClassName(null);
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::ENTITY_TYPE,
-                    sprintf('Unknown entity type: %s.', $entityClass)
-                )
-            );
+        $context->setClassName($normalizedEntityClass);
+        if (null === $normalizedEntityClass) {
+            $context->addError(Error::createValidationError(
+                Constraint::ENTITY_TYPE,
+                sprintf('Unknown entity type: %s.', $entityClass)
+            ));
         }
     }
 
@@ -81,9 +86,10 @@ class NormalizeEntityClass implements ProcessorInterface
             $requestType,
             false
         );
-        if (null !== $entityClass
-            && !$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
-        ) {
+        if (!$entityClass) {
+            return null;
+        }
+        if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
             throw new ResourceNotAccessibleException();
         }
 

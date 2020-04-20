@@ -130,6 +130,42 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         return self::getContainer()->get('oro_api.tests.batch_update_exception_controller');
     }
 
+    public function testTryToSendUpdateListRequestWhenGetActionIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cpatch(
+            ['entity' => $entityType],
+            ['data' => [['type' => $entityType, 'attributes' => ['title' => 'New Department 1']]]],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
+    }
+
+    public function testTryToSendUpdateListRequestWhenBothCreateAndUpdateActionsAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['create' => false, 'update' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cpatch(
+            ['entity' => $entityType],
+            ['data' => [['type' => $entityType, 'attributes' => ['title' => 'New Department 1']]]],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
+    }
+
     public function testTryToSendUpdateListRequestWithoutCreatePermissionForAsyncOperationEntity()
     {
         $this->updateRolePermissions(

@@ -55,6 +55,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->createTestProductTable($schema);
         $this->createTestOrderTables($schema);
         $this->createTestOverrideClassEntityTables($schema);
+        $this->createTestMagazineTables($schema);
     }
 
     /**
@@ -757,5 +758,40 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
             $anotherTargetTable->getName(),
             true
         );
+    }
+
+    /**
+     * Create test_api_magazine and test_api_article tables
+     *
+     * @param Schema $schema
+     */
+    protected function createTestMagazineTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_article') || $schema->hasTable('test_api_magazine')) {
+            return;
+        }
+
+        $tableArticle = $schema->createTable('test_api_article');
+        $tableArticle->addColumn('id', 'integer', ['autoincrement' => true]);
+        $tableArticle->addColumn('headline', 'string', ['length' => 255]);
+        $tableArticle->addColumn('body', 'text', ['notnull' => false]);
+        $tableArticle->setPrimaryKey(['id']);
+
+        $tableMagazine = $schema->createTable('test_api_magazine');
+        $tableMagazine->addColumn('id', 'integer', ['autoincrement' => true]);
+        $tableMagazine->addColumn('name', 'string', ['length' => 255]);
+        $tableMagazine->addColumn('best_article_id', 'integer', ['notnull' => false]);
+        $tableMagazine->addIndex(['best_article_id']);
+        $tableMagazine->setPrimaryKey(['id']);
+        $tableMagazine->addForeignKeyConstraint($tableArticle, ['best_article_id'], ['id']);
+
+        $tableMagazineArticles = $schema->createTable('test_api_magazine_articles');
+        $tableMagazineArticles->addColumn('magazine_id', 'integer');
+        $tableMagazineArticles->addColumn('article_id', 'integer');
+        $tableMagazineArticles->setPrimaryKey(['magazine_id', 'article_id']);
+        $tableMagazineArticles->addIndex(['magazine_id']);
+        $tableMagazineArticles->addIndex(['article_id']);
+        $tableMagazineArticles->addForeignKeyConstraint($tableMagazine, ['magazine_id'], ['id']);
+        $tableMagazineArticles->addForeignKeyConstraint($tableArticle, ['article_id'], ['id']);
     }
 }

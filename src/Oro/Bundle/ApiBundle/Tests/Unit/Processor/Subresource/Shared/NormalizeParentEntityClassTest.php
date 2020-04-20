@@ -37,6 +37,24 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
     {
         $this->processor->process($this->context);
 
+        self::assertNull($this->context->getParentClassName());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The parent entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWhenParentClassNameIsEmpty()
+    {
+        $this->context->setParentClassName('');
+        $this->processor->process($this->context);
+
+        self::assertSame('', $this->context->getParentClassName());
         self::assertEquals(
             [
                 Error::createValidationError(
@@ -50,27 +68,27 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
 
     public function testProcessWhenParentClassAlreadyNormalized()
     {
-        $this->context->setParentClassName('Test\Class');
-
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
+        $this->context->setParentClassName('Test\Class');
         $this->processor->process($this->context);
     }
 
     public function testConvertParentEntityTypeToEntityClass()
     {
-        $this->context->setParentClassName('test');
+        $parentEntityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($parentEntityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
         $this->resourcesProvider->expects(self::once())
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(true);
 
+        $this->context->setParentClassName($parentEntityType);
         $this->processor->process($this->context);
 
         self::assertSame('Test\Class', $this->context->getParentClassName());
@@ -81,29 +99,31 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
      */
     public function testProcessForNotAccessibleParentEntityType()
     {
-        $this->context->setParentClassName('test');
+        $parentEntityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($parentEntityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
         $this->resourcesProvider->expects(self::once())
-            ->method('isResourceAccessible')
+            ->method('isResourceAccessibleAsAssociation')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(false);
 
+        $this->context->setParentClassName($parentEntityType);
         $this->processor->process($this->context);
     }
 
     public function testProcessForInvalidParentEntityType()
     {
-        $this->context->setParentClassName('test');
+        $parentEntityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($parentEntityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willThrowException(new \Exception('some error'));
 
+        $this->context->setParentClassName($parentEntityType);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getParentClassName());

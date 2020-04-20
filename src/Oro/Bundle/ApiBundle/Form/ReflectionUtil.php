@@ -61,6 +61,8 @@ class ReflectionUtil
 
     /**
      * Marks all children of the given form as submitted.
+     * Not submitted compound forms with "required" option equals to FALSE will not be marked as submitted
+     * to avoid validation of child forms.
      *
      * @param FormInterface             $form
      * @param PropertyAccessorInterface $propertyAccessor
@@ -73,7 +75,8 @@ class ReflectionUtil
             if (!$child instanceof Form) {
                 continue;
             }
-            if (!$child->isSubmitted()) {
+            $hasChildren = ($child->count() > 0);
+            if (!$child->isSubmitted() && (!$hasChildren || $child->getConfig()->getRequired())) {
                 $markClosure = \Closure::bind(
                     function ($form, $data) {
                         $form->submitted = true;
@@ -84,7 +87,7 @@ class ReflectionUtil
                 );
                 $markClosure($child, self::getDataForSubmittedForm($child, $propertyAccessor));
             }
-            if ($child->count() > 0) {
+            if ($hasChildren) {
                 self::markFormChildrenAsSubmitted($child, $propertyAccessor);
             }
         }

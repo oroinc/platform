@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * A storage for configuration of all registered API resources.
  */
-class ConfigBag implements ConfigBagInterface
+class ConfigBag implements ConfigBagInterface, ResetInterface
 {
     private const ENTITIES = 'entities';
 
@@ -33,7 +35,13 @@ class ConfigBag implements ConfigBagInterface
      */
     public function getClassNames(string $version): array
     {
-        return \array_keys($this->findConfigs($version));
+        $this->ensureInitialized();
+
+        if (!isset($this->config[self::ENTITIES])) {
+            return [];
+        }
+
+        return array_keys($this->config[self::ENTITIES]);
     }
 
     /**
@@ -41,44 +49,20 @@ class ConfigBag implements ConfigBagInterface
      */
     public function getConfig(string $className, string $version): ?array
     {
-        return $this->findConfig($className, $version);
+        $this->ensureInitialized();
+
+        return $this->config[self::ENTITIES][$className] ?? null;
     }
 
     /**
-     * @param string $version
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    private function findConfigs($version)
+    public function reset()
     {
-        $this->ensureInitialized();
-
-        if (!isset($this->config[self::ENTITIES])) {
-            return [];
-        }
-
-        return $this->config[self::ENTITIES];
+        $this->config = null;
     }
 
-    /**
-     * @param string $className
-     * @param string $version
-     *
-     * @return array|null
-     */
-    private function findConfig($className, $version)
-    {
-        $this->ensureInitialized();
-
-        if (!isset($this->config[self::ENTITIES][$className])) {
-            // no config for the requested class
-            return null;
-        }
-
-        return $this->config[self::ENTITIES][$className];
-    }
-
-    private function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null === $this->config) {
             $this->config = $this->configCache->getConfig($this->configFile);

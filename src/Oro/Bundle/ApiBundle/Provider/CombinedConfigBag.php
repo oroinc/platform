@@ -3,18 +3,22 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The API resources configuration bag that collects the configuration
  * from all child configuration bags and returns the merged version of the configuration.
  */
-class CombinedConfigBag implements ConfigBagInterface
+class CombinedConfigBag implements ConfigBagInterface, ResetInterface
 {
     /** @var ConfigBagInterface[] */
     private $configBags;
 
     /** @var EntityConfigMerger */
     private $entityConfigMerger;
+
+    /** @var array [class name + version => config, ...] */
+    private $cache = [];
 
     /**
      * @param ConfigBagInterface[] $configBags
@@ -46,28 +50,49 @@ class CombinedConfigBag implements ConfigBagInterface
      */
     public function getConfig(string $className, string $version): ?array
     {
+        $cacheKey = $className . '|' . $version;
+        if (\array_key_exists($cacheKey, $this->cache)) {
+            return $this->cache[$cacheKey];
+        }
+
         $configs = [];
         foreach ($this->configBags as $configBag) {
             $config = $configBag->getConfig($className, $version);
-            if (!empty($config)) {
+            if ($config) {
                 $configs[] = $config;
             }
         }
-        $count = \count($configs);
-        if (0 === $count) {
-            return null;
-        }
-        if (1 === $count) {
-            return $configs[0];
+
+        $result = null;
+        if ($configs) {
+            $count = count($configs);
+            if (1 === $count) {
+                $result = $configs[0];
+            } else {
+                $index = $count - 1;
+                $result = $configs[$index];
+                while ($index > 0) {
+                    $index--;
+                    $result = $this->entityConfigMerger->merge($configs[$index], $result);
+                }
+            }
         }
 
-        $index = \count($configs) - 1;
-        $result = $configs[$index];
-        while ($index > 0) {
-            $index--;
-            $result = $this->entityConfigMerger->merge($configs[$index], $result);
-        }
+        $this->cache[$cacheKey] = $result;
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        foreach ($this->configBags as $configBag) {
+            if ($configBag instanceof ResetInterface) {
+                $configBag->reset();
+            }
+        }
+        $this->cache = [];
     }
 }

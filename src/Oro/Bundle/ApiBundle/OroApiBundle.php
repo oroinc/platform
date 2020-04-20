@@ -95,6 +95,10 @@ class OroApiBundle extends Bundle
             'oro.api.documentation_provider'
         ));
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.api_doc.filters_sorter_registry',
+            'oro.api.filters_sorter'
+        ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
             'oro_api.rest.routes_registry',
             'oro.api.rest_routes'
         ));

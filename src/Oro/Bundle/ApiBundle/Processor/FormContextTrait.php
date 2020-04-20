@@ -22,6 +22,9 @@ trait FormContextTrait
     /** @var IncludedEntityCollection|null */
     private $includedEntities;
 
+    /** @var array [entity hash => entity, ...] */
+    private $additionalEntities = [];
+
     /** @var EntityMapper|null */
     private $entityMapper;
 
@@ -92,6 +95,39 @@ trait FormContextTrait
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
     {
         $this->includedEntities = $includedEntities;
+    }
+
+    /**
+     * Gets the list of additional entities involved to the request processing.
+     *
+     * @return object[]
+     */
+    public function getAdditionalEntities(): array
+    {
+        return array_values($this->additionalEntities);
+    }
+
+    /**
+     * Adds the entity to a list of additional entities involved to the request processing.
+     * For example when an association is represented as a field,
+     * a target entity of this association does not exist in the list of included entities
+     * and need to be persisted manually, so, it should be added to the list of additional entities.
+     *
+     * @param object $entity
+     */
+    public function addAdditionalEntity($entity): void
+    {
+        $this->additionalEntities[spl_object_hash($entity)] = $entity;
+    }
+
+    /**
+     * Removes an entity from the list of additional entities involved to the request processing.
+     *
+     * @param object $entity
+     */
+    public function removeAdditionalEntity($entity): void
+    {
+        unset($this->additionalEntities[spl_object_hash($entity)]);
     }
 
     /**

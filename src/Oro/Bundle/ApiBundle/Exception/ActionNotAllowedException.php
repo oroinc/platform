@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -9,8 +10,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ActionNotAllowedException extends HttpException
 {
-    public function __construct()
+    /**
+     * @param string $message
+     */
+    public function __construct(string $message = 'The action is not allowed.')
     {
-        parent::__construct(405, 'The action is not allowed.');
+        parent::__construct(Response::HTTP_METHOD_NOT_ALLOWED, $message);
     }
 }

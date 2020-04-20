@@ -15,6 +15,9 @@ class CollectResourcesContext extends ApiContext
     /** @var string[] */
     private $accessibleResources = [];
 
+    /** @var string[] */
+    private $accessibleAsAssociationResources = [];
+
     /**
      * {@inheritdoc}
      */
@@ -29,7 +32,7 @@ class CollectResourcesContext extends ApiContext
      *
      * @return string[] The list of class names
      */
-    public function getAccessibleResources()
+    public function getAccessibleResources(): array
     {
         return $this->accessibleResources;
     }
@@ -39,8 +42,28 @@ class CollectResourcesContext extends ApiContext
      *
      * @param string[] $classNames
      */
-    public function setAccessibleResources(array $classNames)
+    public function setAccessibleResources(array $classNames): void
     {
         $this->accessibleResources = $classNames;
+    }
+
+    /**
+     * Gets a list of resources accessible as an association in API.
+     *
+     * @return string[] The list of class names
+     */
+    public function getAccessibleAsAssociationResources(): array
+    {
+        return $this->accessibleAsAssociationResources;
+    }
+
+    /**
+     * Sets a list of resources accessible as an association in API.
+     *
+     * @param string[] $classNames
+     */
+    public function setAccessibleAsAssociationResources(array $classNames): void
+    {
+        $this->accessibleAsAssociationResources = $classNames;
     }
 }
