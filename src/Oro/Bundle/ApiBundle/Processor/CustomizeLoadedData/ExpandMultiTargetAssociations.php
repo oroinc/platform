@@ -437,7 +437,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     ): ?array {
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-        if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
+        if (!$this->resourcesProvider->isResourceAccessibleAsAssociation($entityClass, $version, $requestType)) {
             return null;
         }
 

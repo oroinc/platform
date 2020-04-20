@@ -15,7 +15,7 @@ api:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
             fields:
                 emails:
-                    data_type: array
+                    data_type: objects
                     exclusion_policy: all
                     fields:
                         email: ~

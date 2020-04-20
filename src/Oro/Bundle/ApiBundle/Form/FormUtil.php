@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -13,6 +15,22 @@ use Symfony\Component\Validator\ConstraintViolation;
  */
 class FormUtil
 {
+    /**
+     * Gets API context within the given form is processed.
+     *
+     * @param FormInterface $form
+     *
+     * @return FormContext|null
+     */
+    public static function getApiContext(FormInterface $form): ?FormContext
+    {
+        $context = $form->getRoot()->getConfig()->getOption(CustomizeFormDataHandler::API_CONTEXT);
+
+        return $context instanceof FormContext
+            ? $context
+            : null;
+    }
+
     /**
      * Checks whether the form is submitted and does not have errors.
      *

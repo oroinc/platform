@@ -216,6 +216,134 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
         $this->assertResponseContains($responseContent, $response);
     }
 
+    public function testTryToCreateEntityWithoutTypeInRequestData()
+    {
+        $operationId = $this->processUpdateList(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ],
+            false
+        );
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 400,
+                'title'  => 'entity type constraint',
+                'detail' => 'The entity class must be set in the context.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToCreateEntityWhenCreateActionDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['create' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->processUpdateList(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ],
+            false
+        );
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToCreateEntityWhenCreateActionDisabledAfterUpdateListRequestWasAlreadySent()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->sendUpdateListRequest(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ]
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['create' => false]],
+            true
+        );
+        $this->processUpdateListChunkMessages();
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToCreateEntityWhenGetActionDisabledAfterUpdateListRequestWasAlreadySent()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->sendUpdateListRequest(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ]
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get' => false]],
+            true
+        );
+        $this->processUpdateListChunkMessages();
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToCreateAndUpdateEntitiesWithoutCreatePermission()
     {
         $this->updateRolePermissions(
@@ -383,6 +511,142 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    public function testTryToUpdateEntityWithoutTypeInRequestData()
+    {
+        $operationId = $this->processUpdateList(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'meta'       => ['update' => true],
+                        'id'         => '1',
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ],
+            false
+        );
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 400,
+                'title'  => 'entity type constraint',
+                'detail' => 'The entity class must be set in the context.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToUpdateEntityWhenUpdateActionDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['update' => false]],
+            true
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->processUpdateList(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'meta'       => ['update' => true],
+                        'type'       => $entityType,
+                        'id'         => '1',
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ],
+            false
+        );
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToUpdateEntityWhenUpdateActionDisabledAfterUpdateListRequestWasAlreadySent()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->sendUpdateListRequest(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'meta'       => ['update' => true],
+                        'type'       => $entityType,
+                        'id'         => '1',
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ]
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['update' => false]],
+            true
+        );
+        $this->processUpdateListChunkMessages();
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToUpdateEntityWhenGetActionDisabledAfterUpdateListRequestWasAlreadySent()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $operationId = $this->sendUpdateListRequest(
+            TestDepartment::class,
+            [
+                'data' => [
+                    [
+                        'meta'       => ['update' => true],
+                        'type'       => $entityType,
+                        'id'         => '1',
+                        'attributes' => ['name' => 'Updated Department']
+                    ]
+                ]
+            ]
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get' => false]],
+            true
+        );
+        $this->processUpdateListChunkMessages();
+
+        $this->assertAsyncOperationError(
+            [
+                'id'     => $operationId . '-1-1',
+                'status' => 405,
+                'title'  => 'action not allowed exception',
+                'detail' => 'The action is not allowed.',
+                'source' => ['pointer' => '/data/0']
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToUpdateEntityWithoutIdInRequestData()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
@@ -506,7 +770,6 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 
     public function testTryToCreateEntitiesWhenRequestDataContainsEntityForWhichUpdateListActionIsNotEnabled()
     {
-        $entityType = $this->getEntityType(TestDepartment::class);
         $anotherEntityType = $this->getEntityType(TestProductType::class);
         $operationId = $this->processUpdateList(
             TestDepartment::class,

@@ -39,7 +39,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAccessibleResources()
     {
-        $cachedData = [null, ['Test\Entity1', 'Test\Entity2']];
+        $cachedData = [null, ['Test\Entity1' => 0, 'Test\Entity2' => 1, 'Test\Entity3' => 3]];
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -145,9 +145,9 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         $resource3->setExcludedActions(['create']);
 
         $accessibleResources = [
-            'Test\Entity1' => true,
-            'Test\Entity2' => false,
-            'Test\Entity3' => true
+            'Test\Entity1' => 0,
+            'Test\Entity2' => 1,
+            'Test\Entity3' => 3
         ];
         $excludedActions = [
             'Test\Entity2' => ['get', 'get_list'],

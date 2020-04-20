@@ -118,7 +118,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondResolver, $registry->getEntityAliasResolver($requestType));
     }
 
-    public function testGetEntityAliasResolverShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetEntityAliasResolverShouldReturnDefaultResolverIfSpecificResolverNotFound()
     {
         $registry = $this->getRegistry(
             [

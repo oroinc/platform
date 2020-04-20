@@ -50,6 +50,24 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getIncludedEntities());
     }
 
+    public function testAdditionalEntities()
+    {
+        self::assertSame([], $this->context->getAdditionalEntities());
+
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+
+        $this->context->addAdditionalEntity($entity1);
+        $this->context->addAdditionalEntity($entity2);
+        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+
+        $this->context->addAdditionalEntity($entity1);
+        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+
+        $this->context->removeAdditionalEntity($entity1);
+        self::assertSame([$entity2], $this->context->getAdditionalEntities());
+    }
+
     public function testEntityMapper()
     {
         $entityMapper = $this->createMock(EntityMapper::class);

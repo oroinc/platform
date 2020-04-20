@@ -113,6 +113,7 @@ oro_api:
         money_value: money
         duration: integer
         entityType: string
+        objects: array of objects
 
     api_doc_cache:
         excluded_features: [ web_api ]
@@ -224,8 +225,6 @@ oro_api:
         - Oro\Bundle\ApiBundle\Form\Type\ArrayType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
-        - Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
-        - Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
         - Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
     form_type_extensions:

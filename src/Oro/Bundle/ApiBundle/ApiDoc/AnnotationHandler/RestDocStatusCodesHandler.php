@@ -17,7 +17,7 @@ class RestDocStatusCodesHandler
     public function handle(ApiDoc $annotation, StatusCodesConfig $statusCodes)
     {
         $codes = $statusCodes->getCodes();
-        \ksort($codes);
+        ksort($codes);
         foreach ($codes as $statusCode => $code) {
             if (!$code->isExcluded()) {
                 $annotation->addStatusCode($statusCode, $code->getDescription());

@@ -37,6 +37,32 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getClassName());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWhenClassIsEmpty()
+    {
+        $this->context->setClassName('');
+        $this->processor->process($this->context);
+
+        self::assertSame('', $this->context->getClassName());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
     }
 
     public function testProcessWhenClassAlreadyNormalized()
@@ -52,16 +78,18 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenEntityClassIsNotNormalized()
     {
+        $entityType = 'test';
+
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Entity');
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(true);
 
-        $this->context->setClassName('entity');
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
 
         self::assertEquals('Test\Entity', $this->context->getClassName());
@@ -72,33 +100,37 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
      */
     public function testProcessForNotAccessibleEntityType()
     {
+        $entityType = 'test';
+
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Entity');
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessible')
             ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(false);
 
-        $this->context->setClassName('entity');
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
     }
 
     public function testProcessForInvalidEntityType()
     {
+        $entityType = 'test';
+
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willThrowException(new \Exception('some error'));
 
-        $this->context->setClassName('entity');
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getClassName());
         self::assertEquals(
             [
-                Error::createValidationError('entity type constraint', 'Unknown entity type: entity.')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: test.')
             ],
             $this->context->getErrors()
         );
