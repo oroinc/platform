@@ -274,3 +274,55 @@ services:
             - 'before_flush'
         tags:
             - { name: oro.api.processor, action: batch_update, group: save_data, priority: 255 }
+
+    oro_api.tests.set_identifier_generator_for_test_model:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetIdentifierGeneratorForTestModel
+        tags:
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1, priority: -20 }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2, priority: -20 }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1, priority: -20 }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel2, priority: -20 }
+
+    oro_api.tests.load_test_magazine_model_1:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestMagazineModel1
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1 }
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1 }
+
+    oro_api.tests.load_test_magazine_model_2:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestMagazineModel2
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
+
+    oro_api.tests.save_new_test_magazine_model_1:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SaveNewTestMagazineModel1
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1 }
+
+    oro_api.tests.save_new_test_magazine_model_2:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SaveNewTestMagazineModel2
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
+
+    oro_api.tests.save_existing_test_magazine_model_1:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SaveExistingTestMagazineModel1
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1 }
+
+    oro_api.tests.save_existing_test_magazine_model_2:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SaveExistingTestMagazineModel2
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }

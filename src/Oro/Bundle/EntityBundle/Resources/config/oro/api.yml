@@ -35,7 +35,7 @@ api:
                 icon:
                     data_type: string
                 fields:
-                    data_type: array
+                    data_type: objects
                     target_class: Oro\Bundle\EntityBundle\Model\EntityFieldStructure
                     target_type: collection
                     fields:

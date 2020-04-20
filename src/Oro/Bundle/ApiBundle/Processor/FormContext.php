@@ -56,6 +56,30 @@ interface FormContext extends ContextInterface
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null);
 
     /**
+     * Gets the list of additional entities involved to the request processing.
+     *
+     * @return object[]
+     */
+    public function getAdditionalEntities(): array;
+
+    /**
+     * Adds an entity to the list of additional entities involved to the request processing.
+     * For example when an association is represented as a field,
+     * a target entity of this association does not exist in the list of included entities
+     * and need to be persisted manually, so, it should be added to the list of additional entities.
+     *
+     * @param object $entity
+     */
+    public function addAdditionalEntity($entity): void;
+
+    /**
+     * Removes an entity from the list of additional entities involved to the request processing.
+     *
+     * @param object $entity
+     */
+    public function removeAdditionalEntity($entity): void;
+
+    /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.
      *
      * @return EntityMapper|null

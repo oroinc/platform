@@ -28,6 +28,7 @@ final class DataType
     public const GUID             = 'guid';
     public const ARRAY            = 'array';
     public const OBJECT           = 'object';
+    public const OBJECTS          = 'objects';
     public const SCALAR           = 'scalar';
     public const ENTITY_TYPE      = 'entityType';
     public const ENTITY_CLASS     = 'entityClass';
@@ -37,7 +38,7 @@ final class DataType
     private const NESTED_ASSOCIATION              = 'nestedAssociation';
     private const EXTENDED_ASSOCIATION_PREFIX     = 'association';
     private const EXTENDED_ASSOCIATION_MARKER     = 'association:';
-    private const ASSOCIATION_AS_FIELD_DATA_TYPES = ['array', 'object', 'scalar', 'nestedObject'];
+    private const ASSOCIATION_AS_FIELD_DATA_TYPES = ['array', 'object', 'nestedObject', 'objects', 'scalar'];
 
     /**
      * Checks whether the field represents a nested object.
@@ -66,10 +67,12 @@ final class DataType
     /**
      * Checks whether an association should be represented as a field.
      * For JSON:API it means that it should be in "attributes" section instead of "relationships" section.
-     * Usually, to increase readability, "array" data-type is used for "to-many" associations
-     * and "object" or "scalar" data-type is used for "to-one" associations.
-     * The "object" is usually used if a value of such field contains several properties.
-     * The "scalar" is usually used if a value of such field contains a scalar value.
+     * Usually, to increase readability, "scalar" and "object" data-types are used for "to-one" associations
+     * and "array" and "objects" data-types are used for "to-many" associations.
+     * The "scalar" is usually used if a value of the field contains a scalar value.
+     * The "array" is usually used if a value of the field contains a list of scalar values.
+     * The "object" is usually used if a value of the field contains several properties.
+     * The "objects" is usually used if a value of the field contains a list of items that have several properties.
      * Also "nestedObject" data-type, that is used to group several fields in one object,
      * is classified as an association that should be represented as a field because the behaviour
      * of it is the same.

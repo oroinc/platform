@@ -13,6 +13,8 @@ use Symfony\Component\Form\FormInterface;
  * * reset value of a field bound to CompoundObjectType form type
  * * add mandatory value constraint violation for fields with "required" option is set to TRUE
  *   and that value does not exist in the submitted data
+ * * add an entity processed by CompoundObjectType form type to the list of additional entities
+ *   of API context within this form is processed
  */
 class CompoundObjectListener implements EventSubscriberInterface
 {
@@ -22,7 +24,8 @@ class CompoundObjectListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SUBMIT => 'preSubmit'
+            FormEvents::PRE_SUBMIT  => 'preSubmit',
+            FormEvents::POST_SUBMIT => ['postSubmit', -250]
         ];
     }
 
@@ -35,10 +38,12 @@ class CompoundObjectListener implements EventSubscriberInterface
         $submittedData = $event->getData();
         if (null === $submittedData) {
             $submittedData = [];
-            foreach ($form as $name => $child) {
-                $submittedData[$name] = null;
-                if ($child->isRequired()) {
-                    $this->addRequiredFieldConstraintViolation($form, $name);
+            if ($form->getConfig()->getRequired()) {
+                foreach ($form as $name => $child) {
+                    $submittedData[$name] = null;
+                    if ($child->isRequired()) {
+                        $this->addRequiredFieldConstraintViolation($form, $name);
+                    }
                 }
             }
             $event->setData($submittedData);
@@ -49,6 +54,23 @@ class CompoundObjectListener implements EventSubscriberInterface
                     $this->addRequiredFieldConstraintViolation($form, $name);
                 }
             }
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $entity = $form->getData();
+        if (null === $entity) {
+            return;
+        }
+
+        $context = FormUtil::getApiContext($form);
+        if (null !== $context) {
+            $context->addAdditionalEntity($entity);
         }
     }
 

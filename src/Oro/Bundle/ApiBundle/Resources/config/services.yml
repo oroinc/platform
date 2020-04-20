@@ -672,6 +672,8 @@ services:
                 'currency': 'string'
                 'money_value': 'money'
                 'duration': 'integer'
+                'entityType': 'string'
+                'objects': 'array of objects'
 
     oro_api.rest.doc_url_generator:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator
