@@ -54,9 +54,10 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     public function associationAsFieldProvider()
     {
         return [
-            ['array', true],
-            ['object', true],
             ['scalar', true],
+            ['object', true],
+            ['array', true],
+            ['objects', true],
             ['nestedObject', true],
             ['string', false],
             [null, false],
@@ -88,7 +89,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testParseExtendedAssociation($dataType, $expectedAssociationType, $expectedAssociationKind)
     {
-        list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+        [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
         self::assertSame($expectedAssociationType, $associationType);
         self::assertSame($expectedAssociationKind, $associationKind);
     }

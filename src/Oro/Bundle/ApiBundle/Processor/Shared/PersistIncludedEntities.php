@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -30,25 +31,36 @@ class PersistIncludedEntities implements ProcessorInterface
     {
         /** @var FormContext $context */
 
-        $includedData = $context->getIncludedData();
-        if (empty($includedData)) {
-            // no included data
-            return;
+        $additionalEntities = $context->getAdditionalEntities();
+        foreach ($additionalEntities as $entity) {
+            $this->persistEntity($entity, true);
         }
 
         $includedEntities = $context->getIncludedEntities();
-        if (null === $includedEntities) {
-            // the context does not have included entities
-            return;
-        }
-
-        foreach ($includedEntities as $entity) {
-            if (!$includedEntities->getData($entity)->isExisting()) {
-                $em = $this->doctrineHelper->getEntityManager($entity, false);
-                if (null !== $em) {
-                    $em->persist($entity);
+        if (null !== $includedEntities) {
+            foreach ($includedEntities as $entity) {
+                if (!$includedEntities->getData($entity)->isExisting()) {
+                    $this->persistEntity($entity);
                 }
             }
         }
+    }
+
+    /**
+     * @param object $entity
+     * @param bool   $checkIsNew
+     */
+    private function persistEntity($entity, bool $checkIsNew = false): void
+    {
+        $em = $this->doctrineHelper->getEntityManager($entity, false);
+        if (null === $em) {
+            return;
+        }
+
+        if ($checkIsNew && UnitOfWork::STATE_NEW !== $em->getUnitOfWork()->getEntityState($entity)) {
+            return;
+        }
+
+        $em->persist($entity);
     }
 }
