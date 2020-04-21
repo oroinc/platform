@@ -31,7 +31,9 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new FileDigitalAssetChangedListener($this->fileReflector);
 
         $this->eventArgs = $this->createMock(LifecycleEventArgs::class);
-        $this->file = $this->createPartialMock(File::class, ['getDigitalAsset']);
+        $this->file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
     }
 
     public function testPrePersistWhenNoDigitalAsset(): void

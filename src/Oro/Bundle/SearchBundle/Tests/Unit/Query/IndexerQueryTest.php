@@ -39,9 +39,9 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
             ['query']
         );
 
-        $this->innerQuery = $this->createPartialMock(
-            Query::class,
-            [
+        $this->innerQuery = $this->getMockBuilder(Query::class)
+            ->onlyMethods(['getCriteria', 'addSelect'])
+            ->addMethods([
                 'setFirstResult',
                 'getFirstResult',
                 'setMaxResults',
@@ -49,11 +49,9 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
-                'getCriteria',
-                'getOrderings',
-                'addSelect'
-            ]
-        );
+                'getOrderings'
+            ])
+            ->getMock();
 
         $this->criteria = $this->createMock(Criteria::class);
 

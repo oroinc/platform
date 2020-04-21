@@ -41,7 +41,9 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
             $this->doctrine
         );
 
-        $this->file = $this->createPartialMock(File::class, ['getDigitalAsset']);
+        $this->file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
     }
 
     public function testGetTitleWhenNoDigitalAssetNoParent(): void

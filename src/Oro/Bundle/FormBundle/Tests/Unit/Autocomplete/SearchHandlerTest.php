@@ -482,7 +482,9 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         foreach (array_keys($data) as $name) {
             $methods[$name] = 'get' . ucfirst($name);
         }
-        $result = $this->createPartialMock(\stdClass::class, array_values($methods));
+        $result = $this->getMockBuilder(\stdClass::class)
+            ->addMethods($methods)
+            ->getMock();
         foreach ($data as $name => $property) {
             $result->expects($this->any())
                 ->method($methods[$name])

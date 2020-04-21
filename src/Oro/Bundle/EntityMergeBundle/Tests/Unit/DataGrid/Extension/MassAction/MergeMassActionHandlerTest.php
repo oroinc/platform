@@ -107,8 +107,12 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private function setUpMockObjects()
     {
-        $this->firstEntity = $this->createPartialMock(\stdClass::class, array('getId'));
-        $this->secondEntity = $this->createPartialMock(\stdClass::class, array('getId'));
+        $this->firstEntity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
+        $this->secondEntity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $this->firstResultRecordId = rand();
         $this->secondResultRecordId = rand();
 

@@ -128,7 +128,9 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     public function testBeforeValueRenderProceedSingleRelations(array $data, array $expected)
     {
         $entity = $this->createMock('\StdClass');
-        $value = $this->createPartialMock('\StdClass', ['getId']);
+        $value = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $fieldType = 'manyToOne';
 
         if (!empty($data['field'])) {
@@ -329,7 +331,9 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
             foreach ($shownFields as $field) {
                 $entityMethods[] = "get{$field}";
             }
-            $item = $this->createPartialMock('\StdClass', $entityMethods);
+            $item = $this->getMockBuilder(\stdClass::class)
+                ->addMethods($entityMethods)
+                ->getMock();
 
             foreach ($shownFields as $field) {
                 $item->expects($this->once())

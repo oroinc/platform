@@ -436,10 +436,10 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
      */
     private function createUserStub()
     {
-        return $this->createPartialMock(
-            UserInterface::class,
-            ['getId', 'getEmail', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
-        );
+        return $this->getMockBuilder(UserInterface::class)
+            ->onlyMethods(['getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials'])
+            ->addMethods(['getId', 'getEmail'])
+            ->getMock();
     }
 
     /**

@@ -23,10 +23,10 @@ class GroupManagerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repository = $this->createPartialMock(
-            'Doctrine\Common\Persistence\ObjectRepository',
-            array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'getUserQueryBuilder')
-        );
+        $this->repository = $this->getMockBuilder(\Doctrine\Common\Persistence\ObjectRepository::class)
+            ->onlyMethods(['find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])
+            ->addMethods(['getUserQueryBuilder'])
+            ->getMock();
 
         $this->em->expects($this->any())
             ->method('getRepository')

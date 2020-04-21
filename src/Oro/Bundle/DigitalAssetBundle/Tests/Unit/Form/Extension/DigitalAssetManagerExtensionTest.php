@@ -373,11 +373,15 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testPostSubmitWhenNoDigitalAsset(): void
     {
+        $file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
+
         $formEvent = $this->createMock(FormEvent::class);
         $formEvent
             ->expects($this->once())
             ->method('getData')
-            ->willReturn($file = $this->createPartialMock(File::class, ['getDigitalAsset']));
+            ->willReturn($file);
 
         $file
             ->expects($this->once())
@@ -393,11 +397,15 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testPostSubmit(): void
     {
+        $file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
+
         $formEvent = $this->createMock(FormEvent::class);
         $formEvent
             ->expects($this->once())
             ->method('getData')
-            ->willReturn($file = $this->createPartialMock(File::class, ['getDigitalAsset']));
+            ->willReturn($file);
 
         $file
             ->expects($this->once())
