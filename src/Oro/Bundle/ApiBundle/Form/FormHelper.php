@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -66,7 +67,7 @@ class FormHelper
             null,
             $formType,
             $data,
-            \array_merge($this->getFormDefaultOptions(), $options)
+            array_merge($this->getFormDefaultOptions(), $options)
         );
         $formBuilder->setDataMapper(new PropertyPathMapper($this->propertyAccessor));
         if (!empty($eventSubscribers)) {
@@ -122,11 +123,22 @@ class FormHelper
         PropertyMetadata $fieldMetadata,
         array $options = []
     ) {
-        $fieldFormBuilder = $formBuilder->add(
-            $fieldName,
-            $fieldConfig->getFormType(),
-            \array_replace($options, $this->getFormFieldOptions($fieldMetadata, $fieldConfig))
-        );
+        $formType = $fieldConfig->getFormType();
+        /**
+         * Ignore configured form options for associations that are represented as fields
+         * to avoid collisions between configured and guessed form options.
+         * For these associations the options merging is performed by form type guessers.
+         * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForArrayAssociation
+         * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForCollapsedArrayAssociation
+         */
+        $configuredOptions = $this->getFormFieldOptions($fieldMetadata, $fieldConfig);
+        if (null !== $formType
+            || !DataType::isAssociationAsField($fieldConfig->getDataType())
+            || false === ($configuredOptions['mapped'] ?? true)
+        ) {
+            $options = array_replace($options, $configuredOptions);
+        }
+        $fieldFormBuilder = $formBuilder->add($fieldName, $formType, $options);
 
         $targetConfig = $fieldConfig->getTargetEntity();
         if (null !== $targetConfig) {

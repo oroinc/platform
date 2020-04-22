@@ -18,6 +18,9 @@ use Symfony\Component\Form\FormInterface;
  */
 class CompoundObjectListener implements EventSubscriberInterface
 {
+    /** @var bool */
+    private $setDataToNull = false;
+
     /**
      * {@inheritdoc}
      */
@@ -25,6 +28,7 @@ class CompoundObjectListener implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SUBMIT  => 'preSubmit',
+            FormEvents::SUBMIT      => 'onSubmit',
             FormEvents::POST_SUBMIT => ['postSubmit', -250]
         ];
     }
@@ -37,23 +41,35 @@ class CompoundObjectListener implements EventSubscriberInterface
         $form = $event->getForm();
         $submittedData = $event->getData();
         if (null === $submittedData) {
-            $submittedData = [];
             if ($form->getConfig()->getRequired()) {
+                $event->setData($this->getEmptySubmittedData($form));
+            } else {
+                $this->setDataToNull = true;
+                foreach ($form->all() as $child) {
+                    $form->remove($child->getName());
+                }
+            }
+        } elseif (\is_array($submittedData)) {
+            if ($submittedData) {
+                /** @var FormInterface $child */
                 foreach ($form as $name => $child) {
-                    $submittedData[$name] = null;
-                    if ($child->isRequired()) {
+                    if (!\array_key_exists($name, $submittedData) && $child->isRequired()) {
                         $this->addRequiredFieldConstraintViolation($form, $name);
                     }
                 }
+            } elseif (null === $form->getData() && $form->getConfig()->getRequired()) {
+                $event->setData($this->getEmptySubmittedData($form));
             }
-            $event->setData($submittedData);
-        } elseif (\is_array($submittedData)) {
-            /** @var FormInterface $child */
-            foreach ($form as $name => $child) {
-                if (!\array_key_exists($name, $submittedData) && $child->isRequired()) {
-                    $this->addRequiredFieldConstraintViolation($form, $name);
-                }
-            }
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onSubmit(FormEvent $event)
+    {
+        if ($this->setDataToNull) {
+            $event->setData(null);
         }
     }
 
@@ -72,6 +88,24 @@ class CompoundObjectListener implements EventSubscriberInterface
         if (null !== $context) {
             $context->addAdditionalEntity($entity);
         }
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return array
+     */
+    private function getEmptySubmittedData(FormInterface $form): array
+    {
+        $submittedData = [];
+        foreach ($form as $name => $child) {
+            $submittedData[$name] = null;
+            if ($child->isRequired()) {
+                $this->addRequiredFieldConstraintViolation($form, $name);
+            }
+        }
+
+        return $submittedData;
     }
 
     /**
