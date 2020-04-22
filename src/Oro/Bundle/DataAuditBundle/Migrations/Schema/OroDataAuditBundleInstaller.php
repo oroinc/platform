@@ -51,8 +51,8 @@ class OroDataAuditBundleInstaller implements Installation
         );
         $auditTable->addColumn('version', 'integer', ['notnull' => false]);
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $auditTable->addColumn('type', 'string', ['length' => 255]);
-        $auditTable->addColumn('transaction_id', 'string', ['length' => 255]);
+        $auditTable->addColumn('type', 'string', ['length' => 30]);
+        $auditTable->addColumn('transaction_id', 'string', ['length' => 36]);
         $auditTable->addColumn('owner_description', 'string', ['notnull' => false, 'length' => 255]);
         $auditTable->addColumn('additional_fields', 'array', ['notnull' => false]);
 

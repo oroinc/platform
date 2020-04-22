@@ -95,6 +95,7 @@ oro:
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields
+            type.label: Audit type
 
         audit:
             entity_label: Audit
@@ -114,3 +115,4 @@ oro:
             organization.label: Audit organization
             user.label: Audit user
             additional_fields.label: Additional fields
+            type.label: Audit type
