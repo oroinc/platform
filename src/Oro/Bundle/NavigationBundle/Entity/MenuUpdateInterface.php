@@ -7,6 +7,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
+/**
+ * Interface for menu update entity.
+ */
 interface MenuUpdateInterface
 {
     /**
@@ -194,6 +197,13 @@ interface MenuUpdateInterface
      * @return array
      */
     public function getExtras();
+
+    /**
+     * Get array of link attributes
+     *
+     * @return array
+     */
+    public function getLinkAttributes(): array;
 
     /**
      * @return Scope

@@ -15,39 +15,44 @@ class ModelWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
     {
         parent::setUp();
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/test_magazine.yml']);
-        $this->appendEntityConfig(
-            TestMagazineModel2::class,
-            [
-                'fields' => [
-                    'articles'    => [
-                        'data_type'        => 'array',
-                        'exclusion_policy' => 'all',
-                        'collapse'         => true,
-                        'fields'           => [
-                            'headline' => [
-                                'data_type'    => 'string',
-                                'form_options' => [
-                                    'constraints' => [['NotBlank' => []]]
-                                ]
+        $this->appendEntityConfig(TestMagazineModel2::class, $this->getEntityConfig());
+    }
+
+    /**
+     * @return array
+     */
+    private function getEntityConfig(): array
+    {
+        return [
+            'fields' => [
+                'articles'    => [
+                    'data_type'        => 'array',
+                    'exclusion_policy' => 'all',
+                    'collapse'         => true,
+                    'fields'           => [
+                        'headline' => [
+                            'data_type'    => 'string',
+                            'form_options' => [
+                                'constraints' => [['NotBlank' => []]]
                             ]
                         ]
-                    ],
-                    'bestArticle' => [
-                        'data_type'        => 'scalar',
-                        'exclusion_policy' => 'all',
-                        'collapse'         => true,
-                        'fields'           => [
-                            'headline' => [
-                                'data_type'    => 'string',
-                                'form_options' => [
-                                    'constraints' => [['NotBlank' => []]]
-                                ]
+                    ]
+                ],
+                'bestArticle' => [
+                    'data_type'        => 'scalar',
+                    'exclusion_policy' => 'all',
+                    'collapse'         => true,
+                    'fields'           => [
+                        'headline' => [
+                            'data_type'    => 'string',
+                            'form_options' => [
+                                'constraints' => [['NotBlank' => []]]
                             ]
                         ]
                     ]
                 ]
             ]
-        );
+        ];
     }
 
     /**
@@ -178,9 +183,42 @@ class ModelWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
         );
     }
 
-    public function testUpdateForToOneAssociationWhenNewValueIsNull()
+    public function testTryToUpdateForToOneAssociationWhenNewValueIsNull()
     {
-        self::markTestSkipped('Need to find a way to set null');
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'bestArticle' => null
+                ]
+            ]
+        ];
+        $response = $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data,
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/bestArticle']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateForToOneAssociationWhenNewValueIsNullAndRequiredIsFalse()
+    {
+        $entityConfig = $this->getEntityConfig();
+        $entityConfig['fields']['bestArticle']['form_options'] = [
+            'required' => false
+        ];
+        $this->appendEntityConfig(TestMagazineModel2::class, $entityConfig);
+
         $magazineId = $this->getReference('magazine1')->getId();
         $data = [
             'data' => [
@@ -214,6 +252,76 @@ class ModelWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
             $response
         );
         $this->assertArticleExists('Article 1');
+    }
+
+    public function testTryToUpdateForToOneAssociationWhenNewValueIsNullAndPreviousValueIsNull()
+    {
+        $magazineId = $this->getReference('magazine2')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'bestArticle' => null
+                ]
+            ]
+        ];
+        $response = $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data,
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/bestArticle']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateForToOneAssociationWhenNewValueIsNullAndPreviousValueIsNullAndRequiredIsFalse()
+    {
+        $entityConfig = $this->getEntityConfig();
+        $entityConfig['fields']['bestArticle']['form_options'] = [
+            'required' => false
+        ];
+        $this->appendEntityConfig(TestMagazineModel2::class, $entityConfig);
+
+        $magazineId = $this->getReference('magazine2')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'bestArticle' => null
+                ]
+            ]
+        ];
+        $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data
+        );
+
+        $response = $this->get(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'testapimagazinemodel2',
+                    'id'         => (string)$magazineId,
+                    'attributes' => [
+                        'name'        => 'Magazine 2',
+                        'articles'    => [],
+                        'bestArticle' => null
+                    ]
+                ]
+            ],
+            $response
+        );
     }
 
     public function testUpdateForToManyAssociation()
@@ -325,6 +433,227 @@ class ModelWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
             $response
         );
         $this->assertArticleExists('Article 1');
+        $this->assertArticleExists('Article 2');
+        $this->assertArticleExists('Article 3');
+    }
+
+    public function testTryToUpdateForToManyAssociationWhenFirstItemIsNull()
+    {
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => [null, 'Updated Article 2']
+                ]
+            ]
+        ];
+        $response = $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data,
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/articles/0']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateForToManyAssociationWhenFirstItemIsNullAndRequiredIsFalse()
+    {
+        $entityConfig = $this->getEntityConfig();
+        $entityConfig['fields']['articles']['form_options'] = [
+            'entry_options' => [
+                'required' => false
+            ]
+        ];
+        $this->appendEntityConfig(TestMagazineModel2::class, $entityConfig);
+
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => [null, 'Updated Article 2']
+                ]
+            ]
+        ];
+        $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data
+        );
+
+        $response = $this->get(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'testapimagazinemodel2',
+                    'id'         => (string)$magazineId,
+                    'attributes' => [
+                        'name'        => 'Magazine 1',
+                        'articles'    => ['Updated Article 2'],
+                        'bestArticle' => 'Article 1'
+                    ]
+                ]
+            ],
+            $response
+        );
+        $this->assertArticleExists('Article 1');
+        $this->assertArticleExists('Article 3');
+    }
+
+    public function testTryToUpdateForToManyAssociationWhenMiddleItemIsNull()
+    {
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => ['Updated Article 1', null, 'Updated Article 3']
+                ]
+            ]
+        ];
+        $response = $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data,
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/articles/1']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateForToManyAssociationWhenMiddleItemIsNullAndRequiredIsFalse()
+    {
+        $entityConfig = $this->getEntityConfig();
+        $entityConfig['fields']['articles']['form_options'] = [
+            'entry_options' => [
+                'required' => false
+            ]
+        ];
+        $this->appendEntityConfig(TestMagazineModel2::class, $entityConfig);
+
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => ['Updated Article 1', null, 'Updated Article 3']
+                ]
+            ]
+        ];
+        $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data
+        );
+
+        $response = $this->get(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'testapimagazinemodel2',
+                    'id'         => (string)$magazineId,
+                    'attributes' => [
+                        'name'        => 'Magazine 1',
+                        'articles'    => ['Updated Article 1', 'Updated Article 3'],
+                        'bestArticle' => 'Updated Article 1'
+                    ]
+                ]
+            ],
+            $response
+        );
+        $this->assertArticleExists('Article 2');
+    }
+
+    public function testTryToUpdateForToManyAssociationWhenLastItemIsNull()
+    {
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => ['Updated Article 1', null]
+                ]
+            ]
+        ];
+        $response = $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data,
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/articles/1']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateForToManyAssociationWhenLastItemIsNullAndRequiredIsFalse()
+    {
+        $entityConfig = $this->getEntityConfig();
+        $entityConfig['fields']['articles']['form_options'] = [
+            'entry_options' => [
+                'required' => false
+            ]
+        ];
+        $this->appendEntityConfig(TestMagazineModel2::class, $entityConfig);
+
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazinemodel2',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'articles' => ['Updated Article 1', null]
+                ]
+            ]
+        ];
+        $this->patch(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId],
+            $data
+        );
+
+        $response = $this->get(
+            ['entity' => 'testapimagazinemodel2', 'id' => (string)$magazineId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'testapimagazinemodel2',
+                    'id'         => (string)$magazineId,
+                    'attributes' => [
+                        'name'        => 'Magazine 1',
+                        'articles'    => ['Updated Article 1'],
+                        'bestArticle' => 'Updated Article 1'
+                    ]
+                ]
+            ],
+            $response
+        );
         $this->assertArticleExists('Article 2');
         $this->assertArticleExists('Article 3');
     }

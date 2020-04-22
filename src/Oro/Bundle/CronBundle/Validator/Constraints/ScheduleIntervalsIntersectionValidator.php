@@ -3,22 +3,30 @@
 namespace Oro\Bundle\CronBundle\Validator\Constraints;
 
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
-use Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * This validator is used to check that schedule intervals are not intersected
+ */
 class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
 {
     /**
-     * @param ScheduleIntervalInterface|mixed $value The value that should be validated
-     * @param Constraint|ScheduleIntervalsIntersection $constraint The constraint for the validation
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof ScheduleIntervalsIntersection) {
+            throw new UnexpectedTypeException($constraint, ScheduleIntervalsIntersection::class);
+        }
+
+        if (null === $value) {
+            return;
+        }
+
         if (!$value instanceof ScheduleIntervalInterface) {
-            throw new \InvalidArgumentException(
-                'Constraint value should be of type ' . ScheduleIntervalInterface::class
-            );
+            throw new UnexpectedTypeException($value, ScheduleIntervalInterface::class);
         }
 
         $this->validateSchedules($value, $constraint);
@@ -26,67 +34,33 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
 
     /**
      * @param ScheduleIntervalInterface $validatedSchedule
-     * @param Constraint $constraint
+     * @param Constraint                $constraint
      */
-    protected function validateSchedules(ScheduleIntervalInterface $validatedSchedule, Constraint $constraint)
+    private function validateSchedules(ScheduleIntervalInterface $validatedSchedule, Constraint $constraint): void
     {
         if (null === $validatedSchedule->getScheduleIntervalsHolder()) {
             return;
         }
 
         $schedules = $validatedSchedule->getScheduleIntervalsHolder()->getSchedules();
-
         if (false === $this->hasIntersection($schedules, $validatedSchedule)) {
             return;
         }
 
-        $form = $this->context->getRoot();
-
-        /**
-         * This is here to provide proper validation for API request on schedule PATCH
-         * https://github.com/symfony/symfony/pull/10567
-         */
-        if ($form instanceof \Symfony\Component\Form\Form
-            && $form->getConfig()->hasOption('api_context')) {
-            $this->buildViolationOnApiForm($constraint);
-
-            return;
-        }
-
-        $this->buildDefaultViolation($constraint);
-    }
-
-    /**
-     * @param Constraint $constraint
-     */
-    protected function buildDefaultViolation(Constraint $constraint)
-    {
-        $this->context
-            ->buildViolation($constraint->message)
-            ->atPath(ScheduleIntervalType::ACTIVE_AT_FIELD)
+        $this->context->buildViolation($constraint->message)
             ->addViolation();
     }
 
     /**
-     * @param Constraint $constraint
-     */
-    protected function buildViolationOnApiForm(Constraint $constraint)
-    {
-        $this->context
-            ->buildViolation($constraint->message)
-            ->addViolation();
-    }
-
-    /**
-     * @param ScheduleIntervalInterface[] $collection
-     * @param ScheduleIntervalInterface $schedule
+     * @param ScheduleIntervalInterface[]|iterable $collection
+     * @param ScheduleIntervalInterface            $schedule
+     *
      * @return bool
      */
-    protected function hasIntersection($collection, ScheduleIntervalInterface $schedule)
+    private function hasIntersection(iterable $collection, ScheduleIntervalInterface $schedule): bool
     {
         $aLeft = $schedule->getActiveAt();
         $aRight = $schedule->getDeactivateAt();
-
         foreach ($collection as $item) {
             if ($item === $schedule) {
                 continue;
@@ -104,15 +78,21 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
     }
 
     /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @param \DateTime|null $aLeft
-     * @param \DateTime|null $aRight
-     * @param \DateTime|null $bLeft
-     * @param \DateTime|null $bRight
+     * @param \DateTimeInterface|null $aLeft
+     * @param \DateTimeInterface|null $aRight
+     * @param \DateTimeInterface|null $bLeft
+     * @param \DateTimeInterface|null $bRight
+     *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function isSegmentsIntersected($aLeft, $aRight, $bLeft, $bRight)
-    {
+    private function isSegmentsIntersected(
+        ?\DateTimeInterface $aLeft,
+        ?\DateTimeInterface $aRight,
+        ?\DateTimeInterface $bLeft,
+        ?\DateTimeInterface $bRight
+    ): bool {
         if (($aRight === null && $bRight === null)
             || (null === $aRight && $bRight >= $aLeft)
             || (null === $bRight && $aRight >= $bLeft)

@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormEvents;
  */
 class ScalarObjectListener implements EventSubscriberInterface
 {
+    /** @var bool */
+    private $setDataToNull = false;
+
     /**
      * {@inheritdoc}
      */
@@ -23,6 +26,7 @@ class ScalarObjectListener implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SUBMIT  => 'preSubmit',
+            FormEvents::SUBMIT      => 'onSubmit',
             FormEvents::POST_SUBMIT => ['postSubmit', -250]
         ];
     }
@@ -32,7 +36,26 @@ class ScalarObjectListener implements EventSubscriberInterface
      */
     public function preSubmit(FormEvent $event): void
     {
-        $event->setData([ConfigUtil::IGNORE_PROPERTY_PATH => $event->getData()]);
+        $form = $event->getForm();
+        $submittedData = $event->getData();
+        if (null === $submittedData && !$form->getConfig()->getRequired()) {
+            $this->setDataToNull = true;
+            foreach ($form->all() as $child) {
+                $form->remove($child->getName());
+            }
+        } else {
+            $event->setData([ConfigUtil::IGNORE_PROPERTY_PATH => $event->getData()]);
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onSubmit(FormEvent $event): void
+    {
+        if ($this->setDataToNull) {
+            $event->setData(null);
+        }
     }
 
     /**

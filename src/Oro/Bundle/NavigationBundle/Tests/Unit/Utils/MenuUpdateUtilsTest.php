@@ -79,11 +79,13 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
                 ->setString('second test description')
                 ->setLocalization($secondLocalization)
         );
+        $update->setLinkAttributes(['testAttribute' => 'testValue']);
 
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
         $expectedItem->setExtra('description', 'second test description');
+        $expectedItem->setLinkAttribute('testAttribute', 'testValue');
 
         /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
