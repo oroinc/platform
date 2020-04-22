@@ -7,8 +7,55 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides a set of static methods that may be helpful in form processing.
+ */
 class FormUtils
 {
+    /**
+     * Finds a form field by its property path and checks whether it is submitted.
+     *
+     * @param FormInterface $form
+     * @param string        $propertyPath
+     *
+     * @return bool
+     */
+    public static function isFormFieldSubmitted(FormInterface $form, string $propertyPath): bool
+    {
+        $field = self::findFormField($form, $propertyPath);
+
+        return null !== $field && $field->isSubmitted();
+    }
+
+    /**
+     * Finds a form field by its property path.
+     *
+     * @param FormInterface $form
+     * @param string        $propertyPath
+     *
+     * @return FormInterface|null
+     */
+    public static function findFormField(FormInterface $form, string $propertyPath): ?FormInterface
+    {
+        if ($form->has($propertyPath)) {
+            $field = $form->get($propertyPath);
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (null === $fieldPropertyPath || (string)$fieldPropertyPath === $propertyPath) {
+                return $field;
+            }
+        }
+
+        /** @var FormInterface $field */
+        foreach ($form as $field) {
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (null !== $fieldPropertyPath && (string)$fieldPropertyPath === $propertyPath) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Replace form field by the same field with different options
      * Example of usage:

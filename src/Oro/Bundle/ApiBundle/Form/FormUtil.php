@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -156,27 +157,7 @@ class FormUtil
      */
     public static function findFormFieldByPropertyPath(FormInterface $form, string $propertyPath): ?FormInterface
     {
-        if ($form->has($propertyPath)) {
-            $child = $form->get($propertyPath);
-            $childPropertyPath = $child->getPropertyPath();
-            if (null === $childPropertyPath || (string)$childPropertyPath === $propertyPath) {
-                return $child;
-            }
-        }
-
-        /** @var FormInterface $child */
-        foreach ($form as $child) {
-            $childPropertyPath = $child->getPropertyPath();
-            if (null === $childPropertyPath) {
-                if ($child->getName() === $propertyPath) {
-                    return $child;
-                }
-            } elseif ((string)$childPropertyPath === $propertyPath) {
-                return $child;
-            }
-        }
-
-        return null;
+        return FormUtils::findFormField($form, $propertyPath);
     }
 
     /**

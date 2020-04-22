@@ -89,7 +89,7 @@ services:
     oro_cron.validator.schedule_intervals_intersection:
         class: Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_cron_schedule_intervals_intersection_validator }
+            - { name: validator.constraint_validator }
 
     oro_cron.form.type.schedule_interval:
         class: Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType
