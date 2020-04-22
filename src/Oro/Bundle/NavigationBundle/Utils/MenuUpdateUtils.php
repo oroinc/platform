@@ -10,16 +10,16 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Helps to update MenuUpdate entity using MenuItem object data,
+ * and update MenuItem object using MenuUpdate entity data.
+ */
 class MenuUpdateUtils
 {
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     private static $propertyAccessor;
 
     /**
-     * Apply changes from menu item to menu update
-     *
      * @param MenuUpdateInterface $update
      * @param ItemInterface       $item
      * @param string              $menuName
@@ -98,6 +98,10 @@ class MenuUpdateUtils
 
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
+        }
+
+        foreach ($update->getLinkAttributes() as $key => $linkAttribute) {
+            $item->setLinkAttribute($key, $linkAttribute);
         }
 
         if ($update->getDescriptions()->count()) {
