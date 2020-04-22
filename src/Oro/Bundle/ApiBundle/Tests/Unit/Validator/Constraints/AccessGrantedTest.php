@@ -18,10 +18,4 @@ class AccessGrantedTest extends \PHPUnit\Framework\TestCase
         $constraint = new AccessGranted();
         self::assertEquals('property', $constraint->getTargets());
     }
-
-    public function testValidatedBy()
-    {
-        $constraint = new AccessGranted();
-        self::assertEquals('oro_api.validator.access_granted', $constraint->validatedBy());
-    }
 }

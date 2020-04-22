@@ -119,7 +119,7 @@ services:
         arguments:
             - '@security.authorization_checker'
         tags:
-            - { name: validator.constraint_validator, alias: oro_api.validator.access_granted }
+            - { name: validator.constraint_validator }
 
     oro_api.form.unidirectional_association_handler:
         class: Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler

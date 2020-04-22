@@ -8,12 +8,12 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * The validator for AccessGranted constraint.
+ * This validator is used to check if an access to an associated entity is granted.
  */
 class AccessGrantedValidator extends ConstraintValidator
 {
     /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -29,7 +29,7 @@ class AccessGrantedValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof AccessGranted) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\AccessGranted');
+            throw new UnexpectedTypeException($constraint, AccessGranted::class);
         }
 
         if (null === $value) {

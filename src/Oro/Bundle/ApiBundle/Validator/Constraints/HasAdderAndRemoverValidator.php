@@ -7,6 +7,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * This validator is used to check whether an to-many association has methods to add and to remove elements.
+ */
 class HasAdderAndRemoverValidator extends ConstraintValidator
 {
     /**
@@ -15,7 +18,7 @@ class HasAdderAndRemoverValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof HasAdderAndRemover) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\HasAdderAndRemover');
+            throw new UnexpectedTypeException($constraint, HasAdderAndRemover::class);
         }
 
         if (null === $value) {

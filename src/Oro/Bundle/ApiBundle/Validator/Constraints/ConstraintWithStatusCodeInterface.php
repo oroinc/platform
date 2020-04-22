@@ -13,5 +13,5 @@ interface ConstraintWithStatusCodeInterface
      *
      * @return int
      */
-    public function getStatusCode();
+    public function getStatusCode(): int;
 }
