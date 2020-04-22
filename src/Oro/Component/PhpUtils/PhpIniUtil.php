@@ -2,12 +2,15 @@
 
 namespace Oro\Component\PhpUtils;
 
+/**
+ * Converts a shorthand byte value to floating-point number.
+ */
 class PhpIniUtil
 {
     /**
      * @param  string $val
      *
-     * @return int
+     * @return float
      *
      * @see https://secure.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
      */

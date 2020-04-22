@@ -136,7 +136,7 @@ class InstallPackageCommand extends Command
 
         $minimalSuggestedMemory = 2 * pow(1024, 3);
         $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
-        if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
+        if ($memoryLimit !== -1.0 && $memoryLimit < $minimalSuggestedMemory) {
             $warnings[] = '<comment>It\'s recommended at least 2Gb to be available for PHP CLI</comment>';
         }
 
