@@ -109,4 +109,12 @@ class MenuUpdate extends ExtendMenuUpdate implements
 
         return $extras;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLinkAttributes(): array
+    {
+        return [];
+    }
 }
