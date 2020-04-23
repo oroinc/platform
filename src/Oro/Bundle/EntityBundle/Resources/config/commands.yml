@@ -5,3 +5,9 @@ services:
             - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EntityBundle\Command\DumpConfigReferenceCommand:
+        class: Oro\Bundle\EntityBundle\Command\DumpConfigReferenceCommand
+        public: false
+        tags:
+            - { name: console.command }
