@@ -5305,11 +5305,10 @@
         {
             "name": "oro/redis-config",
             "version": "dev-master",
-            "target-dir": "Oro/Bundle/RedisConfigBundle",
             "dist": {
                 "type": "path",
                 "url": "../redis-config",
-                "reference": "81010b194a467ef0c41bf6332edab255f7fa50ad"
+                "reference": "ae4617aae03bf1289602ea4d79c523b3eb7d09b6"
             },
             "require": {
                 "predis/predis": "^1.0",
@@ -5325,9 +5324,12 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Oro\\Bundle\\RedisConfigBundle": "./"
-                }
+                "psr-4": {
+                    "Oro\\Bundle\\RedisConfigBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "license": [
                 "MIT"
@@ -5336,7 +5338,8 @@
             "homepage": "https://github.com/oroinc/redis-config",
             "keywords": [
                 "Oro",
-                "OroCrm",
+                "OroCRM",
+                "OroCommerce",
                 "OroPlatform",
                 "Redis"
             ]
@@ -8775,16 +8778,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.7.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
                 "shasum": ""
             },
             "require": {
@@ -8792,7 +8795,7 @@
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
-                "vimeo/psalm": "<3.6.0"
+                "vimeo/psalm": "<3.9.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.36 || ^7.5.13"
@@ -8819,7 +8822,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2020-02-14T12:15:55+00:00"
+            "time": "2020-04-18T12:12:48+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
