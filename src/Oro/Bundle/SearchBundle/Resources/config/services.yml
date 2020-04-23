@@ -314,10 +314,10 @@ services:
         tags:
             - { name: form.type, alias: oro_search_type_boolean_filter }
 
-    oro_search.provider.console.optional_listeners_global_options_provider:
-        class: Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProvider
+    oro_search.event_listener.reindexation_options_command_listener:
+        class: Oro\Bundle\SearchBundle\EventListener\Command\ReindexationOptionsCommandListener
         tags:
-            - { name: oro_platform.console.global_options_provider }
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
 
     oro_search.event_listener.install_command:
         class: Oro\Bundle\SearchBundle\EventListener\Command\InstallCommandListener

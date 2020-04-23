@@ -12,6 +12,7 @@ use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
 use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
@@ -42,104 +43,93 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
     {
         $kernel = $this->getKernel();
         $kernel->boot();
-        $app = new Application($kernel);
-        $app->add($this->getCommandMock());
-        $command = $app->find('oro:translation:pack');
+        $command = $this->getCommand($kernel);
 
         $this->assertNotEmpty($command->getDescription());
         $this->assertNotEmpty($command->getDefinition());
         $this->assertNotEmpty($command->getHelp());
     }
 
-    /**
-     * Test command execute
-     *
-     * @dataProvider executeInputProvider
-     *
-     * @param array       $input
-     * @param array       $expectedCalls
-     * @param bool|string $exception
-     */
-    public function testExecute($input, $expectedCalls = array(), $exception = false)
+    public function testExecuteWhenActionNotSpecified()
     {
         $kernel = $this->getKernel();
         $kernel->boot();
-        $app         = new Application($kernel);
-        $commandMock = $this->getCommandMock(array_keys($expectedCalls));
-        $app->add($commandMock);
-        $command = $app->find('oro:translation:pack');
-        $command->setApplication($app);
+        $command = $this->getCommand($kernel);
 
-        if ($exception) {
-            $this->expectException($exception);
-        }
+        $this->translationDumper->expects($this->never())
+            ->method('dump');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('update');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('upload');
 
-        $transServiceMock = $this->getMockBuilder(
-            'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        foreach ($expectedCalls as $method => $count) {
-            if ($method == 'getTranslationService') {
-                $commandMock->expects($this->exactly($count))
-                    ->method($method)
-                    ->will($this->returnValue($transServiceMock));
-            }
-            $commandMock->expects($this->exactly($count))->method($method);
-        }
-
-        $tester = new CommandTester($command);
-        $input += array('command' => $command->getName());
-        $tester->execute($input);
+        $this->executeCommand($command, ['project' => 'SomeProject']);
     }
 
-    /**
-     * @return array
-     */
-    public function executeInputProvider()
+    public function testExecuteWhenProjectNotSpecified()
     {
-        return array(
-            'error if action not specified'         => array(
-                array('project' => 'SomeProject'),
-                array(
-                    'dump'   => 0,
-                    'upload' => 0
-                )
-            ),
-            'error if project not specified'        => array(
-                array('--dump' => true),
-                array(
-                    'dump'   => 0,
-                    'upload' => 0
-                ),
-                '\RuntimeException'
-            ),
-            'dump action should perform'            => array(
-                array('--dump' => true, 'project' => 'SomeProject'),
-                array(
-                    'dump'   => 1,
-                    'upload' => 0
-                ),
-            ),
-            'upload action should perform'          => array(
-                array('--upload' => true, 'project' => 'SomeProject'),
-                array(
-                    'dump'                  => 0,
-                    'upload'                => 1,
-                    'getTranslationService' => 1,
-                    'getLangPackDir'        => 1,
-                ),
-            ),
-            'dump and upload action should perform' => array(
-                array('--upload' => true, '--dump' => true, 'project' => 'SomeProject'),
-                array(
-                    'dump'   => 1,
-                    'upload' => 1,
-                    'getTranslationService' => 1,
-                ),
-            )
-        );
+        $kernel = $this->getKernel();
+        $kernel->boot();
+        $command = $this->getCommand($kernel);
+
+        $this->expectException(RuntimeException::class);
+
+        $this->translationDumper->expects($this->never())
+            ->method('dump');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('update');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('upload');
+
+        $this->executeCommand($command, ['--dump' => true]);
+    }
+
+    public function testExecuteForDumpAction()
+    {
+        $kernel = $this->getKernel();
+        $kernel->boot();
+        $command = $this->getCommand($kernel);
+
+        $this->translationDumper->expects($this->once())
+            ->method('dump');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('update');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('upload');
+
+        $this->executeCommand($command, ['--dump' => true, 'project' => 'SomeProject']);
+    }
+
+    public function testExecuteForUploadAction()
+    {
+        $kernel = $this->getKernel();
+        $kernel->boot();
+        $command = $this->getCommand($kernel);
+
+        $this->translationDumper->expects($this->never())
+            ->method('dump');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('update');
+        $this->translationServiceProvider->expects($this->once())
+            ->method('upload');
+
+        $this->executeCommand($command, ['--upload' => true, 'project' => 'SomeProject']);
+    }
+
+    public function testExecuteForDumpAndUploadActions()
+    {
+        $kernel = $this->getKernel();
+        $kernel->boot();
+        $command = $this->getCommand($kernel);
+
+        $this->translationDumper->expects($this->once())
+            ->method('dump');
+        $this->translationServiceProvider->expects($this->never())
+            ->method('update');
+        $this->translationServiceProvider->expects($this->once())
+            ->method('upload');
+
+        $this->executeCommand($command, ['--upload' => true, '--dump' => true, 'project' => 'SomeProject']);
     }
 
     public function testUpload()
@@ -149,7 +139,7 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdate()
     {
-        $this->runUploadDownloadTest('upload', array('-m' => 'update'));
+        $this->runUploadDownloadTest('upload', ['-m' => 'update']);
     }
 
     public function testDownload()
@@ -162,8 +152,8 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
         $kernel = $this->getKernel();
         $kernel->boot();
 
-        $projectId   = 'someproject';
-        $adapterMock = $this->getNewMock(CrowdinAdapter::class);
+        $projectId = 'someproject';
+        $adapterMock = $this->createMock(CrowdinAdapter::class);
 
         $adapterMock->expects($this->any())
             ->method('setProjectId')
@@ -184,91 +174,61 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 
         $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
 
-        $app         = new Application($kernel);
-        $commandMock = $this->getCommandMock();
-        $app->add($commandMock);
+        $command = $this->getCommand($kernel);
 
-        $command = $app->find('oro:translation:pack');
-        $command->setApplication($app);
-
-        $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), '--' . $commandName => true, 'project' => $projectId);
+        $input = ['--' . $commandName => true, 'project' => $projectId];
         if (!empty($args)) {
             $input = array_merge($input, $args);
         }
-
-        $tester->execute($input);
+        $this->executeCommand($command, $input);
     }
 
     public function testExecuteWithoutMode()
     {
         $kernel = $this->getKernel();
         $kernel->boot();
+        $command = $this->getCommand($kernel);
 
-        $app         = new Application($kernel);
-        $commandMock = $this->getCommandMock();
-        $app->add($commandMock);
-
-        $command = $app->find('oro:translation:pack');
-        $command->setApplication($app);
-
-        $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), 'project' => 'test123');
-
-        $return = $tester->execute($input);
+        $return = $this->executeCommand($command, ['project' => 'test123']);
         $this->assertEquals(1, $return);
     }
 
     /**
-     * @return array
+     * @param OroTranslationPackCommand $command
+     * @param array                     $input
+     *
+     * @return int
      */
-    public function formatProvider()
+    private function executeCommand(OroTranslationPackCommand $command, array $input): int
     {
-        return array(
-            'format do not specified, yml default' => array('yml', false),
-            'format specified xml expected '       => array('xml', 'xml')
-        );
+        $tester = new CommandTester($command);
+
+        return $tester->execute(array_merge(['command' => $command->getName()], $input));
     }
 
     /**
-     * Prepares command mock
-     * asText mocked by default in case when we don't need to mock anything
-     *
-     * @param array $methods
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|OroTranslationPackCommand
+     * @return OroTranslationPackCommand
      */
-    protected function getCommandMock($methods = ['asText'])
+    private function getCommand(TestKernel $kernel): OroTranslationPackCommand
     {
-        $commandMock = $this->getMockBuilder(OroTranslationPackCommand::class)
-            ->setConstructorArgs(
-                [
-                    $this->translationDumper,
-                    $this->translationServiceProvider,
-                    $this->translationPackageProvider,
-                    $this->translationAdaptersCollection,
-                    'kernel_dir'
-                ]
-            )
-            ->setMethods($methods);
+        $app = new Application($kernel);
+        $app->add(new OroTranslationPackCommand(
+            $this->translationDumper,
+            $this->translationServiceProvider,
+            $this->translationPackageProvider,
+            $this->translationAdaptersCollection,
+            'kernel_dir'
+        ));
+        $command = $app->find('oro:translation:pack');
+        $command->setApplication($app);
 
-        return $commandMock->getMock();
-    }
-
-    /**
-     * @param $class
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getNewMock($class)
-    {
-        return $this->createMock($class);
+        return $command;
     }
 
     /**
      * @return TestKernel
      */
-    private function getKernel()
+    private function getKernel(): TestKernel
     {
         return new TestKernel($this->getTempDir('translation-test-stub-cache'));
     }

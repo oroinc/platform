@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\EventListener\Command;
 
 use Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
-use Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -71,7 +70,7 @@ class PlatformUpdateCommandListener
      */
     private function skipReindexation(InputInterface $input): bool
     {
-        return $this->isOptionSet($input, SearchReindexationGlobalOptionsProvider::SKIP_REINDEXATION_OPTION_NAME);
+        return $this->isOptionSet($input, ReindexationOptionsCommandListener::SKIP_REINDEXATION_OPTION_NAME);
     }
 
     /**
@@ -80,7 +79,7 @@ class PlatformUpdateCommandListener
      */
     private function scheduleReindexation(InputInterface $input): bool
     {
-        return $this->isOptionSet($input, SearchReindexationGlobalOptionsProvider::SCHEDULE_REINDEXATION_OPTION_NAME);
+        return $this->isOptionSet($input, ReindexationOptionsCommandListener::SCHEDULE_REINDEXATION_OPTION_NAME);
     }
 
     /**

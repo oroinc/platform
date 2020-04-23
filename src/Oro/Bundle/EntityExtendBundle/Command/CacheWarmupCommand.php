@@ -6,15 +6,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The CLI command to warming up caches related to extended entities.
+ */
 class CacheWarmupCommand extends CacheCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity-extend:cache:warmup';
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:cache:warmup')
             ->setDescription('Warms up extended entity cache.')
             ->addOption(
                 'cache-dir',

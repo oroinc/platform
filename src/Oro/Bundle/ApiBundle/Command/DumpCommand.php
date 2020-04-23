@@ -23,6 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DumpCommand extends AbstractDebugCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:api:dump';
+
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
@@ -52,7 +55,6 @@ class DumpCommand extends AbstractDebugCommand
     protected function configure()
     {
         $this
-            ->setName('oro:api:dump')
             ->setDescription('Dumps all resources accessible through API.')
             ->addArgument(
                 'entity',

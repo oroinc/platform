@@ -67,7 +67,7 @@ class OroTranslationPackCommand extends Command
      */
     protected function configure()
     {
-        $this->setName(self::$defaultName)
+        $this
             ->setDescription('Dump translation messages and optionally upload them to third-party service')
             ->setDefinition(
                 [
