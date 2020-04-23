@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for Auto Response email templates selector.
+ */
 class AutoResponseTemplateChoiceType extends AbstractType
 {
     const NAME = 'oro_email_autoresponse_template_choice';
@@ -44,7 +47,8 @@ class AutoResponseTemplateChoiceType extends AbstractType
                 return $repository->getEntityTemplatesQueryBuilder(
                     Email::ENTITY_CLASS,
                     $this->tokenAccessor->getOrganization(),
-                    true
+                    true,
+                    false
                 );
             },
             'configs' => [

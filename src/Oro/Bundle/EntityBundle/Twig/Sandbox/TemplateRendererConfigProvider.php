@@ -11,6 +11,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
 {
     private const PROPERTY_PATH     = 'property_path';
     private const DEFAULT_FORMATTER = 'default_formatter';
+    private const RELATED_ENTITY    = 'related_entity_name';
 
     /** @var VariablesProvider */
     private $variablesProvider;
@@ -125,6 +126,16 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
                     }
                     if (!empty($getter[self::DEFAULT_FORMATTER])) {
                         $defaultFormatters[$varName] = $getter[self::DEFAULT_FORMATTER];
+                    }
+                    // Register related class in methods to allow __toString
+                    if (!empty($getter[self::RELATED_ENTITY])) {
+                        if (!array_key_exists(self::METHODS, $configuration)) {
+                            $configuration[self::METHODS]= [];
+                        }
+                        $relatedClass = $getter[self::RELATED_ENTITY];
+                        if (!array_key_exists($relatedClass, $configuration[self::METHODS])) {
+                            $configuration[self::METHODS][$relatedClass] = [];
+                        }
                     }
                 }
             }

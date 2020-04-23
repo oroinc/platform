@@ -62,19 +62,24 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
                     'property_path'     => 'getField3',
                     'default_formatter' => 'formatter3'
                 ],
-                'field4' => ['property_path' => null]
+                'field4' => ['property_path' => null],
+                'field5' => [
+                    'property_path'     => 'getField5',
+                    'related_entity_name' => 'Test\Entity2'
+                ],
             ]
         ];
         $config = [
             'default_formatters' => ['Test\Entity' => ['field3' => 'formatter3']],
+            'methods'            => ['Test\Entity2' => [], 'Test\Entity' => ['getField1', 'getField3', 'getField5']],
             'properties'         => ['Test\Entity' => ['field2', 'field4']],
-            'methods'            => ['Test\Entity' => ['getField1', 'getField3']],
             'accessors'          => [
                 'Test\Entity' => [
                     'field1' => 'getField1',
                     'field2' => null,
                     'field3' => 'getField3',
-                    'field4' => null
+                    'field4' => null,
+                    'field5' => 'getField5'
                 ]
             ]
         ];
