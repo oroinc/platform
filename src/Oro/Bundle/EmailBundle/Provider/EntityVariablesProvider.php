@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -137,16 +138,10 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 'label' => $this->translator->trans($fieldLabel)
             ];
 
-            if ($metadata->hasAssociation($fieldName)) {
-                $targetClass = $metadata->getAssociationTargetClass($fieldName);
-                if ($entityConfigProvider->hasConfig($targetClass)) {
-                    $var['related_entity_name'] = $targetClass;
-                }
-            }
-
-            $formatter = $this->formatterManager->guessFormatter($fieldId->getFieldType());
-            if ($formatter) {
-                $var['default_formatter'] = $formatter;
+            $this->addFormatterData($fieldId, $var);
+            $this->addTargetClassData($fieldId, $metadata, $var);
+            if (!empty($var['related_entity_name']) && !$entityConfigProvider->hasConfig($var['related_entity_name'])) {
+                unset($var['related_entity_name']);
             }
 
             $result[$varName] = $var;
@@ -170,6 +165,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             return [];
         }
 
+        $em = $this->doctrine->getManagerForClass($entityClass);
+        $metadata = $em->getClassMetadata($entityClass);
         $result = [];
         $reflClass = new \ReflectionClass($entityClass);
         $fieldConfigs = $this->configManager->getProvider('email')->getConfigs($entityClass);
@@ -181,17 +178,16 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             /** @var FieldConfigId $fieldId */
             $fieldId = $fieldConfig->getId();
 
-            list($varName, $getter) = $this->getFieldAccessInfo($reflClass, $fieldId->getFieldName());
+            [$varName, $getter] = $this->getFieldAccessInfo($reflClass, $fieldId->getFieldName());
             if (!$varName) {
                 continue;
             }
 
-            $formatter = $this->formatterManager->guessFormatter($fieldId->getFieldType());
-            if ($formatter) {
-                $getter = [
-                    'property_path'     => $getter,
-                    'default_formatter' => $formatter
-                ];
+            $data = [];
+            $this->addTargetClassData($fieldId, $metadata, $data);
+            $this->addFormatterData($fieldId, $data);
+            if ($data) {
+                $getter = array_merge($data, ['property_path' => $getter]);
             }
 
             $result[$varName] = $getter;
@@ -225,5 +221,30 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return [null, null];
+    }
+
+    /**
+     * @param FieldConfigId $fieldId
+     * @param ClassMetadata $metadata
+     * @param array $data
+     */
+    private function addTargetClassData(FieldConfigId $fieldId, ClassMetadata $metadata, array &$data)
+    {
+        $fieldName = $fieldId->getFieldName();
+        if ($metadata->hasAssociation($fieldName)) {
+            $data['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
+        }
+    }
+
+    /**
+     * @param FieldConfigId $fieldId
+     * @param array $data
+     */
+    private function addFormatterData(FieldConfigId $fieldId, array &$data)
+    {
+        $formatter = $this->formatterManager->guessFormatter($fieldId->getFieldType());
+        if ($formatter) {
+            $data['default_formatter'] = $formatter;
+        }
     }
 }
