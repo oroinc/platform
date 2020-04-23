@@ -16,7 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ReindexCommand extends Command
 {
-    public const COMMAND_NAME = 'oro:search:reindex';
+    /** @var string */
+    protected static $defaultName = 'oro:search:reindex';
 
     /** @var DoctrineHelper */
     private $doctrineHelper;
@@ -53,7 +54,6 @@ class ReindexCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->addArgument(
                 'class',
                 InputArgument::OPTIONAL,

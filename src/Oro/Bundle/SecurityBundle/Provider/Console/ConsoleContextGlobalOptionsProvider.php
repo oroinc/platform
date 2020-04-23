@@ -35,7 +35,6 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         $this->container = $container;
     }
 
-
     /**
      * {@inheritdoc}
      */

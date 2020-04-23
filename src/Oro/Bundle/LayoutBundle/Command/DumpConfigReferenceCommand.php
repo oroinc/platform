@@ -14,6 +14,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DumpConfigReferenceCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:layout:config:dump-reference';
+
     /** @var ThemeConfiguration */
     private $themeConfiguration;
 
@@ -32,7 +35,6 @@ class DumpConfigReferenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('oro:layout:config:dump-reference')
             ->setDescription('Dumps the structure of "Resources/views/layouts/*/theme.yml".');
     }
 

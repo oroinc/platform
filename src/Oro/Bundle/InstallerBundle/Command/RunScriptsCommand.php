@@ -9,14 +9,20 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The CLI command to run PHP script files in scope application container.
+ */
 class RunScriptsCommand extends ContainerAwareCommand
 {
+    /** @var string */
+    protected static $defaultName = 'oro:platform:run-script';
+
     /**
      * @inheritdoc
      */
     protected function configure()
     {
-        $this->setName('oro:platform:run-script')
+        $this
             ->setDescription('Run PHP script files in scope application container.')
             ->addArgument(
                 'script',

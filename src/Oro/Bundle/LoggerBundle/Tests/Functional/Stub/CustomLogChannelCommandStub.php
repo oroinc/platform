@@ -15,14 +15,8 @@ class CustomLogChannelCommandStub extends ContainerAwareCommand
     const LOGGER_NAME = 'monolog.logger.custom_channel';
     const LOG_MESSAGE = 'Test log message';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this
-            ->setName('oro:logger:use-custom-channel');
-    }
+    /** @var string */
+    protected static $defaultName = 'oro:logger:use-custom-channel';
 
     /**
      * {@inheritdoc}

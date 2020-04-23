@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,10 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class DumpApiDocConsoleCommandListener
 {
-    const VIEW_OPTION = 'view';
+    private const VIEW_OPTION = 'view';
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /**
      * @param RestDocViewDetector $docViewDetector
@@ -32,10 +34,10 @@ class DumpApiDocConsoleCommandListener
     /**
      * @param ConsoleCommandEvent $event
      */
-    public function onConsoleCommand(ConsoleCommandEvent $event)
+    public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
-        if ('help' === $command->getName()) {
+        if ($command instanceof HelpCommand) {
             $innerCommand = $this->getHelpInnerCommand($command, $event->getInput());
             if ($innerCommand && $this->isApiDocDumpCommand($innerCommand)) {
                 $this->ensureViewOptionDefined($innerCommand);
@@ -55,14 +57,13 @@ class DumpApiDocConsoleCommandListener
      *
      * @return Command|null
      */
-    protected function getHelpInnerCommand(Command $helpCommand, InputInterface $input)
+    private function getHelpInnerCommand(Command $helpCommand, InputInterface $input): ?Command
     {
         $innerCommand = null;
-        $reflClass = new \ReflectionClass($helpCommand);
-        if ($reflClass->hasProperty('command')) {
-            $property = $reflClass->getProperty('command');
-            $property->setAccessible(true);
-            $innerCommand = $property->getValue($helpCommand);
+        $commandProperty = ReflectionUtil::getProperty(new \ReflectionClass($helpCommand), 'command');
+        if (null !== $commandProperty) {
+            $commandProperty->setAccessible(true);
+            $innerCommand = $commandProperty->getValue($helpCommand);
         }
         if (!$innerCommand) {
             $innerCommandName = $this->getApiDocDumpCommandFromParameterOptions($input);
@@ -79,7 +80,7 @@ class DumpApiDocConsoleCommandListener
      *
      * @return bool
      */
-    protected function isApiDocDumpCommand(Command $command)
+    private function isApiDocDumpCommand(Command $command): bool
     {
         return in_array($command->getName(), $this->getApiDocDumpCommands(), true);
     }
@@ -89,7 +90,7 @@ class DumpApiDocConsoleCommandListener
      *
      * @return string|null
      */
-    protected function getApiDocDumpCommandFromParameterOptions(InputInterface $input)
+    private function getApiDocDumpCommandFromParameterOptions(InputInterface $input): ?string
     {
         $commands = $this->getApiDocDumpCommands();
         foreach ($commands as $command) {
@@ -104,7 +105,7 @@ class DumpApiDocConsoleCommandListener
     /**
      * @return string[]
      */
-    protected function getApiDocDumpCommands()
+    private function getApiDocDumpCommands(): array
     {
         return ['api:doc:dump', 'api:swagger:dump'];
     }
@@ -112,7 +113,7 @@ class DumpApiDocConsoleCommandListener
     /**
      * @param Command $command
      */
-    protected function ensureViewOptionDefined(Command $command)
+    private function ensureViewOptionDefined(Command $command): void
     {
         $viewOption = new InputOption(
             self::VIEW_OPTION,
