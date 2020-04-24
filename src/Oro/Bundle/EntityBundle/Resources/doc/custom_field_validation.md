@@ -7,7 +7,7 @@ Example:
 
     # Validator
     oro_acme.validator.acme_custom_grid_field_validator:
-        class: %oro_acme.validator.acme_custom_grid_field_validator.class%
+        class: Acme\DemoBundle\Entity\Manager\Field\CustomGridFeildValidator
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_AcmeBundle_Entity_Foo }
 

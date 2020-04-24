@@ -14,7 +14,7 @@ Actions
 
 **Configuration Example**
 ```
-- @create_note:
+- '@create_note':
     message: $.comment
     target_entity: $.entity
     attribute: $.result.note

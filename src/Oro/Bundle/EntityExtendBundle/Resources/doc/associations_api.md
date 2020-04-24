@@ -48,7 +48,7 @@ You see that it has the AssociationManager injected into it as a dependency:
         class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
         arguments:
             ...
-            - @oro_entity_extend.association_manager
+            - '@oro_entity_extend.association_manager'
             ...
 ```
 
@@ -173,8 +173,8 @@ Here is how we register the API entity manager in the DI container:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
 ```
 
 And finally, we'll create the API controller. For the case with activities it will look like this:
@@ -268,8 +268,8 @@ And then register a custom Route Option Resolver using `oro.api.routing_options_
         class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
         public: false
         arguments:
-            - @oro_entity_config.provider.grouping
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity_config.provider.grouping'
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro.api.routing_options_resolver, view: default }
 ```
@@ -307,7 +307,7 @@ You can see that it has the AssociationManager injected into it as a dependency:
         class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
         arguments:
             ...
-            - @oro_entity_extend.association_manager
+            - '@oro_entity_extend.association_manager'
             ...
 ```
 
@@ -431,8 +431,8 @@ And register it in the DI container:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
 ```
 
 Note that the API entity manager is extended from `ApiEntityManager` and overrides `getListQueryBuilder()` method.
