@@ -178,7 +178,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         $watcherServiceId = sprintf('oro.doctrine.connection.chain_transaction_watcher.%s', $connectionName);
         if ($container->hasAlias($watcherServiceId) || $container->hasDefinition($watcherServiceId)) {
             throw new \RuntimeException(sprintf(
-                'The transaction watcher for the DBAL connection "%s" is alredy exist.',
+                'The transaction watcher for the DBAL connection "%s" already exists.',
                 $connectionName
             ));
         }
@@ -242,10 +242,10 @@ class $proxyClass extends $connectionClass implements $transactionWatcherAwareIn
     public function commit()
     {
         parent::commit();
-        // the nesting level equal to 0 means that the root transaction is commited,
+        // the nesting level equal to 0 means that the root transaction is committed,
         // for nested transactions the nesting level will be greater that 0
         if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === 0) {
-            \$this->transactionWatcher->onTransactionCommited();
+            \$this->transactionWatcher->onTransactionCommitted();
         }
     }
     public function rollBack()
