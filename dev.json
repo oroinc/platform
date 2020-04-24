@@ -59,7 +59,7 @@
         "lexik/maintenance-bundle": "2.1.5",
         "composer/composer": "1.6.*",
         "akeneo/batch-bundle": "0.4.11",
-        "nesbot/Carbon": "1.29.*",
+        "nesbot/carbon": "1.29.*",
         "monolog/monolog": "1.23.*",
         "ocramius/proxy-manager": "2.1.1",
         "knplabs/knp-gaufrette-bundle": "0.5.2",
