@@ -8,17 +8,17 @@ namespace Oro\Component\DoctrineUtils\DBAL;
 interface TransactionWatcherInterface
 {
     /**
-     * This method is called after the root DBAL transaction is sucessfully started.
+     * This method is called after the root DBAL transaction is successfully started.
      */
     public function onTransactionStarted();
 
     /**
-     * This method is called after the root DBAL transaction is sucessfully commited.
+     * This method is called after the root DBAL transaction is successfully committed.
      */
-    public function onTransactionCommited();
+    public function onTransactionCommitted();
 
     /**
-     * This method is called after the root DBAL transaction is sucessfully rolled back.
+     * This method is called after the root DBAL transaction is successfully rolled back.
      */
     public function onTransactionRolledback();
 }

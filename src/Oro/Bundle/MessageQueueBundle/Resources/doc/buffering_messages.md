@@ -9,12 +9,12 @@ Please imagine the following cases:
 - a new entity is created and then a message contains its ID is sent to the message queue, but the database
   transaction was rolled back
 - a new entity is created and then a message contains its ID is sent to the message queue, but before
-  the database transaction is commited
-- the database transaction was committed successfuly, but sending of related messages to the message queue was failed
+  the database transaction is committed
+- the database transaction was committed successfully, but sending of related messages to the message queue was failed
 
 Using the buffering we try to solve the first two cases. But be aware that this approach works well only if
 the master-slave replication is not used, what is the common case, at least for small and middle size databases.
-In case of master-slave replication is used the desctibed issues are still possible because the transfering
+In case of master-slave replication is used the described issues are still possible because the transferring
 of changes from the master to the slave requires some time and if the consumer is connected to the slave database
 it may receive not up-to-date data. So, the message queue processors should be ready to handle this issue.
 
@@ -23,7 +23,7 @@ this can happens is probably that the message queue broker is not reachable.
 
 The buffering works in the following way: before sending a message to the message queue, the database transaction
 is checked whether it is open (including nested) or not. If the transaction is not open, the message will be
-sent right away. But when an open transaction is detected, then the message will be stoted to a buffer and it
+sent right away. But when an open transaction is detected, then the message will be stored to a buffer and it
 will be sent only after all the transactions (including nested) were committed. In case if the transaction is
 rolled back the buffer is cleared up without sending them.
 
@@ -43,7 +43,7 @@ By default the buffering is disabled.
 [DbalTransactionWatcher](../../Client/DbalTransactionWatcher.php) - Watches the default DBAL transaction in order to
 enable the buffering mode of [BufferedMessageProducer](../../Client/BufferedMessageProducer.php) when the root
 transaction starts (call `enableBuffering` method of the producer) and send all collected messages when the root
-transaction is commited (call `flushBuffer` and then `disableBuffering` methods of the producer) or remove all
+transaction is committed (call `flushBuffer` and then `disableBuffering` methods of the producer) or remove all
 collected messages from the buffer without sending them when the root transaction is rolled back (call
 `clearBuffer` and then `disableBuffering` methods of the producer).
 

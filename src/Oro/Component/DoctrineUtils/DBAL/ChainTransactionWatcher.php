@@ -31,10 +31,10 @@ class ChainTransactionWatcher implements TransactionWatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function onTransactionCommited()
+    public function onTransactionCommitted()
     {
         foreach ($this->watchers as $watcher) {
-            $watcher->onTransactionCommited();
+            $watcher->onTransactionCommitted();
         }
     }
 

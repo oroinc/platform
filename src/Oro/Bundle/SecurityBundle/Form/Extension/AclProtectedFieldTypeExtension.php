@@ -33,7 +33,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var bool */
     protected $showRestricted = true;
 
-    /** @var array List of non accessable fields with commited data */
+    /** @var array List of non accessible fields with committed data */
     protected $disabledFields = [];
 
     /**
