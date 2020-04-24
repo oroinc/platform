@@ -84,7 +84,7 @@ And register your provider service in the DI container using the `oro_entity.ali
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
         public: false
         arguments:
-            - @oro_email.email.address.manager
+            - '@oro_email.email.address.manager'
         tags:
             - { name: oro_entity.alias_provider, priority: 100 }
 ```

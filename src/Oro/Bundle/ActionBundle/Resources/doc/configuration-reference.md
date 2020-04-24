@@ -577,11 +577,11 @@ operations:
     demo_operation:
         # ...
         preactions:
-            - @assign_value: [$name, 'User Name']
+            - '@assign_value': [$name, 'User Name']
         form_init:
-            - @assign_value: [$group, 'Group Name']
+            - '@assign_value': [$group, 'Group Name']
         actions:
-            - @create_entity:
+            - '@create_entity':
                 class: Acme\Bundle\DemoBundle\Entity\User
                 attribute: $user
                 data:

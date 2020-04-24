@@ -82,7 +82,7 @@ Then, register this event listener in the DI container:
 ```yml
 services:
     acme_test.event_listener.search.set_search_relevance_weight:
-        class: 'Acme\Bundle\TestBundle\EventListener\SetSearchRelevanceWeightListener'
+        class: Acme\Bundle\TestBundle\EventListener\SetSearchRelevanceWeightListener
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: onPrepareEntityMap }
 ```

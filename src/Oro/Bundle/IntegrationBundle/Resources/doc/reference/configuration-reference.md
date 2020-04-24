@@ -17,7 +17,7 @@ that will contains `type` key, it's should be unique.
 #### Example:
 ``` yaml
     acme.demo_integration.provider.prestashop.channel:
-        class: %acme.demo_integration.provider.prestashop.channel.class%
+        class: Acme\DemoBundle\Integration\PrestashopChannel
         tags:
             - { name: oro_integration.channel, type: presta_shop }
 ```
@@ -38,7 +38,7 @@ could be used.
 #### Example:
 ``` yaml
     acme.demo_integration.provider.db_transport:
-        class: %acme.demo_integration.provider.db_transport.class%
+        class: Acme\DemoBundle\Integration\PrestashopTransport
         tags:
             - { name: oro_integration.transport, type: db, channel_type: presta_shop }
 ```
@@ -56,7 +56,7 @@ channel type it could be used.
 #### Example:
 ``` yaml
     acme.demo_integration.provider.prestashop_product.connector:
-        class: %acme.demo_integration.provider.prestashop_product.connector.class%
+        class: Acme\DemoBundle\Integration\PrestashopProductConnector
         tags:
             - { name: oro_integration.connector, type: product, channel_type: presta_shop }
 ```

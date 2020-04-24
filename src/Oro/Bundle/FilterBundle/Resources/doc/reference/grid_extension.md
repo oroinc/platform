@@ -48,7 +48,7 @@ For example:
                     data_name: priorityLabel
                     case_insensitive: true
             default:
-                fieldName: { value: 'someText', type: %oro_filter.form.type.filter.text.class%::TYPE_CONTAINS }
+                fieldName: { value: 'someText', type: 'Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType::TYPE_CONTAINS' }
 ```
 
 ### Choice filter

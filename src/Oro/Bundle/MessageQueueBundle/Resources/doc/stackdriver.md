@@ -59,7 +59,7 @@ Define service in DI:
 
 services:
     acme_demo.log.handler.stackdriver:
-        class: 'Acme\Bundle\DemoBundle\Log\Handler\StackdriverHandler'
+        class: Acme\Bundle\DemoBundle\Log\Handler\StackdriverHandler
 ```
 
 Configure Monolog handler to listen only message queue logs:

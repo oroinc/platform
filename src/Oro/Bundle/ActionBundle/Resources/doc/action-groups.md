@@ -33,12 +33,12 @@ action_groups:                                  # root node for action groups
         conditions:                             # Condition expression
             @not_empty: [$.who]
         actions:                                # list of actions that should be executed
-            - @call_service_method:
+            - '@call_service_method':
                 service: type_guesser
                 method: guess
                 method_parameters: [$.who]      # as you can see, parameters are accessible from root $.<parameterName>
                 attribute: $.typeOfWho
-            - @flash_message:
+            - '@flash_message':
                 message: "%param1%, %param2%!"
                 type: 'info'
                 message_parameters:

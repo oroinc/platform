@@ -116,7 +116,7 @@ register it as a service:
 ```yml
 
       acme_test.provider.form_provider.test:
-          class: %acme_test.provider.form_provider.test.class%
+          class: 'Acme\Bundle\SomeBundle\Provider\TestConfigurationFormProvider'
           parent: 'oro_config.provider.abstract_provider'
           lazy: true
 ```
