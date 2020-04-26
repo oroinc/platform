@@ -14,7 +14,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 {
     const MOCK_FILE_NAME = 'mock_file_for_initialize.xlsx';
 
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextRegistry|MockObject */
     private $contextRegistry;
 
     /** @var XlsxFileReader */
@@ -29,7 +29,12 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);
 
-        $this->reader = new XlsxFileReader($this->contextRegistry);
+        $this->reader = new class($this->contextRegistry) extends XlsxFileReader {
+            public function xisFirstLineIsHeader(): bool
+            {
+                return $this->firstLineIsHeader;
+            }
+        };
         $this->reader->setImportHelper($this->importHelper);
     }
 
@@ -41,14 +46,14 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
             'header' => ['one', 'two']
         ];
 
-        $this->assertAttributeEquals(true, 'firstLineIsHeader', $this->reader);
-        $this->assertAttributeEmpty('header', $this->reader);
+        static::assertTrue($this->reader->xisFirstLineIsHeader());
+        static::assertEmpty($this->reader->getHeader());
 
         $context = new Context($options);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->reader);
-        $this->assertAttributeEquals($options['header'], 'header', $this->reader);
+        static::assertEquals($options['firstLineIsHeader'], $this->reader->xisFirstLineIsHeader());
+        static::assertEquals($options['header'], $this->reader->getHeader());
     }
 
     /**
@@ -146,7 +151,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param ContextInterface $context
-     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
+     * @return MockObject|StepExecution
      */
     protected function getMockStepExecution($context)
     {

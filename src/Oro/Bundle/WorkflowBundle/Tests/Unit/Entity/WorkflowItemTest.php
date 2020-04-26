@@ -10,16 +10,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowItem
-     */
+    /** @var WorkflowItem */
     protected $workflowItem;
 
     protected function setUp(): void
@@ -34,10 +36,10 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testId()
     {
-        $this->assertNull($this->workflowItem->getId());
+        static::assertNull($this->workflowItem->getId());
         $value = 1;
         $this->workflowItem->setId($value);
-        $this->assertEquals($value, $this->workflowItem->getId());
+        static::assertEquals($value, $this->workflowItem->getId());
     }
 
     public function testMerge()
@@ -63,25 +65,24 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testWorkflowName()
     {
-        $this->assertNull($this->workflowItem->getWorkflowName());
+        static::assertNull($this->workflowItem->getWorkflowName());
         $value = 'example_workflow';
         $this->workflowItem->setWorkflowName($value);
-        $this->assertEquals($value, $this->workflowItem->getWorkflowName());
+        static::assertEquals($value, $this->workflowItem->getWorkflowName());
     }
 
     public function testCurrentStepName()
     {
-        $this->assertNull($this->workflowItem->getCurrentStep());
-        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
-            ->disableOriginalConstructor()
-            ->getMock();
+        static::assertNull($this->workflowItem->getCurrentStep());
+        /** @var WorkflowStep|MockObject $value */
+        $value = $this->getMockBuilder(WorkflowStep::class)->disableOriginalConstructor()->getMock();
         $this->workflowItem->setCurrentStep($value);
-        $this->assertEquals($value, $this->workflowItem->getCurrentStep());
+        static::assertEquals($value, $this->workflowItem->getCurrentStep());
     }
 
     public function testData()
     {
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData', $this->workflowItem->getData());
+        $this->assertInstanceOf(WorkflowData::class, $this->workflowItem->getData());
 
         $data = new WorkflowData();
         $data['foo'] = 'Bar';
@@ -92,17 +93,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDataWithSerialization()
     {
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getEntityAttributeName')
-            ->will($this->returnValue('attr'));
+        /** @var WorkflowDefinition|MockObject $definition */
+        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects(static::once())->method('getEntityAttributeName')->willReturn('attr');
 
         /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
         $workflowItem->setDefinition($definition);
 
@@ -111,10 +109,10 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $data = new WorkflowData();
         $data->set('foo', 'bar');
 
-        $serializer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
+        $serializer = $this->createMock(WorkflowAwareSerializer::class);
         $serializer->expects($this->once())->method('deserialize')
-            ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\WorkflowData', 'json')
-            ->will($this->returnValue($data));
+            ->with($serializedData, WorkflowData::class, 'json')
+            ->willReturn($data);
 
         $workflowItem->setSerializer($serializer, 'json');
         $workflowItem->setSerializedData($serializedData);
@@ -125,13 +123,13 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDataWithSerializationFails()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Cannot deserialize data of workflow item. Serializer is not available.');
 
         /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
         $workflowItem->setSerializedData('serialized_data');
         $workflowItem->getData();
@@ -140,36 +138,36 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
     public function testGetDataWithWithEmptySerializedData()
     {
         /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $data = $workflowItem->getData();
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData', $data);
-        $this->assertTrue($data->isEmpty());
+        static::assertInstanceOf(WorkflowData::class, $data);
+        static::assertTrue($data->isEmpty());
     }
 
     public function testSetSerializedData()
     {
-        $this->assertAttributeEmpty('serializedData', $this->workflowItem);
+        static::assertEmpty($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
         $this->workflowItem->setSerializedData($data);
-        $this->assertAttributeEquals($data, 'serializedData', $this->workflowItem);
+        static::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
     public function testGetSerializedData()
     {
-        $this->assertNull($this->workflowItem->getSerializedData());
+        static::assertNull($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
         $this->workflowItem->setSerializedData($data);
-        $this->assertEquals($data, $this->workflowItem->getSerializedData());
+        static::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
     public function testGetResult()
     {
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowResult', $this->workflowItem->getResult());
-        $this->assertTrue($this->workflowItem->getResult()->isEmpty());
+        static::assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
+        static::assertTrue($this->workflowItem->getResult()->isEmpty());
     }
 
     /**
@@ -181,7 +179,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $resultProperty = $reflection->getProperty('result');
         $resultProperty->setAccessible(true);
         $resultProperty->setValue($this->workflowItem, null);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowResult', $this->workflowItem->getResult());
+        $this->assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
         $this->assertTrue($this->workflowItem->getResult()->isEmpty());
     }
 
@@ -232,7 +230,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testSetEntityException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity can not be changed');
 
         $this->workflowItem->setEntity(new \stdClass());
@@ -248,7 +246,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testSetEntityIdException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity ID can not be changed');
 
         $this->workflowItem->setEntityId(1);
@@ -352,7 +350,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testSetEntityClassException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity CLASS can not be changed');
 
         $this->workflowItem->setEntityClass('stdClass');

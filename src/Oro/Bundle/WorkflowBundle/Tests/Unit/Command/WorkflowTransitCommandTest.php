@@ -119,10 +119,8 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $messages = $this->getObjectAttribute($this->output, 'messages');
-
         $found = 0;
-        foreach ($messages as $message) {
+        foreach ($this->output->messages as $message) {
             foreach ($expectedOutput as $expected) {
                 if (strpos($message, $expected) !== false) {
                     $found++;

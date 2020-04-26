@@ -33,9 +33,14 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             'anotherTopicName' => [['aProcessorName', 'aQueueName']]
         ];
 
-        $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry(), $routes);
+        $router = new class($this->createDriverStub(), $this->createDestinationMetaRegistry(), $routes) extends Router {
+            public function xgetRoutes(): array
+            {
+                return $this->routes;
+            }
+        };
 
-        $this->assertAttributeEquals($routes, 'routes', $router);
+        static::assertEquals($routes, $router->xgetRoutes());
     }
 
     public function testThrowIfTopicNameEmptyOnOnAddRoute()
@@ -56,34 +61,48 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAllowAddRouteWithQueueSetExplicitly()
     {
-        $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
+        $router = new class($this->createDriverStub(), $this->createDestinationMetaRegistry()) extends Router {
+            public function xgetRoutes(): array
+            {
+                return $this->routes;
+            }
+        };
 
         $router->addRoute('aTopicName', 'aProcessorName', 'aQueueName');
 
-        $this->assertAttributeEquals(['aTopicName' => [['aProcessorName', 'aQueueName']]], 'routes', $router);
+        static::assertEquals(['aTopicName' => [['aProcessorName', 'aQueueName']]], $router->xgetRoutes());
     }
 
     public function testShouldAllowAddTwoRoutesForSameTopic()
     {
-        $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
+        $router = new class($this->createDriverStub(), $this->createDestinationMetaRegistry()) extends Router {
+            public function xgetRoutes(): array
+            {
+                return $this->routes;
+            }
+        };
 
         $router->addRoute('aTopicName', 'aFooProcessorName', 'aFooQueueName');
         $router->addRoute('aTopicName', 'aBarProcessorName', 'aBarQueueName');
 
-        $this->assertAttributeEquals(
+        static::assertEquals(
             ['aTopicName' => [['aFooProcessorName', 'aFooQueueName'], ['aBarProcessorName', 'aBarQueueName']]],
-            'routes',
-            $router
+            $router->xgetRoutes()
         );
     }
 
     public function testShouldAllowAddRouteWithDefaultQueue()
     {
-        $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
+        $router = new class($this->createDriverStub(), $this->createDestinationMetaRegistry()) extends Router {
+            public function xgetRoutes(): array
+            {
+                return $this->routes;
+            }
+        };
 
         $router->addRoute('aTopicName', 'aProcessorName', 'default');
 
-        $this->assertAttributeEquals(['aTopicName' => [['aProcessorName', 'default']]], 'routes', $router);
+        static::assertEquals(['aTopicName' => [['aProcessorName', 'default']]], $router->xgetRoutes());
     }
 
     public function testShouldThrowExceptionIfTopicNameParameterIsNotSet()
@@ -247,7 +266,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 return new Queue($queueName);
             })
         ;
-        
+
         return $driverMock;
     }
 }

@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -50,22 +50,22 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\Test
         unset($this->extension, $this->doctrineHelper, $this->triggerCache, $this->entityManager, $this->triggers);
     }
 
-    /**
-     * @param string $event
-     * @param object $entity
-     * @param array $changeSet
-     */
-    protected function callPreFunctionByEventName($event, $entity, $changeSet = [])
-    {
+    protected function callPreFunctionByEventName(
+        string $event,
+        object $entity,
+        array $changeSet = [],
+        ?object $extension = null
+    ): void {
+        if (null === $extension) {
+            $extension = $this->extension;
+        }
         switch ($event) {
             case EventTriggerInterface::EVENT_CREATE:
-                $this->extension->schedule($entity, $event);
+            case EventTriggerInterface::EVENT_DELETE:
+                $extension->schedule($entity, $event);
                 break;
             case EventTriggerInterface::EVENT_UPDATE:
-                $this->extension->schedule($entity, $event, $changeSet);
-                break;
-            case EventTriggerInterface::EVENT_DELETE:
-                $this->extension->schedule($entity, $event);
+                $extension->schedule($entity, $event, $changeSet);
                 break;
         }
     }
@@ -139,4 +139,12 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\Test
             array_merge(['id' => $id], $fields)
         );
     }
+
+    /**
+     * Creates a mock of a descendant of the trigger extension that provides additional getters
+     * to access its internal state.
+     *
+     * @return AbstractEventTriggerExtension
+     */
+    abstract protected function mockTriggerExtensionDescendant();
 }

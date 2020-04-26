@@ -64,14 +64,6 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetGetAddress()
-    {
-        /** @var AbstractAddress $address */
-        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
-        $this->entity->addAddress($address);
-        $this->assertAttributeEquals($this->entity->getAddresses(), 'addresses', $this->entity);
-    }
-
     public function testHasAddress()
     {
         /** @var AbstractAddress $address */

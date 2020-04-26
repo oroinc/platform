@@ -12,22 +12,14 @@ use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
  */
 class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigurationManager */
     private $configurationManager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configurationManager = $this->createMock(ConfigurationManager::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         unset($this->configurationManager);
@@ -43,13 +35,19 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetVoters()
     {
+        $this->configurationManager->expects(static::any())
+            ->method('get')
+            ->willReturnArgument(2);
+
         $checker = new FeatureChecker($this->configurationManager);
-        $voter = $this->getVoter(FeatureChecker::STRATEGY_CONSENSUS);
+
+        $voter = $this->createMock(VoterInterface::class);
+        $voter->expects(static::once())
+            ->method('vote');
 
         $checker->setVoters([$voter]);
 
-        $this->assertAttributeCount(1, 'voters', $checker);
-        $this->assertAttributeEquals([$voter], 'voters', $checker);
+        $checker->isFeatureEnabled('testfeaturex');
     }
 
     /**
@@ -339,7 +337,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testResetCache()
     {
-        $this->configurationManager->expects($this->any())
+        $this->configurationManager->expects(static::any())
             ->method('get')
             ->withConsecutive(
                 ['feature1', 'strategy', FeatureChecker::STRATEGY_UNANIMOUS],
@@ -347,14 +345,19 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnArgument(2);
 
-        $checker = new FeatureChecker($this->configurationManager);
+        $checker = new class($this->configurationManager) extends FeatureChecker {
+            public function xgetFeaturesStates(): array
+            {
+                return $this->featuresStates;
+            }
+        };
 
-        $this->assertFalse($checker->isFeatureEnabled('feature1'));
-        $this->assertAttributeNotEmpty('featuresStates', $checker);
+        static::assertFalse($checker->isFeatureEnabled('feature1'));
+        static::assertNotEmpty($checker->xgetFeaturesStates());
 
         $checker->resetCache();
 
-        $this->assertAttributeEmpty('featuresStates', $checker);
+        static::assertEmpty($checker->xgetFeaturesStates());
     }
 
     /**

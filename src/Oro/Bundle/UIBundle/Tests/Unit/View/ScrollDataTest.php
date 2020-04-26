@@ -22,7 +22,6 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
         $data = ['some' => 'fields'];
         $this->scrollData->setData($data);
-        $this->assertAttributeEquals($data, 'data', $this->scrollData);
         $this->assertEquals($data, $this->scrollData->getData());
     }
 

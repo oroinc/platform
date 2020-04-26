@@ -37,7 +37,12 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
 
-        $this->cache = new EventTriggerCache($this->registry);
+        $this->cache = new class($this->registry) extends EventTriggerCache {
+            public function xgetProvider(): ?CacheProvider
+            {
+                return $this->provider;
+            }
+        };
         $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
     }
 
@@ -45,9 +50,9 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
     {
         $provider = $this->prepareProvider([]);
 
-        $this->assertAttributeEmpty('provider', $this->cache);
+        static::assertEmpty($this->cache->xgetProvider());
         $this->cache->setProvider($provider);
-        $this->assertAttributeEquals($provider, 'provider', $this->cache);
+        static::assertSame($provider, $this->cache->xgetProvider());
     }
 
     public function testBuild()

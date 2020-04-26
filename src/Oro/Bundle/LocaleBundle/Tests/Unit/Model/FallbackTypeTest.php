@@ -11,7 +11,6 @@ class FallbackTypeTest extends \PHPUnit\Framework\TestCase
         $type = FallbackType::SYSTEM;
         $fallbackType = new FallbackType($type);
 
-        $this->assertAttributeEquals($type, 'type', $fallbackType);
-        $this->assertEquals($type, $fallbackType->getType());
+        static::assertEquals($type, $fallbackType->getType());
     }
 }

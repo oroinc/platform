@@ -6,37 +6,33 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\ImportProcessorTest;
 use Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
 {
-    /**
-     * @var StepExecutionAwareImportProcessor
-     */
+    /** @var StepExecutionAwareImportProcessor */
     protected $processor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|StepExecution
-     */
+    /** @var MockObject|StepExecution */
     protected $stepExecution;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry
-     */
+    /** @var MockObject|ContextRegistry */
     protected $contextRegistry;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processor = new class() extends StepExecutionAwareImportProcessor {
+            public function xgetEntityName(): string
+            {
+                return $this->entityName;
+            }
+        };
 
-        $this->processor = new StepExecutionAwareImportProcessor();
         $this->processor->setSerializer($this->serializer);
         $this->processor->setImportExportContext($this->context);
     }
@@ -53,9 +49,9 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
     {
         $this->processor->setContextRegistry($this->contextRegistry);
 
-        $this->contextRegistry->expects($this->once())
+        $this->contextRegistry->expects(static::once())
             ->method('getByStepExecution')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
         $this->processor->setStepExecution($this->stepExecution);
     }

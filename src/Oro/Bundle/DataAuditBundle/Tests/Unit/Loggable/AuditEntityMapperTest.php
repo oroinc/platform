@@ -168,9 +168,6 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->addAuditEntryClass(get_class($user2), 'Test\AuditEntry2');
         $this->mapper->addAuditEntryClass(get_class($user3), 'Test\AuditEntry3');
 
-        // guard
-        $this->assertAttributeCount(3, 'map', $this->mapper);
-
         $this->mapper->getAuditEntryFieldClassForAuditEntry('Test\AuditEntry3');
     }
 }

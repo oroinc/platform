@@ -92,9 +92,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     public function testShouldBeEnabledByDefault()
     {
-        $listener = $this->getListener();
+        $em = $this->getEntityManager();
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $em->persist($owner);
+        $em->flush();
 
-        self::assertAttributeEquals(true, 'enabled', $listener);
+        self::assertMessagesCount(Topics::ENTITIES_CHANGED, 1);
     }
 
     public function testShouldDoNothingIfListenerDisabled()

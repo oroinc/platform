@@ -92,29 +92,32 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $countQb = $this->createMock(QueryBuilder::class);
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(static::once())
             ->method('processQuery')
             ->with($config)
             ->willReturn($qb);
-        $this->processor->expects($this->once())
+        $this->processor->expects(static::once())
             ->method('processCountQuery')
             ->with($config)
             ->willReturn($countQb);
 
-        $datagrid->expects($this->once())
+        $datagrid->expects(static::once())
             ->method('setDatasource')
-            ->willReturnCallback(function ($datasource) {
-                $this->assertEquals($this->datasource, $datasource);
-                $this->assertNotSame($this->datasource, $datasource);
-            });
+            ->with(
+                static::logicalAnd(
+                    static::equalTo($this->datasource),
+                    static::logicalNot(static::identicalTo($this->datasource))
+                )
+            )
+            ->willReturnSelf();
 
         $this->datasource->process($datagrid, $config);
 
-        $this->assertAttributeSame($datagrid, 'datagrid', $this->datasource);
-        $this->assertAttributeSame($qb, 'qb', $this->datasource);
-        $this->assertAttributeSame($countQb, 'countQb', $this->datasource);
-        $this->assertAttributeSame([], 'queryHints', $this->datasource);
-        $this->assertAttributeSame([], 'countQueryHints', $this->datasource);
+        static::assertSame($datagrid, $this->datasource->getDatagrid());
+        static::assertSame($qb, $this->datasource->getQueryBuilder());
+        static::assertSame($countQb, $this->datasource->getCountQb());
+        static::assertSame([], $this->datasource->getQueryHints());
+        static::assertSame([], $this->datasource->getCountQueryHints());
     }
 
     public function testProcessWithHints()
@@ -138,18 +141,21 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 
         $datagrid->expects($this->once())
             ->method('setDatasource')
-            ->willReturnCallback(function ($datasource) {
-                $this->assertEquals($this->datasource, $datasource);
-                $this->assertNotSame($this->datasource, $datasource);
-            });
+            ->with(
+                static::logicalAnd(
+                    static::equalTo($this->datasource),
+                    static::logicalNot(static::identicalTo($this->datasource))
+                )
+            )
+            ->willReturnSelf();
 
         $this->datasource->process($datagrid, $config);
 
-        $this->assertAttributeSame($datagrid, 'datagrid', $this->datasource);
-        $this->assertAttributeSame($qb, 'qb', $this->datasource);
-        $this->assertAttributeSame($countQb, 'countQb', $this->datasource);
-        $this->assertAttributeSame($config['hints'], 'queryHints', $this->datasource);
-        $this->assertAttributeSame($config['count_hints'], 'countQueryHints', $this->datasource);
+        static::assertSame($datagrid, $this->datasource->getDatagrid());
+        static::assertSame($qb, $this->datasource->getQueryBuilder());
+        static::assertSame($countQb, $this->datasource->getCountQb());
+        static::assertSame($config['hints'], $this->datasource->getQueryHints());
+        static::assertSame($config['count_hints'], $this->datasource->getCountQueryHints());
     }
 
     public function testGetResults()

@@ -8,38 +8,29 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructionWithoutProviders()
-    {
-        $chain = new ChainOwnershipMetadataProvider();
-
-        $this->assertAttributeCount(0, 'providers', $chain);
-    }
-
     public function testAddProvider()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider1 */
-        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $supports1 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $supports1->expects($this->once())
+            ->method('supports');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider2 */
-        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $chain1 = new ChainOwnershipMetadataProvider();
+        $chain1->addProvider('alias1', $supports1);
+        $chain1->supports();
 
-        $chain = new ChainOwnershipMetadataProvider();
-        $chain->addProvider('alias1', $provider1);
+        $notSupports = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $notSupports->expects($this->any())
+            ->method('supports')
+            ->willReturn(false);
 
-        $this->assertAttributeCount(1, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
+        $supports2 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $supports2->expects($this->once())
+            ->method('supports');
 
-        $chain->addProvider('alias2', $provider2);
-
-        $this->assertAttributeCount(2, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
-        $this->assertAttributeContains($provider2, 'providers', $chain);
-
-        $chain->addProvider('alias2', $provider1);
-
-        $this->assertAttributeCount(2, 'providers', $chain);
-        $this->assertAttributeContains($provider1, 'providers', $chain);
-        $this->assertAttributeNotContains($provider2, 'providers', $chain);
+        $chain2 = new ChainOwnershipMetadataProvider();
+        $chain2->addProvider('alias1', $notSupports);
+        $chain2->addProvider('alias2', $supports2);
+        $chain2->supports();
     }
 
     public function testSupports()

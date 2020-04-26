@@ -14,22 +14,23 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
+    /** @var MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationRegistry */
+    /** @var MockObject|OperationRegistry */
     protected $registry;
 
     /** @var DeleteMassActionExtension */
     protected $extension;
 
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextHelper|MockObject */
     protected $contextHelper;
 
     protected function setUp(): void
@@ -39,12 +40,18 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(OperationRegistry::class);
         $this->contextHelper = $this->createMock(ContextHelper::class);
 
-        $this->extension = new DeleteMassActionExtension(
+        $this->extension = new class(
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->registry,
             $this->contextHelper
-        );
+        ) extends DeleteMassActionExtension {
+            public function xgetGroups(): array
+            {
+                return $this->groups;
+            }
+        };
+
         $this->extension->setParameters(new ParameterBag());
     }
 
@@ -64,7 +71,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->setGroups($data);
 
-        $this->assertAttributeEquals($data, 'groups', $this->extension);
+        static::assertEquals($data, $this->extension->xgetGroups());
     }
 
     /**

@@ -17,11 +17,13 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldAddObjectWithoutData()
     {
         $this->collection->add(new \stdClass(), 'key');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldAddObjectWithData()
     {
         $this->collection->add(new \stdClass(), 'key', 'data');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldAddThrowExceptionIfObjectIsNull()
@@ -90,6 +92,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldAddWithNotStringKey($key)
     {
         $this->collection->add(new \stdClass(), $key);
+        $this->expectNotToPerformAssertions();
     }
 
     public function validKeysProvider()
@@ -196,11 +199,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldClearAllData()
     {
-        $this->collection->add(new \stdClass(), 'key', 'data');
+        $object = new \stdClass();
+        $this->collection->add($object, 'key', 'data');
         $this->collection->clear();
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 
     public function testShouldIsEmptyReturnTrueForEmptyCollection()
@@ -233,6 +237,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldRemoveNotThrowExceptionForUnknownObject()
     {
         $this->collection->remove(new \stdClass());
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldRemoveObject()
@@ -240,22 +245,24 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $object = new \stdClass();
         $this->collection->add($object, 'key', 'data');
         $this->collection->remove($object);
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 
     public function testShouldRemoveKeyNotThrowExceptionForUnknownKey()
     {
         $this->collection->removeKey('key');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testShouldRemoveObjectByKey()
     {
-        $this->collection->add(new \stdClass(), 'key', 'data');
+        $object = new \stdClass();
+        $this->collection->add($object, 'key', 'data');
         $this->collection->removeKey('key');
-        self::assertAttributeSame([], 'objects', $this->collection);
-        self::assertAttributeSame([], 'keys', $this->collection);
-        self::assertAttributeSame([], 'data', $this->collection);
+        self::assertSame([], $this->collection->getAll());
+        self::assertNull($this->collection->getKey($object));
+        self::assertNull($this->collection->getData($object));
     }
 }

@@ -76,38 +76,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a haystack that is stored in a static attribute of a class
-     * or an attribute of an object contains a needle.
-     *
-     * @param mixed  $needle
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     * @param bool   $ignoreCase
-     * @param bool   $checkForObjectIdentity
-     * @param bool   $checkForNonObjectIdentity
-     */
-    public static function assertAttributeContains(
-        $needle,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $message = '',
-        $ignoreCase = false,
-        $checkForObjectIdentity = true,
-        $checkForNonObjectIdentity = false
-    ) {
-        Assert::assertAttributeContains(
-            $needle,
-            $haystackAttributeName,
-            $haystackClassOrObject,
-            $message,
-            $ignoreCase,
-            $checkForObjectIdentity,
-            $checkForNonObjectIdentity
-        );
-    }
-
-    /**
      * Asserts that a haystack does not contain a needle.
      *
      * @param mixed  $needle
@@ -128,38 +96,6 @@ trait AssertTrait
         Assert::assertNotContains(
             $needle,
             $haystack,
-            $message,
-            $ignoreCase,
-            $checkForObjectIdentity,
-            $checkForNonObjectIdentity
-        );
-    }
-
-    /**
-     * Asserts that a haystack that is stored in a static attribute of a class
-     * or an attribute of an object does not contain a needle.
-     *
-     * @param mixed  $needle
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     * @param bool   $ignoreCase
-     * @param bool   $checkForObjectIdentity
-     * @param bool   $checkForNonObjectIdentity
-     */
-    public static function assertAttributeNotContains(
-        $needle,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $message = '',
-        $ignoreCase = false,
-        $checkForObjectIdentity = true,
-        $checkForNonObjectIdentity = false
-    ) {
-        Assert::assertAttributeNotContains(
-            $needle,
-            $haystackAttributeName,
-            $haystackClassOrObject,
             $message,
             $ignoreCase,
             $checkForObjectIdentity,
@@ -193,32 +129,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a haystack that is stored in a static attribute of a class
-     * or an attribute of an object contains only values of a given type.
-     *
-     * @param string $type
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param bool   $isNativeType
-     * @param string $message
-     */
-    public static function assertAttributeContainsOnly(
-        $type,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $isNativeType = null,
-        $message = ''
-    ) {
-        Assert::assertAttributeContainsOnly(
-            $type,
-            $haystackAttributeName,
-            $haystackClassOrObject,
-            $isNativeType,
-            $message
-        );
-    }
-
-    /**
      * Asserts that a haystack does not contain only values of a given type.
      *
      * @param string $type
@@ -229,33 +139,6 @@ trait AssertTrait
     public static function assertNotContainsOnly($type, $haystack, $isNativeType = null, $message = '')
     {
         Assert::assertNotContainsOnly($type, $haystack, $isNativeType, $message);
-    }
-
-    /**
-     * Asserts that a haystack that is stored in a static attribute of a class
-     * or an attribute of an object does not contain only values of a given
-     * type.
-     *
-     * @param string $type
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param bool   $isNativeType
-     * @param string $message
-     */
-    public static function assertAttributeNotContainsOnly(
-        $type,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $isNativeType = null,
-        $message = ''
-    ) {
-        Assert::assertAttributeNotContainsOnly(
-            $type,
-            $haystackAttributeName,
-            $haystackClassOrObject,
-            $isNativeType,
-            $message
-        );
     }
 
     /**
@@ -271,24 +154,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts the number of elements of an array, Countable or Traversable
-     * that is stored in an attribute.
-     *
-     * @param int    $expectedCount
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeCount(
-        $expectedCount,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $message = ''
-    ) {
-        Assert::assertAttributeCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
-    }
-
-    /**
      * Asserts the number of elements of an array, Countable or Traversable.
      *
      * @param int    $expectedCount
@@ -298,24 +163,6 @@ trait AssertTrait
     public static function assertNotCount($expectedCount, $haystack, $message = '')
     {
         Assert::assertNotCount($expectedCount, $haystack, $message);
-    }
-
-    /**
-     * Asserts the number of elements of an array, Countable or Traversable
-     * that is stored in an attribute.
-     *
-     * @param int    $expectedCount
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeNotCount(
-        $expectedCount,
-        $haystackAttributeName,
-        $haystackClassOrObject,
-        $message = ''
-    ) {
-        Assert::assertAttributeNotCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
     }
 
     /**
@@ -342,40 +189,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a variable is equal to an attribute of an object.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     * @param float  $delta
-     * @param int    $maxDepth
-     * @param bool   $canonicalize
-     * @param bool   $ignoreCase
-     */
-    public static function assertAttributeEquals(
-        $expected,
-        $actualAttributeName,
-        $actualClassOrObject,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10,
-        $canonicalize = false,
-        $ignoreCase = false
-    ) {
-        Assert::assertAttributeEquals(
-            $expected,
-            $actualAttributeName,
-            $actualClassOrObject,
-            $message,
-            $delta,
-            $maxDepth,
-            $canonicalize,
-            $ignoreCase
-        );
-    }
-
-    /**
      * Asserts that two variables are not equal.
      *
      * @param mixed  $expected
@@ -399,40 +212,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a variable is not equal to an attribute of an object.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     * @param float  $delta
-     * @param int    $maxDepth
-     * @param bool   $canonicalize
-     * @param bool   $ignoreCase
-     */
-    public static function assertAttributeNotEquals(
-        $expected,
-        $actualAttributeName,
-        $actualClassOrObject,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10,
-        $canonicalize = false,
-        $ignoreCase = false
-    ) {
-        Assert::assertAttributeNotEquals(
-            $expected,
-            $actualAttributeName,
-            $actualClassOrObject,
-            $message,
-            $delta,
-            $maxDepth,
-            $canonicalize,
-            $ignoreCase
-        );
-    }
-
-    /**
      * Asserts that a variable is empty.
      *
      * @param mixed  $actual
@@ -444,19 +223,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a static attribute of a class or an attribute of an object
-     * is empty.
-     *
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeEmpty($haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        Assert::assertAttributeEmpty($haystackAttributeName, $haystackClassOrObject, $message);
-    }
-
-    /**
      * Asserts that a variable is not empty.
      *
      * @param mixed  $actual
@@ -465,19 +231,6 @@ trait AssertTrait
     public static function assertNotEmpty($actual, $message = '')
     {
         Assert::assertNotEmpty($actual, $message);
-    }
-
-    /**
-     * Asserts that a static attribute of a class or an attribute of an object
-     * is not empty.
-     *
-     * @param string $haystackAttributeName
-     * @param mixed  $haystackClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeNotEmpty($haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        Assert::assertAttributeNotEmpty($haystackAttributeName, $haystackClassOrObject, $message);
     }
 
     /**
@@ -493,23 +246,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that an attribute is greater than another value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeGreaterThan(
-        $expected,
-        $actualAttributeName,
-        $actualClassOrObject,
-        $message = ''
-    ) {
-        Assert::assertAttributeGreaterThan($expected, $actualAttributeName, $actualClassOrObject, $message);
-    }
-
-    /**
      * Asserts that a value is greater than or equal to another value.
      *
      * @param mixed  $expected
@@ -519,23 +255,6 @@ trait AssertTrait
     public static function assertGreaterThanOrEqual($expected, $actual, $message = '')
     {
         Assert::assertGreaterThanOrEqual($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that an attribute is greater than or equal to another value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeGreaterThanOrEqual(
-        $expected,
-        $actualAttributeName,
-        $actualClassOrObject,
-        $message = ''
-    ) {
-        Assert::assertAttributeGreaterThanOrEqual($expected, $actualAttributeName, $actualClassOrObject, $message);
     }
 
     /**
@@ -551,19 +270,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that an attribute is smaller than another value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeLessThan($expected, $actualAttributeName, $actualClassOrObject, $message = '')
-    {
-        Assert::assertAttributeLessThan($expected, $actualAttributeName, $actualClassOrObject, $message);
-    }
-
-    /**
      * Asserts that a value is smaller than or equal to another value.
      *
      * @param mixed  $expected
@@ -573,23 +279,6 @@ trait AssertTrait
     public static function assertLessThanOrEqual($expected, $actual, $message = '')
     {
         Assert::assertLessThanOrEqual($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that an attribute is smaller than or equal to another value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param string $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeLessThanOrEqual(
-        $expected,
-        $actualAttributeName,
-        $actualClassOrObject,
-        $message = ''
-    ) {
-        Assert::assertAttributeLessThanOrEqual($expected, $actualAttributeName, $actualClassOrObject, $message);
     }
 
     /**
@@ -847,20 +536,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a variable and an attribute of an object have the same type
-     * and value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param object $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeSame($expected, $actualAttributeName, $actualClassOrObject, $message = '')
-    {
-        Assert::assertAttributeSame($expected, $actualAttributeName, $actualClassOrObject, $message);
-    }
-
-    /**
      * Asserts that two variables do not have the same type and value.
      * Used on objects, it asserts that two variables do not reference
      * the same object.
@@ -872,20 +547,6 @@ trait AssertTrait
     public static function assertNotSame($expected, $actual, $message = '')
     {
         Assert::assertNotSame($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that a variable and an attribute of an object do not have the
-     * same type and value.
-     *
-     * @param mixed  $expected
-     * @param string $actualAttributeName
-     * @param object $actualClassOrObject
-     * @param string $message
-     */
-    public static function assertAttributeNotSame($expected, $actualAttributeName, $actualClassOrObject, $message = '')
-    {
-        Assert::assertAttributeNotSame($expected, $actualAttributeName, $actualClassOrObject, $message);
     }
 
     /**
@@ -901,19 +562,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that an attribute is of a given type.
-     *
-     * @param string $expected
-     * @param string $attributeName
-     * @param mixed  $classOrObject
-     * @param string $message
-     */
-    public static function assertAttributeInstanceOf($expected, $attributeName, $classOrObject, $message = '')
-    {
-        Assert::assertAttributeInstanceOf($expected, $attributeName, $classOrObject, $message);
-    }
-
-    /**
      * Asserts that a variable is not of a given type.
      *
      * @param string $expected
@@ -923,19 +571,6 @@ trait AssertTrait
     public static function assertNotInstanceOf($expected, $actual, $message = '')
     {
         Assert::assertNotInstanceOf($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that an attribute is of a given type.
-     *
-     * @param string $expected
-     * @param string $attributeName
-     * @param mixed  $classOrObject
-     * @param string $message
-     */
-    public static function assertAttributeNotInstanceOf($expected, $attributeName, $classOrObject, $message = '')
-    {
-        Assert::assertAttributeNotInstanceOf($expected, $attributeName, $classOrObject, $message);
     }
 
     /**
@@ -958,44 +593,6 @@ trait AssertTrait
     public static function assertIsString($actual, $message = '')
     {
         Assert::assertIsString($actual, $message);
-    }
-
-    /**
-     * Asserts that an attribute is of a given type.
-     *
-     * @param string $expected
-     * @param string $attributeName
-     * @param mixed  $classOrObject
-     * @param string $message
-     */
-    public static function assertAttributeInternalType($expected, $attributeName, $classOrObject, $message = '')
-    {
-        Assert::assertAttributeInternalType($expected, $attributeName, $classOrObject, $message);
-    }
-
-    /**
-     * Asserts that a variable is not of a given type.
-     *
-     * @param string $expected
-     * @param mixed  $actual
-     * @param string $message
-     */
-    public static function assertNotInternalType($expected, $actual, $message = '')
-    {
-        Assert::assertNotInternalType($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that an attribute is of a given type.
-     *
-     * @param string $expected
-     * @param string $attributeName
-     * @param mixed  $classOrObject
-     * @param string $message
-     */
-    public static function assertAttributeNotInternalType($expected, $attributeName, $classOrObject, $message = '')
-    {
-        Assert::assertAttributeNotInternalType($expected, $attributeName, $classOrObject, $message);
     }
 
     /**

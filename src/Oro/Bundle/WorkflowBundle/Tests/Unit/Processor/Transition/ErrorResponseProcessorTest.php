@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorResponseProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
@@ -18,7 +19,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildResponseFromDefinedFields()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
+        /** @var TransitionContext|MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('hasError')
@@ -29,12 +30,11 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['responseCode'], ['responseMessage'])
             ->willReturnOnConsecutiveCalls(418, 'message');
 
-        $context->expects($this->once())->method('setResult')->willReturnCallback(
-            function (Response $response) {
-                $this->assertEquals(418, $response->getStatusCode());
-                $this->assertAttributeEquals('message', 'statusText', $response);
-            }
-        );
+        $context->expects(static::once())
+            ->method('setResult')
+            ->with(static::callback(static function (Response $response) {
+                return static::stringContains("HTTP/1.0 418 message")->evaluate((string) $response);
+            }));
         $context->expects($this->once())->method('setProcessed')->with(true);
 
         $this->processor->process($context);
@@ -42,7 +42,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildResponseFromError()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
+        /** @var TransitionContext|MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('hasError')
@@ -54,12 +54,12 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $context->expects($this->once())->method('getError')->willReturn(new \Exception('error message'));
-        $context->expects($this->once())->method('setResult')->willReturnCallback(
-            function (Response $response) {
-                $this->assertEquals(500, $response->getStatusCode());
-                $this->assertAttributeEquals('error message', 'statusText', $response);
-            }
-        );
+        $context->expects(static::once())
+            ->method('setResult')
+            ->with(static::callback(static function (Response $response) {
+                return static::stringContains("HTTP/1.0 500 error message")->evaluate((string) $response);
+            }));
+
         $context->expects($this->once())->method('setProcessed')->with(true);
 
         $this->processor->process($context);
@@ -67,7 +67,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSkipHasNoErrors()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
+        /** @var TransitionContext|MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasError')->willReturn(false);
         $context->expects($this->never())->method('setResult');

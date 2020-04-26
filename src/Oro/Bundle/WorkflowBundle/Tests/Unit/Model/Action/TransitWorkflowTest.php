@@ -6,38 +6,49 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TransitWorkflow
-     */
+    /** @var TransitWorkflow */
     protected $action;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|WorkflowManager
-     */
+    /** @var MockObject|WorkflowManager */
     protected $workflowManager;
 
     protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->setMethods(
-                [
-                    'getWorkflowItem',
-                    'transit',
-                ]
-            )
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
+            ->onlyMethods(['getWorkflowItem', 'transit',])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->action = new TransitWorkflow(new ContextAccessor(), $this->workflowManager);
+        $this->action = new class(new ContextAccessor(), $this->workflowManager) extends TransitWorkflow {
+            public function xgetEntity(): string
+            {
+                return $this->entity;
+            }
+
+            public function xgetTransition(): string
+            {
+                return $this->transition;
+            }
+
+            public function xgetWorkflow(): string
+            {
+                return $this->workflow;
+            }
+
+            public function xgetData(): array
+            {
+                return $this->data;
+            }
+        };
+
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
@@ -133,10 +144,10 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         array $expectedData = []
     ) {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($expectedEntity, 'entity', $this->action);
-        $this->assertAttributeEquals($expectedTransition, 'transition', $this->action);
-        $this->assertAttributeEquals($expectedWorkflow, 'workflow', $this->action);
-        $this->assertAttributeEquals($expectedData, 'data', $this->action);
+        static::assertEquals($expectedEntity, $this->action->xgetEntity());
+        static::assertEquals($expectedTransition, $this->action->xgetTransition());
+        static::assertEquals($expectedWorkflow, $this->action->xgetWorkflow());
+        static::assertEquals($expectedData, $this->action->xgetData());
     }
 
     /**

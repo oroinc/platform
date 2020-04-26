@@ -32,13 +32,7 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->reportingLevel = error_reporting(E_ALL);
         $this->formConfig = new FormConfig();
-    }
-
-    protected function tearDown(): void
-    {
-        error_reporting($this->reportingLevel);
     }
 
     public function testAddBlock()
@@ -100,15 +94,5 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
             $this->blocks,
             $this->formConfig->getBlocks()
         );
-    }
-
-    public function testException()
-    {
-        // NOTE: do not change default Error Handler or restore it
-
-        /** test getSubBlock Exception */
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Undefined index: testBlock');
-        $this->formConfig->getBlock('testBlock');
     }
 }

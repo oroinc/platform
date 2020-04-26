@@ -61,19 +61,19 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructorWithOneResourceLoader()
     {
-        $resourceLoader = $this->createMock(CumulativeResourceLoader::class);
+        $this->expectNotToPerformAssertions();
 
-        $loader = new CumulativeConfigLoader('test', $resourceLoader);
-        $this->assertAttributeCount(1, 'resourceLoaders', $loader);
+        new CumulativeConfigLoader('test', $this->createMock(CumulativeResourceLoader::class));
     }
 
     public function testConstructorWithSeveralResourceLoader()
     {
-        $resourceLoader1 = $this->createMock(CumulativeResourceLoader::class);
-        $resourceLoader2 = $this->createMock(CumulativeResourceLoader::class);
+        $this->expectNotToPerformAssertions();
 
-        $loader = new CumulativeConfigLoader('test', [$resourceLoader1, $resourceLoader2]);
-        $this->assertAttributeCount(2, 'resourceLoaders', $loader);
+        new CumulativeConfigLoader('test', [
+            $this->createMock(CumulativeResourceLoader::class),
+            $this->createMock(CumulativeResourceLoader::class)
+        ]);
     }
 
     public function testRegisterResources()

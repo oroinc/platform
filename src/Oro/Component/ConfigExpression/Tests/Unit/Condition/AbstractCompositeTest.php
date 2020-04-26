@@ -2,31 +2,45 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\AbstractComposite;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\AbstractComposite */
+    /** @var AbstractComposite */
     protected $condition;
 
     protected function setUp(): void
     {
-        $this->condition = $this->getMockForAbstractClass(
-            'Oro\Component\ConfigExpression\Condition\AbstractComposite'
-        );
+        $this->condition = new class() extends AbstractComposite {
+            public function xgetOperands(): array
+            {
+                return $this->operands;
+            }
+
+            protected function isConditionAllowed($context)
+            {
+            }
+
+            public function getName()
+            {
+            }
+        };
     }
 
     public function testInitializeSuccess()
     {
-        $operands = [$this->createMock('Oro\Component\ConfigExpression\ExpressionInterface')];
+        $operands = [$this->createMock(ExpressionInterface::class)];
 
-        $this->assertSame($this->condition, $this->condition->initialize($operands));
-        $this->assertAttributeEquals($operands, 'operands', $this->condition);
+        static::assertSame($this->condition, $this->condition->initialize($operands));
+        static::assertEquals($operands, $this->condition->xgetOperands());
     }
 
     public function testInitializeFailsWithEmptyElements()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have at least one element');
 
         $this->condition->initialize([]);
@@ -34,10 +48,10 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWithScalarElement()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(\sprintf(
             'Invalid type of option "0". Expected "%s", "string" given.',
-            \Oro\Component\ConfigExpression\ExpressionInterface::class
+            ExpressionInterface::class
         ));
 
         $this->condition->initialize(['anything']);
@@ -45,10 +59,10 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWithWrongInstanceElement()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(\sprintf(
             'Invalid type of option "0". Expected "%s", "stdClass" given.',
-            \Oro\Component\ConfigExpression\ExpressionInterface::class
+            ExpressionInterface::class
         ));
 
         $this->condition->initialize([new \stdClass]);

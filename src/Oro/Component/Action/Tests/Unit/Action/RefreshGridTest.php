@@ -2,15 +2,18 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RefreshGrid;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RefreshGridTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    /** @var MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var RefreshGrid */
@@ -18,9 +21,15 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->action = new RefreshGrid(new ContextAccessor());
+        $this->action = new class(new ContextAccessor()) extends RefreshGrid {
+            public function xgetGridNames(): array
+            {
+                return $this->gridNames;
+            }
+        };
+
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
@@ -33,17 +42,13 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
     {
         $gridname = 'test_grid';
 
-        $this->assertInstanceOf(
-            'Oro\Component\Action\Action\ActionInterface',
-            $this->action->initialize([$gridname])
-        );
-
-        $this->assertAttributeEquals([$gridname], 'gridNames', $this->action);
+        static::assertInstanceOf(ActionInterface::class, $this->action->initialize([$gridname]));
+        static::assertEquals([$gridname], $this->action->xgetGridNames());
     }
 
     public function testInitializeException()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Gridname parameter must be specified');
 
         $this->action->initialize([]);
@@ -62,7 +67,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($inputData['options']);
         $this->action->execute($context);
 
-        $this->assertEquals($expectedData, $context->getValues());
+        static::assertEquals($expectedData, $context->getValues());
     }
 
     /**

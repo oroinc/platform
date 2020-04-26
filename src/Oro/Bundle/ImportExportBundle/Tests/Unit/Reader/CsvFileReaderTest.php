@@ -26,7 +26,24 @@ class CsvFileReaderTest extends TestCase
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);
 
-        $this->reader = new CsvFileReader($this->contextRegistry);
+        $this->reader = new class($this->contextRegistry) extends CsvFileReader {
+            public function xisFirstLineIsHeader(): bool
+            {
+                return $this->firstLineIsHeader;
+            }
+            public function xgetDelimiter(): string
+            {
+                return $this->delimiter;
+            }
+            public function xgetEnclosure(): string
+            {
+                return $this->enclosure;
+            }
+            public function xgetEscape(): string
+            {
+                return $this->escape;
+            }
+        };
         $this->reader->setImportHelper($this->importHelper);
     }
 
@@ -86,20 +103,20 @@ class CsvFileReaderTest extends TestCase
             'header' => ['one', 'two']
         ];
 
-        $this->assertAttributeEquals(',', 'delimiter', $this->reader);
-        $this->assertAttributeEquals('"', 'enclosure', $this->reader);
-        $this->assertAttributeEquals(chr(0), 'escape', $this->reader);
-        $this->assertAttributeEquals(true, 'firstLineIsHeader', $this->reader);
-        $this->assertAttributeEmpty('header', $this->reader);
+        static::assertEquals(',', $this->reader->xgetDelimiter());
+        static::assertEquals('"', $this->reader->xgetEnclosure());
+        static::assertEquals(chr(0), $this->reader->xgetEscape());
+        static::assertTrue($this->reader->xisFirstLineIsHeader());
+        static::assertEmpty($this->reader->getHeader());
 
         $context = $this->getContextWithOptionsMock($options);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertAttributeEquals($options['delimiter'], 'delimiter', $this->reader);
-        $this->assertAttributeEquals($options['enclosure'], 'enclosure', $this->reader);
-        $this->assertAttributeEquals($options['escape'], 'escape', $this->reader);
-        $this->assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->reader);
-        $this->assertAttributeEquals($options['header'], 'header', $this->reader);
+        static::assertEquals($options['delimiter'], $this->reader->xgetDelimiter());
+        static::assertEquals($options['enclosure'], $this->reader->xgetEnclosure());
+        static::assertEquals($options['escape'], $this->reader->xgetEscape());
+        static::assertEquals($options['firstLineIsHeader'], $this->reader->xisFirstLineIsHeader());
+        static::assertEquals($options['header'], $this->reader->getHeader());
     }
 
     /** @return array */

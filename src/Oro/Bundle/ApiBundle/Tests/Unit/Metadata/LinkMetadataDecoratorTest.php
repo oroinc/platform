@@ -26,7 +26,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         $decoratorClone = clone $this->decorator;
 
         self::assertEquals($this->decorator, $decoratorClone);
-        self::assertAttributeSame($this->linkMetadata, 'link', $decoratorClone);
+        self::assertEquals($this->decorator->toArray(), $decoratorClone->toArray());
     }
 
     public function testToArray()

@@ -97,9 +97,6 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
         $unserialized = unserialize(serialize($loader));
         $this->assertEquals($loader, $unserialized);
-        $this->assertNotSame($loader, $unserialized);
-        $this->assertAttributeEquals($fileMatcher, 'fileMatcher', $unserialized);
-        $this->assertAttributeNotSame($fileMatcher, 'fileMatcher', $unserialized);
     }
 
     /**

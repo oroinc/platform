@@ -371,35 +371,29 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $fallbackLocales = ['en'];
 
         $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategy->expects($this->exactly(2))
+        $strategy->expects(static::exactly(2))
             ->method('getName')
             ->willReturn($strategyName);
 
         /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
-        $strategyProvider->expects($this->exactly(4))
+        $strategyProvider->expects(static::exactly(4))
             ->method('getStrategy')
             ->willReturn($strategy);
-        $strategyProvider->expects($this->once())
+        $strategyProvider->expects(static::once())
             ->method('getAllFallbackLocales')
             ->with($strategy)
             ->willReturn($allFallbackLocales);
         $this->mockStrategyProviderFallbackLocales($strategyProvider, $strategy, $locale, $fallbackLocales);
 
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $translator = $this->getTranslator($this->getLoader(), $strategyProvider, $eventDispatcher);
 
-        $this->assertAttributeEmpty('strategyName', $translator);
-        $this->assertEmpty($translator->getFallbackLocales());
-        $this->assertAttributeEmpty('catalogues', $translator);
-
+        static::assertEmpty($translator->getFallbackLocales());
         $translator->getCatalogue($locale);
-
-        $this->assertAttributeEquals($strategyName, 'strategyName', $translator);
-        $this->assertEquals($allFallbackLocales, $translator->getFallbackLocales());
-        $this->assertAttributeCount(2, 'catalogues', $translator); // en and en_US
+        static::assertEquals($allFallbackLocales, $translator->getFallbackLocales());
     }
 
     public function testGetCatalogueStrategyChanged()
@@ -409,25 +403,25 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $firstStrategy */
         $firstStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $firstStrategy->expects($this->exactly(2))
+        $firstStrategy->expects(static::exactly(2))
             ->method('getName')
             ->willReturn($firstStrategyName);
 
         /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $secondStrategy */
         $secondStrategy = $this->createMock(TranslationStrategyInterface::class);
-        $secondStrategy->expects($this->exactly(2))
+        $secondStrategy->expects(static::exactly(2))
             ->method('getName')
             ->willReturn($secondStrategyName);
 
         /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
             ->setConstructorArgs([[$firstStrategy, $secondStrategy]])
-            ->setMethods(['getAllFallbackLocales', 'getFallbackLocales'])
+            ->onlyMethods(['getAllFallbackLocales', 'getFallbackLocales'])
             ->getMock();
-        $strategyProvider->expects($this->exactly(2))
+        $strategyProvider->expects(static::exactly(2))
             ->method('getAllFallbackLocales')
             ->willReturn([]);
-        $strategyProvider->expects($this->exactly(2))
+        $strategyProvider->expects(static::exactly(2))
             ->method('getFallbackLocales')
             ->willReturn([]);
 
@@ -438,13 +432,13 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $strategyProvider->setStrategy($firstStrategy);
         $translator->getCatalogue('en');
-        $this->assertAttributeEquals($firstStrategyName, 'strategyName', $translator);
-        $this->assertAttributeCount(1, 'catalogues', $translator);
+        static::assertEquals($firstStrategyName, $translator->xgetStrategyName());
+        static::assertEquals(1, $translator->xgetCataloguesCount());
 
         $strategyProvider->setStrategy($secondStrategy);
         $translator->getCatalogue('ru');
-        $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
-        $this->assertAttributeCount(1, 'catalogues', $translator);
+        static::assertEquals($secondStrategyName, $translator->xgetStrategyName());
+        static::assertEquals(1, $translator->xgetCataloguesCount());
     }
 
     /**
@@ -465,13 +459,23 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
 
-        $translator = new Translator(
+        $translator = new class(
             $this->getContainer($loader),
             new MessageFormatter(),
             'en',
             ['loader' => ['loader']],
             array_merge(['resource_files' => []], $options)
-        );
+        ) extends Translator {
+            // exposing protected properties because of the complicated design of the original class
+            public function xgetStrategyName(): string
+            {
+                return $this->strategyName;
+            }
+            public function xgetCataloguesCount(): int
+            {
+                return \count($this->catalogues);
+            }
+        };
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);

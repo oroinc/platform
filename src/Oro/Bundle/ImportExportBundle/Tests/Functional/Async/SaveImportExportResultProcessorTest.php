@@ -54,13 +54,13 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
         $processorResult = $processor->process($message, $this->createSessionMock());
 
-        /** @var ImportExportResult $resultJob */
+        /** @var ImportExportResult $rootJobResult */
         $rootJobResult = $importExportResultManager->findOneBy(['jobId' => $rootJob]);
 
         self::assertEquals(ExportMessageProcessor::ACK, $processorResult);
-        self::assertAttributeEquals($rootJob->getId(), 'jobId', $rootJobResult);
-        self::assertAttributeEquals(ProcessorRegistry::TYPE_EXPORT, 'type', $rootJobResult);
-        self::assertAttributeEquals(ImportExportResult::class, 'entity', $rootJobResult);
+        self::assertEquals($rootJob->getId(), $rootJobResult->getJobId());
+        self::assertEquals(ProcessorRegistry::TYPE_EXPORT, $rootJobResult->getType());
+        self::assertEquals(ImportExportResult::class, $rootJobResult->getEntity());
     }
 
     public function testProcessSaveJobWithInvalidData():void

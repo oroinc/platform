@@ -3,8 +3,10 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\CloneObject;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CloneObjectTest extends \PHPUnit\Framework\TestCase
@@ -18,12 +20,15 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->action = new CloneObject($this->contextAccessor);
+        $this->action = new class($this->contextAccessor) extends CloneObject {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
@@ -34,7 +39,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeExceptionNoTargetObject()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Target parameter is required');
 
         $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
@@ -42,7 +47,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeExceptionNoAttribute()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute name parameter is required.');
 
         $this->action->initialize(['target' => new \stdClass()]);
@@ -50,7 +55,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeExceptionInvalidAttribute()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
 
         $this->action->initialize(['target' => new \stdClass(), 'attribute' => 'string']);
@@ -58,7 +63,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeExceptionInvalidData()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object data must be an array.');
 
         $this->action->initialize(
@@ -68,7 +73,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeExceptionInvalidIgnoredProperties()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Ignored properties should be a sequence.');
 
         $this->action->initialize(
@@ -79,15 +84,13 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
     public function testInitialize()
     {
         $options = ['target' => new \stdClass(), 'attribute' => $this->getPropertyPath()];
-        $this->assertEquals($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertEquals($this->action, $this->action->initialize($options));
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     protected function getPropertyPath()
     {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -102,8 +105,8 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $attributeName = (string)$options['attribute'];
         $this->action->initialize($options);
         $this->action->execute($context);
-        $this->assertNotNull($context->$attributeName);
-        $this->assertInstanceOf(get_class($options['target']), $context->$attributeName);
+        static::assertNotNull($context->$attributeName);
+        static::assertInstanceOf(get_class($options['target']), $context->$attributeName);
 
         if ($context->$attributeName instanceof ItemStub) {
             /** @var ItemStub $entity */
@@ -111,8 +114,8 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
             if (!$expectedData) {
                 $expectedData = !empty($options['data']) ? $options['data'] : [];
             }
-            $this->assertInstanceOf(get_class($options['target']), $entity);
-            $this->assertEquals($expectedData, $entity->getData());
+            static::assertInstanceOf(get_class($options['target']), $entity);
+            static::assertEquals($expectedData, $entity->getData());
         }
     }
 

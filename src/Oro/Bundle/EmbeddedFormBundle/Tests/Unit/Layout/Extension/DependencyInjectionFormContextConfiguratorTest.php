@@ -42,8 +42,11 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
+        /** @var DependencyInjectionFormAccessor $formAccessor */
         $formAccessor = $context->get($contextOptionName);
         $this->assertInstanceOf(DependencyInjectionFormAccessor::class, $formAccessor);
-        $this->assertAttributeEquals($serviceId, 'formServiceId', $formAccessor);
+
+        $this->container->expects(static::once())->method('get')->with($serviceId);
+        $formAccessor->getForm();
     }
 }

@@ -141,8 +141,8 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $provider = $this->getProvider($initialConfig);
 
         $provider->clearCache();
-        self::assertAttributeSame(null, 'config', $provider);
         self::assertFileNotExists($this->cacheFile);
+        self::assertNull($provider->getCacheTimestamp());
 
         // test that the cache is built after it was cleared
         self::assertEquals($initialConfig, $provider->getConfig());
