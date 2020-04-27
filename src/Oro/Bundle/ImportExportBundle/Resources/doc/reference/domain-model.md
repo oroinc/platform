@@ -319,9 +319,9 @@ services:
     orocrm_contact.importexport.processor.export:
         parent: oro_importexport.processor.export_abstract
         calls:
-             - [setDataConverter, [@orocrm_contact.importexport.data_converter.contact]]
+             - [setDataConverter, ['@orocrm_contact.importexport.data_converter.contact']]
         tags:
-            - { name: oro_importexport.processor, type: export, entity: %orocrm_contact.entity.class%, alias: orocrm_contact }
+            - { name: oro_importexport.processor, type: export, entity: 'Oro\Bundle\ContactBundle\Entity\Contact', alias: orocrm_contact }
 ```
 
 **Methods:**
@@ -635,8 +635,8 @@ Serializer is a class extended from a standard Symfony's serializer and used ins
 
 ```
 services:
-    oro_user.importexport.user_normalizer:
-        class: %oro_user.importexport.user_normalizer.class%
+    acme_demo.importexport.user_normalizer:
+        class: Acme\Bundle\AcmeBundle\ImportExport\UserNormalizer
         tags:
             - { name: oro_importexport.normalizer }
 ```

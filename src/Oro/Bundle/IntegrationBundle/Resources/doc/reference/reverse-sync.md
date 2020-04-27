@@ -36,9 +36,9 @@ Processor and writer could be initialized in your bundle in service.yaml
 #### Example:
 ``` yaml
     YOUR_PROCESSOR:
-        class: %YOUR_PROCESSOR.class%
+        class: Acme\Bundle\AcmeBundle\Processor\YourProcessor
     YOUR_REVERSE_WRITER:
-        class: %YOUR_REVERSE_WRITER.class%
+        class:Acme\Bundle\AcmeBundle\Writer\YourReverseWriter
 ```
 
 Where `YOUR_PROCESSOR.class` - should implements Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface

@@ -20,7 +20,7 @@ For provide current localization, need create custom extension, implement `Oro\B
 services:
     ...
     acme_demo.extension.current_localization:
-        class: 'Acme\Bundle\DemoBundle\Extension\CurrentLocalizationExtension'
+        class: Acme\Bundle\DemoBundle\Extension\CurrentLocalizationExtension
         arguments:
             ...
         tags:

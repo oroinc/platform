@@ -230,11 +230,11 @@ to add declaration like below:
 
 ```yml
 services:
-    users_search_handler:
+    my_search_handler:
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - %user_class% # pass class name of entity
-            - ["firstName", "lastName"] # pass properties that should be transported to the client
+            - 'Acme\DemoBundle\Entity\EntityName' # pass class name of entity
+            - ['firstName', 'lastName'] # pass properties that should be transported to the client
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: user_acl_resource }
 

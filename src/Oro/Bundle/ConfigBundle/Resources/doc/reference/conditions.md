@@ -21,6 +21,6 @@ Is System Config Equal Condition
 
 **Configuration Example**
 ```
-- @is_system_config_equal: ['some_config_path', 'needed value']
+- '@is_system_config_equal': ['some_config_path', 'needed value']
 
 ```

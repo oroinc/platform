@@ -147,7 +147,7 @@ services.yml
 services:
     oro_acme.email_body_loader:
         public: false
-        class: %oro_acme.email_body_loader.class%
+        class: Acme\Bundle\AcmeBundle\Email\AcmeEmailBodyLoader
         arguments:
         tags:
             - { name: oro_acme.email_body_loader }

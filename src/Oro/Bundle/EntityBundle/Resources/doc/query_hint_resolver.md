@@ -24,7 +24,7 @@ Please pay attention on `walker_hint_provider` attribute. It is optional and can
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
         arguments:
-             - @security.token_storage
+             - '@security.token_storage'
 ```
 
 To map a hint to a custom output walker use the attribute `output_walker` instead of `tree_walker` in DI container configuration, for example:

@@ -132,9 +132,9 @@ services:
     oro_contact.importexport.processor.export_group:
         parent: oro_importexport.processor.export_abstract
         calls:
-             - [setDataConverter, [@orocrm_contact.importexport.data_converter.group]]
+             - [setDataConverter, ['@orocrm_contact.importexport.data_converter.group']]
         tags:
-            - { name: oro_importexport.processor, type: export, entity: %orocrm_contact.group.entity.class%, alias: orocrm_contact_group }
+            - { name: oro_importexport.processor, type: export, entity: 'Oro\Bundle\ContactBundle\Entity\Group', alias: orocrm_contact_group }
 ```
 
 There is a controller in OroImportExportBundle that is used to request a CSV file export. See the controller action, defined in the OroImportExportBundle:ImportExport:instantExport method, route **oro_importexport_export_instant**.
@@ -204,11 +204,11 @@ services:
     oro_contact.importexport.processor.import_group:
         parent: oro_importexport.processor.import_abstract
         calls:
-             - [setDataConverter, [@orocrm_contact.importexport.data_converter.group]]
-             - [setStrategy, [@orocrm_contact.importexport.strategy.group.add_or_replace]]
+             - [setDataConverter, ['@orocrm_contact.importexport.data_converter.group']]
+             - [setStrategy, ['@orocrm_contact.importexport.strategy.group.add_or_replace']]
         tags:
-            - { name: oro_importexport.processor, type: import, entity: %orocrm_contact.group.entity.class%, alias: orocrm_contact.add_or_replace_group }
-            - { name: oro_importexport.processor, type: import_validation, entity: %orocrm_contact.entity.class%, alias: orocrm_contact.add_or_replace_group }
+            - { name: oro_importexport.processor, type: import, entity: 'Oro\Bundle\ContactBundle\Entity\Group', alias: orocrm_contact.add_or_replace_group }
+            - { name: oro_importexport.processor, type: import_validation, entity: 'Oro\Bundle\ContactBundle\Entity\Contact', alias: orocrm_contact.add_or_replace_group }
 ```
 
 Note, that the import requires a processor for import validation as in the example above.
@@ -302,9 +302,9 @@ services:
     oro_contact.importexport.processor.export_template:
         parent: oro_importexport.processor.export_abstract
         calls:
-            - [setDataConverter, [@orocrm_contact.importexport.template_fixture.data_converter.contact]]
+            - [setDataConverter, ['@orocrm_contact.importexport.template_fixture.data_converter.contact']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: %orocrm_contact.entity.class%, alias: orocrm_contact }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\ContactBundle\Entity\Contact', alias: orocrm_contact }
 
 ```
 
@@ -418,7 +418,7 @@ The alias is used to group import/export buttons with different configurations o
 
 ```yaml
 oro_product.importexport.configuration_provider.product:
-    class: 'Oro\Bundle\ProductBundle\ImportExport\Configuration\ProductImportExportConfigurationProvider'
+    class: Oro\Bundle\ProductBundle\ImportExport\Configuration\ProductImportExportConfigurationProvider
     arguments:
         - '@translator'
     tags:
@@ -459,16 +459,16 @@ The same thing is applicable for the export of the templates used for the import
     oro.importexport.processor.export.some_type:
         parent: oro_importexport.processor.export_abstract
         calls:
-            - [setDataConverter, [@oro.importexport.data_converter]]
+            - [setDataConverter, ['@oro.importexport.data_converter']]
         tags:
-            - { name: oro_importexport.processor, type: export, entity: %oro.some_entity.class%, alias: oro_some_type }
+            - { name: oro_importexport.processor, type: export, entity: 'Acme\DemoBundle\Entity\EntityName', alias: oro_some_type }
 
     oro.importexport.processor.export.another_type:
         parent: oro_importexport.processor.export_abstract
         calls:
-            - [setDataConverter, [@oro.importexport.data_converter]]
+            - [setDataConverter, ['@oro.importexport.data_converter']]
         tags:
-            - { name: oro_importexport.processor, type: export, entity: %oro.some_entity.class%, alias: oro_another_type }
+            - { name: oro_importexport.processor, type: export, entity: 'Acme\DemoBundle\Entity\EntityName', alias: oro_another_type }
 ```
 
 *Translation keys for selections in an export pop-up:*
