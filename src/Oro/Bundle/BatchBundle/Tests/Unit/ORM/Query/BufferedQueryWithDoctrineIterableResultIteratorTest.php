@@ -14,7 +14,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BufferedQueryResultIteratorTest extends OrmTestCase
+class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 {
     /**
      * @var EntityManagerMock
