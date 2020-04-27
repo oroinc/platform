@@ -18,7 +18,3 @@ $base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
 $base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
                           0 0 0 3px get-color('ui', 'focus'),
                           0 0 6px get-color('ui', 'normal') !default;
-
-$primary: #404041 !default;
-$primary-300: lighten($primary, 12%) !default; // #5e5e60
-$primary-900: lighten($primary, 72%) !default; // #f8f8f8

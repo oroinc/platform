@@ -38,12 +38,12 @@
         }) %}
     {%- endif -%}
     {% set attributesThatContainsUri = ['src', 'href', 'action', 'cite', 'data', 'poster'] %}
-    {% set attributesThatNeedsTranslations = ['title', 'aria-label'] %}
+    {% set attributesThatNeedToTranslate = ['title', 'aria-label'] %}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
             {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
-        {%- if attrname in attributesThatNeedsTranslations -%}
+        {%- if attrname in attributesThatNeedToTranslate -%}
             {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain)|e('html_attr') }}"
         {% elseif attrname in attributesThatContainsUri %}
             {{- ' ' ~ attrname }}="{{ attrvalue|e('html')|replace({'&amp;': '&'})|raw }}"
