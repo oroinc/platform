@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
@@ -112,6 +113,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     protected function getRunUniqueJobCallback($jobUniqueName, array $body)
     {
         return function (JobRunner $jobRunner, Job $job) use ($jobUniqueName, $body) {
+            $this->addDependentJob($job->getRootJob(), $body);
             $exportingEntityIds = $this->getExportingEntityIds($body);
 
             $ids = $this->splitOnBatch($exportingEntityIds);
@@ -129,7 +131,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
                 );
             }
 
-            $this->addDependentJob($job->getRootJob(), $body);
 
             return true;
         };
