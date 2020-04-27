@@ -190,6 +190,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
                 $body['options']['importVersion'] = time();
                 $this->dispatchBeforeChunksEvent($body);
+                $this->createFinishJobs($job, $body);
 
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
@@ -204,27 +205,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                         }
                     );
                 }
-                $context = $this->dependentJob->createDependentJobContext($job->getRootJob());
-                $context->addDependentJob(
-                    Topics::SEND_IMPORT_NOTIFICATION,
-                    [
-                        'rootImportJobId' => $job->getRootJob()->getId(),
-                        'originFileName' => $body['originFileName'],
-                        'userId' => $body['userId'],
-                        'process' => $body['process'],
-                    ]
-                );
-                $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
-                    'jobId' => $job->getRootJob()->getId(),
-                    'userId' => $body['userId'],
-                    'type' => $body['process'],
-                    'entity' => $this->importHandler->getEntityName(
-                        $body['process'],
-                        $body['processorAlias']
-                    ),
-                    'options' => $body['options']
-                ]);
-                $this->dependentJob->saveDependentJob($context);
 
                 return true;
             }
@@ -232,6 +212,35 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->fileManager->deleteFile($body['fileName']);
 
         return $result;
+    }
+
+    /**
+     * @param Job $job
+     * @param array $body
+     */
+    private function createFinishJobs(Job $job, array $body): void
+    {
+        $context = $this->dependentJob->createDependentJobContext($job->getRootJob());
+        $context->addDependentJob(
+            Topics::SEND_IMPORT_NOTIFICATION,
+            [
+                'rootImportJobId' => $job->getRootJob()->getId(),
+                'originFileName' => $body['originFileName'],
+                'userId' => $body['userId'],
+                'process' => $body['process'],
+            ]
+        );
+        $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
+            'jobId' => $job->getRootJob()->getId(),
+            'userId' => $body['userId'],
+            'type' => $body['process'],
+            'entity' => $this->importHandler->getEntityName(
+                $body['process'],
+                $body['processorAlias']
+            ),
+            'options' => $body['options']
+        ]);
+        $this->dependentJob->saveDependentJob($context);
     }
 
     /**

@@ -187,7 +187,7 @@ Declare service:
 
 services:
     acme_demo.consumption.custom_extension:
-        class: 'Acme\Bundle\DemoBundle\Consumption\Extension\CustomExtension'
+        class: Acme\Bundle\DemoBundle\Consumption\Extension\CustomExtension
         public: false
         tags:
             - { name: 'oro_message_queue.consumption.extension', persistent: true }

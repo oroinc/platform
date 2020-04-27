@@ -17,8 +17,6 @@ Call method getChoicesQuery with datagrid name and YAML configuration key as arg
 Static method call
 ------------------
 ```
-%oro_datagrid.some.class%::testStaticCall
-or
 Acme\Bundle\DemoBundle\SomeClass::testStaticCall
 ```
 Class name can be defined in container's parameters or specified directly.
@@ -26,7 +24,6 @@ Class name can be defined in container's parameters or specified directly.
 Constant
 --------
 ```
-%oro_datagrid.some.class%::TEST
 Acme\Bundle\DemoBundle\SomeClass::TEST
 ```
 PHP is_callable used to determine if it's callable or should be treated as constant.

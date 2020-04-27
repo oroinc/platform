@@ -17,6 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEve
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
+use PHPUnit\Framework\TestResult;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
@@ -59,50 +60,35 @@ abstract class WebTestCase extends BaseWebTestCase
     const AUTH_PW = 'admin';
     const AUTH_ORGANIZATION = 1;
 
-    /**
-     * @var string Default application kernel class
-     */
+    /** @var string Default application kernel class */
     protected static $class = 'AppKernel';
 
-    /**
-     * @var bool[]
-     */
+    /** @var bool[] */
     private static $dbIsolationPerTest = [];
 
-    /**
-     * @var bool[]
-     */
+    /** @var bool[] */
     private static $nestTransactionsWithSavepoints = [];
 
-    /**
-     * @var Client
-     */
+    /** @var Client */
     private static $clientInstance;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $loadedFixtures = [];
 
-    /**
-     * @var Client
-     */
+    /** @var Client */
     protected $client;
 
-    /**
-     * @var callable
-     */
+    /** @var callable */
     private static $resetCallback;
 
-    /**
-     * @var ReferenceRepository
-     */
+    /** @var ReferenceRepository */
     private static $referenceRepository;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private static $afterInitClientMethods = [];
+
+    /** @var bool */
+    private static $initClientAllowed = false;
 
     protected function setUp()
     {
@@ -180,6 +166,16 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function run(TestResult $result = null): TestResult
+    {
+        self::$initClientAllowed = true;
+
+        return parent::run($result);
+    }
+
+    /**
      * Creates a Client.
      *
      * @param array $options An array of options to pass to the createKernel class
@@ -190,6 +186,21 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function initClient(array $options = [], array $server = [], $force = false)
     {
+        if (!self::$initClientAllowed) {
+            $callstack = '';
+            foreach (debug_backtrace() as $frame) {
+                if (!isset($frame['class'], $frame['function'], $frame['type'])) {
+                    break;
+                }
+                $callstack .= '  ' . $frame['class'] . $frame['type'] . $frame['function'] . "()\n";
+            }
+            throw new \LogicException(
+                'The initClient() must not be called in data providers.'
+                . "\nCall stack:\n"
+                . $callstack
+            );
+        }
+
         if (self::isClassHasAnnotation(get_called_class(), 'dbIsolation')) {
             throw new \RuntimeException(
                 sprintf(

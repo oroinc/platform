@@ -9,14 +9,10 @@ class ResourceConsistencyTest extends RestJsonApiTestCase
 {
     use ResourceConsistencyTestTrait;
 
-    /**
-     * @param string   $entityClass
-     * @param string[] $excludedActions
-     *
-     * @dataProvider getEntities
-     */
-    public function testResourceConsistency($entityClass, $excludedActions)
+    public function testResourceConsistency()
     {
-        $this->checkResourceConsistency($entityClass, $excludedActions);
+        $this->runForEntities(function (string $entityClass, array $excludedActions) {
+            $this->checkResourceConsistency($entityClass, $excludedActions);
+        });
     }
 }

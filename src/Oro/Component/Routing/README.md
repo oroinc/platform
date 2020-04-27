@@ -20,12 +20,12 @@ services:
     acme.routing_loader:
         class: Oro\Component\Routing\Loader\CumulativeRoutingFileLoader
         arguments:
-            - @kernel
-            - @acme.routing_options_resolver
+            - '@kernel'
+            - '@acme.routing_options_resolver'
             - [Resources/config/acme/routing.yml]
             - acme_auto
         calls:
-            - [setResolver, [@routing.resolver]]
+            - [setResolver, ['@routing.resolver']]
         tags:
             - { name: routing.loader }
 ```

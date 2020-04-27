@@ -26,7 +26,7 @@
 
 **Configuration Example**
 ```
-- @run_action_group:
+- '@run_action_group':
     result: $.result
     results: 
         result_entity_id: $.demo_new_attribute
@@ -58,7 +58,7 @@
 
 **Configuration Example**
 ```
-- @format_name:
+- '@format_name':
     attribute: $.result.formattedCustomerName
     object: $cart.customer
 ```
@@ -80,12 +80,12 @@
 **Configuration Example**
 
 ```
-- @create_date:
+- '@create_date':
     attribute: $sales_funnel_start_date
 
 #OR
 
-- @create_date:
+- '@create_date':
     conditions:
             # optional condition configuration
     parameters:
@@ -103,7 +103,7 @@
 **Description:**  Copies the values from a context or an object to the provided attribute and behaves the same as the `array_merge` PHP function.
 
 ```
-- @copy_values: [$.to, $.from1, $.from2, {key: 'value'}]
+- '@copy_values': [$.to, $.from1, $.from2, {key: 'value'}]
 ```
 
 
@@ -123,21 +123,21 @@
 
 **Configuration Example**
 ```
-- @resolve_destination_page: view
+- '@resolve_destination_page': view
 
 #OR
 
-- @resolve_destination_page: ['view', $.entity, $.attribute]
+- '@resolve_destination_page': ['view', $.entity, $.attribute]
 
 #OR
 
-- @resolve_destination_page:
+- '@resolve_destination_page':
     name: index
     entity: $.data.entity
 
 #OR
 
-- @resolve_destination_page:
+- '@resolve_destination_page':
     name: index
     entity: $.entity
     attribute: $.attribute
@@ -169,7 +169,7 @@ For more information please refer to the [DeepCopy](https://packagist.org/packag
 
 **Configuration Example**
 ```
-- @duplicate:
+- '@duplicate':
     target: $.entity
     attribute: $.entityCopy
     settings:

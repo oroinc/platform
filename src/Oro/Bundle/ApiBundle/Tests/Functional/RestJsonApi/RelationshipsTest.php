@@ -11,47 +11,27 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RelationshipsTest extends RestJsonApiTestCase
 {
-    /**
-     * @param string         $entityClass
-     * @param string         $associationName
-     * @param ApiSubresource $subresource
-     *
-     * @dataProvider getSubresources
-     */
-    public function testRelationship($entityClass, $associationName, ApiSubresource $subresource)
+    public function testRelationship()
     {
-        $entityId = $this->findEntityId($entityClass);
-        if (null === $entityId) {
-            return;
-        }
+        $this->runForSubresources(function (string $entityClass, string $associationName, ApiSubresource$subresource) {
+            $entityId = $this->findEntityId($entityClass);
+            if (null === $entityId) {
+                return;
+            }
 
-        $entityId = $this->getRestApiEntityId($entityClass, $entityId);
-        $entityType = $this->getEntityType($entityClass);
+            $entityId = $this->getRestApiEntityId($entityClass, $entityId);
+            $entityType = $this->getEntityType($entityClass);
 
-        $resourceObjectId = $this->checkGetRelationshipRequest(
-            $entityType,
-            $entityId,
-            $associationName,
-            $subresource
-        );
-
-        $this->startTransaction();
-        try {
-            $this->checkUpdateRelationshipRequest(
+            $resourceObjectId = $this->checkGetRelationshipRequest(
                 $entityType,
                 $entityId,
                 $associationName,
-                $resourceObjectId,
                 $subresource
             );
-        } finally {
-            $this->rollbackTransaction();
-        }
 
-        if ($subresource->isCollection()) {
             $this->startTransaction();
             try {
-                $this->checkDeleteRelationshipRequest(
+                $this->checkUpdateRelationshipRequest(
                     $entityType,
                     $entityId,
                     $associationName,
@@ -62,19 +42,34 @@ class RelationshipsTest extends RestJsonApiTestCase
                 $this->rollbackTransaction();
             }
 
-            $this->startTransaction();
-            try {
-                $this->checkAddRelationshipRequest(
-                    $entityType,
-                    $entityId,
-                    $associationName,
-                    $resourceObjectId,
-                    $subresource
-                );
-            } finally {
-                $this->rollbackTransaction();
+            if ($subresource->isCollection()) {
+                $this->startTransaction();
+                try {
+                    $this->checkDeleteRelationshipRequest(
+                        $entityType,
+                        $entityId,
+                        $associationName,
+                        $resourceObjectId,
+                        $subresource
+                    );
+                } finally {
+                    $this->rollbackTransaction();
+                }
+
+                $this->startTransaction();
+                try {
+                    $this->checkAddRelationshipRequest(
+                        $entityType,
+                        $entityId,
+                        $associationName,
+                        $resourceObjectId,
+                        $subresource
+                    );
+                } finally {
+                    $this->rollbackTransaction();
+                }
             }
-        }
+        });
     }
 
     /**
