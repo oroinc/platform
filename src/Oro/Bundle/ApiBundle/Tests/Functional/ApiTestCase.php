@@ -159,10 +159,8 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
-    public function getEntities()
+    protected function getEntities()
     {
-        $this->initClient();
-
         $result = [];
         $doctrineHelper = $this->getDoctrineHelper();
         $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
@@ -179,12 +177,29 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param callable $callback
+     */
+    protected function runForEntities(callable $callback)
+    {
+        $entities = $this->getEntities();
+        foreach ($entities as [$entityClass, $excludedActions]) {
+            try {
+                $callback($entityClass, $excludedActions);
+            } catch (\Throwable $e) {
+                throw new \RuntimeException(
+                    sprintf('The test failed for the "%s" entity.', $entityClass),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+    }
+
+    /**
      * @return array [[entity class, association name, ApiSubresource], ...]
      */
-    public function getSubresources()
+    protected function getSubresources()
     {
-        $this->initClient();
-
         $result = [];
         $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
         $subresourcesProvider = self::getContainer()->get('oro_api.subresources_provider');
@@ -204,6 +219,29 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return $result;
+    }
+
+    /**
+     * @param callable $callback
+     */
+    protected function runForSubresources(callable $callback)
+    {
+        $subresources = $this->getSubresources();
+        foreach ($subresources as [$entityClass, $associationName, $subresource]) {
+            try {
+                $callback($entityClass, $associationName, $subresource);
+            } catch (\Throwable $e) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'The test failed for the "%s" association of the "%s" entity.',
+                        $associationName,
+                        $entityClass
+                    ),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
     }
 
     /**
