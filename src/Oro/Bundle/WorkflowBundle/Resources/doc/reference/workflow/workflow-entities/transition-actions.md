@@ -69,7 +69,7 @@ Create Related Entity
 
 **Configuration Example**
 ```
-- @create_related_entity:
+- '@create_related_entity':
     conditions:
         # optional condition configuration
     parameters:
@@ -81,7 +81,7 @@ Create Related Entity
 
 OR
 
-- @create_entity:
+- '@create_entity':
     data:
         result: $conversation_result
         comment: $conversation_comment
@@ -107,7 +107,7 @@ Start Workflow
 
 **Configuration Example**
 ```
-- @start_workflow: # start workflow and create workflow item
+- '@start_workflow': # start workflow and create workflow item
     conditions:
         # optional condition configuration
     parameters:
@@ -118,7 +118,7 @@ Start Workflow
 
 OR
 
-- @start_workflow: # start workflow and create workflow item
+- '@start_workflow': # start workflow and create workflow item
     name: sales
     attribute: $.result.workflowItem
     entity: $.result.opportunity
@@ -143,7 +143,7 @@ Transit Workflow
  
 **Configuration Example**
 ```
-- @transit_workflow:
+- '@transit_workflow':
     entity: $opportunity
     transition: develop
     workflow: opportunity_flow
@@ -153,7 +153,7 @@ Transit Workflow
         
 OR
 
-- @transit_workflow:
+- '@transit_workflow':
     conditions:
         # optional condition configuration
     parameters:
@@ -166,6 +166,6 @@ OR
         
 OR
 
-- @transit_workflow:
+- '@transit_workflow':
     [$opportunity, 'develop', 'opportunity_flow', { budget_amount: 1000, probability: 0.95 }]
 ```
