@@ -1,5 +1,6 @@
 ---
 test: test
+test1:
 test %num%: tessto presto #%num%
 multi: |-
   Test l'aide <a href="http://community.oroinc.com"> forums</a>.
