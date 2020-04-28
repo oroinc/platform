@@ -33,6 +33,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             }
         });
 
+        $(document).on('keydown', 'a[role=button]', function(e) {
+            if (e.keyCode === 32 && !e.isDefaultPrevented()) {
+                $(e.target).click();
+                e.preventDefault();
+            }
+        });
+
         const mainMenu = $('#main-menu');
         const sideMainMenu = $('#side-menu');
 

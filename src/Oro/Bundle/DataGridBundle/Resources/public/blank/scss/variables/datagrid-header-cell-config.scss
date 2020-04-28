@@ -5,6 +5,7 @@ $datagrid-header-cell-mass-action-offset-inner: 0 ($offset-y-m + 2px) 0 !default
 
 $datagrid-header-cell-action-column-width: 50px !default;
 $datagrid-header-cell-action-column-text-align: right !default;
+$datagrid-header-cell-action-column-offset-inner: $datagrid-header-cell-mass-action-offset-inner !default;
 
 $datagrid-header-cell-sortable-icon-offset: 0 0 0 5px !default;
 $datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;

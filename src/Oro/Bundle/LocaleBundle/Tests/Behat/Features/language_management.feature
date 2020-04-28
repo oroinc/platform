@@ -35,7 +35,7 @@ Feature: Language management
       | Title    | Install "German (Germany)" language |
       | okButton | Install                             |
 
-    When I click "Install"
+    When I click "Install" in modal window
     Then I should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |
