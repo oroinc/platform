@@ -65,9 +65,12 @@ define(function(require) {
         render: function() {
             this.$el.empty();
 
-            _.each(this.launchers, function(launcher) {
+            const isDropdown = this.$el.is('.dropdown-menu');
+
+            this.launchers.forEach(launcher => {
+                launcher.setOptions({withinDropdown: isDropdown});
                 this.$el.append(launcher.render().$el);
-            }, this);
+            });
 
             return this;
         },
