@@ -200,8 +200,8 @@ class CleanupCommand extends Command implements CronCommandInterface
             );
         $queryBuilder->setParameter('statusCompleted', Status::STATUS_COMPLETED, Type::STRING);
         $queryBuilder->setParameter('statusFailed', Status::STATUS_FAILED, Type::STRING);
-        $queryBuilder->setParameter('completedInterval', $completedInterval);
-        $queryBuilder->setParameter('failedInterval', $failedInterval);
+        $queryBuilder->setParameter('completedInterval', $completedInterval, Type::DATETIME);
+        $queryBuilder->setParameter('failedInterval', $failedInterval, Type::DATETIME);
         $queryBuilder->setParameter('excludes', $excludes);
 
         return $queryBuilder;
