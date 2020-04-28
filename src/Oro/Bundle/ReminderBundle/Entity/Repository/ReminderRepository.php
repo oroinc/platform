@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -44,7 +45,7 @@ class ReminderRepository extends EntityRepository
             ->where('reminder.state = :state')
             ->andWhere('reminder.startAt <= :now')
             ->andWhere('reminder.expireAt >= :now')
-            ->setParameter('now', new \DateTime())
+            ->setParameter('now', new \DateTime(), Type::DATETIME)
             ->setParameter('state', Reminder::STATE_NOT_SENT);
     }
 

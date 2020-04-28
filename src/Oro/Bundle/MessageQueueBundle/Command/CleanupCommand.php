@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
@@ -142,8 +143,16 @@ class CleanupCommand extends Command implements CronCommandInterface
                 $qb->expr()->lt('job.stoppedAt', ':failed_end_time')
             ))
             ->setParameter('status_success', JobComponent::STATUS_SUCCESS)
-            ->setParameter('success_end_time', new \DateTime(self::INTERVAL_FOR_SUCCESSES, new \DateTimeZone('UTC')))
+            ->setParameter(
+                'success_end_time',
+                new \DateTime(self::INTERVAL_FOR_SUCCESSES, new \DateTimeZone('UTC')),
+                Type::DATETIME
+            )
             ->setParameter('status_failed', JobComponent::STATUS_FAILED)
-            ->setParameter('failed_end_time', new \DateTime(self::INTERVAL_FOR_FAILED, new \DateTimeZone('UTC')));
+            ->setParameter(
+                'failed_end_time',
+                new \DateTime(self::INTERVAL_FOR_FAILED, new \DateTimeZone('UTC')),
+                Type::DATETIME
+            );
     }
 }
