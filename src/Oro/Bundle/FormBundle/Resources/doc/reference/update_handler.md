@@ -54,7 +54,7 @@ Among usual arguments there are two most valuable from the point of reuse.
 - `null` - to use `default` registered provider (usually it returns `['form' => FormView $instance]`)
        
  Custom TemplateDataProvider and FormHandler can be reused in different parts of platform, such as 
- [WorkflowBundle Custom Form Configuration](../../../../WorkflowBundle/Resources/doc/reference/workflow/transition-forms.md#custom-form-type-example).
+ [WorkflowBundle Custom Form Configuration](https://doc.oroinc.com/backend/entities-data-management/workflows/transition-forms.html#custom-form-type-example).
  
  **Example of custom handler and data provider services registration and usage:**
 
