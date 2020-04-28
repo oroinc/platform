@@ -3,12 +3,16 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
+/**
+ * Doctrine repository for ImapEmailFolder entity.
+ */
 class ImapEmailFolderRepository extends EntityRepository
 {
     /**
@@ -50,7 +54,7 @@ class ImapEmailFolderRepository extends EntityRepository
                 'folder',
                 'COALESCE(folder.synchronizedAt, :minDate) AS HIDDEN nullsFirstDate'
             );
-        $qb->setParameter('minDate', new \DateTime('1970-01-01', new \DateTimeZone('UTC')));
+        $qb->setParameter('minDate', new \DateTime('1970-01-01', new \DateTimeZone('UTC')), Type::DATETIME);
         if ($syncEnabled !== EmailFolder::SYNC_ENABLED_IGNORE) {
             $qb->andWhere('folder.syncEnabled = :syncEnabled')
                 ->setParameter('syncEnabled', (bool)$syncEnabled);

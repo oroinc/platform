@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
@@ -10,6 +11,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
+/**
+ * Doctrine repository for ImapEmail entity.
+ */
 class ImapEmailRepository extends EntityRepository
 {
     /**
@@ -150,7 +154,7 @@ class ImapEmailRepository extends EntityRepository
 
         if ($date) {
             $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
-                ->setParameter('date', $date);
+                ->setParameter('date', $date, Type::DATETIME);
         }
         $emailUserIds = $qb->getQuery()->getArrayResult();
 

@@ -19,7 +19,14 @@ class AddUniqIndexForTransactionField implements Migration
         $queries->addPreQuery(new RemoveAuditDuplicatesQuery());
 
         $table = $schema->getTable('oro_audit');
-        $table->addUniqueIndex(['object_id', 'object_class', 'transaction_id', 'type'], 'idx_oro_audit_transaction');
+        if (!$table->hasIndex('idx_oro_audit_transaction')) {
+            $table->addUniqueIndex([
+                'object_id',
+                'object_class',
+                'transaction_id',
+                'type'
+            ], 'idx_oro_audit_transaction');
+        }
 
         // Update version unique index including type discriminator field
         $table->dropIndex('idx_oro_audit_version');
