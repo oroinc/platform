@@ -1062,7 +1062,9 @@ define(function(require) {
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
             this._deferredRender();
-            this.initLayout().always(_.bind(function() {
+            this.initLayout({
+                datagrid: this
+            }).always(_.bind(function() {
                 this.rendered = true;
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
