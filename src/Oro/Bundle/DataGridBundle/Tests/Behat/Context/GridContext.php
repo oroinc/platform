@@ -1895,11 +1895,12 @@ TEXT;
     /**
      * Example: Then I reset "UsersGrid" grid
      *
+     * @Then /^(?:|I )reset grid$/
      * @Then /^(?:|I )reset "(?P<gridName>[^"]+)" grid$/
      *
      * @param string $gridName
      */
-    public function iResetGrid($gridName)
+    public function iResetGrid($gridName = null)
     {
         $grid = $this->getGrid($gridName);
         $refreshButton = $grid->getElement($grid->getMappedChildElementName('GridToolbarActionReset'));
