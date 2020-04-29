@@ -90,10 +90,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'Got invalid message.',
-                ['message' => $message]
-            );
+            ->with('Got invalid message.');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -118,10 +115,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'The root job does not exist.',
-                ['message' => $message]
-            );
+            ->with('The root job does not exist.');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -380,7 +374,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             ->method('critical')
             ->with(
                 'The child job does not exist.',
-                ['message' => $message, 'jobId' => 10000]
+                ['jobId' => 10000]
             );
 
         $result = $this->processor->process($message, $this->getSession());
