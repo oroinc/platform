@@ -520,7 +520,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             // services.yml
             'oro_message_queue.consumption.extensions',
             'oro_message_queue.consumption.container_reset_extension',
-            'oro_message_queue.consumption.docrine_ping_connection_extension',
             'oro_message_queue.consumption.docrine_clear_identity_map_extension',
             'oro_message_queue.consumption.maintenance_extension',
             'oro_message_queue.consumption.interrupt_consumption_extension',
@@ -528,7 +527,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.consumption.security_aware_extension',
             'oro_message_queue.consumption.locale_extension',
             'oro_message_queue.consumption.clear_logger_extension',
-            'oro_message_queue.consumption.database_connections_clearer',
             'oro_message_queue.consumption.container_clearer',
             'oro_message_queue.consumption.garbage_collector_clearer',
             'oro_message_queue.consumption.queue_consumer',

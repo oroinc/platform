@@ -166,7 +166,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $body['chunkSize'],
             $body['includedDataChunkSize']
         )) {
-            $this->logger->critical('Got invalid message.', ['message' => $message]);
+            $this->logger->critical('Got invalid message.');
 
             return self::REJECT;
         }
@@ -187,7 +187,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
                 'A file splitter was not found for the request type "%s".',
                 (string)$requestType
             );
-            $this->logger->error($errorMessage, ['message' => $message]);
+            $this->logger->error($errorMessage);
             $this->operationManager->markAsFailed($operationId, $dataFileName, $errorMessage);
 
             return self::REJECT;
@@ -199,7 +199,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
                 'A chunk file classifier was not found for the request type "%s".',
                 (string)$requestType
             );
-            $this->logger->error($errorMessage, ['message' => $message]);
+            $this->logger->error($errorMessage);
             $this->operationManager->markAsFailed($operationId, $dataFileName, $errorMessage);
 
             return self::REJECT;
@@ -227,7 +227,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
                     'An include accessor was not found for the request type "%s".',
                     (string)$requestType
                 );
-                $this->logger->error($errorMessage, ['message' => $message]);
+                $this->logger->error($errorMessage);
                 $this->operationManager->markAsFailed($operationId, $dataFileName, $errorMessage);
 
                 return self::REJECT;
@@ -547,7 +547,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $errorException = null;
         }
 
-        $errorContext = ['message' => $message];
+        $errorContext = [];
         if (null !== $errorException) {
             $errorContext['exception'] = $errorException;
         }

@@ -113,7 +113,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             $body['firstRecordOffset'],
             $body['sectionName']
         )) {
-            $this->logger->critical('Got invalid message.', ['message' => $message]);
+            $this->logger->critical('Got invalid message.');
 
             return self::REJECT;
         }
