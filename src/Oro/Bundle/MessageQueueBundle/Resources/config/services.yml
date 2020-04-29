@@ -10,30 +10,6 @@ services:
             - []
             - '@oro_message_queue.log.consumer_state'
 
-    oro_message_queue.consumption.container_reset_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
-        public: false
-        arguments:
-            - [] # clearers. They are set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass
-        tags:
-            - { name: 'oro_message_queue.consumption.extension', priority: 250, persistent: true }
-
-    oro_message_queue.consumption.docrine_ping_connection_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
-        public: false
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: 'oro_message_queue.consumption.extension', priority: 210, persistent: true }
-
-    oro_message_queue.consumption.docrine_clear_identity_map_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
-        public: false
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: 'oro_message_queue.consumption.extension', priority: 200, persistent: true }
-
     oro_message_queue.consumption.maintenance_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
         public: false
@@ -45,6 +21,38 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.docrine_ping_connection_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
+        public: false
+        arguments:
+            - '@service_container'
+
+    oro_message_queue.consumption.docrine_clear_identity_map_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        calls:
+            - [ 'setManagers', ['%doctrine.entity_managers%'] ]
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: -245 }
+
+    oro_message_queue.consumption.database_connections_clear:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearExtension'
+        arguments:
+            - '@service_container'
+            - '%doctrine.connections%'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: -250 }
+
+    oro_message_queue.consumption.container_reset_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
+        public: false
+        arguments:
+            - [] # clearers. They are set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: -255, persistent: true }
+
     oro_message_queue.consumption.interrupt_consumption_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
         public: false
@@ -52,7 +60,7 @@ services:
             - '%oro_message_queue.consumption.interrupt_filepath%'
             - '@oro_message_queue.consumption.cache_state'
         tags:
-            - { name: 'oro_message_queue.consumption.extension', persistent: true }
+            - { name: 'oro_message_queue.consumption.extension' }
 
     oro_message_queue.consumption.consumer_heartbeat_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'
@@ -61,7 +69,7 @@ services:
             - '%oro_message_queue.consumer_heartbeat_update_period%'
             - '@oro_message_queue.consumption.consumer_heartbeat'
         tags:
-            - { name: 'oro_message_queue.consumption.extension', persistent: true }
+            - { name: 'oro_message_queue.consumption.extension' }
 
     oro_message_queue.consumption.security_aware_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension'
@@ -112,8 +120,6 @@ services:
         arguments:
             - '@service_container'
             - '%doctrine.connections%'
-        tags:
-            - { name: oro_message_queue.consumption.clearer, priority: 10 }
 
     oro_message_queue.consumption.container_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer
@@ -121,7 +127,7 @@ services:
         arguments:
             - '@service_container'
         tags:
-            - { name: oro_message_queue.consumption.clearer }
+            - { name: oro_message_queue.consumption.clearer, priority: -250 }
 
     oro_message_queue.consumption.garbage_collector_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\GarbageCollectorClearer
