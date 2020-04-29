@@ -324,10 +324,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'Got invalid message.',
-                ['message' => $message]
-            );
+            ->with('Got invalid message.');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -359,10 +356,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with(
-                'A file splitter was not found for the request type "testRequest".',
-                ['message' => $message]
-            );
+            ->with('A file splitter was not found for the request type "testRequest".');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -399,10 +393,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with(
-                'A chunk file classifier was not found for the request type "testRequest".',
-                ['message' => $message]
-            );
+            ->with('A chunk file classifier was not found for the request type "testRequest".');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -447,8 +438,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with(
                 'The splitting of the file "testFile" failed.'
-                . ' Reason: Failed to parse the data file. Some parsing error.',
-                ['message' => $message]
+                . ' Reason: Failed to parse the data file. Some parsing error.'
             );
 
         $this->processingHelper->expects(self::once())
@@ -492,10 +482,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with(
-                'The splitting of the file "testFile" failed. Reason: Failed to parse the data file.',
-                ['message' => $message]
-            );
+            ->with('The splitting of the file "testFile" failed. Reason: Failed to parse the data file.');
 
         $this->processingHelper->expects(self::once())
             ->method('safeDeleteChunkFiles')
@@ -540,7 +527,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with(
                 'The splitting of the file "testFile" failed. Reason: some error',
-                ['message' => $message, 'exception' => $splitterException]
+                ['exception' => $splitterException]
             );
 
         $this->processingHelper->expects(self::never())
@@ -1090,10 +1077,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with(
-                'An include accessor was not found for the request type "testRequest".',
-                ['message' => $message]
-            );
+            ->with('An include accessor was not found for the request type "testRequest".');
 
         $this->processingHelper->expects(self::never())
             ->method('hasChunkIndex');

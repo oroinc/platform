@@ -133,10 +133,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'Got invalid message.',
-                ['message' => $message]
-            );
+            ->with('Got invalid message.');
 
         $result = $this->processor->process($message, $this->getSession());
 
