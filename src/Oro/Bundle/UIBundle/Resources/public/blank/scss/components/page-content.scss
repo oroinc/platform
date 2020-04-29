@@ -2,13 +2,11 @@
 
 .page-content {
     width: $page-content-width;
-    
+
     @include clearfix();
 
     &--has-sidebar {
         padding: $page-content-with-sidebar-inner-offset;
-
-        order: $page-content-with-sidebar-order;
     }
     &--has-sidebar-right {
         padding: $page-content-with-sidebar-right-inner-offset;
@@ -18,10 +16,6 @@
 @include breakpoint('desktop') {
     .page-content {
         &--has-sidebar {
-            width: calc(#{$page-content-width} - #{$page-sidebar-width});
-        }
-
-        &--has-sidebar-right {
             width: calc(#{$page-content-width} - #{$page-sidebar-width});
         }
     }
