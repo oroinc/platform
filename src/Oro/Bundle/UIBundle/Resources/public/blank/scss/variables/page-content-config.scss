@@ -1,10 +1,9 @@
 /* @theme: blank; */
 
-$page-content-width: 100%;
-$page-content-with-sidebar-order: 2;
-$page-content-with-sidebar-inner-offset: 0 0 0 30px;
+$page-content-width: 100% !default;
+$page-content-with-sidebar-inner-offset: 0 0 0 24px !default;
 
-$page-content-with-sidebar-right-inner-offset: 0 $offset-x 0 0;
+$page-content-with-sidebar-right-inner-offset: 0 24px 0 0 !default;
 
 // Tablet
 $page-content-with-sidebar-tables-s-inner-offset: 0;
