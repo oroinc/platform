@@ -125,6 +125,16 @@ class FlushData implements ProcessorInterface
         } catch (\Throwable $e) {
             $flushResult = self::FLUSH_EXCEPTION;
             $isUniqueConstraintViolationException = ($e instanceof UniqueConstraintViolationException);
+            if (!$isUniqueConstraintViolationException) {
+                $this->logger->error(
+                    'Unexpected error occurred when flushing data for a batch operation chunk.',
+                    [
+                        'operationId' => $context->getOperationId(),
+                        'chunkFile'   => $context->getFile()->getFileName(),
+                        'exception'   => $e
+                    ]
+                );
+            }
             if (count($items) === 1) {
                 $item = reset($items);
                 if ($isUniqueConstraintViolationException) {
@@ -144,15 +154,6 @@ class FlushData implements ProcessorInterface
                     }
                     $item->getContext()->addError(Error::createByException($e));
                 }
-            } elseif (!$isUniqueConstraintViolationException) {
-                $this->logger->error(
-                    'Unexpected error occurred when flushing data for a batch operation chunk.',
-                    [
-                        'operationId' => $context->getOperationId(),
-                        'chunkFile'   => $context->getFile()->getFileName(),
-                        'exception'   => $e
-                    ]
-                );
             }
         } finally {
             $flushHandler->finishFlushData($items);
