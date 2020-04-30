@@ -1,12 +1,15 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
 
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Splits the "groups" field into two fields: "exclusive_active_groups" and "exclusive_record_groups".
+ */
 class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
 {
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;

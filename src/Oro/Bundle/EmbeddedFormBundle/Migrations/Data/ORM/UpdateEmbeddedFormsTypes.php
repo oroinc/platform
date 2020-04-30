@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EmbeddedForm\Migrations\Data\ORM;
+namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Oro\Bundle\ContactUsBundle\Form\Type\ContactRequestType as ContactUsContactRequestType;
 use Oro\Bundle\MagentoContactUsBundle\Form\Type\ContactRequestType as MagentoContactRequestType;
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -14,9 +15,21 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  * This fixtures aims to update forms' types for oro_contact_us.embedded_form and oro_magento_contact_us.embedded_form
  * embedded forms.
  */
-class UpdateEmbeddedFormsTypes extends AbstractFixture implements ContainerAwareInterface
+class UpdateEmbeddedFormsTypes extends AbstractFixture implements
+    ContainerAwareInterface,
+    RenamedFixtureInterface
 {
     use ContainerAwareTrait;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            'Oro\\Bundle\\EmbeddedForm\\Migrations\\Data\\ORM\\UpdateEmbeddedFormsTypes',
+        ];
+    }
 
     /**
      * {@inheritdoc}
