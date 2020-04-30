@@ -51,12 +51,14 @@ const TogglePaginationView = BaseView.extend({
         const {pageSize: initialPageSize} = this.grid.collection.initialState;
         const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
         const isMaxPageSize = currentPageSize === this.maxPageSize;
+        const translationPrefix = `oro.frontend.shoppinglist.btn.${isMaxPageSize ? 'show_less' : 'show_all'}`;
 
         return {
             enabled: this.enabled,
             visible: totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize,
             isMaxPageSize,
-            title: __(`oro.frontend.shoppinglist.btn.${isMaxPageSize ? 'show_less' : 'show_all'}.label`)
+            label: __(`${translationPrefix}.label`),
+            ariaLabel: __(`${translationPrefix}.aria_label`)
         };
     },
 
