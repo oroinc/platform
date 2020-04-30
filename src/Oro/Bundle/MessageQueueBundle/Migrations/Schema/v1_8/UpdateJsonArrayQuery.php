@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema\v1_8;
+namespace Oro\Bundle\MessageQueueBundle\Migrations\Schema\v1_8;
 
 use Doctrine\DBAL\Platforms\MySQL57Platform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;

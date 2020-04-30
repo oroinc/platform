@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\ImportExport\Migrations\Data\ORM;
+namespace Oro\Bundle\ImportExportBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtureInterface
+/**
+ * Loads email templates to the database.
+ */
+class LoadEmailTemplates extends AbstractEmailFixture implements
+    VersionedFixtureInterface,
+    RenamedFixtureInterface
 {
     /**
      * {@inheritdoc}
@@ -14,6 +20,16 @@ class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtur
     public function getVersion()
     {
         return '1.2';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            'Oro\\Bundle\\ImportExport\\Migrations\\Data\\ORM\\LoadEmailTemplates',
+        ];
     }
 
     /**
