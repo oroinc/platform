@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Functional;
 
+use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
+use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
@@ -18,11 +23,18 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MessageCollector */
     private static $messageCollector;
 
+    /** @var MessageFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private static $messageFilter;
+
+    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
+    private static $bufferedProducer;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
+        self::tearDownAfterClass();
         $this->initClient();
     }
 
@@ -33,14 +45,22 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         self::$container = null;
         self::$messageCollector = null;
+        self::$messageFilter = null;
+        self::$bufferedProducer = null;
     }
 
     protected function initClient()
     {
         if (null === self::$container) {
             self::$container = new Container();
-            self::$messageCollector = new MessageCollector($this->createMock(MessageProducerInterface::class));
+            self::$messageFilter = $this->createMock(MessageFilterInterface::class);
+            self::$messageCollector = new MessageCollector(
+                $this->createMock(MessageProducerInterface::class),
+                self::$messageFilter
+            );
             self::$container->set('oro_message_queue.test.message_collector', self::$messageCollector);
+            self::$bufferedProducer = $this->createMock(BufferedMessageProducer::class);
+            self::$container->set('oro_message_queue.client.buffered_message_producer', self::$bufferedProducer);
         }
     }
 
@@ -50,6 +70,72 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     protected static function getContainer()
     {
         return self::$container;
+    }
+
+    public function testShouldAllowEnableMessageBuffering()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::once())
+            ->method('enableBuffering');
+
+        self::enableMessageBuffering();
+    }
+
+    public function testShouldNotEnableMessageBufferingWhenItIsAlreadyEnabled()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::never())
+            ->method('enableBuffering');
+
+        self::enableMessageBuffering();
+    }
+
+    public function testShouldAllowDisableMessageBuffering()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::once())
+            ->method('disableBuffering');
+
+        self::disableMessageBuffering();
+    }
+
+    public function testShouldNotDisableMessageBufferingWhenItIsAlreadyDisabled()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::never())
+            ->method('disableBuffering');
+
+        self::disableMessageBuffering();
+    }
+
+    public function testShouldAllowFlushMessagesBuffer()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::once())
+            ->method('flushBuffer');
+
+        self::flushMessagesBuffer();
+    }
+
+    public function testShouldNotFlushMessagesBufferWhenBufferingIsNotEnabled()
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::never())
+            ->method('flushBuffer');
+
+        self::flushMessagesBuffer();
     }
 
     public function testShouldAllowGetMessageCollector()

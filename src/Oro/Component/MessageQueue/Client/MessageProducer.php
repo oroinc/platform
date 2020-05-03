@@ -64,12 +64,15 @@ class MessageProducer implements MessageProducerInterface
     }
 
     /**
-     * @param Message|array|string|null $rawMessage
+     * @param Message|MessageBuilderInterface|array|string|null $rawMessage
      *
      * @return Message
      */
     private function getMessage($rawMessage): Message
     {
+        if ($rawMessage instanceof MessageBuilderInterface) {
+            $rawMessage = $rawMessage->getMessage();
+        }
         if ($rawMessage instanceof Message) {
             $message = clone $rawMessage;
         } else {

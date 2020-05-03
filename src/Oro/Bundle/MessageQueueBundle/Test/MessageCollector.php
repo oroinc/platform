@@ -9,16 +9,11 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
  */
 class MessageCollector implements MessageProducerInterface
 {
-    /**
-     * @var MessageProducerInterface|null
-     */
+    /** @var MessageProducerInterface|null */
     private $messageProducer;
 
-    /**
-     * @var array [['topic' => topic name, 'message' => message (string|array|Message)], ...]
-     */
+    /** @var array [['topic' => topic name, 'message' => message (string|array|Message)], ...] */
     private $sentMessages = [];
-
 
     /**
      * @param MessageProducerInterface|null $messageProducer

@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -28,8 +29,7 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         $internalMessageProducer
             ->expects($this->once())
             ->method('send')
-            ->with($topic, $body)
-        ;
+            ->with($topic, $body);
 
         $messageProducer = new TraceableMessageProducer($internalMessageProducer);
 
@@ -62,14 +62,26 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         ], $messageProducer->getTraces());
     }
 
+    public function testShouldResolveMessageIfItRepresentsByBuilder()
+    {
+        $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
+
+        $messageProducer->send('aFooTopic', new CallbackMessageBuilder(function () {
+            return 'aFooBody';
+        }));
+
+        $this->assertEquals([
+            ['topic'=> 'aFooTopic', 'message' => 'aFooBody']
+        ], $messageProducer->getTraces());
+    }
+
     public function testShouldNotStoreAnythingIfInternalMessageProducerThrowsException()
     {
         $internalMessageProducer = $this->createMessageProducer();
         $internalMessageProducer
             ->expects($this->once())
             ->method('send')
-            ->willThrowException(new \Exception)
-        ;
+            ->willThrowException(new \Exception);
 
         $messageProducer = new TraceableMessageProducer($internalMessageProducer);
 
@@ -86,7 +98,6 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
 
         $messageProducer->send('aFooTopic', 'aFooBody');
-
 
         //guard
         $this->assertNotEmpty($messageProducer->getTraces());

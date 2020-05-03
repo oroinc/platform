@@ -1,13 +1,17 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
+/**
+ * Represents a class that is used to send messages to the queue.
+ */
 interface MessageProducerInterface
 {
     /**
      * Sends a message to a topic. There are some message processor may be subscribed to a topic.
      *
      * @param string $topic
-     * @param string|array|Message $message
+     * @param string|array|Message|MessageBuilderInterface $message
      *
      * @return void
      *

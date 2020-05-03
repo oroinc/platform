@@ -20,20 +20,21 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddTransactionWatcherCompilerPass implements CompilerPassInterface
 {
-    const CONNECTION_PROXY_NAMESPACE = 'OroDoctrineConnection';
-    const CONNECTION_PROXY_CLASS     = 'ConnectionProxy';
+    public const CONNECTION_PROXY_NAMESPACE = 'OroDoctrineConnection';
+
+    private const CONNECTION_PROXY_CLASS = 'ConnectionProxy';
 
     /** @var string */
     private $transactionWatcherTag;
 
-    /** @var string */
+    /** @var string|null */
     private $connectionName;
 
     /**
-     * @param string $transactionWatcherTag
-     * @param string $connectionName
+     * @param string      $transactionWatcherTag
+     * @param string|null $connectionName
      */
-    public function __construct(string $transactionWatcherTag, string $connectionName = '')
+    public function __construct(string $transactionWatcherTag, string $connectionName = null)
     {
         $this->transactionWatcherTag = $transactionWatcherTag;
         $this->connectionName = $connectionName;
@@ -57,16 +58,16 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         // check that the connection class is "Doctrine\DBAL\Connection"
         // ("Oro\Component\Testing\Doctrine\PersistentConnection" for the test environment)
         // or one of its subtype
-        $extectedConnectionClass = Connection::class;
+        $expectedConnectionClass = Connection::class;
         if ('test' === $container->getParameter('kernel.environment')) {
-            $extectedConnectionClass = PersistentConnection::class;
+            $expectedConnectionClass = PersistentConnection::class;
         }
-        $connectionWrapperClass = $options['wrapperClass'] ?? $extectedConnectionClass;
-        if (!is_a($connectionWrapperClass, $extectedConnectionClass, true)) {
+        $connectionWrapperClass = $options['wrapperClass'] ?? $expectedConnectionClass;
+        if (!is_a($connectionWrapperClass, $expectedConnectionClass, true)) {
             throw new \RuntimeException(sprintf(
                 'The DBAL connection "wrapperClass" "%s" has to be "%s" or its subtype.',
                 $connectionWrapperClass,
-                $extectedConnectionClass
+                $expectedConnectionClass
             ));
         }
 
@@ -75,7 +76,11 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         $this->ensureProxyDirExists($proxyDir);
 
         // replace the connection class with the proxy
-        $options['wrapperClass'] = $this->generateProxy($proxyDir, $connectionWrapperClass);
+        $options['wrapperClass'] = $this->generateProxy(
+            $proxyDir,
+            $connectionWrapperClass,
+            $container->getParameter('kernel.environment') === 'test'
+        );
         $connectionDef->replaceArgument(0, $options);
 
         // create the chain watcher and inject it to the connection proxy
@@ -118,7 +123,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         // sort by priority and flatten
         if (!empty($watchers)) {
             krsort($watchers);
-            $watchers = call_user_func_array('array_merge', $watchers);
+            $watchers = array_merge(...$watchers);
         }
 
         return $watchers;
@@ -198,12 +203,13 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
     /**
      * @param string $proxyDir
      * @param string $connectionClass
+     * @param bool   $isTestMode
      *
      * @return string The connection proxy fully-qualified class name
      *
      * @throws \RuntimeException if the creation of the proxy file failed
      */
-    private function generateProxy(string $proxyDir, string $connectionClass): string
+    private function generateProxy(string $proxyDir, string $connectionClass, bool $isTestMode = false): string
     {
         if (strpos($connectionClass, '\\') !== 0) {
             $connectionClass = '\\' . $connectionClass;
@@ -214,6 +220,18 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         $proxyNamespace = self::CONNECTION_PROXY_NAMESPACE;
         $proxyClass = self::CONNECTION_PROXY_CLASS . '_' . md5($connectionClass);
         $proxyFile = $proxyDir . DIRECTORY_SEPARATOR . $proxyClass . '.php';
+        $startNestingLevel = 1;
+        $endNestingLevel = 0;
+        $startNestingLevelInComments = '1';
+        $endNestingLevelInComments = '0';
+        if ($isTestMode) {
+            // this is required because functional tests are wrapped with an external DBAL transaction
+            // as a result of dbIsolation and dbIsolationPerTest annotations
+            $startNestingLevel = 2;
+            $endNestingLevel = 1;
+            $startNestingLevelInComments = '2 (only for the "test" environment; 1 for other environments)';
+            $endNestingLevelInComments = '1 (only for the "test" environment; 0 for other environments)';
+        }
 
         if (!is_file($proxyFile)) {
             $this->writeProxyFile(
@@ -233,27 +251,27 @@ class $proxyClass extends $connectionClass implements $transactionWatcherAwareIn
     public function beginTransaction()
     {
         parent::beginTransaction();
-        // the nesting level equal to 1 means that the root transaction is started,
-        // for nested transactions the nesting level will be greater that 1
-        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === 1) {
+        // the nesting level equal to $startNestingLevelInComments means that the root transaction is started,
+        // for nested transactions the nesting level will be greater that $startNestingLevelInComments
+        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === $startNestingLevel) {
             \$this->transactionWatcher->onTransactionStarted();
         }
     }
     public function commit()
     {
         parent::commit();
-        // the nesting level equal to 0 means that the root transaction is committed,
-        // for nested transactions the nesting level will be greater that 0
-        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === 0) {
+        // the nesting level equal to $endNestingLevelInComments means that the root transaction is committed,
+        // for nested transactions the nesting level will be greater that $endNestingLevelInComments
+        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === $endNestingLevel) {
             \$this->transactionWatcher->onTransactionCommitted();
         }
     }
     public function rollBack()
     {
         parent::rollBack();
-        // the nesting level equal to 0 means that the root transaction is rolled back,
-        // for nested transactions the nesting level will be greater that 0
-        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === 0) {
+        // the nesting level equal to $endNestingLevelInComments means that the root transaction is rolled back,
+        // for nested transactions the nesting level will be greater that $endNestingLevelInComments
+        if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === $endNestingLevel) {
             \$this->transactionWatcher->onTransactionRolledback();
         }
     }

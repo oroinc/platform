@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client;
 
 use Doctrine\Common\Cache\Cache;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageBuilderInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
@@ -32,6 +33,9 @@ class MockLifecycleMessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message)
     {
+        if ($message instanceof MessageBuilderInterface) {
+            $message = $message->getMessage();
+        }
         if ($message instanceof Message) {
             $message = clone $message;
         } else {

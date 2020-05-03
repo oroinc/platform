@@ -30,17 +30,10 @@ class BufferedMessageProducerTest extends WebTestCase
         $this->connection = $container->get('doctrine.dbal.default_connection');
         $this->producer = $container->get('oro_message_queue.client.message_producer');
         $this->bufferedProducer = $container->get('oro_message_queue.client.buffered_message_producer');
-        $this->bufferedProducer->enable();
-
-        // make sute that there are no active transactions
-        while ($this->connection->isTransactionActive()) {
-            $this->connection->rollBack();
-        }
     }
 
     protected function tearDown()
     {
-        $this->bufferedProducer->disable();
         self::getMessageCollector()->clear();
 
         // make sure that there are not messages in the database
@@ -66,6 +59,48 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertMessagesSent($topic, [$message]);
     }
 
+    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsOne()
+    {
+        $topic = BasicMessageProcessor::TEST_TOPIC;
+        $message = 'foo';
+
+        $this->bufferedProducer->enableBuffering();
+        $this->bufferedProducer->disable();
+        try {
+            // buffered producer should send messages directly omitting buffering
+            $this->producer->send($topic, $message);
+            self::assertMessagesSent($topic, [$message]);
+            self::assertTrue($this->bufferedProducer->isBufferingEnabled());
+        } finally {
+            $this->bufferedProducer->enable();
+            $this->bufferedProducer->disableBuffering();
+        }
+        self::assertFalse($this->bufferedProducer->isBufferingEnabled());
+    }
+
+    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsMoreThanOne()
+    {
+        $topic = BasicMessageProcessor::TEST_TOPIC;
+        $message = 'foo';
+
+        $this->bufferedProducer->enableBuffering();
+        $this->bufferedProducer->enableBuffering();
+        $this->bufferedProducer->enableBuffering();
+        $this->bufferedProducer->disable();
+        try {
+            // buffered producer should send messages directly omitting buffering
+            $this->producer->send($topic, $message);
+            self::assertMessagesSent($topic, [$message]);
+            self::assertTrue($this->bufferedProducer->isBufferingEnabled());
+        } finally {
+            $this->bufferedProducer->enable();
+            $this->bufferedProducer->disableBuffering();
+            $this->bufferedProducer->disableBuffering();
+            $this->bufferedProducer->disableBuffering();
+        }
+        self::assertFalse($this->bufferedProducer->isBufferingEnabled());
+    }
+
     public function testFlushBufferOnCommit()
     {
         $topic = BasicMessageProcessor::TEST_TOPIC;
@@ -82,25 +117,6 @@ class BufferedMessageProducerTest extends WebTestCase
         }
 
         self::assertMessagesSent($topic, $messages);
-    }
-
-    public function testClearBufferOnRollback()
-    {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $messages = ['foo', 'bar'];
-
-        $this->connection->beginTransaction();
-        try {
-            foreach ($messages as $message) {
-                $this->producer->send($topic, $message);
-            }
-            self::assertMessagesEmpty($topic);
-        } finally {
-            $this->connection->rollBack();
-        }
-
-        self::assertAttributeEmpty('buffer', $this->bufferedProducer);
-        self::assertMessagesEmpty($topic);
     }
 
     public function testNestedTransactions()
@@ -129,5 +145,24 @@ class BufferedMessageProducerTest extends WebTestCase
             $this->connection->commit();
         }
         self::assertMessagesSent($topic, $messages);
+    }
+
+    public function testClearBufferOnRollback()
+    {
+        $topic = BasicMessageProcessor::TEST_TOPIC;
+        $messages = ['foo', 'bar'];
+
+        $this->connection->beginTransaction();
+        try {
+            foreach ($messages as $message) {
+                $this->producer->send($topic, $message);
+            }
+            self::assertMessagesEmpty($topic);
+        } finally {
+            $this->connection->rollBack();
+        }
+
+        self::assertFalse($this->bufferedProducer->hasBufferedMessages());
+        self::assertMessagesEmpty($topic);
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Client;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * The message producer that can be used in case if the sending messages
@@ -16,18 +17,31 @@ class BufferedMessageProducer implements MessageProducerInterface
     /** @var MessageProducerInterface */
     private $innerProducer;
 
-    /** @var array [[topic, message], ...] */
-    private $buffer = [];
+    /** @var LoggerInterface */
+    private $logger;
 
-    /** @var bool */
-    private $bufferEnabled = false;
+    /** @var MessageFilterInterface */
+    private $filter;
+
+    /** @var MessageBuffer|null */
+    private $buffer;
+
+    /** @var int */
+    private $enableBufferingNestingLevel = 0;
 
     /**
      * @param MessageProducerInterface $producer
+     * @param LoggerInterface          $logger
+     * @param MessageFilterInterface   $filter
      */
-    public function __construct(MessageProducerInterface $producer)
-    {
+    public function __construct(
+        MessageProducerInterface $producer,
+        LoggerInterface $logger,
+        MessageFilterInterface $filter
+    ) {
         $this->innerProducer = $producer;
+        $this->logger = $logger;
+        $this->filter = $filter;
     }
 
     /**
@@ -35,19 +49,24 @@ class BufferedMessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message)
     {
-        if ($this->bufferEnabled) {
-            $this->buffer[] = [$topic, $message];
+        if ($this->enableBufferingNestingLevel > 0) {
+            if (null === $this->buffer) {
+                $this->buffer = new MessageBuffer();
+            }
+            $this->buffer->addMessage($topic, $message);
         } else {
-            $this->innerProducer->send($topic, $message);
+            $buffer = new MessageBuffer();
+            $buffer->addMessage($topic, $message);
+            $this->sendMessages($buffer);
         }
     }
 
     /**
-     * Indicates whather the buffering of messages is enabled.
+     * Indicates whether the buffering of messages is enabled.
      */
-    public function isBufferingEnabled()
+    public function isBufferingEnabled(): bool
     {
-        return $this->bufferEnabled;
+        return $this->enableBufferingNestingLevel > 0;
     }
 
     /**
@@ -56,9 +75,9 @@ class BufferedMessageProducer implements MessageProducerInterface
      * To send collected messages to the queue the "flushBuffer" method should be called.
      * To remove all collected messages without sending them to the queue the "clearBuffer" method should be called.
      */
-    public function enableBuffering()
+    public function enableBuffering(): void
     {
-        $this->bufferEnabled = true;
+        $this->enableBufferingNestingLevel++;
     }
 
     /**
@@ -66,10 +85,26 @@ class BufferedMessageProducer implements MessageProducerInterface
      * In this mode messages are sent to the queue directly without buffering.
      * Please note that this method does nothing with already buffered messages;
      * to send them to the queue the buffering should be enabled and the "flushBuffer" method should be called.
+     *
+     * @throws \LogicException if the buffering of messages is already disabled
      */
-    public function disableBuffering()
+    public function disableBuffering(): void
     {
-        $this->bufferEnabled = false;
+        if (0 === $this->enableBufferingNestingLevel) {
+            $this->logger->critical(
+                'The buffered message producer fails because the buffering of messages is already disabled.'
+            );
+            throw new \LogicException('The buffering of messages is already disabled.');
+        }
+        $this->enableBufferingNestingLevel--;
+    }
+
+    /**
+     * Checks whether the buffer contains at least one message.
+     */
+    public function hasBufferedMessages(): bool
+    {
+        return null !== $this->buffer && $this->buffer->hasMessages();
     }
 
     /**
@@ -79,15 +114,11 @@ class BufferedMessageProducer implements MessageProducerInterface
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception if the sending a message to the queue
      * fails due to some internal error
      */
-    public function flushBuffer()
+    public function flushBuffer(): void
     {
         $this->assertBufferingEnabled();
-        try {
-            foreach ($this->buffer as list($topic, $message)) {
-                $this->innerProducer->send($topic, $message);
-            }
-        } finally {
-            $this->buffer = [];
+        if (null !== $this->buffer && $this->buffer->hasMessages()) {
+            $this->sendMessages($this->buffer);
         }
     }
 
@@ -96,10 +127,12 @@ class BufferedMessageProducer implements MessageProducerInterface
      *
      * @throws \LogicException if the buffering of messages is disabled
      */
-    public function clearBuffer()
+    public function clearBuffer(): void
     {
         $this->assertBufferingEnabled();
-        $this->buffer = [];
+        if (null !== $this->buffer) {
+            $this->buffer->clear();
+        }
     }
 
     /**
@@ -107,10 +140,38 @@ class BufferedMessageProducer implements MessageProducerInterface
      *
      * @throws \LogicException if the buffering is disabled
      */
-    private function assertBufferingEnabled()
+    private function assertBufferingEnabled(): void
     {
-        if (!$this->bufferEnabled) {
+        if (0 === $this->enableBufferingNestingLevel) {
+            $this->logger->critical(
+                'The buffered message producer fails because the buffering of messages is disabled.'
+            );
             throw new \LogicException('The buffering of messages is disabled.');
+        }
+    }
+
+    /**
+     * @param MessageBuffer $buffer
+     *
+     * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception if the sending a message to the queue
+     * fails due to some internal error
+     */
+    private function sendMessages(MessageBuffer $buffer): void
+    {
+        try {
+            $this->filter->apply($buffer);
+            $messages = $buffer->getMessages();
+            foreach ($messages as [$topic, $message]) {
+                $this->innerProducer->send($topic, $message);
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'The buffered message producer fails to send messages to the queue.',
+                ['exception' => $e]
+            );
+            throw $e;
+        } finally {
+            $buffer->clear();
         }
     }
 }
