@@ -435,6 +435,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     protected function processUpdateListChunkMessages(): array
     {
         $result = [];
+        self::flushMessagesBuffer();
         $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
         while ($messages) {
             self::getMessageCollector()->clearTopicMessages(Topics::UPDATE_LIST_PROCESS_CHUNK);
@@ -445,9 +446,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
                     $this->processMessage('oro_api.batch.async.update_list.process_chunk', $message)
                 ];
             }
+            self::flushMessagesBuffer();
             $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
         }
 
+        self::flushMessagesBuffer();
         $messages = self::getSentMessagesByTopic(JobTopics::ROOT_JOB_STOPPED, true);
         self::getMessageCollector()->clearTopicMessages(JobTopics::ROOT_JOB_STOPPED);
         self::assertCount(1, $messages, JobTopics::ROOT_JOB_STOPPED);
@@ -455,6 +458,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
             $this->processMessage('oro_message_queue.job.dependent_job_processor', $this->createMessage($body));
         }
 
+        self::flushMessagesBuffer();
         $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_FINISH, true);
         self::getMessageCollector()->clearTopicMessages(Topics::UPDATE_LIST_FINISH);
         self::assertCount(1, $messages, Topics::UPDATE_LIST_FINISH);

@@ -4,6 +4,12 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.2.0-beta
 
+### Added
+
+#### MessageQueueBundle
+* Added a possibility to filter messages before they are sent to the message queue.
+  See [Filtering Messages in the Message Producer](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/filtering_messages.md).
+
 ### Removed
 
 #### ApiBundle

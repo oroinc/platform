@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducer;
@@ -240,6 +241,14 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
                 'message' => (new Message())->setHeader('test', 'property1'),
                 'expectedMessage' => $this->getExpectedMessage()
                     ->setHeader('test', 'property1'),
+            ],
+            'message builder'              => [
+                'message' => new CallbackMessageBuilder(function () {
+                    return ['key' => 'value'];
+                }),
+                'expectedMessage' => $this->getExpectedMessage()
+                    ->setBody(JSON::encode(['key' => 'value']))
+                    ->setContentType('application/json')
             ]
         ];
     }

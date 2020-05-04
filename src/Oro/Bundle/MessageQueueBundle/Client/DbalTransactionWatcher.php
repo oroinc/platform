@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Client;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
 
 /**
- * Watches DBAL transaction in order to enable the buffering mode when the root transaction starts
+ * Watches DBAL transactions in order to enable the buffering mode when the root transaction starts
  * and send all collected messages when the root transaction is committed
  * or remove all collected messages from the buffer without sending them when the root transaction is rolled back.
  */

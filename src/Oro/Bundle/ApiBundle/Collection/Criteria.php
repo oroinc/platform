@@ -33,7 +33,7 @@ class Criteria extends BaseCriteria
     /**
      * Determines whether a join for a given path exists.
      *
-     * @param string $propertyPath The path for which a join should be applied.
+     * @param string $propertyPath The path to which a join should be applied.
      *
      * @return bool
      */
@@ -45,7 +45,7 @@ class Criteria extends BaseCriteria
     /**
      * Gets a join for a given path.
      *
-     * @param string $propertyPath The path for which a join should be applied.
+     * @param string $propertyPath The path to which a join should be applied.
      *
      * @return Join|null
      */
@@ -71,7 +71,7 @@ class Criteria extends BaseCriteria
      * * '{entity}' for a current joined entity
      * * '{property path}' for another join
      *
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.
      * @param string|null $condition     The condition for the join.
@@ -96,7 +96,7 @@ class Criteria extends BaseCriteria
      * * '{entity}' for a current joined entity
      * * '{property path}' for another join
      *
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.
      * @param string|null $condition     The condition for the join.
@@ -115,7 +115,7 @@ class Criteria extends BaseCriteria
     }
 
     /**
-     * @param string      $propertyPath  The path for which the join should be applied.
+     * @param string      $propertyPath  The path to which the join should be applied.
      * @param string      $joinType      The condition type constant. Either Join::INNER_JOIN or Join::LEFT_JOIN.
      * @param string      $join          The relationship to join.
      * @param string|null $conditionType The condition type constant. Either Join::ON or Join::WITH.

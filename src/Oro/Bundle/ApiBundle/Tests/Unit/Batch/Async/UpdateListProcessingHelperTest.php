@@ -65,7 +65,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $startTimestamp = microtime(true);
         usleep(10000);
         $calculatedAggregateTime = $this->helper->calculateAggregateTime($startTimestamp, 5);
-        self::assertEqualsWithDelta(15, $calculatedAggregateTime, 1);
+        self::assertEqualsWithDelta(15, $calculatedAggregateTime, 3);
     }
 
     public function testSafeDeleteFile()
