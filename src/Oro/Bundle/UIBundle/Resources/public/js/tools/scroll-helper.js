@@ -73,6 +73,8 @@ define(function(require, exports, module) {
          */
         _isBodyTouchScrollDisabled: false,
 
+        _passiveEventSupported: void 0,
+
         /**
          * Disable body scroll on touch devices
          * @returns {boolean}
@@ -415,6 +417,31 @@ define(function(require, exports, module) {
             _scrollTimer = setTimeout(function() {
                 mediator.trigger('scroll:direction:change', 0);
             }, this._scrollTimeout);
+        },
+
+        /**
+         * Detects support for the passive option to addEventListener
+         */
+        isPassiveEventSupported: function() {
+            if (this._passiveEventSupported !== void 0) {
+                return this._passiveEventSupported;
+            }
+
+            let support = false;
+
+            try {
+                const opts = Object.defineProperty({}, 'passive', {
+                    get: function() {
+                        support = true;
+                    }
+                });
+                const fn = function() {};
+
+                window.addEventListener('checkPassiveEvent', fn, opts);
+                window.removeEventListener('checkPassiveEvent', fn, opts);
+            } catch (e) {}
+
+            return this._passiveEventSupported = support;
         }
     };
 
