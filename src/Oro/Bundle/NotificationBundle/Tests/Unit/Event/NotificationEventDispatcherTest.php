@@ -64,7 +64,7 @@ class NotificationEventDispatcherTest extends TestCase
             ->method('addListener');
         $this->expectsMethodCallOnDecoratedEventDispatcher(
             'dispatch',
-            ['eventName', new Event()]
+            [new Event(), 'eventName']
         );
     }
 
@@ -82,7 +82,7 @@ class NotificationEventDispatcherTest extends TestCase
             );
         $this->expectsMethodCallOnDecoratedEventDispatcher(
             'dispatch',
-            ['eventName', new NotificationEvent(new \stdClass())]
+            [new NotificationEvent(new \stdClass()), 'eventName']
         );
     }
 
@@ -107,11 +107,12 @@ class NotificationEventDispatcherTest extends TestCase
 
         $this->eventDispatcherMock->expects($this->exactly(3))
             ->method('dispatch')
-            ->with($eventName, $notificationEvent);
+            ->with($notificationEvent, $eventName);
 
         $this->notificationEventDispatcher->dispatch($eventName, $notificationEvent);
         $this->notificationEventDispatcher->dispatch($eventName, $notificationEvent);
-        $this->notificationEventDispatcher->dispatch($eventName, $notificationEvent);
+        /** swap arguments @see \Symfony\Contracts\EventDispatcher\EventDispatcherInterface::dispatch */
+        $this->notificationEventDispatcher->dispatch($notificationEvent, $eventName);
     }
 
     public function testDispatchRegisteredNotificationEvent()
@@ -121,8 +122,55 @@ class NotificationEventDispatcherTest extends TestCase
         $this->notificationEventDispatcher->setRegisteredNotificationEvents(['registered.event']);
         $this->expectsMethodCallOnDecoratedEventDispatcher(
             'dispatch',
-            ['registered.event', new NotificationEvent(new \stdClass())]
+            [new NotificationEvent(new \stdClass()), 'registered.event']
         );
+    }
+
+    public function testDispatchNotNotificationEventSwapArguments()
+    {
+        $this->eventDispatcherMock->expects($this->never())
+            ->method('addListener');
+
+        $this->eventDispatcherMock->expects($this->once())
+            ->method('dispatch')
+            ->with(new Event(), 'eventName');
+
+        $this->notificationEventDispatcher->dispatch('eventName', new Event());
+    }
+
+    public function testDispatchNotificationEventSwapArguments()
+    {
+        $eventName = 'eventName';
+        $notificationEvent = new NotificationEvent(new \stdClass());
+
+        $this->eventDispatcherMock->expects($this->once())
+            ->method('addListener')
+            ->with(
+                'eventName',
+                [
+                    $this->notificationManagerMock,
+                    'process',
+                ],
+                0
+            );
+
+        $this->eventDispatcherMock->expects($this->once())
+            ->method('dispatch')
+            ->with($notificationEvent, $eventName);
+
+        $this->notificationEventDispatcher->dispatch($eventName, $notificationEvent);
+    }
+
+    public function testDispatchWithoutEventName()
+    {
+        $this->eventDispatcherMock->expects($this->never())
+            ->method('addListener');
+
+        $this->eventDispatcherMock->expects($this->once())
+            ->method('dispatch')
+            ->with(new Event(), Event::class);
+
+        $this->notificationEventDispatcher->dispatch(new Event());
     }
 
     public function testAddListener()

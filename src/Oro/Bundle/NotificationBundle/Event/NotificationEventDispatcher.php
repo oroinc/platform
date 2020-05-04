@@ -55,8 +55,18 @@ class NotificationEventDispatcher implements EventDispatcherInterface
     /**
      * @inheritDoc
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($event/*, string $eventName = null*/)
     {
+        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
+
+        if (\is_object($event)) {
+            $eventName = $eventName ?? \get_class($event);
+        } else {
+            $swap = $event;
+            $event = $eventName ?? new Event();
+            $eventName = $swap;
+        }
+
         if ($event instanceof NotificationEvent && !in_array($eventName, $this->registeredNotificationEvents, true)) {
             $this->eventDispatcher->addListener(
                 $eventName,
@@ -69,7 +79,7 @@ class NotificationEventDispatcher implements EventDispatcherInterface
             $this->registeredNotificationEvents[] = $eventName;
         }
 
-        return $this->eventDispatcher->dispatch($eventName, $event);
+        return $this->eventDispatcher->dispatch($event, $eventName);
     }
 
     /**
