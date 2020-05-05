@@ -583,7 +583,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ]
         );
         $message = $this->createMessage(self::getSentMessage(Topics::UPDATE_LIST));
-        $this->clearMessageCollector();
+        self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
         $this->assertAsyncOperationStatus($operationId, $newOperationAttributes);
@@ -666,7 +666,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ]
         );
         $message = $this->createMessage(self::getSentMessage(Topics::UPDATE_LIST));
-        $this->clearMessageCollector();
+        self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
         $this->assertAsyncOperationStatus($operationId, $newOperationAttributes);
