@@ -408,7 +408,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
         $operationId = $this->extractOperationIdFromContentLocationHeader($response);
-        self::getMessageCollector()->clear();
+        self::clearMessageCollector();
 
         /** @var AsyncOperation $operation */
         $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
