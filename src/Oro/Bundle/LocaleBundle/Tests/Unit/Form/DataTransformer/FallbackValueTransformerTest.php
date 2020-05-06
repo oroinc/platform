@@ -12,7 +12,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new FallbackValueTransformer();
     }
@@ -22,7 +22,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
      * @param mixed $expected
      * @dataProvider transformDataProvider
      */
-    public function testTransform($input, $expected)
+    public function testTransform($input, $expected): void
     {
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
@@ -30,7 +30,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             'null' => [
@@ -53,7 +53,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
      * @param mixed $expected
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($input, $expected)
+    public function testReverseTransform($input, $expected): void
     {
         $this->assertSame($expected, $this->transformer->reverseTransform($input));
     }
@@ -61,7 +61,7 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'null' => [
@@ -83,13 +83,38 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformWhenFallback(): void
+    /**
+     * @param mixed $input
+     * @param mixed $expected
+     * @dataProvider reverseTransformWhenFallbackDataProvider
+     */
+    public function testReverseTransformWhenFallback($input, $expected): void
     {
-        $this->assertEquals(
-            new FallbackType(FallbackType::SYSTEM),
-            $this->transformer->reverseTransform(
-                ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true]
-            )
-        );
+        $this->assertEquals($expected, $this->transformer->reverseTransform($input));
+    }
+
+    /**
+     * @return array
+     */
+    public function reverseTransformWhenFallbackDataProvider(): array
+    {
+        return [
+            'fallback' => [
+                'input' => ['value' => null, 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
+                'expected' => new FallbackType(FallbackType::SYSTEM),
+            ],
+            'when not use_fallback than value' => [
+                'input' => ['value' => 'string', 'fallback' => FallbackType::SYSTEM, 'use_fallback' => false],
+                'expected' => 'string',
+            ],
+            'when use_fallback than fallback' => [
+                'input' => ['value' => 'string', 'fallback' => FallbackType::SYSTEM, 'use_fallback' => true],
+                'expected' => new FallbackType(FallbackType::SYSTEM),
+            ],
+            'use_fallback required fallback' => [
+                'input' => ['value' => 'string', 'use_fallback' => true],
+                'expected' => 'string',
+            ],
+        ];
     }
 }
