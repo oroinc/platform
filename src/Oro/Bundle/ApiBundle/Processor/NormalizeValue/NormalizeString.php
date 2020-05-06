@@ -38,7 +38,7 @@ class NormalizeString extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    public function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context)
     {
         $context->setRequirement($this->getRequirement());
     }

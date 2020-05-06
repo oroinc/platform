@@ -26,7 +26,12 @@ services:
     oro_api.normalize_value.string:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: string|guid|currency, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: string|currency, priority: -10 }
+
+    oro_api.normalize_value.guid:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: guid, priority: -10 }
 
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger

@@ -46,7 +46,7 @@ abstract class AbstractProcessor implements ProcessorInterface
      *
      * @param NormalizeValueContext $context
      */
-    public function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context)
     {
         if ($context->isArrayAllowed()) {
             $requirement = $this->getArrayRequirement($context->getArrayDelimiter());

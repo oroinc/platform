@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
 /**
  * The base execution context for processors for "customize_loaded_data" and "customize_form_data" actions.
  */
-abstract class CustomizeDataContext extends ApiContext
+abstract class CustomizeDataContext extends ApiContext implements SharedDataAwareContextInterface
 {
     /** FQCN of a root entity */
     const ROOT_CLASS_NAME = 'rootClass';
