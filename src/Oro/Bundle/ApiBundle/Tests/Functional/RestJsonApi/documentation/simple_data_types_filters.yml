@@ -32,7 +32,7 @@ filters:
         type: 'float or array or range'
         operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
     'filter[fieldGuid]':
-        requirement: '.+'
+        requirement: '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}(,[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12})*'
         type: 'string or array'
         operators: 'eq,neq,exists,neq_or_null'
     'filter[fieldInt]':
