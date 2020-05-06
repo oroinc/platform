@@ -60,9 +60,16 @@ class NumberFormatterTest extends TestCase
         $defaultLocale = null
     ) {
         if ($defaultLocale) {
-            $this->localeSettings->expects($this->once())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
+            $this->localeSettings->expects($this->once())
+                ->method('getLocale')
+                ->willReturn($defaultLocale);
         }
+        $this->assertEquals(
+            $expected,
+            $this->formatter->format($value, $style, $attributes, $textAttributes, $symbols, $locale)
+        );
+
+        // check local cache
         $this->assertEquals(
             $expected,
             $this->formatter->format($value, $style, $attributes, $textAttributes, $symbols, $locale)
@@ -206,13 +213,20 @@ class NumberFormatterTest extends TestCase
         $currency = 'GBP';
         $currencySymbol = '£';
 
-        $this->localeSettings->expects($this->any())->method('getLocale')->will($this->returnValue($locale));
-        $this->localeSettings->expects($this->any())->method('getCurrency')->will($this->returnValue($currency));
         $this->localeSettings->expects($this->any())
+            ->method('getLocale')
+            ->willReturn($locale);
+        $this->localeSettings->expects($this->any())
+            ->method('getCurrency')
+            ->willReturn($currency);
+        $this->localeSettings->expects($this->once())
             ->method('getCurrencySymbolByCurrency')
             ->with($currency)
-            ->will($this->returnValue($currencySymbol));
+            ->willReturn($currencySymbol);
 
+        $this->assertEquals('£1,234.57', $this->formatter->formatCurrency(1234.56789));
+
+        // check local cache
         $this->assertEquals('£1,234.57', $this->formatter->formatCurrency(1234.56789));
     }
 
