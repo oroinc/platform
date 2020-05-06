@@ -121,6 +121,24 @@ class NumberFormatter
     }
 
     /**
+     * @param string $currencyCode
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getCurrencySymbolByCurrency(string $currencyCode, string $locale): string
+    {
+        if (!isset($this->currencySymbols[$currencyCode][$locale])) {
+            $this->currencySymbols[$currencyCode][$locale] = $this->localeSettings->getCurrencySymbolByCurrency(
+                $currencyCode,
+                $locale
+            );
+        }
+
+        return $this->currencySymbols[$currencyCode][$locale];
+    }
+
+    /**
      * Format decimal
      *
      * @param float $value

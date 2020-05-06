@@ -45,6 +45,12 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             self::FORMATTED_VALUE,
             $this->formatter->format(self::UNFORMATTED_VALUE, $style, [], [], [], self::LOCALE)
         );
+
+        // check local cache
+        $this->assertEquals(
+            $expected,
+            $this->formatter->format($value, $style, $attributes, $textAttributes, $symbols, $locale)
+        );
     }
 
     /**
