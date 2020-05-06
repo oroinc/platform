@@ -26,7 +26,13 @@ class NumberFormatter
      *
      * @var array
      */
-    protected $currencySymbolPrepend = array();
+    protected $currencySymbolPrepend = [];
+
+    /** @var IntlNumberFormatter[] */
+    protected $formatters = [];
+
+    /** @var array */
+    protected $currencySymbols = [];
 
     /**
      * @param LocaleSettings $localeSettings
@@ -97,7 +103,7 @@ class NumberFormatter
 
         $formattedString = $formatter->formatCurrency($value, $currencyCode);
         $fromCurrencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-        $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode, $locale);
+        $toCurrencySymbol = $this->getCurrencySymbolByCurrency($currencyCode, $locale);
 
         if ($toCurrencySymbol === $currencyCode) {
             // Adds a space after currency if it is an ISO code.
@@ -113,6 +119,24 @@ class NumberFormatter
         }
 
         return $formattedString;
+    }
+
+    /**
+     * @param string $currencyCode
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getCurrencySymbolByCurrency(string $currencyCode, string $locale): string
+    {
+        if (!isset($this->currencySymbols[$currencyCode][$locale])) {
+            $this->currencySymbols[$currencyCode][$locale] = $this->localeSettings->getCurrencySymbolByCurrency(
+                $currencyCode,
+                $locale
+            );
+        }
+
+        return $this->currencySymbols[$currencyCode][$locale];
     }
 
     /**
@@ -389,33 +413,38 @@ class NumberFormatter
     protected function getFormatter(
         $locale,
         $style,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array()
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = []
     ) {
-        $locale = $locale ? : $this->localeSettings->getLocale();
-        $style = $this->parseStyle($style);
-        $attributes = $this->parseAttributes($attributes);
-        $textAttributes = $this->parseAttributes($textAttributes);
-        $symbols = $this->parseAttributes($symbols);
+        $cacheKey = sha1(\json_encode(func_get_args()));
+        if (!isset($this->formatters[$cacheKey])) {
+            $locale = $locale ? : $this->localeSettings->getLocale();
+            $style = $this->parseStyle($style);
+            $attributes = $this->parseAttributes($attributes);
+            $textAttributes = $this->parseAttributes($textAttributes);
+            $symbols = $this->parseAttributes($symbols);
 
-        $formatter = new IntlNumberFormatter($locale, $style);
+            $formatter = new IntlNumberFormatter($locale, $style);
 
-        foreach ($attributes as $attribute => $value) {
-            $formatter->setAttribute($attribute, $value);
+            foreach ($attributes as $attribute => $value) {
+                $formatter->setAttribute($attribute, $value);
+            }
+
+            foreach ($textAttributes as $attribute => $value) {
+                $formatter->setTextAttribute($attribute, $value);
+            }
+
+            foreach ($symbols as $symbol => $value) {
+                $formatter->setSymbol($symbol, $value);
+            }
+
+            $this->adjustFormatter($formatter, $locale, $style, $attributes);
+
+            $this->formatters[$cacheKey] = $formatter;
         }
 
-        foreach ($textAttributes as $attribute => $value) {
-            $formatter->setTextAttribute($attribute, $value);
-        }
-
-        foreach ($symbols as $symbol => $value) {
-            $formatter->setSymbol($symbol, $value);
-        }
-
-        $this->adjustFormatter($formatter, $locale, $style, $attributes);
-
-        return $formatter;
+        return $this->formatters[$cacheKey];
     }
 
     /**
