@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'jquery-ui',
+    'orotranslation/js/translator',
     'oroui/js/app/views/sticky-element/sticky-element-mixin'
-], function($, _, $ui, stickyElementMixin) {
+], function($, _, $ui, __, stickyElementMixin) {
     'use strict';
 
     /**
@@ -32,8 +33,11 @@ define([
         dropdown: null,
 
         _create: function() {
+            this._togglerId = _.uniqueId('dropdown-toggle-');
             // replaces button's separators
-            this.element.find(this.options.separator).replaceWith('<div class="dropdown-divider"></div>');
+            this.element
+                .find(this.options.separator)
+                .replaceWith('<div class="dropdown-divider" aria-hidden="true"></div>');
 
             this._renderButtons();
         },
@@ -127,10 +131,15 @@ define([
          * @private
          */
         _moreButton: function() {
-            const $button = $('<a href="#"/>');
+            const $button = $('<a></a>');
             $button
                 .attr($.extend({
+                    'id': this._togglerId,
+                    'href': '#',
                     'role': 'button',
+                    'aria-label': __('oro.ui.dropdown_option_aria_label'),
+                    'aria-haspopup': true,
+                    'aria-expanded': false,
                     'data-toggle': 'dropdown',
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
@@ -151,7 +160,9 @@ define([
          */
         _dropdownMenu: function($buttons) {
             return $('<ul></ul>', {
-                'class': 'dropdown-menu'
+                'class': 'dropdown-menu',
+                'role': 'menu',
+                'aria-labelledby': this._togglerId
             }).append(this._prepareButtons($buttons));
         },
 
@@ -172,6 +183,8 @@ define([
                         const shortText = text.substring(0, self.options.truncateLength);
                         if (shortText !== text) {
                             this.parentNode.setAttribute('title', text);
+                            this.parentNode
+                                .setAttribute('aria-label', __('oro.ui.dropdown_main_btn_prefix') + ' ' + text);
                             this.nodeValue = shortText + '\u2026';
                         }
                     }
@@ -185,7 +198,7 @@ define([
             return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).wrap('<li></li>').parent();
+                }).wrap('<li role="menuitem"></li>').parent();
         }
     }));
 

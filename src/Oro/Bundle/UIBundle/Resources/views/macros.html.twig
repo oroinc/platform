@@ -798,7 +798,10 @@
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
     {% spaceless %}
-        <button {{- UIMacro.clientControlAttrs(parameters) -}}>
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}
+            {% if (parameters.title is defined) %}
+                title="{{ parameters.title }}"
+            {% endif %}>
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
@@ -1110,7 +1113,7 @@
     Separator between buttons
 #}
 {% macro buttonSeparator() %}
-    <div class="pull-left">
+    <div class="pull-left" aria-hidden="true">
         <div class="separator-btn"></div>
     </div>
 {% endmacro %}
