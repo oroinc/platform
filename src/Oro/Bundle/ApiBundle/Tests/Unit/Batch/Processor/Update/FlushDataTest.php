@@ -360,6 +360,9 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
 
     public function testProcessWhenExceptionOccurredInFlushDataAndOneBatchItemsInContext()
     {
+        $operationId = 123;
+        $chunkFileName = 'test.json';
+
         $item1 = $this->getBatchUpdateItem(0);
         $item1->getContext()->setClassName(self::ENTITY_CLASS);
         $items = [$item1];
@@ -387,6 +390,15 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->method('finishFlushData')
             ->with($items);
 
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Unexpected error occurred when flushing data for a batch operation chunk.',
+                ['operationId' => $operationId, 'chunkFile' => $chunkFileName, 'exception' => $exception]
+            );
+
+        $this->context->setOperationId($operationId);
+        $this->context->setFile(new ChunkFile($chunkFileName, 0, 0, 'data'));
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);

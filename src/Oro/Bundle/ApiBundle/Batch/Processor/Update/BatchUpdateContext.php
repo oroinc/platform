@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Batch\Processor\Update;
 
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
+use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
@@ -249,6 +250,22 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     public function clearBatchItems(): void
     {
         $this->batchItems = null;
+    }
+
+    /**
+     * Gets items were processed by this batch operation without any errors.
+     *
+     * @return BatchUpdateItem[]|iterable
+     */
+    public function getBatchItemsProcessedWithoutErrors(): iterable
+    {
+        if ($this->batchItems) {
+            foreach ($this->batchItems as $item) {
+                if (BatchUpdateItemStatus::NO_ERRORS === ($this->processedItemStatuses[$item->getIndex()] ?? null)) {
+                    yield $item;
+                }
+            }
+        }
     }
 
     /**
