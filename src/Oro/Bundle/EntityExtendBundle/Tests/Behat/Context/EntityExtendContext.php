@@ -31,9 +31,8 @@ class EntityExtendContext extends OroFeatureContext implements OroPageObjectAwar
     {
         /** @var Select2Entity $element */
         $element = $this->createElement($field);
-        $element->fillSearchField($entityName);
 
-        $suggestions = $element->getSuggestions();
+        $suggestions = $element->getSuggestions($entityName);
         static::assertCount(1, $suggestions);
         static::assertEquals('No matches found', reset($suggestions)->getText());
 
