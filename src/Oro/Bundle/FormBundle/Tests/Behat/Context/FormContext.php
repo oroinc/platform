@@ -508,20 +508,27 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
      * @param string $field
      * @param TableNode $options
      * @param string $formName
+     * @param string $value
+     * @throws ElementNotFoundException
      */
     //@codingStandardsIgnoreEnd
-    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
-    {
+    public function shouldSeeTheFollowingOptionsForSelect(
+        $field,
+        TableNode $options,
+        $formName = 'OroForm',
+        $value = ''
+    ) {
         $optionLabels = array_merge(...$options->getRows());
 
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues();
+            $options = $element->getSuggestedValues($value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $options);
             }
@@ -545,20 +552,27 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
      * @param string $field
      * @param TableNode $options
      * @param string $formName
+     * @param string $value
+     * @throws ElementNotFoundException
      */
     //@codingStandardsIgnoreEnd
-    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
-    {
+    public function shouldNotSeeTheFollowingOptionsForSelect(
+        $field,
+        TableNode $options,
+        $formName = 'OroForm',
+        $value = ''
+    ) {
         $optionLabels = array_merge(...$options->getRows());
 
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues();
+            $options = $element->getSuggestedValues($value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertNotContains($optionLabel, $options);
             }
@@ -761,10 +775,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 $assertionFunction();
             } catch (\Exception $exception) {
                 $failureException = $exception;
+
                 return null;
             }
 
             $failureException = null;
+
             return true;
         }, 5);
 

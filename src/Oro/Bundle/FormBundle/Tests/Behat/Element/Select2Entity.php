@@ -34,8 +34,7 @@ class Select2Entity extends Element implements ClearableInterface
             return;
         }
 
-        $this->fillSearchField($value);
-        $results = $this->getSuggestions();
+        $results = $this->getSuggestions($value);
 
         if (1 < count($results)) {
             // Try remove (Add new) records
@@ -104,12 +103,13 @@ class Select2Entity extends Element implements ClearableInterface
     }
 
     /**
+     * @param string $value
      * @return NodeElement[]
      */
-    public function getSuggestions()
+    public function getSuggestions($value = '')
     {
         $this->attempts = 0;
-        $resultSet = $this->getResultSet();
+        $resultSet = $this->getResultSet(true, $value);
 
         $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
             /** @var NodeElement[] $results */
@@ -136,11 +136,12 @@ class Select2Entity extends Element implements ClearableInterface
 
     /**
      * @param bool $failOnEmpty
+     * @param string $value
      * @return NodeElement|null
      */
-    public function getResultSet($failOnEmpty = true)
+    public function getResultSet($failOnEmpty = true, $value = '')
     {
-        $this->open();
+        $this->fillSearchField($value);
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
@@ -160,15 +161,16 @@ class Select2Entity extends Element implements ClearableInterface
     }
 
     /**
+     * @param string $value
      * @return string[]
      */
-    public function getSuggestedValues()
+    public function getSuggestedValues($value = '')
     {
         $suggestions = array_map(
             function (NodeElement $element) {
                 return $element->getText();
             },
-            $this->getSuggestions()
+            $this->getSuggestions($value)
         );
         $this->close();
 
