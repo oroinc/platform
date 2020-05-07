@@ -52,6 +52,9 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
         $this->setUpFallbackConfig($entityConfig);
 
         $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
+
+        // check the local entity config cache
+        $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
     }
 
     public function testGetFallbackHolderEntityReturnsCorrectValue()
