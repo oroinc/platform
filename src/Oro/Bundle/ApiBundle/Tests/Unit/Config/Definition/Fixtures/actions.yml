@@ -371,6 +371,34 @@ invalid_value_for_disable_meta_properties:
     expected: []
     error: 'Invalid type for path "entity.actions.get_list.disable_meta_properties". Expected boolean, but got integer'
 
+enable_partial_load:
+    config:
+        actions:
+            get_list:
+                disable_partial_load: false
+    expected:
+        actions:
+            get_list:
+                disable_partial_load: false
+
+disable_partial_load:
+    config:
+        actions:
+            get_list:
+                disable_partial_load: true
+    expected:
+        actions:
+            get_list:
+                disable_partial_load: true
+
+invalid_value_for_disable_partial_load:
+    config:
+        actions:
+            get_list:
+                disable_partial_load: 123
+    expected: []
+    error: 'Invalid type for path "entity.actions.get_list.disable_partial_load". Expected boolean, but got integer'
+
 null_status_codes:
     config:
         actions:
@@ -610,6 +638,50 @@ field_dash_in_field_name:
             create:
                 fields:
                     test-field: []
+
+field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: path1
+    expected:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: path1
+
+null_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: null
+    expected: []
+    error: 'The path "entity.actions.create.fields.field1.property_path" cannot contain an empty value, but got null.'
+
+empty_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: ""
+    expected: []
+    error: 'The path "entity.actions.create.fields.field1.property_path" cannot contain an empty value, but got "".'
+
+invalid_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: []
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.fields.field1.property_path". Expected scalar, but got array.'
 
 field_form:
     config:

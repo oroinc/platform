@@ -229,7 +229,7 @@ class EntityConfig
     }
 
     /**
-     * Indicates whether using of Doctrine partial object is enabled.
+     * Indicates whether using of Doctrine partial objects is enabled.
      *
      * @return bool
      */
@@ -239,7 +239,7 @@ class EntityConfig
     }
 
     /**
-     * Allows using of Doctrine partial object.
+     * Allows using of Doctrine partial objects.
      */
     public function enablePartialLoad()
     {
@@ -247,7 +247,7 @@ class EntityConfig
     }
 
     /**
-     * Prohibits using of Doctrine partial object.
+     * Prohibits using of Doctrine partial objects.
      */
     public function disablePartialLoad()
     {

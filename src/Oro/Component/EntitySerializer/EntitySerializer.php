@@ -95,7 +95,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  *  ]
  *
  * Special attributes:
- * * 'disable_partial_load' - Disables using of Doctrine partial object.
+ * * 'disable_partial_load' - Disables using of Doctrine partial objects.
  *                            It can be helpful for entities with SINGLE_TABLE inheritance mapping
  * * 'hints'                - The list of Doctrine query hints. Each item can be a string or name/value pair.
  *                            Example:

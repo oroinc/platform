@@ -111,6 +111,20 @@ meta_properties:
             get_subresource:
                 disable_meta_properties: true
 
+partial_load:
+    config:
+        actions:
+            get_list:
+                disable_partial_load: false
+            get_subresource:
+                disable_partial_load: true
+    expected:
+        actions:
+            get_list:
+                disable_partial_load: false
+            get_subresource:
+                disable_partial_load: true
+
 full:
     config:
         get: ~
@@ -202,6 +216,18 @@ entity_form:
             form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             form_options:
                 option1: value1
+
+field_property_path:
+    config:
+        create:
+            fields:
+                field1:
+                    property_path: path1
+    expected:
+        create:
+            fields:
+                field1:
+                    property_path: path1
 
 field_form:
     config:

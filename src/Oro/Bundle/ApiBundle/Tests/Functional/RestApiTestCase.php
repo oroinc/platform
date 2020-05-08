@@ -247,6 +247,8 @@ abstract class RestApiTestCase extends ApiTestCase
             $server
         );
 
+        $this->clearEntityManager();
+
         if ($assertValid) {
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
@@ -291,7 +293,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $content
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = self::extractEntityType($routeParameters);
@@ -454,6 +456,8 @@ abstract class RestApiTestCase extends ApiTestCase
             $server
         );
 
+        $this->clearEntityManager();
+
         if ($assertValid) {
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
@@ -612,6 +616,8 @@ abstract class RestApiTestCase extends ApiTestCase
             $parameters,
             $server
         );
+
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = self::extractEntityType($routeParameters);
