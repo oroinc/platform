@@ -58,30 +58,26 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
      */
     public function getLocalization($id, $useCache = true)
     {
-        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
+        $cacheKey = static::getCacheKey($id);
+        $localizations = $useCache ? $this->cacheProvider->fetch($cacheKey) : false;
 
-        if ($cache !== false && array_key_exists($id, $cache)) {
-            // make doctrine know about entity from cache
-            $this->doctrineHelper
-                ->getEntityManager(Localization::class)
-                ->getUnitOfWork()
-                ->merge($cache[$id]);
+        if (isset($localizations[$id])) {
+            $this->makeLocalizationsManaged($localizations);
 
-            return $cache[$id];
+            return $localizations[$id];
         }
 
-        /** @var Localization $cache */
-        $cache = $this->getRepository()->find($id);
-
-        if ($cache === null) {
+        /** @var Localization $localization */
+        $localization = $this->getRepository()->find($id);
+        if ($localization === null) {
             return null;
         }
 
         if ($useCache) {
-            $this->cacheProvider->save(static::getCacheKey($id), [$id => $cache]);
+            $this->cacheProvider->save($cacheKey, [$id => $localization]);
         }
 
-        return $cache;
+        return $localization;
     }
 
     /**
@@ -131,28 +127,28 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
      */
     public function getLocalizations(array $ids = null, $useCache = true)
     {
-        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey()) : false;
+        $cacheKey = static::getCacheKey();
+        $localizations = $useCache ? $this->cacheProvider->fetch($cacheKey) : false;
 
-        if ($cache === false) {
-            $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
-            $cache = $this->associateLocalizationsArray($cache);
+        if ($localizations === false) {
+            $localizations = $this->getRepository()->findAllIndexedById();
 
             if ($useCache) {
-                $this->cacheProvider->save(static::getCacheKey(), $cache);
+                $this->cacheProvider->save($cacheKey, $localizations);
 
-                foreach ($cache as $id => $localization) {
+                foreach ($localizations as $id => $localization) {
                     $this->cacheProvider->save(static::getCacheKey($id), [$id => $localization]);
                 }
             }
+        } else {
+            $this->makeLocalizationsManaged($localizations);
         }
 
         if (null === $ids) {
-            return $cache;
+            return $localizations;
         }
 
-        $keys = $this->filterOnlyExistingKeys($ids, $cache);
-
-        return array_intersect_key($cache, array_flip($keys));
+        return array_intersect_key($localizations, array_flip($ids));
     }
 
     /**
@@ -216,41 +212,14 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
     }
 
     /**
-     * Set ids of the localizations as keys
-     *
-     * @param Localization[] $localizations
-     * @return Localization[]
+     * @param array $localizations
      */
-    private function associateLocalizationsArray(array $localizations)
+    private function makeLocalizationsManaged(array $localizations): void
     {
-        $localizations = array_combine(
-            array_map(
-                function (Localization $element) {
-                    return $element->getId();
-                },
-                $localizations
-            ),
-            $localizations
-        );
-
-        return $localizations;
-    }
-
-    /**
-     * @param array $ids
-     * @param Localization[] $localizations
-     * @return array
-     */
-    private function filterOnlyExistingKeys(array $ids, $localizations)
-    {
-        $keys = array_filter(
-            array_keys($localizations),
-            function ($key) use ($ids) {
-                // strict comparing is not allowed because ID might be represented by a string
-                return in_array($key, $ids);
-            }
-        );
-
-        return $keys;
+        $unitOfWork = $this->doctrineHelper->getEntityManager(Localization::class)->getUnitOfWork();
+        foreach ($localizations as $localization) {
+            $unitOfWork->merge($localization);
+            $unitOfWork->markReadOnly($localization);
+        }
     }
 }
