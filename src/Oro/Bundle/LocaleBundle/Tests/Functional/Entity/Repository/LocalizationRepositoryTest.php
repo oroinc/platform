@@ -25,7 +25,7 @@ class LocalizationRepositoryTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadLocalizationData::class]);
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroLocaleBundle:Localization');
+        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Localization::class);
         $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
     }
 
@@ -113,5 +113,23 @@ class LocalizationRepositoryTest extends WebTestCase
             'language' => $this->getReference('language.' . $language),
             'formattingCode' => $locale
         ]);
+    }
+
+    public function testFindAllIndexedById(): void
+    {
+        $result = $this->repository->findAllIndexedById();
+
+        $localizationEnCa = $this->getReference('en_CA');
+        $localizationDefault = $this->getReference(LoadLocalizationData::DEFAULT_LOCALIZATION_CODE);
+        $localizationEs = $this->getReference('es');
+
+        $this->assertSame(
+            [
+                $localizationEnCa->getId() => $localizationEnCa,
+                $localizationDefault->getId() => $localizationDefault,
+                $localizationEs->getId() => $localizationEs
+            ],
+            $result
+        );
     }
 }
