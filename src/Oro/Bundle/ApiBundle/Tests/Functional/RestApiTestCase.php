@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class RestApiTestCase extends ApiTestCase
 {
+    protected const API_TEST_STATEFUL_REQUEST = '_api_test_stateful';
+
     /**
      * @return array
      */
@@ -113,7 +115,10 @@ abstract class RestApiTestCase extends ApiTestCase
         } elseif (null !== $csrfCookie) {
             $server[$csrfHeader] = $csrfCookie->getValue();
         }
-        if (array_key_exists($csrfHeader, $server) && !array_key_exists('HTTP_SESSION', $server)) {
+        if (array_key_exists($csrfHeader, $server)
+            && !array_key_exists('HTTP_SESSION', $server)
+            && !$this->isStatelessRequest($server)
+        ) {
             $server['HTTP_SESSION'] = 'test_session';
         }
     }
@@ -889,14 +894,26 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     /**
+     * @param array $server
+     *
+     * @return bool
+     */
+    protected function isStatelessRequest(array $server): bool
+    {
+        return
+            !array_key_exists('HTTP_' . CsrfRequestManager::CSRF_HEADER, $server)
+            || null === $this->client->getCookieJar()->get(self::API_TEST_STATEFUL_REQUEST);
+    }
+
+    /**
      * @param string $method
      * @param string $uri
      * @param array  $server
      */
-    protected static function assertSessionNotStarted($method, $uri, array $server)
+    protected function assertSessionNotStarted(string $method, string $uri, array $server): void
     {
         // do not check session if request was made as a session aware AJAX request
-        if (array_key_exists('HTTP_' . CsrfRequestManager::CSRF_HEADER, $server)) {
+        if (!$this->isStatelessRequest($server)) {
             return;
         }
 
