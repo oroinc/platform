@@ -17,29 +17,25 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('ids', [123, 456]);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
             [
                 [
-                    'id_0'            => 123,
-                    'name_1'          => 'user_name1',
-                    'category_name_2' => 'category_name1'
+                    'id_0'   => 123,
+                    'name_1' => 'user_name1'
                 ],
                 [
-                    'id_0'            => 456,
-                    'name_1'          => 'user_name2',
-                    'category_name_2' => 'category_name2'
+                    'id_0'   => 456,
+                    'name_1' => 'user_name2'
                 ]
             ],
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             1,
@@ -127,29 +123,25 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('ids', [123, 456]);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
             [
                 [
-                    'id_0'            => 123,
-                    'name_1'          => 'user_name1',
-                    'category_name_2' => 'category_name1'
+                    'id_0'   => 123,
+                    'name_1' => 'user_name1'
                 ],
                 [
-                    'id_0'            => 456,
-                    'name_1'          => 'user_name2',
-                    'category_name_2' => 'category_name2'
+                    'id_0'   => 456,
+                    'name_1' => 'user_name2'
                 ]
             ],
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             1,
@@ -178,7 +170,6 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             2,
@@ -259,30 +250,26 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('ids', ['id1', 'id2']);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT r0_.code AS code_0, c1_.name AS name_1, r0_.category_name AS category_name_2'
+            'SELECT r0_.code AS code_0, c1_.name AS name_1'
             . ' FROM role_table r0_'
             . ' LEFT JOIN category_table c1_ ON r0_.category_name = c1_.name'
             . ' WHERE r0_.code IN (?, ?)',
             [
                 [
-                    'code_0'          => 'id1',
-                    'name_1'          => 'category_1',
-                    'category_name_2' => 'category_1'
+                    'code_0' => 'id1',
+                    'name_1' => 'category_1'
                 ],
                 [
-                    'code_0'          => 'id2',
-                    'name_1'          => null,
-                    'category_name_2' => null
+                    'code_0' => 'id2',
+                    'name_1' => null
                 ]
             ],
             [1 => 'id1', 2 => 'id2'],
             [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             1,
@@ -353,18 +340,16 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'category_name_2' => 'category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'user_name'
                 ]
             ],
             [1 => 1],
@@ -425,18 +410,16 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'category_name_2' => 'category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'user_name'
                 ]
             ],
             [1 => 1],
@@ -502,18 +485,16 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'category_name_2' => 'category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'user_name'
                 ]
             ],
             [1 => 1],
@@ -544,25 +525,20 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             $conn,
             2,
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' c1_.name AS name_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4'
+            . ' c1_.name AS name_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN category_table c1_ ON p0_.category_name = c1_.name'
             . ' WHERE p0_.id IN (?, ?)',
             [
                 [
-                    'id_0'            => 10,
-                    'name_1'          => 'product_name1',
-                    'name_2'          => 'category_name1',
-                    'category_name_3' => 'category_name1',
-                    'owner_id_4'      => 1
+                    'id_0'   => 10,
+                    'name_1' => 'product_name1',
+                    'name_2' => 'category_name1'
                 ],
                 [
-                    'id_0'            => 20,
-                    'name_1'          => 'product_name2',
-                    'name_2'          => 'category_name2',
-                    'category_name_3' => 'category_name2',
-                    'owner_id_4'      => 1
+                    'id_0'   => 20,
+                    'name_1' => 'product_name2',
+                    'name_2' => 'category_name2'
                 ]
             ],
             [1 => 10, 2 => 20],
@@ -623,18 +599,16 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'category_name_2' => 'category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'user_name'
                 ]
             ],
             [1 => 1],
@@ -664,30 +638,22 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             2,
-            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' p0_.category_name AS category_name_2, p0_.owner_id AS owner_id_3'
+            'SELECT p0_.id AS id_0, p0_.name AS name_1'
             . ' FROM product_table p0_'
             . ' WHERE p0_.id IN (?, ?)',
             [
                 [
-                    'id_0'            => 10,
-                    'name_1'          => 'product_name1',
-                    'name_2'          => 'category_name1',
-                    'category_name_3' => 'category_name1',
-                    'owner_id_4'      => 1
+                    'id_0'   => 10,
+                    'name_1' => 'product_name1'
                 ],
                 [
-                    'id_0'            => 20,
-                    'name_1'          => 'product_name2',
-                    'name_2'          => 'category_name2',
-                    'category_name_3' => 'category_name2',
-                    'owner_id_4'      => 1
+                    'id_0'   => 20,
+                    'name_1' => 'product_name2'
                 ]
             ],
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             3,
@@ -766,25 +732,19 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -865,20 +825,15 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $conn,
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],

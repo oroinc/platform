@@ -130,7 +130,7 @@ class ConfigUtil
             return $value;
         }
 
-        throw new \UnexpectedValueException(\sprintf(
+        throw new \UnexpectedValueException(sprintf(
             'Expected value of type "array, string or nothing", "%s" given.',
             \is_object($value) ? \get_class($value) : \gettype($value)
         ));

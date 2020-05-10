@@ -335,21 +335,16 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2, u1_.name AS name_3,'
-            . ' p0_.category_name AS category_name_4, p0_.owner_id AS owner_id_5,'
-            . ' u1_.category_name AS category_name_6'
+            . ' u1_.id AS id_2, u1_.name AS name_3'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'name_3'          => 'user_name',
-                    'category_name_4' => 'category_name',
-                    'owner_id_5'      => 10,
-                    'category_name_6' => 'user_category_name',
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10,
+                    'name_3' => 'user_name'
                 ]
             ],
             [1 => 1],

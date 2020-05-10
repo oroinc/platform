@@ -19,8 +19,6 @@ class Role
     protected $code;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
     protected $label;

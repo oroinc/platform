@@ -89,7 +89,7 @@ class ConfigNormalizer
                             $path = ConfigUtil::explodePropertyPath($propertyPath);
                             if (\count($path) === 1) {
                                 $renamedFields[$propertyPath] = $field;
-                            } else {
+                            } elseif (!ConfigUtil::isExclude($fieldConfig)) {
                                 $config = $this->applyPropertyPathConfig($config, $path);
                             }
                         } else {

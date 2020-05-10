@@ -20,7 +20,7 @@ class FieldAccessor extends BaseFieldAccessor
     /**
      * @param MandatoryFieldProviderRegistry $mandatoryFieldProvider
      */
-    public function setMandatoryFieldProvider(MandatoryFieldProviderRegistry $mandatoryFieldProvider)
+    public function setMandatoryFieldProvider(MandatoryFieldProviderRegistry $mandatoryFieldProvider): void
     {
         $this->mandatoryFieldProvider = $mandatoryFieldProvider;
     }
@@ -28,7 +28,7 @@ class FieldAccessor extends BaseFieldAccessor
     /**
      * @param RequestType|null $requestType
      */
-    public function setRequestType(RequestType $requestType = null)
+    public function setRequestType(RequestType $requestType = null): void
     {
         $this->requestType = $requestType;
     }
@@ -36,13 +36,13 @@ class FieldAccessor extends BaseFieldAccessor
     /**
      * {@inheritdoc}
      */
-    public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
+    public function getFieldsToSelect(string $entityClass, EntityConfig $config, bool $withAssociations = false): array
     {
         $fields = parent::getFieldsToSelect($entityClass, $config, $withAssociations);
         if (null !== $this->requestType) {
             $mandatoryFields = $this->mandatoryFieldProvider->getMandatoryFields($entityClass, $this->requestType);
             if (!empty($mandatoryFields)) {
-                $fields = \array_unique(\array_merge($fields, $mandatoryFields));
+                $fields = array_unique(array_merge($fields, $mandatoryFields));
             }
         }
 

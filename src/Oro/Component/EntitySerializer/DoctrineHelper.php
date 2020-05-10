@@ -4,6 +4,7 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -163,6 +164,30 @@ class DoctrineHelper
         }
 
         return $this->resolveEntityClass($entities[0]);
+    }
+
+    /**
+     * Gets an alias for the given JOIN statement.
+     *
+     * @param QueryBuilder $qb
+     * @param string       $rootAlias
+     * @param string       $join
+     *
+     * @return string|null
+     */
+    public function getExistingJoinAlias(QueryBuilder $qb, string $rootAlias, string $join): ?string
+    {
+        $joinParts = $qb->getDQLPart('join');
+        if (!empty($joinParts[$rootAlias])) {
+            /** @var Expr\Join $item */
+            foreach ($joinParts[$rootAlias] as $item) {
+                if ($item->getJoin() === $join) {
+                    return $item->getAlias();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

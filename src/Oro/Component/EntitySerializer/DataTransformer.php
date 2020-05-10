@@ -60,7 +60,7 @@ class DataTransformer implements DataTransformerInterface
         if (\is_string($transformer)) {
             $transformerService = $this->container->get($transformer, ContainerInterface::NULL_ON_INVALID_REFERENCE);
             if (null === $transformerService) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'Undefined data transformer service "%s".',
                     $transformer
                 ));
@@ -78,7 +78,7 @@ class DataTransformer implements DataTransformerInterface
             return $transformer($value, $config, $context);
         }
 
-        throw new \InvalidArgumentException(\sprintf(
+        throw new \InvalidArgumentException(sprintf(
             'Unexpected type of data transformer "%s". Expected "%s", "%s" or "%s".',
             \is_object($transformer) ? \get_class($transformer) : \gettype($transformer),
             DataTransformerInterface::class,

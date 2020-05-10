@@ -17,8 +17,6 @@ class Category
     protected $name;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
     protected $label;
@@ -71,13 +69,5 @@ class Category
         $this->label = $label;
 
         return $this;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function __toString()
-    {
-        return (string)$this->name;
     }
 }
