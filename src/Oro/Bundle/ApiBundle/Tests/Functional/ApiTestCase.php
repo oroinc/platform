@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -17,8 +15,6 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -29,61 +25,6 @@ abstract class ApiTestCase extends WebTestCase
 {
     /** @var bool */
     private $isKernelRebootDisabled = false;
-
-    /** @var bool */
-    private $isKernelTerminateHandlerDisabled = false;
-
-    /**
-     * Disables clearing the security token and stopping sending messages
-     * when handling the "kernel.terminate" event.
-     * @see initClient
-     *
-     * @param bool $disable
-     */
-    protected function disableKernelTerminateHandler(bool $disable = true)
-    {
-        $this->isKernelTerminateHandlerDisabled = $disable;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function initClient(array $options = [], array $server = [], $force = false)
-    {
-        $client = parent::initClient($options, $server, $force);
-
-        /**
-         * Clear the security token and stop sending messages when handling the "kernel.terminate" event.
-         * This is needed to prevent unexpected exceptions
-         * if some database related exception occurs when handling an API request
-         * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
-         * As functional tests work inside a database transaction, any query to the database
-         * after such exception can raise "current transaction is aborted,
-         * commands ignored until end of transaction block" SQL exception
-         * if PostgreSQL is used in the tests.
-         */
-        if (!$this->isKernelTerminateHandlerDisabled) {
-            $container = $client->getKernel()->getContainer();
-            $handler = new KernelTerminateHandler($container, true);
-            $eventDispatcher = $container->get('event_dispatcher');
-            $eventDispatcher->addListener(
-                KernelEvents::TERMINATE,
-                function (PostResponseEvent $event) use ($handler) {
-                    $handler->onBeforeTerminate();
-                },
-                255
-            );
-            $eventDispatcher->addListener(
-                KernelEvents::TERMINATE,
-                function (PostResponseEvent $event) use ($handler) {
-                    $handler->onAfterTerminate();
-                },
-                -255
-            );
-        }
-
-        return $client;
-    }
 
     /**
      * @return RequestType
@@ -686,23 +627,9 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function clearEntityManager()
     {
-        try {
-            $this->getEntityManager()->clear();
-        } catch (DBALException $e) {
-            /**
-             * Suppress database related exceptions when clearing the entity manager,
-             * if it was requested for safe handling of "kernel.terminate" event.
-             * This is needed to prevent unexpected exceptions
-             * if some database related exception occurs when handling an API request
-             * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
-             * As functional tests work inside a database transaction, any query to the database
-             * after such exception can raise "current transaction is aborted,
-             * commands ignored until end of transaction block" SQL exception
-             * if PostgreSQL is used in the tests.
-             */
-            if ($this->isKernelTerminateHandlerDisabled) {
-                throw $e;
-            }
+        $em = $this->getEntityManager();
+        if ($em->isOpen()) {
+            $em->clear();
         }
     }
 
