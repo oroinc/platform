@@ -4,25 +4,31 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+/**
+ * Provides a set of methods to get information about fields.
+ */
 class FieldAccessor
 {
-    /** @internal Uses for caching the built list of fields */
-    const FIELDS_ALL = '_fields';
-    /** @internal Uses for caching the built list of fields to be selected */
-    const FIELDS_SELECT = '_select';
-    /** @internal Uses for caching the built lists of fields and to-one associations to be selected */
-    const FIELDS_SELECT_WITH_ASSOCIATIONS = '_select_assoc';
-    /** @internal Uses for caching the built lists of fields to be serialized */
-    const FIELDS_SERIALIZE = '_serialize';
+    /** Uses for caching the built list of fields */
+    private const FIELDS_ALL = '_fields';
+
+    /** Uses for caching the built list of fields to be selected */
+    private const FIELDS_SELECT = '_select';
+
+    /** Uses for caching the built lists of fields and to-one associations to be selected */
+    private const FIELDS_SELECT_WITH_ASSOCIATIONS = '_select_assoc';
+
+    /** Uses for caching the built lists of fields to be serialized */
+    private const FIELDS_SERIALIZE = '_serialize';
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var DataAccessorInterface */
-    protected $dataAccessor;
+    private $dataAccessor;
 
     /** @var EntityFieldFilterInterface */
-    protected $entityFieldFilter;
+    private $entityFieldFilter;
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
@@ -45,7 +51,7 @@ class FieldAccessor
      *
      * @return string[]
      */
-    public function getFields($entityClass, EntityConfig $config)
+    public function getFields(string $entityClass, EntityConfig $config): array
     {
         // try to use cached result
         $result = $config->get(self::FIELDS_ALL);
@@ -72,8 +78,8 @@ class FieldAccessor
                         $result[] = $field;
                     }
                 } elseif ($this->isApplicableField($entityClass, $property)) {
-                    // @todo: ignore not configured relations to avoid infinite loop
-                    // it is a temporary fix until the identifier field will not be used by default for them
+                    // ignore not configured associations to avoid infinite loop
+                    // this can be fixed when the identifier field will not be used by default for them
                     if (!$entityMetadata->isAssociation($field)) {
                         $result[] = $field;
                     }
@@ -99,7 +105,7 @@ class FieldAccessor
      *
      * @return string[]
      */
-    public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
+    public function getFieldsToSelect(string $entityClass, EntityConfig $config, bool $withAssociations = false): array
     {
         $cacheKey = self::FIELDS_SELECT;
         if ($withAssociations) {
@@ -118,11 +124,7 @@ class FieldAccessor
         foreach ($fields as $field) {
             $field = $this->getPropertyPath($field, $config->getField($field));
             if ($entityMetadata->isField($field)
-                || (
-                    $withAssociations
-                    && $entityMetadata->isAssociation($field)
-                    && !$entityMetadata->isCollectionValuedAssociation($field)
-                )
+                || ($withAssociations && $entityMetadata->isSingleValuedAssociation($field))
             ) {
                 $result[] = $field;
             }
@@ -130,7 +132,7 @@ class FieldAccessor
         // make sure identifier fields are added
         $idFields = $entityMetadata->getIdentifierFieldNames();
         foreach ($idFields as $field) {
-            if (!in_array($field, $result, true)) {
+            if (!\in_array($field, $result, true)) {
                 $result[] = $field;
             }
         }
@@ -146,7 +148,7 @@ class FieldAccessor
      *
      * @return string[]
      */
-    public function getFieldsToSerialize($entityClass, EntityConfig $config)
+    public function getFieldsToSerialize(string $entityClass, EntityConfig $config): array
     {
         // try to use cached result
         $result = $config->get(self::FIELDS_SERIALIZE);
@@ -165,13 +167,13 @@ class FieldAccessor
         }
         // make sure identifier fields are added
         $idField = $this->getIdField($entityClass, $config);
-        if (!in_array($idField, $result, true)) {
+        if (!\in_array($idField, $result, true)) {
             $result[] = $idField;
             if ($config->isExcludeAll()) {
                 $excludedFields = $config->get(ConfigUtil::EXCLUDED_FIELDS);
                 if (null === $excludedFields) {
                     $config->set(ConfigUtil::EXCLUDED_FIELDS, [$idField]);
-                } elseif (!in_array($idField, $excludedFields, true)) {
+                } elseif (!\in_array($idField, $excludedFields, true)) {
                     $excludedFields[] = $idField;
                     $config->set(ConfigUtil::EXCLUDED_FIELDS, $excludedFields);
                 }
@@ -184,42 +186,42 @@ class FieldAccessor
     }
 
     /**
-     * Gets the name of identifier field
+     * Gets the name of identifier field.
      *
      * @param string       $entityClass
      * @param EntityConfig $config
      *
      * @return string
      */
-    public function getIdField($entityClass, EntityConfig $config)
+    public function getIdField(string $entityClass, EntityConfig $config): string
     {
         return $this->getField($config, $this->doctrineHelper->getEntityIdFieldName($entityClass));
     }
 
     /**
-     * Checks whether the given property path represents a metadata property
+     * Checks whether the given property represents a metadata property.
      *
-     * @param string $propertyPath
+     * @param string $property
      *
-     * @return mixed
+     * @return bool
      */
-    public function isMetadataProperty($propertyPath)
+    public function isMetadataProperty(string $property): bool
     {
-        return ConfigUtil::CLASS_NAME === $propertyPath || ConfigUtil::DISCRIMINATOR === $propertyPath;
+        return ConfigUtil::CLASS_NAME === $property || ConfigUtil::DISCRIMINATOR === $property;
     }
 
     /**
-     * Returns a value of a metadata property
+     * Gets a value of a metadata property.
      *
      * @param object         $entity
-     * @param string         $propertyPath
+     * @param string         $property
      * @param EntityMetadata $entityMetadata
      *
      * @return mixed
      */
-    public function getMetadataProperty($entity, $propertyPath, $entityMetadata)
+    public function getMetadataProperty(object $entity, string $property, EntityMetadata $entityMetadata)
     {
-        switch ($propertyPath) {
+        switch ($property) {
             case ConfigUtil::CLASS_NAME:
                 return ClassUtils::getClass($entity);
             case ConfigUtil::DISCRIMINATOR:
@@ -235,7 +237,7 @@ class FieldAccessor
      *
      * @return bool
      */
-    protected function isApplicableField($entityClass, $field)
+    private function isApplicableField(string $entityClass, string $field): bool
     {
         if (!$this->dataAccessor->hasGetter($entityClass, $field)) {
             return false;
@@ -247,14 +249,14 @@ class FieldAccessor
     }
 
     /**
-     * Gets the field name for the given entity property taking into account renaming
+     * Gets the field name for the given entity property taking into account renaming.
      *
      * @param EntityConfig $config
      * @param string       $property
      *
      * @return string
      */
-    protected function getField(EntityConfig $config, $property)
+    private function getField(EntityConfig $config, string $property): string
     {
         $renamedFields = $config->get(ConfigUtil::RENAMED_FIELDS);
         if (null !== $renamedFields && isset($renamedFields[$property])) {
@@ -265,14 +267,14 @@ class FieldAccessor
     }
 
     /**
-     * Gets the path to entity property for the given field
+     * Gets the path to entity property for the given field.
      *
      * @param string           $fieldName
      * @param FieldConfig|null $fieldConfig
      *
      * @return string
      */
-    protected function getPropertyPath($fieldName, FieldConfig $fieldConfig = null)
+    private function getPropertyPath(string $fieldName, FieldConfig $fieldConfig = null): string
     {
         if (null === $fieldConfig) {
             return $fieldName;

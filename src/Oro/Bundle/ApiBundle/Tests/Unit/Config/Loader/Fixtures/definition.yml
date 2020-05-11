@@ -89,6 +89,17 @@ enable_meta_properties:
         disable_meta_properties: false
     expected: []
 
+disable_partial_load:
+    config:
+        disable_partial_load: true
+    expected:
+        disable_partial_load: true
+
+enable_partial_load:
+    config:
+        disable_partial_load: false
+    expected: []
+
 empty_identifier_field_names:
     config:
         identifier_field_names: []

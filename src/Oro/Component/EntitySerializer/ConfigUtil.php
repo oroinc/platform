@@ -51,7 +51,7 @@ class ConfigUtil
     /** exclude only fields are marked as excluded */
     public const EXCLUSION_POLICY_NONE = 'none';
 
-    /** a flag indicates whether using of Doctrine partial object is disabled */
+    /** a flag indicates whether using of Doctrine partial objects is disabled */
     public const DISABLE_PARTIAL_LOAD = 'disable_partial_load';
 
     /** a list Doctrine query hints */
@@ -130,7 +130,7 @@ class ConfigUtil
             return $value;
         }
 
-        throw new \UnexpectedValueException(\sprintf(
+        throw new \UnexpectedValueException(sprintf(
             'Expected value of type "array, string or nothing", "%s" given.',
             \is_object($value) ? \get_class($value) : \gettype($value)
         ));

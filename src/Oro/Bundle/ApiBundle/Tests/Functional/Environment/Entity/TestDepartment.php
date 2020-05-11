@@ -48,7 +48,7 @@ class TestDepartment implements TestFrameworkEntityInterface
     protected $name;
 
     /**
-     * @var TestDepartment|null
+     * @var Collection|TestPerson[]|null
      *
      * @ORM\OneToMany(
      *     targetEntity="Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestPerson",

@@ -24,6 +24,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
         ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
         ConfigUtil::DISABLE_META_PROPERTIES => ['disableMetaProperties', 'enableMetaProperties'],
+        ConfigUtil::DISABLE_PARTIAL_LOAD    => ['disablePartialLoad', 'enablePartialLoad'],
         ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
 

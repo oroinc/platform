@@ -6,16 +6,15 @@ trusted_data:
                 associationMapping: true
         Oro\Component\EntitySerializer\EntitySerializer:
             updateQuery:
-                propertyPath: true
+                property: true
                 alias: true
             updateSelectQueryPart:
                 alias: true
     safe_methods:
         Oro\Component\EntitySerializer\DoctrineHelper:
             getRootAlias: true
-            getEntityIdFieldName: true
-        Oro\Component\EntitySerializer\EntitySerializer:
             getExistingJoinAlias: true
+            getEntityIdFieldName: true
         Oro\Component\EntitySerializer\FieldAccessor:
             getFieldsToSelect: true
         Oro\Component\EntitySerializer\FieldConfig:

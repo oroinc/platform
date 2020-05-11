@@ -515,6 +515,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
+    public function testPartialLoadFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertTrue($config->isPartialLoadEnabled());
+
+        $config->disablePartialLoad();
+        self::assertFalse($config->isPartialLoadEnabled());
+        self::assertEquals(['disable_partial_load' => true], $config->toArray());
+
+        $config->enablePartialLoad();
+        self::assertTrue($config->isPartialLoadEnabled());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testIdentifierFieldNames()
     {
         $config = new EntityDefinitionConfig();

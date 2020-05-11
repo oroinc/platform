@@ -111,6 +111,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
+            ->booleanNode(ConfigUtil::DISABLE_PARTIAL_LOAD)->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('')
@@ -240,6 +241,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->enumNode(ConfigUtil::DIRECTION)
                 ->values([
                     ConfigUtil::DIRECTION_INPUT_ONLY,
