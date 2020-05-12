@@ -325,21 +325,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobProcessor->successChildJob($rootJob);
     }
 
-    public function testSuccessChildJobShouldThrowIfJobHasNotRunningStatus()
-    {
-        $job = new Job();
-        $job->setId(12345);
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_CANCELLED);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Can success only running jobs. id: "12345", status: "oro.message_queue_job.status.cancelled"'
-        );
-
-        $this->jobProcessor->successChildJob($job);
-    }
-
     public function testSuccessJobShouldUpdateJobWithSuccessStatusAndStopAtTime()
     {
         $job = new Job();
@@ -366,21 +351,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Can\'t fail root jobs. id: "12345"');
 
         $this->jobProcessor->failChildJob($rootJob);
-    }
-
-    public function testFailChildJobShouldThrowIfJobHasNotRunningStatus()
-    {
-        $job = new Job();
-        $job->setId(12345);
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_CANCELLED);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Can fail only running jobs. id: "12345", status: "oro.message_queue_job.status.cancelled"'
-        );
-
-        $this->jobProcessor->failChildJob($job);
     }
 
     public function testFailJobShouldUpdateJobWithFailStatusAndStopAtTime()
@@ -567,22 +537,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobProcessor->failAndRedeliveryChildJob($job);
 
         self::assertEquals(Job::STATUS_FAILED_REDELIVERED, $job->getStatus());
-    }
-
-    public function testFailAndRedeliveryChildJobShouldThrowNotRunningStatus()
-    {
-        $job = new Job();
-        $job->setId(12345);
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Can fail and redelivery only running jobs. id: "12345", ' .
-            'status: "oro.message_queue_job.status.failed_redelivered"'
-        );
-
-        $this->jobProcessor->failAndRedeliveryChildJob($job);
     }
 
     /**

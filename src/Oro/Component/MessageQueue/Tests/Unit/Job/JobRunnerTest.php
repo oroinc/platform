@@ -236,8 +236,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             ->method('successChildJob');
 
         $this->jobProcessor
-            ->expects($this->never())
-            ->method('failChildJob');
+            ->expects($this->once())
+            ->method('failChildJob')
+            ->with($childJob);
 
         $this->jobExtension
             ->expects($this->never())
@@ -937,8 +938,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             ->method('successChildJob');
 
         $this->jobProcessor
-            ->expects($this->never())
-            ->method('failChildJob');
+            ->expects($this->once())
+            ->method('failChildJob')
+            ->with($childJob);
 
         $this->jobExtension
             ->expects($this->never())
