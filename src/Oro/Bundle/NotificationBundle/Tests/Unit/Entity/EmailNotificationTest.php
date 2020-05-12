@@ -42,11 +42,10 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetterSetterForEvent()
     {
-        $this->assertNull($this->entity->getEvent());
+        $this->assertNull($this->entity->getEventName());
 
-        $event = $this->createMock('Oro\Bundle\NotificationBundle\Entity\Event', array(), array('test.name'));
-        $this->entity->setEvent($event);
-        $this->assertEquals($event, $this->entity->getEvent());
+        $this->entity->setEventName('test.name');
+        $this->assertEquals('test.name', $this->entity->getEventName());
     }
 
     public function testGetterSetterForRecipients()

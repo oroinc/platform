@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -16,12 +15,17 @@ class EmailNotificationGridHelper
     /** @var ManagerRegistry */
     private $doctrine;
 
+    /** @var array */
+    private $events;
+
     /**
      * @param ManagerRegistry $doctrine
+     * @param array           $events
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, array $events)
     {
         $this->doctrine = $doctrine;
+        $this->events = $events;
     }
 
     /**
@@ -45,9 +49,7 @@ class EmailNotificationGridHelper
      */
     public function getEventNameChoices()
     {
-        return $this->getEntityManager(Event::class)
-            ->getRepository(Event::class)
-            ->getEventNamesChoices();
+        return $this->events;
     }
 
     /**

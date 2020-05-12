@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Add workflow name and workflow transition name fields to the email notification form
+ */
 class EmailNotificationTypeListener
 {
     /** @var WorkflowRegistry */
@@ -70,15 +72,13 @@ class EmailNotificationTypeListener
             return;
         }
 
-        $event = $data->getEvent();
-        if ($event instanceof Event && $event->getName() === LoadWorkflowNotificationEvents::TRANSIT_EVENT) {
-            $form->getData()->setEvent(null);
+        if ($data->getEventName() === WorkflowEvents::NOTIFICATION_TRANSIT_EVENT) {
+            $form->getData()->setEventName(null);
         }
 
-        /** @var QueryBuilder $qb */
-        $qb = $form->get('event')->getConfig()->getOption('query_builder');
-        $qb->andWhere($qb->expr()->neq('c.name', ':event'))
-            ->setParameter('event', LoadWorkflowNotificationEvents::TRANSIT_EVENT);
+        $choices = $form->get('eventName')->getConfig()->getOption('choices');
+        unset($choices[WorkflowEvents::NOTIFICATION_TRANSIT_EVENT]);
+        FormUtils::replaceField($form, 'eventName', ['choices' => $choices]);
     }
 
     /**
@@ -88,8 +88,8 @@ class EmailNotificationTypeListener
     private function addWorkflowFields(FormInterface $form, EmailNotification $data)
     {
         if (!$data->getEntityName() ||
-            !$data->getEvent() ||
-            $data->getEvent()->getName() !== LoadWorkflowNotificationEvents::TRANSIT_EVENT
+            !$data->getEventName() ||
+            $data->getEventName() !== WorkflowEvents::NOTIFICATION_TRANSIT_EVENT
         ) {
             return;
         }

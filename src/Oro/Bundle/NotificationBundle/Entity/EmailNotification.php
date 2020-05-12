@@ -55,10 +55,11 @@ class EmailNotification extends ExtendEmailNotification
     protected $entityName;
 
     /**
-     * @var Event
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\NotificationBundle\Entity\Event",cascade={"persist"})
+     * @var string
+     *
+     * @ORM\Column(name="event_name", type="string", length=255, nullable=true)
      */
-    protected $event;
+    protected $eventName;
 
     /**
      * @var EmailTemplate
@@ -123,26 +124,22 @@ class EmailNotification extends ExtendEmailNotification
     }
 
     /**
-     * Set event
-     *
-     * @param Event $event
-     * @return EmailNotification
+     * @return string
      */
-    public function setEvent(Event $event = null)
+    public function getEventName()
     {
-        $this->event = $event;
-
-        return $this;
+        return $this->eventName;
     }
 
     /**
-     * Get event
-     *
-     * @return Event
+     * @param string $eventName
+     * @return EmailNotification
      */
-    public function getEvent()
+    public function setEventName($eventName)
     {
-        return $this->event;
+        $this->eventName = $eventName;
+
+        return $this;
     }
 
     /**
