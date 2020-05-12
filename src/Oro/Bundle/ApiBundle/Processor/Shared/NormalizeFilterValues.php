@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -123,7 +124,7 @@ class NormalizeFilterValues implements ProcessorInterface
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed($operator);
         $isRangeAllowed = $filter->isRangeAllowed($operator);
-        if (ComparisonFilter::EXISTS === $operator) {
+        if (FilterOperator::EXISTS === $operator) {
             $dataType = DataType::BOOLEAN;
             $isArrayAllowed = false;
             $isRangeAllowed = false;

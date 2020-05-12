@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Extension\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -41,20 +41,20 @@ class ConfigLoaderTest extends \PHPUnit\Framework\TestCase
                 ApiAction::DELETE_RELATIONSHIP
             ]);
         $filterOperatorRegistry = new FilterOperatorRegistry([
-            ComparisonFilter::EQ              => '=',
-            ComparisonFilter::NEQ             => '!=',
-            ComparisonFilter::GT              => '>',
-            ComparisonFilter::LT              => '<',
-            ComparisonFilter::GTE             => '>=',
-            ComparisonFilter::LTE             => '<=',
-            ComparisonFilter::EXISTS          => '*',
-            ComparisonFilter::NEQ_OR_NULL     => '!*',
-            ComparisonFilter::CONTAINS        => '~',
-            ComparisonFilter::NOT_CONTAINS    => '!~',
-            ComparisonFilter::STARTS_WITH     => '^',
-            ComparisonFilter::NOT_STARTS_WITH => '!^',
-            ComparisonFilter::ENDS_WITH       => '$',
-            ComparisonFilter::NOT_ENDS_WITH   => '!$'
+            FilterOperator::EQ              => '=',
+            FilterOperator::NEQ             => '!=',
+            FilterOperator::GT              => '>',
+            FilterOperator::LT              => '<',
+            FilterOperator::GTE             => '>=',
+            FilterOperator::LTE             => '<=',
+            FilterOperator::EXISTS          => '*',
+            FilterOperator::NEQ_OR_NULL     => '!*',
+            FilterOperator::CONTAINS        => '~',
+            FilterOperator::NOT_CONTAINS    => '!~',
+            FilterOperator::STARTS_WITH     => '^',
+            FilterOperator::NOT_STARTS_WITH => '!^',
+            FilterOperator::ENDS_WITH       => '$',
+            FilterOperator::NOT_ENDS_WITH   => '!$'
         ]);
 
         $configExtensionRegistry = new ConfigExtensionRegistry();

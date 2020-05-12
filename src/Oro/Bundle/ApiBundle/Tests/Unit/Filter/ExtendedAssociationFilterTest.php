@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -245,7 +245,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterWithManyToManyAssociationAndNotOperator()
     {
-        $filterValue = new FilterValue('target.users', '123', ComparisonFilter::NEQ);
+        $filterValue = new FilterValue('target.users', '123', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
         $associationOwnerClass = 'Test\OwnerClass';
         $associationType = 'manyToMany';
@@ -256,7 +256,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setAssociationOwnerClass($associationOwnerClass);
         $this->filter->setAssociationType($associationType);
         $this->filter->setAssociationKind($associationKind);
-        $this->filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $this->filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')

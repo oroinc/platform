@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -18,22 +18,22 @@ use Oro\Component\ChainProcessor\ContextInterface;
 class RegisterConfiguredFilters extends RegisterFilters
 {
     private const ASSOCIATION_ALLOWED_OPERATORS            = [
-        ComparisonFilter::EQ,
-        ComparisonFilter::NEQ,
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL
+        FilterOperator::EQ,
+        FilterOperator::NEQ,
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL
     ];
     private const COLLECTION_ASSOCIATION_ALLOWED_OPERATORS = [
-        ComparisonFilter::EQ,
-        ComparisonFilter::NEQ,
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL,
-        ComparisonFilter::CONTAINS,
-        ComparisonFilter::NOT_CONTAINS
+        FilterOperator::EQ,
+        FilterOperator::NEQ,
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL,
+        FilterOperator::CONTAINS,
+        FilterOperator::NOT_CONTAINS
     ];
     private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS     = [
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL
     ];
 
     /** @var DoctrineHelper */

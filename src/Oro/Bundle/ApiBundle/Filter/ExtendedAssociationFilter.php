@@ -79,7 +79,7 @@ class ExtendedAssociationFilter extends AssociationFilter
         $fieldName = $this->getFieldName(\substr($path, \strlen($field) + 1));
         if (RelationType::MANY_TO_MANY === $this->associationType) {
             $expr = $this->buildComparisonExpression($fieldName, Comparison::MEMBER_OF, $value);
-            if (self::NEQ === $operator) {
+            if (FilterOperator::NEQ === $operator) {
                 $expr = $this->buildNotExpression($expr);
             }
 
