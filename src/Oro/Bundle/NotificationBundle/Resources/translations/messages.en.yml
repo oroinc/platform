@@ -35,7 +35,7 @@ oro:
             id.label:                            Id
             entity_name.label:                   Entity name
             entity_name.tooltip:                 Only entities that have templates available are listed. If you don't see an entity you want in this list, please create <a href="url" target="_blank">a notification template</a> for it first.
-            event.label:                         Event name
+            event_name.label:                    Event name
             template.label:                      Template
             recipient_list.label:                Recipient list
             email.label:                         Email

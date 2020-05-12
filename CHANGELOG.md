@@ -2,7 +2,17 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 4.2.0-beta
+## 4.2.0-alpha.2
+
+### Changed
+
+#### NotificationBundle
+
+* `Oro\Bundle\NotificationBundle\Entity\Event` and
+  `Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\RegisterNotificationEventsCompilerPass` classes were deleted.
+
+  To migrate custom notification events, delete all the usages of `Event` and `RegisterNotificationEventsCompilerPass` classes
+  and register events with the YAML configuration according to [the documentation](http://doc.oroinc.com/backend/bundles/platform/NotificationBundle/notification-event/).
 
 ### Added
 
@@ -233,7 +243,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * All `*.class` parameters for service definitions were removed from the dependency injection container.
 
 #### Math component
-* The deprecated method `Oro\Component\Math\BigDecimal::withScale()` was removed. Use `toScale()` method instead.  
+* The deprecated method `Oro\Component\Math\BigDecimal::withScale()` was removed. Use `toScale()` method instead.
 
 #### DataGridBundle
 * The DIC parameter `oro_datagrid.extension.orm_sorter.class` was removed.
@@ -265,7 +275,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
   It was replaced with `Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent`.
 
 #### EntityExtendBundle
-* Removed *HTML* field type, all HTML fields were converted to Text fields.  
+* Removed *HTML* field type, all HTML fields were converted to Text fields.
 
 #### QueryDesignerBundle
 * The deprecated constant `Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension::NAME_PATH` was removed.
@@ -276,10 +286,10 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
   Use `oro_migration.locator.fixture_path_locator` service instead.
 
 #### SoapBundle
-* The deprecated `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` class was removed. Use `Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter` instead.  
+* The deprecated `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` class was removed. Use `Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter` instead.
 
 #### SecurityBundle
-* The deprecated method `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface::getGlobalOwnerFieldName()` was removed. Use `getOrganizationFieldName()` method instead.  
+* The deprecated method `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface::getGlobalOwnerFieldName()` was removed. Use `getOrganizationFieldName()` method instead.
 
 #### TagBundle
 * The deprecated constant `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension::GRID_NAME_PATH` was removed.
@@ -426,7 +436,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
  `Unable to replace alias “swiftmailer.mailer.default.transport.real” with actual definition “mail”.
   You have requested a non-existent service “mail”.` Please
   use `mailer_transport: sendmail` instead or another available swiftmailer transport type.
-  
+
 #### UIBundle
 * The redundant methods `getFormatterName`, `getSupportedTypes` and `isDefaultFormatter` were removed from `Oro\Bundle\UIBundle\Formatter\FormatterInterface`.
   Use `data_type` attribute of `oro_formatter` tag to specify the default formatter for the data type.
@@ -507,70 +517,70 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 
 ### Changed
 #### EmailBundle
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction` 
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`
  (`oro_email_check_smtp_connection` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::purgeEmailsAttachmentsAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::purgeEmailsAttachmentsAction`
  (`oro_email_purge_emails_attachments` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::linkAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::linkAction`
  (`oro_email_attachment_link` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::userEmailsSyncAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::userEmailsSyncAction`
  (`oro_email_user_sync_emails` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::toggleSeenAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::toggleSeenAction`
  (`oro_email_toggle_seen` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::markSeenAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markSeenAction`
  (`oro_email_mark_seen` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EmailBundle\Controller\EmailController::markAllEmailsAsSeenAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EmailBundle\Controller\EmailController::markAllEmailsAsSeenAction`
  (`oro_email_mark_all_as_seen` route)
- action the request method was changed to POST. 
+ action the request method was changed to POST.
 
 #### EmbeddedFormBundle
-* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::deleteAction` 
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::deleteAction`
  (`oro_embedded_form_delete` route)
- action the request method was changed to DELETE. 
-* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::defaultDataAction` 
+ action the request method was changed to DELETE.
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::defaultDataAction`
  (`oro_embedded_form_default_data` route)
- action the request method was changed to POST. 
+ action the request method was changed to POST.
 
 #### EntityBundle
-* In `Oro\Bundle\EntityBundle\Controller\EntitiesController::deleteAction` 
+* In `Oro\Bundle\EntityBundle\Controller\EntitiesController::deleteAction`
  (`oro_entity_delete` route)
- action the request method was changed to DELETE. 
+ action the request method was changed to DELETE.
 
 #### EntityConfigBundle
-* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::removeAction` 
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::removeAction`
  (`oro_attribute_remove` route)
- action the request method was changed to DELETE. 
-* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::unremoveAction` 
+ action the request method was changed to DELETE.
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeController::unremoveAction`
  (`oro_attribute_unremove` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController::deleteAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController::deleteAction`
  (`oro_attribute_family_delete` route)
- action the request method was changed to DELETE. 
+ action the request method was changed to DELETE.
 
 #### EntityExtendBundle
-* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::removeAction` 
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::removeAction`
  (`oro_entityextend_entity_remove` route)
- action the request method was changed to DELETE. 
-* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::unremoveAction` 
+ action the request method was changed to DELETE.
+* In `Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController::unremoveAction`
  (`oro_entityextend_field_unremove` route)
- action the request method was changed to POST. 
+ action the request method was changed to POST.
 
 #### ImportExportBundle
-* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importValidateAction` 
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importValidateAction`
  (`oro_importexport_import_validate` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importProcessAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::importProcessAction`
  (`oro_importexport_import_process` route)
- action the request method was changed to POST. 
-* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::instantExportAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\ImportExportBundle\Controller\ImportExportController::instantExportAction`
  (`oro_importexport_export_instant` route)
- action the request method was changed to POST. 
+ action the request method was changed to POST.
 * Introduced concept of import/export owner. Applied approach with role-based owner-based permissions to the export and import functionality.
 * Option `--email` has become required for `oro:import:file` command.
 * Removed Message Queue Topics and related Processors. All messages with this topics will be rejected:
@@ -579,37 +589,37 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
     * `oro.importexport.import_http_validation_preparing`
     * `oro.importexport.pre_cli_import`, should be used `oro.importexport.pre_import` instead.
     * `oro.importexport.cli_import` , should be used `oro.importexport.import` instead.
-    
+
 #### IntegrationBundle
-* In `Oro\Bundle\IntegrationBundle\Controller\IntegrationController::scheduleAction` 
+* In `Oro\Bundle\IntegrationBundle\Controller\IntegrationController::scheduleAction`
  (`oro_integration_schedule` route)
- action the request method was changed to POST. 
+ action the request method was changed to POST.
 
 #### MessageQueueBundle
-* In `Oro\Bundle\MessageQueueBundle\Controller\Api\Rest\JobController::interruptRootJobAction` 
+* In `Oro\Bundle\MessageQueueBundle\Controller\Api\Rest\JobController::interruptRootJobAction`
  (`/api/rest/{version}/message-queue/job/interrupt/{id}` path)
- action the request method was changed to POST. 
- 
+ action the request method was changed to POST.
+
 #### UserBundle
  * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
 
 #### WorkflowBundle
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction` 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction`
  (`/api/rest/{version}/process/activate/{processDefinition}` path)
- action the request method was changed to POST. 
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction`
  (`/api/rest/{version}/process/deactivate/{processDefinition}` path)
- action the request method was changed to POST. 
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction`
  (`/api/rest/{version}/workflow/start/{workflowName}/{transitionName}` path)
- action the request method was changed to POST. 
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction`
  (`/api/rest/{version}/workflow/transit/{workflowName}/{transitionName}` path)
- action the request method was changed to POST. 
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::activateAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::activateAction`
  (`/api/rest/{version}/workflow/activate/{workflowName}/{transitionName}` path)
- action the request method was changed to POST. 
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deactivateAction` 
+ action the request method was changed to POST.
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::deactivateAction`
  (`/api/rest/{version}/workflow/deactivate/{workflowName}/{transitionName}` path)
  action the request method was changed to POST.
 
@@ -628,7 +638,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 #### SecurityBundle
 * Twig function `resource_granted` has been removed. Use `is_granted` from Symfony instead.
 
-## 3.1.4 
+## 3.1.4
 [Show detailed list of changes](incompatibilities-3-1-4.md)
 
 ### Removed
@@ -650,7 +660,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 
 ### Added
 #### AssetBundle
-* `AssetBundle` replaces the deprecated `AsseticBundle` to build assets using Webpack. 
+* `AssetBundle` replaces the deprecated `AsseticBundle` to build assets using Webpack.
 It currently supports only styles assets. JS assets are still managed by [OroRequireJsBundle](src/Oro/Bundle/RequireJSBundle).
 
 #### ApiBundle
@@ -696,7 +706,7 @@ css:
       - 'bundles/app/css/scss/first.scss'
       - 'bundles/app/css/scss/second.scss'
 -    'another_asset_group':
-      - 'bundles/app/css/scss/third.scss'             
+      - 'bundles/app/css/scss/third.scss'
 ```
 #### ApiBundle
 * Fixed the `depends_on` configuration option of the `entities.fields` section of `Resources/config/oro/api.yml`. Now, only entity property names (or paths that contain entity property names) can be used in it. In addition, exception handling of invalid values for this option was improved to return more useful exception messages.
@@ -777,7 +787,7 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
     - the attribute `created` was renamed to `createdAt`
     - the attribute `updated` was renamed to `updatedAt`
 #### MessageQueue Component
-* In case when message processor specified in message not found this message will be rejected and exception will be thrown. 
+* In case when message processor specified in message not found this message will be rejected and exception will be thrown.
 
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)
@@ -818,11 +828,11 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 * Removed the deprecated `getDefaultTimeout` and `setDefaultTimeout` methods from the `Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor` class
 
 #### ImportExportBundle
-* Removed the `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` class and the corresponding `oro_importexport.event_listener.export_join_listener` service 
+* Removed the `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` class and the corresponding `oro_importexport.event_listener.export_join_listener` service
 * The `%oro_importexport.file.split_csv_file.size_of_batch%` parameter was removed; use `%oro_importexport.import.size_of_batch%` instead.
 
 #### InstallerBundle
-* Removed the deprecated `getDefaultTimeout` and `setDefaultTimeout` methods from the `Oro\Bundle\InstallerBundle\CommandExecutor` class 
+* Removed the deprecated `getDefaultTimeout` and `setDefaultTimeout` methods from the `Oro\Bundle\InstallerBundle\CommandExecutor` class
 
 #### UIBundle
 * Removed twig filter `oro_html_tag_trim`; use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
@@ -994,8 +1004,8 @@ datagrids:
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 * Added Stale Jobs functionality
     * Added the `setJobConfigurationProvider` method to `Oro\Component\MessageQueue\Job\JobProcessor`
-    * Added the new oro.message_queue_job.status.stale state 
-    * Added the new `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` interface 
+    * Added the new oro.message_queue_job.status.stale state
+    * Added the new `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` interface
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
 * Added configuration for Stale Jobs
@@ -1037,7 +1047,7 @@ datagrids:
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.
-* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md) 
+* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md)
 #### WorkflowBundle
 * The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
@@ -1045,7 +1055,7 @@ datagrids:
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
 ### Removed
 #### ActivityListBundle
-* Refactored setup of ActivityCondition for QueryDesigner's ConditionBuilder. 
+* Refactored setup of ActivityCondition for QueryDesigner's ConditionBuilder.
     * jQuery widget `oroactivity.activityCondition` replaced with `ActivityConditionView` Backbone view, removed unused extensions support in its options.
     * Removed class `Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener`.
 #### DataAuditBundle
@@ -1076,12 +1086,12 @@ datagrids:
 #### CacheBundle
 * Added tag `oro.config_cache_warmer.provider` to be able to register custom warmer configuration provider for `CacheWarmerListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/CacheBundle/EventListener/CacheWarmerListener.php "Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener")</sup>. It must implement `ConfigCacheWarmerInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/CacheBundle/Provider/ConfigCacheWarmerInterface.php "Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface")</sup>.
 #### ImportExportBundle
-* Was added new parameter to `ConfigurableAddOrReplaceStrategy`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Strategy/Import/ConfigurableAddOrReplaceStrategy.php "Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy")</sup> class constructor and 
+* Was added new parameter to `ConfigurableAddOrReplaceStrategy`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Strategy/Import/ConfigurableAddOrReplaceStrategy.php "Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy")</sup> class constructor and
 `oro_importexport.strategy.configurable_add_or_replace` service. New parameter id `oro_security.owner.checker` service that helps check the owner during import.
 * `JobResult`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobResult.php "Oro\Bundle\ImportExportBundle\Job\JobResult")</sup> have new `needRedelivery` flag.
 `JobExecutor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobExecutor.php "Oro\Bundle\ImportExportBundle\Job\JobExecutor")</sup> in case of any of catched exception during Job processing is a type of
 `Doctrine\DBAL\Exception\UniqueConstraintViolationException` JobResult will have a `needRedelivery` flag set to true.
-* `ImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Async/Import/ImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor")</sup> is able to catch new 
+* `ImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Async/Import/ImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor")</sup> is able to catch new
 `Oro\Component\MessageQueue\Exception\JobRedeliveryException` and it this case is able to requeue a message to process
 #### MessageQueue component
 * Added interface `Oro\Component\MessageQueue\Job\ExtensionInterface` that can be used to do some additional work before and after job processing.
@@ -1119,8 +1129,8 @@ datagrids:
 #### UIBundle
 * Some inline underscore templates were moved to separate .html file for each template.
 * `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
-* `'oroui/js/app/components/base/component-container-mixin'` Each view on which we want to call `'initLayout()'` method 
-(to intialize all components within) have to be marked as separated layout by adding `'data-layout="separate"'` 
+* `'oroui/js/app/components/base/component-container-mixin'` Each view on which we want to call `'initLayout()'` method
+(to intialize all components within) have to be marked as separated layout by adding `'data-layout="separate"'`
 attribute. Otherwise `'Error'` will be thrown.
 ### Removed
 #### ApiBundle
@@ -1142,7 +1152,7 @@ attribute. Otherwise `'Error'` will be thrown.
 as other Symfony's tagged services. From now the highest the priority number, the earlier the extension is executed.
 * Service `oro_message_queue.client.consume_messages_command` was removed
 * Service `oro_message_queue.command.consume_messages` was removed
-* The extension `TokenStorageClearerExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/TokenStorageClearerExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension")</sup> was removed. This 
+* The extension `TokenStorageClearerExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/TokenStorageClearerExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension")</sup> was removed. This
 job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/ContainerResetExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension")</sup> extension.
 
 ## 2.3.1 (2017-07-28)
@@ -1236,7 +1246,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 * Updated TinyMCE to 4.6.* version
 #### IntegrationBundle
 * Interface `RestResponseInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/IntegrationBundle/Provider/Rest/Client/RestResponseInterface.php "Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface")</sup> was changed:
-    * Methods `getContentEncoding`, `getContentLanguage`, `getContentLength`, `getContentLocation`, `getContentDisposition`, `getContentMd5`, `getContentRange`, `getContentType`, `isContentType` were superseded by `getHeader` method 
+    * Methods `getContentEncoding`, `getContentLanguage`, `getContentLength`, `getContentLocation`, `getContentDisposition`, `getContentMd5`, `getContentRange`, `getContentType`, `isContentType` were superseded by `getHeader` method
 #### LocaleBundle
 * Updated Moment.js to 2.18.* version
 * Updated Numeral.js to 2.0.6 version
@@ -1410,7 +1420,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
     * ***methods***:
         - `hasRelatedActiveWorkflows($entity)`
         - `hasRelatedWorkflows($entity)`
-    - invalidation of cache occurs on workflow changes events: 
+    - invalidation of cache occurs on workflow changes events:
         - `oro.workflow.after_update`
         - `oro.workflow.after_create`
         - `oro.workflow.after_delete`
@@ -1440,11 +1450,11 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 #### ImportExportBundle
 * Class `CliImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/ImportExportBundle/Async/Import/CliImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor")</sup>
     * does not implement TopicSubscriberInterface now.
-    * subscribed topic moved to tag in `mq_processor.yml`.  
+    * subscribed topic moved to tag in `mq_processor.yml`.
     * service `oro_importexport.async.http_import` decorates `oro_importexport.async.import`
 * Class `HttpImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/ImportExportBundle/Async/Import/HttpImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor")</sup>
     * does not implement TopicSubscriberInterface now.
-    * subscribed topic moved to tag in `mq_processor.yml`.  
+    * subscribed topic moved to tag in `mq_processor.yml`.
     * service `oro_importexport.async.cli_import` decorates `oro_importexport.async.import`
 #### SegmentBundle
 * Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
@@ -1553,8 +1563,8 @@ injection of a collection of services that are registered in system, but there n
 all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`)
 and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add`
 with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
-* Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
-which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
+* Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by
+which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to
 provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).
 #### EmailBundle
 * Class `AssociationManager`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/EmailBundle/Async/Manager/AssociationManager.php "Oro\Bundle\EmailBundle\Async\Manager\AssociationManager")</sup> changed the return type of `getOwnerIterator` method from `BufferedQueryResultIterator` to `\Iterator`

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * This interface should be implemented by filters that applies to a field.
+ * This interface should be implemented by filters that are applied to a field and need to know the field name.
  */
-interface FieldAwareFilterInterface
+interface FieldAwareFilterInterface extends FieldFilterInterface
 {
     /**
      * Sets a field by which the data is filtered.

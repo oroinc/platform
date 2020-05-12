@@ -24,6 +24,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('oro_notification');
         $rootNode    = $treeBuilder->getRootNode();
 
+        $rootNode->children()
+            ->arrayNode('events')
+            ->info('List of notification events.')
+            ->prototype('scalar')->end();
+
         SettingsBuilder::append(
             $rootNode,
             [

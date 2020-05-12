@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\NestedTreeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -21,7 +21,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
         $filter = new NestedTreeFilter(DataType::INTEGER);
         $filter->apply(
             new Criteria(),
-            new FilterValue('path.association', 'value', ComparisonFilter::GT)
+            new FilterValue('path.association', 'value', FilterOperator::GT)
         );
     }
 
@@ -32,7 +32,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     public function testUnsupportedOperator()
     {
         $filter = new NestedTreeFilter(DataType::INTEGER);
-        $filter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::NEQ));
+        $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::NEQ));
     }
 
     /**
@@ -51,8 +51,8 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     public function testFilter($filterValue, $expectation, $field = null)
     {
         $supportedOperators = [
-            ComparisonFilter::GT,
-            ComparisonFilter::GTE
+            FilterOperator::GT,
+            FilterOperator::GTE
         ];
 
         $filter = new NestedTreeFilter(DataType::INTEGER);
@@ -71,20 +71,20 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'GT filter'               => [
-                new FilterValue('path', 'value', ComparisonFilter::GT),
+                new FilterValue('path', 'value', FilterOperator::GT),
                 new Comparison('', 'NESTED_TREE', new Value('value'))
             ],
             'GTE filter'              => [
-                new FilterValue('path', 'value', ComparisonFilter::GTE),
+                new FilterValue('path', 'value', FilterOperator::GTE),
                 new Comparison('', 'NESTED_TREE_WITH_ROOT', new Value('value'))
             ],
             'GT filter (with field)'  => [
-                new FilterValue('path', 'value', ComparisonFilter::GT),
+                new FilterValue('path', 'value', FilterOperator::GT),
                 new Comparison('someField', 'NESTED_TREE', new Value('value')),
                 'someField'
             ],
             'GTE filter (with field)' => [
-                new FilterValue('path', 'value', ComparisonFilter::GTE),
+                new FilterValue('path', 'value', FilterOperator::GTE),
                 new Comparison('someField', 'NESTED_TREE_WITH_ROOT', new Value('value')),
                 'someField'
             ]

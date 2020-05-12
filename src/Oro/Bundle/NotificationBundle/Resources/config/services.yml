@@ -12,6 +12,7 @@ services:
             - '@oro_notification.form.subscriber.additional_emails'
             - '@router'
             - '@oro_notification.form.subscriber.contact_information_emails'
+            - '%oro_notification.events%'
         tags:
             - { name: form.type, alias: emailnotification }
 
@@ -145,6 +146,7 @@ services:
         public: true
         arguments:
             - '@doctrine'
+            - '%oro_notification.events%'
 
     oro_notification.email_notification_entity_provider:
         class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider

@@ -5,12 +5,11 @@ namespace Oro\Bundle\NotificationBundle\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 
 /**
  * Clears the notification rules cache if there are changes related to
- * EmailNotification or Event entities that affect this cache.
+ * EmailNotification entities that affect this cache.
  */
 class InvalidateCacheListener
 {
@@ -53,11 +52,11 @@ class InvalidateCacheListener
      */
     private function isRulesCacheDirty(UnitOfWork $uow): bool
     {
-        if ($this->hasEmailNotificationOrEventEntity($uow->getScheduledEntityInsertions())) {
+        if ($this->hasEmailNotificationEntity($uow->getScheduledEntityInsertions())) {
             return true;
         }
 
-        if ($this->hasEmailNotificationOrEventEntity($uow->getScheduledEntityDeletions())) {
+        if ($this->hasEmailNotificationEntity($uow->getScheduledEntityDeletions())) {
             return true;
         }
 
@@ -65,11 +64,6 @@ class InvalidateCacheListener
             if ($entity instanceof EmailNotification) {
                 $changeSet = $uow->getEntityChangeSet($entity);
                 if (isset($changeSet['entityName']) || isset($changeSet['event'])) {
-                    return true;
-                }
-            } elseif ($entity instanceof Event) {
-                $changeSet = $uow->getEntityChangeSet($entity);
-                if (isset($changeSet['name'])) {
                     return true;
                 }
             }
@@ -83,10 +77,10 @@ class InvalidateCacheListener
      *
      * @return bool
      */
-    private function hasEmailNotificationOrEventEntity(array $entities): bool
+    private function hasEmailNotificationEntity(array $entities): bool
     {
         foreach ($entities as $entity) {
-            if ($entity instanceof EmailNotification || $entity instanceof Event) {
+            if ($entity instanceof EmailNotification) {
                 return true;
             }
         }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -51,10 +52,15 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['name']);
+        $config->addField('name');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('name');
 
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -66,15 +72,93 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
+    public function testProcessWhenSortFilterIsNotAddedYetAndSorterIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['name']);
+        $config->addField('name');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('name')->setExcluded(true);
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setClassName(Category::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
+    public function testProcessWhenSortFilterIsNotAddedYetForRenamedIdentifierField()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['renamedName']);
+        $config->addField('renamedName')->setPropertyPath('name');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('renamedName')->setPropertyPath('name');
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setClassName(Category::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
+    public function testProcessWhenSortFilterIsNotAddedYetForRenamedIdentifierFieldAndSorterIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['renamedName']);
+        $config->addField('renamedName')->setPropertyPath('name');
+
+        $configOfSorters = new SortersConfig();
+        $sorterField = $configOfSorters->addField('renamedName');
+        $sorterField->setPropertyPath('name');
+        $sorterField->setExcluded(true);
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setClassName(Category::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
     public function testProcessWhenConfigHasOrderByOption()
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['name']);
         $config->setOrderBy(['label' => 'DESC']);
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('name');
+
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -91,6 +175,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setConfigOfSorters(new SortersConfig());
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -109,6 +194,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setConfigOfSorters(new SortersConfig());
         $this->context->getFilters()->add('sort', $sortFilter, false);
         $this->processor->process($this->context);
 

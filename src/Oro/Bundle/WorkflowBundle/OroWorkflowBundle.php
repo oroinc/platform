@@ -42,7 +42,6 @@ class OroWorkflowBundle extends Bundle
             ),
             PassConfig::TYPE_BEFORE_REMOVING
         );
-        $container->addCompilerPass(new Compiler\EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         $container->addCompilerPass(
             AddTopicMetaPass::create()

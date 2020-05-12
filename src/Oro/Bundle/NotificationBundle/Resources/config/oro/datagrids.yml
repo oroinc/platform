@@ -93,21 +93,18 @@ datagrids:
             type: orm
             query:
                 select:
-                    - partial e.{id, entityName}
-                    - event.name as eventName
-                    - event.id as eventId
+                    - partial e.{id, entityName, eventName}
                     - recipientList.email as emailRecipient
                     - template.name as templateName
                 from:
                     - { table: OroNotificationBundle:EmailNotification, alias: e }
                 join:
                     left:
-                        - { join: e.event, alias: event }
                         - { join: e.template, alias: template }
                         - { join: e.recipientList, alias: recipientList }
                         - { join: recipientList.users, alias: recipientUsersList }
                         - { join: recipientList.groups, alias: recipientGroupsList }
-                groupBy: e.id, eventName, eventId, emailRecipient, templateName
+                groupBy: e.id, emailRecipient, templateName
 
         columns:
             entityName:
@@ -121,7 +118,7 @@ datagrids:
                 order: 10
 
             eventName:
-                label: oro.notification.emailnotification.event.label
+                label: oro.notification.emailnotification.event_name.label
                 type: translatable
                 choices: "@oro_notification.grid_helper->getEventNameChoices"
                 order: 20
@@ -193,7 +190,7 @@ datagrids:
                 eventName:
                     filter_by_having: true
                     type: choice
-                    data_name: eventId
+                    data_name: eventName
                     options:
                         field_options:
                             multiple: true

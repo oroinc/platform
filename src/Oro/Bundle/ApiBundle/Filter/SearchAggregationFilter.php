@@ -10,7 +10,7 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 /**
  * A filter that can be used to requests aggregated data from a search index.
  */
-class SearchAggregationFilter extends StandaloneFilter
+class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInterface
 {
     /** @var SearchFieldResolverFactory */
     private $searchFieldResolverFactory;
@@ -75,7 +75,7 @@ class SearchAggregationFilter extends StandaloneFilter
      */
     public function applyToSearchQuery(SearchQueryInterface $query): void
     {
-        foreach ($this->aggregations as list($fieldName, $fieldType, $function, $alias)) {
+        foreach ($this->aggregations as [$fieldName, $fieldType, $function, $alias]) {
             $query->addAggregate($alias, $fieldType . '.' . $fieldName, $function);
         }
     }
@@ -86,7 +86,7 @@ class SearchAggregationFilter extends StandaloneFilter
     public function getAggregationDataTypes(): array
     {
         $result = [];
-        foreach ($this->aggregations as list($fieldName, $fieldType, $function, $alias)) {
+        foreach ($this->aggregations as [$fieldName, $fieldType, $function, $alias]) {
             $result[$alias] = $fieldType;
         }
 
@@ -107,7 +107,7 @@ class SearchAggregationFilter extends StandaloneFilter
         }
 
         $parts = \explode(' ', $aggregate);
-        list($field, $function) = $parts;
+        [$field, $function] = $parts;
         if (!$field || !$function || (\array_key_exists(2, $parts) && !$parts[2])) {
             throw $this->createInvalidAggregateDefinitionException($aggregate);
         }

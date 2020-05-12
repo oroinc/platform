@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -46,7 +47,8 @@ class SetDefaultSorting implements ProcessorInterface
             $this->addSortFilter(
                 $this->filterNamesRegistry->getFilterNames($context->getRequestType())->getSortFilterName(),
                 $context->getFilters(),
-                $config
+                $config,
+                $context->getConfigOfSorters()
             );
         }
     }
@@ -55,11 +57,13 @@ class SetDefaultSorting implements ProcessorInterface
      * @param string                 $filterName
      * @param FilterCollection       $filters
      * @param EntityDefinitionConfig $config
+     * @param SortersConfig|null     $configOfSorters
      */
     protected function addSortFilter(
         string $filterName,
         FilterCollection $filters,
-        EntityDefinitionConfig $config
+        EntityDefinitionConfig $config,
+        ?SortersConfig $configOfSorters
     ): void {
         if (!$filters->has($filterName)) {
             $filters->add(
@@ -67,8 +71,8 @@ class SetDefaultSorting implements ProcessorInterface
                 new SortFilter(
                     DataType::ORDER_BY,
                     $this->getSortFilterDescription(),
-                    function () use ($config) {
-                        return $this->getDefaultValue($config);
+                    function () use ($config, $configOfSorters) {
+                        return $this->getDefaultValue($config, $configOfSorters);
                     },
                     function ($value) {
                         return $this->convertDefaultValueToString($value);
@@ -89,26 +93,50 @@ class SetDefaultSorting implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $config
+     * @param SortersConfig          $configOfSorters
      *
      * @return array [field name => direction, ...]
      */
-    protected function getDefaultValue(EntityDefinitionConfig $config): array
+    protected function getDefaultValue(EntityDefinitionConfig $config, ?SortersConfig $configOfSorters): array
     {
         $orderBy = $config->getOrderBy();
-        if (empty($orderBy)) {
+        if (!$orderBy) {
             $idFieldNames = $config->getIdentifierFieldNames();
-            if (!empty($idFieldNames)) {
-                foreach ($idFieldNames as $fieldName) {
-                    $field = $config->getField($fieldName);
-                    if (null !== $field) {
-                        $fieldName = $field->getPropertyPath($fieldName);
-                    }
+            foreach ($idFieldNames as $fieldName) {
+                $field = $config->getField($fieldName);
+                if (null !== $field) {
+                    $fieldName = $field->getPropertyPath($fieldName);
+                }
+                if ($this->isSorterEnabled($fieldName, $configOfSorters)) {
                     $orderBy[$fieldName] = Criteria::ASC;
                 }
             }
         }
 
         return $orderBy;
+    }
+
+    /**
+     * @param string             $fieldName
+     * @param SortersConfig|null $configOfSorters
+     * @param bool               $byPropertyPath
+     *
+     * @return bool
+     */
+    protected function isSorterEnabled(
+        string $fieldName,
+        ?SortersConfig $configOfSorters,
+        bool $byPropertyPath = true
+    ): bool {
+        if (null === $configOfSorters) {
+            return false;
+        }
+        $sorter = $configOfSorters->findField($fieldName, $byPropertyPath);
+        if (null === $sorter) {
+            return false;
+        }
+
+        return !$sorter->isExcluded();
     }
 
     /**

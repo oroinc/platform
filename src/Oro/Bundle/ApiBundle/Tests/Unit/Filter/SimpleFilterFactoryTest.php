@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 use Psr\Container\ContainerInterface;
@@ -38,8 +39,8 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
             $factoryContainer,
             new PropertyAccessor(),
             new FilterOperatorRegistry([
-                ComparisonFilter::EQ  => '=',
-                ComparisonFilter::NEQ => '!='
+                FilterOperator::EQ  => '=',
+                FilterOperator::NEQ => '!='
             ])
         );
     }
@@ -75,7 +76,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
 
         self::assertEquals(
             $expectedFilter,
@@ -92,7 +93,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
 
         $expectedFilter = new ComparisonFilter($filterType);
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ]);
 
         self::assertEquals(
             $expectedFilter,

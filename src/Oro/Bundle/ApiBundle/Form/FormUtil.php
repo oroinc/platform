@@ -106,16 +106,18 @@ class FormUtil
      * @param string        $errorType
      * @param string        $errorMessage
      * @param string|null   $propertyPath
+     * @param int|null      $statusCode
      */
     public static function addNamedFormError(
         FormInterface $form,
         string $errorType,
         string $errorMessage,
-        string $propertyPath = null
+        string $propertyPath = null,
+        int $statusCode = null
     ): void {
         self::addFormConstraintViolation(
             $form,
-            new NamedValidationConstraint($errorType),
+            new NamedValidationConstraint($errorType, $statusCode),
             $errorMessage,
             $propertyPath
         );
