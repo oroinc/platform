@@ -1034,7 +1034,7 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeLinkWithUrl($text, $url)
     {
         $link = $this->elementFactory->findElementContains('Link', $text);
-        self::assertRegExp($url, $link->getAttribute('href'));
+        self::assertMatchesRegularExpression($url, $link->getAttribute('href'));
     }
 
     /**
@@ -1045,7 +1045,7 @@ class OroMainContext extends MinkContext implements
     public function iShouldNotSeeLinkWithUrl($text, $url)
     {
         $link = $this->elementFactory->findElementContains('Link', $text);
-        self::assertNotRegExp($url, $link->getAttribute('href'));
+        static::assertDoesNotMatchRegularExpression($url, $link->getAttribute('href'));
     }
 
     /**

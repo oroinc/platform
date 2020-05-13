@@ -180,7 +180,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         $packageVersion = '*';
 
         // guard. Platform requirement is the one that matches following regexp
-        $this->assertRegExp(PlatformRepository::PLATFORM_PACKAGE_REGEX, $platformRequirement);
+        $this->assertMatchesRegularExpression(PlatformRepository::PLATFORM_PACKAGE_REGEX, $platformRequirement);
 
         $requirementLinkMock1 = $this->createComposerPackageLinkMock();
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();

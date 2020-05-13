@@ -56,7 +56,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertEquals(['test message'], $migrationQuery->getDescription());
-        self::assertFileNotExists($this->temporaryFilePath);
+        self::assertFileDoesNotExist($this->temporaryFilePath);
     }
 
     public function testExecute()
@@ -91,6 +91,6 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $migrationQuery->execute($logger);
 
         self::assertEquals(['test message'], $logger->getMessages());
-        self::assertFileNotExists($this->temporaryFilePath);
+        self::assertFileDoesNotExist($this->temporaryFilePath);
     }
 }

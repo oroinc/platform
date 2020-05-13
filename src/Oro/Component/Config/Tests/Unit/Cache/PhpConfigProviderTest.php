@@ -18,7 +18,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PhpConfigProvider');
-        self::assertFileNotExists($this->cacheFile);
+        self::assertFileDoesNotExist($this->cacheFile);
     }
 
     /**
@@ -141,7 +141,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $provider = $this->getProvider($initialConfig);
 
         $provider->clearCache();
-        self::assertFileNotExists($this->cacheFile);
+        self::assertFileDoesNotExist($this->cacheFile);
         self::assertNull($provider->getCacheTimestamp());
 
         // test that the cache is built after it was cleared

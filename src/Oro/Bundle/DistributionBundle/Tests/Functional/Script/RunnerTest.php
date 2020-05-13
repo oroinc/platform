@@ -246,8 +246,8 @@ class RunnerTest extends WebTestCase
         $runner = $this->createRunner(null, null, null, $tempDir);
         $runner->removeCachedFiles();
 
-        $this->assertFileNotExists($bundlesFileName);
-        $this->assertFileNotExists($containerFileName);
+        $this->assertFileDoesNotExist($bundlesFileName);
+        $this->assertFileDoesNotExist($containerFileName);
     }
 
     public function testShouldRunClearCacheCommandForDistApplicationWithoutErrors()

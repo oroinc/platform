@@ -774,7 +774,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
         $row = $grid->getRowByNumber($this->getNumberFromString($rowNumber));
-        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+        self::assertMatchesRegularExpression(sprintf('/%s/i', $content), $row->getText());
     }
 
     /**
@@ -891,7 +891,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->open();
         $selected = $filterItem->getSelectedType();
 
-        self::assertRegExp(
+        self::assertMatchesRegularExpression(
             sprintf('/%s/i', $type),
             $selected,
             sprintf('Chosen "%s" filter instead of "%s" type', $selected, $type)
@@ -1635,7 +1635,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
         $regex = '/\d+ entities have been deleted successfully/';
-        self::assertRegExp($regex, $flashMessage->getText());
+        self::assertMatchesRegularExpression($regex, $flashMessage->getText());
     }
 
     /**

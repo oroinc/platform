@@ -657,7 +657,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
                 $anotherTmpFileName = $this->fileManager->getTemporaryFileName($suggestedFileName);
                 self::assertNotEmpty($anotherTmpFileName);
                 self::assertNotEquals($tmpFileName, $anotherTmpFileName);
-                self::assertFileNotExists($anotherTmpFileName);
+                self::assertFileDoesNotExist($anotherTmpFileName);
             }
         } finally {
             @unlink($tmpFileName);
@@ -678,7 +678,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
                 self::assertNotEmpty($anotherTmpFileName);
                 self::assertNotEquals($tmpFileName, $anotherTmpFileName);
                 self::assertStringEndsWith($fileExtension, $anotherTmpFileName);
-                self::assertFileNotExists($anotherTmpFileName);
+                self::assertFileDoesNotExist($anotherTmpFileName);
             }
         } finally {
             @unlink($tmpFileName);

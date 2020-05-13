@@ -43,7 +43,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     {
         $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
 
-        $this->assertFileNotExists($filePath);
+        $this->assertFileDoesNotExist($filePath);
 
         $this->removeListenersForEventExceptTested();
 

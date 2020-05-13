@@ -56,8 +56,8 @@ class NavigationListenerTest extends WebTestCase
 
         static::assertStringContainsString('divider', $divider->getName());
         foreach ($children as $child) {
-            $this->assertRegExp('/^Report [123]_report$/i', $child->getFirstChild()->getName());
-            $this->assertRegExp('/^Report [123]$/i', $child->getFirstChild()->getLabel());
+            $this->assertMatchesRegularExpression('/^Report [123]_report$/i', $child->getFirstChild()->getName());
+            $this->assertMatchesRegularExpression('/^Report [123]$/i', $child->getFirstChild()->getLabel());
         }
     }
 

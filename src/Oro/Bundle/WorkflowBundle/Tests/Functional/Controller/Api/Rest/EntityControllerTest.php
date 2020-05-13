@@ -32,7 +32,7 @@ class EntityControllerTest extends WebTestCase
             foreach ($entityData['fields'] as $fieldData) {
                 if (array_key_exists('relation_type', $fieldData)) {
                     $this->assertArrayHasKey('name', $fieldData);
-                    $this->assertNotRegExp(
+                    static::assertDoesNotMatchRegularExpression(
                         '/many$/',
                         $fieldData['relation_type'],
                         sprintf('Unsupported *toMany relation present %s:%s', $entityData['name'], $fieldData['name'])

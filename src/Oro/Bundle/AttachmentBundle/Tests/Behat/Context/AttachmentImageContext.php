@@ -248,7 +248,7 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
             $paths = $this->imagePaths[$imageName];
 
             foreach ($paths as $path) {
-                $this->assertFileNotExists($path);
+                $this->assertFileDoesNotExist($path);
             }
         }
     }

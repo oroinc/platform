@@ -42,7 +42,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(401, $response->getStatusCode());
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',
                 self::REALM_NAME,
@@ -62,7 +62,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(401, $response->getStatusCode());
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',
                 self::REALM_NAME,

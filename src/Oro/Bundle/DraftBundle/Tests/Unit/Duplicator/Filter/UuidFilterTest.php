@@ -22,7 +22,7 @@ class UuidFilterTest extends \PHPUnit\Framework\TestCase
 
         $this->filter->apply($object, $property, null);
         $this->assertNotNull($object->getDraftUuid());
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/',
             $object->getDraftUuid()
         );

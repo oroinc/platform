@@ -378,9 +378,9 @@ trait AssertTrait
      * @param string $filename
      * @param string $message
      */
-    public static function assertFileNotExists($filename, $message = '')
+    public static function assertFileDoesNotExist($filename, $message = '')
     {
-        Assert::assertFileNotExists($filename, $message);
+        Assert::assertFileDoesNotExist($filename, $message);
     }
 
     /**
@@ -602,9 +602,9 @@ trait AssertTrait
      * @param string $string
      * @param string $message
      */
-    public static function assertRegExp($pattern, $string, $message = '')
+    public static function assertMatchesRegularExpression($pattern, $string, $message = '')
     {
-        Assert::assertRegExp($pattern, $string, $message);
+        Assert::assertMatchesRegularExpression($pattern, $string, $message);
     }
 
     /**

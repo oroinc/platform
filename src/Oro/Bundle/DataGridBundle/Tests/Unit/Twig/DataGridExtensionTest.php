@@ -316,7 +316,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getScope')
             ->will($this->returnValue($gridScope));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             $expectedPattern,
             self::callTwigFunction($this->extension, 'oro_datagrid_generate_element_id', [$grid])
         );

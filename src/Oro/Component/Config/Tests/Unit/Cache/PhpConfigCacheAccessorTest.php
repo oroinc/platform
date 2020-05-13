@@ -34,7 +34,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadNotExistingFile()
     {
-        self::assertFileNotExists($this->cacheFile);
+        self::assertFileDoesNotExist($this->cacheFile);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The file "%s" does not exist.', $this->cacheFile));

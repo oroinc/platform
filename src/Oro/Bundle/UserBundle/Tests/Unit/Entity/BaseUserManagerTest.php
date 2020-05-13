@@ -155,7 +155,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     {
         $password = $this->userManager->generatePassword();
         self::assertNotEmpty($password);
-        self::assertRegExp('/[\w\-]+/', $password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
         self::assertLessThanOrEqual(30, strlen($password));
 
         self::assertNotEquals($password, $this->userManager->generatePassword());
@@ -166,7 +166,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $maxLength = 10;
         $password = $this->userManager->generatePassword($maxLength);
         self::assertNotEmpty($password);
-        self::assertRegExp('/[\w\-]+/', $password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
         self::assertLessThanOrEqual($maxLength, strlen($password));
 
         self::assertNotEquals($password, $this->userManager->generatePassword($maxLength));

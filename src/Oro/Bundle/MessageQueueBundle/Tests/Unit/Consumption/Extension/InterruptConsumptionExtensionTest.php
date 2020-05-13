@@ -39,7 +39,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldCreateFileIfItNotExist(): void
     {
-        $this->assertFileNotExists($this->filePath);
+        $this->assertFileDoesNotExist($this->filePath);
 
         new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 

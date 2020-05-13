@@ -92,7 +92,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
 
         // test
         $processManager->removePidFile('consumer-id');
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
     }
 
     public function testShouldNotThrowAnyErrorIfFileDoesNotExistWhenRemovindPids()
@@ -101,7 +101,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $processManager->createPidFile('consumer-id');
 
         // guard
-        $this->assertFileNotExists($this->pidDir.'/not-existent-pid-file.pid');
+        $this->assertFileDoesNotExist($this->pidDir.'/not-existent-pid-file.pid');
 
         // test
         $processManager->removePidFile('not-existent-pid-file');

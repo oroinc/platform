@@ -144,7 +144,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 }
 
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
-                self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
+                self::assertMatchesRegularExpression(sprintf('/%s/i', $fieldValue), $value);
 
                 return;
             }

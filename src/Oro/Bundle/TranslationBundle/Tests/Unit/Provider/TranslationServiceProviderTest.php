@@ -201,7 +201,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $method->invoke($this->service, $dir);
         $method->invoke($this->service, $dir . '1');
 
-        $this->assertFileNotExists($fileName);
+        $this->assertFileDoesNotExist($fileName);
     }
 
     public function testApply()
@@ -312,7 +312,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $method->invoke($service, '.en.', '.en_US.', $targetPath);
 
         foreach ($files as $k => $file) {
-            $this->assertFileNotExists($file);
+            $this->assertFileDoesNotExist($file);
             $this->assertFileExists($filesExpected[$k]);
         }
     }
