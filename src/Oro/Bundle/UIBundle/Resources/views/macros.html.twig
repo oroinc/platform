@@ -730,6 +730,9 @@
     {% if (parameters.ariaLabel is defined) %}
         aria-label="{{ parameters.ariaLabel }}"
     {% endif %}
+    {% if (parameters.ariaHaspopup is defined) %}
+        aria-haspopup="{{ parameters.ariaHaspopup ? 'true' : 'false' }}"
+    {% endif %}
     {%- if (parameters.visible is defined and not parameters.visible) -%}
         style="display: none"
     {%- endif -%}
