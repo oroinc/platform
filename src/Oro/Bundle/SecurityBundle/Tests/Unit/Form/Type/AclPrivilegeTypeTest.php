@@ -17,23 +17,13 @@ class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildForm()
     {
         /** @var FormBuilder|MockObject $builder */
-        $builder = $this->getMockBuilder(FormBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with(
-                'identity',
-                $this->isInstanceOf(AclPrivilegeIdentityType::class),
-                ['required' => false]
-            );
+        $builder = $this->getMockBuilder(FormBuilder::class)->disableOriginalConstructor()->getMock();
         $options = ['privileges_config' => ['field_type' => 'grid']];
-        $builder->expects($this->at(1))
+        $builder->expects(static::exactly(2))
             ->method('add')
-            ->with(
-                'permissions',
-                PermissionCollectionType::class,
-                $this->contains($options)
+            ->withConsecutive(
+                ['identity', static::isInstanceOf(AclPrivilegeIdentityType::class), ['required' => false]],
+                ['permissions', PermissionCollectionType::class, static::containsEqual($options)]
             );
 
         (new AclPrivilegeType())->buildForm($builder, $options);
@@ -42,11 +32,9 @@ class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
     public function testConfigureOptions()
     {
         /** @var OptionsResolver|MockObject $resolver */
-        $resolver = $this->getMockBuilder(OptionsResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
 
-        $resolver->expects($this->once())
+        $resolver->expects(static::once())
             ->method('setDefaults')
             ->with(['privileges_config' => [], 'data_class' => AclPrivilege::class,]);
 
@@ -56,20 +44,16 @@ class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildView()
     {
         /** @var FormView|MockObject $view */
-        $view = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $view = $this->getMockBuilder(FormView::class)->disableOriginalConstructor()->getMock();
 
         /** @var FormInterface|MockObject $form */
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $form = $this->getMockBuilder(FormInterface::class)->disableOriginalConstructor()->getMock();
 
-        $privileges_config = ['test'];
-        $options = ['privileges_config' => $privileges_config];
+        $privilegesConfig = ['test'];
+        $options = ['privileges_config' => $privilegesConfig];
 
         (new AclPrivilegeType())->buildView($view, $form, $options);
 
-        $this->assertSame($privileges_config, $view->vars['privileges_config']);
+        static::assertSame($privilegesConfig, $view->vars['privileges_config']);
     }
 }
