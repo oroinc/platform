@@ -34,16 +34,16 @@ class LoggerLevelCommandTest extends WebTestCase
             ->findOneBy(['email' => 'admin@example.com']);
         $configUser->setScopeIdFromEntity($user);
 
-        $this->assertEquals(
+        static::assertEquals(
             $params[0],
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        $this->assertEquals(
+        static::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
-            'Failed asseting that disable after is correct.',
-            10
+            10,
+            'Failed asserting that disable after is correct.'
         );
     }
 
@@ -59,16 +59,16 @@ class LoggerLevelCommandTest extends WebTestCase
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
 
-        $this->assertEquals(
+        static::assertEquals(
             $params[0],
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        $this->assertEquals(
+        static::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
-            'Failed asseting that disable after is correct.',
-            10
+            10,
+            'Failed asserting that disable after is correct.'
         );
     }
 
