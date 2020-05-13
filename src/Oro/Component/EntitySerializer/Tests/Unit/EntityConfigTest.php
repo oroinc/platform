@@ -187,7 +187,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
     public function testHints()
     {
         $entityConfig = new EntityConfig();
-        $this->assertEquals([], $entityConfig->getHints());
+        $this->assertSame([], $entityConfig->getHints());
 
         $entityConfig->addHint('hint1');
         $entityConfig->addHint('hint2', 'val');
@@ -207,8 +207,46 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['hints' => [['name' => 'hint2', 'value' => 'val']]], $entityConfig->toArray());
 
         $entityConfig->removeHint('hint2', 'val');
-        $this->assertEquals([], $entityConfig->getHints());
-        $this->assertEquals([], $entityConfig->toArray());
+        $this->assertSame([], $entityConfig->getHints());
+        $this->assertSame([], $entityConfig->toArray());
+    }
+
+    public function testInnerJoinAssociations()
+    {
+        $entityConfig = new EntityConfig();
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+
+        $entityConfig->addInnerJoinAssociation('association1');
+        $this->assertEquals(['association1'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1']], $entityConfig->toArray());
+
+        $entityConfig->addInnerJoinAssociation('association2');
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->addInnerJoinAssociation('association1');
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association1');
+        $this->assertEquals(['association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association1');
+        $this->assertEquals(['association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association2']], $entityConfig->toArray());
+
+        $entityConfig->removeInnerJoinAssociation('association2');
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+        $this->assertSame([], $entityConfig->toArray());
+
+        $entityConfig->setInnerJoinAssociations(['association1', 'association2']);
+        $this->assertEquals(['association1', 'association2'], $entityConfig->getInnerJoinAssociations());
+        $this->assertEquals(['inner_join_associations' => ['association1', 'association2']], $entityConfig->toArray());
+
+        $entityConfig->setInnerJoinAssociations([]);
+        $this->assertSame([], $entityConfig->getInnerJoinAssociations());
+        $this->assertSame([], $entityConfig->toArray());
     }
 
     public function testPostSerializeHandler()

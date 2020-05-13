@@ -13,9 +13,10 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     private const METHOD_MAP = [
         ConfigUtil::EXCLUSION_POLICY        => 'setExclusionPolicy',
         ConfigUtil::IDENTIFIER_FIELD_NAMES  => 'setIdentifierFieldNames',
-        ConfigUtil::ORDER_BY                => 'setOrderBy',
         ConfigUtil::MAX_RESULTS             => 'setMaxResults',
+        ConfigUtil::ORDER_BY                => 'setOrderBy',
         ConfigUtil::HINTS                   => 'setHints',
+        ConfigUtil::INNER_JOIN_ASSOCIATIONS => 'setInnerJoinAssociations',
         ConfigUtil::FORM_TYPE               => 'setFormType',
         ConfigUtil::FORM_OPTIONS            => 'setFormOptions',
         ConfigUtil::DOCUMENTATION_RESOURCE  => 'setDocumentationResources',

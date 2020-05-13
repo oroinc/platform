@@ -111,20 +111,6 @@ meta_properties:
             get_subresource:
                 disable_meta_properties: true
 
-partial_load:
-    config:
-        actions:
-            get_list:
-                disable_partial_load: false
-            get_subresource:
-                disable_partial_load: true
-    expected:
-        actions:
-            get_list:
-                disable_partial_load: false
-            get_subresource:
-                disable_partial_load: true
-
 full:
     config:
         get: ~

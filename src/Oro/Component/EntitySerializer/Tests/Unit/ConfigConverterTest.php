@@ -38,6 +38,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                         ['name' => 'hint2'],
                         ['name' => 'hint3', 'value' => 'val']
                     ],
+                    'inner_join_associations'   => ['association1', 'association2.association21'],
                     'order_by'                  => ['field1' => 'DESC'],
                     'max_results'               => 123,
                     'has_more'                  => true,
@@ -59,6 +60,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                                 ['name' => 'hint11'],
                                 ['name' => 'hint12', 'value' => 'val']
                             ],
+                            'inner_join_associations'   => ['association11'],
                             'order_by'                  => ['field2' => 'DESC'],
                             'max_results'               => 456,
                             'has_more'                  => true,
@@ -75,6 +77,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                         'hint2',
                         ['name' => 'hint3', 'value' => 'val']
                     ],
+                    'inner_join_associations'   => ['association1', 'association2.association21'],
                     'order_by'                  => ['field1' => 'DESC'],
                     'max_results'               => 123,
                     'has_more'                  => true,
@@ -96,6 +99,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                                 'hint11',
                                 ['name' => 'hint12', 'value' => 'val']
                             ],
+                            'inner_join_associations'   => ['association11'],
                             'order_by'                  => ['field2' => 'DESC'],
                             'max_results'               => 456,
                             'has_more'                  => true,

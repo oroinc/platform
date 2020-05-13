@@ -443,6 +443,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Sets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
      *
      * @param array|null $hints
      */

@@ -33,6 +33,7 @@ class ConfigConverter
         $this->setExclusionPolicy($result, $config);
         $this->setPartialLoad($result, $config);
         $this->setHints($result, $config);
+        $this->setInnerJoinAssociations($result, $config);
         $this->setOrderBy($result, $config);
         $this->setMaxResults($result, $config);
         $this->setHasMore($result, $config);
@@ -112,6 +113,17 @@ class ConfigConverter
                     $result->addHint($hint);
                 }
             }
+        }
+    }
+
+    /**
+     * @param EntityConfig $result
+     * @param array        $config
+     */
+    protected function setInnerJoinAssociations(EntityConfig $result, array $config)
+    {
+        if (!empty($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS])) {
+            $result->setInnerJoinAssociations($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS]);
         }
     }
 

@@ -57,6 +57,9 @@ class ConfigUtil
     /** a list Doctrine query hints */
     public const HINTS = 'hints';
 
+    /** a list of associations for which INNER JOIN should be used instead of LEFT JOIN */
+    public const INNER_JOIN_ASSOCIATIONS = 'inner_join_associations';
+
     /** the ordering of the result */
     public const ORDER_BY = 'order_by';
 

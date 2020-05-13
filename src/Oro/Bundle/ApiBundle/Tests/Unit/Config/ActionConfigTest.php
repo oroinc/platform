@@ -286,20 +286,6 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPartialLoadFlag()
-    {
-        $config = new ActionConfig();
-        self::assertTrue($config->isPartialLoadEnabled());
-
-        $config->disablePartialLoad();
-        self::assertFalse($config->isPartialLoadEnabled());
-        self::assertEquals(['disable_partial_load' => true], $config->toArray());
-
-        $config->enablePartialLoad();
-        self::assertTrue($config->isPartialLoadEnabled());
-        self::assertEquals([], $config->toArray());
-    }
-
     public function testFormType()
     {
         $config = new ActionConfig();
