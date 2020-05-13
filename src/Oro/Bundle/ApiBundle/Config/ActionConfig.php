@@ -628,32 +628,6 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Indicates whether using of Doctrine partial objects is enabled.
-     *
-     * @return bool
-     */
-    public function isPartialLoadEnabled()
-    {
-        return !$this->get(\Oro\Component\EntitySerializer\ConfigUtil::DISABLE_PARTIAL_LOAD, false);
-    }
-
-    /**
-     * Allows using of Doctrine partial objects.
-     */
-    public function enablePartialLoad()
-    {
-        unset($this->items[ConfigUtil::DISABLE_PARTIAL_LOAD]);
-    }
-
-    /**
-     * Prohibits using of Doctrine partial objects.
-     */
-    public function disablePartialLoad()
-    {
-        $this->items[ConfigUtil::DISABLE_PARTIAL_LOAD] = true;
-    }
-
-    /**
      * Indicates whether the "disable_sorting" option is set explicitly.
      *
      * @return bool

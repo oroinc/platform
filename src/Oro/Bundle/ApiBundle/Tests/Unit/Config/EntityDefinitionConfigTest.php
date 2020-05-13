@@ -668,20 +668,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
     public function testHints()
     {
         $config = new EntityDefinitionConfig();
-        self::assertEquals([], $config->getHints());
+        self::assertSame([], $config->getHints());
 
         $config->setHints(['hint1']);
         self::assertEquals(['hint1'], $config->getHints());
         self::assertEquals(['hints' => ['hint1']], $config->toArray());
 
         $config->setHints();
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
 
         $config->setHints(['hint1']);
         $config->setHints([]);
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
     }
 
     public function testIdentifierDescription()

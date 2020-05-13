@@ -404,6 +404,61 @@ class EntityConfig
     }
 
     /**
+     * Gets a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
+     *
+     * @return string[] [property path, ...]
+     */
+    public function getInnerJoinAssociations(): array
+    {
+        return $this->get(ConfigUtil::INNER_JOIN_ASSOCIATIONS, []);
+    }
+
+    /**
+     * Sets a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
+     *
+     * @param string[] $propertyPaths [property path, ...]
+     */
+    public function setInnerJoinAssociations(array $propertyPaths): void
+    {
+        if ($propertyPaths) {
+            $this->items[ConfigUtil::INNER_JOIN_ASSOCIATIONS] = $propertyPaths;
+        } else {
+            unset($this->items[ConfigUtil::INNER_JOIN_ASSOCIATIONS]);
+        }
+    }
+
+    /**
+     * Adds an association to a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
+     *
+     * @param string $propertyPath
+     */
+    public function addInnerJoinAssociation(string $propertyPath): void
+    {
+        $propertyPaths = $this->get(ConfigUtil::INNER_JOIN_ASSOCIATIONS, []);
+        if (!$propertyPaths || !\in_array($propertyPath, $propertyPaths, true)) {
+            $propertyPaths[] = $propertyPath;
+            $this->items[ConfigUtil::INNER_JOIN_ASSOCIATIONS] = $propertyPaths;
+        }
+    }
+
+    /**
+     * Removes an association from a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
+     *
+     * @param string $propertyPath
+     */
+    public function removeInnerJoinAssociation(string $propertyPath): void
+    {
+        $propertyPaths = $this->get(ConfigUtil::INNER_JOIN_ASSOCIATIONS, []);
+        if ($propertyPaths) {
+            $i = array_search($propertyPath, $propertyPaths, true);
+            if (false !== $i) {
+                unset($propertyPaths[$i]);
+                $this->setInnerJoinAssociations(array_values($propertyPaths));
+            }
+        }
+    }
+
+    /**
      * Gets a handler that should be used to modify serialized data for a single item.
      *
      * @return callable|null

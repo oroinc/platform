@@ -141,6 +141,21 @@ invalid_hints:
     expected: []
     error: 'Unrecognized option "extra" under "entity.hints.0"'
 
+empty_inner_join_associations:
+    config:
+        inner_join_associations: []
+    expected: []
+
+inner_join_associations:
+    config:
+        inner_join_associations:
+            - association1
+            - association2.association21
+    expected:
+        inner_join_associations:
+            - association1
+            - association2.association21
+
 description_cannot_be_set_in_config:
     config:
         description: test
@@ -254,6 +269,9 @@ all_attributes:
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
     expected:
         exclusion_policy: all
         documentation_resource: [test.md]
@@ -264,6 +282,9 @@ all_attributes:
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
 
 empty_field:
     config:
