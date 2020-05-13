@@ -20,10 +20,7 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
         $this->messages = $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function evaluate($other, $description = '', $returnResult = false)
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         $comparatorFactory = \SebastianBergmann\Comparator\Factory::getInstance();
         try {
