@@ -13,7 +13,7 @@ class WrongTableNameMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('extra_long_table_name_bigger_than_30_chars');
+        $table = $schema->createTable('extra_long_table_name_which_are_bigger_than_63_different_characters');
         $table->addColumn('id', 'integer');
     }
 }
