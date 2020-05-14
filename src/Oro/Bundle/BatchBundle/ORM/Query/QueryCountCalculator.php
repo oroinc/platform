@@ -4,9 +4,9 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
@@ -19,34 +19,60 @@ class QueryCountCalculator
     /** @var bool|null */
     private $shouldUseWalker;
 
+    /** @var bool|null */
+    private $shouldUseDistinct;
+
     /**
-     * Calculates total count of query records
+     * Calculates the total count of records returned by the given query.
      *
      * @param Query|SqlQuery $query
      * @param bool           $useWalker
      *
-     * @return integer
+     * @return int
      */
     public static function calculateCount($query, $useWalker = null)
     {
-        /** @var QueryCountCalculator $instance */
         $instance = new static();
-
         $instance->setUseWalker($useWalker);
 
         return $instance->getCount($query);
     }
 
     /**
-     * @param bool $value  Determine should CountWalker be used or wrap count query with additional select.
-     *                     Walker might be turned off on queries where exists GROUP BY statement and count select
-     *                     will returns large dataset(it's only critical when more then e.g. 1000 results returned)
-     *                     Another point to disable it, when query has LIMIT and you want to count results
-     *                     relatively to it.
+     * Calculates the total count of unique records returned by the given query.
+     *
+     * @param Query|SqlQuery $query
+     *
+     * @return int
+     */
+    public static function calculateCountDistinct($query)
+    {
+        $instance = new static();
+        $instance->setUseDistinct(true);
+
+        return $instance->getCount($query);
+    }
+
+    /**
+     * @param bool $value  Determines whether {@see \Doctrine\ORM\Tools\Pagination\CountWalker} should be used
+     *                     or the count query should be wrapped with an additional SELECT statement.
+     *                     The walker might be turned off on queries with GROUP BY statement and count select
+     *                     will returns large dataset (it's only critical when more then e.g. 1000 results returned)
+     *                     Another point to disable the walker is when the query has LIMIT
+     *                     and you want to count results relatively to it.
      */
     public function setUseWalker($value)
     {
         $this->shouldUseWalker = $value;
+    }
+
+    /**
+     * @param bool $value  Determine whether DISTINCT keyword should be used or not.
+     *                     By default this keyword is used only if the source query has this keyword.
+     */
+    public function setUseDistinct($value)
+    {
+        $this->shouldUseDistinct = $value;
     }
 
     /**
@@ -55,18 +81,17 @@ class QueryCountCalculator
      *
      * @param Query|SqlQuery $query
      *
-     * @return integer
+     * @return int
      */
     public function getCount($query)
     {
         if ($this->useWalker($query)) {
-            if (!$query->contains('DISTINCT')) {
-                $query->setHint(CountWalker::HINT_DISTINCT, false);
-            }
-
-            $paginator = new Paginator($query);
-            $paginator->setUseOutputWalkers(false);
-            $result = $paginator->count();
+            $result = $this->executeOrmCountQueryUsingCountWalker($query);
+        } elseif (true === $this->shouldUseDistinct) {
+            throw new \InvalidArgumentException(sprintf(
+                'The usage of DISTINCT keyword can be forced only together with %s.',
+                CountWalker::class
+            ));
         } else {
             if ($query instanceof Query) {
                 $statement = $this->executeOrmCountQuery($query);
@@ -78,18 +103,43 @@ class QueryCountCalculator
                 $statement = $this->executeDbalCountQuery($query);
             } else {
                 throw new \InvalidArgumentException(sprintf(
-                    'Expected instance of %s, %s or %s, "%s" given',
+                    'Expected instance of %s, %s or %s, "%s" given.',
                     Query::class,
                     SqlQuery::class,
                     DbalQueryBuilder::class,
                     is_object($query) ? get_class($query) : gettype($query)
                 ));
             }
-
             $result = $statement->fetchColumn();
         }
 
         return $result ? (int)$result : 0;
+    }
+
+    /**
+     * @param Query $query
+     *
+     * @return int
+     */
+    private function executeOrmCountQueryUsingCountWalker(Query $query): int
+    {
+        $countQuery = QueryUtil::cloneQuery($query);
+        if (null !== $this->shouldUseDistinct) {
+            $countQuery->setHint(CountWalker::HINT_DISTINCT, $this->shouldUseDistinct);
+        } elseif (!$countQuery->hasHint(CountWalker::HINT_DISTINCT)) {
+            $countQuery->setHint(CountWalker::HINT_DISTINCT, $countQuery->contains('DISTINCT'));
+        }
+        QueryUtil::addTreeWalker($countQuery, CountWalker::class);
+        $this->unbindUnusedQueryParams($countQuery, QueryUtil::parseQuery($countQuery));
+        $countQuery->setFirstResult(null)->setMaxResults(null);
+        // the result-set mapping is not relevant and should be rebuilt because the query is be changed
+        QueryUtil::resetResultSetMapping($countQuery);
+
+        try {
+            return array_sum(array_map('current', $countQuery->getScalarResult()));
+        } catch (NoResultException $e) {
+            return 0;
+        }
     }
 
     /**
@@ -100,11 +150,12 @@ class QueryCountCalculator
     private function executeOrmCountQuery(Query $query)
     {
         $parserResult = QueryUtil::parseQuery($query);
+        $sql = $parserResult->getSqlExecutor()->getSqlStatements();
         $parameterMappings = $parserResult->getParameterMappings();
-        list($params, $types) = QueryUtil::processParameterMappings($query, $parameterMappings);
+        [$params, $types] = QueryUtil::processParameterMappings($query, $parameterMappings);
 
         return $query->getEntityManager()->getConnection()->executeQuery(
-            sprintf('SELECT COUNT(*) FROM (%s) AS count_query', $query->getSQL()),
+            sprintf('SELECT COUNT(*) FROM (%s) AS count_query', $sql),
             $params,
             $types
         );
@@ -123,6 +174,23 @@ class QueryCountCalculator
             ->select('COUNT(*)')
             ->from('(' . $query->getSQL() . ')', 'count_query')
             ->execute();
+    }
+
+    /**
+     * @param Query              $query
+     * @param Query\ParserResult $parserResult
+     */
+    private function unbindUnusedQueryParams(Query $query, Query\ParserResult $parserResult): void
+    {
+        $parameterMappings = $parserResult->getParameterMappings();
+        $parameters = $query->getParameters();
+        foreach ($parameters as $key => $parameter) {
+            $parameterName = $parameter->getName();
+            if (!\array_key_exists($parameterName, $parameterMappings)) {
+                unset($parameters[$key]);
+            }
+        }
+        $query->setParameters($parameters);
     }
 
     /**

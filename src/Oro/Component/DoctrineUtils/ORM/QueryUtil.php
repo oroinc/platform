@@ -5,7 +5,11 @@ namespace Oro\Component\DoctrineUtils\ORM;
 use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\QueryException;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
+/**
+ * Provides a set of static methods to work with ORM query.
+ */
 class QueryUtil
 {
     /**
@@ -128,8 +132,8 @@ class QueryUtil
 
         $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
 
-        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
-        list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
+        [$params, $types] = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
+        [$sql, $params, $types] = SQLParserUtils::expandListParameters($sql, $params, $types);
 
         $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
         for ($i = count($paramPos) - 1; $i >= 0; $i--) {
@@ -151,8 +155,36 @@ class QueryUtil
      */
     public static function parseQuery(Query $query)
     {
-        $parser = new Query\Parser($query);
+        // we have to call the private _parse() method to be able to use the query cache
+        // and as result avoid unneeded query parsing when the parse result is already cached
+        $parseClosure = \Closure::bind(
+            function ($query) {
+                return $query->_parse();
+            },
+            null,
+            $query
+        );
 
-        return $parser->parse();
+        return $parseClosure($query);
+    }
+
+    /**
+     * @param Query $query
+     */
+    public static function resetResultSetMapping(Query $query): void
+    {
+        // unfortunately the reflection is the only way to reset the result-set mapping
+        $resultSetMappingProperty = ReflectionUtil::getProperty(
+            new \ReflectionClass($query),
+            '_resultSetMapping'
+        );
+        if (null === $resultSetMappingProperty) {
+            throw new \LogicException(sprintf(
+                'The "_resultSetMapping" property does not exist in %s.',
+                \get_class($query)
+            ));
+        }
+        $resultSetMappingProperty->setAccessible(true);
+        $resultSetMappingProperty->setValue($query, null);
     }
 }
