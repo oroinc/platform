@@ -596,22 +596,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a file/dir exists and is not readable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4062
-     * @see Assert::assertNotIsReadable
-     */
-    public static function assertNotIsReadable(string $filename, string $message = ''): void
-    {
-        Assert::assertNotIsReadable(...\func_get_args());
-    }
-
-    /**
      * Asserts that a file/dir exists and is writable.
      *
      * @throws ExpectationFailedException
@@ -635,22 +619,6 @@ trait AssertTrait
     public static function assertIsNotWritable(string $filename, string $message = ''): void
     {
         Assert::assertIsNotWritable(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a file/dir exists and is not writable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4065
-     * @see Assert::assertNotIsWritable
-     */
-    public static function assertNotIsWritable(string $filename, string $message = ''): void
-    {
-        Assert::assertNotIsWritable(...\func_get_args());
     }
 
     /**
@@ -680,22 +648,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a directory does not exist.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4068
-     * @see Assert::assertDirectoryNotExists
-     */
-    public static function assertDirectoryNotExists(string $directory, string $message = ''): void
-    {
-        Assert::assertDirectoryNotExists(...\func_get_args());
-    }
-
-    /**
      * Asserts that a directory exists and is readable.
      *
      * @throws ExpectationFailedException
@@ -719,22 +671,6 @@ trait AssertTrait
     public static function assertDirectoryIsNotReadable(string $directory, string $message = ''): void
     {
         Assert::assertDirectoryIsNotReadable(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a directory exists and is not readable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4071
-     * @see Assert::assertDirectoryNotIsReadable
-     */
-    public static function assertDirectoryNotIsReadable(string $directory, string $message = ''): void
-    {
-        Assert::assertDirectoryNotIsReadable(...\func_get_args());
     }
 
     /**
@@ -764,22 +700,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a directory exists and is not writable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4074
-     * @see Assert::assertDirectoryNotIsWritable
-     */
-    public static function assertDirectoryNotIsWritable(string $directory, string $message = ''): void
-    {
-        Assert::assertDirectoryNotIsWritable(...\func_get_args());
-    }
-
-    /**
      * Asserts that a file exists.
      *
      * @throws ExpectationFailedException
@@ -803,22 +723,6 @@ trait AssertTrait
     public static function assertFileDoesNotExist(string $filename, string $message = ''): void
     {
         Assert::assertFileDoesNotExist(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a file does not exist.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4077
-     * @see Assert::assertFileNotExists
-     */
-    public static function assertFileNotExists(string $filename, string $message = ''): void
-    {
-        Assert::assertFileNotExists(...\func_get_args());
     }
 
     /**
@@ -848,22 +752,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a file exists and is not readable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4080
-     * @see Assert::assertFileNotIsReadable
-     */
-    public static function assertFileNotIsReadable(string $file, string $message = ''): void
-    {
-        Assert::assertFileNotIsReadable(...\func_get_args());
-    }
-
-    /**
      * Asserts that a file exists and is writable.
      *
      * @throws ExpectationFailedException
@@ -887,22 +775,6 @@ trait AssertTrait
     public static function assertFileIsNotWritable(string $file, string $message = ''): void
     {
         Assert::assertFileIsNotWritable(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a file exists and is not writable.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4083
-     * @see Assert::assertFileNotIsWritable
-     */
-    public static function assertFileNotIsWritable(string $file, string $message = ''): void
-    {
-        Assert::assertFileNotIsWritable(...\func_get_args());
     }
 
     /**
@@ -1536,22 +1408,6 @@ trait AssertTrait
     }
 
     /**
-     * Asserts that a string matches a given regular expression.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4086
-     * @see Assert::assertRegExp
-     */
-    public static function assertRegExp(string $pattern, string $string, string $message = ''): void
-    {
-        Assert::assertRegExp(...\func_get_args());
-    }
-
-    /**
      * Asserts that a string does not match a given regular expression.
      *
      * @throws ExpectationFailedException
@@ -1562,22 +1418,6 @@ trait AssertTrait
     public static function assertDoesNotMatchRegularExpression(string $pattern, string $string, string $message = ''): void
     {
         Assert::assertDoesNotMatchRegularExpression(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a string does not match a given regular expression.
-     *
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4089
-     * @see Assert::assertNotRegExp
-     */
-    public static function assertNotRegExp(string $pattern, string $string, string $message = ''): void
-    {
-        Assert::assertNotRegExp(...\func_get_args());
     }
 
     /**
@@ -1859,23 +1699,6 @@ trait AssertTrait
     public static function assertXmlStringNotEqualsXmlString($expectedXml, $actualXml, string $message = ''): void
     {
         Assert::assertXmlStringNotEqualsXmlString(...\func_get_args());
-    }
-
-    /**
-     * Asserts that a hierarchy of DOMElements matches.
-     *
-     * @throws AssertionFailedError
-     * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-     *
-     * @codeCoverageIgnore
-     *
-     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/4091
-     * @see Assert::assertEqualXMLStructure
-     */
-    public static function assertEqualXMLStructure(\DOMElement $expectedElement, \DOMElement $actualElement, bool $checkAttributes = false, string $message = ''): void
-    {
-        Assert::assertEqualXMLStructure(...\func_get_args());
     }
 
     /**
