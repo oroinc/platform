@@ -45,6 +45,12 @@ return PhpCsFixer\Config::create()
 //            'phpdoc_align' => ['tags' => ['param']],
 //            'phpdoc_order' => true,
 //            'phpdoc_types_order' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
+
+            // Otherwise anonymous classes cannot be used with any meaningful constructor arguments.
+            // It is temporary for now, until a decision is made by PSR-12 editors (see
+            // https://github.com/php-fig/fig-standards/pull/1206#issuecomment-628873709 ) and
+            // and a PR to php-cs-fixer will be proposed based on that decision to address it one way or the other.
+            'class_definition' => false,
         ]
     )
     ->setFinder($finder)
