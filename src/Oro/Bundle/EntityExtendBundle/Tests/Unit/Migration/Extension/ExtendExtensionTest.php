@@ -176,7 +176,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Entity name length must be less or equal 22 characters.
+     * @expectedExceptionMessage Entity name length must be less or equal 55 characters.
      */
     public function testCreateCustomEntityTableWithTooLongName()
     {
@@ -185,7 +185,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension->createCustomEntityTable(
             $schema,
-            'E1234567891234567890123'
+            'E1234567891234567890123E1234567891234567890123456789012E'
         );
     }
 

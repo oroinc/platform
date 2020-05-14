@@ -14,6 +14,6 @@ class WrongColumnNameMigration implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('wrong_table');
-        $table->addColumn('extra_long_column_bigger_30_chars', 'integer');
+        $table->addColumn('extra_long_column_name_which_are_bigger_than_63_different_characters', 'integer');
     }
 }

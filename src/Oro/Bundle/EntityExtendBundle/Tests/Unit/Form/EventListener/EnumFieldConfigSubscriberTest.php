@@ -3,23 +3,30 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
+use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Translation\Translator;
 
 class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject */
     protected $enumSynchronizer;
+
+    /** @var ExtendDbIdentifierNameGenerator\PHPUnit\Framework\MockObject\MockObject */
+    protected $nameGenerator;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
@@ -27,26 +34,29 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var EnumFieldConfigSubscriber */
     protected $subscriber;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->configManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator       = $this->createMock('Symfony\Component\Translation\Translator');
-        $this->enumSynchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
+        $this->translator = $this->createMock(Translator::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
+
+        $this->enumSynchronizer = $this->createMock(EnumSynchronizer::class);
+
+        $this->nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
+        $this->nameGenerator->expects($this->any())
+            ->method('getMaxEnumCodeSize')
+            ->willReturn(54);
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->subscriber = new EnumFieldConfigSubscriber(
             $this->configManager,
             $this->translator,
-            $this->enumSynchronizer
+            $this->enumSynchronizer,
+            $this->nameGenerator,
         );
         $this->subscriber->setLogger($this->logger);
     }

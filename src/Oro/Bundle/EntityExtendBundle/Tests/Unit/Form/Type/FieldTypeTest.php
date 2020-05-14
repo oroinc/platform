@@ -213,7 +213,7 @@ class FieldTypeTest extends TypeTestCase
                     [
                         FieldNameLength::class => [
                             'min' => FieldNameLength::MIN_LENGTH,
-                            'max' => 22, //will be returned by generator
+                            'max' => 55, //will be returned by generator
                         ]
                     ]
                 )
