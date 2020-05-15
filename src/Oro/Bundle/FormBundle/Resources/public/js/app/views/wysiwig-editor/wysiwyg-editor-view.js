@@ -161,6 +161,9 @@ define(function(require) {
                     editor.on('SetContent', function() {
                         editor.save({no_events: true});
                     });
+                    editor.on('focusout', function() {
+                        editor.save();
+                    });
                 },
                 init_instance_callback: function(editor) {
                     self.removeSubview('loadingMask');
