@@ -7,12 +7,15 @@ use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * FormType for the display of add comment functionality
+ */
 class CommentTypeApi extends AbstractType
 {
     const FORM_NAME = 'oro_comment_api';
@@ -44,7 +47,7 @@ class CommentTypeApi extends AbstractType
                         'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
-                    'constraints' => [ new NotBlank() ]
+                    'constraints' => [ new HtmlNotBlank() ]
                 ]
             )
             ->add(
