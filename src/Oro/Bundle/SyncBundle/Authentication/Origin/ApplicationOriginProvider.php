@@ -32,7 +32,7 @@ class ApplicationOriginProvider implements OriginProviderInterface
      */
     public function getOrigins(): array
     {
-        $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url', null));
+        $origin = $this->originExtractor->fromUrl($this->configManager->get('oro_ui.application_url'));
 
         return $origin === null ? [] : [$origin];
     }
