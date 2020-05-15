@@ -1037,6 +1037,42 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testFieldDescriptionWhenItExistsInConfigAndContainsDescriptionInheritDocPlaceholder()
+    {
+        $entityClass = TestEntity::class;
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'testField' => [
+                    'description' => 'field description, {@inheritdoc:description}'
+                ]
+            ]
+        ];
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getFieldDocumentation')
+            ->with($entityClass, 'testField')
+            ->willReturn('field description from the entity config');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'testField' => [
+                        'description' => 'field description, field description from the entity config'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testFieldDescriptionWhenItExistsInDocFile()
     {
         $entityClass = TestEntity::class;
@@ -2200,6 +2236,34 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'documentation'    => 'action documentation. {@inheritdoc}'
+        ];
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityDocumentation')
+            ->with($entityClass)
+            ->willReturn('entity documentation');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'documentation'          => 'action documentation. entity documentation'
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testPrimaryResourceDocumentationWithDescriptionInheritDocPlaceholder()
+    {
+        $entityClass = TestEntity::class;
+        $config = [
+            'exclusion_policy' => 'all',
+            'documentation'    => 'action documentation. {@inheritdoc:description}'
         ];
 
         $this->entityDocProvider->expects(self::once())

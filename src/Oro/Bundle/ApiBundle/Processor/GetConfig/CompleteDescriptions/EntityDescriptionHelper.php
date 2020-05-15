@@ -190,6 +190,12 @@ class EntityDescriptionHelper implements ResetInterface
 
         $documentation = $definition->getDocumentation();
         if ($documentation) {
+            if (InheritDocUtil::hasDescriptionInheritDoc($documentation)) {
+                $documentation = InheritDocUtil::replaceDescriptionInheritDoc(
+                    $documentation,
+                    $this->entityDocProvider->getEntityDocumentation($entityClass)
+                );
+            }
             $definition->setDocumentation($this->descriptionProcessor->process($documentation, $requestType));
         }
     }
