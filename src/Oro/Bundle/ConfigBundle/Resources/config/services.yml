@@ -50,6 +50,11 @@ services:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - '@oro_config.config_definition_bag'
             - '@event_dispatcher'
+        calls:
+            - [setArrayCache, ['@oro_config.manager.array_cache']]
+
+    oro_config.manager.array_cache:
+        parent: doctrine_cache.abstract.array
 
     Oro\Bundle\ConfigBundle\Config\ConfigManager:
         alias: oro_config.manager

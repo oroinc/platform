@@ -66,8 +66,8 @@ class EnabledLocalizationsGridListenerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
-                [],
-                null,
+                false,
+                false,
                 null
             )
             ->willReturn($enabledLocalizationIds);
