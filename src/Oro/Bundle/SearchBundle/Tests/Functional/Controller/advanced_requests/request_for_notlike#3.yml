@@ -1,6 +1,6 @@
-# checking case sensitivity: search by all strings NOT LIKE "%TEM%" so it shouldn't find a single record
+# checking case sensitivity: search by all strings NOT LIKE "%ITEM%" so it shouldn't find a single record
 request:
-    query: "from oro_test_item where stringValue notlike TEM order_by stringValue desc"
+    query: "from oro_test_item where stringValue notlike ITEM order_by stringValue desc"
 response:
     records_count: 0
     count: 0
