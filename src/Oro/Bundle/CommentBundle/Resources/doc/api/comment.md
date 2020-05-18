@@ -67,6 +67,8 @@ Example:
 
 Edit a specific comment record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
@@ -232,15 +234,15 @@ Example:
 
 #### get_subresource
 
-Retrieve a record that the comment was made on.
+Retrieve an entity record that the comment was made on.
 
 #### get_relationship
 
-Retrieve the ID of a record that the comment was made on.
+Retrieve the ID of an entity record that the comment was made on.
 
 #### update_relationship
 
-Replace a record that the comment was made on.
+Replace an entity record that the comment was made on.
 
 {@request:json_api}
 Example:
