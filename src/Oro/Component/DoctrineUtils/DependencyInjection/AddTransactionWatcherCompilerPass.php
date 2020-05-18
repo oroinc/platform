@@ -244,6 +244,8 @@ class $proxyClass extends $connectionClass implements $transactionWatcherAwareIn
 {
     private \$transactionWatcher;
 
+    private \$originalTransactionWatcherException;
+
     public function setTransactionWatcher($transactionWatcherInterface \$transactionWatcher = null)
     {
         \$this->transactionWatcher = \$transactionWatcher;
@@ -263,11 +265,26 @@ class $proxyClass extends $connectionClass implements $transactionWatcherAwareIn
         // the nesting level equal to $endNestingLevelInComments means that the root transaction is committed,
         // for nested transactions the nesting level will be greater that $endNestingLevelInComments
         if (null !== \$this->transactionWatcher && \$this->getTransactionNestingLevel() === $endNestingLevel) {
-            \$this->transactionWatcher->onTransactionCommitted();
+            try {
+                \$this->transactionWatcher->onTransactionCommitted();
+            } catch (\Throwable \$exception) {
+                // to avoid silent exception in case if error was occurred in transaction
+                // original exception was saved and throw before `rollback` method called
+                // @see \Doctrine\DBAL\Connection::transactional
+                \$this->originalTransactionWatcherException = \$exception;
+                throw \$exception;
+            }
         }
     }
     public function rollBack()
     {
+        // throw original exception that catched in `commit` method
+        if (!\$this->isTransactionActive() && \$this->originalTransactionWatcherException) {
+            \$exception = \$this->originalTransactionWatcherException;
+            \$this->originalTransactionWatcherException = null;
+            throw \$exception;
+        }
+
         parent::rollBack();
         // the nesting level equal to $endNestingLevelInComments means that the root transaction is rolled back,
         // for nested transactions the nesting level will be greater that $endNestingLevelInComments
