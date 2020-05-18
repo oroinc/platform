@@ -1,6 +1,5 @@
 # tests searching entity which have configured field without `target_fields` parameter
 request:
-    supported_engines: [orm]
     search: 'watt'
     offset: ~
     max_results: ~

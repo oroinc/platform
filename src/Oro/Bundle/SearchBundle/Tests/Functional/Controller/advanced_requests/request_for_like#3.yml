@@ -1,6 +1,6 @@
-# checking case sensitivity: search by all strings LIKE "%TEM%" so it should find all records with "itemX@mail.com"
+# checking case sensitivity: search by all strings LIKE "%ITEM%" so it should find all records with "itemX@mail.com"
 request:
-    query: "from oro_test_item where stringValue like TEM order_by stringValue desc"
+    query: "from oro_test_item where stringValue like ITEM order_by stringValue desc"
 response:
     records_count: 9
     count: 9

@@ -1,6 +1,6 @@
-# search by all strings LIKE "%tem%" so it should find all records with "itemX@mail.com"
+# search by all strings LIKE "%item%" so it should find all records with "itemX@mail.com"
 request:
-    query: "from oro_test_item where stringValue like tem order_by stringValue desc"
+    query: "from oro_test_item where stringValue like item order_by stringValue desc"
 response:
     records_count: 9
     count: 9
