@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
@@ -286,7 +287,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->willThrowException(new \Exception('cannot normalize entity type'));
+            ->willThrowException(new EntityAliasNotFoundException('cannot normalize entity type'));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
@@ -307,7 +308,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertEquals(
             [
                 Error::createValidationError('entity type constraint')
-                    ->setInnerException(new \Exception('cannot normalize entity type'))
+                    ->setInnerException(new EntityAliasNotFoundException('cannot normalize entity type'))
                     ->setSource(ErrorSource::createByPointer('/data/type'))
             ],
             $this->context->getErrors()
@@ -364,7 +365,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willThrowException(new \Exception('cannot normalize entity type'));
+            ->willThrowException(new EntityAliasNotFoundException('cannot normalize entity type'));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
@@ -398,10 +399,10 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertEquals(
             [
                 Error::createValidationError('entity type constraint')
-                    ->setInnerException(new \Exception('cannot normalize entity type'))
+                    ->setInnerException(new EntityAliasNotFoundException('cannot normalize entity type'))
                     ->setSource(ErrorSource::createByPointer('/data/0/type')),
                 Error::createValidationError('entity type constraint')
-                    ->setInnerException(new \Exception('cannot normalize entity type'))
+                    ->setInnerException(new EntityAliasNotFoundException('cannot normalize entity type'))
                     ->setSource(ErrorSource::createByPointer('/data/1/type'))
             ],
             $this->context->getErrors()

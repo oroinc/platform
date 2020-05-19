@@ -108,8 +108,8 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('products')
-            ->willReturn(Product::class);
+            ->with('test')
+            ->willReturn('Test\Entity');
 
         $this->context->setClassName(Product::class);
         $this->context->setMetadata($metadata);
