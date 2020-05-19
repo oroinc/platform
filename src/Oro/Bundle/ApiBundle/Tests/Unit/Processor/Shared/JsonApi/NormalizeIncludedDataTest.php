@@ -22,6 +22,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
@@ -462,7 +463,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->willThrowException(new EntityAliasNotFoundException('testType'));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
