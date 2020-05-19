@@ -19,7 +19,7 @@ use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-abstract class AbstractImportExportTest extends WebTestCase
+abstract class AbstractImportExportTestCase extends WebTestCase
 {
     use MessageQueueExtension;
 
