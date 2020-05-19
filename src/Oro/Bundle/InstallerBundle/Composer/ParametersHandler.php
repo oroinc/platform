@@ -78,7 +78,7 @@ DOC;
         $parametersFile = $options['incenteev-parameters']['file'] ?? 'config/parameters.yml';
 
         if (is_file($parametersFile) && is_writable($parametersFile)) {
-            $parameters = Yaml::parseFile($parametersFile);
+            $parameters = Yaml::parse(file_get_contents($parametersFile));
             $arguments = $event->getArguments();
             if (empty($arguments)) {
                 $event->getIO()->write(self::DOCUMENTATION);
