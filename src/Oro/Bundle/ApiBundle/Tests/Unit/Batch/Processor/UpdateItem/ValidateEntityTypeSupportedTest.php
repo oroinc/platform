@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\ValidateEntityTypeSupported;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
 {
@@ -83,7 +84,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('Test\AnotherEntity', DataType::ENTITY_TYPE, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->willThrowException(new EntityAliasNotFoundException('Test\AnotherEntity'));
 
         $this->context->setClassName('Test\AnotherEntity');
         $this->context->setSupportedEntityClasses(['Test\Entity']);

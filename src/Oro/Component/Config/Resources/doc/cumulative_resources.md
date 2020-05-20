@@ -53,10 +53,8 @@ The `Cumulative Resources` routine need to be initialized before you can use it.
 
 namespace Oro\Bundle\DistributionBundle;
 
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Config\ConfigCache;
-
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\HttpKernel\Kernel;
 
 abstract class OroKernel extends Kernel
 {
@@ -65,7 +63,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles       = [];
+        $bundles = [];
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -86,7 +84,7 @@ abstract class OroKernel extends Kernel
 Resource Loaders
 ----------------
 
-As well as `Symfony Config Component` the `Oro Config Component` uses own loader for each type of the resource. Currently the following loaders are implempented:
+As well as `Symfony Config Component` the `Oro Config Component` uses own loader for each type of the resource. Currently the following loaders are implemented:
 
  - [YAML file loader](../../Loader/YamlCumulativeFileLoader.php) - responsible to load YAML files. Do not provide any normalization or validation of loaded data.
  - ["Foldering" file loader](../../Loader/FolderingCumulativeFileLoader.php) - provides a way to load a configuration file located in a folder conforms some pattern.

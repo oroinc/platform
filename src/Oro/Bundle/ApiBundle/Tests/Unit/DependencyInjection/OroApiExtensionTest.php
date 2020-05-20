@@ -137,9 +137,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceExists($container, 'oro_api.config_bag_registry');
         if ($devMode) {
             self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
+            self::assertEquals(
+                [['addDependency', [new Reference('oro_entity.entity_configuration.provider')]]],
+                $container->getDefinition('oro_api.config_cache_factory')->getMethodCalls()
+            );
             self::assertServiceExists($container, 'oro_api.config_cache_state.default');
         } else {
             self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
+            self::assertSame(
+                [],
+                $container->getDefinition('oro_api.config_cache_factory')->getMethodCalls()
+            );
             self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
         }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
