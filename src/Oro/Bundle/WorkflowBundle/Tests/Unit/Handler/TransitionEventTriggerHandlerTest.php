@@ -40,7 +40,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionEventTrigger */
     private $trigger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 

@@ -20,7 +20,7 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()->getMock();

@@ -44,7 +44,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -123,7 +123,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formType);
         unset($this->managerRegistry);

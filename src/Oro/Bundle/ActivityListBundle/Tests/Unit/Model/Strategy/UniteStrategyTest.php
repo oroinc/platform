@@ -27,7 +27,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $activityListManager = 'Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager';
         $this->activityListManager = $this->getMockBuilder($activityListManager)

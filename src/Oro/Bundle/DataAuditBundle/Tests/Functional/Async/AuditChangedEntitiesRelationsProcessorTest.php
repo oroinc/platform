@@ -19,7 +19,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -28,7 +28,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
     {
         /** @var AuditChangedEntitiesRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        
+
         $this->assertInstanceOf(AuditChangedEntitiesRelationsProcessor::class, $processor);
     }
 
@@ -95,7 +95,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
     {
         $message = new Message();
         $message->setBody(json_encode($body));
-        
+
         return $message;
     }
 

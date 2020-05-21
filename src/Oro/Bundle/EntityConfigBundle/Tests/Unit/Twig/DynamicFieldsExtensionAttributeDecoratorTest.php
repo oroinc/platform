@@ -26,7 +26,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
     /** @var DynamicFieldsExtensionAttributeDecorator */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->baseExtension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
             ->disableOriginalConstructor()

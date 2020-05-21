@@ -26,7 +26,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $htmlTagHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

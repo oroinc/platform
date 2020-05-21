@@ -15,7 +15,7 @@ class OrganizationTest extends \PHPUnit\Framework\TestCase
     /** @var Organization */
     protected $organization;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->organization = new Organization();
     }

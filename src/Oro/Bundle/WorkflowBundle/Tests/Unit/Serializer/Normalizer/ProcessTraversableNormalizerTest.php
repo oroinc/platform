@@ -17,7 +17,7 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer')
             ->disableOriginalConstructor()

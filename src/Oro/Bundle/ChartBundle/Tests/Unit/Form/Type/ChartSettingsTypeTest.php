@@ -19,7 +19,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
      */
     protected $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this
             ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')

@@ -17,7 +17,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
     /** @var TreeListener|\PHPUnit\Framework\MockObject\MockObject */
     private $treeListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->treeListener = $this->createMock(TreeListener::class);

@@ -79,7 +79,7 @@ class FieldTypeTest extends TypeTestCase
     /** @var array */
     protected $expectedChoicesView;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
 

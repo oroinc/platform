@@ -17,7 +17,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
@@ -57,39 +57,35 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $this->registry->getType($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
-     */
     public function testGetTypeWithNullName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
+
         $this->registry->getType(null);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a block type "".
-     */
     public function testGetTypeWithEmptyName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load a block type "".');
+
         $this->registry->getType('');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testGetTypeWithNotStringName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $this->registry->getType(1);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a block type "widget".
-     */
     public function testGetUndefinedType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load a block type "widget".');
+
         $this->extension->expects($this->once())
             ->method('hasType')
             ->with('widget')
@@ -154,12 +150,11 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
-     */
     public function testFindDataProviderWithNullName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
+
         $this->registry->findDataProvider(null);
     }
 
@@ -168,12 +163,11 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->findDataProvider(''));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testFindDataProviderWithNotStringName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $this->registry->findDataProvider(1);
     }
 

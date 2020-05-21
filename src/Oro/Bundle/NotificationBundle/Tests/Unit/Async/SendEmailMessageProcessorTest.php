@@ -286,11 +286,9 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->process($message, $this->createSessionMock());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testShouldThrowExceptionIfTemplateNotFound()
     {
+        $this->expectException(\RuntimeException::class);
         $repository = $this->createMock(EmailTemplateRepository::class);
         $repository
             ->expects($this->once())

@@ -10,12 +10,12 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->container);
@@ -64,12 +64,13 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($transformer, $configBag->getDataTransformer('test_key'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\ConfigBundle\Config\DataTransformerInterface"
-     */
     public function testGetDataTransformerWithUnexpectedType()
     {
+        $this->expectException(\Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\ConfigBundle\Config\DataTransformerInterface"'
+        );
+
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')

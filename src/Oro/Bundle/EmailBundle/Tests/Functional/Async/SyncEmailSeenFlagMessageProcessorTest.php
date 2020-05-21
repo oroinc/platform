@@ -24,7 +24,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,7 +71,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setBody(json_encode($messageData));
-        
+
         $this->assertEquals(SyncEmailSeenFlagMessageProcessor::ACK, $processor->process($message, $session));
     }
 

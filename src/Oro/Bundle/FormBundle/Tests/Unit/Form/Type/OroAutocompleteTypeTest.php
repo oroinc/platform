@@ -26,13 +26,13 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
      */
     protected $searchHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new OroAutocompleteType($this->getMockSearchRegistry());
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

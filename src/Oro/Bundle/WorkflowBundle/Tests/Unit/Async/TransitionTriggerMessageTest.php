@@ -34,7 +34,7 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateFromJsonException($json, $expectedMessage)
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         TransitionTriggerMessage::createFromJson($json);

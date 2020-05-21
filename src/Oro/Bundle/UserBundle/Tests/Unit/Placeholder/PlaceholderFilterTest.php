@@ -14,14 +14,14 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->placeholderFilter = new PlaceholderFilter($this->tokenAccessor);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->placeholderFilter, $this->tokenAccessor);
     }

@@ -21,10 +21,10 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(900, $result['npm_install_timeout']);
 
         $this->assertArrayHasKey('nodejs_path', $result);
-        $this->assertInternalType('string', $result['nodejs_path']);
+        $this->assertIsString($result['nodejs_path']);
 
         $this->assertArrayHasKey('npm_path', $result);
-        $this->assertInternalType('string', $result['npm_path']);
+        $this->assertIsString($result['npm_path']);
     }
 
     /**

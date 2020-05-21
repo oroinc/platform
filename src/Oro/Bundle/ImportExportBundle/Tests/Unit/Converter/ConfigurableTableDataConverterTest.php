@@ -236,7 +236,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $fieldProvider = $this->createMock(EntityFieldProvider::class);
@@ -261,12 +261,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Entity class for data converter is not specified
-     */
     public function testAssertEntityName()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Entity class for data converter is not specified');
+
         $this->converter->convertToExportFormat([]);
     }
 

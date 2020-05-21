@@ -22,7 +22,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinitionScopeListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowScopeManager = $this->getMockBuilder(WorkflowScopeManager::class)
             ->disableOriginalConstructor()
@@ -31,7 +31,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowDefinitionScopeListener($this->workflowScopeManager);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listener, $this->workflowScopeManager);
     }

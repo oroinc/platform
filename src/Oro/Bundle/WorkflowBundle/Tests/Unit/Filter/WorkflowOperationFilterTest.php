@@ -20,7 +20,7 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowOperationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
             ->disableOriginalConstructor()

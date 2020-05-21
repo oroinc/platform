@@ -16,7 +16,7 @@ class InitializeConfigExtrasTest extends GetSubresourceProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

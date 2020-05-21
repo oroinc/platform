@@ -29,7 +29,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
@@ -45,7 +45,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->managerRegistry,

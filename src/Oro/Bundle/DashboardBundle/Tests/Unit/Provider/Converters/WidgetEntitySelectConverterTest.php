@@ -14,7 +14,7 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
     /** @var  WidgetEntitySelectConverter */
     protected $converter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()

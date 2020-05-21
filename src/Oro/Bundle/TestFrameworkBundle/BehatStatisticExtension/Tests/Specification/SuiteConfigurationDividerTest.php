@@ -38,7 +38,7 @@ class SuiteConfigurationDividerTest extends \PHPUnit\Framework\TestCase
         );
         $actualResult = $divider->divide('SetStub', $this->generateConfigs($suites), $maxSeconds);
 
-        $this->assertInternalType('array', $actualResult);
+        $this->assertIsArray($actualResult);
         $this->assertCount(count($expectedSets), $actualResult);
 
         foreach ($actualResult as $setName => $suiteConfigs) {

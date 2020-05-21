@@ -11,6 +11,7 @@ class GridTest extends \PHPUnit\Framework\TestCase
     public function shouldBeConstructedWithTwoArguments()
     {
         new Grid(3, [':', '$']);
+        $this->expectNotToPerformAssertions();
     }
 
     /**
@@ -19,6 +20,7 @@ class GridTest extends \PHPUnit\Framework\TestCase
     public function couldBeConstructedWithoutSecondArgument()
     {
         new Grid(3);
+        $this->expectNotToPerformAssertions();
     }
 
     /**
@@ -26,9 +28,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldBeDefaultDelimiter()
     {
-        $grid = new Grid(2);
+        $row = ['1', '2', '3', '4', '5', '6'];
+        $grid = new Grid(\count($row));
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals(':', 'defaultDelimiter', $grid);
+        static::assertEquals('1 : 2 : 3 : 4 : 5 : 6', $grid->render());
     }
 
     /**
@@ -36,9 +40,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldSetDelimitersFromDefaultDelimiter()
     {
-        $grid = new Grid(6);
+        $row = ['1', '2', '3', '4', '5', '6'];
+        $grid = new Grid(\count($row));
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals([':', ':', ':', ':', ':'], 'delimiters', $grid);
+        static::assertEquals('1 : 2 : 3 : 4 : 5 : 6', $grid->render());
     }
 
     /**
@@ -46,9 +52,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function sizeOfDelimitersShouldBeOneLessThenColumnCount()
     {
-        $grid = new Grid(6);
+        $row = ['1', '2', '3', '4', '5', '6'];
+        $grid = new Grid(\count($row));
+        $grid->addRow($row);
 
-        $this->assertAttributeCount(5, 'delimiters', $grid);
+        static::assertEquals('1 : 2 : 3 : 4 : 5 : 6', $grid->render());
     }
 
     /**
@@ -56,9 +64,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldPadDelimitersFromDefaultDelimiter()
     {
-        $grid = new Grid(6, [';', ';', ';']);
+        $row = ['1', '2', '3', '4', '5', '6'];
+        $grid = new Grid(\count($row), [';', ';', ';']);
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals([';', ';', ';', ':', ':'], 'delimiters', $grid);
+        static::assertEquals('1 ; 2 ; 3 ; 4 : 5 : 6', $grid->render());
     }
 
     /**
@@ -66,9 +76,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldSliceRedundantDelimiters()
     {
-        $grid = new Grid(4, [';', ';', ';', ';']);
+        $row = ['1', '2', '3', '4'];
+        $grid = new Grid(\count($row), [';', ';', ';', ';']);
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals([';', ';', ';'], 'delimiters', $grid);
+        static::assertEquals('1 ; 2 ; 3 ; 4', $grid->render());
     }
 
     /**
@@ -77,10 +89,10 @@ class GridTest extends \PHPUnit\Framework\TestCase
     public function shouldAddRow()
     {
         $grid = new Grid(2);
-        $this->assertAttributeCount(0, 'rows', $grid);
+        static::assertEquals('', $grid->render());
 
         $grid->addRow([1, 2]);
-        $this->assertAttributeCount(1, 'rows', $grid);
+        static::assertEquals('1 : 2', $grid->render());
     }
 
     /**
@@ -88,10 +100,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldSliceRedundantCellsOnAddRow()
     {
+        $row = ['1', '2', '3', '4', '5', '6'];
         $grid = new Grid(3);
-        $grid->addRow(['1', '2', '3', '4', '5']);
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals([['1', '2', '3']], 'rows', $grid);
+        static::assertEquals('1 : 2 : 3', $grid->render());
     }
 
     /**
@@ -99,10 +112,11 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldPadRowWithEmptyCellsOnAddRow()
     {
+        $row = ['1', '2'];
         $grid = new Grid(4);
-        $grid->addRow(['1', '2']);
+        $grid->addRow($row);
 
-        $this->assertAttributeEquals([['1', '2', '', '']], 'rows', $grid);
+        static::assertEquals('1 : 2 :  : ', $grid->render());
     }
 
     /**
@@ -110,11 +124,10 @@ class GridTest extends \PHPUnit\Framework\TestCase
      */
     public function shouldWrapDelimiterWithSpacesOnRender()
     {
-        $expectedResult = '1 : 2 : 3';
         $grid = new Grid(3);
         $grid->addRow(['1', '2', '3']);
 
-        $this->assertEquals($expectedResult, $grid->render());
+        static::assertEquals('1 : 2 : 3', $grid->render());
     }
 
     /**
@@ -135,7 +148,7 @@ GRID;
         $grid->addRow(['1', '2', '3']);
         $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
         $result = $grid->render();
-        $this->assertEquals($expected, $result);
+        static::assertEquals($expected, $result);
     }
 
     /**
@@ -156,7 +169,7 @@ GRID;
         $grid->addRow(['1', '2', '3']);
 
         $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
-        $this->assertEquals($expected, $grid->render());
+        static::assertEquals($expected, $grid->render());
     }
 
     /**
@@ -176,7 +189,7 @@ GRID;
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['10', '20', '300']);
         $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
-        $this->assertEquals($expected, $grid->render());
+        static::assertEquals($expected, $grid->render());
     }
 
     /**
@@ -196,6 +209,6 @@ GRID;
         $grid->addRow(['1']);
         $grid->addRow(['10']);
         $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
-        $this->assertEquals($expected, $grid->render());
+        static::assertEquals($expected, $grid->render());
     }
 }

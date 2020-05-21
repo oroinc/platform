@@ -22,7 +22,7 @@ class EntityTypeTest extends FormIntegrationTestCase
 {
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $validator = new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),

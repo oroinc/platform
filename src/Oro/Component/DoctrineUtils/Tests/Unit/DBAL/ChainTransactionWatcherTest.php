@@ -19,7 +19,7 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->watcher1 = $this->createMock(TransactionWatcherInterface::class);
         $this->watcher2 = $this->createMock(TransactionWatcherInterface::class);

@@ -23,7 +23,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(Cache::class);
         $this->em = $this->createMock(EntityManagerInterface::class);

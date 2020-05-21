@@ -8,11 +8,9 @@ use Oro\Bundle\ImapBundle\Connector\ImapServicesFactory;
 
 class ImapServicesFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException Oro\Bundle\ImapBundle\Connector\Exception\InvalidConfigurationException
-     */
     public function testMissingDefaultServices()
     {
+        $this->expectException(\Oro\Bundle\ImapBundle\Connector\Exception\InvalidConfigurationException::class);
         new ImapServicesFactory(array('TEST' => array('StorageClass', 'SearchStringManagerClass')));
     }
 

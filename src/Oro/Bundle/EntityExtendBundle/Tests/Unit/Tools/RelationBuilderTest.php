@@ -19,7 +19,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var RelationBuilder */
     protected $builder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
         $this->builder       = new RelationBuilder($this->configManager);

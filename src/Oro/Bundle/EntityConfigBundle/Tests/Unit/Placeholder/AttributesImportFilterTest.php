@@ -41,7 +41,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
      */
     protected $attributesImportFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $this->topicSender = $this->createMock(AttributesImportTopicSender::class);

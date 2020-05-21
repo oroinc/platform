@@ -14,12 +14,12 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ConstraintAsOptionExtension(new ConstraintFactory());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->extension);
     }

@@ -84,7 +84,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mappingProvider = $this->createMock(SearchMappingProvider::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

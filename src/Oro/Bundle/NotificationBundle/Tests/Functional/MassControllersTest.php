@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class MassControllersTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             array(),
@@ -35,6 +35,6 @@ class MassControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains($notification->getBody(), $result->getContent());
+        static::assertStringContainsString($notification->getBody(), $result->getContent());
     }
 }

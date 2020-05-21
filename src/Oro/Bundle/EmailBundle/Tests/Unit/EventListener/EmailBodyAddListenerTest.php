@@ -38,7 +38,7 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();

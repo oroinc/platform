@@ -23,7 +23,7 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $iterableResultFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->iterableResultFactory = new IterableResultFactory($this->aclHelper);

@@ -33,7 +33,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var ReportQueryExecutor */
     private $reportQueryExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->baseQueryExecutor = $this->createMock(QueryExecutorInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -12,12 +12,11 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $metadata->get('code', true));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "code" not exists
-     */
     public function testGetNonExistingStrict()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "code" not exists');
+
         $metadata = new Metadata();
         $this->assertEquals('value', $metadata->get('code', true));
     }

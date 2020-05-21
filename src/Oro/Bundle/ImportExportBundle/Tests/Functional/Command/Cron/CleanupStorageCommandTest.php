@@ -16,7 +16,7 @@ class CleanupStorageCommandTest extends WebTestCase
      */
     private $fileManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->initClient();

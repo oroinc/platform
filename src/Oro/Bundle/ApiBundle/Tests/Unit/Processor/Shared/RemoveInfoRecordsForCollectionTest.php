@@ -16,7 +16,7 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
     /** @var RemoveInfoRecordsForCollection */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -22,7 +22,7 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var UniqueEnumNameValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

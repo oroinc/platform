@@ -24,7 +24,7 @@ class VerbosityFilterHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
         $this->output = $this->createMock(OutputInterface::class);

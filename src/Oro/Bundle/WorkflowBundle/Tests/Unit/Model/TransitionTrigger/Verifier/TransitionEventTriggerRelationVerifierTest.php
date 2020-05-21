@@ -15,7 +15,7 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\Test
      */
     private $verifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new TransitionEventTriggerRelationVerifier();
     }

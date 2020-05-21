@@ -23,7 +23,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
     /**
      * @dbIsolationPerTest
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

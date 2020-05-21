@@ -16,7 +16,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $doctrineHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
             ->disableOriginalConstructor()

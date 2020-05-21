@@ -17,7 +17,7 @@ class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->callable = $this->getMockBuilder('stdClass')
             ->setMethods(['virtualMethod'])

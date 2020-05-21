@@ -29,7 +29,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

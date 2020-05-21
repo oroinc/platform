@@ -17,7 +17,7 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->manager   = new OroEventManager($this->container);

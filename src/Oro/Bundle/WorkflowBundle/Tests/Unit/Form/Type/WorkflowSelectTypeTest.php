@@ -29,7 +29,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
@@ -39,7 +39,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

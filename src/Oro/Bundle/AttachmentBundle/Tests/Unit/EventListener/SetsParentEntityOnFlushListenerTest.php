@@ -34,7 +34,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
         $this->configManager = $this->createMock(ConfigManager::class);

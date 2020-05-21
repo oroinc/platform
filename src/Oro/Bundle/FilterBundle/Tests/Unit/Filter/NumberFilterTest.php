@@ -48,7 +48,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->filterUtility = $this->createMock(FilterUtility::class);

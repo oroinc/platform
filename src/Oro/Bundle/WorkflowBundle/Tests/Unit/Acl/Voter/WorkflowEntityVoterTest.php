@@ -36,7 +36,7 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowPermissionRegistry */
     private $permissionRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

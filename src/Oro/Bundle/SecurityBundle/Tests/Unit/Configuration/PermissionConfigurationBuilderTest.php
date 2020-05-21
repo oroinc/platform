@@ -35,7 +35,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository $repository */
         $repository = $this->createMock(EntityRepository::class);
@@ -61,7 +61,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator, $this->entityManager);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->builder, $this->validator);
     }

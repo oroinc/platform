@@ -14,7 +14,7 @@ class PackageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalRepositoryFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory')
             ->disableOriginalConstructor()

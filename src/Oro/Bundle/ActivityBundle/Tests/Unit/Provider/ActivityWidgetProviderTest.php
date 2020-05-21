@@ -29,7 +29,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityWidgetProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->activityManager = $this->createMock(ActivityManager::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -102,7 +102,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $widgets = $this->provider->getWidgets($entity);
 
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(3, $widgets);
     }
 
@@ -142,7 +142,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $widgets = $this->provider->getWidgets($entity);
 
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
     }
 
@@ -182,7 +182,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
         $widgets = $this->provider->getWidgets($entity);
 
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(0, $widgets);
     }
 
@@ -225,7 +225,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
         $this->assertEquals('theFooUrl', $widgets[0]['url']);
@@ -267,7 +267,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
         $this->assertEquals('theFooLabelTranslated', $widgets[0]['label']);
@@ -300,7 +300,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
         $this->assertEquals('block', $widgets[0]['widgetType']);
@@ -334,7 +334,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
         $this->assertFalse(isset($widgets[0]['priority']));
@@ -369,7 +369,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
-        $this->assertInternalType('array', $widgets);
+        $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
         $this->assertEquals('thefooclassname_6a3e4d5a_theFooAssociationName', $widgets[0]['alias']);

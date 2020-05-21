@@ -13,7 +13,7 @@ class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodyHelper */
     protected $bodyHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $htmlTagProvider = $this->getMockBuilder('Oro\Bundle\FormBundle\Provider\HtmlTagProvider')
             ->disableOriginalConstructor()

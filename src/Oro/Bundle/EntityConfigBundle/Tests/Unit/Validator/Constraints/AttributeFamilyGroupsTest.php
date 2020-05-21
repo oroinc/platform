@@ -11,17 +11,17 @@ class AttributeFamilyGroupsTest extends \PHPUnit\Framework\TestCase
      * @var AttributeFamilyGroups
      */
     protected $constraint;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->constraint = new AttributeFamilyGroups();
     }
-    
+
     public function testGetTargets()
     {
         $this->assertEquals('class', $this->constraint->getTargets());
     }
-    
+
     public function testValidatedBy()
     {
         $this->assertEquals(AttributeFamilyGroupsValidator::ALIAS, $this->constraint->validatedBy());

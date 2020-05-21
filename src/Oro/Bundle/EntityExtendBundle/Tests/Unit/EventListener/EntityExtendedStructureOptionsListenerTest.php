@@ -26,7 +26,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->listener = new EntityExtendedStructureOptionsListener($this->doctrineHelper);

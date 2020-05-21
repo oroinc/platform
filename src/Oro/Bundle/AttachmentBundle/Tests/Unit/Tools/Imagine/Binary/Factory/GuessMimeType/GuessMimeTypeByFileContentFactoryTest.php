@@ -27,7 +27,7 @@ class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mimeTypeGuesser = $this->createMock(MimeTypeGuesserInterface::class);
         $this->extensionGuesser = $this->createMock(ExtensionGuesserInterface::class);

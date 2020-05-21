@@ -4,6 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\Action\Action\FormatString;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -14,38 +15,33 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     const ATTRIBUTE_PATH = 'attribute';
     const ARGUMENTS_PATH = 'arguments';
 
-    /**
-     * @var FormatString
-     */
+    /** @var FormatString */
     protected $action;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $testString = 'some "%param1%" test "%param2%" string';
 
-    /**
-     * @var array
-     */
-    protected $testArguments = array('param1' => 'first', 'param2' => 'second');
+    /** @var array */
+    protected $testArguments = ['param1' => 'first', 'param2' => 'second'];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $expectedString = 'some "first" test "second" string';
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->action = new FormatString(new ContextAccessor());
+        $this->action = new class(new ContextAccessor()) extends FormatString {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }
@@ -57,49 +53,47 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            'only string' => array(
-                'options' => array(
+        return [
+            'only string' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => 'some test string'
-                ),
+                ],
                 'expected' => 'some test string',
-            ),
-            'array arguments' => array(
-                'options' => array(
+            ],
+            'array arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => $this->testArguments,
-                ),
+                ],
                 'expected' => $this->expectedString,
-            ),
-            'property path array arguments' => array(
-                'options' => array(
+            ],
+            'property path array arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-                ),
+                ],
                 'expected' => $this->expectedString,
                 'arguments' => $this->testArguments,
-            ),
-            'property path collection arguments' => array(
-                'options' => array(
+            ],
+            'property path collection arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-                ),
+                ],
                 'expected' => $this->expectedString,
                 'arguments' => new ArrayCollection($this->testArguments),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -115,41 +109,38 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no attribute' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no attribute' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute name parameter is required',
-            ),
-            'incorrect attribute' => array(
-                'options' => array(
+            ],
+            'incorrect attribute' => [
+                'options' => [
                     'attribute' => 'string'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute must be valid property definition',
-            ),
-            'no string' => array(
-                'options' => array(
+            ],
+            'no string' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'String parameter must be specified',
-            ),
-            'incorrect arguments' => array(
-                'options' => array(
+            ],
+            'incorrect arguments' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
                     'string' => $this->testString,
                     'arguments' => 'not array',
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Argument parameter must be either array or PropertyPath',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -170,20 +161,19 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $attributePath = self::ATTRIBUTE_PATH;
-        $this->assertEquals($expected, $context->$attributePath);
+        static::assertEquals($expected, $context->$attributePath);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Argument parameter must be traversable
-     */
     public function testNotTraversableArguments()
     {
-        $options = array(
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Argument parameter must be traversable');
+
+        $options = [
             'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
             'string' => $this->testString,
             'arguments' => new PropertyPath(self::ARGUMENTS_PATH),
-        );
+        ];
 
         $context = new ItemStub();
         $argumentsPath = self::ARGUMENTS_PATH;

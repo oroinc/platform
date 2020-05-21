@@ -11,7 +11,7 @@ class ObfuscatedEmailTraitTest extends \PHPUnit\Framework\TestCase
      */
     private $obfuscatedEmailStub;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->obfuscatedEmailStub = new ObfuscatedEmailStub();
     }

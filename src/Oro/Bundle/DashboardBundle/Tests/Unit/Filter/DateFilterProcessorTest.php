@@ -25,7 +25,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateFilter = $this->createMock(DateRangeFilter::class);
         $this->modifier = $this->createMock(DateFilterModifier::class);

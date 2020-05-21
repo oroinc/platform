@@ -11,7 +11,7 @@ class MassNotificationTest extends \PHPUnit\Framework\TestCase
      */
     protected $massNotification;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->massNotification = new MassNotification();
 
@@ -19,11 +19,11 @@ class MassNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->massNotification->getId());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->massNotification);
     }
-    
+
     /**
      * @dataProvider getSetDataProvider
      */

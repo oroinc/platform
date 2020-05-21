@@ -27,7 +27,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileUrlByUuidProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
         $this->cache = $this->createMock(CacheProvider::class);
@@ -76,11 +76,9 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException
-     */
     public function testGetFileUrlFileNotFound(): void
     {
+        $this->expectException(\Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException::class);
         $file = $this->createFile();
 
         $this->assertLoadNotExistFile($file);
@@ -126,11 +124,9 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException
-     */
     public function testGetResizedImageUrlFileNotFound(): void
     {
+        $this->expectException(\Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException::class);
         $file = $this->createFile();
 
         $this->assertLoadNotExistFile($file);
@@ -177,11 +173,9 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException
-     */
     public function testGetFilteredImageUrlFileNotFound(): void
     {
+        $this->expectException(\Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException::class);
         $file = $this->createFile();
 
         $this->assertLoadNotExistFile($file);

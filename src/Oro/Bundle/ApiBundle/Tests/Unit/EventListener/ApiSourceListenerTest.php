@@ -14,7 +14,7 @@ class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ApiSourceListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheManager = $this->createMock(CacheManager::class);
 

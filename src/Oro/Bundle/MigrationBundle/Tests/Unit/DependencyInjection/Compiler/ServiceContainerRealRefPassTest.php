@@ -18,7 +18,7 @@ class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceContainerRealRefPass */
     private $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
 

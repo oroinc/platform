@@ -18,14 +18,14 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
     use DbalSchemaExtensionTrait;
     use TempDirExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
         $this->ensureTableExists('message_queue');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dropTable('message_queue');
     }

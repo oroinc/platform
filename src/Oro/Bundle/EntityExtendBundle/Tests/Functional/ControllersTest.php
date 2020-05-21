@@ -59,7 +59,7 @@ class ControllersTest extends AbstractConfigControllerTest
         $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Entity saved", $crawler->html());
+        static::assertStringContainsString("Entity saved", $crawler->html());
         preg_match('/\/view\/(\d+)/', $this->client->getHistory()->current()->getUri(), $matches);
         $this->assertCount(2, $matches);
         return $matches[1];
@@ -85,7 +85,7 @@ class ControllersTest extends AbstractConfigControllerTest
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Entity saved", $crawler->html());
+        static::assertStringContainsString("Entity saved", $crawler->html());
 
         return $id;
     }
@@ -101,7 +101,7 @@ class ControllersTest extends AbstractConfigControllerTest
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('test entity label updated', $result->getContent());
+        static::assertStringContainsString('test entity label updated', $result->getContent());
 
         return $id;
     }
@@ -130,7 +130,7 @@ class ControllersTest extends AbstractConfigControllerTest
             $this->client->submit($form);
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
-            $this->assertContains('Field saved', $result->getContent());
+            static::assertStringContainsString('Field saved', $result->getContent());
         }
     }
 
@@ -158,7 +158,7 @@ class ControllersTest extends AbstractConfigControllerTest
             $this->client->submit($form);
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
-            $this->assertContains('Field saved', $result->getContent());
+            static::assertStringContainsString('Field saved', $result->getContent());
             $this->assertEntityTranslations($translationKeys);
         }
     }
@@ -205,7 +205,7 @@ class ControllersTest extends AbstractConfigControllerTest
             $result = $this->client->getResponse();
 
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
-            $this->assertContains('Field saved', $result->getContent());
+            static::assertStringContainsString('Field saved', $result->getContent());
 
             $isBidirectional = $this->getEntityConfigManager()
                 ->getFieldConfig('extend', 'Extend\Entity\testExtendedEntity', $name)
@@ -259,7 +259,7 @@ class ControllersTest extends AbstractConfigControllerTest
 
         return $entityLabels;
     }
-    
+
     /**
      * @depends testView
      * @param integer $id
@@ -287,8 +287,8 @@ class ControllersTest extends AbstractConfigControllerTest
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('Field saved', $content);
-        $this->assertContains($name, $content);
+        static::assertStringContainsString('Field saved', $content);
+        static::assertStringContainsString($name, $content);
     }
 
     /**
@@ -320,7 +320,7 @@ class ControllersTest extends AbstractConfigControllerTest
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains(
+        static::assertStringContainsString(
             'The field can&#039;t be set to &#039;Yes&#039; when target entity isn&#039;t extended.',
             $result->getContent()
         );

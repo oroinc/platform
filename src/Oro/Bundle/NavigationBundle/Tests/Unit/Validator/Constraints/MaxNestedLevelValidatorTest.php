@@ -27,7 +27,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(ExecutionContextInterface::class);
 
@@ -47,7 +47,9 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 2);
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->getMockBuilder(Scope::class)
+            ->addMethods(['getOrganization', 'getUser'])
+            ->getMock();
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -90,7 +92,9 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->getMockBuilder(Scope::class)
+            ->addMethods(['getOrganization', 'getUser'])
+            ->getMock();
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -136,7 +140,9 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
 
         $update = new MenuUpdateStub();
 
-        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->getMockBuilder(Scope::class)
+            ->addMethods(['getOrganization', 'getUser'])
+            ->getMock();
 
         $update->setScope($scope);
         $update->setMenu('menu');

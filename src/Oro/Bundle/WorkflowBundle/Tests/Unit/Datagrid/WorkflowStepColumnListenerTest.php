@@ -77,7 +77,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
@@ -102,31 +102,34 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
         $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
         $this->datagrid = $this->createMock(DatagridInterface::class);
 
-        $this->listener = new WorkflowStepColumnListener(
+        $this->listener = new class(
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->configProvider,
             $this->workflowManagerRegistry,
             $this->filtersStateProvider
-        );
+        ) extends WorkflowStepColumnListener {
+            public function xgetWorkflowStepColumns(): array
+            {
+                return $this->workflowStepColumns;
+            }
+        };
     }
 
     public function testAddWorkflowStepColumn()
     {
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN],
-            'workflowStepColumns',
-            $this->listener
+            $this->listener->xgetWorkflowStepColumns()
         );
 
         $this->listener->addWorkflowStepColumn(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN);
         $this->listener->addWorkflowStepColumn('workflowStep');
         $this->listener->addWorkflowStepColumn('workflowStep');
 
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN, 'workflowStep'],
-            'workflowStepColumns',
-            $this->listener
+            $this->listener->xgetWorkflowStepColumns()
         );
     }
 

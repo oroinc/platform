@@ -17,7 +17,7 @@ class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PasswordFieldOptionsProvider */
     protected $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
             ->disableOriginalConstructor()

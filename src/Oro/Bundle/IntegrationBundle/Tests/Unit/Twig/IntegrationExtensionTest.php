@@ -18,7 +18,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationExtension */
     private $integrationExtension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

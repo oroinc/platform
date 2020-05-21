@@ -2,62 +2,63 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
+use Guzzle\Http\Client;
+use Guzzle\Http\Message\RequestInterface;
+use Guzzle\Http\Message\Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Client|MockObject */
     protected $sourceClient;
 
-    /**
-     * @var GuzzleRestClient
-     */
+    /** @var GuzzleRestClient */
     protected $client;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $baseUrl = 'https://example.com/api';
 
-    /**
-     * @var array
-     */
-    protected $defaultOptions = array('default' => 'value');
+    /** @var array */
+    protected $defaultOptions = ['default' => 'value'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->sourceClient = $this->getMockBuilder('Guzzle\Http\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->sourceClient = $this->getMockBuilder(Client::class)->disableOriginalConstructor()->getMock();
 
-        $this->client = new GuzzleRestClient($this->baseUrl, $this->defaultOptions);
+        $this->client = new class($this->baseUrl, $this->defaultOptions) extends GuzzleRestClient {
+            public function xgetBaseUrl(): string
+            {
+                return $this->baseUrl;
+            }
+
+            public function xgetDefaultOptions(): array
+            {
+                return $this->defaultOptions;
+            }
+        };
         $this->client->setGuzzleClient($this->sourceClient);
     }
 
     public function testConstructor()
     {
-        $this->assertAttributeEquals($this->baseUrl, 'baseUrl', $this->client);
-        $this->assertAttributeEquals($this->defaultOptions, 'defaultOptions', $this->client);
+        static::assertEquals($this->baseUrl, $this->client->xgetBaseUrl());
+        static::assertEquals($this->defaultOptions, $this->client->xgetDefaultOptions());
     }
 
     public function testGetLastResponseWorks()
     {
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($request));
+        $request = $this->createMock(RequestInterface::class);
+        $this->sourceClient->expects(static::once())->method('createRequest')->willReturn($request);
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue($response));
+        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
+        $request->expects(static::once())->method('send')->willReturn($response);
 
         $response = $this->client->get('users');
-        $this->assertEquals($response, $this->client->getLastResponse());
+
+        static::assertEquals($response, $this->client->getLastResponse());
     }
 
     /**
@@ -65,25 +66,19 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testPerformRequestWorks($method, $args, $expected)
     {
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
-        $this->sourceClient->expects($this->once())
+        $request = $this->createMock(RequestInterface::class);
+        $this->sourceClient->expects(static::once())
             ->method('createRequest')
             ->with($expected['method'], $expected['url'], $expected['headers'], $expected['data'], $expected['options'])
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue($response));
+        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
+        $request->expects(static::once())->method('send')->willReturn($response);
 
-        $actual = call_user_func_array(array($this->client, $method), $args);
-        $this->assertInstanceOf(
-            'Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse',
-            $actual
-        );
-        $this->assertEquals($response, $actual->getSourceResponse());
+        $actual = call_user_func_array([$this->client, $method], $args);
+
+        static::assertInstanceOf(GuzzleRestResponse::class, $actual);
+        static::assertEquals($response, $actual->getSourceResponse());
     }
 
     /**
@@ -205,24 +200,18 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
-     * @expectedExceptionMessage Exception message
-     */
     public function testPerformRequestThrowException()
     {
+        $this->expectException(GuzzleRestException::class);
+        $this->expectExceptionMessage('Exception message');
+
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock(RequestInterface::class);
+        $this->sourceClient->expects(static::once())->method('createRequest')->willReturn($request);
 
-        $this->sourceClient->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($request));
-
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->throwException(new \Exception('Exception message')));
+        $request->expects(static::once())->method('send')->willThrowException(new \Exception('Exception message'));
 
         $this->client->performRequest($method, $url);
     }
@@ -240,31 +229,23 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $expectedUrl = $url . '?foo=param';
         $expectedOptions = ['foo' => 'option', 'default' => 'value'];
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock(RequestInterface::class);
 
-        $this->sourceClient->expects($this->once())
+        $this->sourceClient->expects(static::once())
             ->method('createRequest')
             ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue($response));
+        $request->expects(static::once())->method('send')->willReturn($response);
 
-        $response->expects($this->once())
-            ->method('isSuccessful')
-            ->will($this->returnValue(true));
+        $response->expects(static::once())->method('isSuccessful')->willReturn(true);
+        $response->expects(static::once())->method($format)->willReturn($expectedResult);
 
-        $response->expects($this->once())
-            ->method($format)
-            ->will($this->returnValue($expectedResult));
+        $getter = 'get' . \strtoupper($format);
 
-        $getter = 'get' . strtoupper($format);
-        $this->assertEquals($expectedResult, $this->client->$getter($url, $params, $headers, $options));
+        static::assertEquals($expectedResult, $this->client->$getter($url, $params, $headers, $options));
     }
 
     /**
@@ -281,38 +262,23 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $statusCode = 403;
         $reasonPhrase = 'Forbidden';
 
-        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
 
-        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock(RequestInterface::class);
 
-        $this->sourceClient->expects($this->once())
+        $this->sourceClient->expects(static::once())
             ->method('createRequest')
             ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
-        $request->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue($response));
+        $request->expects(static::once())->method('send')->willReturn($response);
+        $request->expects(static::atLeastOnce())->method('getUrl')->willReturn($url);
 
-        $request->expects($this->atLeastOnce())
-            ->method('getUrl')
-            ->will($this->returnValue($url));
+        $response->expects(static::once())->method('isSuccessful')->willReturn(false);
+        $response->expects(static::atLeastOnce())->method('getStatusCode')->willReturn($statusCode);
+        $response->expects(static::atLeastOnce())->method('getReasonPhrase')->willReturn($reasonPhrase);
 
-        $response->expects($this->once())
-            ->method('isSuccessful')
-            ->will($this->returnValue(false));
-
-        $response->expects($this->atLeastOnce())
-            ->method('getStatusCode')
-            ->will($this->returnValue($statusCode));
-
-        $response->expects($this->atLeastOnce())
-            ->method('getReasonPhrase')
-            ->will($this->returnValue($reasonPhrase));
-
-        $this->expectException('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException');
+        $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage(
             "Unsuccessful response" . PHP_EOL .
             "[status code] $statusCode" . PHP_EOL .
@@ -320,7 +286,8 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
             "[url] $url"
         );
 
-        $getter = 'get' . strtoupper($format);
+        $getter = 'get' . \strtoupper($format);
+
         $this->client->$getter($url, $params, $headers, $options);
     }
 

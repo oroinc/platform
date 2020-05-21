@@ -21,7 +21,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = self::createMock(EntityNameResolver::class);
     }

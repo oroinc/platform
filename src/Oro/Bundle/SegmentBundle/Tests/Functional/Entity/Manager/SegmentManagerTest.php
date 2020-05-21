@@ -25,7 +25,7 @@ class SegmentManagerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([
@@ -36,7 +36,7 @@ class SegmentManagerTest extends WebTestCase
         $this->manager = self::getContainer()->get('oro_segment.segment_manager');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
         parent::tearDown();
@@ -135,7 +135,7 @@ class SegmentManagerTest extends WebTestCase
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
         $result = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
-        $this->assertContains('FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity', $result);
+        static::assertStringContainsString('FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity', $result);
     }
 
     public function testGetFilterSubQueryDynamicWithLimit()
@@ -150,7 +150,7 @@ class SegmentManagerTest extends WebTestCase
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
         $dynamicSegment->setRecordsLimit(10);
         $dqlQuery = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
-        $this->assertContains(
+        static::assertStringContainsString(
             'id FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
             $dqlQuery
         );
@@ -175,7 +175,7 @@ class SegmentManagerTest extends WebTestCase
 
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
-        $this->assertContains(
+        static::assertStringContainsString(
             'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $this->manager->getFilterSubQuery($dynamicSegment, $qb)
         );

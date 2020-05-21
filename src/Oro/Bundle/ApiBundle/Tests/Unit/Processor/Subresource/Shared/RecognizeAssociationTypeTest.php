@@ -17,7 +17,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
     /** @var RecognizeAssociationType */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -114,11 +114,9 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException
-     */
     public function testProcessForExcludedAssociation()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 

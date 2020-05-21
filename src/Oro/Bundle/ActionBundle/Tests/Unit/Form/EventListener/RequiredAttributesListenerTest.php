@@ -12,12 +12,12 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RequiredAttributesListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new RequiredAttributesListener();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listener);
     }

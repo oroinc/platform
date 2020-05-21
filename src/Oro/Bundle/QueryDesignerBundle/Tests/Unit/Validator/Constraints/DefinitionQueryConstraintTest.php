@@ -9,7 +9,7 @@ class DefinitionQueryConstraintTest extends \PHPUnit\Framework\TestCase
     /** @var DefinitionQueryConstraint */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new DefinitionQueryConstraint();
     }

@@ -16,7 +16,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
@@ -79,36 +79,33 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(BooleanType::class, $extension->getType(BooleanType::class));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not registered.
-     */
     public function testGetTypeShouldThrowExceptionForUnknownType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not registered.');
+
         $extension = $this->getExtension([], [], []);
 
         $extension->getType(BooleanType::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load form type "Test\UnknownClass": class does not exist.
-     */
     public function testGetTypeShouldThrowExceptionForUnknownTypeClass()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load form type "Test\UnknownClass": class does not exist.');
+
         $extension = $this->getExtension(['Test\UnknownClass' => null], [], []);
 
         $extension->getType('Test\UnknownClass');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load form type "stdClass": class does not implement "Symfony\Component\Form\FormTypeInterface".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeShouldThrowExceptionForInvalidTypeClass()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Could not load form type "stdClass": class does not implement "Symfony\Component\Form\FormTypeInterface".'
+        );
+
         $extension = $this->getExtension([\stdClass::class => null], [], []);
 
         $extension->getType(\stdClass::class);
@@ -147,14 +144,14 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$typeExtension1, $typeExtension2], $extension->getTypeExtensions('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The extended type specified for the service "extension" does not match the actual extended type. Expected "test", given "unmatched".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeExtensionsShouldThrowExceptionForInvalidExtendedType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The extended type specified for the service "extension" does not match the actual extended type.'
+            . ' Expected "test", given "unmatched".'
+        );
+
         $extension = $this->getExtension([], ['test' => ['extension']], []);
         $formTypeExtension = $this->getFormTypeExtension('unmatched');
 

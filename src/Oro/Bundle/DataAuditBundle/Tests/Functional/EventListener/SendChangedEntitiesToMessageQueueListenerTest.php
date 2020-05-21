@@ -33,7 +33,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     use MessageQueueExtension;
     use AdminUserTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -92,9 +92,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     public function testShouldBeEnabledByDefault()
     {
-        $listener = $this->getListener();
+        $em = $this->getEntityManager();
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $em->persist($owner);
+        $em->flush();
 
-        self::assertAttributeEquals(true, 'enabled', $listener);
+        self::assertMessagesCount(Topics::ENTITIES_CHANGED, 1);
     }
 
     public function testShouldDoNothingIfListenerDisabled()
@@ -140,24 +144,24 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         /** @var Message $message */
         $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
 
-        self::assertInstanceOf(Message::class, $message);
+        $this->assertInstanceOf(Message::class, $message);
 
         $body = $message->getBody();
 
-        self::assertArrayHasKey('timestamp', $body);
-        self::assertArrayHasKey('transaction_id', $body);
+        $this->assertArrayHasKey('timestamp', $body);
+        $this->assertArrayHasKey('transaction_id', $body);
 
-        self::assertArrayHasKey('entities_updated', $body);
-        self::assertInternalType('array', $body['entities_updated']);
+        $this->assertArrayHasKey('entities_updated', $body);
+        $this->assertIsArray($body['entities_updated']);
 
-        self::assertArrayHasKey('entities_deleted', $body);
-        self::assertInternalType('array', $body['entities_deleted']);
+        $this->assertArrayHasKey('entities_deleted', $body);
+        $this->assertIsArray($body['entities_deleted']);
 
-        self::assertArrayHasKey('entities_inserted', $body);
-        self::assertInternalType('array', $body['entities_inserted']);
+        $this->assertArrayHasKey('entities_inserted', $body);
+        $this->assertIsArray($body['entities_inserted']);
 
-        self::assertArrayHasKey('collections_updated', $body);
-        self::assertInternalType('array', $body['collections_updated']);
+        $this->assertArrayHasKey('collections_updated', $body);
+        $this->assertIsArray($body['collections_updated']);
     }
 
     public function testShouldSendMessageWithVeryLowPriority()
@@ -979,7 +983,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $em->flush();
@@ -1010,7 +1014,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $entity->setStringProperty('new string');

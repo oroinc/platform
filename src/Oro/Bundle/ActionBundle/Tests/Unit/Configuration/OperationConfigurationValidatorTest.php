@@ -26,7 +26,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var OperationConfigurationValidator */
     protected $validator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $this->twigLoader = $this->createMock(LoaderInterface::class);

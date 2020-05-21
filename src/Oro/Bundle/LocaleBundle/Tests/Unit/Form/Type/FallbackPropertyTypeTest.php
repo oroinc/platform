@@ -23,7 +23,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
      */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var TranslatorInterface $translator */
         $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
@@ -38,7 +38,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator, $this->formType);
     }

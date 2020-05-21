@@ -24,7 +24,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->repository = $this->createMock(EntityRepository::class);

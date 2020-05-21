@@ -34,7 +34,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transitionDataProvider = $this->createMock(TransitionDataProvider::class);
         $this->workflowManager = $this->createMock(WorkflowManager::class);
@@ -54,7 +54,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->transitionDataProvider,

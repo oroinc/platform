@@ -22,7 +22,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $containerBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->compilerPass = new DetailedLogsHandlerPass();
@@ -129,11 +129,9 @@ class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
         $this->compilerPass->process($this->containerBuilder);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException
-     */
     public function testRemoveNestedHandlersFromHandlersToChannelsParamFails()
     {
+        $this->expectException(\Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException::class);
         $handlersToChannels = [
             'monolog.handler.detailed_logs' => null,
             'monolog.handler.nested' => null,
@@ -220,11 +218,9 @@ class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
         $this->compilerPass->process($this->containerBuilder);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException
-     */
     public function testRemoveNestedHandlersFromAllChannelsFails()
     {
+        $this->expectException(\Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException::class);
         $this->containerBuilder->expects($this->exactly(2))->method('has')->willReturn(true);
 
         $this->containerBuilder->expects($this->once())

@@ -21,7 +21,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProviderMock */
     protected $extendConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $manager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')

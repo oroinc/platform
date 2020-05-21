@@ -27,7 +27,7 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var DraftAccessRule */
     private $rule;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
         $this->draftPermissionHelper = $this->createMock(DraftPermissionHelper::class);

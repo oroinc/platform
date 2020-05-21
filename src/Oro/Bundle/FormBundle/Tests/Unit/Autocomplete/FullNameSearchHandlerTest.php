@@ -23,7 +23,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityNameResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
@@ -55,12 +55,11 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Name resolver must be configured
-     */
     public function testConvertItemFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Name resolver must be configured');
+
         $this->searchHandler->convertItem(new \stdClass());
     }
 }

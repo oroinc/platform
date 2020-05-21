@@ -74,7 +74,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
      */
     private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)

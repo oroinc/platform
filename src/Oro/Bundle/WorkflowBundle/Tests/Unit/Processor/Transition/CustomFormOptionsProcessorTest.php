@@ -14,7 +14,7 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var CustomFormOptionsProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new CustomFormOptionsProcessor();
     }

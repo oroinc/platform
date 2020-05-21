@@ -31,7 +31,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleSettings */
     private $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->calendarFactory = $this->createMock(CalendarFactoryInterface::class);

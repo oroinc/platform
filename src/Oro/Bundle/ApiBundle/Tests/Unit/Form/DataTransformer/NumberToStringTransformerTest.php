@@ -24,11 +24,9 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testTransformWithInvalidValue()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new NumberToStringTransformer();
         $transformer->transform('a');
     }
@@ -63,21 +61,19 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformWithNotStringValue()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new NumberToStringTransformer();
         $transformer->reverseTransform(1);
     }
 
     /**
      * @dataProvider reverseTransformInvalidValueDataProvider
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformWithInvalidValue($scale, $value)
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new NumberToStringTransformer($scale);
         $transformer->reverseTransform($value);
     }

@@ -14,12 +14,12 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
     /** @var BasePerson */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BasePerson();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }
@@ -62,14 +62,6 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
             'createdAt'  => ['createdAt', $created, $created],
             'updatedAt'  => ['updatedAt', $updated, $updated],
         ];
-    }
-
-    public function testSetGetAddress()
-    {
-        /** @var AbstractAddress $address */
-        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
-        $this->entity->addAddress($address);
-        $this->assertAttributeEquals($this->entity->getAddresses(), 'addresses', $this->entity);
     }
 
     public function testHasAddress()

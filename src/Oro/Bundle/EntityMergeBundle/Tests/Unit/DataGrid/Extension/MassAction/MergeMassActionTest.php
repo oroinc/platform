@@ -15,7 +15,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
      */
     private $target;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -101,12 +101,11 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Trying to get name of unnamed object
-     */
     public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Trying to get name of unnamed object');
+
         $this->target->setOptions(ActionConfiguration::create(array()));
     }
 }

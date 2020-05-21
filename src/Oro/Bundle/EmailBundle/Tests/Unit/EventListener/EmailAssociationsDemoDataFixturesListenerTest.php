@@ -23,7 +23,7 @@ class EmailAssociationsDemoDataFixturesListenerTest extends \PHPUnit\Framework\T
     /** @var EmailAssociationsDemoDataFixturesListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
         $this->associationManager = $this->createMock(AssociationManager::class);

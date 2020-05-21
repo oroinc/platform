@@ -10,7 +10,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /** @var GetContextValue */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new GetContextValue();
         $this->function->setContextAccessor(new ContextAccessor());
@@ -51,30 +51,27 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
+
         $this->function->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 3 given.
-     */
     public function testInitializeFailsWhenTooManyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
+
         $this->function->initialize([1, 2, 3]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The first option should be a string, but integer given.
-     */
     public function testInitializeFailsWhenFirstOptionIsNotString()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The first option should be a string, but integer given.');
+
         $this->function->initialize([4, 5]);
     }
 

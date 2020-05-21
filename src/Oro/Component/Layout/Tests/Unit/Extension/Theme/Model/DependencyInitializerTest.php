@@ -13,13 +13,13 @@ class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyInitializer */
     protected $initializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container   = new Container();
         $this->initializer = new DependencyInitializer($this->container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->initializer, $this->container);
     }

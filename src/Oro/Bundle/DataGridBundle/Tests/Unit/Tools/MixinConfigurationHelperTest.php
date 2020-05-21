@@ -18,7 +18,7 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface');
 

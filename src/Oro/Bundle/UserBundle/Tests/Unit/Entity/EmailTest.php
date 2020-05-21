@@ -10,7 +10,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
     private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->user = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\User');
         $this->email = new Email();

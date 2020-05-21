@@ -31,7 +31,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ResizedImageProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->imagineBinaryFactory = $this->createMock(ImagineBinaryByFileContentFactoryInterface::class);

@@ -9,7 +9,7 @@ class RestUsersACLTest extends WebTestCase
 {
     const DEFAULT_USER_ID = '1';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(array('Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData'));

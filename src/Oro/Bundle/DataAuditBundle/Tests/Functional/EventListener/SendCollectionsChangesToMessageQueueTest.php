@@ -12,8 +12,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->initClient();
     }

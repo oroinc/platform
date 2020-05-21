@@ -13,7 +13,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateItemContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new BatchUpdateItemContext();
     }

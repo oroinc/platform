@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromSortersP
 
 class SelectedFieldsFromSortersProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

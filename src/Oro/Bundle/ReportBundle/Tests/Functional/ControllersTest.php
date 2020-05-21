@@ -15,7 +15,7 @@ class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -24,7 +24,7 @@ class ControllersTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->getDatagridQueryCollector()->disable();
@@ -174,7 +174,7 @@ class ControllersTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('reports-grid', $crawler->html());
+        static::assertStringContainsString('reports-grid', $crawler->html());
         $this->assertEquals('reports-grid', $crawler->filter('h1.oro-subtitle')->html());
     }
 
@@ -309,6 +309,6 @@ class ControllersTest extends WebTestCase
     {
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
-        $this->assertContains('Report saved', $crawler->html());
+        static::assertStringContainsString('Report saved', $crawler->html());
     }
 }

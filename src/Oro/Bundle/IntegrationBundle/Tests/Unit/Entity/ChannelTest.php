@@ -19,7 +19,7 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
     /** @var Channel */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new Channel();
     }

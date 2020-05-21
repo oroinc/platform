@@ -12,7 +12,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $query;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->query = $this->getMockBuilder(SearchQueryInterface::class)
             ->disableOriginalConstructor()->getMock();

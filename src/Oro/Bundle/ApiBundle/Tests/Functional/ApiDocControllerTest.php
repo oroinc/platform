@@ -14,7 +14,7 @@ class ApiDocControllerTest extends WebTestCase
 {
     use ApiFeatureTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

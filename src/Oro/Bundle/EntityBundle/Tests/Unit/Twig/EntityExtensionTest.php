@@ -30,7 +30,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
@@ -47,7 +47,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new EntityExtension($container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->extension);
     }

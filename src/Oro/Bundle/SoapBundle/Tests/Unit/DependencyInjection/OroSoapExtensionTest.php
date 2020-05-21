@@ -12,7 +12,7 @@ class OroSoapExtensionTest extends ExtensionTestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new OroSoapExtension();
     }

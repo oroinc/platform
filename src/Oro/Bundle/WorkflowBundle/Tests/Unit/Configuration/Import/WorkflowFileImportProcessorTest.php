@@ -20,7 +20,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $parentProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
         $this->fileLocator = $this->createMock(FileLocatorInterface::class);

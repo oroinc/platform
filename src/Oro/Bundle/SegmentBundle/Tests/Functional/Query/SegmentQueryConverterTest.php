@@ -13,7 +13,7 @@ class SegmentQueryConverterTest extends WebTestCase
     /** @var SegmentQueryConverter */
     private $segmentQueryConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentData::class]);

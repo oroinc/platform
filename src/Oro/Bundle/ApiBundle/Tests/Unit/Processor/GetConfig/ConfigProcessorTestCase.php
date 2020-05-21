@@ -32,7 +32,7 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new ConfigContext();
         $this->context->setClassName(self::TEST_CLASS_NAME);

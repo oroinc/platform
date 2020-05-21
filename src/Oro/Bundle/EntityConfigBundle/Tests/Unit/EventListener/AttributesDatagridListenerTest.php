@@ -22,7 +22,7 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributesDatagridListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()

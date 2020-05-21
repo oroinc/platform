@@ -13,7 +13,7 @@ class EnumValueTranslationListenerTest extends EnumValueListenerTestCase
     /** @var EnumValueTranslationListener */
     private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

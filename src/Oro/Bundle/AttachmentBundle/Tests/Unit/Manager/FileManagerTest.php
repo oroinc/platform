@@ -28,7 +28,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileManager */
     protected $fileManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filesystem = $this->createMock(Filesystem::class);
 
@@ -83,11 +83,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fileContent, $this->fileManager->getContent($fileEntity));
     }
 
-    /**
-     * @expectedException \Gaufrette\Exception\FileNotFound
-     */
     public function testGetContentWhenFileDoesNotExist()
     {
+        $this->expectException(\Gaufrette\Exception\FileNotFound::class);
         $fileName = 'testFile.txt';
 
         $this->filesystem->expects($this->never())
@@ -117,10 +115,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider fileWithoutProtocolDataProvider
-     * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testCreateFileEntityWhenProtocolIsNotSpecified($path)
     {
+        $this->expectException(\Symfony\Component\Filesystem\Exception\FileNotFoundException::class);
         $this->protocolValidator->expects($this->never())
             ->method('isSupportedProtocol');
 
@@ -141,10 +139,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedFileProtocolDataProvider
-     * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testCreateFileEntityWhenProtocolIsSupported($path, $expectedProtocol)
     {
+        $this->expectException(\Symfony\Component\Filesystem\Exception\FileNotFoundException::class);
         $this->protocolValidator->expects($this->once())
             ->method('isSupportedProtocol')
             ->with($expectedProtocol)
@@ -164,10 +162,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider notSupportedFileProtocolDataProvider
-     * @expectedException \Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException
      */
     public function testCreateFileEntityWhenProtocolIsNotSupported($path, $expectedProtocol)
     {
+        $this->expectException(\Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException::class);
         $this->protocolValidator->expects($this->once())
             ->method('isSupportedProtocol')
             ->with($expectedProtocol)
@@ -185,11 +183,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
-     */
     public function testCreateFileEntityForNotExistingFile()
     {
+        $this->expectException(\Symfony\Component\Filesystem\Exception\FileNotFoundException::class);
         $path = __DIR__ . '/../Fixtures/testFile/not_existed.txt';
 
         $this->fileManager->createFileEntity($path);

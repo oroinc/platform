@@ -17,7 +17,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityStructureOptionsListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->auditConfigProvider = $this->createMock(AuditConfigProvider::class);
         $this->listener = new EntityStructureOptionsListener($this->auditConfigProvider);

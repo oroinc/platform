@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TextFilteredObjectMapperTest extends ObjectMapperTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

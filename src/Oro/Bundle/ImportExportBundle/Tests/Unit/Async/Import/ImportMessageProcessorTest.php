@@ -188,8 +188,8 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
-        $this->assertContains([
+        static::assertEquals(MessageProcessorInterface::ACK, $result);
+        static::assertContainsEquals([
             'success' => true,
             'filePath' => 'csv',
         ], $job->getData());

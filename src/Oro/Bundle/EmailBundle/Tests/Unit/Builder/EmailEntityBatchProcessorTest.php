@@ -31,7 +31,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcher */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ownerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
@@ -59,7 +59,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Test@example.com', $this->batch->getAddress('TeST@example.com')->getEmail());
         $this->assertNull($this->batch->getAddress('Another@example.com'));
 
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->batch->addAddress($this->addrManager->newEmailAddress()->setEmail('TEST@example.com'));
     }
 
@@ -85,7 +85,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Test', $this->batch->getFolder('trash', 'TeST')->getFullName());
         $this->assertNull($this->batch->getFolder('trash', 'Another'));
 
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $folder2 = new EmailFolder();
         $folder2->setType('sent');
         $folder2->setName('TEST');

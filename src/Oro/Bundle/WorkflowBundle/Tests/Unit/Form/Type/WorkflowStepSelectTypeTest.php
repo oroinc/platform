@@ -36,7 +36,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MessageCatalogueInterface */
     protected $translatorCatalogue;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 
@@ -113,13 +113,13 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider incorrectOptionsDataProvider
      *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Either "workflow_name" or "workflow_entity_class" must be set
-     *
      * @param $options
      */
     public function testNormalizersException(array $options)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
+
         $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
@@ -216,12 +216,11 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals('transtaled_wf_l2: transtaled_step2label', $view->vars['choices'][1]->label);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Either "workflow_name" or "workflow_entity_class" must be set
-     */
     public function testFinishViewException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
+
         $this->type->finishView(
             new FormView(),
             $this->createMock('Symfony\Component\Form\Test\FormInterface'),

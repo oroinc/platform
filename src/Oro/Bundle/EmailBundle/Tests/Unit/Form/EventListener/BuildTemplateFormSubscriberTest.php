@@ -20,7 +20,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * SetUp test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
@@ -30,7 +30,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->tokenStorage);
         unset($this->listener);
@@ -40,7 +40,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->listener->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }

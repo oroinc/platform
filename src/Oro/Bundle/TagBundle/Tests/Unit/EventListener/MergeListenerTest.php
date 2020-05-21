@@ -30,7 +30,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()

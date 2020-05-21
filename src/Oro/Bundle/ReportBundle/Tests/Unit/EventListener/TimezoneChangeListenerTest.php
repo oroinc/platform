@@ -17,7 +17,7 @@ class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->calendarDateManager = $this->createMock(CalendarDateManager::class);
 

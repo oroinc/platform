@@ -32,7 +32,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->jobRunner = $this->createMock(JobRunner::class);

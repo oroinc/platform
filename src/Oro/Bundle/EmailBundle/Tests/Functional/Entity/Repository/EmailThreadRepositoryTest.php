@@ -14,7 +14,7 @@ class EmailThreadRepositoryTest extends WebTestCase
     /** @var DoctrineHelper */
     protected $doctrineHeler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadEmailThreadedData::class]);

@@ -15,12 +15,12 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
      */
     protected $aclIdentity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclIdentity = new WorkflowEntityAclIdentity();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->aclIdentity);
     }
@@ -76,12 +76,11 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->aclIdentity->getAclAttributeStepKey(), $newAclIdentity->getAclAttributeStepKey());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow ACL identity with ID 1 doesn't have entity ACL
-     */
     public function testGetAclAttributeStepKeyNoAclException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage("Workflow ACL identity with ID 1 doesn't have entity ACL");
+
         $this->setEntityId(1);
         $this->aclIdentity->getAclAttributeStepKey();
     }

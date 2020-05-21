@@ -20,7 +20,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider =
             $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
@@ -108,12 +108,11 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('action_group1', $group->getDefinition()->getName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException
-     * @expectedExceptionMessage ActionGroup with name "not exists" not found
-     */
     public function testGetException()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException::class);
+        $this->expectExceptionMessage('ActionGroup with name "not exists" not found');
+
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn([]);

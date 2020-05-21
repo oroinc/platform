@@ -17,14 +17,10 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function __construct(array $messages)
     {
-        parent::__construct();
         $this->messages = $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function evaluate($other, $description = '', $returnResult = false)
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         $comparatorFactory = \SebastianBergmann\Comparator\Factory::getInstance();
         try {
@@ -49,6 +45,6 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function toString(): string
     {
-        return 'messages ' . $this->exporter->export($this->messages);
+        return 'messages ' . $this->exporter()->export($this->messages);
     }
 }

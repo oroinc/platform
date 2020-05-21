@@ -13,7 +13,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationGuesser */
     private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new OrganizationGuesser();
     }

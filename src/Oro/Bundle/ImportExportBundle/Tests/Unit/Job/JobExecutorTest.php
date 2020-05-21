@@ -42,7 +42,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var JobExecutor */
     protected $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -446,12 +446,11 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Error 1'], $result->getFailureExceptions());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage No job instance found with code unknown
-     */
     public function testGetJobErrorsUnknownInstanceException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('No job instance found with code unknown');
+
         $code = 'unknown';
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -467,12 +466,11 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->getJobErrors($code);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage No job execution found for job instance with code unknown
-     */
     public function testGetJobErrorsUnknownExecutionException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('No job execution found for job instance with code unknown');
+
         $code = 'unknown';
 
         $jobInstance = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobInstance')

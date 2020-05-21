@@ -27,7 +27,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 
@@ -39,12 +39,11 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(CurrentStepNameIsEqual::NAME, $this->condition->getName());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing "step_name" option
-     */
     public function testInitializeInvalid()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing "step_name" option');
+
         $this->assertInstanceOf(
             'Oro\Component\ConfigExpression\Condition\AbstractCondition',
             $this->condition->initialize([])
@@ -123,11 +122,11 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
 
         $key = '@'.CurrentStepNameIsEqual::NAME;
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey($key, $result);
 
         $resultSection = $result[$key];
-        $this->assertInternalType('array', $resultSection);
+        $this->assertIsArray($resultSection);
         $this->assertArrayHasKey('parameters', $resultSection);
         $this->assertContains($stdClass, $resultSection['parameters']);
     }

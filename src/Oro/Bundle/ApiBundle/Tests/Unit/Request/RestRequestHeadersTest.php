@@ -13,7 +13,7 @@ class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
     /** @var RestRequestHeaders */
     private $requestHeaders;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = Request::create('http://test.com');
         $this->request->headers->set('prm1', 'val1');

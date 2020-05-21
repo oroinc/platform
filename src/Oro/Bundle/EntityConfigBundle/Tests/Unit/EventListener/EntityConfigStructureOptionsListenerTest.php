@@ -23,7 +23,7 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->listener = new EntityConfigStructureOptionsListener($this->entityConfigProvider);

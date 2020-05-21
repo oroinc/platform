@@ -13,7 +13,7 @@ class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
     /** @var SetDeletedCountHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -20,7 +20,7 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var  GridViewApiEntityManager */
     protected $gridViewApiEntityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()

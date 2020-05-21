@@ -11,7 +11,7 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
      */
     protected $segmentFiltersPurifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->segmentFiltersPurifier = new SegmentFiltersPurifier();
     }

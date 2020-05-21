@@ -19,7 +19,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
     /** @var CreateAsyncOperation */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,12 +40,11 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The target file name was not set to the context.
-     */
     public function testProcessWithoutTargetFileName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The target file name was not set to the context.');
+
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->doctrineHelper->expects(self::never())
@@ -54,12 +53,11 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to create the asynchronous operation.
-     */
     public function testProcessWhenNoCreatePermissionForAsyncOperation()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to create the asynchronous operation.');
+
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('CREATE', 'entity:' . AsyncOperation::class)
@@ -74,12 +72,11 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to create the asynchronous operation.
-     */
     public function testProcessWhenNoViewPermissionForAsyncOperation()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to create the asynchronous operation.');
+
         $this->authorizationChecker->expects(self::exactly(2))
             ->method('isGranted')
             ->withConsecutive(

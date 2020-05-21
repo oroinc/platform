@@ -29,7 +29,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -48,7 +48,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->authorizationChecker, $this->registry);
 

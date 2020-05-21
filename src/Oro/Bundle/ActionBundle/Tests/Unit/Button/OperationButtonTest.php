@@ -33,7 +33,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->originOperationName = 'origin_name';
         $this->definition = $this->createMock(OperationDefinition::class);
@@ -50,7 +50,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->operation, $this->button);
     }

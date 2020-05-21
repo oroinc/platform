@@ -28,10 +28,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
     /** @var QueueConsumer */
     private $consumer;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $container = self::getContainer();
@@ -42,7 +39,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->clearMessages();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->clearMessages();
     }

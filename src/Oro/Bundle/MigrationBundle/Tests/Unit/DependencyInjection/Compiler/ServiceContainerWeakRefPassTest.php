@@ -20,7 +20,7 @@ class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceContainerWeakRefPass */
     private $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
 

@@ -19,7 +19,7 @@ class EmailVoterTest extends \PHPUnit\Framework\TestCase
     /** @var EmailVoter */
     private $emailVoter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->mailboxManager = $this->createMock(MailboxManager::class);

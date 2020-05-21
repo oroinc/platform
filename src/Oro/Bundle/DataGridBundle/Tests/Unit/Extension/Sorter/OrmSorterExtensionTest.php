@@ -17,7 +17,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -77,7 +77,7 @@ class EmailTypeTest extends TypeTestCase
     /** @var ValidatorInterface */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

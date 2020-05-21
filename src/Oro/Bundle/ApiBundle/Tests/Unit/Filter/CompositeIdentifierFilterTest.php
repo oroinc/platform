@@ -22,7 +22,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     /** @var CompositeIdentifierFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
 
@@ -45,12 +45,11 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getWhereExpression());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The composite identifier value must not be NULL.
-     */
     public function testApplyFilterForNullIdentifier()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The composite identifier value must not be NULL.');
+
         $filterValue = new FilterValue('id', null);
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();
@@ -62,12 +61,11 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The operator ">" is not supported for composite identifier.
-     */
     public function testApplyFilterForUnsupportedOperator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The operator ">" is not supported for composite identifier.');
+
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', '>');
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();

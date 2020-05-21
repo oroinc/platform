@@ -32,7 +32,7 @@ class EmailNotificationTypeListenerTest extends TestCase
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 

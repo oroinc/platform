@@ -21,7 +21,7 @@ class UpdateListProcessorTestCase extends \PHPUnit\Framework\TestCase
     /** @var UpdateListContext */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider   = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);

@@ -11,7 +11,7 @@ class UpdateListContextTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new UpdateListContext(
             $this->createMock(ConfigProvider::class),

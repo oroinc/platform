@@ -23,7 +23,7 @@ class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dateHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->converter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
             ->disableOriginalConstructor()

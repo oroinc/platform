@@ -17,7 +17,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->helper = new TransitionWidgetHelper($this->doctrineHelper);
@@ -26,7 +26,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->doctrineHelper,
@@ -58,11 +58,10 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
      * @param null|mixed $entityId
      *
      * @dataProvider getOrCreateEntityReferenceDataProvider
-     *
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
     public function testGetOrCreateEntityReferenceException($entityClass, $entityId = null)
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         if ($entityId) {
             $this->doctrineHelper->expects($this->once())
                 ->method('getEntityReference')

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilder;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
@@ -20,7 +21,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdAccessor */
     private $entityIdAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
@@ -77,12 +78,13 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An object of the type "Test\Entity" does not have the identifier property "id".
-     */
     public function testGetEntityIdForEntityWithSingleIdAndEntityDoesNotHaveIdProperty()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'An object of the type "Test\Entity" does not have the identifier property "id".'
+        );
+
         $entity   = ['name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
@@ -120,12 +122,13 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An object of the type "Test\Entity" does not have the identifier property "id1".
-     */
     public function testGetEntityIdForEntityWithCompositeIdAndEntityDoesNotHaveOneOfIdProperty()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'An object of the type "Test\Entity" does not have the identifier property "id1".'
+        );
+
         $entity   = ['id2' => 456, 'name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
@@ -140,12 +143,11 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "Test\Entity" entity does not have an identifier.
-     */
     public function testGetEntityIdWhenMetadataDoesNotHaveIdInfo()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "Test\Entity" entity does not have an identifier.');
+
         $entity   = ['id' => 123, 'name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
@@ -159,12 +161,11 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The identifier value for "Test\Entity" entity must not be empty.
-     */
     public function testGetEntityIdWhenIdValueIsNull()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
+
         $entity   = ['id' => null, 'name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');
@@ -183,12 +184,11 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The identifier value for "Test\Entity" entity must not be empty.
-     */
     public function testGetEntityIdWhenIdValueIsEmpty()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
+
         $entity   = ['id' => 123, 'name' => 'val'];
         $metadata = new EntityMetadata();
         $metadata->setClassName('Test\Entity');

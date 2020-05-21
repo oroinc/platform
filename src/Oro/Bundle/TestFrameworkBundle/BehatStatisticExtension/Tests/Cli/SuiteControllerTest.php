@@ -30,7 +30,7 @@ class SuiteControllerTest extends \PHPUnit\Framework\TestCase
         'Second' => ['AcmeDemo3'],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureStatisticManager = $this->createMock(FeatureStatisticManager::class);
     }

@@ -29,7 +29,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $activityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

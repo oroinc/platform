@@ -39,7 +39,7 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
@@ -238,7 +238,7 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManagerForClass')
             ->with($attributeFamily->getEntityClass())
             ->willReturn($entityManager);
-        
+
         return $entityManager;
     }
 }

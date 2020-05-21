@@ -33,7 +33,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var DateHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $dateHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config = DatagridConfiguration::create([]);
         $this->joinIdHelper = $this->createMock(JoinIdentifierHelper::class);

@@ -31,7 +31,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();
@@ -102,12 +102,11 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($entity, $this->form, $this->request));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test flush exception
-     */
     public function testHandleUpdateWorksWhenFormFlushFailed()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test flush exception');
+
         $entity = (object)[];
         $this->form->expects($this->once())
             ->method('setData')

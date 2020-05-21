@@ -18,7 +18,7 @@ class GetScopeTest extends GetListProcessorTestCase
     /** @var GetScope */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

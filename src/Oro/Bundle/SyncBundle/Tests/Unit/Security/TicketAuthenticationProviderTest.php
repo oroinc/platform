@@ -32,7 +32,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TicketAuthenticationProvider */
     private $ticketAuthenticationProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userProvider = $this->createMock(UserProviderInterface::class);
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);

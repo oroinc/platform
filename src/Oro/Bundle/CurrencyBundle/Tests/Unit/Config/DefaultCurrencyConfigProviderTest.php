@@ -12,7 +12,7 @@ class DefaultCurrencyConfigProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $configManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()

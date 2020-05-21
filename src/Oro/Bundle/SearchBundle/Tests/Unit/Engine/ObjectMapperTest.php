@@ -169,7 +169,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     protected $categories = ['<p>men</p>', '<p>women</p>'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manufacturer = new Manufacturer();
         $this->manufacturer->setName('<p>adidas</p>');

@@ -12,7 +12,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
     /** @var ValidateFilterValues */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

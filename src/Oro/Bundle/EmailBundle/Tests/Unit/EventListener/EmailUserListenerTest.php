@@ -28,7 +28,7 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $uow;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor')
                 ->disableOriginalConstructor()

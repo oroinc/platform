@@ -19,7 +19,7 @@ class DictionaryFilterTest extends WebTestCase
     /** @var DictionaryFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);

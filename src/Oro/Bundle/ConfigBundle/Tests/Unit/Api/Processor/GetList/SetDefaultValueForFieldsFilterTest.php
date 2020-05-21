@@ -26,7 +26,7 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
     /** @var SetDefaultValueForFieldsFilter */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->context->getRequestType()->add(RequestType::JSON_API);

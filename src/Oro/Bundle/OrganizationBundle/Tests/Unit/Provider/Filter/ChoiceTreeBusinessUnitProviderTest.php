@@ -26,7 +26,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $qb;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()

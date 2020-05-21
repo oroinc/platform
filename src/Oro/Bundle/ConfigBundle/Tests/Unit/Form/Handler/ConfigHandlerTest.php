@@ -32,7 +32,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
 

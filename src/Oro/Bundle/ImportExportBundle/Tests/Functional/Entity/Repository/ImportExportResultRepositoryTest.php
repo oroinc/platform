@@ -15,7 +15,7 @@ class ImportExportResultRepositoryTest extends WebTestCase
      */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

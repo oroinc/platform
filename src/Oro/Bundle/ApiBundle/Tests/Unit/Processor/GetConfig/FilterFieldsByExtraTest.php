@@ -21,7 +21,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /** @var FilterFieldsByExtra */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,12 +71,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
-     * @expectedExceptionMessage Requested unsupported operation "filter_fields" when building config for "Test\Class".
-     */
     public function testProcessForDisabledFieldset()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectExceptionMessage(
+            'Requested unsupported operation "filter_fields" when building config for "Test\Class".'
+        );
+
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,
@@ -798,12 +799,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
-     * @expectedExceptionMessage Requested unsupported operation "filter_fields" when building config for "Test\Class".
-     */
     public function testProcessForSubresourceWithDisabledFieldsetAndAdditionalFieldsFilter()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectExceptionMessage(
+            'Requested unsupported operation "filter_fields" when building config for "Test\Class".'
+        );
+
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,

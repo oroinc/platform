@@ -33,7 +33,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * Setup test env
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
                 ->disableOriginalConstructor()
@@ -73,7 +73,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->type->configureOptions($resolver);
     }
-    
+
     public function testBuildForm()
     {
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

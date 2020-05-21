@@ -14,7 +14,7 @@ class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterUtility */
     protected $utility;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
@@ -41,7 +41,7 @@ class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
         $this->utility = new DateFilterUtility($localeSettings, $compiler);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->utility);
     }

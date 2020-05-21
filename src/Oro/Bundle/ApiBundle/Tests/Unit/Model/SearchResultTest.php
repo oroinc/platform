@@ -13,7 +13,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|SearchQueryInterface */
     private $query;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->query = $this->createMock(SearchQueryInterface::class);
     }
@@ -116,11 +116,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         self::assertSame($records, $searchResult->getRecords());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException
-     */
     public function testGetRecordsForInvalidQuery()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -130,11 +128,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         $searchResult->getRecords();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException
-     */
     public function testGetRecordsForInvalidQueryAndLazyResult()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
         $result = $this->createMock(Result::class);
 
@@ -148,11 +144,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         $searchResult->getRecords();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetRecordsForUnexpectedException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -180,11 +174,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         self::assertSame($recordsCount, $searchResult->getRecordsCount());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException
-     */
     public function testGetRecordsCountForInvalidQuery()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -194,11 +186,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         $searchResult->getRecordsCount();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetRecordsCountForUnexpectedException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -239,11 +229,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedAggregatedData, $searchResult->getAggregatedData());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException
-     */
     public function testGetAggregatedDataForInvalidQuery()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -253,11 +241,9 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
         $searchResult->getAggregatedData();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetAggregatedDataForUnexpectedException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())

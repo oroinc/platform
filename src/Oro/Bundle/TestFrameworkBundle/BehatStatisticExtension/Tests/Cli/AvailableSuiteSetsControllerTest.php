@@ -28,7 +28,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit\Framework\TestCase
     /** @var AvailableSuiteSetsController */
     private $controller;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->suiteConfigRegistry = $this->createMock(SuiteConfigurationRegistry::class);
         $this->featureAvgTimeRegistry = new FeatureAvgTimeRegistry();

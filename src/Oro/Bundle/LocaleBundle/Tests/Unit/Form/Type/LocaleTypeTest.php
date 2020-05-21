@@ -4,8 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LocaleType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType as BaseLocaleType;
+use Symfony\Component\Intl\Locales;
 
 class LocaleTypeTest extends FormIntegrationTestCase
 {
@@ -17,7 +17,7 @@ class LocaleTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->formType = new LocaleType();
@@ -27,16 +27,11 @@ class LocaleTypeTest extends FormIntegrationTestCase
     {
         $view = $this->factory->create(LocaleType::class)->createView();
         $choices = $view->vars['choices'];
-
-        $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
-        $this->assertContains(
-            new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macao SAR China)'),
-            $choices,
-            '',
-            false,
-            false
-        );
+        $values = [];
+        foreach ($choices as $choice) {
+            $values[$choice->value] = $choice->label;
+        }
+        $this->assertEquals(Locales::getNames('en'), $values);
     }
 
     public function testGetParent()

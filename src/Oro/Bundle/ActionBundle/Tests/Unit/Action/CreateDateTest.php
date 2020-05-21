@@ -28,7 +28,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
      */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -48,17 +48,16 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->localeSettings, $this->action);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "date" must be a string, boolean given.
-     */
     public function testInitializeExceptionInvalidTime()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Option "date" must be a string, boolean given.');
+
         $this->action->initialize(array('attribute' => new PropertyPath('test_attribute'), 'date' => true));
     }
 

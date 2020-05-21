@@ -22,7 +22,6 @@ class PropertyGetterReturnsDefaultValue extends \PHPUnit\Framework\Constraint\Co
      */
     public function __construct($propertyName)
     {
-        parent::__construct();
         $this->propertyName = $propertyName;
     }
 

@@ -51,7 +51,7 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);

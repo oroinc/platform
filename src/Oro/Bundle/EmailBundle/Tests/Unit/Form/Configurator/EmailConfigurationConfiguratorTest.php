@@ -34,7 +34,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     private static $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         self::$encryptor = $this->createMock(SymmetricCrypterInterface::class);
@@ -68,13 +68,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $form->setData([$passwordKey => ['value' => self::OLD_PASSWORD]]);
         $form->submit([$passwordKey => ['value' => '']]);
 
-        $expectedData = [
-            $passwordKey => [
-                'value' => self::OLD_PASSWORD
-            ]
-        ];
-
-        self::assertArraySubset($expectedData, $form->getData());
+        $this->assertSame(self::OLD_PASSWORD, $form->getData()[$passwordKey]['value']);
     }
 
     public function testConfigureWhenSmtpPasswordSettingExistAndNewPasswordKeyIsSubmitted(): void
@@ -93,13 +87,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $form->setData([$passwordKey => ['value' => self::OLD_PASSWORD]]);
         $form->submit([$passwordKey => ['value' => self::NEW_PASSWORD]]);
 
-        $expectedData = [
-            $passwordKey => [
-                'value' => self::ENCRYPTED_PASSWORD
-            ]
-        ];
-
-        self::assertArraySubset($expectedData, $form->getData());
+        $this->assertSame(self::ENCRYPTED_PASSWORD, $form->getData()[$passwordKey]['value']);
     }
 
     public function testConfigureWithParentScopeValue(): void

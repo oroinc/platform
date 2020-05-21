@@ -51,7 +51,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     /** @var EmailNotificationType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage */
         $tokenStorage = $this->createMock(TokenStorageInterface::class);

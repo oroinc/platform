@@ -17,7 +17,7 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var FormSubmitLayoutRedirectProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new FormSubmitLayoutRedirectProcessor();
     }

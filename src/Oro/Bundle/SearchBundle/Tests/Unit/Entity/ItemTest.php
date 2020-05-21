@@ -16,7 +16,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
      */
     private $item;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->item = new Item();
     }
@@ -210,23 +210,13 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(5, $integerFields->get(3)->getValue());
     }
 
-    public function testSetWeight()
+    public function testSetGetWeight()
     {
-        $this->assertAttributeEquals(1, 'weight', $this->item);
+        static::assertEquals(1.0, $this->item->getWeight());
 
         $weight = 4.2;
         $this->item->setWeight($weight);
 
-        $this->assertAttributeEquals($weight, 'weight', $this->item);
-    }
-
-    public function testGetWeight()
-    {
-        $this->assertEquals(1, $this->item->getWeight());
-
-        $weight = 4.2;
-        $this->item->setWeight($weight);
-
-        $this->assertEquals($weight, $this->item->getWeight());
+        static::assertEquals($weight, $this->item->getWeight());
     }
 }

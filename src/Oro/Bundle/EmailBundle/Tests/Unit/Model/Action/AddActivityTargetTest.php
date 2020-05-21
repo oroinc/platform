@@ -27,7 +27,7 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 
@@ -153,11 +153,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attribute->getValue($this->action), null);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     */
     public function testInitializeWithMissingRequiredOption()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $options = [
             'email' => '$.email',
         ];

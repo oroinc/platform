@@ -42,7 +42,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionTriggerCronVerifier */
     private $verifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
             ->disableOriginalConstructor()
@@ -79,21 +79,25 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
 
     public function testAddOptionVerifier()
     {
-        $this->assertAttributeEmpty('optionVerifiers', $this->verifier);
+        $trigger = $this->createMock(TransitionCronTrigger::class);
+        $trigger->expects(static::any())
+            ->method('getCron')
+            ->willReturn('something');
 
-        $this->verifier->addOptionVerifier('test', $this->cronVerifier);
+        $verifier1 = $this->createMock(ExpressionVerifierInterface::class);
+        $verifier1->expects(static::exactly(2))
+            ->method('verify');
 
-        $this->assertAttributeCount(1, 'optionVerifiers', $this->verifier);
-        $this->assertAttributeEquals(['test' => [$this->cronVerifier]], 'optionVerifiers', $this->verifier);
+        $this->verifier->addOptionVerifier('cron', $verifier1);
 
-        $this->verifier->addOptionVerifier('test', $this->filterVerifier);
+        $this->verifier->verify($trigger);
 
-        $this->assertAttributeCount(1, 'optionVerifiers', $this->verifier);
-        $this->assertAttributeEquals(
-            ['test' => [$this->cronVerifier, $this->filterVerifier]],
-            'optionVerifiers',
-            $this->verifier
-        );
+        $verifier2 = $this->createMock(ExpressionVerifierInterface::class);
+        $verifier2->expects(static::exactly(1))
+            ->method('verify');
+
+        $this->verifier->addOptionVerifier('cron', $verifier2);
+        $this->verifier->verify($trigger);
     }
 
     public function testVerify()

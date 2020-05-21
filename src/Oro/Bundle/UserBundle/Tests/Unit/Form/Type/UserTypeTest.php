@@ -38,7 +38,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

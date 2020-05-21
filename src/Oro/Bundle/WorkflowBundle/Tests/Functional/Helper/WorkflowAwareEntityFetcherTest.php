@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 
 class WorkflowAwareEntityFetcherTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitions::class]);

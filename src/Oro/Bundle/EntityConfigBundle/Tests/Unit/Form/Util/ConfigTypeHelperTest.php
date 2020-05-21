@@ -14,7 +14,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigTypeHelper */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

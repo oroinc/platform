@@ -18,7 +18,7 @@ class AddressTypeTest extends AddressFormExtensionTestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new AddressType(
             new AddressCountryAndRegionSubscriberStub(),

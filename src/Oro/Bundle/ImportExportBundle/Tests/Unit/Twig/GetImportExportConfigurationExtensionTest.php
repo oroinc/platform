@@ -23,7 +23,7 @@ class GetImportExportConfigurationExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationRegistry = $this->createMock(ImportExportConfigurationRegistryInterface::class);
 

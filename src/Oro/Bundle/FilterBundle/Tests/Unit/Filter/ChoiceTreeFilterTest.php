@@ -23,7 +23,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
         $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->disableOriginalConstructor()

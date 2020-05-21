@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
  */
 class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadUserData::class]);

@@ -17,7 +17,7 @@ class TranslationControllerTest extends WebTestCase
     /** @var TranslationRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 

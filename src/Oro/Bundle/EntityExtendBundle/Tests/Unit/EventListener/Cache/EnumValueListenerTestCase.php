@@ -12,7 +12,7 @@ abstract class EnumValueListenerTestCase extends \PHPUnit\Framework\TestCase
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(EnumTranslationCache::class);
     }

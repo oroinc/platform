@@ -137,12 +137,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertSame($value, $expressionVisitor->walkValue(new Value($value)));
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown composite NOT SUPPORTED
-     */
     public function testWalkCompositeExpressionOnNonSupportedExpressionType()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('Unknown composite NOT SUPPORTED');
+
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression()],
@@ -189,12 +188,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No aliases are set before invoking walkComparison().
-     */
     public function testWalkComparisonWithoutAliases()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('No aliases are set before invoking walkComparison().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -267,12 +265,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown comparison operator "NOT SUPPORTED".
-     */
     public function testWalkComparisonWithUnknownOperator()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('Unknown comparison operator "NOT SUPPORTED".');
+
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression(), '=' => new EqComparisonExpression()],
@@ -284,12 +281,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown modifier "a" for comparison operator "=".
-     */
     public function testWalkComparisonWithUnknownModifierOfOperator()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('Unknown modifier "a" for comparison operator "=".');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
@@ -323,12 +319,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsafe value passed 1=1 OR e
-     */
     public function testWalkComparisonWithUnsafeFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsafe value passed 1=1 OR e');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
@@ -354,12 +349,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             ->getSQL();
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No query is set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutQuery()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('No query is set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -369,12 +363,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No join map is set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutJoinMap()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('No join map is set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -387,12 +380,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No aliases are set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutAliases()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('No aliases are set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -555,14 +547,14 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user_groups" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenJoinExistsInJoinMapButDoesNotExistInQuery()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason:'
+            . ' The join "user_groups" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -581,14 +573,13 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenParentJoinExistsInJoinMapButDoesNotExistInQuery()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -607,14 +598,13 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenParentJoinDoesNotExistsInBothJoinMapAndQuery()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -633,14 +623,14 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.unknownAssociation". Reason: Association name expected, 'unknownAssociation' is not an association.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryForUnknownAssociation()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.unknownAssociation".'
+            . " Reason: Association name expected, 'unknownAssociation' is not an association."
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],

@@ -29,7 +29,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     /** @var LanguageSelectType */
     protected $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
 

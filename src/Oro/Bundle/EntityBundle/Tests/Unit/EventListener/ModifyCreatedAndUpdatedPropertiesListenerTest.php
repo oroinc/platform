@@ -21,7 +21,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
@@ -48,17 +48,14 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
-        $datesAwareEntity->expects($this->once())
-            ->method('getCreatedAt');
-        $datesAwareEntity->expects($this->once())
+        $datesAwareEntity->expects(static::once())->method('getCreatedAt');
+        $datesAwareEntity->expects(static::once())
             ->method('setCreatedAt')
-            ->with($this->equalTo(new \DateTime(), 1));
-        $datesAwareEntity->expects($this->once())
-            ->method('isUpdatedAtSet')
-            ->willReturn(false);
-        $datesAwareEntity->expects($this->once())
+            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
+        $datesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(false);
+        $datesAwareEntity->expects(static::once())
             ->method('setUpdatedAt')
-            ->with($this->equalTo(new \DateTime(), 1));
+            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
 
         $alreadyUpdatedDatesAwareEntity = $this->createMock(DatesAwareInterface::class);
         $alreadyUpdatedDatesAwareEntity->expects($this->once())
@@ -121,42 +118,28 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
-        $datesAwareEntity->expects($this->once())
-            ->method('isUpdatedAtSet')
-            ->willReturn(false);
-        $datesAwareEntity->expects($this->once())
+        $datesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(false);
+        $datesAwareEntity->expects(static::once())
             ->method('setUpdatedAt')
-            ->with($this->equalTo(new \DateTime(), 1));
+            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
 
         $alreadyUpdatedDatesAwareEntity = $this->createMock(DatesAwareInterface::class);
-        $alreadyUpdatedDatesAwareEntity->expects($this->once())
-            ->method('isUpdatedAtSet')
-            ->willReturn(true);
-        $alreadyUpdatedDatesAwareEntity->expects($this->never())
-            ->method('setUpdatedAt');
+        $alreadyUpdatedDatesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(true);
+        $alreadyUpdatedDatesAwareEntity->expects(static::never())->method('setUpdatedAt');
 
         $currentToken = $this->createMock(TokenInterface::class);
-        $currentToken->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
-        $this->tokenStorage->expects($this->once())
-            ->method('getToken')
-            ->willReturn($currentToken);
+        $currentToken->expects(static::once())->method('getUser')->willReturn($user);
+        $this->tokenStorage->expects(static::once())->method('getToken')->willReturn($currentToken);
 
         $updatedByAwareEntity = $this->createMock(UpdatedByAwareInterface::class);
-        $updatedByAwareEntity->expects($this->once())
-            ->method('isUpdatedBySet')
-            ->willReturn(false);
-        $updatedByAwareEntity->expects($this->exactly((int)$expectedCallSetUpdatedBy))
+        $updatedByAwareEntity->expects(static::once())->method('isUpdatedBySet')->willReturn(false);
+        $updatedByAwareEntity->expects(static::exactly((int)$expectedCallSetUpdatedBy))
             ->method('setUpdatedBy')
             ->with($user);
 
         $alreadyUpdatedUpdatedByAwareEntity = $this->createMock(UpdatedByAwareInterface::class);
-        $alreadyUpdatedUpdatedByAwareEntity->expects($this->once())
-            ->method('isUpdatedBySet')
-            ->willReturn(true);
-        $alreadyUpdatedUpdatedByAwareEntity->expects($this->never())
-            ->method('setUpdatedBy');
+        $alreadyUpdatedUpdatedByAwareEntity->expects(static::once())->method('isUpdatedBySet')->willReturn(true);
+        $alreadyUpdatedUpdatedByAwareEntity->expects(static::never())->method('setUpdatedBy');
 
         $scheduled = [
             $datesAwareEntity,

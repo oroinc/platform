@@ -33,7 +33,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new FileNormalizer();
 

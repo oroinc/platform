@@ -16,7 +16,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
      */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionAssembler')
             ->disableOriginalConstructor()

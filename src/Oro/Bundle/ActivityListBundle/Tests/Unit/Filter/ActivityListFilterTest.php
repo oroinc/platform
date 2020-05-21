@@ -56,7 +56,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListFilter */
     private $activityListFilter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->qb = $this->createMock(QueryBuilder::class);
@@ -89,11 +89,9 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
+        $this->expectException(\LogicException::class);
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->activityListFilter->apply($ds, []);
     }

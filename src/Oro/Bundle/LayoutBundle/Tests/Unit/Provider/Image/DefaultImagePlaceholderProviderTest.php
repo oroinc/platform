@@ -16,7 +16,7 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultImagePlaceholderProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->imagineCacheManager = $this->createMock(CacheManager::class);
 

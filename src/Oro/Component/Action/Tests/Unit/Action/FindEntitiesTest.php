@@ -3,48 +3,54 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Component\Action\Action\FindEntities;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FindEntitiesTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FindEntities
-     */
+    /** @var FindEntities */
     protected $function;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
+    /** @var MockObject|ManagerRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->function = new FindEntities(new ContextAccessor(), $this->registry);
+        $this->function = new class(new ContextAccessor(), $this->registry) extends FindEntities {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
         $this->function->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->registry, $this->function);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|PropertyPath
+     * @return MockObject|PropertyPath
      */
     protected function getPropertyPath()
     {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -54,7 +60,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->function->initialize($options);
@@ -111,13 +117,12 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
-     */
     public function testExecuteNotManageableEntity()
     {
-        $this->registry->expects($this->once())
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "\stdClass" is not manageable.');
+
+        $this->registry->expects(static::once())
             ->method('getManagerForClass')
             ->with('\stdClass')
             ->willReturn(null);
@@ -139,8 +144,8 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize(array $source, array $expected)
     {
-        $this->assertEquals($this->function, $this->function->initialize($source));
-        $this->assertAttributeEquals($expected, 'options', $this->function);
+        static::assertEquals($this->function, $this->function->initialize($source));
+        static::assertEquals($expected, $this->function->xgetOptions());
     }
 
     /**
@@ -185,48 +190,48 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
 
         $entity = new \stdClass();
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+        $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
+            ->onlyMethods(['getResult'])
             ->getMockForAbstractClass();
-        $query->expects($this->once())
+        $query->expects(static::once())
             ->method('getResult')
             ->willReturn([$entity]);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
-        $queryBuilder->expects($this->once())
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $queryBuilder->expects(static::once())
             ->method('andWhere')
             ->with('e.name = :name')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(static::once())
             ->method('orWhere')
             ->with('e.label = :label')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(static::once())
             ->method('setParameters')
             ->with($parameters)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(static::once())
             ->method('orderBy')
             ->with('e.createdDate', strtoupper($options['order_by']['createdDate']))
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(static::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
-        $repository->expects($this->once())
+        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
+        $repository->expects(static::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
 
-        $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $em->expects($this->once())
+        $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $em->expects(static::once())
             ->method('getRepository')
             ->with($options['class'])
             ->willReturn($repository);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(static::once())
             ->method('getManagerForClass')
             ->with($options['class'])
             ->willReturn($em);
@@ -237,6 +242,6 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         $this->function->execute($context);
 
         $attributeName = (string)$options['attribute'];
-        $this->assertEquals([$entity], $context->$attributeName);
+        static::assertEquals([$entity], $context->$attributeName);
     }
 }

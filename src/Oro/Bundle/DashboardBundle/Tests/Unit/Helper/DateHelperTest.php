@@ -24,7 +24,7 @@ class DateHelperTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

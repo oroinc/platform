@@ -15,7 +15,7 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit\Framework\Test
      */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = $this->getEntity();
     }

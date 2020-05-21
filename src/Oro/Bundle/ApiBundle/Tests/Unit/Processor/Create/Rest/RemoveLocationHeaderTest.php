@@ -13,7 +13,7 @@ class RemoveLocationHeaderTest extends FormProcessorTestCase
     /** @var RemoveLocationHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

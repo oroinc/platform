@@ -12,7 +12,7 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCa
     /** @var CustomFromStartWorkflowDataProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new CustomFromStartWorkflowDataProcessor();
     }

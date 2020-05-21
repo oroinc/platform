@@ -26,7 +26,7 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumValueListProvider */
     protected $enumValueListProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

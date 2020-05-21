@@ -19,7 +19,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbalTransportFactory = new DbalTransportFactory();
     }

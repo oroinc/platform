@@ -19,7 +19,7 @@ class FileLockManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileLockManager */
     private $fileLockManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 

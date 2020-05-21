@@ -12,7 +12,7 @@ class SegmentControllerTest extends WebTestCase
     private const TEST_SEGMENT = 'Test user segment';
     private const UPDATED_TEST_SEGMENT = 'Updated test user segment';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }
@@ -64,7 +64,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Segment saved', $crawler->html());
+        static::assertStringContainsString('Segment saved', $crawler->html());
     }
 
     /**
@@ -76,8 +76,8 @@ class SegmentControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('oro_segments-grid', $crawler->html());
-        $this->assertContains(self::TEST_SEGMENT, $result->getContent());
+        static::assertStringContainsString('oro_segments-grid', $crawler->html());
+        static::assertStringContainsString(self::TEST_SEGMENT, $result->getContent());
     }
 
     /**
@@ -103,7 +103,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Segment saved', $crawler->html());
+        static::assertStringContainsString('Segment saved', $crawler->html());
 
         $em->clear();
 
@@ -132,7 +132,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Segment saved', $crawler->html());
+        static::assertStringContainsString('Segment saved', $crawler->html());
 
         $repository = $this->getContainer()
             ->get('doctrine')
@@ -170,7 +170,7 @@ class SegmentControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('oro_segments-grid', $crawler->html());
-        $this->assertContains($name, $result->getContent());
+        static::assertStringContainsString('oro_segments-grid', $crawler->html());
+        static::assertStringContainsString($name, $result->getContent());
     }
 }

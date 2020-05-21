@@ -19,14 +19,14 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAvailableByRecordGroup */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 
         $this->condition = new WorkflowAvailableByRecordGroup($this->manager);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->condition, $this->manager);
     }

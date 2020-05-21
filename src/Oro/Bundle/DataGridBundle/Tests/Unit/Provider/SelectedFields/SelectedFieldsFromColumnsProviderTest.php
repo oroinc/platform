@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 
 class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

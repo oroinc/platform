@@ -22,7 +22,7 @@ class StrategyEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = $this->createMock('Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface');
         $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');

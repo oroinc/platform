@@ -15,7 +15,7 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new DatagridCallbackActionProvider();
 
@@ -80,15 +80,9 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
         $this->config->expects($this->once())->method('offsetAddToArrayByPath')->with(
             '[properties][action_configuration]',
             $this->callback(function ($argument) use ($propertyConfigExpected, $resultRecord) {
-                $this->assertArraySubset(
-                    [
-                        'type' => 'callback',
-                        'frontend_type' => 'row_array'
-                    ],
-                    $argument
-                );
+                $this->assertSame('callback', $argument['type']);
+                $this->assertSame('row_array', $argument['frontend_type']);
                 $this->assertArrayHasKey('callable', $argument);
-
                 $this->assertEquals(['an array'], $argument['callable']($resultRecord));
                 $this->assertEquals([], $argument['callable']($resultRecord));
                 return true;

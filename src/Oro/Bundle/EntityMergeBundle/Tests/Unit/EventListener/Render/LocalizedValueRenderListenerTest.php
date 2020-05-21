@@ -41,7 +41,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->addressFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\AddressFormatter')
             ->disableOriginalConstructor()

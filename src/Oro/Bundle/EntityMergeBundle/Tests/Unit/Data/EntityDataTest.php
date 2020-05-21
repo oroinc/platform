@@ -36,7 +36,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityFieldsMetadata = array();
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()
@@ -122,12 +122,11 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($barEntity, $this->entityData->getEntityByOffset(1));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException
-     * @expectedExceptionMessage "undefined" is illegal offset for getting entity.
-     */
     public function testGetEntityByOffsetFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException::class);
+        $this->expectExceptionMessage('"undefined" is illegal offset for getting entity.');
+
         $this->entityData->getEntityByOffset('undefined');
     }
 
@@ -155,12 +154,11 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entities[0], $field->getSourceEntity());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Field "unknown" not exist.
-     */
     public function testGetFieldFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "unknown" not exist.');
+
         $this->entityData->getField('unknown');
     }
 

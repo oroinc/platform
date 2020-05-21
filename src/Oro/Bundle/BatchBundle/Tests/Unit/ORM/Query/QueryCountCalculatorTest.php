@@ -30,7 +30,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     /** @var Statement|\PHPUnit\Framework\MockObject\MockObject */
     private $statement;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->statement = $this->getMockBuilder(Statement::class)
             ->setMethods(['fetch', 'fetchColumn', 'closeCursor'])

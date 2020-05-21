@@ -9,7 +9,7 @@ class FiltersConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var FiltersConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new FiltersConfigExtra();
     }

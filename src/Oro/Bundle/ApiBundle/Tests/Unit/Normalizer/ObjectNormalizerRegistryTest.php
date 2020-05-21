@@ -19,7 +19,7 @@ class ObjectNormalizerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectNormalizerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer1 = $this->createMock(ObjectNormalizerInterface::class);
         $this->normalizer2 = $this->createMock(ObjectNormalizerInterface::class);

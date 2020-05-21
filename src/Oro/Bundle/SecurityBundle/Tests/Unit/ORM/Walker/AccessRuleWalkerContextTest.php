@@ -141,11 +141,9 @@ class AccessRuleWalkerContextTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUnserialize()
     {
+        $this->expectException(\RuntimeException::class);
         $context = new AccessRuleWalkerContext(
             $this->createMock(AccessRuleExecutor::class)
         );

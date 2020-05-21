@@ -9,7 +9,7 @@ class ParentBusinessUnitTest extends \PHPUnit\Framework\TestCase
     /** @var ParentBusinessUnit */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new ParentBusinessUnit();
     }

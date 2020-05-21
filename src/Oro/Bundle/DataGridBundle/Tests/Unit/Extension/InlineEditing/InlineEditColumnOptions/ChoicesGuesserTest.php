@@ -22,7 +22,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ChoicesGuesser */
     protected $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
 

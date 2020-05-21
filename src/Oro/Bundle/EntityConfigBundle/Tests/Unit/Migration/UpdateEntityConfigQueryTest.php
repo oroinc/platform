@@ -28,7 +28,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->once())

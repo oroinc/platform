@@ -21,7 +21,7 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var MultiEnumSnapshotFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

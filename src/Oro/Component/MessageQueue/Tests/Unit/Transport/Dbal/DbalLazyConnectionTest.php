@@ -6,176 +6,99 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
 {
-    use ClassExtensionTrait;
+    /** @var DbalLazyConnection */
+    private $connection;
+
+    /** @var ManagerRegistry|MockObject */
+    private $registry;
+
+    /** @var Connection|MockObject */
+    private $dbalConnection;
+
+    protected function setUp(): void
+    {
+        $this->dbalConnection = $this->createMock(Connection::class);
+        $this->dbalConnection->method('getSchemaManager')->willReturn($this->createMock(AbstractSchemaManager::class));
+
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->connection = new DbalLazyConnection($this->registry, 'theConnection', 'table');
+    }
 
     public function testShouldImplementConnectionInterface()
     {
-        self::assertClassExtends(DbalConnection::class, DbalLazyConnection::class);
-    }
-    
-    public function testCouldBeConstructedWithRequiredArguments()
-    {
-        new DbalLazyConnection($this->createManagerRegistryStub(), 'connection', 'table');
+        static::assertInstanceOf(DbalConnection::class, $this->connection);
     }
 
-    public function testShouldNotBeInitOnConstruct()
+    public function testShouldNotInitializeOnCreateSession()
     {
-        $connection = new DbalLazyConnection($this->createManagerRegistryStub(), 'connection', 'table');
+        $this->registry->expects(static::never())->method('getConnection');
 
-        self::assertConnectionIsNotInit($connection);
+        $session = $this->connection->createSession();
+
+        static::assertInstanceOf(DbalLazyConnection::class, $session->getConnection());
     }
 
-    public function testShouldInitDBALConnectionUsingRegistryAndConnectionName()
+    public function testShouldInitializeOnGetDBALConnection()
     {
-        $dbalConnection = $this->createDBALConnectionMock();
-
-        $registry = $this->createManagerRegistryMock();
-        $registry
-            ->expects(self::once())
+        $this->registry->expects(static::once())
             ->method('getConnection')
             ->with('theConnection')
-            ->willReturn($dbalConnection)
-        ;
+            ->willReturn($this->dbalConnection);
 
-        $connection = new DbalLazyConnection($registry, 'theConnection', 'table');
+        $connection = $this->connection->getDBALConnection();
 
-        //guard
-        self::assertConnectionIsNotInit($connection);
-
-        self::assertSame($dbalConnection, $connection->getDBALConnection());
-        self::assertConnectionIsInit($connection);
+        static::assertSame($this->dbalConnection, $connection);
     }
 
-    public function testShouldNotInitOnCreateSessionMethodCall()
+    public function testShouldNotInitializeOnGetDBALConnectionIfAlreadyInitialized()
     {
-        $connection = new DbalLazyConnection($this->createManagerRegistryStub(), 'connection', 'table');
-
-        //guard
-        self::assertConnectionIsNotInit($connection);
-
-        $session = $connection->createSession();
-
-        self::assertAttributeInstanceOf(DbalLazyConnection::class, 'connection', $session);
-        self::assertConnectionIsNotInit($connection);
-    }
-
-    public function testShouldNotInitOnGetTableNameCall()
-    {
-        $connection = new DbalLazyConnection($this->createManagerRegistryStub(), 'connection', 'theTable');
-
-        //guard
-        self::assertConnectionIsNotInit($connection);
-
-        self::assertEquals('theTable', $connection->getTableName());
-
-        self::assertConnectionIsNotInit($connection);
-    }
-
-    public function testShouldNotInitOnGetOptionsCall()
-    {
-        $options = ['foo' => 'fooVal', 'bar' => 'barVal'];
-
-        $connection = new DbalLazyConnection($this->createManagerRegistryStub(), 'connection', 'table', $options);
-
-        //guard
-        self::assertConnectionIsNotInit($connection);
-
-        self::assertEquals($options, $connection->getOptions());
-
-        self::assertConnectionIsNotInit($connection);
-    }
-
-    public function testShouldNotInitOnCloseIfNotInit()
-    {
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects(self::never())
-            ->method('close')
-        ;
-
-        $registry = $this->createManagerRegistryStub($dbalConnection);
-
-        $connection = new DbalLazyConnection($registry, 'connection', 'table');
-
-        //guard
-        self::assertConnectionIsNotInit($connection);
-
-        $connection->close();
-
-        self::assertConnectionIsNotInit($connection);
-    }
-
-    public function testShouldCallCloseInitOnCloseIfNotInit()
-    {
-        $dbalConnection = $this->createDBALConnectionMock();
-        $dbalConnection
-            ->expects(self::once())
-            ->method('close')
-        ;
-
-        $registry = $this->createManagerRegistryStub($dbalConnection);
-
-        $connection = new DbalLazyConnection($registry, 'connection', 'table');
-
-        $connection->getDBALConnection();
-
-        //guard
-        self::assertConnectionIsInit($connection);
-
-        $connection->close();
-    }
-
-    private static function assertConnectionIsNotInit(DbalLazyConnection $connection)
-    {
-        self::assertAttributeSame(false, 'isInit', $connection);
-    }
-
-    private static function assertConnectionIsInit(DbalLazyConnection $connection)
-    {
-        self::assertAttributeSame(true, 'isInit', $connection);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    private function createManagerRegistryMock()
-    {
-        return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    private function createManagerRegistryStub($connection = null)
-    {
-        $registryMock = $this->createManagerRegistryMock();
-        $registryMock
-            ->expects(self::any())
+        $this->registry->expects(static::once())
             ->method('getConnection')
-            ->willReturn($connection)
-        ;
+            ->with('theConnection')
+            ->willReturn($this->dbalConnection);
 
-        return $registryMock;
+        $connection1 = $this->connection->getDBALConnection();
+        static::assertSame($this->dbalConnection, $connection1);
+
+        $this->registry->expects(static::never())->method('getConnection');
+        $connection2 = $this->connection->getDBALConnection();
+        static::assertSame($this->dbalConnection, $connection2);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
-     */
-    private function createDBALConnectionMock()
+    public function testShouldNotInitializeOnGetTableName()
     {
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $this->registry->expects(static::never())->method('getConnection');
 
-        $dbalConnection = $this->createMock(Connection::class);
-        $dbalConnection
-            ->expects($this->any())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManager))
-        ;
+        $this->connection->getTableName();
+    }
 
-        return $dbalConnection;
+    public function testShouldNotInitializeOnGetOptions()
+    {
+        $this->registry->expects(static::never())->method('getConnection');
+
+        $this->connection->getOptions();
+    }
+
+    public function testShouldNotCallCloseIfNotInitialized()
+    {
+        $this->dbalConnection->expects(static::never())->method('close');
+        $this->connection->close();
+    }
+
+    public function testShouldCallCloseIfAlreadyInitialized()
+    {
+        $this->registry->expects(static::once())
+            ->method('getConnection')
+            ->with('theConnection')
+            ->willReturn($this->dbalConnection);
+        $this->connection->getDBALConnection();
+
+        $this->dbalConnection->expects(static::once())->method('close');
+
+        $this->connection->close();
     }
 }

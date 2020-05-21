@@ -15,7 +15,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $contextAccessor = new ContextAccessor();
         $this->action    = new SaveFieldsChangesAction($contextAccessor);
@@ -34,7 +34,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     public function testInitializeFailed(array $options, $message = null)
     {
         if ($message) {
-            $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+            $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
             $this->expectExceptionMessage($message);
         }
 

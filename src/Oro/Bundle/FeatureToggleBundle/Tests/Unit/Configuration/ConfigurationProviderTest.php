@@ -106,7 +106,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('FeatureToggleConfigurationProvider');
     }
@@ -176,22 +176,20 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException
-     * @expectedExceptionMessage Feature "feature1" has circular reference on itself
-     */
     public function testGetDependenciesConfigurationCircularReferenceTwoLevel()
     {
+        $this->expectException(\Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException::class);
+        $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
+
         $configurationProvider = $this->getConfigurationProvider([TestBundle4::class]);
         $configurationProvider->getDependenciesConfiguration();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException
-     * @expectedExceptionMessage Feature "feature1" has circular reference on itself
-     */
     public function testGetDependenciesConfigurationCircularReferenceOneLevel()
     {
+        $this->expectException(\Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException::class);
+        $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
+
         $configurationProvider = $this->getConfigurationProvider([TestBundle3::class]);
         $configurationProvider->getDependenciesConfiguration();
     }

@@ -15,7 +15,7 @@ class RegionRepositoryTest extends WebTestCase
     /** @var RegionRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

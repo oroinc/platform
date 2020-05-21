@@ -15,12 +15,12 @@ class UsernamePasswordOrganizationTokenTest extends WebTestCase
     protected $session;
 
     /** {@inheritdoc} */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->session = $this->getContainer()->get('session');
     }
-    
+
     public function testSerializeReferenceWithoutError()
     {
         $doctrine = $this->getContainer()->get('doctrine');

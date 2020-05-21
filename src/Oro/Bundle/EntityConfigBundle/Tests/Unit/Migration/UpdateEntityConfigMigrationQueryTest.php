@@ -11,7 +11,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()

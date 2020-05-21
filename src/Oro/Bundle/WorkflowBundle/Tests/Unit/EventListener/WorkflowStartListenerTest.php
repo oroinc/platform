@@ -12,19 +12,20 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowManager|MockObject */
     protected $systemWorkflowManager;
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowManager|MockObject */
     protected $workflowManager;
 
-    /** @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowManagerRegistry|MockObject */
     protected $workflowManagerRegistry;
 
-    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowAwareCache|MockObject */
     protected $workflowAwareCache;
 
     /** @var WorkflowStartListener */
@@ -33,7 +34,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->systemWorkflowManager = $this->createMock(WorkflowManager::class);
         $this->workflowManager = $this->createMock(WorkflowManager::class);
@@ -41,55 +42,70 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         $this->workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
         $this->workflowAwareCache = $this->createMock(WorkflowAwareCache::class);
 
-        $this->workflowManagerRegistry->expects($this->any())
+        $this->workflowManagerRegistry->expects(static::any())
             ->method('getManager')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['default', $this->workflowManager],
                 ['system', $this->systemWorkflowManager],
-            ]));
+            ]);
 
-        $this->listener = new WorkflowStartListener($this->workflowManagerRegistry, $this->workflowAwareCache);
+        $this->listener = new class(
+            $this->workflowManagerRegistry,
+            $this->workflowAwareCache
+        ) extends WorkflowStartListener {
+            public function xgetEntitiesScheduledForWorkflowStart(): array
+            {
+                return $this->entitiesScheduledForWorkflowStart;
+            }
+
+            public function xgetDeepLevel(): int
+            {
+                return $this->deepLevel;
+            }
+        };
     }
 
     public function testScheduleStartWorkflowForNewEntityNoWorkflow()
     {
         $entity = new \stdClass();
 
-        $this->workflowAwareCache->expects($this->once())
+        $this->workflowAwareCache->expects(static::once())
             ->method('hasRelatedActiveWorkflows')
             ->with($entity)->willReturn(false);
 
         $this->listener->postPersist($this->getEvent($entity));
 
-        $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
+        static::assertEmpty($this->listener->xgetEntitiesScheduledForWorkflowStart());
     }
 
     public function testScheduleStartWorkflowForNewEntityNoStartStep()
     {
         $entity = new \stdClass();
 
-        $this->workflowAwareCache->expects($this->once())
+        $this->workflowAwareCache->expects(static::once())
             ->method('hasRelatedActiveWorkflows')
-            ->with($entity)->willReturn(true);
+            ->with($entity)
+            ->willReturn(true);
 
         $stepManager = $this->createMock(StepManager::class);
-        $stepManager->expects($this->any())->method('hasStartStep')->willReturn(false);
+        $stepManager->expects(static::any())->method('hasStartStep')->willReturn(false);
 
         $workflow = $this->getWorkflow();
-        $workflow->expects($this->any())->method('getStepManager')->willReturn($stepManager);
+        $workflow->expects(static::any())->method('getStepManager')->willReturn($stepManager);
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(static::once())
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
 
-        $this->systemWorkflowManager->expects($this->once())
+        $this->systemWorkflowManager->expects(static::once())
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
 
         $this->listener->postPersist($this->getEvent($entity));
-        $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
+
+        static::assertEmpty($this->listener->xgetEntitiesScheduledForWorkflowStart());
     }
 
     public function testStartWorkflowForNewEntity()
@@ -99,23 +115,25 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         $workflowName = 'test_workflow';
         $childWorkflowName = 'test_child_workflow';
 
-        $this->workflowAwareCache->expects($this->at(0))
+        $this->workflowAwareCache->expects(static::at(0))
             ->method('hasRelatedActiveWorkflows')
-            ->with($entity)->willReturn(true);
-        $this->workflowAwareCache->expects($this->at(1))
+            ->with($entity)
+            ->willReturn(true);
+        $this->workflowAwareCache->expects(static::at(1))
             ->method('hasRelatedActiveWorkflows')
-            ->with($childEntity)->willReturn(true);
+            ->with($childEntity)
+            ->willReturn(true);
 
-        $this->systemWorkflowManager->expects($this->any())->method('getApplicableWorkflows')->willReturn([]);
+        $this->systemWorkflowManager->expects(static::any())->method('getApplicableWorkflows')->willReturn([]);
 
         list($event, $workflow) = $this->prepareEventForWorkflow($entity, $workflowName);
-        $this->workflowManager->expects($this->at(0))
+        $this->workflowManager->expects(static::at(0))
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
 
         list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity, $childWorkflowName);
-        $this->workflowManager->expects($this->at(1))
+        $this->workflowManager->expects(static::at(1))
             ->method('getApplicableWorkflows')
             ->with($childEntity)
             ->willReturn([$childWorkflow]);
@@ -127,8 +145,8 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
                 new WorkflowStartArguments($workflowName, $entity),
             ],
         ];
-        $this->assertAttributeEquals(0, 'deepLevel', $this->listener);
-        $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->listener);
+        static::assertEquals(0, $this->listener->xgetDeepLevel());
+        static::assertEquals($expectedSchedule, $this->listener->xgetEntitiesScheduledForWorkflowStart());
 
         $startChildWorkflow = function () use ($childEvent, $childEntity, $childWorkflow, $childWorkflowName) {
             $this->listener->postPersist($childEvent);
@@ -138,31 +156,31 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
                     new WorkflowStartArguments($childWorkflowName, $childEntity)
                 ],
             ];
-            $this->assertAttributeEquals(1, 'deepLevel', $this->listener);
-            $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->listener);
+            static::assertEquals(1, $this->listener->xgetDeepLevel());
+            static::assertEquals($expectedSchedule, $this->listener->xgetEntitiesScheduledForWorkflowStart());
 
             $this->listener->postFlush();
 
-            $this->assertAttributeEquals(1, 'deepLevel', $this->listener);
-            $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
+            static::assertEquals(1, $this->listener->xgetDeepLevel());
+            static::assertEmpty($this->listener->xgetEntitiesScheduledForWorkflowStart());
         };
 
-        $this->systemWorkflowManager->expects($this->at(0))
+        $this->systemWorkflowManager->expects(static::at(0))
             ->method('massStartWorkflow')
             ->with([new WorkflowStartArguments($workflowName, $entity)])
-            ->will($this->returnCallback($startChildWorkflow));
-        $this->systemWorkflowManager->expects($this->at(1))
+            ->willReturnCallback($startChildWorkflow);
+        $this->systemWorkflowManager->expects(static::at(1))
             ->method('massStartWorkflow')
             ->with([new WorkflowStartArguments($childWorkflowName, $childEntity)]);
 
         $this->listener->postFlush();
 
-        $this->assertAttributeEquals(0, 'deepLevel', $this->listener);
-        $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
+        static::assertEquals(0, $this->listener->xgetDeepLevel());
+        static::assertEmpty($this->listener->xgetEntitiesScheduledForWorkflowStart());
     }
 
     /**
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
+     * @return Workflow|MockObject
      */
     protected function getWorkflow()
     {
@@ -197,7 +215,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param $entity
      * @param EntityManager|null $entityManager
-     * @return LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
+     * @return LifecycleEventArgs|MockObject
      */
     private function getEvent($entity, EntityManager $entityManager = null)
     {

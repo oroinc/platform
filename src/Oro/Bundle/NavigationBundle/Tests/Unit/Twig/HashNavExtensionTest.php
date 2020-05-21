@@ -12,7 +12,7 @@ class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new HashNavExtension();
     }

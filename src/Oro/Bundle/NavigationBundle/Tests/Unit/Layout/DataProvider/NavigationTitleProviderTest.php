@@ -24,7 +24,7 @@ class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $userConfigManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->titleService = $this->getMockBuilder(TitleService::class)
             ->disableOriginalConstructor()

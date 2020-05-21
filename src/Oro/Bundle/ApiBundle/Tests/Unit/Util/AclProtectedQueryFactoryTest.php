@@ -24,7 +24,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
     /** @var AclProtectedQueryFactory */
     private $queryFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -79,12 +79,11 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The query factory was not initialized.
-     */
     public function testGetQueryWhenRequestTypeIsNotSet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The query factory was not initialized.');
+
         $this->queryFactory->getQuery(
             $this->createMock(QueryBuilder::class),
             new EntityConfig()

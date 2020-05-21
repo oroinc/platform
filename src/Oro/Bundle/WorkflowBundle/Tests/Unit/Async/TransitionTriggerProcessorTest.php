@@ -31,7 +31,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
-    
+
     /** @var TransitionTriggerHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $handler;
 
@@ -41,7 +41,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $session;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);
 
@@ -56,7 +56,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->session = $this->createMock(SessionInterface::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->processor, $this->registry, $this->handler, $this->logger, $this->objectManager, $this->session);
     }

@@ -91,7 +91,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $fileConstraintsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->helper = $this->createMock(EmailModelBuilderHelper::class);

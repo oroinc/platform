@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class AuditControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadAuditData::class]);
@@ -21,8 +21,8 @@ class AuditControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_dataaudit_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('999999', $crawler->html());
-        $this->assertContains('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
+        static::assertStringContainsString('999999', $crawler->html());
+        static::assertStringContainsString('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
     }
 
     public function testAuditHistory()
@@ -34,7 +34,7 @@ class AuditControllerTest extends WebTestCase
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('999999', $crawler->html());
+        static::assertStringContainsString('999999', $crawler->html());
     }
 
     public function testAuditHistoryStringId()
@@ -49,6 +49,6 @@ class AuditControllerTest extends WebTestCase
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
+        static::assertStringContainsString('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
     }
 }

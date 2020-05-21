@@ -102,7 +102,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
@@ -202,7 +202,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = $this->createMessageMock();
         $message->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $userId = 1;
 
@@ -279,7 +279,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -343,7 +343,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -455,31 +455,25 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('runUnique')
             ->with(1, 'oro:import:processor_test:test_import:1')
-            ->will(
-                $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
-                    return $callback($jobRunner, $childJob);
-                })
-            );
+            ->willreturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                return $callback($jobRunner, $childJob);
+            });
 
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
             ->with('oro:import:processor_test:test_import:1:chunk.1')
-            ->will(
-                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
-                    return $callback($jobRunner, $childJob1);
-                })
-            );
+            ->willreturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+                return $callback($jobRunner, $childJob1);
+            });
 
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
             ->with('oro:import:processor_test:test_import:1:chunk.2')
-            ->will(
-                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
-                    return $callback($jobRunner, $childJob2);
-                })
-            );
+            ->willreturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+                return $callback($jobRunner, $childJob2);
+            });
 
         $messageData1 = $messageData;
         $messageData1['fileName'] = 'chunk_1_12345.csv';
@@ -496,7 +490,21 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     Topics::IMPORT,
                     $this->callback(function ($messageData) use ($messageData1) {
-                        $this->assertArraySubset($messageData1, $messageData);
+                        $this->assertSame($messageData1['fileName'], $messageData['fileName']);
+                        $this->assertSame($messageData1['jobId'], $messageData['jobId']);
+                        $this->assertSame($messageData1['originFileName'], $messageData['originFileName']);
+                        $this->assertSame($messageData1['userId'], $messageData['userId']);
+                        $this->assertSame($messageData1['jobName'], $messageData['jobName']);
+                        $this->assertSame($messageData1['processorAlias'], $messageData['processorAlias']);
+                        $this->assertSame($messageData1['process'], $messageData['process']);
+                        $this->assertSame(
+                            $messageData1['options']['batch_size'],
+                            $messageData['options']['batch_size']
+                        );
+                        $this->assertSame(
+                            $messageData1['options']['batch_number'],
+                            $messageData['options']['batch_number']
+                        );
 
                         return true;
                     })
@@ -504,7 +512,21 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     Topics::IMPORT,
                     $this->callback(function ($messageData) use ($messageData2) {
-                        $this->assertArraySubset($messageData2, $messageData);
+                        $this->assertSame($messageData2['fileName'], $messageData['fileName']);
+                        $this->assertSame($messageData2['jobId'], $messageData['jobId']);
+                        $this->assertSame($messageData2['originFileName'], $messageData['originFileName']);
+                        $this->assertSame($messageData2['userId'], $messageData['userId']);
+                        $this->assertSame($messageData2['jobName'], $messageData['jobName']);
+                        $this->assertSame($messageData2['processorAlias'], $messageData['processorAlias']);
+                        $this->assertSame($messageData2['process'], $messageData['process']);
+                        $this->assertSame(
+                            $messageData2['options']['batch_size'],
+                            $messageData['options']['batch_size']
+                        );
+                        $this->assertSame(
+                            $messageData2['options']['batch_number'],
+                            $messageData['options']['batch_number']
+                        );
 
                         return true;
                     })
@@ -549,7 +571,16 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(
                 Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
                 $this->callback(function (BeforeImportChunksEvent $eventData) use ($messageData) {
-                    $this->assertArraySubset($messageData, $eventData->getBody());
+                    $body = $eventData->getBody();
+
+                    $this->assertSame($messageData['fileName'], $body['fileName']);
+                    $this->assertSame($messageData['originFileName'], $body['originFileName']);
+                    $this->assertSame($messageData['userId'], $body['userId']);
+                    $this->assertSame($messageData['jobName'], $body['jobName']);
+                    $this->assertSame($messageData['processorAlias'], $body['processorAlias']);
+                    $this->assertSame($messageData['process'], $body['process']);
+                    $this->assertSame($messageData['options']['batch_size'], $body['options']['batch_size']);
+                    $this->assertSame($messageData['options']['batch_number'], $body['options']['batch_number']);
 
                     return true;
                 })
@@ -563,7 +594,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message
             ->expects($this->once())
             ->method('getMessageId')
-            ->willReturn(1);
+            ->willReturn('1');
 
         $result = $this->preImportMessageProcessor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);

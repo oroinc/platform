@@ -17,7 +17,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()
@@ -25,17 +25,16 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
         $this->type        = new DownloadLinksType($this->assetHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type, $this->assetHelper);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "source" is missing.
-     */
     public function testConfigureOptionsWithoutSource()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "source" is missing.');
+
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([]);

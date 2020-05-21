@@ -23,7 +23,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     /** @var FormSubmitTemplateResponseProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->viewHandler = $this->createMock(ViewHandlerInterface::class);
         $this->twig = $this->createMock(Environment::class);

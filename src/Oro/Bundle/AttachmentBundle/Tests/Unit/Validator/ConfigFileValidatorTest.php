@@ -20,7 +20,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fileConstraintsProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->fileConstraintsProvider = $this->createMock(FileConstraintsProvider::class);

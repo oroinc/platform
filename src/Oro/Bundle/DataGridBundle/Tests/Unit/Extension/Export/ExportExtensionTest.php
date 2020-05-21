@@ -32,7 +32,7 @@ class ExportExtensionTest extends \PHPUnit\Framework\TestCase
     public function testShouldThrowExceptionIfIdsExistAndDatasourceIsNotInstanceOfOrmDatasource()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessageRegExp('/Expected argument of type .*? given/');
+        $this->expectExceptionMessageMatches('/Expected argument of type .*? given/');
 
         $extension = new ExportExtension(
             $this->createMock(TranslatorInterface::class),

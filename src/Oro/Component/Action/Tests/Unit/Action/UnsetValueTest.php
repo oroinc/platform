@@ -19,7 +19,7 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assignValue = $this->getMockBuilder('Oro\Component\Action\Action\AssignValue')
             ->disableOriginalConstructor()

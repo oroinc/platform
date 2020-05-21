@@ -9,7 +9,7 @@ class MoneyToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var MoneyToStringTransformer */
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new MoneyToStringTransformer();
     }

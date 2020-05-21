@@ -73,7 +73,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Set up test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(Router::class);
 

@@ -9,7 +9,7 @@ class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayAccessor */
     private $arrayAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrayAccessor = new ArrayAccessor();
     }
@@ -33,21 +33,19 @@ class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage The "__class__" property does not exist.
-     */
     public function testGetValueForMetadataProperty()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('The "__class__" property does not exist.');
+
         $this->arrayAccessor->getValue(['__class__' => 'Test\Class'], '__class__');
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage The "name" property does not exist.
-     */
     public function testGetValueForNotExistingProperty()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('The "name" property does not exist.');
+
         $this->arrayAccessor->getValue([], 'name');
     }
 

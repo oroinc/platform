@@ -19,7 +19,7 @@ class PrepareContextTitleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()

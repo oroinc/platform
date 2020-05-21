@@ -24,7 +24,7 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocMetadata */
     private $apiDocMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = 'testAction';
         $this->metadata = $this->createMock(EntityMetadata::class);

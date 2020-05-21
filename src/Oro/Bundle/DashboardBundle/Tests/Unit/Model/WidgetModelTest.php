@@ -33,7 +33,7 @@ class WidgetModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $widgetModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $this->widgetState  = $this->createMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');

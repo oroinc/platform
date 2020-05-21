@@ -22,7 +22,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAggregationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);
 
@@ -108,94 +108,93 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value "field1" must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
+
     public function testNoFunction()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value "field1" must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = 'field1';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The aggregating function "someFunction" is not supported.
-     */
     public function testNotSupportedFunction()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The aggregating function "someFunction" is not supported.');
+
         $value = 'field1 someFunction';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The aggregating function "sum" is not supported for the field type "text".
-     */
     public function testNotSupportedFunctionForDataType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The aggregating function "sum" is not supported for the field type "text".');
+
         $value = 'field2 sum';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value "field1 count alias someOther" must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
     public function testExtraElement()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value "field1 count alias someOther" must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = 'field1 count alias someOther';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value "" must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEmptyDefinition()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value "" must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = '';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value " " must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEmptyField()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value " " must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = ' ';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value "field1 " must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEmptyFunction()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value "field1 " must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = 'field1 ';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The value "field1 count " must match one of the following patterns: "fieldName functionName" or "fieldName functionName resultName".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEmptyAlias()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage(
+            'The value "field1 count " must match one of the following patterns:'
+            . ' "fieldName functionName" or "fieldName functionName resultName".'
+        );
+
         $value = 'field1 count ';
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }

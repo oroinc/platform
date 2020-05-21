@@ -13,26 +13,24 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
      */
     protected $mapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mapper = new AuditEntityMapper();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Audit entry not found for "Oro\Bundle\UserBundle\Entity\User"
-     */
     public function testShouldThrowExceptionIfAuditEntryIsRequestedInEmptyMap()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Audit entry not found for "Oro\Bundle\UserBundle\Entity\User"');
+
         $this->mapper->getAuditEntryClass(new User());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Audit entry field not found for "Oro\Bundle\UserBundle\Entity\User"
-     */
     public function testShouldThrowExceptionIfAuditEntryFieldIsRequestedInEmptyMap()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Audit entry field not found for "Oro\Bundle\UserBundle\Entity\User"');
+
         $this->mapper->getAuditEntryFieldClass(new User());
     }
 
@@ -141,24 +139,22 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Audit entry field not found for "Test\AuditEntry2"
-     */
     public function testShouldThrowExceptionIfAuditEntryFieldCannotBeFound()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Audit entry field not found for "Test\AuditEntry2"');
+
         $user1 = $this->getMockForAbstractClass(AbstractUser::class);
         $this->mapper->addAuditEntryClasses(get_class($user1), 'Test\AuditEntry1', 'Test\AuditEntryField1');
 
         $this->mapper->getAuditEntryFieldClassForAuditEntry('Test\AuditEntry2');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Audit entry field not found for "Test\AuditEntry3"
-     */
     public function testShouldThrowExceptionIfAuditEntryFieldCannotBeFoundDueInvalidMap()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Audit entry field not found for "Test\AuditEntry3"');
+
         $user1 = $this->getMockBuilder(AbstractUser::class)
             ->setMockClassName('User1')
             ->getMockForAbstractClass();
@@ -171,9 +167,6 @@ class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->addAuditEntryFieldClass(get_class($user1), 'Test\AuditEntryField1');
         $this->mapper->addAuditEntryClass(get_class($user2), 'Test\AuditEntry2');
         $this->mapper->addAuditEntryClass(get_class($user3), 'Test\AuditEntry3');
-
-        // guard
-        $this->assertAttributeCount(3, 'map', $this->mapper);
 
         $this->mapper->getAuditEntryFieldClassForAuditEntry('Test\AuditEntry3');
     }

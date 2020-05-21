@@ -2,7 +2,6 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Connection;
 
 /**
  * We need the lazy connection to avoid
@@ -10,29 +9,19 @@ use Doctrine\DBAL\Connection;
  */
 class DbalLazyConnection extends DbalConnection
 {
-    /**
-     * @var bool
-     */
-    private $isInit;
+    /** @var bool */
+    private $isInitialized;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $connectionName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $tableName;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $options;
 
     /**
@@ -50,58 +39,41 @@ class DbalLazyConnection extends DbalConnection
         $this->tableName = $tableName;
         $this->options = $options;
 
-        $this->isInit = false;
+        $this->isInitialized = false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return DbalSession
-     */
     public function createSession()
     {
         return parent::createSession();
     }
 
-    /**
-     * @return Connection
-     */
     public function getDBALConnection()
     {
-        $this->init();
+        $this->initialize();
 
         return parent::getDBALConnection();
     }
 
-    /**
-     * @return string
-     */
     public function getTableName()
     {
         return $this->tableName;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions()
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function close()
     {
-        if ($this->isInit) {
+        if ($this->isInitialized) {
             parent::close();
         }
     }
 
-    private function init()
+    private function initialize()
     {
-        if ($this->isInit) {
+        if ($this->isInitialized) {
             return;
         }
 
@@ -111,6 +83,6 @@ class DbalLazyConnection extends DbalConnection
             $this->options
         );
 
-        $this->isInit = true;
+        $this->isInitialized = true;
     }
 }

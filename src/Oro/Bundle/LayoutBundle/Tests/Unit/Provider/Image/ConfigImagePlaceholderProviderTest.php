@@ -25,7 +25,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigImagePlaceholderProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

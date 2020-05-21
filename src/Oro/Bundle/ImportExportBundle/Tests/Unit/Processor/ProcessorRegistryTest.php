@@ -2,20 +2,31 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessorRegistry
-     */
+    /** @var ProcessorRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = new ProcessorRegistry();
+        $this->registry = new class() extends ProcessorRegistry {
+            public function xgetProcessors(): array
+            {
+                return $this->processors;
+            }
+
+            public function xgetProcessorsByEntity(): array
+            {
+                return $this->processorsByEntity;
+            }
+        };
     }
 
     public function testRegisterProcessor()
@@ -23,49 +34,46 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $importProcessor */
-        $importProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $importProcessor */
+        $importProcessor = $this->createMock(ProcessorInterface::class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNameAwareProcessor $exportProcessor */
-        $exportProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor');
-        $exportProcessor->expects($this->once())->method('setEntityName')->with($entityName);
+        /** @var MockObject|EntityNameAwareProcessor $exportProcessor */
+        $exportProcessor = $this->createMock(EntityNameAwareProcessor::class);
+        $exportProcessor->expects(static::once())->method('setEntityName')->with($entityName);
 
         $this->registry->registerProcessor($importProcessor, ProcessorRegistry::TYPE_IMPORT, $entityName, $alias);
         $this->registry->registerProcessor($exportProcessor, ProcessorRegistry::TYPE_EXPORT, $entityName, $alias);
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [
                 ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
                 ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor],
             ],
-            'processors',
-            $this->registry
+            $this->registry->xgetProcessors()
         );
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [
                 $entityName => [
                     ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
                     ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor]
                 ]
             ],
-            'processorsByEntity',
-            $this->registry
+            $this->registry->xgetProcessorsByEntity()
         );
 
         return $this->registry;
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" already exists
-     */
     public function testRegisterProcessorFails()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" already exists');
+
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $processor */
-        $processor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $processor */
+        $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
@@ -77,31 +85,29 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $fooEntityName = 'foo_entity_name';
         $fooAlias = 'foo_processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $fooProcessor */
-        $fooProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $fooProcessor */
+        $fooProcessor = $this->createMock(ProcessorInterface::class);
 
         $barType = ProcessorRegistry::TYPE_EXPORT;
         $barEntityName = 'bar_entity_name';
         $barAlias = 'bar_processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $barProcessor */
-        $barProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $barProcessor */
+        $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $fooType, $fooEntityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $barType, $barEntityName, $barAlias);
         $this->registry->unregisterProcessor($fooType, $fooEntityName, $fooAlias);
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [$fooType => [], $barType => [$barAlias => $barProcessor]],
-            'processors',
-            $this->registry
+            $this->registry->xgetProcessors()
         );
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [
                 $fooEntityName => [$fooType => []],
                 $barEntityName => [$barType => [$barAlias => $barProcessor]],
             ],
-            'processorsByEntity',
-            $this->registry
+            $this->registry->xgetProcessorsByEntity()
         );
     }
 
@@ -111,12 +117,12 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $processor */
-        $processor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $processor */
+        $processor = $this->createMock(ProcessorInterface::class);
 
-        $this->assertFalse($this->registry->hasProcessor($type, $alias));
+        static::assertFalse($this->registry->hasProcessor($type, $alias));
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
-        $this->assertTrue($this->registry->hasProcessor($type, $alias));
+        static::assertTrue($this->registry->hasProcessor($type, $alias));
     }
 
     public function testGetProcessor()
@@ -125,19 +131,18 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $processor */
-        $processor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $processor */
+        $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
-        $this->assertSame($processor, $this->registry->getProcessor($type, $alias));
+        static::assertSame($processor, $this->registry->getProcessor($type, $alias));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" is not exist
-     */
     public function testGetProcessorFails()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" is not exist');
+
         $this->registry->getProcessor('import', 'processor_alias');
     }
 
@@ -147,17 +152,17 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $fooAlias = 'foo_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $fooProcessor */
-        $fooProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $fooProcessor */
+        $fooProcessor = $this->createMock(ProcessorInterface::class);
         $barAlias = 'bar_alias';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $barProcessor */
-        $barProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $barProcessor */
+        $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $type, $entityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
-        $this->assertEquals(
+        static::assertEquals(
             [$fooAlias => $fooProcessor, $barAlias => $barProcessor],
             $this->registry->getProcessorsByEntity($type, $entityName)
         );
@@ -165,7 +170,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProcessorsByEntityUnknown()
     {
-        $this->assertEquals(
+        static::assertEquals(
             [],
             $this->registry->getProcessorsByEntity('unknown', 'unknown')
         );
@@ -173,7 +178,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProcessorAliasesByEntityUnknown()
     {
-        $this->assertEquals(
+        static::assertEquals(
             [],
             $this->registry->getProcessorAliasesByEntity('unknown', 'unknown')
         );
@@ -184,16 +189,16 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $fooAlias = 'foo_alias';
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $fooProcessor */
-        $fooProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $fooProcessor */
+        $fooProcessor = $this->createMock(ProcessorInterface::class);
         $barAlias = 'bar_alias';
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $barProcessor */
-        $barProcessor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $barProcessor */
+        $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $type, $entityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
-        $this->assertEquals(
+        static::assertEquals(
             [$fooAlias, $barAlias],
             $this->registry->getProcessorAliasesByEntity($type, $entityName)
         );
@@ -204,20 +209,19 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'foo_alias';
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface $processor */
-        $processor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        /** @var MockObject|ProcessorInterface $processor */
+        $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
 
-        $this->assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
+        static::assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Processor with type "import" and alias "foo_alias" is not exist
-     */
     public function testGetProcessorEntityNameFails()
     {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Processor with type "import" and alias "foo_alias" is not exist');
+
         $type = ProcessorRegistry::TYPE_IMPORT;
         $alias = 'foo_alias';
         $this->registry->getProcessorEntityName($type, $alias);
@@ -238,7 +242,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        $this->assertEquals(
+        static::assertEquals(
             $expected,
             $this->registry->getProcessorsByType($type)
         );
@@ -249,7 +253,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
      */
     public function processorsByTypeDataProvider()
     {
-        $processor = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        $processor = $this->createMock(ProcessorInterface::class);
 
         return [
             [

@@ -251,12 +251,11 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testFinishJobOnException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $processJobId = 123;
         $processJob = new ProcessJob();
 

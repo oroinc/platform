@@ -36,17 +36,22 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $reminder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
         $this->messageParamsProvider = $this->createMock(MessageParamsProvider::class);
 
-        $this->processor = new WebSocketSendProcessor(
+        $this->processor = new class(
             $this->websocketClient,
             $this->connectionChecker,
             $this->messageParamsProvider
-        );
+        ) extends WebSocketSendProcessor {
+            public function xgetRemindersByRecipient(): array
+            {
+                return $this->remindersByRecipient;
+            }
+        };
     }
 
     public function testPush()
@@ -64,13 +69,12 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->push($barReminder);
         $this->processor->push($bazReminder);
 
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [
                 $fooUserId => [$fooReminder],
                 $barUserId => [$barReminder, $bazReminder],
             ],
-            'remindersByRecipient',
-            $this->processor
+            $this->processor->xgetRemindersByRecipient()
         );
     }
 

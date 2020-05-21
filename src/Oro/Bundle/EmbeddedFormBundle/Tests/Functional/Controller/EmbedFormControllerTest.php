@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmbedFormControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
@@ -44,7 +44,7 @@ class EmbedFormControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains($feedbackForm->getSuccessMessage(), $result->getContent());
+        static::assertStringContainsString($feedbackForm->getSuccessMessage(), $result->getContent());
     }
 
     public function testSubmitPageIsRenderedSuccessfully()

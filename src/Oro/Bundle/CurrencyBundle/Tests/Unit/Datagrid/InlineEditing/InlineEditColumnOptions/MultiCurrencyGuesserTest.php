@@ -18,7 +18,7 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var CurrencyToString */
     protected $currencyToStringConverter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->currencyHelper = $this
             ->getMockBuilder('Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper')

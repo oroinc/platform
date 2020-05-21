@@ -16,7 +16,7 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldFixture */
     protected $fixture;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
             ->disableOriginalConstructor()
@@ -27,7 +27,7 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
         $this->fixture = new EntityFieldFixture($this->fieldTypeProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->fixture, $this->fieldTypeProvider);
     }

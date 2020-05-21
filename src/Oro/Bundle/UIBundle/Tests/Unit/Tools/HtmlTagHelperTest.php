@@ -20,7 +20,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cachePath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cachePath = $this->getTempDir('cache_test_data');
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
@@ -47,7 +47,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->setAttribute('area', 'tabindex', 'Text');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $fileSystem = new Filesystem();
         $fileSystem->remove($this->cachePath);

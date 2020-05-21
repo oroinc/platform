@@ -9,7 +9,7 @@ class ExtendAttachmentTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendAttachment */
     protected $extendedAttachment;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extendedAttachment = new ExtendAttachment();
     }

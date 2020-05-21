@@ -7,7 +7,8 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Prophecy\Argument;
+use PHPUnit\Framework\Constraint\IsType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
@@ -18,34 +19,20 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
     const FILE1_ID = 1;
     const FILE2_ID = 2;
 
-    /**
-     * @var ConfigFileType
-     */
+    /** @var ConfigFileType */
     protected $formType;
 
-    /**
-     * @var ConfigFileDataTransformer
-     */
+    /** @var ConfigFileDataTransformer|MockObject */
     protected $transformer;
 
-    /**
-     * @var File
-     */
-    protected $file;
-
-    /**
-     * @var HttpFile
-     */
-    protected $httpFile;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->transformer = $this->prophesize(ConfigFileDataTransformer::class);
-        $this->formType = new ConfigFileType($this->transformer->reveal());
+        $this->transformer = $this->createMock(ConfigFileDataTransformer::class);
+        $this->formType = new ConfigFileType($this->transformer);
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->formType);
@@ -53,48 +40,55 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(FileType::class, $this->formType->getParent());
+        static::assertEquals(FileType::class, $this->formType->getParent());
     }
 
-    /**
-     * @param mixed $defaultData
-     * @param mixed $expectedData
-     * @param mixed $submittedData
-     * @param array $transformerArgs
-     * @dataProvider submitDataProvider
-     */
-    public function testSubmit($defaultData, $expectedData, $submittedData, array $transformerArgs)
+    public function testSubmitNull()
     {
-        $this->addTransformerExpectations($transformerArgs);
+        $this->transformer->expects(static::once())
+            ->method('setFileConstraints')
+            ->with(static::isType(IsType::TYPE_ARRAY));
 
-        $form = $this->factory->create(ConfigFileType::class, $defaultData);
-        $form->submit($submittedData);
+        $file = new File();
+        $this->transformer->expects(static::once())
+            ->method('transform')
+            ->with(null)
+            ->willReturn($file);
 
-        $this->assertEquals($expectedData, $form->getData());
+        $this->transformer->expects(static::once())
+            ->method('reverseTransform')
+            ->with($file)
+            ->willReturn(null);
+
+        $form = $this->factory->create(ConfigFileType::class, null);
+        $form->submit(null);
+
+        static::assertNull($form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function testSubmitFile()
     {
-        $this->file = new File();
-        $this->httpFile = new HttpFile('test.php', false);
+        $file = new File();
 
-        return [
-            'null' => [
-                'defaultData' => null,
-                'expectedData' => null,
-                'submittedData' => null,
-                'transformerArgs' => [null, null, Argument::type(File::class), null]
-            ],
-            'file' => [
-                'defaultData' => self::FILE1_ID,
-                'expectedData' => self::FILE1_ID,
-                'submittedData' => ['file' => $this->httpFile],
-                'transformerArgs' => [self::FILE1_ID, $this->file, $this->file, self::FILE1_ID]
-            ]
-        ];
+        $this->transformer->expects(static::once())
+            ->method('setFileConstraints')
+            ->with(static::isType(IsType::TYPE_ARRAY));
+
+        $this->transformer->expects(static::once())
+            ->method('transform')
+            ->with(self::FILE1_ID)
+            ->willReturn($file);
+
+        $httpFile = new HttpFile('test.php', false);
+        $this->transformer->expects(static::once())
+            ->method('reverseTransform')
+            ->with($file)
+            ->willReturn(self::FILE1_ID);
+
+        $form = $this->factory->create(ConfigFileType::class, self::FILE1_ID);
+        $form->submit(['file' => $httpFile]);
+
+        static::assertEquals(self::FILE1_ID, $form->getData());
     }
 
     protected function getExtensions()
@@ -108,15 +102,5 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
             ),
             new ValidatorExtension(Validation::createValidator())
         ];
-    }
-
-    /**
-     * @param array $transformerArgs
-     */
-    protected function addTransformerExpectations(array $transformerArgs)
-    {
-        $this->transformer->setFileConstraints(Argument::type('array'))->shouldBeCalled();
-        $this->transformer->transform($transformerArgs[0])->willReturn($transformerArgs[1]);
-        $this->transformer->reverseTransform($transformerArgs[2])->willReturn($transformerArgs[3]);
     }
 }

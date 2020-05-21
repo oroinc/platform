@@ -19,7 +19,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
         $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';

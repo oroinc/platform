@@ -22,7 +22,7 @@ class GetSubresourceProcessorTestCase extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

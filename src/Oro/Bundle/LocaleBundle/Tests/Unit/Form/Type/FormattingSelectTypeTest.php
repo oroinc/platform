@@ -23,7 +23,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
      */
     protected $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
         $this->formType = new FormattingSelectType($this->provider);

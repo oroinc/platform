@@ -11,14 +11,14 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new LinkType();
     }
 
     public function testGetParent()
     {
-        $this->assertInternalType('string', $this->type->getParent());
+        $this->assertIsString($this->type->getParent());
     }
 
     public function testConfigureOptions()

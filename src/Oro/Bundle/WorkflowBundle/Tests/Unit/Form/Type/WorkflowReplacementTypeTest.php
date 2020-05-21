@@ -25,7 +25,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->helper = $this->createMock(WorkflowDeactivationHelper::class);
 

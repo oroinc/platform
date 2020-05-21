@@ -79,7 +79,7 @@ class FeatureChecker
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
     }
-    
+
     /**
      * Configures the voters.
      *
@@ -142,7 +142,7 @@ class FeatureChecker
     {
         $this->featuresStates = [];
     }
-    
+
     /**
      * @param string $feature
      * @param object|int|null $scopeIdentifier
@@ -165,7 +165,7 @@ class FeatureChecker
      */
     protected function check($feature, $scopeIdentifier = null)
     {
-        switch ($this->configManager->get($feature, 'strategy', $this->strategy)) {
+        switch ($x = $this->configManager->get($feature, 'strategy', $this->strategy)) {
             case self::STRATEGY_AFFIRMATIVE:
                 return $this->checkAffirmativeStrategy($feature, $scopeIdentifier);
 
@@ -255,7 +255,7 @@ class FeatureChecker
 
         return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
-    
+
     /**
      * @param $feature
      * @param object|int|null $scopeIdentifier

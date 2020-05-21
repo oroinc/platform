@@ -15,7 +15,7 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var FileAccessControlChecker */
     private $checker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
 

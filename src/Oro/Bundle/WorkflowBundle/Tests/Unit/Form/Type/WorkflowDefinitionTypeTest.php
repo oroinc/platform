@@ -27,14 +27,14 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
     /** @var WorkflowDefinitionType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
         $this->formType = new WorkflowDefinitionType($this->choicesProvider);
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formType);
 

@@ -15,7 +15,7 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
     /** @var FeatureCheckerWorkflowRegistryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
         $this->filter = new FeatureCheckerWorkflowRegistryFilter($this->featureChecker);

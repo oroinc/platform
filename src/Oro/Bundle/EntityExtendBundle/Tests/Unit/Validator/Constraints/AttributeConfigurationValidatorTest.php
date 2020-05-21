@@ -30,7 +30,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
      */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attributeTypeRegistry = $this->createMock(AttributeTypeRegistry::class);
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);

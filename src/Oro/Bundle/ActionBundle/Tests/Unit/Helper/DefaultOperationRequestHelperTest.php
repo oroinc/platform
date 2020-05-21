@@ -21,7 +21,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
             ->disableOriginalConstructor()

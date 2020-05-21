@@ -90,7 +90,7 @@ class ImpersonateUserCommandTest extends TestCase
     }
 
     //region Setup and helpers
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

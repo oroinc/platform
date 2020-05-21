@@ -11,22 +11,20 @@ use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 
 class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Field must not be empty.
-     */
     public function testFieldIsNotSpecified()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Field must not be empty.');
+
         $filter = new PrimaryFieldFilter('string');
         $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The DataField must not be empty.
-     */
     public function testDataFieldIsNotSpecified()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The DataField must not be empty.');
+
         $filter = new PrimaryFieldFilter('string');
         $filter->setField('association');
         $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));

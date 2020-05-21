@@ -49,7 +49,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
     protected $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');

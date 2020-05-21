@@ -13,7 +13,7 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ThemesRelativePathGeneratorExtension();
     }

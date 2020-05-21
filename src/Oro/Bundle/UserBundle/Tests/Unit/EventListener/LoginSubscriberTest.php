@@ -20,7 +20,7 @@ class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var LoginSubscriber */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(BaseUserManager::class);
 

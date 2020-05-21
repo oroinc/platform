@@ -16,7 +16,7 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
     /** @var ChainAdditionalEmailAssociationProvider */
     private $chainProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(AdditionalEmailAssociationProviderInterface::class);
         $this->provider2 = $this->createMock(AdditionalEmailAssociationProviderInterface::class);
@@ -79,12 +79,11 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
         self::assertEquals('test', $this->chainProvider->getAssociationValue($entity, 'testField'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage There is no provider to get the value.
-     */
     public function testGetAssociationValueWithoutSupportedProvider()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('There is no provider to get the value.');
+
         $entity = new \stdClass();
 
         $this->provider1->expects(self::once())

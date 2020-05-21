@@ -11,7 +11,7 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
      */
     protected $queryAnalyzer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->queryAnalyzer = new DuplicateQueryAnalyzer();
     }

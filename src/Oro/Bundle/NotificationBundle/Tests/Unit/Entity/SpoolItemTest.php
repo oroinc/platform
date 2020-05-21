@@ -11,7 +11,7 @@ class SpoolItemTest extends \PHPUnit\Framework\TestCase
      */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new SpoolItem();
 
@@ -19,7 +19,7 @@ class SpoolItemTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

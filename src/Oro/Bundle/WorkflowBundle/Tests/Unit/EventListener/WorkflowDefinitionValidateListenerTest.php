@@ -16,29 +16,27 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDefinitionValidateListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);
         $this->listener = new WorkflowDefinitionValidateListener($this->workflowAssembler);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage test message
-     */
     public function testOnUpdateWorkflowDefinition()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('test message');
+
         $this->workflowAssembler->method('assemble')
             ->will($this->throwException(new AssemblerException('test message')));
         $this->listener->onCreateWorkflowDefinition($this->getEvent());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage test message
-     */
     public function testOnCreateWorkflowDefinition()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('test message');
+
         $this->workflowAssembler->method('assemble')
             ->will($this->throwException(new AssemblerException('test message')));
         $this->listener->onUpdateWorkflowDefinition($this->getEvent());

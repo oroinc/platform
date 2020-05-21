@@ -24,7 +24,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
      */
     protected $configVoter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()

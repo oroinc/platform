@@ -14,7 +14,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = new AddTreeGeneratorExtension();
     }
@@ -145,7 +145,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testPrepareExceptions(array $source, $message)
     {
-        $this->expectException('\Oro\Component\Layout\Exception\SyntaxException');
+        $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
         $this->expectExceptionMessage($message);
         $visitorCollection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $visitorCollection);

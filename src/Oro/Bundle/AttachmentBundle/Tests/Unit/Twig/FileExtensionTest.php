@@ -49,7 +49,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TestFile */
     private $file;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $configManager = $this->createMock(ConfigManager::class);

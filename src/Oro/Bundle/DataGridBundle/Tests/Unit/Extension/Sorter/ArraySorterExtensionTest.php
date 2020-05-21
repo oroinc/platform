@@ -42,7 +42,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -97,9 +97,10 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->assertEquals($expectedData, $this->arrayDatasource->getArraySource());
     }
 
-    /** @expectedException \Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException */
     public function testVisitDatasourceWithWrongDatasourceType()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException::class);
+
         $this->configureResolver();
         $this->config->expects($this->at(0))->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)

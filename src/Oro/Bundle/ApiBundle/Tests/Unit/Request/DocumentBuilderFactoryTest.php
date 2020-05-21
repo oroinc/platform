@@ -13,7 +13,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
@@ -72,12 +72,11 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a document builder for the request "another".
-     */
     public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a document builder for the request "another".');
+
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api']
         ]);

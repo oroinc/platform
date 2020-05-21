@@ -13,13 +13,13 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
     /** @var Segment */
     protected $segment;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->segment = new Segment();
         $this->entity  = new SegmentSnapshot($this->segment);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->segment, $this->entity);
     }

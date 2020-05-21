@@ -34,7 +34,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * Setup test obj and mock
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -53,7 +53,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->em,

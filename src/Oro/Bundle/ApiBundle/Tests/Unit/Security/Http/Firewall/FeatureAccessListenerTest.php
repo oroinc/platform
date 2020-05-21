@@ -15,7 +15,7 @@ class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureAccessListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
@@ -31,11 +31,9 @@ class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->handle($this->createMock(GetResponseEvent::class));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testHandleWhenTokenDoesNotExist()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);

@@ -8,15 +8,19 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var FieldHelper|MockObject
      */
     protected $fieldHelper;
 
@@ -25,7 +29,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $fieldProvider = $this->createMock(EntityFieldProvider::class);
@@ -37,10 +41,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->setMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
+            ->onlyMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
             ->getMock();
 
-        $this->normalizer = new ConfigurableEntityNormalizer($this->fieldHelper);
+        $this->normalizer = new class($this->fieldHelper) extends ConfigurableEntityNormalizer {
+            public function xgetSerializer()
+            {
+                return $this->serializer;
+            }
+        };
         $this->normalizer->setScalarFieldDenormalizer(new ScalarFieldDenormalizer());
     }
 
@@ -114,14 +123,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Serializer must implement "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface" and "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface"
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetSerializerException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Serializer must implement "%s" and "%s"',
+            NormalizerInterface::class,
+            DenormalizerInterface::class
+        ));
+
         $serializer = $this->createMock(\Symfony\Component\Serializer\Serializer::class);
         $this->normalizer->setSerializer($serializer);
     }
@@ -130,7 +140,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $serializer = $this->createMock(Serializer::class);
         $this->normalizer->setSerializer($serializer);
-        $this->assertAttributeSame($serializer, 'serializer', $this->normalizer);
+        static::assertSame($serializer, $this->normalizer->xgetSerializer());
     }
 
     /**

@@ -21,7 +21,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
     /** @var NormalizeParentEntityClass */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -95,11 +95,10 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         self::assertSame('Test\Class', $this->context->getParentClassName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException
-     */
     public function testProcessForNotAccessibleParentEntityType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException::class);
+
         $parentEntityType = 'test';
 
         $this->valueNormalizer->expects(self::once())

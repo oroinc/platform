@@ -20,18 +20,19 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->compilerPass = new TwigSandboxConfigurationPassStub();
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "oro_email.twig.email_security_policy"
-     */
     public function testProcessWithoutEmailSecurityPoliceService()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectExceptionMessage(
+            'You have requested a non-existent service "oro_email.twig.email_security_policy"'
+        );
+
         $exception = new ServiceNotFoundException(
             TwigSandboxConfigurationPassStub::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY
         );
@@ -44,12 +45,11 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $this->compilerPass->process($this->containerBuilder);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "oro_email.email_renderer"
-     */
     public function testProcessWithoutEmailRendererService()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectExceptionMessage('You have requested a non-existent service "oro_email.email_renderer"');
+
         $exception = new ServiceNotFoundException(
             TwigSandboxConfigurationPassStub::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY
         );

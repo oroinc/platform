@@ -13,7 +13,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
     /** @var Security */
     private $security;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 

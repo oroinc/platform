@@ -10,15 +10,16 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\TestEntityRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContainerInterface|MockObject */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
@@ -33,24 +34,22 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $doctrineConfiguration = new Configuration();
         $doctrineConfiguration->setDefaultRepositoryClassName(TestEntityRepository::class);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::any())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
-        $entityManager->expects($this->any())
+        $entityManager->expects(static::any())
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())
+        $managerRegistry->expects(static::any())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
 
-        $this->container->expects($this->any())
+        $this->container->expects(static::any())
             ->method('get')
             ->with('doctrine')
             ->willReturn($managerRegistry);
@@ -59,10 +58,10 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         /** @var TestEntityRepository $defaultRepository */
         $defaultRepository = $repositoryFactory->getDefaultRepository($entityName);
 
-        $this->assertInstanceOf(TestEntityRepository::class, $defaultRepository);
-        $this->assertEquals($entityName, $defaultRepository->getClassName());
-        $this->assertAttributeEquals($entityManager, '_em', $defaultRepository);
-        $this->assertAttributeEquals($classMetadata, '_class', $defaultRepository);
+        static::assertInstanceOf(TestEntityRepository::class, $defaultRepository);
+        static::assertEquals($entityName, $defaultRepository->getClassName());
+        static::assertEquals($entityManager, $defaultRepository->getEm());
+        static::assertEquals($classMetadata, $defaultRepository->getClass());
     }
 
     public function testGetDefaultRepositoryWithManagerWithRepositoryClass()
@@ -73,10 +72,9 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = null;
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::any())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
@@ -85,10 +83,10 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         /** @var TestEntityRepository $defaultRepository */
         $defaultRepository = $repositoryFactory->getDefaultRepository($entityName, $repositoryClass, $entityManager);
 
-        $this->assertInstanceOf($repositoryClass, $defaultRepository);
-        $this->assertEquals($entityName, $defaultRepository->getClassName());
-        $this->assertAttributeEquals($entityManager, '_em', $defaultRepository);
-        $this->assertAttributeEquals($classMetadata, '_class', $defaultRepository);
+        static::assertInstanceOf($repositoryClass, $defaultRepository);
+        static::assertEquals($entityName, $defaultRepository->getClassName());
+        static::assertEquals($entityManager, $defaultRepository->getEm());
+        static::assertEquals($classMetadata, $defaultRepository->getClass());
     }
 
     public function testGetDefaultRepositoryNotManageableEntity()
@@ -96,12 +94,12 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'TestEntity';
 
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())
+        $managerRegistry->expects(static::any())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn(null);
 
-        $this->container->expects($this->once())
+        $this->container->expects(static::once())
             ->method('get')
             ->with('doctrine')
             ->willReturn($managerRegistry);
@@ -127,16 +125,14 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::any())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
 
-        $this->container->expects($this->once())
+        $this->container->expects(static::once())
             ->method('get')
             ->with($repositoryService)
             ->willReturn($entityRepository);
@@ -144,8 +140,8 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $repositoryFactory = new EntityRepositoryFactory($this->container, [$entityName => $repositoryService]);
 
         // double check is used to make sure that object is stored in the internal cache
-        $this->assertEquals($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
-        $this->assertEquals($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
+        static::assertEquals($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
+        static::assertEquals($entityRepository, $repositoryFactory->getRepository($entityManager, $entityName));
     }
 
     public function testGetRepositoryDefaultRepository()
@@ -155,28 +151,27 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->exactly(4))
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::exactly(4))
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
 
-        $this->container->expects($this->never())
+        $this->container->expects(static::never())
             ->method('get');
 
         $repositoryFactory = new EntityRepositoryFactory($this->container, []);
 
         // double check is used to make sure that object is stored in the internal cache
+        /** @var TestEntityRepository $repository */
         $repository = $repositoryFactory->getRepository($entityManager, $entityName);
-        $this->assertEquals($repository, $repositoryFactory->getRepository($entityManager, $entityName));
+        static::assertEquals($repository, $repositoryFactory->getRepository($entityManager, $entityName));
 
-        $this->assertInstanceOf(TestEntityRepository::class, $repository);
-        $this->assertEquals($entityName, $repository->getClassName());
-        $this->assertAttributeEquals($entityManager, '_em', $repository);
-        $this->assertAttributeEquals($classMetadata, '_class', $repository);
+        static::assertInstanceOf(TestEntityRepository::class, $repository);
+        static::assertEquals($entityName, $repository->getClassName());
+        static::assertEquals($entityManager, $repository->getEm());
+        static::assertEquals($classMetadata, $repository->getClass());
     }
 
     public function testGetRepositoryFromContainerNotEntityRepository()
@@ -187,18 +182,16 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::any())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
 
         $entityRepository = new \stdClass();
 
-        $this->container->expects($this->once())
+        $this->container->expects(static::once())
             ->method('get')
             ->with($repositoryService)
             ->willReturn($entityRepository);
@@ -220,18 +213,16 @@ class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::any())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
 
         $entityRepository = new EntityRepository($entityManager, $classMetadata);
 
-        $this->container->expects($this->once())
+        $this->container->expects(static::once())
             ->method('get')
             ->with($repositoryService)
             ->willReturn($entityRepository);

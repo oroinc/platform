@@ -8,30 +8,16 @@ class DestinationMetaTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithExpectedArguments()
     {
         $destination = new DestinationMeta('aClientName', 'aTransportName');
-        
-        $this->assertAttributeEquals('aClientName', 'clientName', $destination);
-        $this->assertAttributeEquals('aTransportName', 'transportName', $destination);
-        $this->assertAttributeEquals([], 'subscribers', $destination);
-    }
 
-    public function testShouldAllowGetClientNameSetInConstructor()
-    {
-        $destination = new DestinationMeta('theClientName', 'aTransportName');
-        
-        $this->assertSame('theClientName', $destination->getClientName());
-    }
-
-    public function testShouldAllowGetTransportNameSetInConstructor()
-    {
-        $destination = new DestinationMeta('aClientName', 'theTransportName');
-
-        $this->assertSame('theTransportName', $destination->getTransportName());
+        static::assertEquals('aClientName', $destination->getClientName());
+        static::assertEquals('aTransportName', $destination->getTransportName());
+        static::assertEquals([], $destination->getSubscribers());
     }
 
     public function testShouldAllowGetSubscribersSetInConstructor()
     {
         $destination = new DestinationMeta('aClientName', 'aTransportName', ['aSubscriber']);
 
-        $this->assertSame(['aSubscriber'], $destination->getSubscribers());
+        static::assertSame(['aSubscriber'], $destination->getSubscribers());
     }
 }

@@ -21,7 +21,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurableAction = $this->getMockBuilder('Oro\Component\Action\Action\Configurable')
             ->disableOriginalConstructor()
@@ -77,7 +77,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $message)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($message);
         $this->configurableAction->expects($this->never())->method('initialize');
         $this->action->initialize($options);

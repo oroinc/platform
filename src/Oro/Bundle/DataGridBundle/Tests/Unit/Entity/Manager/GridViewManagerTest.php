@@ -43,7 +43,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
     /** @var  GridViewApiEntityManager */
     protected $gridViewApiEntityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->user = new User();
         $this->user->setUsername('username');
@@ -91,7 +91,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
         /** @var TranslatorInterface|\ $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $viewList = new ViewListStub($translator);
-        
+
         $config = $this->createMock(DatagridConfiguration::class);
         $config->expects($this->once())->method('offsetGetOr')->with('views_list', false)->willReturn($viewList);
 

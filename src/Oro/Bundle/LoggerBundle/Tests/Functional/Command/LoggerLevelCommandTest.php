@@ -13,7 +13,7 @@ class LoggerLevelCommandTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -25,7 +25,7 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for user 'admin@example.com' is successfully set to 'debug' till";
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
@@ -34,16 +34,16 @@ class LoggerLevelCommandTest extends WebTestCase
             ->findOneBy(['email' => 'admin@example.com']);
         $configUser->setScopeIdFromEntity($user);
 
-        $this->assertEquals(
+        static::assertEquals(
             $params[0],
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        $this->assertEquals(
+        static::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
-            'Failed asseting that disable after is correct.',
-            10
+            10,
+            'Failed asserting that disable after is correct.'
         );
     }
 
@@ -54,21 +54,21 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for global scope is set to 'warning' till";
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
 
-        $this->assertEquals(
+        static::assertEquals(
             $params[0],
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        $this->assertEquals(
+        static::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
-            'Failed asseting that disable after is correct.',
-            10
+            10,
+            'Failed asserting that disable after is correct.'
         );
     }
 
@@ -82,7 +82,7 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', $params);
 
-        $this->assertContains($expectedContent, $result);
+        static::assertStringContainsString($expectedContent, $result);
     }
 
     /**
@@ -114,6 +114,6 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
-        $this->assertContains('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
+        static::assertStringContainsString('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
     }
 }

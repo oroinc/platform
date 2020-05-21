@@ -12,7 +12,7 @@ class EmailActivityControllerTest extends WebTestCase
     /** @var string */
     protected $baseUrl;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(

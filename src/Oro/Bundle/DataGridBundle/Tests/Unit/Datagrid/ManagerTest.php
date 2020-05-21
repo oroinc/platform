@@ -21,7 +21,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $nameStrategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider =
             $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface')
@@ -342,12 +342,11 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $parameters must be an array or instance of ParameterBag.
-     */
     public function testGetDatagridThrowsException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$parameters must be an array or instance of ParameterBag.');
+
         $datagridName = 'test_grid';
         $parameters = new \stdClass();
 

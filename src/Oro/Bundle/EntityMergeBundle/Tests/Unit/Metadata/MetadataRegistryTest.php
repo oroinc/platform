@@ -16,7 +16,7 @@ class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
      */
     protected $metadataRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataBuilder = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder')
             ->disableOriginalConstructor()

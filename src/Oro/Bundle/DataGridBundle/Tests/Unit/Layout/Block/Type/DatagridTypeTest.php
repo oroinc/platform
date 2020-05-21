@@ -25,7 +25,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -96,12 +96,11 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals([], $view->vars['grid_render_parameters']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "grid_name" is missing.
-     */
     public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "grid_name" is missing.');
+
         $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker));
     }
 

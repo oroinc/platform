@@ -12,7 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class LocalizationManagerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadLocalizationData::class]);

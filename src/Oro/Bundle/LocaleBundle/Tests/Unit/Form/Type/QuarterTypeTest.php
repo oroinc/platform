@@ -33,12 +33,13 @@ class QuarterTypeTest extends FormIntegrationTestCase
         $this->assertFalse($form->has('year'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "input" with value "timestamp" is invalid. Accepted values are: "array".
-     */
     public function testBuildFormTryingToChangeInputType()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectExceptionMessage(
+            'The option "input" with value "timestamp" is invalid. Accepted values are: "array".'
+        );
+
         $this->factory->create(QuarterType::class, null, ['input' => 'timestamp']);
     }
 }

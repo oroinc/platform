@@ -11,9 +11,14 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->strategy = new DelegateStrategy();
+        $this->strategy = new class() extends DelegateStrategy {
+            public function xgetElements(): array
+            {
+                return $this->elements;
+            }
+        };
     }
 
     public function testConstructor()
@@ -21,7 +26,12 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $foo = $this->createStrategy('foo');
         $bar = $this->createStrategy('bar');
 
-        $strategy = new DelegateStrategy(array($foo, $bar));
+        $strategy = new class([$foo, $bar]) extends DelegateStrategy {
+            public function xgetElements(): array
+            {
+                return $this->elements;
+            }
+        };
 
         $expected = [
             'foo' => [
@@ -34,7 +44,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertAttributeEquals($expected, 'elements', $strategy);
+        static::assertEquals($expected, $strategy->xgetElements());
     }
 
     public function testAdd()
@@ -52,7 +62,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertAttributeEquals($expected, 'elements', $this->strategy);
+        static::assertEquals($expected, $this->strategy->xgetElements());
     }
 
     public function testSupportsTrueLast()
@@ -146,12 +156,11 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->merge($data);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot find merge strategy for "test" field.
-     */
     public function testMergeFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot find merge strategy for "test" field.');
+
         $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();

@@ -21,7 +21,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
     /** @var WsseEntryPoint */
     private $entryPoint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->request = $this->createMock(Request::class);
@@ -42,7 +42,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(401, $response->getStatusCode());
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',
                 self::REALM_NAME,
@@ -62,7 +62,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(401, $response->getStatusCode());
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             sprintf(
                 '/^WSSE realm="%s", profile="%s"$/',
                 self::REALM_NAME,

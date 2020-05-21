@@ -16,7 +16,7 @@ class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->factory = new TransformerFactory($this->container);
@@ -35,13 +35,14 @@ class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->factory->createTransformer($serviceId));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedMessage Service "transformer_service" must be an instance of
-     * "Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface".
-     */
     public function testCreateTransformerFails()
     {
+        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Service "transformer_service" must be an instance of "%s".',
+            \Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface::class
+        ));
+
         $serviceId = 'transformer_service';
         $this->container->expects($this->once())
             ->method('get')

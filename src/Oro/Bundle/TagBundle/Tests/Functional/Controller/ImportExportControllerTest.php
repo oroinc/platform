@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImportExportControllerTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }

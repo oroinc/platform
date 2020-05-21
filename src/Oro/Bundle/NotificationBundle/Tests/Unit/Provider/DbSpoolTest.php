@@ -25,7 +25,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->entityPool = $this->createMock(EntityPool::class);

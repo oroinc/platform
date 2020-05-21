@@ -12,7 +12,7 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
      */
     abstract protected function getRequestUrl(array $parameters);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }
@@ -28,13 +28,13 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getRequestUrl($parameters));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertNotContains(
+        static::assertStringNotContainsString(
             'System configuration is not available in mobile version. Please open the page on the desktop.',
             $crawler->html()
         );
 
         foreach ($expected as $value) {
-            $this->assertContains($value, $crawler->html());
+            static::assertStringContainsString($value, $crawler->html());
         }
     }
 
@@ -57,7 +57,7 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains(
+        static::assertStringContainsString(
             'System configuration is not available in mobile version. Please open the page on the desktop.',
             $crawler->html()
         );

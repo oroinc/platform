@@ -32,7 +32,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TabExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->menuExtension = $this->getMockBuilder(MenuExtension::class)
@@ -71,12 +71,11 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Extra parameter "widgetRoute" should be defined for
-     */
     public function testMenuTabPanelWithoutAnyParameters()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Extra parameter "widgetRoute" should be defined for');
+
         $child = $this->createMenuItem();
         $child->expects($this->once())
             ->method('isDisplayed')

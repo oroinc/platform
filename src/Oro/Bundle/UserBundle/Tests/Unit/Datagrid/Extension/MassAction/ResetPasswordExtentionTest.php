@@ -14,7 +14,7 @@ class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
     /** @var  ResetPasswordExtension */
     protected $resetExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()

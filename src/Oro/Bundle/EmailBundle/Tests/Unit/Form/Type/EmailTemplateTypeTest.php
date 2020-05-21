@@ -42,7 +42,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     /** @var EmailTemplateType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
@@ -107,7 +107,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type);
     }

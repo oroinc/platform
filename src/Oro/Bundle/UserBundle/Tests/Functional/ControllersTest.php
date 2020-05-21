@@ -14,7 +14,7 @@ class ControllersTest extends WebTestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
@@ -54,7 +54,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("User saved", $crawler->html());
+        static::assertStringContainsString("User saved", $crawler->html());
     }
 
     public function testUpdate()
@@ -86,7 +86,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("User saved", $crawler->html());
+        static::assertStringContainsString("User saved", $crawler->html());
     }
 
     public function testApiGen()
@@ -121,14 +121,14 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('John Doe - View - Users - User Management - System', $result->getContent());
+        static::assertStringContainsString('John Doe - View - Users - User Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains(
+        static::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
@@ -141,11 +141,11 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("User saved", $crawler->html());
+        static::assertStringContainsString("User saved", $crawler->html());
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains(
+        static::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );

@@ -32,16 +32,16 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
     protected $criteria;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchIndexer = $this->createPartialMock(
             Indexer::class,
             ['query']
         );
 
-        $this->innerQuery = $this->createPartialMock(
-            Query::class,
-            [
+        $this->innerQuery = $this->getMockBuilder(Query::class)
+            ->onlyMethods(['getCriteria', 'addSelect'])
+            ->addMethods([
                 'setFirstResult',
                 'getFirstResult',
                 'setMaxResults',
@@ -49,11 +49,9 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
-                'getCriteria',
-                'getOrderings',
-                'addSelect'
-            ]
-        );
+                'getOrderings'
+            ])
+            ->getMock();
 
         $this->criteria = $this->createMock(Criteria::class);
 
@@ -63,7 +61,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->searchIndexer, $this->innerQuery, $this->query);
     }

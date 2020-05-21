@@ -14,7 +14,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->typeHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper')
             ->disableOriginalConstructor()

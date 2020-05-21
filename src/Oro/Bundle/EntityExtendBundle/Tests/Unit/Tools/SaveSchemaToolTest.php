@@ -24,7 +24,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
     /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
     protected $schemaTool;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection    = $this->createMock('Doctrine\DBAL\Connection');
         $this->configuration = $this->createMock('Doctrine\ORM\Configuration');
@@ -41,7 +41,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->schemaTool, $this->em, $this->connection, $this->configuration);
     }

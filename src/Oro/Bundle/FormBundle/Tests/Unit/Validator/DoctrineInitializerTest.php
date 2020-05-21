@@ -15,7 +15,7 @@ class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineInitializer */
     protected $doctrineInitializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerInitializer = $this->createMock(ObjectInitializerInterface::class);
 

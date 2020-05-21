@@ -26,7 +26,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
      */
     protected $defaultTimezone = 'Pacific/Honolulu';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

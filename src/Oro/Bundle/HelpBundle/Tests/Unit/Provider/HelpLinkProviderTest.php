@@ -35,7 +35,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);

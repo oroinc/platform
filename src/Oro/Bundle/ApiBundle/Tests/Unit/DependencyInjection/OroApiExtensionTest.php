@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $bundle1 = new Fixtures\BarBundle\BarBundle();
         $bundle2 = new Fixtures\BazBundle\BazBundle();
@@ -36,7 +36,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         CumulativeResourceManager::getInstance()->clear();
     }
@@ -1142,14 +1142,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid configuration for path "oro_api.config_files": The "request_type" options for "test1" and "test2" are duplicated.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.config_files":'
+            . ' The "request_type" options for "test1" and "test2" are duplicated.'
+        );
+
         $container = $this->getContainer();
 
         $config = [
@@ -1169,14 +1169,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid configuration for path "oro_api.config_files": The "request_type" options for "test2" and "default" are duplicated.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.config_files":'
+            . ' The "request_type" options for "test2" and "default" are duplicated.'
+        );
+
         $container = $this->getContainer();
 
         $config = [
@@ -1697,14 +1697,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid configuration for path "oro_api.batch_api.chunk_size_per_entity.Test\Entity1": Expected int or NULL.
-     */
-    // @codingStandardsIgnoreEnd
     public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.batch_api.chunk_size_per_entity.Test\Entity1":'
+            . ' Expected int or NULL.'
+        );
+
         $container = $this->getContainer();
 
         $configs = [
@@ -1721,14 +1721,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($configs, $container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid configuration for path "oro_api.batch_api.included_data_chunk_size_per_entity.Test\Entity1": Expected int or NULL.
-     */
-    // @codingStandardsIgnoreEnd
     public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.batch_api.included_data_chunk_size_per_entity.Test\Entity1":'
+            . ' Expected int or NULL.'
+        );
+
         $container = $this->getContainer();
 
         $configs = [

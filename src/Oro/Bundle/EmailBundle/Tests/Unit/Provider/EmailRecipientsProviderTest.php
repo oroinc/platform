@@ -11,7 +11,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 
     protected $emailRecipientsProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())

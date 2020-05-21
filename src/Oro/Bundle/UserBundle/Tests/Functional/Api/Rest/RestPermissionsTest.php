@@ -19,7 +19,7 @@ class RestPermissionsTest extends WebTestCase
      */
     protected $user;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData']);

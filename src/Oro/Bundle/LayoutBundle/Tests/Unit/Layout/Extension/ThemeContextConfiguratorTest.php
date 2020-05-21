@@ -15,7 +15,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var RequestStack */
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
         $this->contextConfigurator = new ThemeContextConfigurator($this->requestStack);

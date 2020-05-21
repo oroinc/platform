@@ -17,7 +17,7 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineParamConverterDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->paramConverter = $this->createMock(ParamConverterInterface::class);
 
@@ -51,12 +51,11 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->decorator->apply($request, $configuration));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage stdClass object not found.
-     */
     public function testApplyWithOutOfRangeException(): void
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('stdClass object not found.');
+
         $request = new Request(['param1' => 'value1']);
         $configuration = new ParamConverter(['class' => \stdClass::class]);
 
@@ -73,12 +72,11 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->decorator->apply($request, $configuration);
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Exception\DriverException
-     * @expectedExceptionMessage out of range
-     */
     public function testApplyWithOtherException(): void
     {
+        $this->expectException(\Doctrine\DBAL\Exception\DriverException::class);
+        $this->expectExceptionMessage('out of range');
+
         $request = new Request(['param1' => 'value1']);
         $configuration = new ParamConverter([]);
 

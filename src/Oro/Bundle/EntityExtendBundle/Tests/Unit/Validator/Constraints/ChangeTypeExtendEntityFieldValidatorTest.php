@@ -20,7 +20,7 @@ class ChangeTypeExtendEntityFieldValidatorTest extends \PHPUnit\Framework\TestCa
     /** @var ChangeTypeExtendEntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldNameValidationHelper = $this->createMock(FieldNameValidationHelper::class);
 

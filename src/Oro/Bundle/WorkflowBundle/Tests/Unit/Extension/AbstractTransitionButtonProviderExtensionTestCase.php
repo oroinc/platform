@@ -36,7 +36,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
@@ -51,7 +51,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowRegistry, $this->routeProvider, $this->extension, $this->applicationProvider);
     }

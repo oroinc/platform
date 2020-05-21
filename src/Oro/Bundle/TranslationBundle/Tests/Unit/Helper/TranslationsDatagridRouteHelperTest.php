@@ -17,7 +17,7 @@ class TranslationsDatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
             ->disableOriginalConstructor()
@@ -29,7 +29,7 @@ class TranslationsDatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->datagridRouteHelper, $this->helper);
     }

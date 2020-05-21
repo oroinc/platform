@@ -27,7 +27,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

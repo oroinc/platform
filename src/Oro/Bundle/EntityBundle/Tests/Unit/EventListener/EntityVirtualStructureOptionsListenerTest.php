@@ -23,7 +23,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);

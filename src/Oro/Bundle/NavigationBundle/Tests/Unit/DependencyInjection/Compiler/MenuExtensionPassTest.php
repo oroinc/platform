@@ -21,7 +21,7 @@ class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->menuFactory = $this->container->register('oro_menu.factory');

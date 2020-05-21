@@ -6,31 +6,35 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS = 'Test\Class';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|SerializerInterface */
     protected $serializer;
 
-    /**
-     * @var ProcessDataSerializeListener
-     */
+    /** @var ProcessDataSerializeListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
-        $this->listener = new ProcessDataSerializeListener(new ServiceLink($this->serializer));
+        $this->serializer = $this->getMockForAbstractClass(SerializerInterface::class);
+        $this->listener = new class(new ServiceLink($this->serializer)) extends ProcessDataSerializeListener {
+            public function xgetScheduledEntities(): array
+            {
+                return $this->scheduledEntities;
+            }
+        };
     }
 
     /**
@@ -38,26 +42,17 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnFlush($entities, $expected)
     {
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $unitOfWork->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($entities));
-        $unitOfWork->expects($this->once())
-            ->method('getScheduledEntityUpdates')
-            ->will($this->returnValue($entities));
+        $unitOfWork = $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
+        $unitOfWork->expects(static::once())->method('getScheduledEntityInsertions')->willReturn($entities);
+        $unitOfWork->expects(static::once())->method('getScheduledEntityUpdates')->willReturn($entities);
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->expects(static::once())->method('getUnitOfWork')->willReturn($unitOfWork);
 
         $this->listener->onFlush(new OnFlushEventArgs($entityManager));
 
-        $this->assertAttributeEquals($expected, 'scheduledEntities', $this->listener);
+        static::assertEquals($expected, $this->listener->xgetScheduledEntities());
     }
 
     public function onFlushProvider()
@@ -66,24 +61,24 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         $processJob = new ProcessJob();
         $processJob->getData()->set('key', 'value');
 
-        return array(
-            'string instead class' => array(
-                'entities' => array('some class'),
-                'expected' => array()
-            ),
-            'invalid class' => array(
-                'entities' => array($stdClass),
-                'expected' => array()
-            ),
-            'valid class' => array(
-                'entities' => array($processJob),
-                'expected' => array($processJob, $processJob)
-            ),
-            'several' => array(
-                'entities' => array($processJob, $stdClass, 'str', $stdClass),
-                'expected' => array($processJob, $processJob)
-            ),
-        );
+        return [
+            'string instead class' => [
+                'entities' => ['some class'],
+                'expected' => []
+            ],
+            'invalid class' => [
+                'entities' => [$stdClass],
+                'expected' => []
+            ],
+            'valid class' => [
+                'entities' => [$processJob],
+                'expected' => [$processJob, $processJob]
+            ],
+            'several' => [
+                'entities' => [$processJob, $stdClass, 'str', $stdClass],
+                'expected' => [$processJob, $processJob]
+            ],
+        ];
     }
 
     public function testPostFlush()
@@ -102,47 +97,35 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         $processJob->setProcessTrigger($processTrigger)
             ->setData($processData);
 
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $unitOfWork->expects($this->at(0))
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue(array($processJob)));
-        $unitOfWork->expects($this->at(1))
-            ->method('getScheduledEntityUpdates')
-            ->will($this->returnValue(array($processJob)));
+        $unitOfWork = $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
+        $unitOfWork->expects(static::at(0))->method('getScheduledEntityInsertions')->willReturn([$processJob]);
+        $unitOfWork->expects(static::at(1))->method('getScheduledEntityUpdates')->willReturn([$processJob]);
 
         $entityId   = 1;
         $entityHash = ProcessJob::generateEntityHash(self::TEST_CLASS, $entityId);
 
-        $this->serializer->expects($this->exactly(2))
+        $this->serializer->expects(static::exactly(2))
             ->method('serialize')
-            ->with($processJob->getData(), 'json', array('processJob' => $processJob))
-            ->will(
-                $this->returnCallback(
-                    function () use ($processJob, $entityId, $serializedData) {
-                        $processJob->setEntityId($entityId);
-                        return $serializedData;
-                    }
-                )
+            ->with($processJob->getData(), 'json', ['processJob' => $processJob])
+            ->willReturnCallback(
+                function () use ($processJob, $entityId, $serializedData) {
+                    $processJob->setEntityId($entityId);
+                    return $serializedData;
+                }
             );
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->any())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
-        $entityManager->expects($this->once())
-            ->method('flush');
+        /** @var EntityManager|MockObject $entityManager */
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager->method('getUnitOfWork')->willReturn($unitOfWork);
+        $entityManager->expects(static::once())->method('flush');
 
         $this->listener->onFlush(new OnFlushEventArgs($entityManager));
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
 
-        $this->assertEquals($serializedData, $processJob->getSerializedData());
-        $this->assertEquals($entityId, $processJob->getEntityId());
-        $this->assertEquals($entityHash, $processJob->getEntityHash());
-        $this->assertFalse($processJob->getData()->isModified());
+        static::assertEquals($serializedData, $processJob->getSerializedData());
+        static::assertEquals($entityId, $processJob->getEntityId());
+        static::assertEquals($entityHash, $processJob->getEntityHash());
+        static::assertFalse($processJob->getData()->isModified());
     }
 
     public function testPostLoad()

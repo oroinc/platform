@@ -12,7 +12,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new ProcessorRegistryCompilerPass();
     }

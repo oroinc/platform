@@ -12,12 +12,12 @@ class FileManagerTest extends WebTestCase
      */
     private $someFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unlink($this->someFile);
         parent::tearDown();

@@ -28,7 +28,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resolver = new SystemAwareResolver();
 
@@ -240,12 +240,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Item key "user_user_show" duplicated in tree menu "navbar".
-     */
     public function testBuildDuplicatedItemTreeCallException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item key "user_user_show" duplicated in tree menu "navbar".');
+
         $options = [
             'areas' => [],
             'items' => [

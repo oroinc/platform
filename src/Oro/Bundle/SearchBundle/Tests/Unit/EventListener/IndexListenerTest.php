@@ -38,7 +38,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('Due to BAP-13223');
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -67,52 +67,50 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
-            ->will($this->returnValue([
+            ->willReturn([
                 'inserted' => $insertedEntity,
                 'not_supported' => $notSupportedEntity,
-            ]));
+            ]);
         $unitOfWork->expects($this->any())->method('getScheduledEntityUpdates')
-            ->will($this->returnValue([
+            ->willReturn([
                 'updated' => $updatedEntity,
                 'not_supported' => $notSupportedEntity,
-            ]));
+            ]);
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
-            ->will($this->returnValue([
+            ->willReturn([
                 'deleted' => $deletedEntity,
                 'not_supported' => $notSupportedEntity,
-            ]));
+            ]);
         $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($updatedEntity)
-            ->will($this->returnValue([
+            ->willReturn([
                 'field' => ['val1', 'val2'],
-            ]));
+            ]);
 
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($deletedEntity)
-            ->will($this->returnValue($entityClass));
+            ->willReturn($entityClass);
         $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($deletedEntity)
-            ->will($this->returnValue($entityId));
+            ->willReturn($entityId);
 
         $entityManager = $this->createEntityManager();
         $entityManager->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
         $entityManager->expects($this->once())->method('getReference')->with($entityClass, $entityId)
-            ->will($this->returnValue($deletedEntityReference));
+            ->willReturn($deletedEntityReference);
         $entityManager->expects($this->any())->method('getClassMetadata')
-            ->will($this->returnValue($meta));
+            ->willReturn($meta);
 
         $listener = $this->createListener();
         $listener->onFlush(new OnFlushEventArgs($entityManager));
 
-        $this->assertAttributeEquals(
+        static::assertEquals(
             ['inserted' => $insertedEntity, 'updated' => $updatedEntity],
-            'savedEntities',
-            $listener
+            $listener->xgetSavedEntities()
         );
-        $this->assertAttributeEquals(
+        static::assertEquals(
             ['deleted' => $deletedEntityReference],
-            'deletedEntities',
-            $listener
+            $listener->xgetDeletedEntities()
         );
     }
 
@@ -136,21 +134,21 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($insertedEntities));
+            ->willReturn($insertedEntities);
         $unitOfWork->expects($this->exactly(2))->method('getScheduledEntityUpdates')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
-            ->will($this->returnValue($deletedEntities));
+            ->willReturn($deletedEntities);
 
         $meta = $this->createClassMetadata();
 
         $entityManager = $this->createEntityManager();
         $entityManager->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
         $entityManager->expects($this->once())->method('getReference')
-            ->will($this->returnValue($deletedEntity));
+            ->willReturn($deletedEntity);
         $entityManager->expects($this->any())->method('getClassMetadata')
-            ->will($this->returnValue($meta));
+            ->willReturn($meta);
 
         $this->searchIndexer
             ->expects($this->once())
@@ -168,8 +166,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->postFlush(new PostFlushEventArgs($entityManager));
 
-        $this->assertAttributeEmpty('savedEntities', $listener);
-        $this->assertAttributeEmpty('deletedEntities', $listener);
+        static::assertFalse($listener->xhasEntitiesToIndex());
     }
 
     public function testOnClear()
@@ -182,26 +179,25 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
         $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($insertedEntities));
+            ->willReturn($insertedEntities);
         $unitOfWork->expects($this->exactly(2))->method('getScheduledEntityUpdates')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
-            ->will($this->returnValue($deletedEntities));
+            ->willReturn($deletedEntities);
 
         $meta = $this->createClassMetadata();
 
         $entityManager = $this->createEntityManager();
         $entityManager->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
         $entityManager->expects($this->any())->method('getClassMetadata')
-            ->will($this->returnValue($meta));
+            ->willReturn($meta);
 
         $listener = $this->createListener();
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->onClear(new OnClearEventArgs($entityManager));
 
-        $this->assertAttributeEmpty('savedEntities', $listener);
-        $this->assertAttributeEmpty('deletedEntities', $listener);
+        static::assertFalse($listener->xhasEntitiesToIndex());
     }
 
     /**
@@ -209,7 +205,26 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected function createListener()
     {
-        $listener = new IndexListener($this->doctrineHelper, $this->searchIndexer, new PropertyAccessor());
+        $listener = new class(
+            $this->doctrineHelper,
+            $this->searchIndexer,
+            new PropertyAccessor()
+        ) extends IndexListener {
+            public function xhasEntitiesToIndex()
+            {
+                return parent::hasEntitiesToIndex();
+            }
+
+            public function xgetSavedEntities(): array
+            {
+                return $this->savedEntities;
+            }
+
+            public function xgetDeletedEntities(): array
+            {
+                return $this->deletedEntities;
+            }
+        };
 
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();

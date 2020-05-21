@@ -25,7 +25,7 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListBodyListenerDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
         $this->request->headers->set('Content-Type', 'text/html');

@@ -29,7 +29,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
@@ -55,7 +55,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflow, $this->definition, $this->button, $this->buttonContext, $this->transition);
     }

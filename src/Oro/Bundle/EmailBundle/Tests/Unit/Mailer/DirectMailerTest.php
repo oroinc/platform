@@ -7,27 +7,28 @@ use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsAwareInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DirectMailerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Mailer */
+    /** @var MockObject|\Swift_Mailer */
     protected $baseMailer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    /** @var MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOrigin */
+    /** @var MockObject|EmailOrigin */
     protected $emailOrigin;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettingsAwareInterface */
+    /** @var MockObject|SmtpSettingsAwareInterface */
     private $smtpSettingsProvider;
 
     /** @var DirectMailer */
     private $mailer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->baseMailer = $this->getMailerMock();
         $this->container = $this->createMock(ContainerInterface::class);
@@ -228,11 +229,9 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->mailer->send($message, $failedRecipients));
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testSendWithException()
     {
+        $this->expectException(\Exception::class);
         $message = new \Swift_Message();
         $failedRecipients = [];
         $transport = $this->createMock(\Swift_Transport::class);
@@ -311,11 +310,9 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(\Swift_Transport_EsmtpTransport::class, $smtpTransport);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EmailBundle\Exception\NotSupportedException
-     */
     public function testRegisterPlugin()
     {
+        $this->expectException(\Oro\Bundle\EmailBundle\Exception\NotSupportedException::class);
         $plugin = $this->createMock(\Swift_Events_EventListener::class);
         $this->mailer->registerPlugin($plugin);
     }
@@ -325,10 +322,11 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
      */
     public function testAfterPrepareSmtpTransportForEsmtpTransport()
     {
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_EsmtpTransport|MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword'])
+            ->onlyMethods(['setHost', 'setPort', 'setEncryption'])
+            ->addMethods(['setUsername', 'setPassword'])
             ->getMock();
         $streamOptions = ['ssl' => ['verify_peer' => false]];
         $smtpTransportMock->setStreamOptions($streamOptions);
@@ -384,20 +382,20 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
      */
     public function testAfterPrepareSmtpTransportForNonEsmtpTransport()
     {
-        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_AbstractSmtpTransport|MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->baseMailer->expects($this->once())
+        $this->baseMailer->expects(static::once())
             ->method('getTransport')
             ->willReturn($smtpTransportMock);
 
-        $this->smtpSettingsProvider->expects($this->any())
+        $this->smtpSettingsProvider->expects(static::any())
             ->method('getSmtpSettings')
             ->willReturn(new SmtpSettings());
 
-        $this->container->expects($this->any())
+        $this->container->expects(static::any())
             ->method('get')
             ->with('oro_email.provider.smtp_settings', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
             ->willReturn($this->smtpSettingsProvider);
@@ -409,22 +407,21 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $settings->setPassword('pass');
         $settings->setEncryption('tls');
 
-        $smtpTransportMock->expects($this->never())
-            ->method($this->anything());
+        $smtpTransportMock->expects(static::never())->method(static::anything());
 
         $this->mailer->afterPrepareSmtpTransport($settings);
-        $this->assertAttributeInstanceOf(\Swift_SmtpTransport::class, 'smtpTransport', $this->mailer);
         $transport = $this->mailer->getTransport();
+        static::assertInstanceOf(\Swift_SmtpTransport::class, $this->mailer->getTransport());
 
-        $this->assertEquals($settings->getHost(), $transport->getHost());
-        $this->assertEquals($settings->getPort(), $transport->getPort());
-        $this->assertEquals($settings->getEncryption(), $transport->getEncryption());
-        $this->assertEquals($settings->getUsername(), $transport->getUsername());
-        $this->assertEquals($settings->getPassword(), $transport->getPassword());
+        static::assertEquals($settings->getHost(), $transport->getHost());
+        static::assertEquals($settings->getPort(), $transport->getPort());
+        static::assertEquals($settings->getEncryption(), $transport->getEncryption());
+        static::assertEquals($settings->getUsername(), $transport->getUsername());
+        static::assertEquals($settings->getPassword(), $transport->getPassword());
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|\Swift_Mailer
+     * @return MockObject|\Swift_Mailer
      */
     private function getMailerMock()
     {

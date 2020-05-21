@@ -35,7 +35,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
         $this->deletedAttributeProvider = $this->createMock(DeletedAttributeProviderInterface::class);
@@ -51,7 +51,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $movedAttributeId = 777;
         $deletedAttributeId = 888;
         $attributeFamily = $this->getFilledAttributeFamily($attributeFamilyId, $movedAttributeId);
-        
+
         $uow = new UnitOfWork();
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $movedAttributeId));
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $deletedAttributeId));
@@ -62,7 +62,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        
+
         $this->deletedAttributeProvider->expects($this->once())
             ->method('getAttributesByIds')
             ->with([$deletedAttributeId])
@@ -77,7 +77,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
             $reflectionProperty->getValue($this->listener)
         );
     }
-    
+
     public function testPostFlush()
     {
         $emptyFamilyId = 1;
@@ -93,7 +93,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
                 $filledFamilyId => $filledFamilyAttributeNames,
             ]
         );
-        
+
         $this->listener->setTopic($topicName);
         $this->messageProducer->expects($this->once())
             ->method('send')
@@ -142,7 +142,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $attributeGroupRelation = new AttributeGroupRelation();
         $attributeGroupRelation->setEntityConfigFieldId($attributeId);
         $attributeGroupRelation->setAttributeGroup($attributeGroup);
-        
+
         return $attributeGroupRelation;
     }
 
@@ -154,7 +154,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $reflectionClass = new \ReflectionClass($this->listener);
         $reflectionProperty = $reflectionClass->getProperty('deletedAttributes');
         $reflectionProperty->setAccessible(true);
-        
+
         return $reflectionProperty;
     }
 }

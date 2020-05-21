@@ -18,7 +18,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
     private $secondState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultState = $this->createMock(ConfigCacheStateInterface::class);
         $this->firstState = $this->createMock(ConfigCacheStateInterface::class);
@@ -38,12 +38,11 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a config cache state service for the request "rest,another".
-     */
     public function testGetConfigCacheStateForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a config cache state service for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getConfigCacheState($requestType);

@@ -18,7 +18,7 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repoImapEmail;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
             ->disableOriginalConstructor()

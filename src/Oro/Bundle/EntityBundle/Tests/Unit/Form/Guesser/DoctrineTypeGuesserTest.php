@@ -2,45 +2,47 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineTypeGuesser
-     */
+    /** @var DoctrineTypeGuesser */
     protected $guesser;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|ConfigProvider */
     protected $entityConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->managerRegistry = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->guesser = new DoctrineTypeGuesser(
+        $this->guesser = new class(
             $this->managerRegistry,
             $this->entityConfigProvider
-        );
+        ) extends DoctrineTypeGuesser {
+            public function xgetDoctrineTypeMappings(): array
+            {
+                return $this->doctrineTypeMappings;
+            }
+        };
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->managerRegistry);
         unset($this->entityConfigProvider);
@@ -51,12 +53,12 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $doctrineType = 'doctrine_type';
         $formType = 'test_form_type';
-        $formOptions = array('form' => 'options');
-        $expectedMappings = array($doctrineType => array('type' => $formType, 'options' => $formOptions));
+        $formOptions = ['form' => 'options'];
+        $expectedMappings = [$doctrineType => ['type' => $formType, 'options' => $formOptions]];
 
         $this->guesser->addDoctrineTypeMapping($doctrineType, $formType, $formOptions);
 
-        $this->assertAttributeEquals($expectedMappings, 'doctrineTypeMappings', $this->guesser);
+        static::assertEquals($expectedMappings, $this->guesser->xgetDoctrineTypeMappings());
     }
 
     public function testGuessNoMetadata()

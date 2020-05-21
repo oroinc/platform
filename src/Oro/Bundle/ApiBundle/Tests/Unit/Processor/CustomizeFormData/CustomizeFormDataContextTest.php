@@ -19,7 +19,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
     /** @var CustomizeFormDataContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CustomizeFormDataContext();
     }
@@ -278,11 +278,9 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasResult());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testRemoveResult()
     {
+        $this->expectException(\BadMethodCallException::class);
         $this->context->removeResult();
     }
 

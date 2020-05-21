@@ -27,18 +27,17 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->templating = $this->createMock(EngineInterface::class);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Please provide valid twig template as third argument
-     */
     public function testConstructor()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Please provide valid twig template as third argument');
+
         new Controller($this->translator, $this->templating, '', []);
     }
 

@@ -39,7 +39,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatterManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())

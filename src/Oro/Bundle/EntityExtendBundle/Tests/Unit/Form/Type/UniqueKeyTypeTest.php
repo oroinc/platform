@@ -22,7 +22,7 @@ class UniqueKeyTypeTest extends TypeTestCase
         'Email' => 'email',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(new AnnotationReader())

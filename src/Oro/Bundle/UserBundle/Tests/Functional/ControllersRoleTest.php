@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Form;
 
 class ControllersRoleTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -35,7 +35,7 @@ class ControllersRoleTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Role saved", $crawler->html());
+        static::assertStringContainsString("Role saved", $crawler->html());
     }
 
     /**
@@ -68,7 +68,7 @@ class ControllersRoleTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Role saved", $crawler->html());
+        static::assertStringContainsString("Role saved", $crawler->html());
     }
 
     /**
@@ -117,9 +117,21 @@ class ControllersRoleTest extends WebTestCase
             $this->getUrl('oro_user_role_view', ['id' => $result['id']])
         );
 
-        self::assertContains('testRoleUpdated', $crawler->filter('.responsive-section')->first()->html());
-        self::assertContains('Clone', $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html());
-        self::assertContains('Edit', $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html());
-        self::assertContains('Delete', $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html());
+        static::assertStringContainsString(
+            'testRoleUpdated',
+            $crawler->filter('.responsive-section')->first()->html()
+        );
+        static::assertStringContainsString(
+            'Clone',
+            $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html()
+        );
+        static::assertStringContainsString(
+            'Edit',
+            $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html()
+        );
+        static::assertStringContainsString(
+            'Delete',
+            $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html()
+        );
     }
 }

@@ -15,7 +15,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfRequestManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 

@@ -17,7 +17,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AssociationTypeHelper */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

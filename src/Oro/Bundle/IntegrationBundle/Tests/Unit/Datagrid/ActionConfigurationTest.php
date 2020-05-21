@@ -18,7 +18,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     private $typesRegistryMock;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->typesRegistryMock = $this->createMock(TypesRegistry::class);
 

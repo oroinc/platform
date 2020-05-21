@@ -13,7 +13,7 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -26,7 +26,7 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entityManager, $this->repository);
     }

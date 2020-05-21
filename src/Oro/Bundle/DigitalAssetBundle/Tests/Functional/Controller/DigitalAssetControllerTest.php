@@ -42,7 +42,7 @@ class DigitalAssetControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Digital Asset has been saved', $crawler->html());
+        static::assertStringContainsString('Digital Asset has been saved', $crawler->html());
 
         /** @var DigitalAsset $digitalAsset */
         $digitalAsset = current(
@@ -97,7 +97,7 @@ class DigitalAssetControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Digital Asset has been saved', $crawler->html());
+        static::assertStringContainsString('Digital Asset has been saved', $crawler->html());
 
         /** @var DigitalAsset $digitalAsset */
         $digitalAsset = current(
@@ -120,8 +120,11 @@ class DigitalAssetControllerTest extends WebTestCase
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_digital_asset_index'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('digital-asset-grid', $crawler->html());
-        $this->assertContains('Create Digital Asset', $crawler->filter('div.title-buttons-container')->html());
+        static::assertStringContainsString('digital-asset-grid', $crawler->html());
+        static::assertStringContainsString(
+            'Create Digital Asset',
+            $crawler->filter('div.title-buttons-container')->html()
+        );
     }
 
     /**

@@ -26,7 +26,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var  ErrorNormalizeProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
 

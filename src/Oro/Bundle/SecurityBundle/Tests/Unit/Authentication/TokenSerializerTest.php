@@ -21,7 +21,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenSerializer */
     protected $tokenSerializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 

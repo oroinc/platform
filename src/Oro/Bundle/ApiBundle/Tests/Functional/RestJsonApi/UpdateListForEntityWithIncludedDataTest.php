@@ -12,7 +12,7 @@ use Oro\Component\MessageQueue\Job\Job;
  */
 class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/update_list_for_entity.yml']);

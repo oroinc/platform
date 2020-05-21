@@ -27,7 +27,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AuditManager */
     private $auditManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(
             'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
@@ -52,7 +52,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->auditManager = new AuditManager($this->tokenStorage, $doctrine);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->tokenStorage, $this->configManager, $this->auditManager);
     }

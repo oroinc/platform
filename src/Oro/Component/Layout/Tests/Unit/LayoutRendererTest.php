@@ -17,7 +17,7 @@ class LayoutRendererTest extends \PHPUnit\Framework\TestCase
     /** @var FormRendererEngineInterface */
     protected $formRenderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerRenderer = $this->createMock('Oro\Component\Layout\Form\FormRendererInterface');
         $this->formRenderer = $this->createMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');

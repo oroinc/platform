@@ -19,7 +19,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DateFormatExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->converterRegistry =$this->getMockBuilder(DateTimeFormatConverterRegistry::class)
             ->disableOriginalConstructor()
@@ -32,7 +32,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DateFormatExtension($container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->converterRegistry);
         unset($this->extension);

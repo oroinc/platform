@@ -22,7 +22,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compiler = new ResourceDocParserCompilerPass();

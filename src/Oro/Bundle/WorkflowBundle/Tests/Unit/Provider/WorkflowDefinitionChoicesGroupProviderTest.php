@@ -19,7 +19,7 @@ class WorkflowDefinitionChoicesGroupProviderTest extends \PHPUnit\Framework\Test
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowDefinitionRepo = $this->createMock(WorkflowDefinitionRepository::class);
 

@@ -12,7 +12,7 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AuthorProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())

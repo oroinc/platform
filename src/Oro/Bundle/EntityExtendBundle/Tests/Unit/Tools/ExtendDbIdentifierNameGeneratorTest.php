@@ -9,7 +9,7 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
@@ -43,13 +43,13 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The enum code length must be less or equal 54 characters. Code:
-     * extra_long_enum_entity_table_name_test_5678901
-     */
     public function testGenerateEnumTableNameWithTooLongEnumCode()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The enum code length must be less or equal 54 characters.'
+            . ' Code: extra_long_enum_entity_table_name_test_5678901'
+        );
         $this->nameGenerator->generateEnumTableName('extra_long_enum_entity_table_name_test_5678901234567890');
     }
 }

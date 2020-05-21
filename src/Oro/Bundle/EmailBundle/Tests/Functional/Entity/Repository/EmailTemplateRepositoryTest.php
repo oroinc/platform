@@ -20,7 +20,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
     const SYSTEM_TEMPLATE_EMAIL_WITH_ENTITY = 'user_reset_password';
     const USER_ENTITY_TEMPLATE_NAME = 'user_reset_password';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -344,11 +344,10 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEmpty($actualEmailTemplates);
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\NoResultException
-     */
     public function testFindOneLocalizedWhenNoResult(): void
     {
+        $this->expectException(\Doctrine\ORM\NoResultException::class);
+
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 
         self::assertNull($this->getRepository()->findWithLocalizations(

@@ -14,7 +14,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
      */
     protected $iterator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->client = $this->createMock('Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface');
         $this->iterator = $this->transport = $this->getMockBuilder(

@@ -156,6 +156,11 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         return $this->qb;
     }
 
+    public function getQueryHints(): ?array
+    {
+        return $this->queryHints;
+    }
+
     /**
      * Set QueryBuilder
      *

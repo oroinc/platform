@@ -15,7 +15,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
     /** @var ExtendDbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
     private $nameGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
 
@@ -40,11 +40,9 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
         return new FieldNameLengthValidator($this->nameGenerator);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testValidateException()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             sprintf('Expected argument of type "%s", "%s" given', FieldNameLength::class, Length::class)
         );

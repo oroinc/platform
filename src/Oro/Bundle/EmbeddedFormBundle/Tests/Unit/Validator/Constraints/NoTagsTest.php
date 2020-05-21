@@ -11,7 +11,7 @@ class NoTagsTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new NoTags();
     }

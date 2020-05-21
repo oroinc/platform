@@ -12,7 +12,7 @@ class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ExtraFieldsValidationExtension();
     }
@@ -26,6 +26,6 @@ class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($resolver->hasDefault('extra_fields_message'));
         $resolvedOptions = $resolver->resolve();
 
-        $this->assertArraySubset(['extra_fields_message' => 'oro.form.extra_fields'], $resolvedOptions);
+        $this->assertSame('oro.form.extra_fields', $resolvedOptions['extra_fields_message']);
     }
 }

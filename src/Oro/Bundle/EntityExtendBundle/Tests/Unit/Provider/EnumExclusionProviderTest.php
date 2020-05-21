@@ -16,7 +16,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EnumExclusionProvider */
     protected $exclusionProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

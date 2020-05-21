@@ -30,7 +30,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigSubscriber */
     protected $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(Translator::class);

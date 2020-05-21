@@ -11,14 +11,14 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->configManager);
     }

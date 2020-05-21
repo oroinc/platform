@@ -14,7 +14,7 @@ class LocalizationScopeCriteriaProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationScopeCriteriaProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currentLocalizationProvider = $this->createMock(CurrentLocalizationProvider::class);
 

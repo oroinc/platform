@@ -38,7 +38,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Localization[]|array */
     private $entities = [];
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(LocalizationRepository::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

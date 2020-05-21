@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     /** @var Router */
     protected $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestQuery = $this->createMock(ParameterBag::class);
         $this->request = $this->createMock(Request::class);
@@ -177,7 +177,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testWrongParametersRedirectAfterSave()
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->router->redirectAfterSave(
             array(),
             array()
@@ -195,12 +195,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($response->getTargetUrl(), $expectedUrl);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Request parameter "input_action" must be string, array is given.
-     */
     public function testRedirectFailsWhenInputActionNotString()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Request parameter "input_action" must be string, array is given.');
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
@@ -209,14 +208,14 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "route" cannot be empty: {"route":""}
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedirectFailsWhenRouteIsEmpty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "route" cannot be empty: {"route":""}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
@@ -225,14 +224,14 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "route" must be string: {"route":{"foo":"bar"}}
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedirectFailsWhenRouteIsNotString()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "route" must be string: {"route":{"foo":"bar"}}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
@@ -241,14 +240,14 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "params" must be array: {"route":"foo","params":"bar"}
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedirectFailsWhenRouteParamsIsNotArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "params" must be array: {"route":"foo","params":"bar"}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)

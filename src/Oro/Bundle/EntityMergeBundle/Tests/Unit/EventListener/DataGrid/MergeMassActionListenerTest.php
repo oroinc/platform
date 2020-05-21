@@ -19,7 +19,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $entityConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

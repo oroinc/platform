@@ -7,31 +7,16 @@ use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
 
 class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MenuTreeBuilder */
-    private $builder;
-
-    protected function setUp()
+    public function testConstructorSetsMenuMapping()
     {
-        $this->builder = new MenuTreeBuilder();
-    }
-
-    public function testConstructor()
-    {
-        $nodeMapping = $this->readAttribute($this->builder, 'nodeMapping');
-        $this->assertArrayHasKey('menu', $nodeMapping);
-        $this->assertEquals(
-            MenuNodeDefinition::class,
-            $nodeMapping['menu']
-        );
+        $builder = new MenuTreeBuilder();
+        static::assertInstanceOf(MenuNodeDefinition::class, $builder->node('menu', 'menu'));
     }
 
     public function testMenuNode()
     {
-        $nodeDefinition = $this->builder->menuNode('test');
-        $this->assertInstanceOf(
-            MenuNodeDefinition::class,
-            $nodeDefinition
-        );
-        $this->assertEquals('test', $nodeDefinition->getNode()->getName());
+        $nodeDefinition = (new MenuTreeBuilder())->menuNode('test');
+        static::assertInstanceOf(MenuNodeDefinition::class, $nodeDefinition);
+        static::assertEquals('test', $nodeDefinition->getNode()->getName());
     }
 }

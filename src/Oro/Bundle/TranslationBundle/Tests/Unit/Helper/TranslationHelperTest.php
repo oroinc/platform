@@ -22,7 +22,7 @@ class TranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(TranslationRepository::class)
             ->disableOriginalConstructor()

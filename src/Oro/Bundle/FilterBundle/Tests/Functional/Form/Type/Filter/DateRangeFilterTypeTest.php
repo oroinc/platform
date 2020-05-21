@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DateRangeFilterTypeTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->initClient();

@@ -18,7 +18,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \stdClass */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -27,7 +27,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         $this->entityPaginationManager = new EntityPaginationManager($this->configManager);
         $this->entity = new \stdClass();
     }
-    
+
     /**
      * @param mixed $source
      * @param bool $expected
@@ -42,7 +42,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with('oro_entity_pagination.enabled')
             ->will($this->returnValue($source));
-    
+
         $storage = new EntityPaginationManager($configManager);
         $this->assertSame($expected, $storage->isEnabled());
     }
@@ -79,12 +79,12 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetLimit()
     {
         $limit = 200;
-    
+
         $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_entity_pagination.limit')
             ->will($this->returnValue($limit));
-    
+
         $this->assertEquals($limit, $this->entityPaginationManager->getLimit());
     }
 
@@ -117,12 +117,11 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Scope "wrong_scope" is not available.
-     */
     public function testGetPermissionException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Scope "wrong_scope" is not available.');
+
         EntityPaginationManager::getPermission(self::WRONG_SCOPE);
     }
 

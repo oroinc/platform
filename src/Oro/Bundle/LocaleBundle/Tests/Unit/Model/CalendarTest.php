@@ -18,7 +18,7 @@ class CalendarTest extends TestCase
      */
     protected $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 
@@ -26,7 +26,7 @@ class CalendarTest extends TestCase
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }

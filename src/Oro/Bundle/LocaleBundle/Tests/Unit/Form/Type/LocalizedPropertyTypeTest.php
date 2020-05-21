@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 

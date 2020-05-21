@@ -18,7 +18,7 @@ class UrlWithoutFrontControllerProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->provider = new UrlWithoutFrontControllerProvider($this->router);

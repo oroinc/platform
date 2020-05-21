@@ -9,7 +9,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->placeholderProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider')
             ->disableOriginalConstructor()

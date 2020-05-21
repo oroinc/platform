@@ -44,7 +44,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(Router::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -447,61 +447,51 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
-        $this->tokenAccessor->expects($this->exactly(2))
+        $this->tokenAccessor->expects(static::exactly(2))
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
-        $this->tokenAccessor->expects($this->exactly(2))
+        $this->tokenAccessor->expects(static::exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(static::once())
             ->method('isGranted')
             ->with($options['extras']['acl_resource_id'])
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         for ($i = 0; $i < 2; $i++) {
             $item = $this->factory->createItem('test', $options);
-            $this->assertTrue($item->getExtra('isAllowed'));
-            $this->assertInstanceOf(MenuItem::class, $item);
+            static::assertTrue($item->getExtra('isAllowed'));
+            static::assertInstanceOf(MenuItem::class, $item);
         }
-
-        $this->assertAttributeCount(1, 'existingAclChecks', $this->factoryExtension);
-        $this->assertAttributeEquals(
-            [$options['extras']['acl_resource_id'] => true],
-            'existingAclChecks',
-            $this->factoryExtension
-        );
     }
 
     public function testAclCacheByKey()
     {
         $options = ['route' => 'route_name'];
 
-        $this->tokenAccessor->expects($this->exactly(2))
+        $this->tokenAccessor->expects(static::exactly(2))
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
-        $this->tokenAccessor->expects($this->exactly(2))
+        $this->tokenAccessor->expects(static::exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
         $generator = new UrlGeneratorStub();
-        $this->router->expects($this->once())
+        $this->router->expects(static::once())
             ->method('getGenerator')
             ->willReturn($generator);
 
         $this->assertClassAuthorizationCheckerCalls(true, 1);
 
         $item = $this->factory->createItem('test', $options);
-        $this->assertTrue($item->getExtra('isAllowed'));
-        $this->assertInstanceOf(MenuItem::class, $item);
+        static::assertTrue($item->getExtra('isAllowed'));
+        static::assertInstanceOf(MenuItem::class, $item);
 
         $options['new_key'] = 'new_value';
         $item = $this->factory->createItem('test', $options);
-        $this->assertTrue($item->getExtra('isAllowed'));
-        $this->assertInstanceOf(MenuItem::class, $item);
-
-        $this->assertAttributeCount(1, 'existingAclChecks', $this->factoryExtension);
-        $this->assertAttributeEquals(['controller::action' => true], 'existingAclChecks', $this->factoryExtension);
+        static::assertTrue($item->getExtra('isAllowed'));
+        static::assertInstanceOf(MenuItem::class, $item);
     }
 
     public function testBuildOptionsWithoutToken()

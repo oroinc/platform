@@ -16,7 +16,7 @@ class EntityDataEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()

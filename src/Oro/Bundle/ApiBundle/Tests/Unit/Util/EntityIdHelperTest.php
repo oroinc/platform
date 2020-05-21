@@ -14,7 +14,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->entityIdHelper = new EntityIdHelper();
@@ -196,14 +196,14 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The entity identifier cannot be an array because the entity "%s" has single identifier.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::class
+        ));
+
         $entityClass = Entity\User::class;
         $entityId = [1, 2];
         $entityMetadata = new EntityMetadata();
@@ -275,14 +275,14 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['renamedTitle'], $titleParameter->getValue());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The entity identifier must be an array because the entity "%s" has composite identifier.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity::class
+        ));
+
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = 123;
         $entityMetadata = new EntityMetadata();
@@ -297,14 +297,14 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The entity identifier array must have the key "title" because the entity "%s" has composite identifier.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity::class
+        ));
+
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123];
         $entityMetadata = new EntityMetadata();

@@ -12,7 +12,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var DynamicAssetVersionManager */
     protected $assetVersionManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache               = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()

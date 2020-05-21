@@ -18,7 +18,7 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerMetadataProvidersPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->chainProvider = $this->container->register('oro_security.owner.metadata_provider.chain');
@@ -47,14 +47,13 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The attribute "alias" is required for "oro_security.owner.metadata_provider" tag. Service: "provider1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWithoutAlias()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "alias" is required for "oro_security.owner.metadata_provider" tag. Service: "provider1".'
+        );
+
         $this->container->register('provider1')
             ->addTag('oro_security.owner.metadata_provider');
 

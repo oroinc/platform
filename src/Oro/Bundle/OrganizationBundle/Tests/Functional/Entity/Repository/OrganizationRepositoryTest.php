@@ -11,7 +11,7 @@ class OrganizationRepositoryTest extends WebTestCase
     /** @var OrganizationRepository */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

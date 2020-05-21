@@ -90,7 +90,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /** @var bool */
     private static $initClientAllowed = false;
 
-    protected function setUp()
+    protected function setUp(): void
     {
     }
 
@@ -98,7 +98,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * In order to disable kernel shutdown
      * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDown
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
     }
 

@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEnumFilter;
 
 class SearchEnumFilterTest extends AbstractSearchEnumFilterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

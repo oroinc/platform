@@ -11,7 +11,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     /** @var ChoiceType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

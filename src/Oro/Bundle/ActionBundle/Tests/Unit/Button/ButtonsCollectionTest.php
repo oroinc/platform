@@ -15,13 +15,13 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchContext;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->collection = new ButtonsCollection();
         $this->searchContext = $this->getMockBuilder(ButtonSearchContext::class)->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->collection, $this->searchContext);
     }
@@ -100,7 +100,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $extension = $this->getExtensionMock([$button]);
         $this->collection->consume($extension, $this->searchContext);
 
-        $this->expectException('Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException');
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException::class);
         $this->expectExceptionMessage(
             sprintf(
                 'Map callback should return `%s` as result got `%s` instead.',

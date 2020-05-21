@@ -22,7 +22,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
         $valueNormalizer = $this->getValueNormalizer();

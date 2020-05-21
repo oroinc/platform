@@ -23,7 +23,7 @@ class AttributeValueProviderTest extends WebTestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -38,11 +38,11 @@ class AttributeValueProviderTest extends WebTestCase
     public function testRemoveAttributeValues()
     {
         $attributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
-        
+
         $testActivityTargetManager = $this->doctrineHelper->getEntityManagerForClass(TestActivityTarget::class);
         $testActivityTarget = $this->loadTestActivityTarget($attributeFamily, $testActivityTargetManager);
         $this->assertNotEmpty($testActivityTarget->getString());
-        
+
         $this->provider->removeAttributeValues(
             $attributeFamily,
             ['string']
@@ -65,7 +65,7 @@ class AttributeValueProviderTest extends WebTestCase
 
         $manager->persist($testActivityTarget);
         $manager->flush();
-        
+
         return $testActivityTarget;
     }
 }

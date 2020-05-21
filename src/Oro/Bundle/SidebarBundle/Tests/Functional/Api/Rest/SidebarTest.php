@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SidebarTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }

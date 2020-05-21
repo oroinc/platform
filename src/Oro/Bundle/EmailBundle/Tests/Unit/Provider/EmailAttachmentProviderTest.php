@@ -35,7 +35,7 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $emailAttachmentProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailThreadProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider');
 

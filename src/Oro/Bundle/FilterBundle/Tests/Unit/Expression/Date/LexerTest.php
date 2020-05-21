@@ -10,14 +10,14 @@ class LexerTest extends \PHPUnit\Framework\TestCase
     /** @var Lexer */
     protected $lexer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translatorMock = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $providerMock   = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
         $this->lexer    = new Lexer($translatorMock, $providerMock);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->lexer);
     }
@@ -37,7 +37,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->lexer->tokenize($input);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(count($expectedTokens), $result);
 
         foreach ($result as $key => $token) {

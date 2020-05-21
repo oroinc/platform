@@ -14,7 +14,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     const RELATED_ENTITY = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
     }

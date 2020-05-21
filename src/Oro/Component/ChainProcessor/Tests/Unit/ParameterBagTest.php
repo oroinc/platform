@@ -9,7 +9,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBag */
     private $parameterBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parameterBag = new ParameterBag();
     }

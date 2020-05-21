@@ -13,13 +13,13 @@ class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicationContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
         $this->contextConfigurator = new ApplicationContextConfigurator($this->kernel);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextConfigurator, $this->kernel);
     }

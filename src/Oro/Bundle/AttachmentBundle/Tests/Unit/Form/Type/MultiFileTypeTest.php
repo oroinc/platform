@@ -22,7 +22,7 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->eventSubscriber = $this->createMock(EventSubscriberInterface::class);
         $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);

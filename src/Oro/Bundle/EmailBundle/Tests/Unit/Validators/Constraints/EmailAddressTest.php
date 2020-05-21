@@ -9,7 +9,7 @@ class EmailAddressTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddress */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailAddress();
     }

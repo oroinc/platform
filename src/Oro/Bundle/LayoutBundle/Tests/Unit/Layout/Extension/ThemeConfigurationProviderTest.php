@@ -23,7 +23,7 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $bundle1 = new TestBundle();
         $bundle2 = new TestBundle2();

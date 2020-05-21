@@ -7,7 +7,7 @@ use Symfony\Component\DomCrawler\Form;
 
 class ReportValidationTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -61,6 +61,6 @@ class ReportValidationTest extends WebTestCase
         $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $expectedMessage = $this->getContainer()->get('translator.default')->trans('Report saved');
-        $this->assertContains($expectedMessage, $this->client->getResponse()->getContent());
+        static::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
     }
 }

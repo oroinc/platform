@@ -19,7 +19,7 @@ class NotDangerousProtocolValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var NotDangerousProtocolValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
         $this->validator = new NotDangerousProtocolValidator($this->uriSecurityHelper);

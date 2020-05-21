@@ -27,7 +27,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     /** @var RelationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $relationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadataDriver = new AnnotationDriver(
             new AnnotationReader(),

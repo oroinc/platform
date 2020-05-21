@@ -46,7 +46,7 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportHandler */
     protected $importHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);

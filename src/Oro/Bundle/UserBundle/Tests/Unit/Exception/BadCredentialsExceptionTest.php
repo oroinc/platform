@@ -9,7 +9,7 @@ class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
     /** @var BadCredentialsException */
     protected $exception;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exception = new BadCredentialsException();
     }

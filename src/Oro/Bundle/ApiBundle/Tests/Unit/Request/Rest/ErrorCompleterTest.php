@@ -24,7 +24,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /** @var ErrorCompleter */
     private $errorCompleter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
         $this->metadata = $this->createMock(EntityMetadata::class);

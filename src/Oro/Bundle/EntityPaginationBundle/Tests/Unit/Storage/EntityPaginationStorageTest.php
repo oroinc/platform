@@ -32,7 +32,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /** @var RequestStack */
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

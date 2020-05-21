@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SetNewAuditVersionServiceTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

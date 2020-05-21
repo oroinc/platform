@@ -20,7 +20,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->themeRegistry = $this->getMockBuilder(ThemeRegistry::class)
             ->disableOriginalConstructor()

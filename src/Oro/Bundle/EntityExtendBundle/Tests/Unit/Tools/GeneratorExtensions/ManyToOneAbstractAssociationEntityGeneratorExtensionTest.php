@@ -15,7 +15,7 @@ class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\
     /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->getMockForAbstractClass(
             'Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension',

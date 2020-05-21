@@ -14,7 +14,7 @@ class GlobalMenuControllerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -36,7 +36,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains(
+        static::assertStringContainsString(
             'Select existing menu item or create new.',
             $crawler->filter('[data-role="content"] .tree-empty-content .no-data')->html()
         );
@@ -62,7 +62,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Menu item saved successfully.', $crawler->html());
+        static::assertStringContainsString('Menu item saved successfully.', $crawler->html());
     }
 
     public function testCreateChild()
@@ -88,7 +88,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Menu item saved successfully.', $crawler->html());
+        static::assertStringContainsString('Menu item saved successfully.', $crawler->html());
     }
 
     public function testUpdateCustom()
@@ -118,8 +118,8 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $html = $crawler->html();
-        $this->assertContains('Menu item saved successfully.', $html);
-        $this->assertContains('menu_update.changed.title.default', $html);
+        static::assertStringContainsString('Menu item saved successfully.', $html);
+        static::assertStringContainsString('menu_update.changed.title.default', $html);
     }
 
     public function testUpdateNotCustom()
@@ -133,7 +133,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains(
+        static::assertStringContainsString(
             $this->getContainer()->get('translator')->trans('oro.navigation.menu.menu_list_default.label'),
             $crawler->html()
         );
@@ -148,8 +148,8 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $html = $crawler->html();
-        $this->assertContains('Menu item saved successfully.', $html);
-        $this->assertContains('menu_update.changed.title.default', $html);
+        static::assertStringContainsString('Menu item saved successfully.', $html);
+        static::assertStringContainsString('menu_update.changed.title.default', $html);
     }
 
     public function testMove()

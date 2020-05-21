@@ -21,7 +21,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -67,11 +67,9 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testProcessWhenAccessDeniedForManageableEntityWithoutConfigOfAclResource()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $className = Product::class;
         $config = new EntityDefinitionConfig();
 
@@ -102,11 +100,9 @@ class EntityTypeSecurityCheckTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testProcessWhenAccessDeniedForEntityWithConfigOfAclResource()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $className = Product::class;
         $aclResource = 'acme_product_test';
         $config = new EntityDefinitionConfig();

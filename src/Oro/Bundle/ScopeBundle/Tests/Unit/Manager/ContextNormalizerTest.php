@@ -18,7 +18,7 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var  ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $scopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);
@@ -75,12 +75,11 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Entity foo_entity with identifier 100 does not exist.
-     */
     public function testDenormalizeContextWithNonExistentEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Entity foo_entity with identifier 100 does not exist.');
+
         $entities = ['foo_entity' => 'FooEntity'];
         $context = ['foo_entity' => 100];
         $scopeType = 'custom_scope_type';

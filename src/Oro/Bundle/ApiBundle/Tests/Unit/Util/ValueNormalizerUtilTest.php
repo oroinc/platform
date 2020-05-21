@@ -61,6 +61,7 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
 
     public function testConvertToEntityTypeWhenExceptionOccurred()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $entityClass = 'Test\Class';
         $requestType = new RequestType([RequestType::REST]);
 

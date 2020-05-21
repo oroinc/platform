@@ -63,7 +63,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionConfigurationProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();

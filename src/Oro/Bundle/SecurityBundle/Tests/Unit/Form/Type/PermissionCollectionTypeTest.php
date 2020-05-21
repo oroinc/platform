@@ -3,38 +3,37 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 
 class PermissionCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PermissionCollectionType */
-    protected $formType;
-
-    protected function setUp()
-    {
-        $this->formType = new PermissionCollectionType();
-    }
-
     public function testGetParent()
     {
-        $this->assertEquals(CollectionType::class, $this->formType->getParent());
+        $formType = new PermissionCollectionType();
+
+        $this->assertEquals(CollectionType::class, $formType->getParent());
     }
 
     public function testBuildView()
     {
-        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')
+        /** @var FormView|MockObject $view */
+        $view = $this->getMockBuilder(FormView::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
+
+        /** @var FormInterface|MockObject $form */
+        $form = $this->getMockBuilder(FormInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $privileges_config = array('permissions' => array('VIEW', 'CREATE'));
-        $options = array(
-            'entry_options' => array(
-                'privileges_config' => $privileges_config
-            )
-        );
-        $this->formType->buildView($view, $form, $options);
-        $this->assertAttributeContains($privileges_config, 'vars', $view);
+
+        $privileges_config = ['permissions' => ['VIEW', 'CREATE']];
+        $options = ['entry_options' => ['privileges_config' => $privileges_config]];
+
+        (new PermissionCollectionType())->buildView($view, $form, $options);
+
+        $this->assertSame($privileges_config, $view->vars['privileges_config']);
     }
 }

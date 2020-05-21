@@ -34,7 +34,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $inputOptionProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->questionHelper = $this->createMock(QuestionHelper::class);

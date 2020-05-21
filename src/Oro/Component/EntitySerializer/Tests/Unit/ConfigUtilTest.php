@@ -44,12 +44,11 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['key' => 'val'], ConfigUtil::getArrayValue($config, $key));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected value of type "array, string or nothing", "integer" given.
-     */
     public function testGetArrayValueWhenConfigValueIsUnexpectedType()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected value of type "array, string or nothing", "integer" given.');
+
         $key = 'testKey';
         $config = [
             $key => 123

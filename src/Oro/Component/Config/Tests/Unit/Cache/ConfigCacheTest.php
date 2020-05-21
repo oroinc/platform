@@ -14,10 +14,10 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('ConfigCache');
-        self::assertFileNotExists($this->cacheFile);
+        self::assertFileDoesNotExist($this->cacheFile);
     }
 
     public function debugModeProvider()
@@ -47,7 +47,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->write('', [$staleResource]);
 
         self::assertTrue($cache->isFresh());
-        self::assertFileNotExists($cache->getPath() . '.meta');
+        self::assertFileDoesNotExist($cache->getPath() . '.meta');
     }
 
     /**
@@ -61,7 +61,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         if ($debug) {
             self::assertFileExists($cache->getPath() . '.meta');
         } else {
-            self::assertFileNotExists($cache->getPath() . '.meta');
+            self::assertFileDoesNotExist($cache->getPath() . '.meta');
         }
     }
 
@@ -70,7 +70,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache = new ConfigCache($this->cacheFile, false);
         $cache->write('');
         self::assertTrue($cache->isFresh());
-        self::assertFileNotExists($cache->getPath() . '.meta');
+        self::assertFileDoesNotExist($cache->getPath() . '.meta');
     }
 
     public function testFreshResourceInDebug()

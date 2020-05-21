@@ -16,14 +16,14 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()->getMock();
         $this->transformer = new TagTransformer($this->manager);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->manager);
         unset($this->transformer);

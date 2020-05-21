@@ -15,7 +15,7 @@ class MixinListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mixinConfigurationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mixinConfigurationHelper = $this
             ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper')

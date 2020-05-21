@@ -17,7 +17,7 @@ class WorkflowActivationTest extends WebTestCase
     /** @var EntityManager */
     protected $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadWorkflowDefinitionsWithGroups::class]);

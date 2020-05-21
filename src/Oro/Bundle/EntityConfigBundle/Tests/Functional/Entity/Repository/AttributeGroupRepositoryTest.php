@@ -15,7 +15,7 @@ class AttributeGroupRepositoryTest extends WebTestCase
      */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 

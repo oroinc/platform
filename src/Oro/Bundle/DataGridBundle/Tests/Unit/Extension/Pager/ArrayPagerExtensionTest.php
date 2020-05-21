@@ -25,7 +25,7 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayPagerExtension */
     protected $arrayPagerExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pager = $this->createMock(ArrayPager::class);
         $this->config = $this->createMock(DatagridConfiguration::class);
@@ -71,9 +71,10 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->arrayPagerExtension->visitDatasource($this->config, $this->arrayDatasource);
     }
 
-    /** @expectedException \Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException */
     public function testVisitDatasourceWithWrongSource()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException::class);
+
         $this->arrayPagerExtension->visitDatasource(
             $this->config,
             $this->createMock(OrmDatasource::class)

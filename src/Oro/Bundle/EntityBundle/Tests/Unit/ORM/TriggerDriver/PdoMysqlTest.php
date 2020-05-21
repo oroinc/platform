@@ -35,7 +35,7 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
      */
     private $tableName = 'oro_test_entity';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

@@ -11,7 +11,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase
      */
     protected $options;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = new Options(['value' => 'test']);
     }
@@ -20,7 +20,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals('test', $this->options->get('value'));
 
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->assertFalse($this->options->get('nameNotExist'));
     }
 

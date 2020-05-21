@@ -19,13 +19,13 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ConsumerHeartbeatExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumerHeartbeat = $this->createMock(ConsumerHeartbeat::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->context = new Context($this->createMock(SessionInterface::class));
+        $this->context->setLogger($this->logger);
+
         $this->extension = new ConsumerHeartbeatExtension(15, $this->consumerHeartbeat);
     }
 

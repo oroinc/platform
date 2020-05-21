@@ -47,7 +47,7 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ClientEvent */
     private $clientEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketAuthenticationProvider = $this->createMock(WebsocketAuthenticationProviderInterface::class);
 

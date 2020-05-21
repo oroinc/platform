@@ -24,14 +24,16 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
     /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileReflector = $this->createMock(FileReflector::class);
 
         $this->listener = new FileDigitalAssetChangedListener($this->fileReflector);
 
         $this->eventArgs = $this->createMock(LifecycleEventArgs::class);
-        $this->file = $this->createPartialMock(File::class, ['getDigitalAsset']);
+        $this->file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
     }
 
     public function testPrePersistWhenNoDigitalAsset(): void

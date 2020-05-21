@@ -24,7 +24,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);

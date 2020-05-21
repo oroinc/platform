@@ -13,7 +13,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOverrideProvider */
     private $entityOverrideProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configCache = $this->createMock(ConfigCache::class);
         $this->configCache->expects(self::once())

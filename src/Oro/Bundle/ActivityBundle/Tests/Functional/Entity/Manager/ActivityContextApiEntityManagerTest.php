@@ -15,7 +15,7 @@ class ActivityContextApiEntityManagerTest extends WebTestCase
     /** @var AuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

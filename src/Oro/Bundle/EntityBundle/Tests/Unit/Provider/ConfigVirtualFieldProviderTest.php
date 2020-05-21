@@ -15,7 +15,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $virtualFieldsConfig;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $hierarchy = [
             'TestEntity1' => ['AbstractEntity1'],

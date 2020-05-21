@@ -24,7 +24,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
      */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobExecutor')
@@ -40,7 +40,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->jobExecutor, $this->action);
     }
@@ -52,7 +52,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeErrors(array $options, $expectedExceptionMessage)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->action->initialize($options);
     }
@@ -108,7 +108,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteExceptions(array $options, $context, $expectedExceptionMessage)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->action->initialize($options);
         $this->action->execute($context);

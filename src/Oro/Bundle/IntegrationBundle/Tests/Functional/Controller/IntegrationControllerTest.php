@@ -21,7 +21,7 @@ class IntegrationControllerTest extends WebTestCase
      */
     protected $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -46,7 +46,7 @@ class IntegrationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_index'));
         $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Integrations - System', $crawler->html());
+        static::assertStringContainsString('Integrations - System', $crawler->html());
     }
 
 
@@ -109,7 +109,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Integration saved", $crawler->html());
+        static::assertStringContainsString("Integration saved", $crawler->html());
 
         return compact('name', 'newUser', 'organization');
     }
@@ -160,7 +160,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains("Integration saved", $crawler->html());
+        static::assertStringContainsString("Integration saved", $crawler->html());
 
         $integration['name'] = $name;
         return $integration;

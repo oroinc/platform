@@ -19,7 +19,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
     /** @var string */
     private $entityType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

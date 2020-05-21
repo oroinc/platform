@@ -25,7 +25,7 @@ class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditColumnOptionsGuesser */
     private $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->validatorMetaData = $this->createMock(ClassMetadataInterface::class);

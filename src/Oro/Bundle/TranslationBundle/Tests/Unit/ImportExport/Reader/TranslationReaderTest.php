@@ -29,7 +29,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()

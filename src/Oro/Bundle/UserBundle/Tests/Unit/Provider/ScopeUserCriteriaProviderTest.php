@@ -15,7 +15,7 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeUserCriteriaProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 

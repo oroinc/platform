@@ -53,7 +53,7 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->crypter = new DefaultCrypter();
         $this->settings['oro_email']['smtp_settings_password']['value'] = $this->crypter->encryptData(
@@ -136,11 +136,11 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
         );
 
         // check types
-        $this->assertInternalType('string', $smtpSettings->getHost());
-        $this->assertInternalType('integer', $smtpSettings->getPort());
-        $this->assertInternalType('string', $smtpSettings->getEncryption());
-        $this->assertInternalType('string', $smtpSettings->getUsername());
-        $this->assertInternalType('string', $smtpSettings->getPassword());
+        $this->assertIsString($smtpSettings->getHost());
+        $this->assertIsInt($smtpSettings->getPort());
+        $this->assertIsString($smtpSettings->getEncryption());
+        $this->assertIsString($smtpSettings->getUsername());
+        $this->assertIsString($smtpSettings->getPassword());
     }
 
     private function getSettingValue($key)

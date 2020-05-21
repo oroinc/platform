@@ -17,7 +17,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $configurationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
             ->disableOriginalConstructor()

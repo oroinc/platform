@@ -10,7 +10,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetConfigVisibilityFilter */
     protected $widgetConfigVisibilityFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
         $resolver->expects($this->any())

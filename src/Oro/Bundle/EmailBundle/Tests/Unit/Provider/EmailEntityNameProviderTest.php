@@ -11,7 +11,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailEntityNameProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new EmailEntityNameProvider(PropertyAccess::createPropertyAccessor());
     }

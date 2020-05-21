@@ -20,7 +20,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var CumulativeRoutingFileLoader */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
 

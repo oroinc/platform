@@ -23,7 +23,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
     /** @var OwnershipEntityConfigDumperExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

@@ -21,7 +21,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $extendConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')

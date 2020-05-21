@@ -15,7 +15,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = ErrorHandler::register();
     }
@@ -23,7 +23,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->handler);
         restore_error_handler();
@@ -98,12 +98,11 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \ErrorException
-     * @expectedExceptionMessage Test error
-     */
     public function testHandleErrors()
     {
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Test error');
+
         trigger_error('Test error', E_USER_ERROR);
     }
 }

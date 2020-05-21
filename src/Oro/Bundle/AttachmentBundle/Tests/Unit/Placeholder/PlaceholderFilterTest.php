@@ -15,7 +15,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attachmentAssociationHelper = $this
             ->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
@@ -29,7 +29,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new PlaceholderFilter($this->attachmentAssociationHelper, $this->doctrineHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->attachmentAssociationHelper, $this->doctrineHelper, $this->filter);
     }

@@ -22,7 +22,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * Setup test env
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userConfigManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -42,7 +42,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals($param['data_class'], 'Oro\Bundle\UserBundle\Entity\User');
                 $this->assertEquals($param['ownership_disabled'], true);
                 $this->assertEquals($param['dynamic_fields_disabled'], true);
-                
+
                 return true;
             }));
         $this->type->configureOptions($resolver);
@@ -65,7 +65,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
                 'constraints' => [new Valid()],
             ]
         );
-        
+
         $this->type->buildForm($builder, []);
     }
 
@@ -85,7 +85,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
                 'constraints' => [new Valid()],
             ]
         );
-        
+
         $this->type->buildForm($builder, []);
     }
 }

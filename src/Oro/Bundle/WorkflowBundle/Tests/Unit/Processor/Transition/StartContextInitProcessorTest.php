@@ -14,7 +14,7 @@ class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var StartContextInitProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new StartContextInitProcessor();
         $this->request = $this->createMock(Request::class);

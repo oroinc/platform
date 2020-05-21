@@ -9,8 +9,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class EndWithTest extends \PHPUnit\Framework\TestCase
 {
     protected $condition;
-    
-    public function setUp()
+
+    protected function setUp(): void
     {
         $this->condition = new Condition\EndWith();
         $this->condition->setContextAccessor(new ContextAccessor());

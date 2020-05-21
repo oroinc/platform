@@ -16,7 +16,7 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->configManager->expects($this->any())

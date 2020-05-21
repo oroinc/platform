@@ -16,7 +16,7 @@ class QueryWithJoinsTest extends AclTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

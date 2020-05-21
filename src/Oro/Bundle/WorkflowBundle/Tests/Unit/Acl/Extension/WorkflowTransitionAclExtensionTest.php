@@ -49,7 +49,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
@@ -88,19 +88,15 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->extension->supports('', ''));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetClasses()
     {
+        $this->expectException(\LogicException::class);
         $this->extension->getClasses();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetObjectIdentity()
     {
+        $this->expectException(\LogicException::class);
         $this->extension->getObjectIdentity('');
     }
 

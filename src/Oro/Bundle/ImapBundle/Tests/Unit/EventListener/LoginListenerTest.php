@@ -18,7 +18,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $syncCredentialsManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->syncCredentialsManager = $this->createMock(SyncCredentialsIssueManager::class);
         $this->listener = new LoginListener($this->syncCredentialsManager);

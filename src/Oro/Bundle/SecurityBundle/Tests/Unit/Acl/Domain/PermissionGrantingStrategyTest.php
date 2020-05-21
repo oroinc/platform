@@ -62,7 +62,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionGrantingStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = $this->createMock(AclExtensionInterface::class);
         $this->configureTestAclExtension();
@@ -227,11 +227,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->context, $this->strategy->getContext());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedReturnsExceptionIfNoAceIsFound()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -320,11 +318,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedUsesParentAcesOnlyIfInheritingIsSet()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $parentAcl = $this->getAcl();
@@ -619,11 +615,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
-     */
     public function testIsGrantedForPermissionStrategyShouldCheckOnlyPermissionEncodedInAceMask()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();

@@ -22,7 +22,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new AttributeFamilyType($this->getTranslator());
         parent::setUp();

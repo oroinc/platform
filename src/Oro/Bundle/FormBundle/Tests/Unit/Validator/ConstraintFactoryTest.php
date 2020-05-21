@@ -40,11 +40,9 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCreateInvalidConstraint()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();
         $factory->create('test');
     }
@@ -109,10 +107,10 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
      * @param array $constraints
      *
      * @dataProvider invalidConstraintsProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testParseWithInvalidArgument($constraints)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();
         $factory->parse($constraints);
     }

@@ -32,7 +32,7 @@ class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->typesRegistry = $this->createMock(TypesRegistry::class);
         $this->typesRegistryLink = $this->createMock(ServiceLink::class);

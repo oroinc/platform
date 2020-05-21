@@ -11,7 +11,7 @@ class OriginExtractorTest extends \PHPUnit\Framework\TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extractor = new OriginExtractor();
     }

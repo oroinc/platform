@@ -11,7 +11,7 @@ class WidgetTitleTypeTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetTitleType */
     protected $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetTitleType();
     }

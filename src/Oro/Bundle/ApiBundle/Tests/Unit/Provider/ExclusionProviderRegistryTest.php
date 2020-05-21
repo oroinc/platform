@@ -22,7 +22,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultExclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->firstExclusionProvider = $this->createMock(ExclusionProviderInterface::class);
@@ -44,12 +44,11 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an exclusion provider for the request "rest,another".
-     */
     public function testGetExclusionProviderForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an exclusion provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getExclusionProvider($requestType);

@@ -18,7 +18,7 @@ class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
         $this->transitionOptionsResolver = new TransitionOptionsResolver($this->optionsResolver);

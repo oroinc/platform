@@ -32,7 +32,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var HtmlTagHelper */
     private $htmlTagHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
@@ -50,7 +50,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->formType, $this->configManager);

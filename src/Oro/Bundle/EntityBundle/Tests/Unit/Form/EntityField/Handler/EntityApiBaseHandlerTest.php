@@ -42,7 +42,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
@@ -185,7 +185,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('invalidateProcess')
             ->with($entity);
-      
+
         $this->initManager();
 
         $this->assertEquals([

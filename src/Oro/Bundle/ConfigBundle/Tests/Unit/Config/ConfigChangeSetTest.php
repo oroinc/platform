@@ -71,20 +71,16 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('old value', $configChangeSet->getOldValue('item1'));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testNewValueRetrievingForUnknownElement()
     {
+        $this->expectException(\LogicException::class);
         $configChangeSet = new ConfigChangeSet([]);
         $configChangeSet->getNewValue('unknown');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testOldValueRetrievingForUnknownElement()
     {
+        $this->expectException(\LogicException::class);
         $configChangeSet = new ConfigChangeSet([]);
         $configChangeSet->getOldValue('unknown');
     }

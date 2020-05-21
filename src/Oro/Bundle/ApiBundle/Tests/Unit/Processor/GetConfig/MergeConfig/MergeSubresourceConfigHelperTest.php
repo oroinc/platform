@@ -21,7 +21,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MergeSubresourceConfigHelper */
     private $mergeSubresourceConfigHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mergeActionConfigHelper = $this->createMock(MergeActionConfigHelper::class);
         $this->mergeFilterConfigHelper = $this->createMock(MergeFilterConfigHelper::class);

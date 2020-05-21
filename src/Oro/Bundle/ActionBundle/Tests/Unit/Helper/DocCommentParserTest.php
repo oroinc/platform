@@ -11,7 +11,7 @@ class DocCommentParserTest extends \PHPUnit\Framework\TestCase
     /** @var DocCommentParser */
     protected $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new DocCommentParser();
     }

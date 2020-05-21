@@ -13,7 +13,7 @@ class ListenerExcludeSearchConnectionPassTest extends \PHPUnit\Framework\TestCas
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new ListenerExcludeSearchConnectionPass();
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')

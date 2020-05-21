@@ -37,7 +37,7 @@ class AssociationManagerTest extends OrmTestCase
     /** @var AssociationManager */
     private $associationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

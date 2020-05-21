@@ -10,7 +10,7 @@ class EnumValueListenerTest extends EnumValueListenerTestCase
     /** @var EnumValueListener */
     private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

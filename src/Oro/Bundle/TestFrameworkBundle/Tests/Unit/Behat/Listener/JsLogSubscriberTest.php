@@ -52,7 +52,7 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $jsLogSubscriber->log($this->getEventMock());
 
         $expectedLogFile = $tempDir . DIRECTORY_SEPARATOR . 'behat_browser.log';
-        $this->assertFileNotExists($expectedLogFile);
+        $this->assertFileDoesNotExist($expectedLogFile);
     }
 
     public function logProvider()

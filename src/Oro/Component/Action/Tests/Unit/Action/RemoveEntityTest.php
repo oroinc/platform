@@ -3,52 +3,51 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RemoveEntity;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RemoveEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
+    /** @var MockObject|ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var ActionInterface
-     */
+    /** @var ActionInterface */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
+        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->getMock();
-
-        $this->action = new RemoveEntity($this->contextAccessor, $this->registry);
+        $this->action = new class($this->contextAccessor, $this->registry) extends RemoveEntity {
+            public function xgetTarget()
+            {
+                return $this->target;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeException(array $options)
     {
+        $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -67,35 +66,35 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
     {
         $target = new \stdClass();
         $this->action->initialize([$target]);
-        $this->assertAttributeEquals($target, 'target', $this->action);
+        static::assertEquals($target, $this->action->xgetTarget());
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "remove_entity" expects reference to entity as parameter, string is given.
-     */
     public function testExecuteNotObjectException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "remove_entity" expects reference to entity as parameter, string is given.'
+        );
+
         $context = new \stdClass();
         $target = 'test';
         $this->action->initialize([$target]);
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteNotManageableException()
     {
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
         $context = new \stdClass();
         $context->test = new \stdClass();
         $target = new PropertyPath('test');
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(static::once())
             ->method('getManagerForClass')
-            ->with(get_class($context->test))
-            ->will($this->returnValue(null));
+            ->with(\get_class($context->test))
+            ->willReturn(null);
 
         $this->action->initialize([$target]);
         $this->action->execute($context);
@@ -107,17 +106,15 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
         $context->test = new \stdClass();
         $target = new PropertyPath('test');
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
+        $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $em->expects(static::once())
             ->method('remove')
             ->with($context->test);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(static::once())
             ->method('getManagerForClass')
-            ->with(get_class($context->test))
-            ->will($this->returnValue($em));
+            ->with(\get_class($context->test))
+            ->willReturn($em);
 
         $this->action->initialize([$target]);
         $this->action->execute($context);

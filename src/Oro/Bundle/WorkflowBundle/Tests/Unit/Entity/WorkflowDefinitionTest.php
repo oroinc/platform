@@ -24,12 +24,12 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
      */
     protected $workflowDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowDefinition = new WorkflowDefinition();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowDefinition);
     }
@@ -194,12 +194,11 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->workflowDefinition->isForceAutostart());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow "test" does not contain step "start_step"
-     */
     public function testStartStepNoStep()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow "test" does not contain step "start_step"');
+
         $this->workflowDefinition->setName('test');
         $this->assertNull($this->workflowDefinition->getStartStep());
         $startStep = new WorkflowStep();
@@ -352,8 +351,8 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $jsonContent = $serializer->serialize($this->workflowDefinition, 'json');
 
         $this->assertJson($jsonContent);
-        $this->assertNotContains('restrictions', $jsonContent);
-        $this->assertNotContains($restrictionAttribute, $jsonContent);
-        $this->assertContains($definitionName, $jsonContent);
+        static::assertStringNotContainsString('restrictions', $jsonContent);
+        static::assertStringNotContainsString($restrictionAttribute, $jsonContent);
+        static::assertStringContainsString($definitionName, $jsonContent);
     }
 }

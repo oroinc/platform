@@ -56,7 +56,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private $exportHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
 

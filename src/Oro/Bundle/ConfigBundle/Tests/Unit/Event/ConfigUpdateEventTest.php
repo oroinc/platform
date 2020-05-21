@@ -23,7 +23,7 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
     ];
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = new ConfigUpdateEvent($this->changeSet);
     }

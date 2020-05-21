@@ -56,12 +56,11 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($tree, $chainProvider->getTree());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException
-     * @expectedExceptionMessage Supported provider not found in chain
-     */
     public function testGetTreeFailed()
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException::class);
+        $this->expectExceptionMessage('Supported provider not found in chain');
+
         $provider = $this->createMock(OwnerTreeProviderInterface::class);
         $provider->expects($this->once())
             ->method('supports')

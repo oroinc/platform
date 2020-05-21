@@ -14,7 +14,7 @@ class RestRoutesTest extends \PHPUnit\Framework\TestCase
     /** @var RestRoutes */
     private $routes;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->routes = new RestRoutes(
             self::ITEM_ROUTE,

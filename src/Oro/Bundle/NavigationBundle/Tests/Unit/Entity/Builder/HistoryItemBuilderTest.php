@@ -22,7 +22,7 @@ class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

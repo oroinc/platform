@@ -26,7 +26,7 @@ abstract class AbstractRoundingService implements RoundingServiceInterface
     /**
      * @param float|int $value
      * @param int $precision
-     * @param int $roundType
+     * @param int|null $roundType
      * @return float|int
      * @throws InvalidRoundingTypeException
      *

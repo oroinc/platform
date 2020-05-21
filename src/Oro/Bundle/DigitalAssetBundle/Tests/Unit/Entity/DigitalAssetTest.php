@@ -13,7 +13,7 @@ class DigitalAssetTest extends \PHPUnit\Framework\TestCase
     /** @var DigitalAsset */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new DigitalAsset();
     }

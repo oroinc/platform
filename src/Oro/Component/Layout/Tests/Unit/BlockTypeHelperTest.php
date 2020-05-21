@@ -16,7 +16,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var BlockTypeHelper */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry   = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->typeHelper = new BlockTypeHelper($this->registry);

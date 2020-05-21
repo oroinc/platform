@@ -19,7 +19,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestRoutes */
     private $secondProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(RestRoutes::class);
         $this->firstProvider = $this->createMock(RestRoutes::class);
@@ -44,12 +44,11 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a routes provider for the request "rest,another".
-     */
     public function testGetRoutesForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a routes provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getRoutes($requestType);

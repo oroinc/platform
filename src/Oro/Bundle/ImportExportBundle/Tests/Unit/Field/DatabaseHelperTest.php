@@ -43,7 +43,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DatabaseHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -152,7 +152,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelperService->expects($this->once())
             ->method('getObjectValue')
             ->willReturn($entity->getOrganization());
-        
+
         $this->ownershipMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->willReturn($metadata);

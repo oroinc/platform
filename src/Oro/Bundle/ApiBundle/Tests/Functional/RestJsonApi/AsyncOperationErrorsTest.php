@@ -16,7 +16,7 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadOperationsErrorsData::class]);

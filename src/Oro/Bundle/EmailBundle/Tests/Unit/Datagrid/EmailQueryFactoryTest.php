@@ -34,7 +34,7 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var MailboxManager */
     protected $mailboxManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->providerStorage  = new EmailOwnerProviderStorage();
 
@@ -62,7 +62,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->factory,

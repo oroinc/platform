@@ -17,7 +17,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entitySecurityMetadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->entitySecurityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);

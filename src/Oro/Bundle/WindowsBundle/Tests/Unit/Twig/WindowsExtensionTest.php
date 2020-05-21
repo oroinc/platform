@@ -37,7 +37,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $fragmentHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->stateManager = $this->createMock(WindowsStateManager::class);
@@ -197,12 +197,11 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Not caught exception.
-     */
     public function testRenderFragmentWithGenericException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Not caught exception.');
+
         $cleanUrl = '/foo/bar';
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
 

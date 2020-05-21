@@ -34,7 +34,7 @@ class UserCreateUpdateTest extends WebTestCase
      */
     protected $userManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadCommandUserCreateUpdateData::class]);

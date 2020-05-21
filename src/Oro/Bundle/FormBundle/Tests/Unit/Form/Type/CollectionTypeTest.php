@@ -17,7 +17,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * Setup test env
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new CollectionType();
     }
@@ -97,12 +97,11 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "entry_type" is missing.
-     */
     public function testConfigureOptionsWithoutType()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "entry_type" is missing.');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([]);

@@ -26,7 +26,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MenuManipulator */
     private $manipulator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(MenuFactory::class);
         $this->loader = $this->getMockBuilder(ArrayLoader::class)
@@ -56,22 +56,20 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($chainProvider->has($notExistingMenuName, $options));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Menu alias was not set.
-     */
     public function testGetException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Menu alias was not set.');
+
         $chainProvider = $this->getBuilderChainProvider([], []);
         $chainProvider->get('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Menu alias was not set.
-     */
     public function testHasException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Menu alias was not set.');
+
         $chainProvider = $this->getBuilderChainProvider([], []);
         $chainProvider->has('');
     }
@@ -90,13 +88,13 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $menu = new MenuItemStub();
         $menu->addChild($item);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(static::once())
             ->method('createItem')
             ->with($menuName, $options)
-            ->will($this->returnValue($menu));
+            ->willReturn($menu);
 
         $builder = $this->createMock(BuilderInterface::class);
-        $builder->expects($this->once())
+        $builder->expects(static::once())
             ->method('build')
             ->with($menu, $options, $menuName);
 
@@ -104,9 +102,8 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
             [$alias => ['builder1']],
             ['builder1' => $builder]
         );
-        $this->assertInstanceOf(ItemInterface::class, $chainProvider->get($menuName, $options));
-        $this->assertInstanceOf(ItemInterface::class, $chainProvider->get($menuName, $options));
-        $this->assertAttributeCount(1, 'menus', $chainProvider);
+        static::assertInstanceOf(ItemInterface::class, $chainProvider->get($menuName, $options));
+        static::assertInstanceOf(ItemInterface::class, $chainProvider->get($menuName, $options));
     }
 
     public function testGetOneMenuWithDifferentLocalCachePrefixes()
@@ -120,7 +117,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $rebuildMenu = clone $menu;
         $rebuildMenu->setAttribute('custom', true);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(static::exactly(2))
             ->method('createItem')
             ->withConsecutive(
                 [$menuName, $options],
@@ -129,7 +126,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($menu, $rebuildMenu);
 
         $builder = $this->createMock(BuilderInterface::class);
-        $builder->expects($this->exactly(2))
+        $builder->expects(static::exactly(2))
             ->method('build')
             ->willReturnMap([
                 [$menu, $options, $menuName],
@@ -140,12 +137,11 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
             [BuilderChainProvider::COMMON_BUILDER_ALIAS => ['builder1']],
             ['builder1' => $builder]
         );
-        $this->assertSame($menu, $chainProvider->get($menuName, $options));
-        $this->assertSame(
+        static::assertSame($menu, $chainProvider->get($menuName, $options));
+        static::assertSame(
             $rebuildMenu,
             $chainProvider->get($menuName, [BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'custom_'])
         );
-        $this->assertAttributeCount(2, 'menus', $chainProvider);
     }
 
     public function testGetOneMenuWithDifferentOptions()
@@ -159,13 +155,13 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $rebuildMenu = clone $menu;
         $rebuildMenu->setAttribute('custom', true);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(static::exactly(2))
             ->method('createItem')
             ->withConsecutive([$menuName, $options], [$menuName, ['foo' => 'bar']])
             ->willReturn($menu, $rebuildMenu);
 
         $builder = $this->createMock(BuilderInterface::class);
-        $builder->expects($this->exactly(2))
+        $builder->expects(static::exactly(2))
             ->method('build')
             ->willReturnMap([
                 [$menu, $options, $menuName],
@@ -176,9 +172,8 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
             [BuilderChainProvider::COMMON_BUILDER_ALIAS => ['builder1']],
             ['builder1' => $builder]
         );
-        $this->assertSame($menu, $chainProvider->get($menuName, $options));
-        $this->assertSame($rebuildMenu, $chainProvider->get($menuName, ['foo' => 'bar']));
-        $this->assertAttributeCount(2, 'menus', $chainProvider);
+        static::assertSame($menu, $chainProvider->get($menuName, $options));
+        static::assertSame($rebuildMenu, $chainProvider->get($menuName, ['foo' => 'bar']));
     }
 
     public function testGetCached()
@@ -190,25 +185,25 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $menu = $this->createMock(ItemInterface::class);
 
         $cache = $this->createMock(ArrayCache::class);
-        $cache->expects($this->once())
+        $cache->expects(static::once())
             ->method('contains')
             ->with($alias)
-            ->will($this->returnValue(true));
-        $cache->expects($this->once())
+            ->willReturn(true);
+        $cache->expects(static::once())
             ->method('fetch')
             ->with($alias)
-            ->will($this->returnValue($items));
+            ->willReturn($items);
 
-        $this->loader->expects($this->once())
+        $this->loader->expects(static::once())
             ->method('load')
             ->with($items)
-            ->will($this->returnValue($menu));
+            ->willReturn($menu);
 
-        $this->factory->expects($this->never())
+        $this->factory->expects(static::never())
             ->method('createItem');
 
         $builder = $this->createMock(BuilderInterface::class);
-        $builder->expects($this->never())
+        $builder->expects(static::never())
             ->method('build');
 
         $chainProvider = $this->getBuilderChainProvider(
@@ -217,8 +212,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         );
         $chainProvider->setCache($cache);
 
-        $this->assertInstanceOf(ItemInterface::class, $chainProvider->get($alias, $options));
-        $this->assertAttributeCount(1, 'menus', $chainProvider);
+        static::assertInstanceOf(ItemInterface::class, $chainProvider->get($alias, $options));
     }
 
     /**

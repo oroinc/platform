@@ -21,7 +21,7 @@ class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->titleReaderRegistry = $this->createMock(TitleReaderRegistry::class);
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);

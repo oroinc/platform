@@ -34,7 +34,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectNormalizer */
     private $objectNormalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -1113,14 +1113,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The exclusion policy must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
-     */
-    // @codingStandardsIgnoreEnd
     public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The exclusion policy must be "all". Object type: "%s".',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category::class
+        ));
+
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [

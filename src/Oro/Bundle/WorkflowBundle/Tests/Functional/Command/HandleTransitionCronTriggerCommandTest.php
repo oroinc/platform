@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 
 class HandleTransitionCronTriggerCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadTransitionTriggers::class]);
@@ -39,7 +39,7 @@ class HandleTransitionCronTriggerCommandTest extends WebTestCase
         );
 
         $this->assertNotEmpty($result);
-        $this->assertContains(
+        static::assertStringContainsString(
             sprintf(
                 'Transition cron trigger #%d of workflow "%s" successfully finished',
                 $trigger->getId(),

@@ -39,7 +39,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $user;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();

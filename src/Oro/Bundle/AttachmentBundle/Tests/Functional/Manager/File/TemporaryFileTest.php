@@ -12,12 +12,12 @@ class TemporaryFileTest extends WebTestCase
      */
     private $tmpFilePath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->tmpFilePath)) {
             unlink($this->tmpFilePath);

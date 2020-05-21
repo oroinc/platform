@@ -10,7 +10,7 @@ class EventTriggerCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var EventTriggerCacheWarmer */
     private $warmer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->warmer = new EventTriggerCacheWarmer();
     }

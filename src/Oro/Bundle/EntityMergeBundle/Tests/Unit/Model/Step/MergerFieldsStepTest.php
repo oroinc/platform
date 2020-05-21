@@ -23,7 +23,7 @@ class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->strategy = $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');

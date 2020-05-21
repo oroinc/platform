@@ -16,7 +16,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->type = new ChoiceFilterType($translator);

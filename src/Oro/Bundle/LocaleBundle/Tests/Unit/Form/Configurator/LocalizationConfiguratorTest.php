@@ -26,7 +26,7 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
     /** @var LocalizationConfigurator|\PHPUnit\Framework\MockObject\MockObject */
     private $configurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

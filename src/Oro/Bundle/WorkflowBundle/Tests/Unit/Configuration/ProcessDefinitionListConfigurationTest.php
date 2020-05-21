@@ -12,12 +12,12 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->configuration);
     }

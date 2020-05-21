@@ -14,7 +14,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = new ReplaceStrategy(new DefaultAccessor());
     }

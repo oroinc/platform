@@ -16,7 +16,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
     /** @var ValidateEntityTypeSupported */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

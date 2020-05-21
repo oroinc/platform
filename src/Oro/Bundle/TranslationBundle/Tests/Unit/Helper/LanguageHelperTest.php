@@ -34,7 +34,7 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->statisticProvider = $this->getMockBuilder(TranslationStatisticProvider::class)
             ->disableOriginalConstructor()
@@ -61,7 +61,7 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->helper,

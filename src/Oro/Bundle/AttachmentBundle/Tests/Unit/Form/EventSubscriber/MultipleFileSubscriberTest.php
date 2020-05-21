@@ -32,7 +32,7 @@ class MultipleFileSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ConfigMultipleFileValidator::class);
 

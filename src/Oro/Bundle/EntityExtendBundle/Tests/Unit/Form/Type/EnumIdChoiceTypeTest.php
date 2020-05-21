@@ -22,7 +22,7 @@ class EnumIdChoiceTypeTest extends TypeTestCase
     /** @var EnumIdChoiceType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->doctrine = $this->createMock(ManagerRegistry::class);

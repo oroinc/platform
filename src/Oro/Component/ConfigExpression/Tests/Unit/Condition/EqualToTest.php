@@ -12,7 +12,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\EqualTo */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\EqualTo();
         $this->condition->setContextAccessor(new ContextAccessor());

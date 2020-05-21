@@ -51,7 +51,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected $propertyConfigContainer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigId = new EntityConfigId(self::SCOPE, self::CLASS_NAME);
 
@@ -167,12 +167,9 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new FormEvent($this->form, []);
         $subscriber->postSubmit($event);
 
-        $this->assertArraySubset([
-            'pending_changes' => [
-                self::SCOPE => [self::FORM_NAME => [$oldVal, $newVal]],
-            ],
-            'state' => ExtendScope::STATE_UPDATE
-        ], $extendConfig->getValues());
+        $values = $extendConfig->getValues();
+        $this->assertSame([self::SCOPE => [self::FORM_NAME => [$oldVal, $newVal]]], $values['pending_changes']);
+        $this->assertSame(ExtendScope::STATE_UPDATE, $values['state']);
     }
 
     public function testPostSubmitWithFieldConfig()

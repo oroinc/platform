@@ -26,7 +26,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
      */
     protected $propertyPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
 
@@ -63,7 +63,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->serviceExists->compile('$factoryAccessor');
 
-        $this->assertContains('$factoryAccessor->create(\'service_exists\'', $result);
+        static::assertStringContainsString('$factoryAccessor->create(\'service_exists\'', $result);
     }
 
     public function testSetContextAccessor()

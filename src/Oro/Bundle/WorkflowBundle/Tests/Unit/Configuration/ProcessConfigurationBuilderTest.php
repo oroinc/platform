@@ -19,12 +19,12 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ProcessConfigurationBuilder();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->builder);
     }
@@ -363,12 +363,11 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Process definition "not_existing_definition" not found
-     */
     public function testBuildProcessTriggersException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Process definition "not_existing_definition" not found');
+
         $this->builder->buildProcessTriggers(
             ['not_existing_definition' => ['triggers', 'configuration']],
             ['existing_definition' => new ProcessDefinition()]

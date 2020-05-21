@@ -17,7 +17,7 @@ class ObjectCacheDataSerializerTest extends \PHPUnit\Framework\TestCase
      */
     private $dataSerializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->dataSerializer = new ObjectCacheDataSerializer($this->serializer);

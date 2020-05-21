@@ -18,27 +18,21 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $metadata->getOwnerColumnName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithInvalidOwnerType()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('test');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithoutOwnerFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('ORGANIZATION');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithoutOwnerIdColumnName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('ORGANIZATION', 'org');
     }
 

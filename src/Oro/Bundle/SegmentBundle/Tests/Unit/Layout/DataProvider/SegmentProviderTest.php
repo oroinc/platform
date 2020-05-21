@@ -20,7 +20,7 @@ class SegmentProviderTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder(SegmentManager::class)->disableOriginalConstructor()->getMock();
         $this->provider = new SegmentProvider($this->manager);

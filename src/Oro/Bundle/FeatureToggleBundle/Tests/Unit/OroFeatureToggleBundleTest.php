@@ -24,7 +24,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
             return !in_array($pass, $passesBeforeBuild, true);
         }));
 
-        $this->assertInternalType('array', $passes);
+        $this->assertIsArray($passes);
         $this->assertCount(2, $passes);
         $this->assertInstanceOf(FeatureToggleVotersPass::class, $passes[0]);
     }
@@ -44,7 +44,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
             }
         );
 
-        $this->assertInternalType('array', $passes);
+        $this->assertIsArray($passes);
         $this->assertCount(1, $passes);
         $this->assertInstanceOf(ConfigurationPass::class, reset($passes));
     }

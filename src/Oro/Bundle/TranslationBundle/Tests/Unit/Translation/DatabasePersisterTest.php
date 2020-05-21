@@ -40,7 +40,7 @@ class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $testLocale = 'en';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder(Registry::class)
             ->disableOriginalConstructor()
@@ -74,7 +74,7 @@ class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->em,

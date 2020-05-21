@@ -37,7 +37,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
@@ -55,7 +55,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->doctrineHelper);
         unset($this->defaultOwner);

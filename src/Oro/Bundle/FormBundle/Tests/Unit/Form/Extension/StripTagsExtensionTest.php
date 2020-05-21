@@ -17,7 +17,7 @@ class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 

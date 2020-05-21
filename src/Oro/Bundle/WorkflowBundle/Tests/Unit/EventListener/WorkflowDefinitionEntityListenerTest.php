@@ -25,7 +25,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entitiesWithWorkflowsCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
@@ -212,12 +212,11 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($workflow->getDefinition(), $eventMock);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException
-     * @expectedExceptionMessage Workflow 'workflow1' can't be removed due its System workflow
-     */
     public function testPreRemoveSystemWorkflowException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException::class);
+        $this->expectExceptionMessage("Workflow 'workflow1' can't be removed due its System workflow");
+
         /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definitionMock */
         $definitionMock = $this->createMock(WorkflowDefinition::class);
         $definitionMock->expects($this->once())->method('isSystem')->willReturn(true);

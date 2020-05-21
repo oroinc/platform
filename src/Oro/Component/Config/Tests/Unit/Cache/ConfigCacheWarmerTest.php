@@ -10,7 +10,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var WarmableConfigCacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(WarmableConfigCacheInterface::class);
     }

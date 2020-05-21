@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ExtendedRelationsTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(['Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData']);

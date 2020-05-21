@@ -18,7 +18,7 @@ class ResizedImagePathProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ResizedImagePathProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
         $this->requestContextAware = $this->createMock(RequestContextAwareInterface::class);

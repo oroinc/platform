@@ -42,7 +42,7 @@ class AccessRuleWalkerTest extends OrmTestCase
     /** @var AccessRuleExecutor */
     private $accessRuleExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -585,14 +585,14 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Parameter of Association expression should be the name of existing association for alias 'address'. Given name: 'city'.
-     */
-    // @codingStandardsIgnoreEnd
     public function testWalkerWithAssociationRuleExpressionWithWrongParameter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            "Parameter of Association expression should be the name of existing association for alias 'address'."
+            . " Given name: 'city'."
+        );
+
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
                 $criteria->andExpression(new Association('city'));
@@ -606,14 +606,13 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Parameter of Association expression should be to-one association. Given name: 'articles'.
-     */
-    // @codingStandardsIgnoreEnd
     public function testWalkerWithAssociationRuleExpressionWithOneToManyParameter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            "Parameter of Association expression should be to-one association. Given name: 'articles'."
+        );
+
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsUser::class) {
                 $criteria->andExpression(new Association('articles'));

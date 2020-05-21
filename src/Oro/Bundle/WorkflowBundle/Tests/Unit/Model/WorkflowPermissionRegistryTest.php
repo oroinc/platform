@@ -32,7 +32,7 @@ class WorkflowPermissionRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowPermissionRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclRepository = $this->createMock(WorkflowEntityAclRepository::class);
         $this->aclIdentityRepository = $this->createMock(WorkflowEntityAclIdentityRepository::class);

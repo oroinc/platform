@@ -18,7 +18,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     /** @var PermissionConfigurationProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -26,7 +26,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
             ->get('oro_security.configuration.provider.permission_configuration');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->provider->warmUpCache();
         $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
@@ -46,7 +46,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
 
-        $this->assertContains('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
+        static::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**
@@ -66,7 +66,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {
-            $this->assertContains($message, $result);
+            static::assertStringContainsString($message, $result);
         }
 
         $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();

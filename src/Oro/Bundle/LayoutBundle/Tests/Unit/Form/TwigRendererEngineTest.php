@@ -20,7 +20,7 @@ class TwigRendererEngineTest extends RendererEngineTest
      */
     protected $environment;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->twigRendererEngine = $this->createRendererEngine();

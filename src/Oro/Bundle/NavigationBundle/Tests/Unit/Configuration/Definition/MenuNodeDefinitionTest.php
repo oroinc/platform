@@ -13,7 +13,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuNodeDefinition */
     private $definition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = $this->getMockBuilder(MenuTreeBuilder::class)
             ->setMethods([

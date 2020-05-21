@@ -27,7 +27,7 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(LanguageRepository::class)->disableOriginalConstructor()->getMock();
         $this->managerRegistry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
@@ -39,7 +39,7 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new LanguageProvider($this->managerRegistry, $this->localeSettings, $this->aclHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider, $this->repository, $this->localeSettings, $this->aclHelper);
     }

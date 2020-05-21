@@ -35,33 +35,30 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($supportedOperators, $comparisonFilter->getSupportedOperators());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The field must not be empty.
-     */
     public function testEmptyFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The field must not be empty.');
+
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The value must not be NULL. Field: "fieldName".
-     */
     public function testNullValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value must not be NULL. Field: "fieldName".');
+
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField('fieldName');
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', null, FilterOperator::EQ));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException
-     * @expectedExceptionMessage The operator "neq" is not supported.
-     */
     public function testUnsupportedOperator()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException::class);
+        $this->expectExceptionMessage('The operator "neq" is not supported.');
+
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField('fieldName');
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::NEQ));
