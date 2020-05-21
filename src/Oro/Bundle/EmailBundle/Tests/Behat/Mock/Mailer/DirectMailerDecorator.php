@@ -5,12 +5,15 @@ namespace Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
 
 /**
  * Mailer for behat tests
  */
 class DirectMailerDecorator extends DirectMailer
 {
+    use SpinTrait;
+
     /** @var DirectMailer */
     private $directMailer;
 
@@ -88,17 +91,15 @@ class DirectMailerDecorator extends DirectMailer
     /**
      * @return array
      */
-    public function getSentMessages()
+    public function getSentMessages(): array
     {
-        if (!$this->cache->contains('messages')) {
-            return [];
-        }
+        return (array) $this->spin(
+            function () {
+                $messages = $this->cache->fetch('messages');
 
-        $messages = unserialize($this->cache->fetch('messages'));
-        if (!is_array($messages)) {
-            return [];
-        }
-
-        return $messages;
+                return is_string($messages) ? unserialize($messages) : [];
+            },
+            3
+        );
     }
 }
