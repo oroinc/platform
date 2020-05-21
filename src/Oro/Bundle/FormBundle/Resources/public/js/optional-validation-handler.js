@@ -11,7 +11,7 @@ define(['jquery'], function($) {
          */
         initialize: function($group) {
             const labels = this.getGroupElements($group, $group.find('label[data-required]'));
-            labels.addClass('required').attr('aria-required', true);
+            labels.addClass('required');
 
             const labelAsterisk = labels.find('em');
             labelAsterisk.html('*');
@@ -118,19 +118,11 @@ define(['jquery'], function($) {
          */
         handleGroupRequire: function($group, value) {
             if (this.isValueEmpty(value) && this.isGroupEmpty($group)) {
-                $group
-                    .find('label[data-required]')
-                    .removeAttr('aria-required')
-                    .find('em')
-                    .hide();
+                $group.find('label[data-required] em').hide();
                 this.clearValidationErrorsAndDisableValidation($group);
                 $group.data('group-validation-required', false);
             } else {
-                $group
-                    .find('label[data-required]')
-                    .attr('aria-required', true)
-                    .find('em')
-                    .show();
+                $group.find('label[data-required] em').show();
                 const inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
                 inputs.data('ignore-validation', false);
                 $group.data('group-validation-required', true);

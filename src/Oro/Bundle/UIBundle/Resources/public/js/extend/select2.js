@@ -183,8 +183,27 @@ define(function(require) {
      * @returns {boolean}
      */
     function toAssignAriaAttributesForSelect($realSelect, $select2Element) {
-        if ($realSelect.attr('aria-required')) {
-            $select2Element.attr('aria-required', $realSelect.attr('aria-required'));
+        $realSelect.on('validate-element', event => {
+            if (event.errorClass === void 0 || event.isValid === void 0) {
+                return;
+            }
+
+            const ariaRequired = $(event.target).attr('aria-required');
+
+            if (ariaRequired) {
+                $select2Element.attr('aria-required', ariaRequired);
+            }
+
+            $select2Element
+                .attr({
+                    'aria-invalid': event.isValid,
+                    'aria-describedby': $(event.target).attr('aria-describedby')
+                })
+                .toggleClass(event.errorClass, event.isValid);
+        });
+
+        if ($realSelect.is('[required], [data-rule-required], .required')) {
+            $select2Element.attr('aria-required', true);
         }
 
         if ($realSelect.attr('aria-label')) {
@@ -204,6 +223,16 @@ define(function(require) {
         }
 
         return false;
+    }
+
+    function toUnAssignAriaAttributesForSelect() {
+        this.opts.element
+            .removeAttr('aria-hidden')
+            .off('validate-element');
+
+        if (this._ariaLabelAdded) {
+            this.opts.element.removeAttr('aria-label');
+        }
     }
 
     const overrideMethods = {
@@ -421,16 +450,14 @@ define(function(require) {
                     this.search.removeAttr('name');
                 }.bind(this));
 
-            this.opts.element.attr('aria-hidden', true);
-            this.opts.element.trigger($.Event('select2-init'));
+            this.opts.element
+                .attr('aria-hidden', true)
+                .trigger($.Event('select2-init'));
         };
 
-        prototype.destroy = function() {
-            this.opts.element.removeAttr('aria-hidden');
 
-            if (this._ariaLabelAdded) {
-                this.opts.element.removeAttr('aria-label');
-            }
+        prototype.destroy = function() {
+            toUnAssignAriaAttributesForSelect.call(this);
 
             if (this.propertyObserver) {
                 this.propertyObserver.disconnect();
