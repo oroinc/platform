@@ -90,7 +90,6 @@ define(function(require, exports, module) {
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
-                    .attr('aria-required', true)
                     .find('em').html('*');
             }
         },
@@ -100,7 +99,6 @@ define(function(require, exports, module) {
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
-                    .removeAttr('aria-required')
                     .find('em').html('&nbsp;');
             }
         },
