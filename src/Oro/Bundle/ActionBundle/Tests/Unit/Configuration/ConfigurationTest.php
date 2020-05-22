@@ -162,6 +162,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'data' => [
                                 'key1' => 'value1'
                             ],
+                            'aria_label' => 'test_aria_label',
                         ],
                         'form_options' => [
                             'validation_groups' => ['Default', 'Optional'],
@@ -283,7 +284,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             ],
                             'data' => [
                                 'key1' => 'value1'
-                            ]
+                            ],
+                            'aria_label' => 'test_aria_label',
                         ],
                     ]
                 ],

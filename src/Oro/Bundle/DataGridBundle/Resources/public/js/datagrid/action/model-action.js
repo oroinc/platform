@@ -1,8 +1,9 @@
 define([
     'underscore',
+    'jquery',
     './abstract-action',
     'orodatagrid/js/url-helper'
-], function(_, AbstractAction, UrlHelper) {
+], function(_, $, AbstractAction, UrlHelper) {
     'use strict';
 
     const location = window.location;
@@ -20,6 +21,12 @@ define([
 
         /** @property {String} */
         link: undefined,
+
+        /** @property {String} */
+        title: undefined,
+
+        /** @property {String} */
+        ariaLabel: undefined,
 
         /** @property {Boolean} */
         backUrl: false,
@@ -57,6 +64,16 @@ define([
                 this.backUrlParameter = opts.backUrlParameter;
             }
 
+            const title = this.getData(this.title);
+            if (title) {
+                this.launcherOptions = $.extend(true, {title: title}, this.launcherOptions);
+            }
+
+            const ariaLabel = this.getData(this.ariaLabel);
+            if (ariaLabel) {
+                this.launcherOptions = $.extend(true, {ariaLabel: ariaLabel, title: ariaLabel}, this.launcherOptions);
+            }
+
             ModelAction.__super__.initialize.call(this, options);
         },
 
@@ -86,6 +103,15 @@ define([
             }
 
             return result;
+        },
+
+        /**
+         * @param {String} name
+         * @return {String}
+         * @private
+         */
+        getData: function(name) {
+            return name && this.model.has(name) ? this.model.get(name) : null;
         },
 
         /**
