@@ -15,10 +15,10 @@ class ConfigurationTest extends TestCase
         $result = $processor->processConfiguration(new Configuration(), []);
 
         $this->assertArrayHasKey('build_timeout', $result);
-        $this->assertEquals(900, $result['build_timeout']);
+        $this->assertNull($result['build_timeout']);
 
         $this->assertArrayHasKey('npm_install_timeout', $result);
-        $this->assertEquals(900, $result['npm_install_timeout']);
+        $this->assertNull($result['npm_install_timeout']);
 
         $this->assertArrayHasKey('nodejs_path', $result);
         $this->assertIsString($result['nodejs_path']);
@@ -56,8 +56,8 @@ class ConfigurationTest extends TestCase
                 'expects' => [
                     'nodejs_path' => 'nodejs',
                     'npm_path' => 'npm',
-                    'build_timeout' => 900,
-                    'npm_install_timeout' => 900,
+                    'build_timeout' => null,
+                    'npm_install_timeout' => null,
                     'webpack_dev_server' => [
                         'enable_hmr' => '%kernel.debug%',
                         'host' => 'localhost',
