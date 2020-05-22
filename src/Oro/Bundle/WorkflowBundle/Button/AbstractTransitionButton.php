@@ -55,6 +55,14 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
+    public function getAriaLabel(): ?string
+    {
+        return null; // not implemented
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getIcon()
     {
         $frontendOptions = $this->transition->getFrontendOptions();

@@ -13,7 +13,14 @@ class ButtonStub implements ButtonInterface
     /** @var array */
     protected $buttonOptions;
 
-    public function __construct(array $buttonOptions = [])
+    /** @var array */
+    protected $datagridOptions;
+
+    /**
+     * @param array $buttonOptions
+     * @param array $datagridOptions
+     */
+    public function __construct(array $buttonOptions = [], array $datagridOptions = [])
     {
         $this->buttonOptions = array_replace_recursive(
             [
@@ -24,6 +31,8 @@ class ButtonStub implements ButtonInterface
             ],
             $buttonOptions
         );
+
+        $this->datagridOptions = array_replace(['aria_label' => 'Label'], $datagridOptions);
     }
 
     /**
@@ -83,6 +92,12 @@ class ButtonStub implements ButtonInterface
     public function getLabel()
     {
         return $this->buttonOptions['label'];
+    }
+
+    /** {@inheritdoc} */
+    public function getAriaLabel(): ?string
+    {
+        return $this->datagridOptions['aria_label'];
     }
 
     /**
