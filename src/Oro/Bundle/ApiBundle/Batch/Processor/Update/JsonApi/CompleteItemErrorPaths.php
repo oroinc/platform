@@ -43,15 +43,15 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
         $pointer = $errorSource->getPointer();
         if ($pointer) {
             if (0 === strpos($pointer, '/' . $sectionName)) {
-                $pointer = substr($pointer, strlen($sectionName) + 1);
-            } else {
+                $pointer = sprintf('/%s/%s%s', $sectionName, $itemOffset, substr($pointer, \strlen($sectionName) + 1));
+            } elseif ('/' . JsonApiDoc::INCLUDED !== $pointer) {
                 $includedData = $item->getIncludedData();
                 if (null !== $includedData && 0 === strpos($pointer, '/' . JsonApiDoc::INCLUDED . '/')) {
-                    $pointer = substr($pointer, strlen(JsonApiDoc::INCLUDED) + 2);
+                    $pointer = substr($pointer, \strlen(JsonApiDoc::INCLUDED) + 2);
                     $endPosOfIncludeIndex = strpos($pointer, '/');
                     if (false !== $endPosOfIncludeIndex) {
                         $includeIndex = substr($pointer, 0, $endPosOfIncludeIndex);
-                        $pointer = substr($pointer, strlen($includeIndex));
+                        $pointer = substr($pointer, \strlen($includeIndex));
                     } else {
                         $includeIndex = $pointer;
                         $pointer = '';
@@ -88,8 +88,8 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
                         );
                     }
                 }
+                $pointer = sprintf('/%s/%s%s', $sectionName, $itemOffset, $pointer);
             }
-            $pointer = sprintf('/%s/%s%s', $sectionName, $itemOffset, $pointer);
         } else {
             $pointer = sprintf('/%s/%s', $sectionName, $itemOffset);
         }
