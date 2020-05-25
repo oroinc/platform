@@ -11,7 +11,7 @@ abstract class AbstractConfigurationProvider
     /**
      * @var string
      */
-    protected $configDirectory = '/Resources/config/';
+    protected $configDirectory = '/Resources/config/oro';
 
     /**
      * @var array
