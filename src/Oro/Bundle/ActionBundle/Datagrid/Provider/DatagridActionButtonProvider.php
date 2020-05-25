@@ -274,6 +274,11 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
             $button->getTemplateData()['additionalData']
         );
 
+        $ariaLabel = $button->getAriaLabel();
+        if ($ariaLabel) {
+            $config['ariaLabel'] = $ariaLabel;
+        }
+
         if ($button->getOrder()) {
             $config['order'] = $button->getOrder();
         }
