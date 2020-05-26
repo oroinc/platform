@@ -134,7 +134,7 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         isValueEmpty: function(value) {
-            value = value ? $.trim(value) : '';
+            value = value ? value.trim() : '';
             return !value;
         },
 
