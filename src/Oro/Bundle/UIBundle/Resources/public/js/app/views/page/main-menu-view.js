@@ -361,7 +361,7 @@ define([
             this.$el
                 .find('.active')
                 .each(function(idx, el) {
-                    activeMenuItemLabels.push($.trim($(el).find('.title').first().text()));
+                    activeMenuItemLabels.push($(el).find('.title').first().text().trim());
                 });
 
             return activeMenuItemLabels;
