@@ -110,7 +110,7 @@ define([
 
             const action = $form.attr('action');
             const method = $form.attr('method');
-            let url = (typeof action === 'string') ? $.trim(action) : '';
+            let url = (typeof action === 'string') ? action.trim() : '';
             url = url || window.location.href || '';
             if (url) {
                 url += '?input_action=' + $(event.target).attr('data-action');

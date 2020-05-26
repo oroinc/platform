@@ -16,7 +16,7 @@ define(function(require) {
             });
 
             it('first visible input should be focused', function() {
-                this.dialog.setContent('<div class="widget-content"><form><input /></form></div>');
+                this.dialog.setContent('<div class="widget-content"><form><input></form></div>');
                 this.dialog.focusContent();
                 expect(document.activeElement).toEqual(this.dialog.$(':input').get(0));
             });

@@ -896,10 +896,10 @@ define(function(require) {
             const currentView = this._getCurrentView();
 
             if (typeof currentView === 'undefined') {
-                return this.title ? $.trim(this.title) : __('Please select view');
+                return this.title ? this.title.trim() : __('Please select view');
             }
 
-            return $.trim(currentView.label);
+            return currentView.label.trim();
         },
 
         /**
