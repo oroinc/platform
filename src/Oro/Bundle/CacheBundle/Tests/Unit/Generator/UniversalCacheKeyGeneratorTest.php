@@ -53,7 +53,7 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
             ],
             'boolean' => [
                 'arguments' => false,
-                'expectedCacheKey' => '0',
+                'expectedCacheKey' => false,
             ],
             'object' => [
                 'arguments' => ['sample_scope' => new \stdClass()],

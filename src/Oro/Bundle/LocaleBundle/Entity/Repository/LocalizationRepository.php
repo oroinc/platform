@@ -76,4 +76,16 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @return array
+     */
+    public function findAllIndexedById(): array
+    {
+        return $this
+            ->createQueryBuilder('localization', 'localization.id')
+            ->orderBy('localization.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
