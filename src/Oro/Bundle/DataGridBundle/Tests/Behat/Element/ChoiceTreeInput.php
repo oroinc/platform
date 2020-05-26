@@ -31,7 +31,13 @@ class ChoiceTreeInput extends Element
 
         foreach ($values as $value) {
             $this->type($value);
-            $searchResults = $this->getSearchResults();
+            $searchResults = array_filter(
+                $this->getSearchResults(),
+                static function ($element) {
+                    return !empty(trim($element->getText()));
+                }
+            );
+
             self::assertCount(
                 1,
                 $searchResults,
