@@ -108,6 +108,9 @@ oro_behat_extension:
         type: xpath
         locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@role="button"]'
 
+    Email Page Contexts:
+      selector: 'div.activity-context-activity'
+
   pages:
     User Emails:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails
