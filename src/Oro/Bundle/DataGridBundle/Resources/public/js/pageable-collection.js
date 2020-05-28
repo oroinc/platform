@@ -394,6 +394,10 @@ define([
          * @protected
          */
         _parseResponseModels: function(resp) {
+            if (this.options.parseResponseModels) {
+                return this.options.parseResponseModels(resp);
+            }
+
             if (_.has(resp, 'data')) {
                 return resp.data;
             }
