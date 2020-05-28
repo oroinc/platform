@@ -24,6 +24,7 @@ aliases:
     oro/datagrid/cell/date-cell$: orodatagrid/js/datagrid/cell/date-cell
     oro/datagrid/cell/datetime-cell$: orodatagrid/js/datagrid/cell/datetime-cell
     oro/datagrid/cell/html-cell$: orodatagrid/js/datagrid/cell/html-cell
+    oro/datagrid/cell/html-template-cell$: orodatagrid/js/datagrid/cell/html-template-cell
     oro/datagrid/cell/multi-relation-cell$: orodatagrid/js/datagrid/cell/multi-relation-cell
     oro/datagrid/cell/multi-select-cell$: orodatagrid/js/datagrid/cell/multi-select-cell
     oro/datagrid/cell/number-cell$: orodatagrid/js/datagrid/cell/number-cell
@@ -71,6 +72,7 @@ dynamic-imports:
         - oro/datagrid/cell/date-cell
         - oro/datagrid/cell/datetime-cell
         - oro/datagrid/cell/html-cell
+        - oro/datagrid/cell/html-template-cell
         - oro/datagrid/cell/multi-relation-cell
         - oro/datagrid/cell/multi-select-cell
         - oro/datagrid/cell/number-cell
@@ -94,6 +96,7 @@ dynamic-imports:
         - orodatagrid/js/app/views/board/column-view
         - orodatagrid/js/app/views/toggle-pagination-view
         - orodatagrid/js/appearance/builder
+        - orodatagrid/js/datagrid/builder/html-templates-preloader
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener
         - orodatagrid/js/datagrid/listener/change-editable-cell-listener
