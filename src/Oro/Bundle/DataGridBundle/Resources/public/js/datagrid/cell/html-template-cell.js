@@ -6,7 +6,12 @@ const HtmlTemplateCell = StringCell.extend({
     },
 
     getTemplateData: function() {
-        return this.model.toJSON();
+        return {
+            ...this.model.toJSON(),
+            _metadata: {
+                ...this.column.get('metadata')
+            }
+        };
     },
 
     getTemplateFunction: function() {
