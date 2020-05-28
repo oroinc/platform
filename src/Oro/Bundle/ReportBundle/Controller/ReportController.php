@@ -50,7 +50,8 @@ class ReportController extends AbstractController
             TranslatorInterface::class,
             ReportHandler::class,
             Router::class,
-            FeatureChecker::class
+            FeatureChecker::class,
+            DateHelper::class,
         ]);
     }
 
@@ -264,7 +265,7 @@ class ReportController extends AbstractController
         );
 
         /** @var DateHelper $dateTimeHelper */
-        $dateTimeHelper = $this->get('oro_dashboard.datetime.helper');
+        $dateTimeHelper = $this->get(DateHelper::class);
         $dateTypes      = [Type::DATETIME, Type::DATE, Type::DATETIMETZ];
 
         if (in_array($labelFieldType, $dateTypes)) {
