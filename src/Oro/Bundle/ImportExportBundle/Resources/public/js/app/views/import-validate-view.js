@@ -7,7 +7,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const WidgetManager = require('oroui/js/widget-manager');
     const Messenger = require('oroui/js/messenger');
-    const DeleteConfirmation = require('oroui/js/standart-confirmation');
+    const DeleteConfirmation = require('oroui/js/standard-confirmation');
 
     const ImportValidateView = BaseView.extend({
         autoRender: true,

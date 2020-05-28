@@ -62,7 +62,7 @@ define(function(require) {
         /**
          * @type {Function}
          */
-        confirmModalConstructor: require('oroui/js/standart-confirmation'),
+        confirmModalConstructor: require('oroui/js/standard-confirmation'),
 
         confirmModalModulePromise: null,
 

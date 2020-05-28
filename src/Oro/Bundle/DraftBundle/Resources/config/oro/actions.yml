@@ -50,7 +50,7 @@ operations:
         frontend_options:
             confirmation:
                 content: '$.confirmationContent'
-                component: oroui/js/standart-confirmation
+                component: oroui/js/standard-confirmation
         preconditions:
             '@and':
                 - '@not_blank': $.data
@@ -101,7 +101,7 @@ operations:
             confirmation:
                 title: oro.draft.operations.publish.label
                 message: oro.draft.operations.publish.message
-                component: oroui/js/standart-confirmation
+                component: oroui/js/standard-confirmation
 
     DUPLICATE_DRAFT:
         extends: CREATE_DRAFT

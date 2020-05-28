@@ -6,7 +6,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
 class FolderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGuessStandartFolderType()
+    public function testGuessStandardFolderType()
     {
         $folder = new Folder('');
         $folder->setFlags(['\\Inbox']);

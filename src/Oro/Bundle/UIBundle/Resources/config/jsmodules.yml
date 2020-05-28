@@ -147,7 +147,7 @@ dynamic-imports:
         - oroui/js/messenger
         - oroui/js/mobile/layout
         - oroui/js/modal
-        - oroui/js/standart-confirmation
+        - oroui/js/standard-confirmation
         - oroui/js/tools/api-accessor
         - oroui/js/tools/manage-focus
         - oroui/js/tools/search-api-accessor
