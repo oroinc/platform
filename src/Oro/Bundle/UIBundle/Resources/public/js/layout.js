@@ -8,12 +8,15 @@ define(function(require) {
     const tools = require('oroui/js/tools');
     const scrollHelper = require('oroui/js/tools/scroll-helper');
     const Popover = require('bootstrap-popover');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
 
     require('jquery-ui');
 
     const document = window.document;
     const console = window.console;
     let pageRenderedCbPool = [];
+
+    const ESCAPE_KEY_CODE = 27;
 
     const layout = {
         /**
@@ -77,7 +80,8 @@ define(function(require) {
                 delay: {show: 0, hide: 0},
                 html: true,
                 container: false,
-                trigger: 'manual'
+                trigger: 'manual',
+                forceToShowTitle: false
             });
 
             if (overrideOptionsByData) {
@@ -87,23 +91,102 @@ define(function(require) {
             $items.not('[data-close="false"]').each(function(i, el) {
                 // append close link
                 let content = el.getAttribute('data-content');
-                content += '<i class="fa-close popover-close"></i>';
+                content += '<i class="fa-close popover-close" aria-hidden="true"></i>';
                 el.setAttribute('data-content', content);
             });
 
-            $items.popover(options).on('click' + Popover.EVENT_KEY, function(e) {
+            const popoverConfig = _.omit(options, 'forceToShowTitle');
+
+            $items.popover(popoverConfig).on('click' + Popover.EVENT_KEY, function(e) {
                 if ($(this).is('.disabled, :disabled')) {
                     return;
                 }
 
                 $(this).popover('toggle');
+
                 e.preventDefault();
+            });
+
+            if (options.forceToShowTitle) {
+                $items
+                    .on('mouseenter' + Popover.EVENT_KEY, e => {
+                        // Element is not disabled, title is cropped and and the popover is not opened
+                        if (
+                            !$(e.target).is('[disabled]') &&
+                            $(e.target).is('[data-original-title]') &&
+                            !$(e.target).is('[aria-describedby]')
+                        ) {
+                            $(e.target).attr('title', $(e.target).attr('data-original-title'));
+                        }
+                    })
+                    .on('mouseleave' + Popover.EVENT_KEY, e => {
+                        // Element is not disabled, title is cropped
+                        if (
+                            !$(e.target).is('[disabled]') &&
+                            $(e.target).is('[data-original-title]')
+                        ) {
+                            $(e.target).attr('title', '');
+                        }
+                    });
+            }
+
+            $items
+                .on(`shown${Popover.EVENT_KEY}`, e => {
+                    const popover = $(e.target).data(Popover.DATA_KEY);
+                    const $tip = $(popover.tip);
+                    const $tabbable = $tip.find(':tabbable').eq(0);
+
+                    if (!$tabbable.length) {
+                        return;
+                    }
+
+                    const config = popover._getConfig();
+                    let timeout = 0;
+
+                    if (config.animation) {
+                        timeout = config.delay.show;
+                    }
+
+                    setTimeout(() => {
+                        manageFocus.focusTabbable($(popover.getTipElement()), $tabbable);
+
+                        $tip.on('keydown' + Popover.EVENT_KEY,
+                            e => manageFocus.preventTabOutOfContainer(e, $tip));
+
+                        $(e.target).one('hide' + Popover.EVENT_KEY, e => $tip.off(Popover.EVENT_KEY));
+                    }, timeout);
+                })
+                .on(`hide${Popover.EVENT_KEY}`, e => {
+                    const popover = $(e.target).data(Popover.DATA_KEY);
+
+                    if ($.contains(popover.tip, document.activeElement)) {
+                        $(e.target).trigger('focus');
+                    }
+                })
+                .on(`focusout${Popover.EVENT_KEY}`, e => {
+                    const popover = $(e.target).data(Popover.DATA_KEY);
+
+                    if (
+                        popover &&
+                        popover.isOpen() &&
+                        !$.contains(popover.tip, e.relatedTarget)
+                    ) {
+                        $(e.target).popover('hide');
+                    }
+                });
+
+            $(document).on('keydown.popover-hide', e => {
+                if (e.keyCode === ESCAPE_KEY_CODE) {
+                    $items.filter('[aria-describedby]').each(function() {
+                        $(this).popover('hide');
+                    });
+                }
             });
 
             $('body')
                 .on('click.popover-hide', function(e) {
                     const $target = $(e.target);
-                    // '[aria-describedby]' -- meens the popover is opened
+                    // '[aria-describedby]' -- means that the popover is opened.
                     $items.filter('[aria-describedby]').each(function() {
                         // the 'is' for buttons that trigger popups
                         // the 'has' for icons within a button that triggers a popup
@@ -120,10 +203,11 @@ define(function(require) {
                         e.preventDefault();
                     }
                 }).on('focus.popover-hide', 'select, input, textarea', function() {
-                    // '[aria-describedby]' -- meens the popover is opened
+                    // '[aria-describedby]' -- means that the popover is opened.
                     $items.filter('[aria-describedby]').popover('hide');
                 });
             mediator.once('page:request', function() {
+                $(document).off('.popover-hide');
                 $('body').off('.popover-hide .popover-prevent');
             });
         },
