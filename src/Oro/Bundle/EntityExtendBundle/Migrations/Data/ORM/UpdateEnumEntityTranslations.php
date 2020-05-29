@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -20,7 +21,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 /**
  * Adds translations to enum entity in case of their absence
  */
-class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedFixtureInterface, ContainerAwareInterface
+class UpdateEnumEntityTranslations extends AbstractFixture implements
+    VersionedFixtureInterface,
+    ContainerAwareInterface,
+    DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -41,6 +45,14 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
     public function getVersion()
     {
         return '1.0';
+    }
+        
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadLocalizationData::class];
     }
 
     /**
