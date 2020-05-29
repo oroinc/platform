@@ -66,7 +66,7 @@ class AliceToStringResolver implements ResolverInterface, ReferencesAwareInterfa
         }
 
         $args = preg_replace_callback(
-            '{(".*?[^\\\\]")|((?<!\\\\)@[a-z0-9_.*]+(?:\->[a-z0-9_-]+)?)}i',
+            '{(".*?[^\\\\]")|((?<!\\\\)@([a-z0-9_\-.]+[a-z0-9]){1}(->[a-z0-9_-]+)?)}i',
             function ($match) {
                 return $match[1] ?: var_export($this->resolver->resolve($match[2]), true);
             },

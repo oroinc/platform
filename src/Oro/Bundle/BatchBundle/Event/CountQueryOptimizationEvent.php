@@ -6,6 +6,12 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Represents the event that is dispatched by CountQueryBuilderOptimizer after the query optimization is finished.
+ * The listeners for this event can be used to final tuning of the list of joins
+ * that should be included in the count query.
+ * @see \Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer
+ */
 class CountQueryOptimizationEvent extends Event
 {
     const EVENT_NAME = 'oro.entity.count_query.optimize';
@@ -76,8 +82,13 @@ class CountQueryOptimizationEvent extends Event
      */
     public function removeJoinFromOptimizedQuery($alias)
     {
-        if (!in_array($alias, $this->toRemoveAliases, true)) {
+        if (!\in_array($alias, $this->toRemoveAliases, true)) {
             $this->toRemoveAliases[] = $alias;
+            $i = array_search($alias, $this->aliases, true);
+            if (false !== $i) {
+                unset($this->aliases[$i]);
+                $this->aliases = array_values($this->aliases);
+            }
         }
     }
 }

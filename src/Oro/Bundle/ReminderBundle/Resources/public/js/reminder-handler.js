@@ -159,11 +159,18 @@ define(
             getReminderMessage: function(reminder) {
                 let message = '';
                 try {
-                    let template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]').html();
-                    if ($.trim(template) === '') {
-                        template = $('.reminder_templates[data-identifier="default"]').html();
+                    const template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]');
+                    let content = '';
+
+                    if (template.length) {
+                        content = template.html().trim();
                     }
-                    message += _.template(template)(reminder);
+
+                    if (!content) {
+                        content = $('.reminder_templates[data-identifier="default"]').html();
+                    }
+
+                    message += _.template(content)(reminder);
                 } catch (ex) {
                     // Suppress possible exceptions during template processing
                     if (console && (typeof console.log === 'function')) {

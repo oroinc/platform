@@ -1,0 +1,11 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection:
+    test_entity{1..2}:
+        name: Entity <current()>
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem:
+    test_item_entity{1..2}:
+        name: Item Entity <current()>
+        inverseManyToManyWithOrphanRemovalParents: ['@test_entity1']
+    test_item_entity{3..4}:
+        name: Item Entity <current()>
+        inverseManyToManyWithOrphanRemovalParents: ['@test_entity2']

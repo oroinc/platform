@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Oro\Bundle\SecurityBundle\Authentication\Listener\RememberMeListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -12,6 +14,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class OrganizationRememberMeFactory extends RememberMeFactory
 {
+    public function __construct()
+    {
+        $this->options['csrf_protected_mode'] = false;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -65,12 +72,26 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         );
 
         // remember-me listener
-        $listenerId = 'security.authentication.listener.rememberme.' . $id;
-        $listener   = $container->setDefinition(
-            $listenerId,
+        // setup default rember-me listener
+        $innerListenerId = 'security.authentication.listener.rememberme.' . $id;
+        $innerListener   = $container->setDefinition(
+            $innerListenerId,
             new ChildDefinition('security.authentication.listener.rememberme')
         );
-        $listener->replaceArgument(1, new Reference($rememberMeServicesId));
+        $innerListener->replaceArgument(1, new Reference($rememberMeServicesId));
+        // setup extended rember-me listener and attach default one to it
+        $listenerId = 'oro_security.authentication.listener.rememberme.' . $id;
+        $listener = $container
+            ->register($listenerId, RememberMeListener::class)
+            ->setArguments([
+                new Reference($innerListenerId),
+                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+            ])
+            ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')]);
+        // point if listener processes CSRF protected AJAX requests only
+        if ($config['csrf_protected_mode'] === true) {
+            $listener->addMethodCall('switchToProcessAjaxCsrfOnlyRequest');
+        }
 
         return [$authProviderId, $listenerId, $defaultEntryPoint];
     }

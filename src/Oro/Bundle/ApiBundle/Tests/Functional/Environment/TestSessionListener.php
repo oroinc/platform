@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -12,6 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class TestSessionListener implements EventSubscriberInterface
 {
+    /** @var bool */
     private $isSessionStarted = false;
 
     /**
@@ -19,15 +21,38 @@ class TestSessionListener implements EventSubscriberInterface
      *
      * @return bool
      */
-    public function isSessionStarted()
+    public function isSessionStarted(): bool
     {
         return $this->isSessionStarted;
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
+        $session = $event->getRequest()->getSession();
+        if (null === $session) {
+            throw new \LogicException(sprintf(
+                'The Session is not initialized. Check the priority of %s::onKernelRequest().',
+                __CLASS__
+            ));
+        }
+
+        $this->isSessionStarted = false;
+        if ($session->isStarted()) {
+            $session->save();
+        }
+    }
+
+    /**
+     * @param ResponseEvent $event
+     */
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -40,12 +65,18 @@ class TestSessionListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             /**
+             * must be executed after Symfony's TestSessionListener::onKernelRequest,
+             * because Symfony's listener initializes the session
+             * @see \Symfony\Component\HttpKernel\EventListener\SessionListener::onKernelResponse
+             */
+            KernelEvents::REQUEST  => ['onKernelRequest', 127],
+            /**
              * must be executed before Symfony's TestSessionListener::onKernelResponse,
-             * because we need to check whether the session was started or not before it is closed
+             * because we need to check whether the session was started before it is closed by Symfony's listener
              * @see \Symfony\Component\HttpKernel\EventListener\TestSessionListener::onKernelResponse
              */
             KernelEvents::RESPONSE => ['onKernelResponse', -127]

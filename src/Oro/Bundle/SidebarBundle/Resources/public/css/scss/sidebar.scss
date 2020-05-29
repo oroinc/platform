@@ -168,7 +168,7 @@
     .sidebar.minimized &.poppedup &__popup_wrapper {
         position: fixed;
         margin-top: -41px;
-        z-index: $zindex-dropdown - 80;
+        z-index: $zindex-dropdown;
         width: 0;
         height: 0;
         overflow: visible;

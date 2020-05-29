@@ -77,7 +77,7 @@ define(['jquery', 'jquery.form'], function($) {
         const action = $form.attr('action');
         const method = $form.attr('method');
 
-        let url = (typeof action === 'string') ? $.trim(action) : '';
+        let url = (typeof action === 'string') ? action.trim() : '';
         url = url || window.location.href || '';
         if (url) {
             // clean url (don't include hash vaue)

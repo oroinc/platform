@@ -160,6 +160,8 @@ oro:
         show_more_view:
             show_more: '{1}And {{ number }} more item|[2,Inf[And {{ number }} more items'
             show_less: 'Show less items'
+        dropdown_option_aria_label: "More Actions"
+        dropdown_main_btn_prefix: "Action"
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

@@ -84,7 +84,7 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
             $body['version'],
             $body['fileName']
         )) {
-            $this->logger->critical('Got invalid message.', ['message' => $message]);
+            $this->logger->critical('Got invalid message.');
 
             return self::REJECT;
         }

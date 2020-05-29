@@ -124,3 +124,10 @@ services:
             - '@oro_message_queue.job.root_job_status_calculator'
         tags:
             - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.job.out_of_memory_job_extension:
+        class: 'Oro\Component\MessageQueue\Job\Extension\OutOfMemoryJobExtension'
+        arguments:
+            - '@oro_message_queue.job.processor'
+        tags:
+            - { name: oro_message_queue.job.extension }

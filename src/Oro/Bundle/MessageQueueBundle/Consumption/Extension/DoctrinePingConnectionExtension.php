@@ -2,25 +2,20 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Doctrine ping connection extension.
+ */
 class DoctrinePingConnectionExtension extends AbstractExtension implements ResettableExtensionInterface
 {
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var ManagerRegistry|null */
-    private $doctrine;
-
     /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**
@@ -28,7 +23,6 @@ class DoctrinePingConnectionExtension extends AbstractExtension implements Reset
      */
     public function reset()
     {
-        $this->doctrine = null;
     }
 
     /**
@@ -36,24 +30,7 @@ class DoctrinePingConnectionExtension extends AbstractExtension implements Reset
      */
     public function onPreReceived(Context $context)
     {
-        if (null === $this->doctrine) {
-            $this->doctrine = $this->container->get('doctrine');
-        }
-
-        $logger = $context->getLogger();
-        $connections = $this->doctrine->getConnectionNames();
-        foreach ($connections as $name => $serviceId) {
-            $connection = $this->doctrine->getConnection($name);
-            if ($connection->ping()) {
-                return;
-            }
-
-            $logger->debug(sprintf('Connection "%s" is not active, trying to reconnect.', $name));
-
-            $connection->close();
-            $connection->connect();
-
-            $logger->debug(sprintf('Connection "%s" is active now.', $name));
-        }
+        // All open connections was closed after each messages was processed, no sense to ping connections.
+        // See \Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearExtension
     }
 }

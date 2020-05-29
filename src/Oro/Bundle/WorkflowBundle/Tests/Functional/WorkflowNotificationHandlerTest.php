@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional;
 
+use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\EmailNotificationHandler;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\NotificationManager;
 
 class WorkflowNotificationHandlerTest extends WebTestCase
 {
@@ -48,7 +48,14 @@ class WorkflowNotificationHandlerTest extends WebTestCase
 
     public function testWorkflowNotificationHandlerIsInTheTop(): void
     {
-        $handlers = $this->notificationManager->getHandlers();
-        $this->assertInstanceOf(WorkflowNotificationHandler::class, $handlers[0]);
+        $reflection = new \ReflectionObject($this->notificationManager);
+        $property = $reflection->getProperty('handlers');
+        $property->setAccessible(true);
+        $handlers = $property->getValue($this->notificationManager);
+        foreach ($handlers as $handler) {
+            // check the first element of iterable
+            $this->assertInstanceOf(WorkflowNotificationHandler::class, $handler);
+            return;
+        }
     }
 }
