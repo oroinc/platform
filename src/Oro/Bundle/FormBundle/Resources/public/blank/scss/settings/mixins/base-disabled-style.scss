@@ -1,7 +1,12 @@
 /* @theme: blank; */
 
-@mixin base-disabled-style($opacity: .5) {
+@mixin base-disabled-style($opacity: .5, $extra-rules: false) {
     opacity: $opacity;
 
     pointer-events: none;
+
+    @if ($extra-rules) {
+        @content;
+
+    }
 }
