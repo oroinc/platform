@@ -55,9 +55,9 @@ abstract class AbstractRole extends BaseRole
      */
     public function generateUniqueRole($role = '')
     {
+        $role = $this->addUniqueSuffix($role);
         $role = $this->normalize($role);
         $role = $this->addPrefix($role);
-        $role = $this->addUniqueSuffix($role);
 
         return $role;
     }

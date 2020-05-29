@@ -29,6 +29,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertStringStartsWith('ROLE_FOO', $role->getRole());
         $this->assertEquals(Role::PREFIX_ROLE, $role->getPrefix());
         $this->assertStringStartsWith(Role::PREFIX_ROLE, (string)$role);
+        $this->assertMatchesRegularExpression('/_[[:upper:]\d]{13}/', substr($role->getRole(), strrpos($role, '_')));
     }
 
     public function testLabel()
