@@ -34,6 +34,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
             [ApiAction::GET, 'Product', 'Get Product'],
             [ApiAction::GET_LIST, 'Products', 'Get Products'],
             [ApiAction::UPDATE, 'Product', 'Update Product'],
+            [ApiAction::UPDATE_LIST, 'Products', 'Create or update a list of Products'],
             [ApiAction::CREATE, 'Product', 'Create Product'],
             [ApiAction::DELETE, 'Product', 'Delete Product'],
             [ApiAction::DELETE_LIST, 'Products', 'Delete Products']
@@ -51,6 +52,9 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getResourceDocumentationProvider()
     {
         return [
@@ -59,6 +63,105 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
             [ApiAction::GET, 'Product', 'Products', 'Get an entity'],
             [ApiAction::GET_LIST, 'Product', 'Products', 'Get a list of entities'],
             [ApiAction::UPDATE, 'Product', 'Products', 'Update an entity'],
+            [
+                ApiAction::UPDATE_LIST,
+                'Product',
+                'Products',
+                'Create or update a list of product records.'
+                . "\n\n"
+                . 'The request is processed asynchronously, and the details of the corresponding asynchronous operation'
+                . "\nare returned in the response."
+                . "\n\n"
+                . '**Note:** *The server may process records in any order regardless of the order'
+                . "\nin which they are specified in the request.*"
+                . "\n\n"
+                . 'The input data for each record is the same as for the API resources to create or update'
+                . "\na single product record."
+                . "\n\n"
+                . 'Example:'
+                . "\n\n"
+                . '```JSON'
+                . "\n{"
+                . "\n   \"data\": ["
+                . "\n      {"
+                . "\n          \"type\":\"entityType\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {...}"
+                . "\n      },"
+                . "\n      {"
+                . "\n          \"type\":\"entityType\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {...}"
+                . "\n       }"
+                . "\n   ]"
+                . "\n}"
+                . "\n```"
+                . "\n\n"
+                . 'Use the **update** meta property to mark the records that should be updated.'
+                . "\nSee [Creating and Updating Related Resources with Primary API Resource]"
+                . '(https://doc.oroinc.com/api/create-update-related-resources/'
+                . '#creating-and-updating-related-resources-with-primary-api-resource)'
+                . "\nfor more details about this meta property."
+                . "\n\n"
+                . 'Example:'
+                . "\n\n"
+                . '```JSON'
+                . "\n{"
+                . "\n   \"data\": ["
+                . "\n      {"
+                . "\n          \"meta\": {\"update\": true},"
+                . "\n          \"type\":\"entityType\","
+                . "\n          \"id\": \"1\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {...}"
+                . "\n      },"
+                . "\n      {"
+                . "\n          \"meta\": {\"update\": true},"
+                . "\n          \"type\":\"entityType\","
+                . "\n          \"id\": \"2\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {...}"
+                . "\n       }"
+                . "\n   ]"
+                . "\n}"
+                . "\n```"
+                . "\n"
+                . "\nThe related entities can be created or updated when processing primary entities."
+                . "\nThe list of related entities should be specified in the **included** section"
+                . "\nthat must be placed at the root level, the same as the **data** section."
+                . "\n\n"
+                . 'Example:'
+                . "\n\n"
+                . '```JSON'
+                . "\n{"
+                . "\n   \"data\": ["
+                . "\n      {"
+                . "\n          \"type\":\"entityType\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {"
+                . "\n              \"relation\": {"
+                . "\n                  \"data\": {"
+                . "\n                      \"type\":\"entityType1\","
+                . "\n                      \"id\": \"included_entity_1\""
+                . "\n                  }"
+                . "\n              },"
+                . "\n              ..."
+                . "\n          }"
+                . "\n      },"
+                . "\n      ..."
+                . "\n   ],"
+                . "\n   \"included\": ["
+                . "\n       {"
+                . "\n          \"type\":\"entityType1\","
+                . "\n          \"id\": \"included_entity_1\","
+                . "\n          \"attributes\": {...},"
+                . "\n          \"relationships\": {...}"
+                . "\n      },"
+                . "\n      ..."
+                . "\n   ]"
+                . "\n}"
+                . "\n```"
+            ],
             [ApiAction::CREATE, 'Product', 'Products', 'Create an entity'],
             [ApiAction::DELETE, 'Product', 'Products', 'Delete an entity'],
             [ApiAction::DELETE_LIST, 'Product', 'Products', 'Delete a list of entities']

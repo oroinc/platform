@@ -29,6 +29,7 @@ oro_rest_api_item:
 # * GET method: returns a list of entities of the given type
 # * DELETE method: deletes a list of entities of the given type by the given filters
 # * POST method: creates an entity of the given type
+# * PATCH method: updates or creates a list of entities of the given type
 oro_rest_api_list:
     path: '%oro_api.rest.prefix%{entity}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiController::listAction

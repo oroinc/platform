@@ -3,6 +3,7 @@ datagrids:
         options:
             entityHint: oro.tag.entity_plural_label
             entity_pagination: true
+        extended_entity_name: 'Oro\Bundle\TagBundle\Entity\Tag'
         acl_resource: oro_tag_view
         source:
             type: orm
@@ -138,6 +139,7 @@ datagrids:
         options:
             entityHint: oro.tag.taxonomy.datagrid.entity_hint
             entity_pagination: true
+        extended_entity_name: 'Oro\Bundle\TagBundle\Entity\Taxonomy'
         acl_resource: oro_taxonomy_view
         source:
             type: orm

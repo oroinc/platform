@@ -67,6 +67,22 @@ class GroupByHelperTest extends \PHPUnit\Framework\TestCase
                 'groupBy' => 'alias.field2',
                 'expected' => ['alias.field2', 'alias.field', 'c1', 'someAlias3'],
             ],
+            'with aggregate and order by' => [
+                'selects' => [
+                    'MAX(t1.f0)',
+                    'AvG(t10.F19) as agF1',
+                    'alias.field',
+                    'alias.field2',
+                    'alias.matchedFields  as  c1',
+                    'alias.secondMatched aS someAlias3',
+                    'alias.matchedFields wrongas c1',
+                    'alias.id ASC',
+                    'c2 DESC',
+                    'alias.id DESC',
+                ],
+                'groupBy' => 'alias.field2',
+                'expected' => ['alias.field2', 'alias.field', 'c1', 'someAlias3', 'alias.id', 'c2'],
+            ],
             'without subselect without group by' => [
                 'selects' => [
                     'alias.field',

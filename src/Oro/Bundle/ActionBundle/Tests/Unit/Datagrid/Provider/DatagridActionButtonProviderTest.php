@@ -248,7 +248,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                         $this->createOperationButton(
                             'action3',
                             true,
-                            ['data' => ['key1' => 'value1']],
+                            ['data' => ['key1' => 'value1'], 'aria_label' => 'test_aria_label'],
                             'Action 3 label'
                         )
                     ]
@@ -287,7 +287,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                         $this->createOperationButton(
                             'test_operation',
                             true,
-                            ['label' => 'test_mass_action_label']
+                            ['label' => 'test_mass_action_label', 'aria_label' => 'test_aria_label']
                         )
                     ]
                 ),
@@ -527,6 +527,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         return array_merge([
             'type' => 'button-widget',
             'label' => $label,
+            'ariaLabel' => 'test_aria_label',
             'rowAction' => false,
             'link' => '#',
             'icon' => 'pencil-square-o',

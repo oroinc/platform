@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Clear all entity managers after each message was processed to ensure that all managed entities was detached.
+ */
 class DoctrineClearIdentityMapExtension extends AbstractExtension implements ResettableExtensionInterface
 {
     /** @var ContainerInterface */
@@ -14,6 +18,9 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension implements Res
 
     /** @var ManagerRegistry|null */
     private $doctrine;
+
+    /** @var array [manager name => manager service id, ...] */
+    private $managers = [];
 
     /**
      * @param ContainerInterface $container
@@ -24,11 +31,18 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension implements Res
     }
 
     /**
+     * @param array $managers
+     */
+    public function setManagers(array $managers)
+    {
+        $this->managers = $managers;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function reset()
     {
-        $this->doctrine = null;
     }
 
     /**
@@ -36,19 +50,41 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension implements Res
      */
     public function onPostReceived(Context $context)
     {
-        if (null === $this->doctrine) {
-            $this->doctrine = $this->container->get('doctrine');
-        }
+        $managers = $this->getAliveManagers();
 
         $logger = $context->getLogger();
-        $managers = $this->doctrine->getManagerNames();
+        $logger->info('Clear entity managers identity map.', ['entity_managers' => array_keys($managers)]);
+        $this->clear($managers);
+    }
+
+    /**
+     * @return ObjectManager[]
+     */
+    private function getAliveManagers()
+    {
+        $aliveManagers = [];
+
+        $managers = $this->managers;
+        if (!$managers) {
+            $managers = $this->doctrine->getManagerNames();
+        }
+
         foreach ($managers as $name => $serviceId) {
             if ($this->container->initialized($serviceId)) {
-                $logger->debug(sprintf('Clear identity map for manager "%s"', $name));
-
-                $manager = $this->doctrine->getManager($name);
-                $manager->clear();
+                $aliveManagers[$name] = $this->container->get($serviceId);
             }
+        }
+
+        return $aliveManagers;
+    }
+
+    /**
+     * @param ObjectManager[] $managers
+     */
+    private function clear(array $managers)
+    {
+        foreach ($managers as $manager) {
+            $manager->clear();
         }
     }
 }

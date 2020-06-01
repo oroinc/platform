@@ -7,28 +7,42 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailBuilder;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailProcessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     protected $render;
 
     /** @var AutoResponseManager */
@@ -39,30 +53,18 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailModelBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-
-        $this->render = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $this->registry = $this->createMock(Registry::class);
+        $this->emailBuilder = $this->createMock(EmailModelBuilder::class);
+        $this->emailProcessor = $this->createMock(Processor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->render = $this->createMock(EmailRenderer::class);
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 return $id;
-            }));
+            });
 
         $this->autoResponseManager = new AutoResponseManager(
             $this->registry,
@@ -127,6 +129,58 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider applicableEmailsProvider
+     * @param string $definition
+     * @param Email $email
+     */
+    public function testSendAutoResponses($definition, Email $email)
+    {
+        $mailbox = new Mailbox();
+        $origin = new UserEmailOrigin();
+        $origin->setUser(new User());
+        $mailbox->setOrigin($origin);
+        $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
+
+        $emailAddress = new EmailAddress();
+        $emailAddress->setEmail('test@test.com');
+        $email->setFromEmailAddress($emailAddress);
+
+        $repo = $this->createMock(MailboxRepository::class);
+        $this->registry->expects($this->once())
+            ->method('getRepository')
+            ->with(Mailbox::class)
+            ->willReturn($repo);
+
+        $repo->expects($this->once())
+            ->method('findForEmail')
+            ->with($email)
+            ->willReturn([$mailbox]);
+
+        $emailModel = new EmailModel();
+        $this->emailBuilder->expects($this->once())
+            ->method('createReplyEmailModel')
+            ->with($email)
+            ->willReturn($emailModel);
+
+        $this->render->expects($this->exactly(2))
+            ->method('renderTemplate')
+            ->willReturnMap(
+                [
+                    ['SUBJECT EN', ['entity' => $email], 'RENDERED EN SUBJECT'],
+                    ['CONTENT EN', ['entity' => $email], 'RENDERED EN CONTENT']
+                ]
+            );
+        $this->emailProcessor->expects($this->once())
+            ->method('process')
+            ->with($emailModel, $origin);
+
+        $this->autoResponseManager->sendAutoResponses($email);
+
+        $this->assertEquals('RENDERED EN SUBJECT', $emailModel->getSubject());
+        $this->assertEquals('RENDERED EN CONTENT', $emailModel->getBody());
+    }
+
+    /**
      * @param string $definition
      *
      * @return AutoResponseRule
@@ -138,6 +192,21 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $createdAt->sub(DateInterval::createFromDateString('1 day'));
         $autoResponseRule->setCreatedAt($createdAt);
         $autoResponseRule->setDefinition($this->getDefinition($definition));
+        $autoResponseRule->setActive(true);
+
+        $template = new EmailTemplate();
+        $template->setContent('TEST');
+        $template->setSubject('SUBJECT');
+        $translation = new EmailTemplateTranslation();
+        $translation->setSubject('SUBJECT EN');
+        $translation->setContent('CONTENT EN');
+        $localization = new Localization();
+        $language = new Language();
+        $language->setCode('en');
+        $localization->setLanguage($language);
+        $translation->setLocalization($localization);
+        $template->addTranslation($translation);
+        $autoResponseRule->setTemplate($template);
 
         return $autoResponseRule;
     }

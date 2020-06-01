@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -34,7 +35,7 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * Disables clearing the security token and stopping sending messages
-     * during handling of "kernel.terminate" event.
+     * when handling the "kernel.terminate" event.
      * @see initClient
      *
      * @param bool $disable
@@ -52,9 +53,9 @@ abstract class ApiTestCase extends WebTestCase
         $client = parent::initClient($options, $server, $force);
 
         /**
-         * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
+         * Clear the security token and stop sending messages when handling the "kernel.terminate" event.
          * This is needed to prevent unexpected exceptions
-         * if some database related exception occurs during handling of API request
+         * if some database related exception occurs when handling an API request
          * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
          * As functional tests work inside a database transaction, any query to the database
          * after such exception can raise "current transaction is aborted,
@@ -122,6 +123,14 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @return DoctrineHelper
+     */
+    protected function getDoctrineHelper()
+    {
+        return self::getContainer()->get('oro_api.doctrine_helper');
+    }
+
+    /**
      * @return ValueNormalizer
      */
     protected function getValueNormalizer()
@@ -155,7 +164,7 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
-        $doctrineHelper = self::getContainer()->get('oro_api.doctrine_helper');
+        $doctrineHelper = $this->getDoctrineHelper();
         $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
@@ -643,10 +652,10 @@ abstract class ApiTestCase extends WebTestCase
             $this->getEntityManager()->clear();
         } catch (DBALException $e) {
             /**
-             * Suppress database related exceptions during the clearing of the entity manager,
+             * Suppress database related exceptions when clearing the entity manager,
              * if it was requested for safe handling of "kernel.terminate" event.
              * This is needed to prevent unexpected exceptions
-             * if some database related exception occurs during handling of API request
+             * if some database related exception occurs when handling an API request
              * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
              * As functional tests work inside a database transaction, any query to the database
              * after such exception can raise "current transaction is aborted,

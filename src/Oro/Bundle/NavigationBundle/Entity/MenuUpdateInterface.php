@@ -7,6 +7,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
+/**
+ * Interface for menu update entity.
+ */
 interface MenuUpdateInterface
 {
     /**

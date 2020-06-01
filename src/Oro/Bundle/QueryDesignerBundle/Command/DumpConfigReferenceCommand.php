@@ -14,6 +14,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DumpConfigReferenceCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:query-designer:config:dump-reference';
+
     /** @var Configuration */
     private $configuration;
 
@@ -32,7 +35,6 @@ class DumpConfigReferenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('oro:query-designer:config:dump-reference')
             ->setDescription('Dumps the structure of "Resources/config/oro/query_designer.yml".');
     }
 

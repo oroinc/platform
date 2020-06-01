@@ -29,10 +29,10 @@ datagrids:
                     - customer.name
                     - IDENTITY(customerProductVisibility.visibility) as visibility
                 from:
-                    - { table: %acme_customer.entity.customer.class%, alias: customer }
+                    - { table: 'Acme\Bundle\AcmeBundle\Entity\Customer', alias: customer }
                 join:
                     left:
-                        - { join: %acme_customer.entity.customer_product_visibility.class%, alias: customerProductVisibility, conditionType: WITH, condition: 'customerProductVisibility.customer = customer' }
+                        - { join: 'Acme\Bundle\AcmeBundle\Entity\CustomerProductVisibility', alias: customerProductVisibility, conditionType: WITH, condition: 'customerProductVisibility.customer = customer' }
                 where:
                     and:
                         - IDENTITY(customerProductVisibility.product) = :product_id

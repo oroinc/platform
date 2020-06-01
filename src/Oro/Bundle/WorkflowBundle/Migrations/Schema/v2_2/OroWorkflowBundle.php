@@ -8,7 +8,6 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterfac
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14\SplitGroupsToIndividualFieldsQuery;
 
 class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
 {

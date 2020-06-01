@@ -38,9 +38,6 @@ define(function(require, exports, module) {
         label: undefined,
 
         /** @property {String} */
-        title: undefined,
-
-        /** @property {String} */
         ariaLabel: undefined,
 
         /**
@@ -49,12 +46,6 @@ define(function(require, exports, module) {
          * @property {boolean}
          */
         allowDefaultAriaLabel: false,
-
-        /** @property {String} */
-        icon: undefined,
-
-        /** @property {String} */
-        iconClassName: undefined,
 
         /** @property {Boolean} */
         /** @deprecated use launcherMode */
@@ -103,9 +94,7 @@ define(function(require, exports, module) {
          * @param {oro.datagrid.action.AbstractAction} options.action
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
-         * @param {String} [options.icon]
          * @param {Boolean} [options.launcherMode]
-         * @param {Boolean} [options.iconHideText]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
@@ -113,53 +102,12 @@ define(function(require, exports, module) {
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            const opts = options || {};
-
-            if (!opts.action) {
+            if (!options.action) {
                 throw new TypeError('"action" is required');
             }
 
-            if (opts.template) {
-                this.template = opts.template;
-            }
-
-            if (opts.label) {
-                this.label = opts.label;
-            }
-
-            if (opts.ariaLabel) {
-                this.ariaLabel = opts.ariaLabel;
-            }
-
-            if (opts.allowDefaultAriaLabel !== void 0) {
-                this.allowDefaultAriaLabel = opts.allowDefaultAriaLabel;
-            }
-
-            if (opts.attributes) {
-                this.attributes = opts.attributes;
-            }
-
-            if (opts.iconHideText !== undefined) {
-                this.iconHideText = opts.iconHideText;
-            }
-
-            if (opts.launcherMode) {
-                this.launcherMode = opts.launcherMode;
-            }
-
-            if (opts.className) {
-                this.className = opts.className;
-            }
-
-            if (_.has(opts, 'runAction')) {
-                this.runAction = opts.runAction;
-            }
-
-            this.selectedItem = opts.selectedItem || opts.items[0];
-
-            this.items = opts.items;
-
-            this.action = opts.action;
+            this.setOptions(options);
+            this.selectedItem = options.selectedItem || options.items[0];
 
             SelectChoiceLauncher.__super__.initialize.call(this, options);
         },
@@ -190,6 +138,28 @@ define(function(require, exports, module) {
             delete this.runAction;
 
             SelectChoiceLauncher.__super__.dispose.call(this);
+        },
+
+        /**
+         * @param {Object} options
+         * @param {oro.datagrid.action.AbstractAction} options.action
+         * @param {function(Object, ?Object=): string} [options.template]
+         * @param {String} [options.label]
+         * @param {Boolean} [options.launcherMode]
+         * @param {String} [options.link]
+         * @param {Boolean} [options.runAction]
+         * @param {Boolean} [options.onClickReturnValue]
+         * @param {Array} [options.links]
+         */
+        setOptions: function(options) {
+            const truthy = _.pick(options, 'template', 'label', 'ariaLabel', 'allowDefaultAriaLabel',
+                'link', 'launcherMode', 'className', 'attributes', 'runAction');
+
+            _.extend(
+                this,
+                _.pick(options, 'action', 'items'),
+                _.pick(truthy, Boolean)
+            );
         },
 
         getTemplateData: function() {

@@ -236,8 +236,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             ->method('successChildJob');
 
         $this->jobProcessor
-            ->expects($this->never())
-            ->method('failChildJob');
+            ->expects($this->once())
+            ->method('failChildJob')
+            ->with($childJob);
 
         $this->jobExtension
             ->expects($this->never())
@@ -937,8 +938,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             ->method('successChildJob');
 
         $this->jobProcessor
-            ->expects($this->never())
-            ->method('failChildJob');
+            ->expects($this->once())
+            ->method('failChildJob')
+            ->with($childJob);
 
         $this->jobExtension
             ->expects($this->never())
@@ -1311,6 +1313,14 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
 
             call_user_func($func, 1);
         });
+    }
+
+    public function testGetJobRunnerForChildJob()
+    {
+        $rootJob = $this->getEntity(Job::class, ['id' => 1]);
+        $jobRunnerForChildJob = $this->jobRunner->getJobRunnerForChildJob($rootJob);
+        $this->assertInstanceOf(JobRunner::class, $jobRunnerForChildJob);
+        $this->assertNotSame($this->jobRunner, $jobRunnerForChildJob);
     }
 
     /**

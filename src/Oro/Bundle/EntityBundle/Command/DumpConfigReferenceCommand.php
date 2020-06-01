@@ -14,13 +14,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DumpConfigReferenceCommand extends Command
 {
+    /** @var string */
+    protected static $defaultName = 'oro:entity:config:dump-reference';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:entity:config:dump-reference')
             ->setDescription('Dumps the structure of "Resources/config/oro/entity.yml".');
     }
 

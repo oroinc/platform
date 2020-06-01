@@ -810,7 +810,7 @@
                     }
 
                     $headers.find('input.key').each(function() {
-                        if ($.trim($(this).val().toLowerCase()) === 'content-type') {
+                        if ($(this).val().toLowerCase().trim() === 'content-type') {
                             $element = $(this).parents('p');
                             return false;
                         }

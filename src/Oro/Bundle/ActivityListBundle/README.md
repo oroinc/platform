@@ -72,8 +72,8 @@ To add a new entity to be displayed within a widget, register a service that imp
     oro_calendar.activity_list.provider:
         class: Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
         arguments:
-           - @oro_entity.doctrine_helper
-           - @doctrine
+           - '@oro_entity.doctrine_helper'
+           - '@doctrine'
         tags:
            - { name: oro_activity_list.provider, class: Oro\Bundle\CalendarBundle\Entity\CalendarEvent, priority: 50 }
 ```

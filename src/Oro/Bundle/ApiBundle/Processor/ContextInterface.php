@@ -338,14 +338,14 @@ interface ContextInterface extends ComponentContextInterface
     public function getAllEntities(bool $primaryOnly = false): array;
 
     /**
-     * Whether any error happened during the processing of an action.
+     * Whether any error occurred when processing an action.
      *
      * @return bool
      */
     public function hasErrors();
 
     /**
-     * Gets all errors happened during the processing of an action.
+     * Gets all errors occurred when processing an action.
      *
      * @return Error[]
      */

@@ -2,14 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|CollectResourcesProcessor */
@@ -42,15 +48,27 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
+        $expectedResourcesBeforeProcessingUpdateListAction = [
+            new ApiResource('Test\Entity1'),
+            new ApiResource('Test\Entity2'),
+            new ApiResource('Test\Entity3')
+        ];
+        $expectedResourcesWithoutIdentifier = ['Test\Entity3'];
+        $expectedResourceWithoutIdentifier = new ApiResource('Test\Entity3');
+        $expectedResourceWithoutIdentifier->addExcludedAction(ApiAction::UPDATE_LIST);
         $expectedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity2')
+            new ApiResource('Test\Entity2'),
+            $expectedResourceWithoutIdentifier
         ];
         $expectedAccessibleResources = [
             'Test\Entity1' => false,
-            'Test\Entity2' => true
+            'Test\Entity2' => true,
+            'Test\Entity3' => true
         ];
-        $expectedExcludedActions = [];
+        $expectedExcludedActions = [
+            'Test\Entity3' => [ApiAction::UPDATE_LIST]
+        ];
 
         $this->resourcesCache->expects(self::at(0))
             ->method('getResources')
@@ -69,11 +87,25 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
                     $context->getResult()->add(new ApiResource('Test\Entity2'));
+                    $context->getResult()->add(new ApiResource('Test\Entity3'));
 
-                    $context->setAccessibleResources(['Test\Entity2']);
+                    $context->setAccessibleResources(['Test\Entity2', 'Test\Entity3']);
+
+                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
                 }
             );
         $this->resourcesCache->expects(self::at(1))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesWithoutIdentifierLoader->expects(self::once())
+            ->method('load')
+            ->with($version, self::identicalTo($requestType), $expectedResourcesBeforeProcessingUpdateListAction)
+            ->willReturn($expectedResourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::at(2))
+            ->method('saveResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType), $expectedResourcesWithoutIdentifier);
+        $this->resourcesCache->expects(self::at(3))
             ->method('saveResources')
             ->with(
                 $version,
@@ -88,6 +120,106 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             $this->resourcesProvider->getResources($version, $requestType)
         );
         // test memory cache
+        self::assertEquals(
+            $expectedResources,
+            $this->resourcesProvider->getResources($version, $requestType)
+        );
+    }
+
+    public function testGetResourcesNoCacheButWithCachedResourcesWithoutIdentifier()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $entity1Resource = new ApiResource('Test\Entity1');
+        $entity1Resource->addExcludedAction(ApiAction::UPDATE_LIST);
+        $entity2Resource = new ApiResource('Test\Entity2');
+        $entity2Resource->addExcludedAction(ApiAction::UPDATE_LIST);
+        $entity3Resource = new ApiResource('Test\Entity3');
+        $entity4Resource = new ApiResource('Test\Entity4');
+        $entity4Resource->addExcludedAction(ApiAction::UPDATE_LIST);
+        $entity5Resource = new ApiResource('Test\Entity5');
+        $entity5Resource->addExcludedAction(ApiAction::UPDATE_LIST);
+        $expectedResources = [
+            $entity1Resource,
+            $entity2Resource,
+            $entity3Resource,
+            $entity4Resource,
+            $entity5Resource
+        ];
+        $expectedAccessibleResources = [
+            'Test\Entity1' => false,
+            'Test\Entity2' => false,
+            'Test\Entity3' => false,
+            'Test\Entity4' => false,
+            'Test\Entity5' => false
+        ];
+        $expectedExcludedActions = [
+            'Test\Entity1' => [ApiAction::UPDATE_LIST],
+            'Test\Entity2' => [ApiAction::UPDATE_LIST],
+            'Test\Entity4' => [ApiAction::UPDATE_LIST],
+            'Test\Entity5' => [ApiAction::UPDATE_LIST]
+        ];
+
+        $this->processor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CollectResourcesContext $context) use ($version, $requestType) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+
+                    $context->getResult()->add(new ApiResource('Test\Entity1'));
+                    $context->getResult()->add(new ApiResource('Test\Entity2'));
+                    $context->getResult()->add(new ApiResource('Test\Entity3'));
+                    $context->getResult()->add(new ApiResource('Test\Entity4'));
+                    $context->getResult()->add(new ApiResource('Test\Entity5'));
+
+                    $context->setAccessibleResources([]);
+
+                    $entity2Actions = new ActionsConfig();
+                    $entity2Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded();
+                    $entity3Actions = new ActionsConfig();
+                    $entity3Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded(false);
+                    $entity4Actions = new ActionsConfig();
+                    $entity4Actions->addAction(ApiAction::UPDATE_LIST);
+                    $entity5Actions = new ActionsConfig();
+                    $entity5Actions->addAction(ApiAction::CREATE);
+                    $entity5Actions->addAction(ApiAction::GET)->setExcluded();
+                    $context->set(
+                        AddExcludedActions::ACTIONS_CONFIG_KEY,
+                        [
+                            'Test\Entity2' => $entity2Actions,
+                            'Test\Entity3' => $entity3Actions,
+                            'Test\Entity4' => $entity4Actions,
+                            'Test\Entity5' => $entity5Actions
+                        ]
+                    );
+                }
+            );
+        $this->resourcesCache->expects(self::once())
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects(self::once())
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([
+                'Test\Entity1',
+                'Test\Entity2',
+                'Test\Entity3',
+                'Test\Entity4',
+                'Test\Entity5'
+            ]);
+        $this->resourcesCache->expects(self::once())
+            ->method('saveResources')
+            ->with(
+                $version,
+                self::identicalTo($requestType),
+                $expectedResources,
+                $expectedAccessibleResources,
+                $expectedExcludedActions
+            );
+
         self::assertEquals(
             $expectedResources,
             $this->resourcesProvider->getResources($version, $requestType)
@@ -216,9 +348,15 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getResult()->add(new ApiResource('Test\Entity2'));
 
                     $context->setAccessibleResources(['Test\Entity2']);
+
+                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
                 }
             );
         $this->resourcesCache->expects(self::at(2))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
+        $this->resourcesCache->expects(self::at(3))
             ->method('saveResources')
             ->with(
                 $version,
@@ -227,10 +365,6 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
                 $expectedAccessibleResources,
                 $expectedExcludedActions
             );
-        $this->resourcesCache->expects(self::at(3))
-            ->method('getResourcesWithoutIdentifier')
-            ->with($version, self::identicalTo($requestType))
-            ->willReturn([]);
 
         self::assertEquals(
             ['Test\Entity2'],
@@ -367,9 +501,15 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getResult()->add(new ApiResource('Test\Entity2'));
 
                     $context->setAccessibleResources(['Test\Entity2']);
+
+                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
                 }
             );
         $this->resourcesCache->expects(self::at(2))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
+        $this->resourcesCache->expects(self::at(3))
             ->method('saveResources')
             ->with(
                 $version,
@@ -512,9 +652,15 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getResult()->add(new ApiResource('Test\Entity2'));
 
                     $context->setAccessibleResources(['Test\Entity2']);
+
+                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
                 }
             );
         $this->resourcesCache->expects(self::at(2))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
+        $this->resourcesCache->expects(self::at(3))
             ->method('saveResources')
             ->with(
                 $version,
@@ -633,9 +779,15 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getResult()->add($resource3);
 
                     $context->setAccessibleResources(['Test\Entity2']);
+
+                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
                 }
             );
         $this->resourcesCache->expects(self::at(3))
+            ->method('getResourcesWithoutIdentifier')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([]);
+        $this->resourcesCache->expects(self::at(4))
             ->method('saveResources')
             ->with(
                 $version,

@@ -115,8 +115,8 @@ class CollectionListener implements EventSubscriberInterface
 
         // The data mapper only adds, but does not remove items, so do this here
         $toDelete = [];
-        foreach ($data as $name => $child) {
-            if (!$form->has($name)) {
+        foreach ($data as $name => $value) {
+            if (!$form->has($name) || (null === $value && !$form->get($name)->getConfig()->getRequired())) {
                 $toDelete[] = $name;
             }
         }

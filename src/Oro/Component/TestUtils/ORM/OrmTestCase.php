@@ -53,9 +53,14 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
-        // Namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create
-        // To load the custom function we need to manually include the file
-        require_once('Mocks/Cast.php');
+        // The namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create, so we are
+        // making our mock of 'CAST' available in Oro\ORM\Query\AST\Platform\Functions\Mock\ namespace:
+        if (!\class_exists('Oro\ORM\Query\AST\Platform\Functions\Mock\Cast', false)) {
+            \class_alias(
+                \Oro\Component\TestUtils\ORM\Mocks\Cast::class,
+                'Oro\ORM\Query\AST\Platform\Functions\Mock\Cast'
+            );
+        }
         $config->setCustomStringFunctions(['cast' => 'Oro\ORM\Query\AST\Functions\Cast']);
 
         if ($conn === null) {

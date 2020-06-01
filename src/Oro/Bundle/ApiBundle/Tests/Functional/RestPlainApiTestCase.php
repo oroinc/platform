@@ -56,7 +56,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         );
 
         // make sure that REST API call does not start the session
-        self::assertSessionNotStarted($method, $uri, $server);
+        $this->assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }

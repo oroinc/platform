@@ -36,6 +36,25 @@ security:
             context: main
             logout_on_user_change: true
 
+knp_gaufrette:
+    adapters:
+        api:
+            doctrine_dbal:
+                connection_name: batch
+                table: oro_api_async_data
+                columns:
+                    key: name
+                    content: content
+                    mtime: updated_at
+                    checksum: checksum
+    filesystems:
+        api_source_data:
+            adapter: importexport
+            alias: api_source_data_filesystem
+        api:
+            adapter: api
+            alias: api_filesystem
+
 oro_api:
     api_firewalls:
         api_wsse_secured:
@@ -398,6 +417,25 @@ oro_api:
                     priority: -80
                 normalize_result:
                     priority: -90
+        update_list:
+            processor_service_id: oro_api.update_list.processor
+            processing_groups:
+                initialize:
+                    priority: -10
+                resource_check:
+                    priority: -15
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                save_data:
+                    priority: -50
+                finalize:
+                    priority: -60
+                normalize_result:
+                    priority: -70
         get_subresource:
             processor_service_id: oro_api.get_subresource.processor
             processing_groups:
@@ -596,3 +634,17 @@ oro_api:
                     priority: -20
                 normalize_result:
                     priority: -30
+        batch_update:
+            processing_groups:
+                # the priorities of groups are not matter because each group is executed separately
+                initialize: ~
+                finalize: ~
+                save_data: ~
+                save_errors: ~
+                normalize_result: ~
+        batch_update_item:
+            processing_groups:
+                # the priorities of groups are not matter because each group is executed separately
+                initialize: ~
+                transform_data: ~
+                normalize_result: ~

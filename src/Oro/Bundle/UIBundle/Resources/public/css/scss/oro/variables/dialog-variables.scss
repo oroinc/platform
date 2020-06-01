@@ -3,7 +3,7 @@
 $dialog-border-radius: 4px !default;
 $dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
 $dialog-background: none !default;
-$dialog-z-index: 990 !default;
+$dialog-z-index: $zindex-fixed !default;
 $dialog-outline: none !default;
 $dialog-border: none !default;
 $dialog-position: absolute !default;

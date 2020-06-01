@@ -73,7 +73,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('OPTIONS, GET, POST', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH, POST', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenNoAllowedHttpMethods()
@@ -84,7 +84,12 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([ApiAction::GET_LIST, ApiAction::DELETE_LIST, ApiAction::CREATE]);
+            ->willReturn([
+                ApiAction::GET_LIST,
+                ApiAction::UPDATE_LIST,
+                ApiAction::DELETE_LIST,
+                ApiAction::CREATE
+            ]);
 
         $this->context->setResponseStatusCode(405);
         $this->context->setClassName('Test\Class');

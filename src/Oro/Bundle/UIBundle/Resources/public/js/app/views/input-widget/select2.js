@@ -47,7 +47,11 @@ define(function(require) {
          */
         initialize: function(options) {
             // fix select2.each2 bug, when empty string is FALSE
-            this.$el.attr('class', $.trim(this.$el.attr('class')));
+            const elCases = this.$el.attr('class');
+
+            if (elCases) {
+                this.$el.attr('class', elCases.trim());
+            }
             Select2InputWidgetView.__super__.initialize.call(this, options);
 
             if (this.isInitialized()) {

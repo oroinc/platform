@@ -24,6 +24,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
  * @Config(
+ *      routeName="oro_tag_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-tag"

@@ -6,8 +6,6 @@ use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
@@ -16,7 +14,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 /**
  * Logs failed user login attempts.
  */
-class LoginAttemptsLogSubscriber implements EventSubscriberInterface
+class LoginAttemptsLogSubscriber implements LoginAttemptsSubscriberInterface
 {
     const SUCCESSFUL_LOGIN_MESSAGE = 'Successful login';
     const UNSUCCESSFUL_LOGIN_MESSAGE = 'Unsuccessful login';
@@ -46,7 +44,7 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
@@ -57,7 +55,7 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param AuthenticationFailureEvent $event
+     * {@inheritDoc}
      */
     public function onAuthenticationFailure(AuthenticationFailureEvent $event)
     {
@@ -68,21 +66,14 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
             $user = $this->userManager->findUserByUsernameOrEmail($user);
         }
 
-        if ($user instanceof User) {
-            $this->logger->notice(
-                self::UNSUCCESSFUL_LOGIN_MESSAGE,
-                $this->infoProvider->getUserLoggingInfo($user)
-            );
-        } elseif ($token instanceof UsernamePasswordToken && $token->getProviderKey() === 'main') {
-            $this->logger->notice(
-                self::UNSUCCESSFUL_LOGIN_MESSAGE,
-                $this->infoProvider->getUserLoggingInfo($token->getUser())
-            );
-        }
+        $this->logger->notice(
+            self::UNSUCCESSFUL_LOGIN_MESSAGE,
+            $this->infoProvider->getUserLoggingInfo($user instanceof User ? $user : $token->getUser())
+        );
     }
 
     /**
-     * @param  InteractiveLoginEvent $event
+     * {@inheritDoc}
      */
     public function onInteractiveLogin(InteractiveLoginEvent $event)
     {

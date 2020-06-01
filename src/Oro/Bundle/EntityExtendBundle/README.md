@@ -348,8 +348,8 @@ This is done through the configuration of oro_entity_extend.validation_loader:
         class: Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
         public: false
         arguments:
-            - @oro_entity_config.provider.extend
-            - @oro_entity_config.provider.form
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity_config.provider.form'
         calls:
             -
                 - addConstraints
@@ -380,10 +380,10 @@ As example you can create Event Listener. Example:
     oro_entity_extend.listener.extend_field_value_render:
         class: Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
         arguments:
-            - @oro_entity_config.config_manager
-            - @router
-            - @oro_entity_extend.extend.field_type_helper
-            - @doctrine.orm.entity_manager
+            - '@oro_entity_config.config_manager'
+            - '@router'
+            - '@oro_entity_extend.extend.field_type_helper'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
 ```

@@ -9,22 +9,23 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
 use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
-use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\EntityType;
 use Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType;
-use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\ScalarObjectType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
  * Guesses form types based on "form_type_guesses" configuration and API metadata.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {
@@ -139,28 +140,27 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         if (null !== $metadata) {
             if ($metadata->hasField($property)) {
                 return $this->getTypeGuessForField($metadata->getField($property)->getDataType());
-            } elseif ($metadata->hasAssociation($property)) {
+            }
+            if ($metadata->hasAssociation($property)) {
                 $association = $metadata->getAssociation($property);
+                $fieldConfig = $this->getFieldConfig($class, $property);
                 if (DataType::isAssociationAsField($association->getDataType())) {
-                    $fieldConfig = $this->getFieldConfig($class, $property);
-                    if (null !== $fieldConfig) {
-                        if (DataType::isNestedObject($fieldConfig->getDataType())) {
-                            return $this->getTypeGuessForNestedObjectAssociation($association, $fieldConfig);
-                        }
-                        if (!$association->isCollapsed()) {
-                            return $this->getTypeGuessForArrayAssociation($association, $fieldConfig);
-                        }
-                    }
-                    if ($association->isCollapsed()) {
-                        return $this->getTypeGuessForCollapsedArrayAssociation($association);
-                    } else {
+                    if (null === $fieldConfig) {
                         return null;
                     }
-                } else {
-                    $fieldConfig = $this->getFieldConfig($class, $property);
-                    if (null !== $fieldConfig && DataType::isNestedAssociation($fieldConfig->getDataType())) {
-                        return $this->getTypeGuessForNestedAssociation($association, $fieldConfig);
+
+                    if (DataType::isNestedObject($fieldConfig->getDataType())) {
+                        return $this->getTypeGuessForNestedObjectAssociation($association, $fieldConfig);
                     }
+                    if ($association->isCollapsed()) {
+                        return $this->getTypeGuessForCollapsedArrayAssociation($association, $fieldConfig);
+                    }
+
+                    return $this->getTypeGuessForArrayAssociation($association, $fieldConfig);
+                }
+
+                if (null !== $fieldConfig && DataType::isNestedAssociation($fieldConfig->getDataType())) {
+                    return $this->getTypeGuessForNestedAssociation($association, $fieldConfig);
                 }
 
                 return $this->getTypeGuessForAssociation($association);
@@ -264,7 +264,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             return $this->createDefaultTypeGuess();
         }
 
-        list($formType, $options) = $this->dataTypeMappings[$dataType];
+        [$formType, $options] = $this->dataTypeMappings[$dataType];
 
         return $this->createTypeGuess($formType, $options, TypeGuess::HIGH_CONFIDENCE);
     }
@@ -272,7 +272,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * @param AssociationMetadata $metadata
      *
-     * @return TypeGuess|null
+     * @return TypeGuess
      */
     protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
@@ -302,22 +302,37 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             return null;
         }
 
+        if (!$metadata->isCollection()) {
+            $formOptions = [
+                'data_class' => $targetMetadata->getClassName(),
+                'metadata'   => $targetMetadata,
+                'config'     => $config->getTargetEntity()
+            ];
+            $configuredFormOptions = $config->getFormOptions();
+            if ($configuredFormOptions) {
+                $formOptions = array_merge($configuredFormOptions, $formOptions);
+            }
+
+            return $this->createTypeGuess(CompoundObjectType::class, $formOptions, TypeGuess::HIGH_CONFIDENCE);
+        }
+
         $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
             ? EntityCollectionType::class
             : CollectionType::class;
+        $formOptions = [
+            'entry_data_class' => $targetMetadata->getClassName(),
+            'entry_type'       => CompoundObjectType::class,
+            'entry_options'    => [
+                'metadata' => $targetMetadata,
+                'config'   => $config->getTargetEntity()
+            ]
+        ];
+        $configuredFormOptions = $config->getFormOptions();
+        if ($configuredFormOptions) {
+            $formOptions = $this->mergeCollectionFormOptions($formOptions, $configuredFormOptions);
+        }
 
-        return $this->createTypeGuess(
-            $formType,
-            [
-                'entry_data_class' => $targetMetadata->getClassName(),
-                'entry_type'       => CompoundObjectType::class,
-                'entry_options'    => [
-                    'metadata' => $targetMetadata,
-                    'config'   => $config->getTargetEntity()
-                ]
-            ],
-            TypeGuess::HIGH_CONFIDENCE
-        );
+        return $this->createTypeGuess($formType, $formOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
     /**
@@ -330,10 +345,18 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         AssociationMetadata $metadata,
         EntityDefinitionFieldConfig $config
     ) {
+        $configuredFormOptions = $config->getFormOptions();
+        if (!$configuredFormOptions || empty($configuredFormOptions['data_class'])) {
+            throw new InvalidArgumentException(sprintf(
+                'The form options for the "%s" field should contain the "data_class" option.',
+                $metadata->getName()
+            ));
+        }
+
         return $this->createTypeGuess(
             CompoundObjectType::class,
             array_merge(
-                $config->getFormOptions(),
+                $configuredFormOptions,
                 [
                     'metadata' => $metadata->getTargetMetadata(),
                     'config'   => $config->getTargetEntity()
@@ -344,12 +367,15 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param AssociationMetadata $metadata
+     * @param AssociationMetadata         $metadata
+     * @param EntityDefinitionFieldConfig $config
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessForCollapsedArrayAssociation(AssociationMetadata $metadata)
-    {
+    protected function getTypeGuessForCollapsedArrayAssociation(
+        AssociationMetadata $metadata,
+        EntityDefinitionFieldConfig $config
+    ) {
         $targetMetadata = $metadata->getTargetMetadata();
         if (null === $targetMetadata) {
             return null;
@@ -366,16 +392,41 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             return null;
         }
 
+        if (!$metadata->isCollection()) {
+            $formOptions = [
+                'data_class'    => $targetMetadata->getClassName(),
+                'data_property' => $targetFieldName,
+                'metadata'      => $targetMetadata,
+                'config'        => $config->getTargetEntity()
+            ];
+            $configuredFormOptions = $config->getFormOptions();
+            if ($configuredFormOptions) {
+                $formOptions = array_merge($configuredFormOptions, $formOptions);
+            }
+
+            return $this->createTypeGuess(ScalarObjectType::class, $formOptions, TypeGuess::HIGH_CONFIDENCE);
+        }
+
         $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
-            ? EntityScalarCollectionType::class
-            : ScalarCollectionType::class;
+            ? EntityCollectionType::class
+            : CollectionType::class;
+        $formOptions = [
+            'entry_data_class' => $targetMetadata->getClassName(),
+            'entry_type'       => ScalarObjectType::class,
+            'entry_options'    => [
+                'data_property' => $targetFieldName,
+                'metadata'      => $targetMetadata,
+                'config'        => $config->getTargetEntity()
+            ]
+        ];
+        $configuredFormOptions = $config->getFormOptions();
+        if ($configuredFormOptions) {
+            $formOptions = $this->mergeCollectionFormOptions($formOptions, $configuredFormOptions);
+        }
 
         return $this->createTypeGuess(
             $formType,
-            [
-                'entry_data_class'    => $targetMetadata->getClassName(),
-                'entry_data_property' => $targetFieldName,
-            ],
+            $formOptions,
             TypeGuess::HIGH_CONFIDENCE
         );
     }
@@ -384,7 +435,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      * @param AssociationMetadata         $metadata
      * @param EntityDefinitionFieldConfig $config
      *
-     * @return TypeGuess|null
+     * @return TypeGuess
      */
     protected function getTypeGuessForNestedAssociation(
         AssociationMetadata $metadata,
@@ -395,5 +446,24 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             ['metadata' => $metadata, 'config' => $config],
             TypeGuess::HIGH_CONFIDENCE
         );
+    }
+
+    /**
+     * @param array $formOptions
+     * @param array $configuredFormOptions
+     *
+     * @return array
+     */
+    private function mergeCollectionFormOptions(array $formOptions, array $configuredFormOptions): array
+    {
+        if (\array_key_exists('entry_options', $configuredFormOptions)) {
+            $formOptions['entry_options'] = array_merge(
+                $configuredFormOptions['entry_options'],
+                $formOptions['entry_options']
+            );
+            unset($configuredFormOptions['entry_options']);
+        }
+
+        return array_merge($configuredFormOptions, $formOptions);
     }
 }

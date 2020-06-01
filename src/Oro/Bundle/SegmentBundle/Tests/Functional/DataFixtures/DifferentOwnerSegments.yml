@@ -1,0 +1,39 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentTypes
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    secondBusinessUnit:
+        name: 'Second Business Unit'
+        organization: '@organization'
+    childBusinessUnit:
+        name: 'Child Business Unit'
+        organization: '@organization'
+        owner: '@business_unit'
+
+Oro\Bundle\SegmentBundle\Entity\Segment:
+    mainBUSegment:
+        name: 'Main BU segment'
+        description: 'Main BU segment'
+        entity: 'Oro\\Bundle\\OrganizationBundle\\Entity\\BusinessUnit'
+        type: '@segment_dynamic_type'
+        definition: <('{"columns":[{"name":"id","label":"Id","func":null,"sorting":""}]}')>
+        owner: '@business_unit'
+        organization: '@organization'
+    secondBUSegment:
+        name: 'Second BU segment'
+        description: 'Second BU segment'
+        entity: 'Oro\\Bundle\\OrganizationBundle\\Entity\\BusinessUnit'
+        type: '@segment_dynamic_type'
+        definition: <('{"columns":[{"name":"id","label":"Id","func":null,"sorting":""}]}')>
+        owner: '@secondBusinessUnit'
+        organization: '@organization'
+    childBUSegment:
+        name: 'Child BU segment'
+        description: 'Child BU segment'
+        entity: 'Oro\\Bundle\\OrganizationBundle\\Entity\\BusinessUnit'
+        type: '@segment_dynamic_type'
+        definition: <('{"columns":[{"name":"id","label":"Id","func":null,"sorting":""}]}')>
+        owner: '@childBusinessUnit'
+        organization: '@organization'

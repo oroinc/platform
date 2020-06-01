@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Adds possible status codes for the following actions executed in scope of REST API:
- * "get_list", "get", "update", "create", "delete", "delete_list",
+ * "get_list", "get", "update", "update_list", "create", "delete", "delete_list",
  * "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
  * "get_relationship", "update_relationship", "add_relationship", "delete_relationship"
  * and "options".
@@ -31,6 +31,9 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
                 break;
             case ApiAction::UPDATE:
                 $this->addStatusCodesForUpdate($statusCodes);
+                break;
+            case ApiAction::UPDATE_LIST:
+                $this->addStatusCodesForUpdateList($statusCodes);
                 break;
             case ApiAction::CREATE:
                 $this->addStatusCodesForCreate($statusCodes);
@@ -142,6 +145,20 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
             $statusCodes,
             Response::HTTP_NOT_FOUND,
             'Returned when the entity is not found'
+        );
+    }
+
+    /**
+     * Adds status codes for "update_list" action
+     *
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function addStatusCodesForUpdateList(StatusCodesConfig $statusCodes)
+    {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_ACCEPTED,
+            'Returned when request data was accepted to asynchronous processing'
         );
     }
 

@@ -18,7 +18,7 @@ Here is example of repository service definition:
 ```yml
 services:
     oro_product.repository.product:
-        class: 'Oro\Bundle\ProductBundle\Entity\Repository\ProductRepository'
+        class: Oro\Bundle\ProductBundle\Entity\Repository\ProductRepository
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\ProductBundle\Entity\Product'
@@ -56,7 +56,7 @@ Here is example of how repository decoration can look like:
 ```yml
 services:
     oro_product.repository.product.new:
-        class: 'Oro\Bundle\ProductBundle\Entity\Repository\NewProductRepository'
+        class: Oro\Bundle\ProductBundle\Entity\Repository\NewProductRepository
         parent: oro_entity.abstract_repository
         decorates: oro_product.repository.product
         decoration_inner_name: oro_product.repository.product.original

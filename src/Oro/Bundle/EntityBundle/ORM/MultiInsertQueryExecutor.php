@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**
  * This executor should be used only for queries that will reduce result count after each execution by itself
@@ -106,9 +107,7 @@ class MultiInsertQueryExecutor extends AbstractInsertQueryExecutor
     protected function getQuery(QueryBuilder $selectQueryBuilder): Query
     {
         $query = $selectQueryBuilder->getQuery();
-        $parser = new Query\Parser($query);
-        $parseResult = $parser->parse();
-        $rsm = $parseResult->getResultSetMapping();
+        $rsm = QueryUtil::parseQuery($query)->getResultSetMapping();
         if ($rsm) {
             $i = 0;
             foreach ($rsm->scalarMappings as &$mapping) {

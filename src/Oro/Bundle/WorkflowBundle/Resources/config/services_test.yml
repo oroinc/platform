@@ -11,11 +11,6 @@ services:
         tags:
             - { name: oro_scope.provider, scopeType: workflow_definition, priority: -255 }
 
-    oro_workflow.tests.notification_manager:
-        decorates: oro_notification.manager
-        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\NotificationManager
-        parent: oro_notification.manager
-
     oro_workflow.tests.notification_email_handler:
         decorates: oro_notification.email_handler
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\EmailNotificationHandler

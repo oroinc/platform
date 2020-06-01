@@ -40,20 +40,20 @@ Assign Value
 
 **Configuration Example**
 ```
-- @assign_value:
+- '@assign_value':
     conditions:
         # optional condition configuration
     parameters: [$call_successfull, true]
 
 OR
 
-- @assign_value:
+- '@assign_value':
     parameters:
         attribute: $call_successfull
         value: true
 OR
 
-- @assign_value: [$call_successfull, true]
+- '@assign_value': [$call_successfull, true]
 ```
 
 Assign Active User
@@ -70,11 +70,11 @@ Assign Active User
 
 **Configuration Example**
 ```
-- @assign_active_user: $opportunity_owner
+- '@assign_active_user': $opportunity_owner
 
 OR
 
-- @assign_active_user:
+- '@assign_active_user':
     parameters:
         attribute: $opportunity_owner
 ```
@@ -93,19 +93,19 @@ Unset Value
 
 **Configuration Example**
 ```
-- @unset_value:
+- '@unset_value':
     conditions:
         # optional condition configuration
     parameters: [$call_successfull]
 
 OR
 
-- @unset_value:
+- '@unset_value':
     parameters:
         attribute: $call_successfull
 OR
 
-- @unset_value: [$call_successfull]
+- '@unset_value': [$call_successfull]
 ```
 
 Count
@@ -141,14 +141,14 @@ Create Object
 
 **Configuration Example**
 ```
-- @create_object:
+- '@create_object':
     class: \DateTimeZone
     arguments: ['UTC']
     attribute: $.result.timezone
 
 OR
 
-- @create_object:
+- '@create_object':
     class: \DateTime
     arguments: ['2014-04-01']
     data:
@@ -174,7 +174,7 @@ Create Entity
 
 **Configuration Example**
 ```
-- @create_entity:
+- '@create_entity':
     conditions:
         # optional condition configuration
     parameters:
@@ -188,7 +188,7 @@ Create Entity
 
 OR
 
-- @create_entity:
+- '@create_entity':
     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
     attribute: $conversation
     flush: true # entity will be flushed to DB immediately after creation
@@ -237,7 +237,7 @@ Find Entity
 
 **Configuration Example**
 ```
-- @find_entity:
+- '@find_entity':
     conditions:
         # optional condition configuration
     parameters:
@@ -247,14 +247,14 @@ Find Entity
 
 OR
 
-- @find_entity:
+- '@find_entity':
     class: Oro\Bundle\SalesBundle\Entity\OpportunityCloseReason
     identifier: 'won'
     attribute: $close_reason
 
 OR
 
-- @find_entity:
+- '@find_entity':
     class: Oro\Bundle\AccountBundle\Entity\Account
     attribute: $account
     where:
@@ -278,16 +278,16 @@ Flush Entity
 
 **Configuration Example**
 ```
-- @flush_entity:
+- '@flush_entity':
      entity: $.someEntity #flush entity stored in some attribute
 
 OR
 
-- @flush_entity: $.someEntity
+- '@flush_entity': $.someEntity
 
 OR
 
-- @flush_entity: ~ #flush context entity
+- '@flush_entity': ~ #flush context entity
 ```
 
 Format String
@@ -306,7 +306,7 @@ Format String
 
 **Configuration Example**
 ```
-- @format_string:
+- '@format_string':
     attribute: $opportunity_name
     string: '%customer_name% - %shopping_cart_id%'
     arguments:
@@ -332,7 +332,7 @@ Call Method
 
 **Configuration Example**
 ```
-- @call_method:
+- '@call_method':
     conditions:
         # optional condition configuration
     parameters:
@@ -343,7 +343,7 @@ Call Method
 
 OR
 
-- @call_method: # add Address to Contact
+- '@call_method': # add Address to Contact
     attribute: $.result.addressResult
     object: $lead.contact
     method: addAddress
@@ -368,12 +368,12 @@ Create Date Time
 
 **Configuration Example**
 ```
-- @create_datetime:
+- '@create_datetime':
     attribute: $sales_funnel_start_datetime
 
 OR
 
-- @create_datetime:
+- '@create_datetime':
     conditions:
             # optional condition configuration
     parameters:
@@ -398,18 +398,18 @@ Redirect
 
 **Configuration Example**
 ```
-- @redirect:
+- '@redirect':
     parameters:
         url: http://google.com
 
 OR
 
-- @redirect:
+- '@redirect':
     url: http://google.com
 
 OR
 
-- @redirect:
+- '@redirect':
     parameters:
         route: some_route_name
         route_parameters: {id: $some_entity.id}
@@ -426,22 +426,22 @@ Tree Executor
 
 **Configuration Example**
 ```
-- @tree:
+- '@tree':
     conditions:
         # optional condition configuration
     actions:
-        - @create_entity:
+        - '@create_entity':
             # action configuration here
-        - @tree:
+        - '@tree':
             # action configuration here
         # other action
 
 OR
 
-- @tree:
-    - @create_entity:
+- '@tree':
+    - '@create_entity':
         # action configuration here
-    - @tree:
+    - '@tree':
         # action configuration here
     # other action
 
@@ -458,20 +458,20 @@ Foreach
 
 **Configuration Example**
 ```
-- @foreach:
+- '@foreach':
     array: $order.relatedCalls
     value: $.result.value
     actions:
-        - @assign_value: [$.result.value.subject, 'Test Subject']
+        - '@assign_value': [$.result.value.subject, 'Test Subject']
 
 OR
 
-- @foreach:
+- '@foreach':
     array: $order.relatedCalls
     key: $.result.key
     value: $.result.value
     actions:
-        - @assign_value: [$.result.value.subject, $.result.key]
+        - '@assign_value': [$.result.value.subject, $.result.key]
 
 ```
 
@@ -552,7 +552,7 @@ Call Service Method
 
 **Configuration Example**
 ```
-- @call_service_method:
+- '@call_service_method':
     conditions:
         # optional condition configuration
     parameters:
@@ -563,7 +563,7 @@ Call Service Method
 
 OR
 
-- @call_method:
+- '@call_method':
     attribute: $.em
     service: doctrine
     method: getManagerForClass
@@ -588,7 +588,7 @@ Find Entities
 
 **Configuration Example**
 ```
-- @find_entities:
+- '@find_entities':
     class: Acme\Bundle\DemoBundle\Entity\User
     attribute: $.users
     where:
@@ -616,21 +616,21 @@ Increase Value
 
 **Configuration Example**
 ```
-- @increase_value:
+- '@increase_value':
     attribute: $.some_value
     value: 5
 
 OR
 
-- @increase_value:
+- '@increase_value':
     attribute: $.some_value
     value: -5
 
 OR
 
-- @increase_value: [$.some_value, 5]
+- '@increase_value': [$.some_value, 5]
 
 OR
 
-- @increase_value: $.some_value
+- '@increase_value': $.some_value
 ```

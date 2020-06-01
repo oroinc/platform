@@ -1,0 +1,20 @@
+data:
+    type: asyncoperations
+    id: '<toString(@user_operation1->id)>'
+    attributes:
+        entityType: testapidepartments
+        status: new
+        progress: null
+        createdAt: '@user_operation1->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@user_operation1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        elapsedTime: '@user_operation1->elapsedTime'
+        summary: null
+    relationships:
+        owner:
+            data:
+                type: users
+                id: '<toString(@user_operation1->owner->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@user_operation1->organization->id)>'

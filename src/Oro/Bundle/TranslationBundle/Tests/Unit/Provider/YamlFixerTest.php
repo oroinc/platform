@@ -15,7 +15,7 @@ class YamlFixerTest extends \PHPUnit\Framework\TestCase
         $file = realpath(__DIR__ . '/../DataFixtures/test.yml');
 
         $contents = file($file);
-        $this->assertCount(8, $contents);
+        $this->assertCount(9, $contents);
 
         $copyFile = $this->getTempFile('yaml_fixer');
 
@@ -33,6 +33,6 @@ class YamlFixerTest extends \PHPUnit\Framework\TestCase
         $contents = file($copyFile);
         unlink($copyFile);
 
-        $this->assertCount(7, $contents);
+        $this->assertCount(8, $contents);
     }
 }

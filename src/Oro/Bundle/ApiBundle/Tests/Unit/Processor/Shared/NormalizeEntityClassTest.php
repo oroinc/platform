@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeEntityClassTest extends GetListProcessorTestCase
 {
@@ -97,13 +98,14 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
 
     public function testProcessForInvalidEntityType()
     {
-        $this->context->setClassName('test');
+        $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willThrowException(new EntityAliasNotFoundException($entityType));
 
+        $this->context->setClassName($entityType);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getClassName());

@@ -159,6 +159,33 @@ class Product
     }
 
     /**
+     * @return ProductPrice|null
+     */
+    public function getNullablePrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param ProductPrice|null $price
+     *
+     * @return self
+     */
+    public function setNullablePrice(?ProductPrice $price)
+    {
+        $this->price = $price;
+        if (null === $this->price) {
+            $this->priceValue = null;
+            $this->priceCurrency = null;
+        } else {
+            $this->priceValue = $this->price->getValue();
+            $this->priceCurrency = $this->price->getCurrency();
+        }
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function __toString()

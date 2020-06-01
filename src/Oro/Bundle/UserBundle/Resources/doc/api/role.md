@@ -51,6 +51,8 @@ Example:
 
 Edit a specific user role record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}

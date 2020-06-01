@@ -56,6 +56,15 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\ApiBundle\Command\CleanupAsyncOperationsCommand:
+        arguments:
+            - ~ # operation lifetime. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - ~ # cleanup process timeout. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.delete_handler_registry'
+        tags:
+            - { name: console.command }
+
     Nelmio\ApiDocBundle\Command\DumpCommand:
         calls:
             - [setContainer, ['@service_container']]

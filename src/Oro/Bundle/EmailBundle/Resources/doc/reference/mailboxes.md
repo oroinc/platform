@@ -74,21 +74,21 @@ definitions:
         entity: Oro\Bundle\EmailBundle\Entity\EmailBody
         order: 150
         actions_configuration:
-            - @find_entity:
+            - '@find_entity':
                 class: Oro\Bundle\EmailBundle\Entity\Email
                 attribute: $.email
                 where:
                     emailBody: $id
-            - @find_mailboxes:
+            - '@find_mailboxes':
                 attribute: $.mailboxes
                 process_type: 'lead'
                 email: $.email
-            - @tree:
+            - '@tree':
                 conditions:
                     @not_empty: [$.mailboxes]
                 actions:
                     # Prepare data which do not depend on mailbox and mailbox process settings here
-            - @traverse:
+            - '@traverse':
                 array: $.mailboxes
                 value: $.mailbox
                 actions:

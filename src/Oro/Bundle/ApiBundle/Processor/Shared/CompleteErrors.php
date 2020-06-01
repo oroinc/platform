@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Checks if there are any errors in the context,
  * and if so, completes missing properties of all Error objects.
  * E.g. if an error is created due to an exception occurs,
- * such error does not have "statusCode", "title", "details" and other properties,
+ * such error does not have "statusCode", "title", "detail" and other properties,
  * and these properties are extracted from the Exception object.
  * Also, removes duplicated errors if any.
  */

@@ -7,7 +7,7 @@ use \Zend\Mime\Decode;
 use Zend\Mail\Headers;
 
 /**
- * Represent email attachement
+ * Represent email attachment
  */
 class Attachment
 {

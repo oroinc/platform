@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\Proxy;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
@@ -69,7 +68,8 @@ class EntityMapper
      */
     public function getModel($entity, string $modelClass = null)
     {
-        $updateReferences = $this->entityMap->offsetExists($entity)
+        $updateReferences =
+            $this->entityMap->offsetExists($entity)
             && null === $this->entityMap->offsetGet($entity);
         try {
             $model = $this->innerGetModel($entity, $modelClass);
@@ -96,6 +96,20 @@ class EntityMapper
      */
     public function getEntity($model, string $entityClass = null)
     {
+        if (!$this->hasModels()) {
+            $modelClass = $this->doctrineHelper->getClass($model);
+            if (!$entityClass) {
+                $entityClass = $this->getEntityClass($modelClass);
+            }
+            if ($modelClass === $entityClass) {
+                if (!$this->modelMap->offsetExists($model)) {
+                    $this->modelMap->offsetSet($model, $model);
+                    $this->entityMap->offsetSet($model, $model);
+                }
+
+                return $model;
+            }
+        }
         try {
             return $this->innerGetEntity($model, $entityClass);
         } finally {
@@ -112,7 +126,7 @@ class EntityMapper
      */
     public function registerEntity($entity): void
     {
-        $this->assertEntity(ClassUtils::getClass($entity));
+        $this->assertEntity($this->doctrineHelper->getClass($entity));
         if (!$this->entityMap->offsetExists($entity)) {
             $this->entityMap->offsetSet($entity, null);
         }
@@ -155,19 +169,18 @@ class EntityMapper
      */
     private function innerGetModel($entity, string $modelClass = null)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        if (!$modelClass) {
-            $modelClass = $this->getModelClass($entity);
-        }
-        $this->assertEntityAndModelClasses($entityClass, $modelClass);
-
         $model = null;
         if ($this->entityMap->offsetExists($entity)) {
             $model = $this->entityMap->offsetGet($entity);
         }
         if (null === $model) {
             $model = $entity;
+            $entityClass = $this->doctrineHelper->getClass($entity);
+            if (!$modelClass) {
+                $modelClass = $this->getModelClass($entityClass);
+            }
             if ($modelClass !== $entityClass) {
+                $this->assertEntityAndModelClasses($entityClass, $modelClass);
                 $model = $this->createObject($modelClass, $entity);
             }
             $this->entityMap->offsetSet($entity, $model);
@@ -187,8 +200,8 @@ class EntityMapper
      */
     private function updateModelAssociations($model, $entity): void
     {
-        $modelReflClass = new \ReflectionClass(ClassUtils::getClass($model));
-        $entityReflClass = new \ReflectionClass(ClassUtils::getClass($entity));
+        $modelReflClass = new \ReflectionClass($this->doctrineHelper->getClass($model));
+        $entityReflClass = new \ReflectionClass($this->doctrineHelper->getClass($entity));
         $metadata = $this->getEntityMetadata($entityReflClass->getName());
         foreach ($metadata->getAssociationNames() as $name) {
             $value = self::getObjectPropertyValue($entityReflClass, $entity, $name);
@@ -223,7 +236,7 @@ class EntityMapper
                 continue;
             }
 
-            $properties = self::getProperties($currentModel);
+            $properties = self::getProperties($this->doctrineHelper->getClass($currentModel));
             foreach ($properties as $property) {
                 $value = self::getPropertyValue($currentModel, $property);
                 if ($value instanceof Collection) {
@@ -234,10 +247,8 @@ class EntityMapper
                             }
                         }
                     }
-                } else {
-                    if ($value === $entity) {
-                        self::setPropertyValue($currentModel, $property, $model);
-                    }
+                } elseif ($value === $entity) {
+                    self::setPropertyValue($currentModel, $property, $model);
                 }
             }
         }
@@ -253,18 +264,18 @@ class EntityMapper
      */
     private function innerGetEntity($model, string $entityClass = null)
     {
-        $modelClass = ClassUtils::getClass($model);
-        if (!$entityClass) {
-            $entityClass = $this->getEntityClass($model);
-        }
-        $this->assertEntityAndModelClasses($entityClass, $modelClass);
-
+        $modelClass = null;
         $isNewEntity = false;
         if ($this->modelMap->offsetExists($model)) {
             $entity = $this->modelMap->offsetGet($model);
         } else {
             $entity = $model;
+            $modelClass = $this->doctrineHelper->getClass($model);
+            if (!$entityClass) {
+                $entityClass = $this->getEntityClass($modelClass);
+            }
             if ($entityClass !== $modelClass) {
+                $this->assertEntityAndModelClasses($entityClass, $modelClass);
                 $entity = $this->createObject($entityClass, $model);
                 $isNewEntity = true;
             }
@@ -274,6 +285,12 @@ class EntityMapper
         if (!$this->processing->offsetExists($model)) {
             $this->processing->offsetSet($model);
             if (!self::isNotInitializedEntityProxy($entity)) {
+                if (!$modelClass) {
+                    $modelClass = $this->doctrineHelper->getClass($model);
+                }
+                if (!$entityClass) {
+                    $entityClass = $this->getEntityClass($modelClass);
+                }
                 $this->updateEntity($entity, $model, $entityClass, $modelClass, $isNewEntity);
             }
         }
@@ -401,34 +418,30 @@ class EntityMapper
     /**
      * Gets the model class name that should be used for the given entity.
      *
-     * @param object $entity
+     * @param string $entityClass
      *
      * @return string
      */
-    private function getModelClass($entity): string
+    private function getModelClass(string $entityClass): string
     {
-        $modelClass = ClassUtils::getClass($entity);
-        $substituteClass = $this->entityOverrideProvider->getSubstituteEntityClass($modelClass);
+        $substituteClass = $this->entityOverrideProvider->getSubstituteEntityClass($entityClass);
         if ($substituteClass) {
-            $modelClass = $substituteClass;
+            return $substituteClass;
         }
 
-        return $modelClass;
+        return $entityClass;
     }
 
     /**
      * Gets the entity class name for the given model.
      *
-     * @param object $model
+     * @param string $modelClass
      *
      * @return string
      */
-    private function getEntityClass($model): string
+    private function getEntityClass(string $modelClass): string
     {
-        $modelClass = ClassUtils::getClass($model);
-        $entityClass = $this->doctrineHelper->resolveManageableEntityClass($modelClass);
-
-        return $entityClass ?? $modelClass;
+        return $this->doctrineHelper->resolveManageableEntityClass($modelClass) ?? $modelClass;
     }
 
     /**
@@ -442,22 +455,20 @@ class EntityMapper
      */
     private function assertEntityAndModelClasses(string $entityClass, string $modelClass): void
     {
-        if ($modelClass !== $entityClass) {
-            if (!\is_subclass_of($modelClass, $entityClass)) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'The model class "%s" must be equal to or a subclass of the entity class "%s".',
-                    $modelClass,
-                    $entityClass
-                ));
-            }
-            if ($this->doctrineHelper->isManageableEntityClass($modelClass)
-                && !self::isParentEntityClass($this->getEntityMetadata($entityClass))
-            ) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'The model class "%s" must not represent a manageable entity.',
-                    $modelClass
-                ));
-            }
+        if (!\is_subclass_of($modelClass, $entityClass)) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The model class "%s" must be equal to or a subclass of the entity class "%s".',
+                $modelClass,
+                $entityClass
+            ));
+        }
+        if ($this->doctrineHelper->isManageableEntityClass($modelClass)
+            && !self::isParentEntityClass($this->getEntityMetadata($entityClass))
+        ) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The model class "%s" must not represent a manageable entity.',
+                $modelClass
+            ));
         }
         $this->assertEntity($entityClass);
     }
@@ -492,7 +503,7 @@ class EntityMapper
     {
         $object = $this->entityInstantiator->instantiate($objectClass);
         $objectReflClass = new \ReflectionClass($objectClass);
-        $sourceProperties = self::getProperties($source);
+        $sourceProperties = self::getProperties($this->doctrineHelper->getClass($source));
         foreach ($sourceProperties as $sourceProperty) {
             $objectProperty = ReflectionUtil::getProperty($objectReflClass, $sourceProperty->getName());
             if (null !== $objectProperty) {
@@ -560,13 +571,13 @@ class EntityMapper
     }
 
     /**
-     * @param object $object
+     * @param string $objectClass
      *
      * @return \ReflectionProperty[]
      */
-    private static function getProperties($object): array
+    private static function getProperties(string $objectClass): array
     {
-        $reflClass = new \ReflectionClass(ClassUtils::getClass($object));
+        $reflClass = new \ReflectionClass($objectClass);
         $properties = $reflClass->getProperties();
         $parentClass = $reflClass->getParentClass();
         if ($parentClass) {
@@ -652,5 +663,19 @@ class EntityMapper
             ReflectionUtil::getProperty($objectReflClass, $propertyName),
             $value
         );
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasModels(): bool
+    {
+        foreach ($this->modelMap as $model) {
+            if ($this->modelMap->offsetGet($model) !== $model) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

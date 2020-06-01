@@ -35,7 +35,7 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *     }
  * )
  * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
  * @ORM\DiscriminatorMap({"audit" = "Oro\Bundle\DataAuditBundle\Entity\Audit"})
  *
  * @Config(
@@ -143,7 +143,7 @@ abstract class AbstractAudit
     /**
      * @var string $transactionId
      *
-     * @ORM\Column(name="transaction_id", type="string", length=255)
+     * @ORM\Column(name="transaction_id", type="string", length=36)
      */
     protected $transactionId;
 

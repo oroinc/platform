@@ -36,6 +36,24 @@ api:
             alias: testapioverrideclassactivity
             plural_alias: testapioverrideclassactivities
             override_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassActivity
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestMagazine:
+            alias: testapimagazine
+            plural_alias: testapimagazines
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestArticle:
+            alias: testapiarticle
+            plural_alias: testapiarticles
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1:
+            alias: testapimagazinemodel1
+            plural_alias: testapimagazinemodel1
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1:
+            alias: testapiarticlemodel1
+            plural_alias: testapiarticlemodel1
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2:
+            alias: testapimagazinemodel2
+            plural_alias: testapimagazinemodel2
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel2:
+            alias: testapiarticlemodel2
+            plural_alias: testapiarticlemodel2
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
@@ -46,13 +64,18 @@ api:
             filters:
                 fields:
                     name: ~
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
             filters:
                 fields:
                     name: ~
             sorters:
                 fields:
+                    name: ~
                     position: ~
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
             fields:
@@ -69,7 +92,7 @@ api:
                 lastName:
                     exclude: true
                 links:
-                    data_type: array
+                    data_type: objects
                     exclusion_policy: all
                     fields:
                         firstName:
@@ -315,3 +338,99 @@ api:
                 activityTargets:
                     data_type: association:manyToMany:activity
         Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestMagazine:
+            fields:
+                articles:
+                    data_type: objects
+                    collapse: false
+                bestArticle:
+                    data_type: object
+                    collapse: false
+            actions:
+                get_list: false
+                delete: false
+                delete_list: false
+                get_relationship: false
+                get_subresource: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestArticle:
+            identifier_field_names: [id]
+            # this entity does not have own API resource
+            actions: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: int
+                name:
+                    data_type: string
+                articles:
+                    data_type: int
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1
+                    target_type: collection
+                bestArticle:
+                    data_type: int
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1
+            actions:
+                get_list: false
+                delete: false
+                delete_list: false
+                get_relationship: false
+                get_subresource: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel1:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: int
+                headline:
+                    data_type: string
+                body:
+                    data_type: string
+            actions:
+                get_list: false
+                delete: false
+                delete_list: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: int
+                name:
+                    data_type: string
+                articles:
+                    data_type: objects
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel2
+                    target_type: collection
+                    collapse: false
+                bestArticle:
+                    data_type: object
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel2
+                    collapse: false
+            actions:
+                get_list: false
+                delete: false
+                delete_list: false
+                get_relationship: false
+                get_subresource: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestArticleModel2:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: int
+                headline:
+                    data_type: string
+                body:
+                    data_type: string
+            # this entity does not have own API resource
+            actions: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection:
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem:
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~

@@ -1,0 +1,3 @@
+oro_entity:
+    exclusions:
+        - { entity: Oro\Bundle\ApiBundle\Entity\AsyncOperation, field: dataFileName }

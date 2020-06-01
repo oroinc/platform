@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\EmbeddedForm\Migrations\Data\ORM;
+namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
-class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
+/**
+ * Adds organizations to embedded forms.
+ */
+class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implements
+    DependentFixtureInterface,
+    RenamedFixtureInterface
 {
     /**
      * {@inheritdoc}
@@ -14,6 +20,16 @@ class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implemen
     public function getDependencies()
     {
         return ['Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            'Oro\\Bundle\\EmbeddedForm\\Migrations\\Data\\ORM\\UpdateEmbeddedFormWithOrganization',
+        ];
     }
 
     /**

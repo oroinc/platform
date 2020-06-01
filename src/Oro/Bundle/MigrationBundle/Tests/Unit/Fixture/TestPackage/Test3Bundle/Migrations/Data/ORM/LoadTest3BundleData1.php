@@ -4,9 +4,13 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test3Bundle\
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class LoadTest3BundleData1 extends AbstractFixture implements VersionedFixtureInterface, OrderedFixtureInterface
+class LoadTest3BundleData1 extends AbstractFixture implements
+    VersionedFixtureInterface,
+    OrderedFixtureInterface,
+    RenamedFixtureInterface
 {
     /**
      * {@inheritdoc}
@@ -29,5 +33,15 @@ class LoadTest3BundleData1 extends AbstractFixture implements VersionedFixtureIn
     public function getOrder()
     {
         return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            self::class . 'OldName',
+        ];
     }
 }

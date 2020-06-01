@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Collects errors occurred during submit of forms for primary and included entities
+ * Collects errors occurred when submitting forms for primary and included entities
  * and adds them into the context.
  */
 class CollectFormErrors extends BaseCollectFormErrors

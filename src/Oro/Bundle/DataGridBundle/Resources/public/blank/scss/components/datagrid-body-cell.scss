@@ -11,6 +11,10 @@
         border-width: $datagrid-body-cell-border-width;
     }
 
+    &.select-row-cell {
+        padding-#{$start}: $datagrid-body-select-row-cell-offset-start;
+    }
+
     &.action-cell {
         width: $datagrid-body-cell-action-cell-width;
 

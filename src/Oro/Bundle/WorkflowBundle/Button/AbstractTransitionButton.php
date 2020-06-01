@@ -53,6 +53,14 @@ abstract class AbstractTransitionButton implements ButtonInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getAriaLabel(): ?string
+    {
+        return null; // not implemented
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getIcon()

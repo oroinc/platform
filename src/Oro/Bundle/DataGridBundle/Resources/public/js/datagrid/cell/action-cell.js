@@ -103,6 +103,7 @@ define(function(require, exports, module) {
         /** @property */
         events: {
             'click': '_showDropdown',
+            'keydown .dropdown-menu': 'onKeydown',
             'mouseover .dropdown-toggle': '_showDropdown',
             'mouseleave .dropleft.show': '_hideDropdown',
             'click .dropdown-close .fa-close': '_hideDropdown'
@@ -326,6 +327,9 @@ define(function(require, exports, module) {
             $launcherItem.append(launcher.render().$el);
             const className = 'mode-' + launcher.launcherMode;
             $launcherItem.addClass(className);
+            if (this.isDropdownActions) {
+                launcher.$el.addClass('dropdown-item');
+            }
             return result;
         },
 
@@ -378,6 +382,13 @@ define(function(require, exports, module) {
                 this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             e.stopPropagation();
+        },
+
+        onKeydown: function(event) {
+            // close dropdown on ESC key
+            if (event.which === 27) {
+                this._hideDropdown(event);
+            }
         }
     });
 

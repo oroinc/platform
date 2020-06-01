@@ -80,6 +80,9 @@ class FieldsDescriptionHelper
      * @param bool                   $isInherit
      * @param string                 $targetAction
      * @param string|null            $fieldPrefix
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function setDescriptionsForFields(
         EntityDefinitionConfig $definition,
@@ -100,7 +103,7 @@ class FieldsDescriptionHelper
                     $targetAction,
                     $fieldName,
                     $fieldPrefix,
-                    $fieldName === $identifierFieldName ? IdentifierDescriptionHelper::ID_DESCRIPTION : null,
+                    $fieldName === $identifierFieldName ? IdentifierDescriptionHelper::ID_DESCRIPTION : null
                 );
                 if ($description) {
                     $field->setDescription($description);
@@ -121,6 +124,12 @@ class FieldsDescriptionHelper
 
             $description = $field->getDescription();
             if ($description) {
+                if (InheritDocUtil::hasDescriptionInheritDoc($description)) {
+                    $description = InheritDocUtil::replaceDescriptionInheritDoc(
+                        $description,
+                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
+                    );
+                }
                 $field->setDescription($this->descriptionProcessor->process($description, $requestType));
             }
 

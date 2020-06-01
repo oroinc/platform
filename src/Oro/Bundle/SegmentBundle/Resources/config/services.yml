@@ -26,6 +26,7 @@ services:
             - '@oro_segment.segment_manager.cache'
         calls:
             - ['setLogger', ['@?logger']]
+            - ['setAclHelper', ['@oro_security.acl_helper']]
 
     oro_segment.segment_manager.cache:
         parent: doctrine_cache.abstract.array

@@ -17,6 +17,15 @@ oro_behat_extension:
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
+    Add Autoresponse Rule Form:
+      selector: "form[id^='oro_email_autoresponserule']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Response Template:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][existing_entity]"]'
+            element: Select2Entity
     Email Form:
       selector: "form[id^='oro_email_email']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
@@ -98,6 +107,9 @@ oro_behat_extension:
       selector:
         type: xpath
         locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@role="button"]'
+
+    Email Page Contexts:
+      selector: 'div.activity-context-activity'
 
   pages:
     User Emails:
