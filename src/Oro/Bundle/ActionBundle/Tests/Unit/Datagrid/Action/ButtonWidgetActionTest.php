@@ -14,13 +14,13 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->action = new ButtonWidgetAction($this->translator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action, $this->translator);
     }

@@ -17,7 +17,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
             ->disableOriginalConstructor()

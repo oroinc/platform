@@ -44,7 +44,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -80,12 +80,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByGroup($group);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByGroupWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getAttributesByGroup(new AttributeGroup());
@@ -120,12 +119,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByFamily($family);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByFamilyWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getAttributesByFamily(new AttributeFamily());
@@ -151,12 +149,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByClassWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getAttributesByClass('ClassName');
@@ -182,12 +179,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getActiveAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetActiveAttributesByClassWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getActiveAttributesByClass('ClassName');
@@ -213,12 +209,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getSystemAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetSystemAttributesByClassWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getSystemAttributesByClass('ClassName');
@@ -244,12 +239,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getNonSystemAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetNonSystemAttributesByClassWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getNonSystemAttributesByClass('ClassName');
@@ -425,12 +419,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByIdsWithIndex([1, 2]);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByIdsWithIndexWhenExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
+
         $this->expectsDatabaseCheck(false);
 
         $this->manager->getAttributesByIdsWithIndex([1, 2]);

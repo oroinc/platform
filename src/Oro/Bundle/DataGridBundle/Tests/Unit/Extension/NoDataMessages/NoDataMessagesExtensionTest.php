@@ -36,7 +36,7 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->mappingProvider = $this->createMock(AbstractSearchMappingProvider::class);

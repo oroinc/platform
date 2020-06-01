@@ -22,7 +22,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->listener = new InvalidateTranslationCacheListener($this->registry);

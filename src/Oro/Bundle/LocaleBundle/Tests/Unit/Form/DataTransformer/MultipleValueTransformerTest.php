@@ -15,7 +15,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_VALUES);
     }
@@ -70,12 +70,11 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testTransformUnexpectedTypeException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $this->transformer->transform(new \DateTime());
     }
 
@@ -130,30 +129,27 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "DateTime" given
-     */
     public function testReverseTransformUnexpectedTypeException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
+
         $this->transformer->reverseTransform(new \DateTime());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Value does not contain default value
-     */
     public function testReverseTransformNoDefaultDataException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Value does not contain default value');
+
         $this->transformer->reverseTransform([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Value does not contain collection value
-     */
     public function testReverseTransformNoCollectionDataException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Value does not contain collection value');
+
         $this->transformer->reverseTransform([self::FIELD_DEFAULT => 'default string']);
     }
 }

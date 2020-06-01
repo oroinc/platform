@@ -19,7 +19,7 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProviderBag */
     protected $configProviderBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configBag = $this->getMockBuilder(PropertyConfigBag::class)
             ->disableOriginalConstructor()
@@ -42,9 +42,6 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
 
         $provider = $this->configProviderBag->getProvider('scope1');
         self::assertInstanceOf(ConfigProvider::class, $provider);
-        $providers = self::getObjectAttribute($this->configProviderBag, 'providers');
-        self::assertArrayHasKey('scope1', $providers);
-        self::assertSame($provider, $providers['scope1']);
 
         // test that cached provider is returned
         self::assertSame($provider, $this->configProviderBag->getProvider('scope1'));
@@ -56,8 +53,6 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
             ->method('getService');
 
         self::assertNull($this->configProviderBag->getProvider('scope2'));
-        $providers = self::getObjectAttribute($this->configProviderBag, 'providers');
-        self::assertArrayNotHasKey('scope2', $providers);
     }
 
     public function testGetProviders()

@@ -12,7 +12,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataConverter = new DefaultDataConverter();
     }
@@ -107,12 +107,11 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->dataConverter->convertToExportFormat($testData));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Delimiter ":" is not allowed in keys
-     */
     public function testConvertToExportFormatIncorrectKey()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Delimiter ":" is not allowed in keys');
+
         $invalidImportedRecord = array(
             'owner:firstName' => 'John'
         );
@@ -120,12 +119,11 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->dataConverter->convertToExportFormat($invalidImportedRecord);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Can't set nested value under key "owner"
-     */
     public function testConvertToImportIncorrectKey()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Can\'t set nested value under key "owner"');
+
         $invalidExportedRecord = array(
             'owner'           => 'John Doe',
             'owner:firstName' => 'John',

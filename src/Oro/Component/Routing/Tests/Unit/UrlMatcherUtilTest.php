@@ -43,11 +43,9 @@ class UrlMatcherUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($contextMethod, $context->getMethod());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testMatchForGetMethodWhenExceptionOccurred()
     {
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $pathInfo = '/pathInfo';
         $contextPathInfo = '/contextPathInfo';
         $contextMethod = Request::METHOD_POST;

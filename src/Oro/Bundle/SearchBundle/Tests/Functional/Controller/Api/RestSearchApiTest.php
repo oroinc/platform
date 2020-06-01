@@ -13,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Product;
  */
 class RestSearchApiTest extends SearchBundleWebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

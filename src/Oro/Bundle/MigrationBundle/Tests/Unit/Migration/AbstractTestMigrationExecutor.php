@@ -21,7 +21,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
     /** @var OroDataCacheManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()

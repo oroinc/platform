@@ -37,7 +37,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EmailHolderStub();
         $this->emailNotification = $this->createMock(EmailNotification::class);
@@ -62,7 +62,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->adapter, $this->entity, $this->emailNotification, $this->em);
     }

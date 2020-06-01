@@ -20,7 +20,7 @@ class DigitalAssetDeleteVoterTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
 

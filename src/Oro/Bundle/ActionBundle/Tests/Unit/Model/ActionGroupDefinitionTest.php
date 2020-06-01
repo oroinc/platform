@@ -12,12 +12,12 @@ class ActionGroupDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupDefinition */
     protected $actionGroupDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionGroupDefinition = new ActionGroupDefinition();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroupDefinition);
     }

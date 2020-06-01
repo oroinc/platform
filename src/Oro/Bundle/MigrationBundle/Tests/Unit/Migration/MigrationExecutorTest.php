@@ -18,7 +18,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     /** @var MigrationExecutor */
     protected $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
             $migrationsToExecute[] = new MigrationState(new $migrationClass());
         }
 
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration.'
         );
@@ -76,7 +76,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         }
         $migrationsToExecute[] = new MigrationState(new Test1BundleInstallation());
 
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration.'
         );

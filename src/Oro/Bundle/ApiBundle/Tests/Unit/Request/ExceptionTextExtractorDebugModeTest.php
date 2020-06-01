@@ -22,7 +22,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /** @var ExceptionTextExtractor */
     private $exceptionTextExtractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())

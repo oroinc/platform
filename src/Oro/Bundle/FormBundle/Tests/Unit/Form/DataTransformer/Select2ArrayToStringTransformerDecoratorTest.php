@@ -17,7 +17,7 @@ class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\Te
      */
     private $transformerDecorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = $this->createMock(DataTransformerInterface::class);
         $this->transformerDecorator = new Select2ArrayToStringTransformerDecorator($this->transformer);

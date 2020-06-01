@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ControllersTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -45,7 +45,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Tag saved", $crawler->html());
+        static::assertStringContainsString("Tag saved", $crawler->html());
     }
 
     public function testUpdate()
@@ -69,7 +69,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Tag saved", $crawler->html());
+        static::assertStringContainsString("Tag saved", $crawler->html());
 
         $response = $this->client->requestGrid(
             'tag-grid',
@@ -95,7 +95,7 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_tag_search', array('id' => $result['id'])));
         $result = $this->client->getResponse();
 
-        $this->assertContains('Records tagged as "tag758_updated"', $result->getContent());
-        $this->assertContains('No results were found', $result->getContent());
+        static::assertStringContainsString('Records tagged as "tag758_updated"', $result->getContent());
+        static::assertStringContainsString('No results were found', $result->getContent());
     }
 }

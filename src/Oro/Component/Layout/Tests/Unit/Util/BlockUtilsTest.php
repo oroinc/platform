@@ -64,12 +64,11 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage Either "path" or "route_name" must be set.
-     */
     public function testProcessUrlShouldThrowExceptionIfRequiredAndEmptyOptions()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('Either "path" or "route_name" must be set.');
+
         BlockUtils::processUrl(
             new BlockView(),
             new Options(),

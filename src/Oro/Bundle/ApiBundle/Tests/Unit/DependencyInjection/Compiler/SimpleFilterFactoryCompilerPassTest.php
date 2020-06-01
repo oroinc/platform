@@ -17,7 +17,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var SimpleFilterFactoryCompilerPass */
     private $compiler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new SimpleFilterFactoryCompilerPass();
     }
@@ -82,14 +82,14 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "unknownMethod($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
     public function testFilterFactoryWhenFactoryMethodDoesNotExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The "unknownMethod($dataType)" public method must be declared in the "%s" class.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub::class
+        ));
+
         $container = new ContainerBuilder();
         DependencyInjectionUtil::setConfig(
             $container,
@@ -107,14 +107,14 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "privateCreate($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
     public function testFilterFactoryWhenFactoryMethodIsNotPublic()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The "privateCreate($dataType)" public method must be declared in the "%s" class.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub::class
+        ));
+
         $container = new ContainerBuilder();
         DependencyInjectionUtil::setConfig(
             $container,
@@ -132,14 +132,14 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "createWithoutDataType($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
-     */
-    // @codingStandardsIgnoreEnd
     public function testFilterFactoryWhenFactoryMethodHasInvalidSignature()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The "createWithoutDataType($dataType)" public method must be declared in the "%s" class.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub::class
+        ));
+
         $container = new ContainerBuilder();
         DependencyInjectionUtil::setConfig(
             $container,

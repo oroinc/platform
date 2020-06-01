@@ -13,7 +13,7 @@ class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
     /** @var ConvertParentModelToEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

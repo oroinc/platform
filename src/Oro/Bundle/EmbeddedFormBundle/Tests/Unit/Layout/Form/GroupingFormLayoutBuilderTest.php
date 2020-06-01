@@ -31,7 +31,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var GroupingFormLayoutBuilder */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
         $this->blockBuilder      = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');

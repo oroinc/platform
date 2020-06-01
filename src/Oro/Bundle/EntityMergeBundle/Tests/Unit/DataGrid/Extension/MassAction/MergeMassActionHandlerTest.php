@@ -66,7 +66,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $secondResultRecordId;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initMockObjects();
         $this->setUpMockObjects();
@@ -107,8 +107,12 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private function setUpMockObjects()
     {
-        $this->firstEntity = $this->createPartialMock(\stdClass::class, array('getId'));
-        $this->secondEntity = $this->createPartialMock(\stdClass::class, array('getId'));
+        $this->firstEntity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
+        $this->secondEntity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $this->firstResultRecordId = rand();
         $this->secondResultRecordId = rand();
 
@@ -187,12 +191,11 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('options', $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Entity name is missing.
-     */
     public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entity name is missing.');
+
         $this->optionsArray['entity_name'] = '';
 
         $this->target->handle($this->args);

@@ -24,7 +24,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FormatExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->formatterManager = $this->createMock(FormatterManager::class);

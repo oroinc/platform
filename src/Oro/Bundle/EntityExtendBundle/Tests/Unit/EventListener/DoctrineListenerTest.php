@@ -32,7 +32,7 @@ class DoctrineListenerTest extends OrmTestCase
     /** @var DoctrineListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->enumManager = $this->createMock(MultiEnumManager::class);
         $this->reader = new AnnotationReader();

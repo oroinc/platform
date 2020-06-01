@@ -13,13 +13,13 @@ class ConfigCheckboxTest extends FormIntegrationTestCase
      */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->formType = new ConfigCheckbox();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->formType);

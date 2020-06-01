@@ -10,7 +10,7 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
     /** @var AddMetaProperties */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -10,7 +10,7 @@
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "phpunit/phpunit": "7.5.*",
+        "phpunit/phpunit": "9.1.*",
         "symfony/process": "4.4.*",
         "symfony/yaml": "4.4.*",
         "symfony/console": "4.4.*"

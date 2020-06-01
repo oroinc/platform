@@ -10,7 +10,7 @@ class EmailRecipientsTest extends \PHPUnit\Framework\TestCase
     /** @var EmailRecipients */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailRecipients();
     }

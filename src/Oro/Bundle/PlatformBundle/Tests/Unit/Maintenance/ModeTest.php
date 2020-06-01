@@ -22,7 +22,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
      */
     protected $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = $this->getMockBuilder('Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory')
             ->disableOriginalConstructor()

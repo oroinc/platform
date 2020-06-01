@@ -10,7 +10,7 @@ class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetSortByConverter */
     protected $widgetSortByConverter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $configId = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
         $config = new Config($configId, ['label' => 'existingLabel']);

@@ -15,7 +15,7 @@ class NodeProcessFactoryTest extends TestCase
 
         $factory = new NodeProcessFactory('test_engine_path');
         $actual = $factory->create(['bin/webpack'], 'web_root');
-        $this->assertEquals($actual, new Process(['test_engine_path', 'bin/webpack'], 'web_root'));
+        $this->assertEquals($actual, new Process(['test_engine_path', 'bin/webpack'], 'web_root', null, null, null));
 
         $_SERVER['PATH'] = $serverPath;
     }

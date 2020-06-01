@@ -14,7 +14,7 @@ class SearchRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchRegistry */
     private $searchRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchHandler = $this->createMock(SearchHandlerInterface::class);
 
@@ -33,12 +33,11 @@ class SearchRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->searchHandler, $this->searchRegistry->getSearchHandler('test'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Search handler "testNotExists" is not registered
-     */
     public function testGetSearchHandlerFails()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Search handler "testNotExists" is not registered');
+
         $this->searchRegistry->getSearchHandler('testNotExists');
     }
 }

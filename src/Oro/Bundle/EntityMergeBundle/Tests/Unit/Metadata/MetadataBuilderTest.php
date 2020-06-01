@@ -47,7 +47,7 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     protected $additionalMetadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
 

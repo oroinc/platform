@@ -23,7 +23,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /** @var LayoutFactoryInterface */
     protected $layoutFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new LayoutContext();
 

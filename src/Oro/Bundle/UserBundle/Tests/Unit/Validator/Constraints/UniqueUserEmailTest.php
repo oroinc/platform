@@ -12,7 +12,7 @@ class UniqueUserEmailTest extends \PHPUnit\Framework\TestCase
      */
     private $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new UniqueUserEmail();
     }

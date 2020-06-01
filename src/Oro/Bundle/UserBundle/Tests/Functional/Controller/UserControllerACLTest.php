@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
 class UserControllerACLTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserACLData::class]);

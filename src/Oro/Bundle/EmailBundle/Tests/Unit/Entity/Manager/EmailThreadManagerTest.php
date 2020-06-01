@@ -22,7 +22,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     protected $fixtures = [];
 
-    public function setUp()
+    protected function setUp(): void
     {
         $thread1 = new TestThread(1);
         $thread2 = new TestThread(2);

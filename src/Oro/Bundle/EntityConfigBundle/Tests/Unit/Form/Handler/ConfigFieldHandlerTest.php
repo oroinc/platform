@@ -38,7 +38,7 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configHelperHandler = $this->createMock(ConfigHelperHandler::class);
         $this->requestStack = $this->createMock(RequestStack::class);

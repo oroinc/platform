@@ -12,7 +12,7 @@ class SetCorsAllowAndExposeHeadersTest extends \PHPUnit\Framework\TestCase
     /** @var Context */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new Context(
             $this->createMock(ConfigProvider::class),

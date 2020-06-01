@@ -23,7 +23,7 @@ class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryExecutor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor')
             ->disableOriginalConstructor()->getMock();

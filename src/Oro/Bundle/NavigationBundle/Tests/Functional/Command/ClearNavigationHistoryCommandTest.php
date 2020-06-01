@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ClearNavigationHistoryCommandTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([NavigationHistoryItemData::class]);
@@ -17,7 +17,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
 
     public function testExecuteWithNonValidInterval()
     {
-        $this->assertContains(
+        static::assertStringContainsString(
             "Value 'invalid' should be valid date interval",
             $this->runCommand('oro:navigation:history:clear', ['--interval' => 'invalid'])
         );
@@ -31,7 +31,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
 
         $this->assertCount(5, $repo->findAll());
 
-        $this->assertContains(
+        static::assertStringContainsString(
             "'2' items deleted from navigation history.",
             $this->runCommand('oro:navigation:history:clear', ['--interval' => '3 days'])
         );

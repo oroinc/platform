@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -17,38 +18,37 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     /** @var Translator */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $statement = $this->createMock(Statement::class);
-        $statement->expects($this->any())
-            ->method('fetchAll')
-            ->willReturn(
-                [
-                    ['code' => 'de']
-                ]
-            );
+        $statement->method('fetchAll')->willReturn([['code' => 'de']]);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->any())->method('select')->willReturnSelf();
-        $qb->expects($this->any())->method('from')->willReturnSelf();
-        $qb->expects($this->any())->method('execute')->willReturn($statement);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('execute')->willReturn($statement);
 
-        /** @var Connection|\PHPUnit\Framework\MockObject\MockObject $connection */
+        /** @var Connection|MockObject $connection */
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->any())->method('createQueryBuilder')->willReturn($qb);
+        $connection->method('createQueryBuilder')->willReturn($qb);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
+        /** @var ManagerRegistry|MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->any())->method('getConnection')->willReturn($connection);
+        $registry->method('getConnection')->willReturn($connection);
 
-        /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
+        /** @var ContainerInterface|MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())->method('get')->with('doctrine')->willReturn($registry);
+        $container->expects(static::any())->method('get')->with('doctrine')->willReturn($registry);
 
-        /** @var MessageFormatterInterface|\PHPUnit\Framework\MockObject\MockObject $selector */
+        /** @var MessageFormatterInterface|MockObject $selector */
         $selector = $this->createMock(MessageFormatterInterface::class);
 
-        $this->translator = new Translator($container, $selector, 'en');
+        $this->translator = new class($container, $selector, 'en') extends Translator {
+            public function xgetDomains(): array
+            {
+                return $this->domains;
+            }
+        };
     }
 
     public function testAddResource()
@@ -56,7 +56,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $this->translator->addResource('test', 'test_resource', 'en', 'messages');
         $this->translator->addResource('test', 'test_resource', 'en', 'jsmessages');
 
-        $this->assertAttributeEquals(['messages', 'jsmessages'], 'domains', $this->translator);
+        static::assertEquals(['messages', 'jsmessages'], $this->translator->xgetDomains());
     }
 
     public function testInitialize()
@@ -70,7 +70,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject $loader */
+        /** @var LoaderInterface|MockObject $loader */
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())
             ->method('load')
@@ -82,7 +82,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->translator->getCatalogue('en');
 
-        $this->assertNotSame($catalogue, $result);
-        $this->assertEquals($catalogue, $result);
+        static::assertNotSame($catalogue, $result);
+        static::assertEquals($catalogue, $result);
     }
 }

@@ -37,7 +37,7 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
      */
     private $fieldProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->constraint = new DefinitionQueryConstraint();

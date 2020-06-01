@@ -19,7 +19,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationManager = $this->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()
@@ -31,7 +31,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translationManager, $this->normalizer);
     }
@@ -66,12 +66,11 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Translation::SCOPE_UI, $translation->getScope());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Incorrect record format
-     */
     public function testDenormalizeEmpty()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Incorrect record format');
+
         $this->normalizer->denormalize([], Translation::class);
     }
 

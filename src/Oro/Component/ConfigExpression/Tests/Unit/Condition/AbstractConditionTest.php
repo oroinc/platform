@@ -2,107 +2,95 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 
 class AbstractConditionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\AbstractCondition|\PHPUnit\Framework\MockObject\MockObject */
-    protected $condition;
-
-    protected function setUp()
+    public function testDoEvaluate()
     {
-        $this->condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\AbstractCondition')
-            ->setMethods(['isConditionAllowed'])
-            ->getMockForAbstractClass();
-    }
+        $allowedCondition = new class() extends AbstractCondition {
+            protected function isConditionAllowed($context)
+            {
+                return true;
+            }
 
-    public function testMessages()
-    {
-        $this->assertAttributeSame(null, 'message', $this->condition);
-        $this->assertSame($this->condition, $this->condition->setMessage('Test'));
-        $this->assertAttributeEquals('Test', 'message', $this->condition);
-    }
+            public function xdoEvaluate($context)
+            {
+                return parent::doEvaluate($context);
+            }
 
-    /**
-     * @dataProvider evaluateDataProvider
-     */
-    public function testEvaluate($allowed, $message, $expectMessage = false)
-    {
-        $errorMessage = 'Some error message';
-        $context      = ['key' => 'value'];
+            public function xgetErrors(): ?\ArrayAccess
+            {
+                return $this->errors;
+            }
 
-        $this->condition->expects($this->any())
-            ->method('isConditionAllowed')
-            ->with($context)
-            ->will($this->returnValue($allowed));
+            public function getName()
+            {
+            }
 
-        if ($message) {
-            $this->condition->setMessage($errorMessage);
-        }
+            public function initialize(array $options)
+            {
+            }
 
-        // without message collection
-        $this->assertEquals($allowed, $this->condition->evaluate($context));
+            public function toArray()
+            {
+            }
 
-        // with message collection
-        $errors = new ArrayCollection();
-        $this->assertEquals($allowed, $this->condition->evaluate($context, $errors));
-        if ($expectMessage) {
-            $this->assertCount(1, $errors);
-            $this->assertEquals(
-                ['message' => $errorMessage, 'parameters' => []],
-                $errors->get(0)
-            );
-        } else {
-            $this->assertEmpty($errors->getValues());
-        }
-    }
+            public function compile($factoryAccessor)
+            {
+            }
+        };
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
-    {
-        return [
-            'allowed, no error message'       => [
-                'allowed' => true,
-                'message' => false,
-            ],
-            'not allowed, no error message'   => [
-                'allowed' => false,
-                'message' => false,
-            ],
-            'allowed, with error message'     => [
-                'allowed' => true,
-                'message' => true,
-            ],
-            'not allowed, with error message' => [
-                'allowed'       => false,
-                'message'       => true,
-                'expectMessage' => true,
-            ]
-        ];
-    }
+        $notAllowedCondition = new class() extends AbstractCondition {
+            public function __construct()
+            {
+                $this->errors = new \ArrayObject();
+            }
 
-    public function testAddError()
-    {
-        $context = ['foo' => 'fooValue', 'bar' => 'barValue'];
-        $options = ['left' => 'foo', 'right' => 'bar'];
+            protected function isConditionAllowed($context)
+            {
+                return false;
+            }
 
-        $this->condition->initialize($options);
-        $message = 'Error message.';
-        $this->condition->setMessage($message);
+            public function xdoEvaluate($context)
+            {
+                return parent::doEvaluate($context);
+            }
 
-        $this->condition->expects($this->once())
-            ->method('isConditionAllowed')
-            ->with($context)
-            ->will($this->returnValue(false));
+            public function xgetErrors(): ?\ArrayAccess
+            {
+                return $this->errors;
+            }
 
-        $errors = new ArrayCollection();
+            public function getName()
+            {
+            }
 
-        $this->assertFalse($this->condition->evaluate($context, $errors));
+            public function initialize(array $options)
+            {
+            }
 
-        $this->assertCount(1, $errors);
-        $this->assertEquals(['message' => $message, 'parameters' => []], $errors->get(0));
+            public function toArray()
+            {
+            }
+
+            public function compile($factoryAccessor)
+            {
+            }
+        };
+
+        $context = new \stdClass();
+
+        $result = $allowedCondition->xdoEvaluate($context);
+        static::assertTrue($result);
+        static::assertNull($allowedCondition->xgetErrors());
+
+        $notAllowedCondition->setMessage('test_message');
+        $result = $notAllowedCondition->xdoEvaluate($context);
+        static::assertFalse($result);
+        static::assertEquals(
+            new \ArrayObject([['message' => 'test_message', 'parameters' => []]]),
+            $notAllowedCondition->xgetErrors()
+        );
     }
 }

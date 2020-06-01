@@ -17,7 +17,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextConfigAccessor */
     private $configAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(Context::class);
 

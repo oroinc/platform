@@ -9,7 +9,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var  DecodeFolderSubscriber */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new DecodeFolderSubscriber();
     }

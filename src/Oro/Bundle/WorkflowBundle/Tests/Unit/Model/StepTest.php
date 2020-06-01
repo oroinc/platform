@@ -11,7 +11,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
      */
     protected $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->step = new Step();
     }

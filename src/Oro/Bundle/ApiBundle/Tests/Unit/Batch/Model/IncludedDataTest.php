@@ -19,7 +19,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
     private $fileLockManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();
         $this->includeAccessor = new JsonApiIncludeAccessor($this->itemKeyBuilder);

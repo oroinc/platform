@@ -22,7 +22,7 @@ class {{ className }} extends \PHPUnit\Framework\TestCase
      */
     protected ${{ testedClassNameVariable }};
 
-    protected function setUp()
+    protected function setUp(): void
     {
 {% for dependencyData in dependenciesData %}
 {% if dependencyData.has_constructor is defined %}

@@ -20,7 +20,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var FormContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
@@ -147,14 +147,15 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form" must be a string, "Symfony\Component\Form\FormInterface" or "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", but "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfInvalidFormType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The "form" must be a string, "%s" or "%s", but "integer" given.',
+            \Symfony\Component\Form\FormInterface::class,
+            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface::class
+        ));
+
         $context = new LayoutContext();
 
         $context['form'] = 123;
@@ -214,14 +215,14 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_action" must be a string or instance of "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction", but "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfInvalidFormAction()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The "form_action" must be a string or instance of "%s", but "integer" given.',
+            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction::class
+        ));
+
         $context = new LayoutContext();
 
         $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
@@ -231,12 +232,11 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_route_name" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_route_name" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
         $context['form']            = $this->createMock('Symfony\Component\Form\FormInterface');
@@ -246,12 +246,11 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_method" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormMethod()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_method" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
         $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
@@ -261,12 +260,11 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_enctype" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormEnctype()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_enctype" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
         $context['form']         = $this->createMock('Symfony\Component\Form\FormInterface');

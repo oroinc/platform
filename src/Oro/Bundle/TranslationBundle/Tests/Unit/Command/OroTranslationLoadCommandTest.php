@@ -42,7 +42,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
@@ -81,7 +81,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->translator,

@@ -29,7 +29,6 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function __construct(array $message, bool $isSubJobMessage = false, bool $canonicalize = false)
     {
-        parent::__construct();
         $this->message = $message;
         $this->isSubJobMessage = $isSubJobMessage;
         $this->canonicalize = $canonicalize;
@@ -79,7 +78,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     public function toString(): string
     {
-        return 'the message ' . $this->exporter->export($this->message) . ' was sent';
+        return 'the message ' . $this->exporter()->export($this->message) . ' was sent';
     }
 
     /**
@@ -95,7 +94,7 @@ class SentMessageConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     protected function additionalFailureDescription($other): string
     {
-        return 'All sent messages: ' . $this->exporter->export($other);
+        return 'All sent messages: ' . $this->exporter()->export($other);
     }
 
     /**

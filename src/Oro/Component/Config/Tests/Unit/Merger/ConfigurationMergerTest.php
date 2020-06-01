@@ -13,7 +13,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationMerger */
     protected $merger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->merger = new ConfigurationMerger([self::BUNDLE1, self::BUNDLE2, self::BUNDLE3]);
     }
@@ -28,7 +28,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     {
         $configs = $this->merger->mergeConfiguration($rawConfig);
 
-        $this->assertInternalType('array', $configs);
+        $this->assertIsArray($configs);
         $this->assertEquals($expected, $configs);
     }
 
@@ -270,7 +270,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
      */
     public function testMergeConfigurationException(array $rawConfig, $expectedMessage)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->merger->mergeConfiguration($rawConfig);

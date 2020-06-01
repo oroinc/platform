@@ -13,6 +13,9 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface, ActivityExtensionAwareInterface
 {
     /** @var ExtendExtension */
@@ -56,6 +59,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->createTestOrderTables($schema);
         $this->createTestOverrideClassEntityTables($schema);
         $this->createTestMagazineTables($schema);
+        $this->createTestCollectionTables($schema);
     }
 
     /**
@@ -625,7 +629,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      *
      * @param Schema $schema
      */
-    protected function createTestOrderTables(Schema $schema)
+    private function createTestOrderTables(Schema $schema)
     {
         if ($schema->hasTable('test_api_order') || $schema->hasTable('test_api_order_line_item')) {
             return;
@@ -765,7 +769,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      *
      * @param Schema $schema
      */
-    protected function createTestMagazineTables(Schema $schema)
+    private function createTestMagazineTables(Schema $schema)
     {
         if ($schema->hasTable('test_api_article') || $schema->hasTable('test_api_magazine')) {
             return;
@@ -793,5 +797,170 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $tableMagazineArticles->addIndex(['article_id']);
         $tableMagazineArticles->addForeignKeyConstraint($tableMagazine, ['magazine_id'], ['id']);
         $tableMagazineArticles->addForeignKeyConstraint($tableArticle, ['article_id'], ['id']);
+    }
+
+    /**
+     * Create test_api_coll and test_api_coll_item tables
+     *
+     * @param Schema $schema
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function createTestCollectionTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_coll') || $schema->hasTable('test_api_coll_item')) {
+            return;
+        }
+
+        $collectionTable = $schema->createTable('test_api_coll');
+        $collectionTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $collectionTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $collectionTable->setPrimaryKey(['id']);
+
+        $collectionItemTable = $schema->createTable('test_api_coll_item');
+        $collectionItemTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $collectionItemTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $collectionItemTable->addColumn('p_or_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->addColumn('p_nor_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->addColumn('p_l_or_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->addColumn('p_l_nor_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->addColumn('p_el_or_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->addColumn('p_el_nor_id', 'integer', ['notnull' => false]);
+        $collectionItemTable->setPrimaryKey(['id']);
+        $collectionItemTable->addIndex(['p_or_id']);
+        $collectionItemTable->addIndex(['p_nor_id']);
+        $collectionItemTable->addIndex(['p_l_or_id']);
+        $collectionItemTable->addIndex(['p_l_nor_id']);
+        $collectionItemTable->addIndex(['p_el_or_id']);
+        $collectionItemTable->addIndex(['p_el_nor_id']);
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_or_id');
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_nor_id');
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_l_or_id');
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_l_nor_id');
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_el_or_id');
+        $this->addCollectionTableForeignKeyConstraint($collectionItemTable, $collectionTable, 'p_el_nor_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_or');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_nor');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_l_or');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_l_nor');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_el_or');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_mtm_el_nor');
+        $table->addColumn('parent_id', 'integer');
+        $table->addColumn('item_id', 'integer');
+        $table->setPrimaryKey(['parent_id', 'item_id']);
+        $table->addIndex(['parent_id']);
+        $table->addIndex(['item_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_or');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_nor');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_l_or');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_l_nor');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_el_or');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+
+        $table = $schema->createTable('test_api_coll_imtm_el_nor');
+        $table->addColumn('item_id', 'integer');
+        $table->addColumn('parent_id', 'integer');
+        $table->setPrimaryKey(['item_id', 'parent_id']);
+        $table->addIndex(['item_id']);
+        $table->addIndex(['parent_id']);
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionItemTable, 'item_id');
+        $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
+    }
+
+    /**
+     * @param Table  $table
+     * @param Table  $targetTable
+     * @param string $columnName
+     */
+    private function addCollectionTableForeignKeyConstraint(Table $table, Table $targetTable, string $columnName)
+    {
+        $table->addForeignKeyConstraint(
+            $targetTable,
+            [$columnName],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
     }
 }

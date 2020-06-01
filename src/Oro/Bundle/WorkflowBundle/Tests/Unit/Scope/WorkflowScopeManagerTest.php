@@ -36,7 +36,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowScopeManager */
     private $workflowScopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(ObjectRepository::class);
 
@@ -63,7 +63,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager, $this->logger);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowScopeManager, $this->repository, $this->manager, $this->scopeManager, $this->logger);
     }

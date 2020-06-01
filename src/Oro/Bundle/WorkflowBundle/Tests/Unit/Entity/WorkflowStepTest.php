@@ -12,12 +12,12 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->step = new WorkflowStep();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->step);
     }

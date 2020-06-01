@@ -19,7 +19,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionEventTriggerHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 

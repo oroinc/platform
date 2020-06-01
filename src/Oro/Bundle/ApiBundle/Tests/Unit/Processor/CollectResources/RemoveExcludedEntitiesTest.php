@@ -17,7 +17,7 @@ class RemoveExcludedEntitiesTest extends \PHPUnit\Framework\TestCase
     /** @var RemoveExcludedEntities */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
 

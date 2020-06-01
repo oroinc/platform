@@ -24,7 +24,7 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->accessor = $this->createMock(AccessorInterface::class);
         $this->renderer = $this->getMockBuilder(MergeRenderer::class)

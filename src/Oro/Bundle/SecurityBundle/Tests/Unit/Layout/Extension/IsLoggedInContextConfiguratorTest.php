@@ -17,7 +17,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->contextConfigurator = new IsLoggedInContextConfigurator($this->tokenAccessor);

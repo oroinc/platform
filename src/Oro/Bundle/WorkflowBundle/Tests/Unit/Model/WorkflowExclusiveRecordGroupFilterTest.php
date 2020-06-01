@@ -24,7 +24,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
      */
     protected $exclusiveRecordGroupFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
         $this->exclusiveRecordGroupFilter = new WorkflowExclusiveRecordGroupFilter($this->doctrineHelper);

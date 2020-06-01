@@ -362,12 +362,11 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to sum a non-numeric value, value: ''.
-     */
     public function testMethodSumNonNumericEvaluate()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unable to sum a non-numeric value, value: ''.");
+
         $variables = [
             'items' => [
                 ['foo' => '']
@@ -390,12 +389,11 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         $node->evaluate([], $variables);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable node type: -1. Available types are 1, 2, 3, 4, 5.
-     */
     public function testUnknownNodeType()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable node type: -1. Available types are 1, 2, 3, 4, 5.');
+
         $node = new CustomNode\GetAttrNode(
             new Node\NameNode('item'),
             new Node\ConstantNode('foo'),
@@ -406,12 +404,11 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         $node->evaluate([], []);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to iterate through a non-object.
-     */
     public function testMethodEvaluateAllWithNotTraversableVariables()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to iterate through a non-object.');
+
         $variables = [
             'items' => new SimpleObject()
         ];
@@ -437,12 +434,11 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         $node->evaluate([], $variables);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to iterate through a non-object.
-     */
     public function testMethodEvaluateAnyWithNotTraversableVariables()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to iterate through a non-object.');
+
         $variables = [
             'items' => new SimpleObject()
         ];
@@ -468,12 +464,11 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         $node->evaluate([], $variables);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to iterate through a non-object.
-     */
     public function testMethodEvaluateSumWithNotTraversableVariables()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to iterate through a non-object.');
+
         $variables = [
             'items' => new SimpleObject()
         ];

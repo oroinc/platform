@@ -13,7 +13,7 @@ class EmailBodyTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBody */
     private $emailBody;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailBody = new EmailBody();
     }

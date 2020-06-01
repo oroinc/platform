@@ -15,7 +15,7 @@ class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
     /** @var TitleTranslator */
     protected $titleTranslator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator        = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')

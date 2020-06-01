@@ -21,7 +21,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
     /** @var  Statement|\PHPUnit\Framework\MockObject\MockObject */
     protected $statement;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connector = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()

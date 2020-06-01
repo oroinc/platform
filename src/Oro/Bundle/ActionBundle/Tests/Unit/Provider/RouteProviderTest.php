@@ -9,7 +9,7 @@ class RouteProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RouteProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new RouteProvider(
             'oro_action_widget_form',
@@ -19,7 +19,7 @@ class RouteProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider);
     }

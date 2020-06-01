@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DuplicatorMatcherPa
 
 class DuplicatorMatcherPassTest extends AbstractDuplicatorPassTest
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new DuplicatorMatcherPass();
         parent::setUp();

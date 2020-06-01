@@ -16,7 +16,7 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCas
     /** @var LayoutDialogDataTransitionProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new LayoutDialogDataTransitionProcessor();
     }

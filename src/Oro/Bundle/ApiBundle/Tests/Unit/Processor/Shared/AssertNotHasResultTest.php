@@ -10,7 +10,7 @@ class AssertNotHasResultTest extends GetProcessorTestCase
     /** @var AssertNotHasResult */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,12 +22,11 @@ class AssertNotHasResultTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The result should not exist.
-     */
     public function testProcessWhenHasResult()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The result should not exist.');
+
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
     }

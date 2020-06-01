@@ -24,7 +24,7 @@ class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagrid;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(EmailQueryFactory::class);
         $this->featureChecker = $this->createMock(FeatureChecker::class);

@@ -11,48 +11,36 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendEmailTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContextAccessor|MockObject */
     protected $contextAccessor;
 
-    /**
-     * @var Processor|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Processor|MockObject */
     protected $emailProcessor;
 
-    /**
-     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityNameResolver|MockObject */
     protected $entityNameResolver;
 
-    /**
-     * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EventDispatcher|MockObject */
     protected $dispatcher;
 
-    /**
-     * @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EmailOriginHelper|MockObject */
     protected $emailOriginHelper;
 
-    /**
-     * @var SendEmail
-     */
+    /** @var SendEmail */
     protected $action;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LoggerInterface|MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
         $this->emailProcessor = $this->createMock(Processor::class);
@@ -60,17 +48,22 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher = $this->createMock(EventDispatcher::class);
         $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
 
-        $this->action = new SendEmail(
+        $this->action = new class(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
             $this->entityNameResolver,
             $this->emailOriginHelper
-        );
+        ) extends SendEmail {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         $this->action->setDispatcher($this->dispatcher);
 
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->action->setLogger($this->logger);
     }
 
@@ -92,52 +85,52 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
      */
     public function initializeExceptionDataProvider()
     {
-        return array(
-            'no from' => array(
-                'options' => array('to' => 'test@test.com', 'subject' => 'test', 'body' => 'test'),
+        return [
+            'no from' => [
+                'options' => ['to' => 'test@test.com', 'subject' => 'test', 'body' => 'test'],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'From parameter is required'
-            ),
-            'no from email' => array(
-                'options' => array(
+            ],
+            'no from email' => [
+                'options' => [
                     'to' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
-                    'from' => array('name' => 'Test')
-                ),
+                    'from' => ['name' => 'Test']
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
-            ),
-            'no to' => array(
-                'options' => array('from' => 'test@test.com', 'subject' => 'test', 'body' => 'test'),
+            ],
+            'no to' => [
+                'options' => ['from' => 'test@test.com', 'subject' => 'test', 'body' => 'test'],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'To parameter is required'
-            ),
-            'no to email' => array(
-                'options' => array(
+            ],
+            'no to email' => [
+                'options' => [
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
-                    'to' => array('name' => 'Test')
-                ),
+                    'to' => ['name' => 'Test']
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
-            ),
-            'no to email in one of addresses' => array(
-                'options' => array(
+            ],
+            'no to email in one of addresses' => [
+                'options' => [
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
-                    'to' => array('test@test.com', array('name' => 'Test'))
-                ),
+                    'to' => ['test@test.com', ['name' => 'Test']]
+                ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
-            ),
-            'no subject' => array(
-                'options' => array('from' => 'test@test.com', 'to' => 'test@test.com', 'body' => 'test'),
+            ],
+            'no subject' => [
+                'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'body' => 'test'],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Subject parameter is required'
-            ),
-            'no body' => array(
-                'options' => array('from' => 'test@test.com', 'to' => 'test@test.com', 'subject' => 'test'),
+            ],
+            'no body' => [
+                'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'subject' => 'test'],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Body parameter is required'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -147,104 +140,104 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize($options, $expected)
     {
-        $this->assertSame($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($expected, 'options', $this->action);
+        static::assertSame($this->action, $this->action->initialize($options));
+        static::assertEquals($expected, $this->action->xgetOptions());
     }
 
     public function optionsDataProvider()
     {
-        return array(
-            'simple' => array(
-                array(
+        return [
+            'simple' => [
+                [
                     'from' => 'test@test.com',
                     'to' => 'test@test.com',
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => 'test@test.com',
-                    'to' => array('test@test.com'),
+                    'to' => ['test@test.com'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'simple with name' => array(
-                array(
+                ]
+            ],
+            'simple with name' => [
+                [
                     'from' => 'Test <test@test.com>',
                     'to' => 'Test <test@test.com>',
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => 'Test <test@test.com>',
-                    'to' => array('Test <test@test.com>'),
+                    'to' => ['Test <test@test.com>'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'extended' => array(
-                array(
-                    'from' => array(
+                ]
+            ],
+            'extended' => [
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
+                    ],
+                    'to' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
-                    'from' => array(
+                ],
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
-                        array(
+                    ],
+                    'to' => [
+                        [
                             'name' => 'Test',
                             'email' => 'test@test.com'
-                        )
-                    ),
+                        ]
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'multiple to' => array(
-                array(
-                    'from' => array(
+                ]
+            ],
+            'multiple to' => [
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
-                        array(
+                    ],
+                    'to' => [
+                        [
                             'name' => 'Test',
                             'email' => 'test@test.com'
-                        ),
+                        ],
                         'test@test.com',
                         'Test <test@test.com>'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
-                    'from' => array(
+                ],
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
-                        array(
+                    ],
+                    'to' => [
+                        [
                             'name' => 'Test',
                             'email' => 'test@test.com'
-                        ),
+                        ],
                         'test@test.com',
                         'Test <test@test.com>'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     /**
@@ -254,50 +247,41 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute($options, $expected)
     {
-        $context = array();
-        $this->contextAccessor->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnArgument(1));
-        $this->entityNameResolver->expects($this->any())
+        $context = [];
+        $this->contextAccessor->method('getValue')->willReturnArgument(1);
+        $this->entityNameResolver->expects(static::any())
             ->method('getName')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        return '_Formatted';
-                    }
-                )
+            ->willReturnCallback(
+                function () {
+                    return '_Formatted';
+                }
             );
 
         $emailEntity = new EmailEntity();
         $emailUserEntity = $this->createMock(EmailUser::class);
-        $emailUserEntity->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($emailEntity);
+        $emailUserEntity->method('getEmail')->willReturn($emailEntity);
 
         $emailOrigin = new TestEmailOrigin();
-        $this->emailOriginHelper->expects($this->once())
+        $this->emailOriginHelper->expects(static::once())
             ->method('getEmailOrigin')
             ->with($expected['from'], null)
             ->willReturn($emailOrigin);
 
-        $self = $this;
-        $this->emailProcessor->expects($this->once())
+        $this->emailProcessor->expects(static::once())
             ->method('process')
-            ->with($this->isInstanceOf(Email::class), $emailOrigin)
-            ->will(
-                $this->returnCallback(
-                    function (Email $model) use ($emailUserEntity, $expected, $self) {
-                        $self->assertEquals($expected['body'], $model->getBody());
-                        $self->assertEquals($expected['subject'], $model->getSubject());
-                        $self->assertEquals($expected['from'], $model->getFrom());
-                        $self->assertEquals($expected['to'], $model->getTo());
+            ->with(static::isInstanceOf(Email::class), $emailOrigin)
+            ->willReturnCallback(
+                function (Email $model) use ($emailUserEntity, $expected) {
+                    static::assertEquals($expected['body'], $model->getBody());
+                    static::assertEquals($expected['subject'], $model->getSubject());
+                    static::assertEquals($expected['from'], $model->getFrom());
+                    static::assertEquals($expected['to'], $model->getTo());
 
-                        return $emailUserEntity;
-                    }
-                )
+                    return $emailUserEntity;
+                }
             );
         if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
+            $this->contextAccessor->expects(static::once())
                 ->method('setValue')
                 ->with($context, $options['attribute'], $emailEntity);
         }
@@ -311,111 +295,108 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
      */
     public function executeOptionsDataProvider()
     {
-        $nameMock = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\FirstNameInterface')
-            ->getMock();
-        $nameMock->expects($this->any())
-            ->method('getFirstName')
-            ->will($this->returnValue('NAME'));
+        $nameMock = $this->getMockBuilder(FirstNameInterface::class)->getMock();
+        $nameMock->method('getFirstName')->willReturn('NAME');
 
-        return array(
-            'simple' => array(
-                array(
+        return [
+            'simple' => [
+                [
                     'from' => 'test@test.com',
                     'to' => 'test@test.com',
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => 'test@test.com',
-                    'to' => array('test@test.com'),
+                    'to' => ['test@test.com'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'simple with name' => array(
-                array(
+                ]
+            ],
+            'simple with name' => [
+                [
                     'from' => '"Test" <test@test.com>',
                     'to' => '"Test" <test@test.com>',
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => '"Test" <test@test.com>',
-                    'to' => array('"Test" <test@test.com>'),
+                    'to' => ['"Test" <test@test.com>'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'extended' => array(
-                array(
-                    'from' => array(
+                ]
+            ],
+            'extended' => [
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
+                    ],
+                    'to' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => '"Test" <test@test.com>',
-                    'to' => array('"Test" <test@test.com>'),
+                    'to' => ['"Test" <test@test.com>'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'extended with name formatting' => array(
-                array(
-                    'from' => array(
+                ]
+            ],
+            'extended with name formatting' => [
+                [
+                    'from' => [
                         'name' => $nameMock,
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
+                    ],
+                    'to' => [
                         'name' => $nameMock,
                         'email' => 'test@test.com'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                ),
-                array(
+                ],
+                [
                     'from' => '"_Formatted" <test@test.com>',
-                    'to' => array('"_Formatted" <test@test.com>'),
+                    'to' => ['"_Formatted" <test@test.com>'],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            ),
-            'multiple to' => array(
-                array(
-                    'from' => array(
+                ]
+            ],
+            'multiple to' => [
+                [
+                    'from' => [
                         'name' => 'Test',
                         'email' => 'test@test.com'
-                    ),
-                    'to' => array(
-                        array(
+                    ],
+                    'to' => [
+                        [
                             'name' => 'Test',
                             'email' => 'test@test.com'
-                        ),
+                        ],
                         'test@test.com',
                         '"Test" <test@test.com>'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test',
                     'attribute' => 'attr'
-                ),
-                array(
+                ],
+                [
                     'from' => '"Test" <test@test.com>',
-                    'to' => array(
+                    'to' => [
                         '"Test" <test@test.com>',
                         'test@test.com',
                         '"Test" <test@test.com>'
-                    ),
+                    ],
                     'subject' => 'test',
                     'body' => 'test'
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     public function testExecuteWithProcessException()
@@ -429,35 +410,29 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
             'entity' => new \stdClass(),
         ];
 
-        $context = array();
-        $this->contextAccessor->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnArgument(1));
-        $this->entityNameResolver->expects($this->any())
+        $context = [];
+        $this->contextAccessor->method('getValue')->willReturnArgument(1);
+        $this->entityNameResolver->expects(static::any())
             ->method('getName')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        return '_Formatted';
-                    }
-                )
+            ->willReturnCallback(
+                function () {
+                    return '_Formatted';
+                }
             );
 
-        $emailUserEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\EmailUser')
+        $emailUserEntity = $this->getMockBuilder(EmailUser::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEmail'])
+            ->onlyMethods(['getEmail'])
             ->getMock();
-        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
-        $emailUserEntity->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($emailEntity);
+        $emailEntity = $this->createMock(EmailEntity::class);
+        $emailUserEntity->method('getEmail')->willReturn($emailEntity);
 
-        $this->emailProcessor->expects($this->once())
+        $this->emailProcessor->expects(static::once())
             ->method('process')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
+            ->with(static::isInstanceOf(Email::class))
             ->willThrowException(new \Swift_SwiftException('The email was not delivered.'));
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(static::once())
             ->method('error')
             ->with('Workflow send email action.');
 

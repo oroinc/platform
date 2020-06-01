@@ -36,7 +36,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionCronTrigger */
     protected $trigger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(WorkflowItemRepository::class)
             ->disableOriginalConstructor()

@@ -16,7 +16,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->packages = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()
@@ -84,24 +84,22 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->provider->getUrl(null));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected a string value for the path, got "array".
-     */
     public function testAddErrorForInvalidPathType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a string value for the path, got "array".');
+
         $this->packages->expects($this->never())
             ->method('getUrl');
 
         $this->provider->getUrl(['test']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected null or a string value for the package name, got "array".
-     */
     public function testAddErrorForInvalidPackageNameType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected null or a string value for the package name, got "array".');
+
         $this->packages->expects($this->never())
             ->method('getUrl');
 

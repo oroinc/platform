@@ -30,7 +30,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $businessUnitManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
         $this->configManager = $this->createMock(ConfigManager::class);

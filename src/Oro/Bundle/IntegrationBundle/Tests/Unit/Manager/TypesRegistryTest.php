@@ -24,7 +24,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var TransportInterface */
     protected $transport2;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->transport1 = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\TransportInterface')
             ->disableOriginalConstructor()->getMock();
@@ -78,11 +78,9 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetTransportType1()
     {
+        $this->expectException(\LogicException::class);
         $this->assertEquals(
             $this->transport1,
             $this->typesRegistry->getTransportType('error1', 'error2')

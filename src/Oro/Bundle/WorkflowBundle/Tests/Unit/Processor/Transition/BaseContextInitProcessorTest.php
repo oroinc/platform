@@ -27,7 +27,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var BaseContextInitProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->processor = new BaseContextInitProcessor($this->workflowManager);

@@ -97,77 +97,69 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('route:' . $routeName, $formAction->toString());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The path must be a string, but "integer" given.
-     */
     public function testCreateByPathShouldAcceptStringOnly()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The path must be a string, but "integer" given.');
+
         FormAction::createByPath(123);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The path must not be empty.
-     */
     public function testCreateByPathShouldNotAcceptEmptyString()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The path must not be empty.');
+
         FormAction::createByPath('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The path must be a string, but "NULL" given.
-     */
     public function testCreateByPathShouldNotAcceptNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The path must be a string, but "NULL" given.');
+
         FormAction::createByPath(null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The route name must be a string, but "integer" given.
-     */
     public function testCreateByRouteShouldAcceptStringOnly()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The route name must be a string, but "integer" given.');
+
         FormAction::createByRoute(123);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The route name must not be empty.
-     */
     public function testCreateByRouteShouldNotAcceptEmptyString()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The route name must not be empty.');
+
         FormAction::createByRoute('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The route name must be a string, but "NULL" given.
-     */
     public function testCreateByRouteShouldNotAcceptNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The route name must be a string, but "NULL" given.');
+
         FormAction::createByRoute(null);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessSetDenied()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $formAction = FormAction::createByPath('test');
 
         $formAction[FormAction::PATH] = 'new';
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessUnsetDenied()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $formAction = FormAction::createByPath('test');
 
         unset($formAction[FormAction::PATH]);

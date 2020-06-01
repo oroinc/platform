@@ -12,7 +12,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridConfiguration */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = DatagridConfiguration::create([]);
     }
@@ -28,12 +28,11 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage The expected data grid source type is "orm". Actual source type is "another".
-     */
     public function testGetOrmQueryForNotOrmDatasourceType()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('The expected data grid source type is "orm". Actual source type is "another".');
+
         $this->configuration->setDatasourceType('another');
         $this->configuration->getOrmQuery();
     }
@@ -223,21 +222,19 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configArray);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage DatagridConfiguration::addColumn: name should not be empty
-     */
     public function testAddColumnWithoutName()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
+
         $this->configuration->addColumn(null, []);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage DatagridConfiguration::updateLabel: name should not be empty
-     */
     public function testUpdateLabelWithoutName()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
+
         $this->configuration->updateLabel(null, []);
     }
 

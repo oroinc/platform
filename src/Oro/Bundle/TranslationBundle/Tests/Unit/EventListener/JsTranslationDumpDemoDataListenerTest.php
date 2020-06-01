@@ -27,7 +27,7 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsTranslationDumper = $this->createMock(JsTranslationDumper::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);

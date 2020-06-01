@@ -7,16 +7,16 @@ use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -39,7 +39,7 @@ class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
                         'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
-                    'constraints' => [ new NotBlank() ]
+                    'constraints' => [ new HtmlNotBlank() ]
                 ]
             )
             ->will($this->returnSelf());

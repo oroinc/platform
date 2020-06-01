@@ -27,7 +27,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectNormalizer */
     private $objectNormalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())

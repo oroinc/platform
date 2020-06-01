@@ -11,12 +11,12 @@ class SegmentTypeTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentType */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new SegmentType(self::TEST_NAME);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

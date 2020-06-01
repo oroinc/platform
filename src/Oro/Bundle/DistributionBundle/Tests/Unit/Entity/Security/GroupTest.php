@@ -25,7 +25,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
     {
         $group = new Group();
         $roles = $group->getRoles();
-        $this->assertInternalType('array', $roles);
+        $this->assertIsArray($roles);
         $this->assertCount(0, $roles);
     }
 

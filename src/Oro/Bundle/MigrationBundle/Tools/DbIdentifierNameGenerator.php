@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\MigrationBundle\Tools;
 
+/**
+ * Provides logic to generate column/table/index names for extend entities.
+ */
 class DbIdentifierNameGenerator
 {
+    /** @var int */
+    private const MAX_TABLE_FIELD_NAME_SIZE = 30; // this value is compatible with previous versions of OroPlatform
+
     /**
      * Gets the max size of an identifier
      *
      * @return int
      */
-    public function getMaxIdentifierSize()
+    public function getMaxIdentifierSize(): int
     {
-        return 30;
+        return 63; // maximum allowed column length of the DB engine
     }
 
     /**
@@ -92,7 +98,7 @@ class DbIdentifierNameGenerator
         if (!$forceHash) {
             $columns = implode('_', $columnNames);
             $tables  = implode('_', $tableNames);
-            if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= $this->getMaxIdentifierSize()) {
+            if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= self::MAX_TABLE_FIELD_NAME_SIZE) {
                 $result = $prefix . '_' . $tables . '_' . $columns;
 
                 return $upperCase === true ? strtoupper($result) : strtolower($result);
@@ -117,7 +123,7 @@ class DbIdentifierNameGenerator
                     )
                 )
             );
-        $result = substr($result, 0, $this->getMaxIdentifierSize());
+        $result = substr($result, 0, self::MAX_TABLE_FIELD_NAME_SIZE);
 
         return $upperCase === false ? strtolower($result) : strtoupper($result);
     }

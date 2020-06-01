@@ -11,52 +11,39 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\AbstractTestMigrationExecuto
 
 class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
 {
-    /** @var ExtendMigrationExecutor */
-    protected $executor;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
-
-    protected function setUp()
+    public function testExtendMigrationExecutor()
     {
-        parent::setUp();
-
         /** @var ExtendOptionsManager $extendOptionManager */
-        $extendOptionManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager')
+        $extendOptionManager = $this->getMockBuilder(ExtendOptionsManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
+        $executor = new class($this->queryExecutor, $this->cacheManager) extends ExtendMigrationExecutor {
+            public function xgetExtendOptionsManager(): ExtendOptionsManager
+            {
+                return $this->extendOptionsManager;
+            }
+        };
+        $executor->setLogger($this->logger);
+        $executor->setNameGenerator(new ExtendDbIdentifierNameGenerator());
 
-        $this->executor = new ExtendMigrationExecutor($this->queryExecutor, $this->cacheManager);
-        $this->executor->setLogger($this->logger);
-        $this->executor->setNameGenerator($this->nameGenerator);
-        $this->executor->setExtendOptionsManager($extendOptionManager);
-    }
-
-    public function testExtendMigrationExecutor()
-    {
-        $this->assertObjectHasAttribute('extendOptionsManager', $this->executor);
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager',
-            'extendOptionsManager',
-            $this->executor
-        );
+        $executor->setExtendOptionsManager($extendOptionManager);
+        static::assertSame($extendOptionManager, $executor->xgetExtendOptionsManager());
 
         $migration = new Test1BundleMigration10();
         $migrations = [
             new MigrationState($migration)
         ];
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(static::once())
             ->method('executeQuery')
             ->with('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
 
-        $this->executor->executeUp($migrations);
+        $executor->executeUp($migrations);
         $messages = $this->logger->getMessages();
-        $this->assertEquals(
+        static::assertEquals(
             [
-                '> ' . get_class($migration),
+                '> ' . \get_class($migration),
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
             ],
             $messages

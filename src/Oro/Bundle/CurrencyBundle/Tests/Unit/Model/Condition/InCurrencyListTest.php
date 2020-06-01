@@ -14,7 +14,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
     /** @var InCurrencyList */
     private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new InCurrencyList(new CurrencyListProviderStub());
     }
@@ -46,7 +46,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
 
             $this->fail('Right now we only support multycurrency class');
         } catch (InvalidArgumentException $e) {
-            $this->assertContains('Entity must be object of', $e->getMessage());
+            static::assertStringContainsString('Entity must be object of', $e->getMessage());
         }
     }
 
@@ -56,14 +56,14 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
             $this->condition->initialize(['test' => 'foo']);
             $this->fail('Exception should be thrown if we have no entity option');
         } catch (InvalidArgumentException $e) {
-            $this->assertContains('Option "entity" must be set', $e->getMessage());
+            static::assertStringContainsString('Option "entity" must be set', $e->getMessage());
         }
 
         try {
             $this->condition->initialize([]);
             $this->fail('Exception should be thrown if we have no options at all');
         } catch (InvalidArgumentException $e) {
-            $this->assertContains('Options must have 1 element', $e->getMessage());
+            static::assertStringContainsString('Options must have 1 element', $e->getMessage());
         }
     }
 

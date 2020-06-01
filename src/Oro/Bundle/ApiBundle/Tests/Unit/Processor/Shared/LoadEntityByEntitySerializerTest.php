@@ -26,7 +26,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
     /** @var LoadEntityByEntitySerializer */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -111,12 +111,11 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The result must have one or zero items.
-     */
     public function testProcessWhenReturnedSeveralEntities()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The result must have one or zero items.');
+
         $entityClass = Group::class;
 
         $sharedData = new ParameterBag();
@@ -205,12 +204,11 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to the entity.
-     */
     public function testProcessWhenNoAccessToEntity()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to the entity.');
+
         $entityClass = Group::class;
         $entityAlias = 'test';
 

@@ -21,7 +21,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
     private $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver = $this->createMock(ResolverInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

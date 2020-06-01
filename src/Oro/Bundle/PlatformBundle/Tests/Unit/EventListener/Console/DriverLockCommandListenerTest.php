@@ -27,7 +27,7 @@ class DriverLockCommandListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcherInterface = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

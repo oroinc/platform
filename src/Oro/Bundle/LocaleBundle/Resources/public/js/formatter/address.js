@@ -52,7 +52,7 @@ define(['jquery', '../locale-settings', './name'
             let addressLines = formatted
                 .split('\\n');
             addressLines = addressLines.filter(function(element) {
-                return $.trim(element) !== '';
+                return element.trim() !== '';
             });
             if (typeof newLine === 'function') {
                 for (let i = 0; i < addressLines.length; i++) {

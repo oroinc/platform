@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
@@ -35,7 +36,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
 
@@ -116,136 +117,94 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->encryptor);
     }
 
-    /**
-     * @param array      $formData
-     * @param array|bool $expectedViewData
-     * @param array      $expectedModelData
-     *
-     * @dataProvider setDataProvider
-     */
-    public function testBindValidData($formData, $expectedViewData, $expectedModelData)
+    public function testBindValidDataShouldHaveOnlyAccountTypeField()
     {
         $form = $this->factory->create(ChoiceAccountType::class);
-        if ($expectedViewData) {
-            $form->submit($formData);
-            foreach ($expectedViewData as $name => $value) {
-                $this->assertEquals($value, $form->get($name)->getData());
-            }
 
-            $entity = $form->getData();
-            foreach ($expectedModelData as $name => $value) {
-                if ($name === 'userEmailOrigin') {
-                    $userEmailOrigin = $this->readAttribute($entity, $name);
+        $form->submit([
+            'accountType' => '',
+            'userEmailOrigin' => [
+                'user' => 'test',
+                'imapHost' => '',
+                'imapPort' => '',
+                'imapEncryption' => '',
+                'accessTokenExpiresAt' => '',
+            ],
+        ]);
 
-                    if ($userEmailOrigin) {
-                        $password = $this->encryptor->decryptData($userEmailOrigin->getPassword());
-                        $userEmailOrigin->setPassword($password);
-                    }
+        static::assertEquals('', $form->get('accountType')->getData());
 
-                    $this->assertAttributeEquals($userEmailOrigin, $name, $entity);
-                } else {
-                    $this->assertAttributeEquals($value, $name, $entity);
-                }
-            }
-        } else {
-            $form->submit($formData);
-            $this->assertNull($form->getData());
-        }
+        /** @var AccountTypeModel $entity */
+        $entity = $form->getData();
+
+        static::assertNull($entity->getUserEmailOrigin());
+        static::assertSame('', $entity->getAccountType());
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProvider()
+    public function testBindValidDataShouldHaveAccountTypeAdnConnectionGmailTypeFields()
     {
-        $accessTokenExpiresAt = new \DateTime();
+        $now = new \DateTime();
+        $form = $this->factory->create(ChoiceAccountType::class);
 
-        return [
-            'should have only accountType field' => [
-                [
-                    'accountType' => '',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => '',
-                    ],
-                ],
-                [
-                    'accountType' => ''
-                ],
-                [
-                    'accountType' => '',
-                    'userEmailOrigin' => null
-                ],
+        $form->submit([
+            'accountType' => 'gmail',
+            'userEmailOrigin' => [
+                'user' => 'test',
+                'imapHost' => '',
+                'imapPort' => '',
+                'imapEncryption' => '',
+                'accessTokenExpiresAt' => $now,
+                'accessToken' => 'token',
+                'googleAuthCode' => 'googleAuthCode'
             ],
-            'should have accountType field and ConnectionGmailType' => [
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'accessToken' => 'token',
-                        'googleAuthCode' => 'googleAuthCode'
-                    ],
-                ],
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'googleAuthCode' => 'googleAuthCode',
-                        'accessToken' => 'token',
-                    ])
-                ],
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'googleAuthCode' => 'googleAuthCode',
-                        'accessToken' => 'token'
-                    ])
-                ],
+        ]);
+
+        static::assertEquals('gmail', $form->get('accountType')->getData());
+        static::assertEquals($this->getUserEmailOrigin([
+            'user' => 'test',
+            'accessTokenExpiresAt' => $now,
+            'googleAuthCode' => 'googleAuthCode',
+            'accessToken' => 'token',
+        ]), $form->get('userEmailOrigin')->getData());
+
+        /** @var AccountTypeModel $entity */
+        $entity = $form->getData();
+
+        static::assertInstanceOf(UserEmailOrigin::class, $entity->getUserEmailOrigin());
+        static::assertSame('gmail', $entity->getAccountType());
+    }
+
+    public function testBindValidDataShouldHaveAccountTypeAndConnectionTypeFields()
+    {
+        $formData = [
+            'accountType' => 'other',
+            'userEmailOrigin' => [
+                'user' => 'test',
+                'imapHost' => '',
+                'imapPort' => '',
+                'imapEncryption' => '',
+                'accessTokenExpiresAt' => new \DateTime(),
+                'accessToken' => '',
+                'googleAuthCode' => 'googleAuthCode',
+                'password' => '111'
             ],
-            'should have accountType field and ConnectionType' => [
-                [
-                    'accountType' => 'other',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'accessToken' => '',
-                        'googleAuthCode' => 'googleAuthCode',
-                        'password' => '111'
-                    ],
-                ],
-                [
-                    'accountType' => 'other',
-                ],
-                [
-                    'accountType' => 'other',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => null,
-                        'googleAuthCode' => null,
-                        'password' => '111'
-                    ])
-                ],
-            ]
         ];
+        $form = $this->factory->create(ChoiceAccountType::class);
+        $form->submit($formData);
+
+        static::assertEquals('other', $form->get('accountType')->getData());
+
+        /** @var AccountTypeModel $entity */
+        $entity = $form->getData();
+
+        static::assertInstanceOf(UserEmailOrigin::class, $entity->getUserEmailOrigin());
+        static::assertSame('other', $entity->getAccountType());
     }
 
     /**

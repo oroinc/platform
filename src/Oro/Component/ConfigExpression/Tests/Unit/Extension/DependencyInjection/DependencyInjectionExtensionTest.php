@@ -15,7 +15,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  array */
     protected $serviceIds;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceIds = ['test' => 'expression_service'];
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
@@ -43,12 +43,11 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expr, $this->extension->getExpression('test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The expression "unknown" is not registered with the service container.
-     */
     public function testGetUnknownExpression()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The expression "unknown" is not registered with the service container.');
+
         $this->extension->getExpression('unknown');
     }
 

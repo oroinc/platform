@@ -14,12 +14,12 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
     /** @var Theme */
     protected $theme;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->theme = new Theme('test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->theme);
     }

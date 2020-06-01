@@ -42,7 +42,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var Integration */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
         $requestStack = new RequestStack();

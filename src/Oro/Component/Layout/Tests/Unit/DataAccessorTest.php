@@ -18,7 +18,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var DataAccessor */
     protected $dataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->context  = new LayoutContext();
@@ -99,12 +99,11 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load the data provider "foo".
-     */
     public function testGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load the data provider "foo".');
+
         $name = 'foo';
         $this->context->resolve();
 
@@ -116,12 +115,11 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->dataAccessor->get($name);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load the data provider "foo".
-     */
     public function testArrayAccessGetFromContextThrowsExceptionIfContextDataDoesNotExist()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load the data provider "foo".');
+
         $name = 'foo';
         $this->context->resolve();
 
@@ -180,21 +178,19 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(isset($this->dataAccessor[$name]));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessSetThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->dataAccessor['foo'] = 'bar';
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testArrayAccessRemoveThrowsException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         unset($this->dataAccessor['foo']);
     }
 }

@@ -16,7 +16,7 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PlatformExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->versionHelper = $this->getMockBuilder(VersionHelper::class)
             ->disableOriginalConstructor()

@@ -8,12 +8,11 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
 
 class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Undefined data transformer service "data_transformer_service_id".
-     */
     public function testUndefinedDataTransformerService()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Undefined data transformer service "data_transformer_service_id".');
+
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -52,14 +51,15 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unexpected type of data transformer "stdClass". Expected "Oro\Component\EntitySerializer\DataTransformerInterface", "Symfony\Component\Form\DataTransformerInterface" or "callable".
-     */
-    // @codingStandardsIgnoreEnd
     public function testInvalidDataTransformerType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Unexpected type of data transformer "stdClass". Expected "%s", "%s" or "callable".',
+            \Oro\Component\EntitySerializer\DataTransformerInterface::class,
+            \Symfony\Component\Form\DataTransformerInterface::class
+        ));
+
         $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);

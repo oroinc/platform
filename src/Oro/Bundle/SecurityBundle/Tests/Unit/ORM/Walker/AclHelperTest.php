@@ -30,7 +30,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $accessRuleExecutor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $configuration = $this->createMock(Configuration::class);

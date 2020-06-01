@@ -22,7 +22,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
     /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettingsModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->notificationSettingsModel = $this->createMock(NotificationSettings::class);
         $this->emailTemplateManager = $this->createMock(EmailTemplateManager::class);

@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
@@ -56,7 +56,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ImportStrategyHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
@@ -82,12 +82,11 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->setConfigProvider($this->extendConfigProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Basic and imported entities must be instances of the same class
-     */
     public function testImportEntityException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Basic and imported entities must be instances of the same class');
+
         $basicEntity = new \stdClass();
         $importedEntity = new \DateTime();
         $excludedProperties = array();
@@ -95,12 +94,11 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Can't find entity manager for stdClass
-     */
     public function testGetEntityManagerWithException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage("Can't find entity manager for stdClass");
+
         $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with('stdClass')
@@ -779,8 +777,10 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCurrentRowNumberWhenBatchContextInterface(): void
     {
-        /** @var ContextInterface|BatchContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->getMockBuilder([ContextInterface::class, BatchContextInterface::class])->getMock();
+        /** @var Context|\PHPUnit\Framework\MockObject\MockObject $context */
+        $context = $this->getMockBuilder(Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $context
             ->expects($this->once())
             ->method('getReadOffset')

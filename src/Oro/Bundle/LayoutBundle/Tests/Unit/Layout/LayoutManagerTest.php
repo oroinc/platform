@@ -25,7 +25,7 @@ class LayoutManagerTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
     private $layoutDataCollector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = $this->createMock(LayoutBuilderInterface::class);
         $this->contextHolder = $this->createMock(LayoutContextHolder::class);

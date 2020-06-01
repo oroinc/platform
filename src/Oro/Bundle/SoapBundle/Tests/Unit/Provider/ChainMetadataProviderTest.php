@@ -2,59 +2,73 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider;
-use Oro\Bundle\SoapBundle\Tests\Unit\Provider\Stub\StubMetadataProvider;
+use Oro\Bundle\SoapBundle\Provider\MetadataProviderInterface;
 
 class ChainMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructionWithoutProviders()
     {
-        $this->createChain();
+        $chain = new ChainMetadataProvider([]);
+
+        $this->assertEquals([], $chain->getMetadataFor($this->createMock(FormAwareInterface::class)));
     }
 
-    public function testPassProviderThroughConstuctor()
+    public function testPassProviderThroughConstructor()
     {
-        $provider = $this->createMock('Oro\Bundle\SoapBundle\Provider\MetadataProviderInterface');
-        $chain    = $this->createChain([$provider]);
-        $this->assertAttributeContains($provider, 'providers', $chain);
+        $object = $this->createMock(FormAwareInterface::class);
+
+        $provider = $this->createMock(MetadataProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($object)
+            ->willReturn(['something']);
+
+        $chain = new ChainMetadataProvider([$provider]);
+
+        $this->assertEquals(['something'], $chain->getMetadataFor($object));
     }
 
     public function testPassProvidersThoughAdder()
     {
-        $provider = $this->createMock('Oro\Bundle\SoapBundle\Provider\MetadataProviderInterface');
-        $chain    = $this->createChain();
+        $object = $this->createMock(FormAwareInterface::class);
+        $provider = $this->createMock(MetadataProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($object)
+            ->willReturn(['something']);
+
+        $chain = new ChainMetadataProvider();
         $chain->addProvider($provider);
 
-        $this->assertAttributeContains($provider, 'providers', $chain);
+        $this->assertEquals(['something'], $chain->getMetadataFor($object));
     }
 
     public function testGetMetadata()
     {
-        $metadataFromMockProvider = ['phpType' => '\stdClass'];
-        $metadataFromStubProvider = ['label' => 'testLabel'];
+        $metadata1 = ['phpType' => 'something'];
+        $metadata2 = ['label' => 'testLabel'];
 
-        $object = new \stdClass();
+        $object = $this->createMock(FormAwareInterface::class);
 
-        $provider = $this->createMock('Oro\Bundle\SoapBundle\Provider\MetadataProviderInterface');
-        $provider->expects($this->once())->method('getMetadataFor')->with($this->equalTo($object))
-            ->willReturn($metadataFromMockProvider);
-        $provider2 = new StubMetadataProvider($metadataFromStubProvider);
+        $provider1 = $this->createMock(MetadataProviderInterface::class);
+        $provider1->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($object)
+            ->willReturn($metadata1);
 
-        $chain = $this->createChain([$provider]);
+        $provider2 = $this->createMock(MetadataProviderInterface::class);
+        $provider2->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($object)
+            ->willReturn($metadata2);
+
+        $chain = new ChainMetadataProvider([$provider1]);
         $chain->addProvider($provider2);
-
         $result = $chain->getMetadataFor($object);
-        $this->assertInternalType('array', $result);
-        $this->assertEquals($metadataFromStubProvider + $metadataFromMockProvider, $result);
-    }
 
-    /**
-     * @param array $providers
-     *
-     * @return ChainMetadataProvider
-     */
-    protected function createChain($providers = [])
-    {
-        return new ChainMetadataProvider($providers);
+        $this->assertIsArray($result);
+        $this->assertEquals($metadata2 + $metadata1, $result);
     }
 }

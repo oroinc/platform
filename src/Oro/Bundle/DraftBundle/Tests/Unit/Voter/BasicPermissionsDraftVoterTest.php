@@ -42,7 +42,7 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
     /** @var BasicPermissionsDraftVoter */
     private $voter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessor::class);
         $this->tokenAccessor

@@ -34,7 +34,7 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mailer = $this->createMock(\Swift_Mailer::class);
         $this->processor = $this->createMock(Processor::class);

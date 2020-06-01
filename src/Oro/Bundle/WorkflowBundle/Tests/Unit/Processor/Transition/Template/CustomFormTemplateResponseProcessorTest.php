@@ -31,7 +31,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     /** @var CustomFormTemplateResponseProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);
         $this->templateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);

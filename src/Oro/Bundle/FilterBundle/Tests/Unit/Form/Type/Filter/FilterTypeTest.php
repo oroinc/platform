@@ -15,7 +15,7 @@ class FilterTypeTest extends AbstractTypeTestCase
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->type = new FilterType($translator);

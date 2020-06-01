@@ -41,7 +41,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateHandlerFacade */
     private $facade;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->session = $this->createMock(Session::class);

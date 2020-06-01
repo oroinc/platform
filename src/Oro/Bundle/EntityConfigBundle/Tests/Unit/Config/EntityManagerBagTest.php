@@ -12,7 +12,7 @@ class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerBag */
     protected $entityManagerBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Tests\Functional\Entity\Repository;
+namespace Oro\Bundle\NotificationBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
@@ -16,7 +16,7 @@ class RecipientListRepositoryTest extends WebTestCase
      */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadRecipientListData::class]);
@@ -222,7 +222,7 @@ class RecipientListRepositoryTest extends WebTestCase
     {
         self::assertCount(\count($expectedRecipients), $actualRecipients);
         foreach ($expectedRecipients as $recipient) {
-            self::assertContains($recipient, $actualRecipients, '', false, false);
+            static::assertContainsEquals($recipient, $actualRecipients);
         }
     }
 

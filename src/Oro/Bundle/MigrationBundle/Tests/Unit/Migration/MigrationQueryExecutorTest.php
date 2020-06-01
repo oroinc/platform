@@ -15,7 +15,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var MigrationQueryExecutor */
     protected $executor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()

@@ -30,7 +30,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
     /** @var InstallerEvent */
     protected $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->command = $this->createMock(Command::class);
         $this->input = $this->createMock(InputInterface::class);

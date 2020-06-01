@@ -33,7 +33,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->cache = $this->getMockBuilder(CacheProvider::class)

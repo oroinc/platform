@@ -23,7 +23,7 @@ class ExportTypeTest extends FormIntegrationTestCase
      */
     protected $exportType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
         $this->exportType = new ExportType($this->processorRegistry);

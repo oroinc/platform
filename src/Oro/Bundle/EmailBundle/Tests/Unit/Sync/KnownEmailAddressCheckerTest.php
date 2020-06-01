@@ -32,7 +32,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailAddressRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger                 = $this->createMock('Psr\Log\LoggerInterface');
         $this->em                     = $this->getMockBuilder('Doctrine\ORM\EntityManager')

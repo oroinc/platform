@@ -12,12 +12,12 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     /** @var Parameter */
     protected $parameter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parameter = new Parameter('test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroupDefinition);
     }
@@ -48,7 +48,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->parameter->hasDefault());
         $this->assertFalse($this->parameter->hasTypeHint());
 
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'Parameter `test` has no default value set. ' .
             'Please check `hasDefault() === true` or `isRequired() === false` before default value retrieval'

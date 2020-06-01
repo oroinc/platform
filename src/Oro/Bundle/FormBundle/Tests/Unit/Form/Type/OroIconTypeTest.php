@@ -13,7 +13,7 @@ class OroIconTypeTest extends FormIntegrationTestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new OroIconType($this->createMock('Symfony\Component\HttpKernel\KernelInterface'));
     }

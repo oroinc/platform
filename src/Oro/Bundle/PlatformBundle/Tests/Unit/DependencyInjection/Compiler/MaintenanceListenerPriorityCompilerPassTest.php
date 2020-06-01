@@ -14,7 +14,7 @@ class MaintenanceListenerPriorityCompilerPassTest extends \PHPUnit\Framework\Tes
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new MaintenanceListenerPriorityCompilerPass();
         $this->container = $this->createMock(ContainerBuilder::class);

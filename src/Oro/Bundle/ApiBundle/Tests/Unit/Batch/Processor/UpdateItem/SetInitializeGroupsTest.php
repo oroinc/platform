@@ -12,28 +12,26 @@ class SetInitializeGroupsTest extends BatchUpdateItemProcessorTestCase
     /** @var SetInitializeGroups */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->processor = new SetInitializeGroups();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target action is not defined.
-     */
     public function testProcessWithoutTargetAction()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target action is not defined.');
+
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The target context is not defined.
-     */
     public function testProcessWithoutTargetContext()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The target context is not defined.');
+
         $this->context->setTargetAction('test');
         $this->processor->process($this->context);
     }

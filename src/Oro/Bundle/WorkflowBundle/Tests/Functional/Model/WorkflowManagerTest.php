@@ -23,7 +23,7 @@ class WorkflowManagerTest extends WorkflowTestCase
     /** @var WorkflowManager */
     protected $systemWorkflowManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
         $this->entityManger = $this->getEntityManager(WorkflowAwareEntity::class);

@@ -22,7 +22,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('DachboardConfigurationProvider');
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -152,12 +152,11 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Can't find configuration for: unknown
-     */
     public function testGetWidgetConfigForUnknownWidget()
     {
+        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for: unknown");
+
         $this->configurationProvider->getWidgetConfig('unknown');
     }
 
@@ -166,12 +165,11 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Can't find configuration for: unknown
-     */
     public function testGetDashboardConfigForUnknownDashboard()
     {
+        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for: unknown");
+
         $this->configurationProvider->getDashboardConfig('unknown');
     }
 }

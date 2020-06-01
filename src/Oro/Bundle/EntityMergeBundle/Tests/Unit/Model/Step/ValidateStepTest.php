@@ -22,7 +22,7 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraintViolation;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this
             ->createMock(ValidatorInterface::class);
@@ -47,11 +47,9 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
         $this->step->run($data);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\ValidationException
-     */
     public function testFail()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\ValidationException::class);
         $data = $this->createEntityData();
 
         $this->constraintViolation

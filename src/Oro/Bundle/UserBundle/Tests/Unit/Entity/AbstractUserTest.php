@@ -87,12 +87,11 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($roles->toArray(), $user->getRoles());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\Role or an array
-     */
     public function testSetRolesThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of Symfony\Component\Security\Core\Role\Role or an array');
+
         $user = $this->getUser();
         $user->setRoles('roles');
     }
@@ -117,12 +116,11 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->hasRole($role));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\Role or a string
-     */
     public function testHasRoleThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of Symfony\Component\Security\Core\Role\Role or a string');
+
         $user = $this->getUser();
         $user->hasRole(new \stdClass());
     }
@@ -149,12 +147,11 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($user->hasRole($role));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\Role or a string
-     */
     public function testRemoveRoleThrowsInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of Symfony\Component\Security\Core\Role\Role or a string');
+
         $user = $this->getUser();
         $user->removeRole(new \stdClass());
     }

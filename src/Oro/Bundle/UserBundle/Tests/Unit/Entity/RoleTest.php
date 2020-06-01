@@ -29,6 +29,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertStringStartsWith('ROLE_FOO', $role->getRole());
         $this->assertEquals(Role::PREFIX_ROLE, $role->getPrefix());
         $this->assertStringStartsWith(Role::PREFIX_ROLE, (string)$role);
+        $this->assertMatchesRegularExpression('/_[[:upper:]\d]{13}/', substr($role->getRole(), strrpos($role, '_')));
     }
 
     public function testLabel()
@@ -74,7 +75,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $secondRole->unserialize($serializedString);
         /** @var Organization $unserializedOrganization */
         $unserializedOrganization = $secondRole->getOrganization();
-        
+
         $this->assertInstanceOf(Organization::class, $unserializedOrganization);
         $this->assertEquals($isEnabled, $unserializedOrganization->isEnabled());
         $this->assertEquals($name, $unserializedOrganization->getName());
@@ -94,6 +95,6 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $secondRole->unserialize($serializedString);
 
         $this->assertEquals($label, $secondRole->getLabel());
-        $this->assertContains($role, $secondRole->getRole());
+        static::assertStringContainsString($role, $secondRole->getRole());
     }
 }

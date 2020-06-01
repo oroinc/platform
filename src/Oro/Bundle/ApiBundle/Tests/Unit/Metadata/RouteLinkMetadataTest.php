@@ -14,7 +14,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
     }
@@ -165,12 +165,11 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($url, $linkMetadata->getHref($dataAccessor));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException
-     * @expectedExceptionMessage Cannot build URL for a link. Reason: an error
-     */
     public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndInvalidParameterExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
+
         $exception = new InvalidParameterException('an error');
 
         $linkMetadata = new RouteLinkMetadata(
@@ -204,12 +203,11 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException
-     * @expectedExceptionMessage Cannot build URL for a link. Reason: an error
-     */
     public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndMissingMandatoryParametersExceptionIsThrown()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
+
         $exception = new MissingMandatoryParametersException('an error');
 
         $linkMetadata = new RouteLinkMetadata(
@@ -243,11 +241,9 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetHrefWhenUnhandledExceptionIsThrown()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $exception = new \InvalidArgumentException('an error');
 
         $linkMetadata = new RouteLinkMetadata($this->urlGenerator, 'routeName');

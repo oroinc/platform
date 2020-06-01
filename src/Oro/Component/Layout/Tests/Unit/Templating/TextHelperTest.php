@@ -12,7 +12,7 @@ class TextHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TextHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $this->translator->expects($this->any())

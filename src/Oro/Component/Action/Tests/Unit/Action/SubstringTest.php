@@ -14,14 +14,17 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
     const ATTRIBUTE_PATH = 'attribute';
     const TEST_STRING = 'some test string';
 
-    /**
-     * @var Substring
-     */
+    /** @var Substring */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->action = new Substring(new ContextAccessor());
+        $this->action = new class(new ContextAccessor()) extends Substring {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -38,7 +41,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     /**
@@ -112,7 +115,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $attributePath = self::ATTRIBUTE_PATH;
-        $this->assertEquals($expected, $context->$attributePath);
+        static::assertEquals($expected, $context->$attributePath);
     }
 
     /**

@@ -20,7 +20,7 @@ class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var CustomFormProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formHandlerRegistry = $this->createMock(FormHandlerRegistry::class);
         $this->processor = new CustomFormProcessor($this->formHandlerRegistry);

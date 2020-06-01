@@ -17,7 +17,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
      */
     private $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -31,19 +31,15 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testClass, $this->resolver->getEntityClass($testClass));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetEntityClassWithInvalidEntityName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->resolver->getEntityClass('AcmeSomeBundle:Entity:SomeClass');
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\ORMException
-     */
     public function testGetEntityClassWithUnknownEntityName()
     {
+        $this->expectException(\Doctrine\ORM\ORMException::class);
         $this->doctrine->expects($this->once())
             ->method('getAliasNamespace')
             ->with($this->equalTo('AcmeSomeBundle'))

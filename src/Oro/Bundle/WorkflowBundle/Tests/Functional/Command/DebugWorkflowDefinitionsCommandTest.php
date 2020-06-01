@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -35,8 +35,8 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         /** @var WorkflowDefinition $workflow */
         foreach ($workflows as $workflow) {
-            $this->assertContains($workflow->getName(), $result);
-            $this->assertContains(
+            static::assertStringContainsString($workflow->getName(), $result);
+            static::assertStringContainsString(
                 $translator->trans(
                     $workflow->getLabel(),
                     [],
@@ -44,7 +44,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 ),
                 $result
             );
-            $this->assertContains($workflow->getRelatedEntity(), $result);
+            static::assertStringContainsString($workflow->getRelatedEntity(), $result);
         }
     }
 
@@ -62,7 +62,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
         if ($exists) {
-            $this->assertNotContains('No workflow definitions found.', $result);
+            static::assertStringNotContainsString('No workflow definitions found.', $result);
 
             $workflowConfiguration = Yaml::parse($result);
             $workflowConfiguration = $this->getContainer()
@@ -107,7 +107,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 $workflowDefinition->getExclusiveRecordGroups()
             );
         } else {
-            $this->assertContains('No workflow definitions found.', $result);
+            static::assertStringContainsString('No workflow definitions found.', $result);
         }
     }
 

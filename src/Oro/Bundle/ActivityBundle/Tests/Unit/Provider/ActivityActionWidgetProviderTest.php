@@ -15,7 +15,7 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()

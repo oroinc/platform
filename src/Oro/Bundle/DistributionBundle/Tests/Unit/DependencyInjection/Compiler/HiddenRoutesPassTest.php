@@ -10,7 +10,7 @@ class HiddenRoutesPassTest extends \PHPUnit\Framework\TestCase
     /** @var HiddenRoutesPass */
     protected $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new HiddenRoutesPass();
     }

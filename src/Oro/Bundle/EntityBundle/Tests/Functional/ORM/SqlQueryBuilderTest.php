@@ -14,7 +14,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
  */
 class SqlQueryBuilderTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

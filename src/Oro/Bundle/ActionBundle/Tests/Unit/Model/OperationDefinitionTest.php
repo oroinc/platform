@@ -12,12 +12,12 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var OperationDefinition */
     protected $definition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->definition = new OperationDefinition();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->definition);
     }
@@ -29,7 +29,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['func1', 'func2'], $this->definition->getActions('name1'));
         $this->assertEquals(['name1' => ['func1', 'func2']], $this->definition->getActions());
     }
-    
+
     public function testSetAndGetConditions()
     {
         $this->definition->setConditions('name1', ['cond1', 'cond2']);

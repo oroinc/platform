@@ -17,7 +17,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $genderProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->genderProvider = $this->createMock(GenderProvider::class);
 

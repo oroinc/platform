@@ -15,7 +15,7 @@ class DateTimeValueFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datetimeFormatter = $this
             ->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface')

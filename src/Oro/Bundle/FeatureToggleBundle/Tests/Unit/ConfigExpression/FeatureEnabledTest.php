@@ -20,7 +20,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
      */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()

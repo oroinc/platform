@@ -22,7 +22,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadataDriver = new AnnotationDriver(
             new AnnotationReader(),

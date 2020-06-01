@@ -13,7 +13,7 @@ class RelationCalculatorTest extends WebTestCase
      */
     protected $relationCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->relationCalculator = $this->getContainer()->get('oro_importexport.data_converter.relation_calculator');
@@ -53,12 +53,11 @@ class RelationCalculatorTest extends WebTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Oro\Bundle\UserBundle\Entity\User:username is not multiple relation field
-     */
     public function testGetMaxRelatedEntitiesException()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('Oro\Bundle\UserBundle\Entity\User:username is not multiple relation field');
+
         $this->relationCalculator->getMaxRelatedEntities('Oro\Bundle\UserBundle\Entity\User', 'username');
     }
 }

@@ -21,7 +21,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OAuthUserProvider */
     private $oauthProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->cm = $this->createMock(ConfigManager::class);
@@ -29,12 +29,11 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage SSO is not enabled
-     */
     public function testLoadUserByOAuthUserResponseShouldThrowExceptionIfSSOIsDisabled()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('SSO is not enabled');
+
         $this->cm
             ->expects($this->any())
             ->method('get')
@@ -89,11 +88,9 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($user, $loadedUser);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
-     */
     public function testLoadUserByOAuthShouldReturnExceptionIfUserIsDisabled()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\DisabledException::class);
         $this->cm
             ->expects($this->at(0))
             ->method('get')
@@ -231,11 +228,9 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($user, $loadedUser);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException
-     */
     public function testLoadUserByOAuthShouldThrowExceptionIfEmailDomainIsDisabled()
     {
+        $this->expectException(\Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException::class);
         $this->cm
             ->expects($this->at(0))
             ->method('get')

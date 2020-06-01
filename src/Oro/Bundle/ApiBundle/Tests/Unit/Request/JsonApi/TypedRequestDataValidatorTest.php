@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -23,7 +24,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var TypedRequestDataValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,8 +42,15 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('products')
-            ->willReturn(Product::class);
+            ->willReturnCallback(function ($entityType) {
+                if ('products' === $entityType) {
+                    return Product::class;
+                }
+                if ('test' === $entityType) {
+                    return 'Test\Entity';
+                }
+                throw new EntityAliasNotFoundException($entityType);
+            });
     }
 
     /**

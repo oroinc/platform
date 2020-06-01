@@ -26,7 +26,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->inner = $this->createMock(MessageProducerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);

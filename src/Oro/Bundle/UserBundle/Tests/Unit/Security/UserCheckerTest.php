@@ -22,7 +22,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $flashBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
@@ -54,7 +54,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
                 ->method('add')
                 ->with('error', 'oro.user.security.password_changed.message');
 
-            $this->expectException('Oro\Bundle\UserBundle\Exception\PasswordChangedException');
+            $this->expectException(\Oro\Bundle\UserBundle\Exception\PasswordChangedException::class);
             $this->expectExceptionMessage('Invalid password.');
         }
 
@@ -70,7 +70,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     public function testCheckPostAuth(UserInterface $user, $exceptionThrown)
     {
         if ($exceptionThrown) {
-            $this->expectException('Oro\Bundle\UserBundle\Exception\OrganizationException');
+            $this->expectException(\Oro\Bundle\UserBundle\Exception\OrganizationException::class);
             $this->expectExceptionMessage('');
         }
 
@@ -170,11 +170,9 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-    /**
-     * @expectedException \Oro\Bundle\UserBundle\Exception\EmptyOwnerException
-     */
     public function testCheckPostAuthOnUserWithoutOwner()
     {
+        $this->expectException(\Oro\Bundle\UserBundle\Exception\EmptyOwnerException::class);
         $user = new User();
 
         $this->userChecker->checkPostAuth($user);

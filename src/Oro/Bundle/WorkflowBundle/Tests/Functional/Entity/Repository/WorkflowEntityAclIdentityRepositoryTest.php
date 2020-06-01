@@ -13,7 +13,7 @@ class WorkflowEntityAclIdentityRepositoryTest extends WebTestCase
     /** @var WorkflowEntityAclIdentityRepository */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowEntityAclIdentities::class]);

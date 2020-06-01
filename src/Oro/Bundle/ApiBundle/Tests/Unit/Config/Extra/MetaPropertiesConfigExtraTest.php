@@ -9,7 +9,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var MetaPropertiesConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new MetaPropertiesConfigExtra();
     }
@@ -57,12 +57,11 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "prop1" meta property does not exist.
-     */
     public function testGetTypeOfUnknownMetaProperty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "prop1" meta property does not exist.');
+
         $this->extra->getTypeOfMetaProperty('prop1');
     }
 
@@ -76,12 +75,11 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "prop1" meta property does not exist.
-     */
     public function testSetTypeOfUnknownMetaProperty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "prop1" meta property does not exist.');
+
         $this->extra->setTypeOfMetaProperty('prop1', 'integer');
     }
 

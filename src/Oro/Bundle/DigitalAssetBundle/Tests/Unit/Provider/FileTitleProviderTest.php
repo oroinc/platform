@@ -29,7 +29,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
     /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerFileTitleProvider = $this->createMock(FileTitleProviderInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
@@ -41,7 +41,9 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
             $this->doctrine
         );
 
-        $this->file = $this->createPartialMock(File::class, ['getDigitalAsset']);
+        $this->file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
     }
 
     public function testGetTitleWhenNoDigitalAssetNoParent(): void

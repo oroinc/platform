@@ -30,7 +30,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new MsMimeTypeGuesser();
     }
@@ -38,7 +38,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             unlink($file);

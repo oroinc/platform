@@ -23,7 +23,7 @@ class BufferedMessageProducerTest extends WebTestCase
     /** @var Connection */
     protected $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $container = self::getContainer();
@@ -32,7 +32,7 @@ class BufferedMessageProducerTest extends WebTestCase
         $this->bufferedProducer = $container->get('oro_message_queue.client.buffered_message_producer');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         self::getMessageCollector()->clear();
 

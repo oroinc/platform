@@ -39,7 +39,7 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
      */
     private $templateEmailNotification;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);

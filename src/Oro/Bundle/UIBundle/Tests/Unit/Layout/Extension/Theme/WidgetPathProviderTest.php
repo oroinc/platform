@@ -10,7 +10,7 @@ class WidgetPathProviderTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetPathProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new WidgetPathProvider();
     }

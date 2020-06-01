@@ -11,7 +11,7 @@ class GridControllerTest extends WebTestCase
 {
     use MessageQueueAssertTrait;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }

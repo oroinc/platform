@@ -2,42 +2,43 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\CallServiceMethod;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\Action\Tests\Unit\Action\Stub\TestService;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface
-     */
+    /** @var MockObject|ContainerInterface */
     private $container;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
-     */
+    /** @var MockObject|EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @var CallServiceMethod
-     */
+    /** @var CallServiceMethod */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->action = new CallServiceMethod(new ContextAccessor(), $this->container);
+        $this->action = new class(new ContextAccessor(), $this->container) extends CallServiceMethod {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action, $this->eventDispatcher, $this->container);
     }
@@ -51,12 +52,8 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
             'attribute' => 'test'
         ];
 
-        $this->assertInstanceOf(
-            'Oro\Component\Action\Action\ActionInterface',
-            $this->action->initialize($options)
-        );
-
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     public function testInitializeNoServiceException()
@@ -131,7 +128,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals(
+        static::assertEquals(
             ['param' => 'value', 'test' => TestService::TEST_METHOD_RESULT . 'value'],
             $context->getValues()
         );
@@ -153,7 +150,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals(['param' => 'value'], $context->getValues());
+        static::assertEquals(['param' => 'value'], $context->getValues());
     }
 
     public function testExecuteActionPropertyPathService()
@@ -172,7 +169,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals(
+        static::assertEquals(
             ['param' => 'value', 'service' => $service],
             $context->getValues()
         );

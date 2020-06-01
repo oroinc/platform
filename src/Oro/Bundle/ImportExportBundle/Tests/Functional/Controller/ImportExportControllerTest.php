@@ -29,7 +29,7 @@ class ImportExportControllerTest extends WebTestCase
      */
     private $existingFiles = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -41,7 +41,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->existingFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $tempFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
         $diffFiles = array_diff($tempFiles, $this->existingFiles);
@@ -288,9 +288,9 @@ class ImportExportControllerTest extends WebTestCase
         $response = $this->client->getResponse();
 
         static::assertResponseStatusCodeEquals($response, 200);
-        static::assertContains('Cancel', $response->getContent());
-        static::assertContains('Validate', $response->getContent());
-        static::assertContains('Import file', $response->getContent());
+        static::assertStringContainsString('Cancel', $response->getContent());
+        static::assertStringContainsString('Validate', $response->getContent());
+        static::assertStringContainsString('Import file', $response->getContent());
     }
 
     public function testImportValidateExportTemplateFormAction(): void
@@ -434,6 +434,6 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertCount(2, $result);
         $this->assertTrue($result['success']);
-        $this->assertContains('message', $result);
+        static::assertContainsEquals('message', $result);
     }
 }

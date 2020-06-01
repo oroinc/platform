@@ -31,7 +31,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);
         $this->router = $this->createMock(RecipientListRouterInterface::class);

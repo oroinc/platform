@@ -33,7 +33,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /** @var IncludeMapManager */
     private $includeMapManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();
         $this->fileManager = $this->createMock(FileManager::class);
@@ -257,12 +257,11 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testGetIncludedItemsWhenLoadIndexDataFailed()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $data = [
             [
                 'data' => [
@@ -1282,14 +1281,14 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Not possible to move included items to processed because the lock cannot be acquired for the "api_123_include_index" file.
-     */
-    // @codingStandardsIgnoreEnd
     public function testMoveToProcessedWhenNotPossibleToAcquireLockForIncludeIndex()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Not possible to move included items to processed'
+            . ' because the lock cannot be acquired for the "api_123_include_index" file.'
+        );
+
         $includeIndexLockFileName = 'api_123_include_index.lock';
         $includeIndexLockAttemptLimit = 3;
         $includeIndexLockWaitBetweenAttempts = 2;

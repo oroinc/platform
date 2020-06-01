@@ -35,7 +35,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -27,7 +27,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     public function testGetTimezonesData()
     {
         $timezones = TimezoneType::getTimezones();
-        $this->assertInternalType('array', $timezones);
+        $this->assertIsArray($timezones);
         $this->assertNotEmpty($timezones);
         $this->assertArrayHasKey('UTC', $timezones);
         $this->assertEquals('(UTC +00:00) Other/UTC', $timezones['UTC']);
@@ -85,7 +85,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     public function testGetTimezones()
     {
         $timezones = TimezoneType::getTimezonesData();
-        $this->assertInternalType('array', $timezones);
+        $this->assertIsArray($timezones);
         $this->assertNotEmpty($timezones);
         $this->assertArrayHasKey('offset', $timezones[0]);
         $this->assertArrayHasKey('timezone_id', $timezones[0]);

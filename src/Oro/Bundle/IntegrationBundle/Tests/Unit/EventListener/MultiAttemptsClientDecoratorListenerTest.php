@@ -25,7 +25,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->listener = new MultiAttemptsClientDecoratorListener();
@@ -71,7 +71,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->logger, $this->listener);
     }

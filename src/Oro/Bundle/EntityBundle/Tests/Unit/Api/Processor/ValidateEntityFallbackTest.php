@@ -30,7 +30,7 @@ class ValidateEntityFallbackTest extends TypeTestCase
     /** @var ValidateEntityFallback */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

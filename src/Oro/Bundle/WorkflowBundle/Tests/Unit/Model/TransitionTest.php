@@ -280,12 +280,12 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      *
      * @param bool $preConditionAllowed
      * @param bool $conditionAllowed
-     *
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException
-     * @expectedExceptionMessage Transition "test" is not allowed.
      */
     public function testTransitNotAllowed(bool $preConditionAllowed, bool $conditionAllowed)
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException::class);
+        $this->expectExceptionMessage('Transition "test" is not allowed.');
+
         $workflowItem = $this->createMock(WorkflowItem::class);
         $errors = new ArrayCollection();
 

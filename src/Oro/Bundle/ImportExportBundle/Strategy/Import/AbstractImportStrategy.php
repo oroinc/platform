@@ -14,6 +14,9 @@ use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Abstract class for the import strategy implementations.
+ */
 abstract class AbstractImportStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
     /**
@@ -151,14 +154,13 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
                 $value = $this->findExistingEntity($value);
             }
 
-            if ($value !== null ||
-                $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)
-            ) {
+            if ($value !== null || $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)) {
                 continue;
             }
 
             unset($identityValues[$fieldName]);
         }
+        unset($value);
 
         return $this->findEntityByIdentityValues($entityName, $identityValues);
     }

@@ -33,7 +33,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->originOperationName = 'origin_name';
         $this->definition = $this->createMock(OperationDefinition::class);
@@ -50,7 +50,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->operation, $this->button);
     }
@@ -66,6 +66,14 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->definition->expects($this->once())->method('getLabel')->willReturn($label);
 
         $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetAriaLabel(): void
+    {
+        $label = 'test_label';
+        $this->definition->expects($this->once())->method('getDatagridOptions')->willReturn(['aria_label' => $label]);
+
+        $this->assertEquals($label, $this->button->getAriaLabel());
     }
 
     public function testGetIcon()

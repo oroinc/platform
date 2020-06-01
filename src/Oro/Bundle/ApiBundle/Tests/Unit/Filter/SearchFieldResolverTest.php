@@ -9,7 +9,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
     /** @var SearchFieldResolver */
     private $fieldResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldResolver = new SearchFieldResolver(
             [
@@ -108,39 +108,35 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The field "another_item" is not supported.
-     */
     public function testResolveFieldNameForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The field "another_item" is not supported.');
+
         $this->fieldResolver->resolveFieldName('another_item');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The field "another_item" is not supported.
-     */
     public function testResolveFieldTypeForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The field "another_item" is not supported.');
+
         $this->fieldResolver->resolveFieldType('another_item');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The field "someField" is not supported.
-     */
     public function testResolveFieldNameForUndefinedField()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The field "someField" is not supported.');
+
         $this->fieldResolver->resolveFieldName('someField');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage The field "someField" is not supported.
-     */
     public function testResolveFieldTypeForUndefinedField()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('The field "someField" is not supported.');
+
         $this->fieldResolver->resolveFieldType('someField');
     }
 }

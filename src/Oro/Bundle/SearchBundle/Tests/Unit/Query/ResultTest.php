@@ -35,7 +35,7 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $product = new Product();
         $product->setName('test product');

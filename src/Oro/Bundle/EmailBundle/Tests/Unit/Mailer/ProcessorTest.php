@@ -51,8 +51,8 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
 
     /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailOriginHelper;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -134,12 +134,11 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sender can not be empty
-     */
     public function testProcessEmptyFromException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Sender can not be empty');
+
         $this->mailer->expects($this->never())
             ->method('createMessage');
         $this->mailer->expects($this->never())
@@ -187,12 +186,11 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($oldMessageId, $messageId);
     }
 
-    /**
-     * @expectedException \Swift_SwiftException
-     * @expectedExceptionMessage The email was not delivered.
-     */
     public function testProcessSendFailException()
     {
+        $this->expectException(\Swift_SwiftException::class);
+        $this->expectExceptionMessage('The email was not delivered.');
+
         $message = $this->getMockForAbstractClass('\Swift_Message');
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -213,12 +211,13 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         $this->emailProcessor->process($model);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The $addresses argument must be a string or a list of strings (array or Iterator)
-     */
     public function testProcessAddressException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The $addresses argument must be a string or a list of strings (array or Iterator)'
+        );
+
         $message = $this->getMockForAbstractClass('\Swift_Message');
         $this->mailer->expects($this->once())
             ->method('createMessage')

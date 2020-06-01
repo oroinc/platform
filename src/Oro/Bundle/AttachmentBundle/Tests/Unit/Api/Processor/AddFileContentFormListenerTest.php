@@ -17,7 +17,7 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
     /** @var AddFileContentFormListener */
     protected $processor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

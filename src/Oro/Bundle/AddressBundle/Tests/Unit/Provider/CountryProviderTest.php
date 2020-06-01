@@ -17,7 +17,7 @@ class CountryProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(CountryRepository::class);
         $this->provider = new CountryProvider($this->repository);

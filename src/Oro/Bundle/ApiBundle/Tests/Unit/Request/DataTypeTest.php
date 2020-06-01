@@ -104,10 +104,10 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidExtendedAssociationProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testParseInvalidExtendedAssociation($dataType)
     {
+        $this->expectException(\InvalidArgumentException::class);
         DataType::parseExtendedAssociation($dataType);
     }
 

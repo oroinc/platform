@@ -4,45 +4,46 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
 use Oro\Bundle\ActionBundle\Action\DuplicateEntity;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Filter\Filter;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\Matcher;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var DuplicateEntity
-     */
+    /** @var DuplicateEntity */
     protected $action;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->action = new DuplicateEntity($this->contextAccessor);
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->action = new class($this->contextAccessor) extends DuplicateEntity {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
+
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->action->setDispatcher($this->eventDispatcher);
         $this->action->setDuplicatorFactory($this->getDuplicateFactory());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }
@@ -55,12 +56,8 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
             DuplicateEntity::OPTION_KEY_ATTRIBUTE => ['copyResult'],
         ];
 
-        $this->assertInstanceOf(
-            'Oro\Component\Action\Action\ActionInterface',
-            $this->action->initialize($options)
-        );
-
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
 
@@ -78,30 +75,23 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             [
-                'options' => [
-                    DuplicateEntity::OPTION_KEY_TARGET => ['target'],
-                ],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Option \'target\' should be string or PropertyPath',
+                'options' => [DuplicateEntity::OPTION_KEY_TARGET => ['target']],
+                'expectedException' => InvalidParameterException::class,
+                'expectedExceptionMessage' => "Option 'target' should be string or PropertyPath",
             ],
             [
-                'options' => [
-                    DuplicateEntity::OPTION_KEY_SETTINGS => 'wrong settings',
-                ],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Option \'settings\' should be array',
+                'options' => [DuplicateEntity::OPTION_KEY_SETTINGS => 'wrong settings'],
+                'expectedException' => InvalidParameterException::class,
+                'expectedExceptionMessage' => "Option 'settings' should be array",
             ],
             [
                 'options' => [],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Attribute name parameter is required',
+                'expectedException' => InvalidParameterException::class,
+                'expectedExceptionMessage' => "Attribute name parameter is required",
             ],
         ];
     }
@@ -119,28 +109,26 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
         /** @var \stdClass $copyObject */
         $copyObject = $context['copyResult'];
-        $this->assertNotSame($copyObject, $target);
-        $this->assertEquals($copyObject, $target);
-        $this->assertSame($copyObject->child, $copyObject->child);
+        static::assertNotSame($copyObject, $target);
+        static::assertEquals($copyObject, $target);
+        static::assertSame($copyObject->child, $copyObject->child);
     }
 
     public function testExecuteWithEntity()
     {
         $target = new \stdClass();
 
-        /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject $contextAccessor */
+        /** @var ContextAccessor|MockObject $contextAccessor */
         $contextAccessor = $this->getMockBuilder(ContextAccessor::class)->disableOriginalConstructor()->getMock();
 
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher $eventDispatcher */
-        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        /** @var EventDispatcherInterface|MockObject $eventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $action = new DuplicateEntity($contextAccessor);
         $action->setDispatcher($eventDispatcher);
         $action->setDuplicatorFactory($this->getDuplicateFactory());
 
-        $context = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMockBuilder(ActionData::class)->disableOriginalConstructor()->getMock();
 
         $options = [
             DuplicateEntity::OPTION_KEY_ENTITY => '$.data',
@@ -171,14 +159,12 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected function getDuplicateFactory()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\TaggedContainerInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $duplicatorFactory = new DuplicatorFactory();
 
-        $duplicatorFactory = new DuplicatorFactory($container);
         $filterFactory = $this->createMock(FilterFactory::class);
         $filterFactory->method('create')->willReturn($this->createMock(Filter::class));
         $duplicatorFactory->setFilterFactory($filterFactory);
+
         $matcherFactory = $this->createMock(MatcherFactory::class);
         $matcherFactory->method('create')->willReturn($this->createMock(Matcher::class));
         $duplicatorFactory->setMatcherFactory($matcherFactory);

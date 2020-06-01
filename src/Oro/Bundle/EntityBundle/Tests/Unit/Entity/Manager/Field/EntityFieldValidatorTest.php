@@ -15,7 +15,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->setMethods(['getManager'])
@@ -58,12 +58,11 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityHasFieldException
-     * @expectedExceptionMessage oro.entity.controller.message.field_not_found
-     */
     public function testValidateWithFieldException()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityHasFieldException::class);
+        $this->expectExceptionMessage('oro.entity.controller.message.field_not_found');
+
         $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
@@ -94,12 +93,11 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException
-     * @expectedExceptionMessage oro.entity.controller.message.access_denied
-     */
     public function testValidateWithAccessException()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException::class);
+        $this->expectExceptionMessage('oro.entity.controller.message.access_denied');
+
         $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
@@ -168,12 +166,11 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException
-     * @expectedExceptionMessage right message
-     */
     public function testFailCustomValidate()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException::class);
+        $this->expectExceptionMessage('right message');
+
         $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())

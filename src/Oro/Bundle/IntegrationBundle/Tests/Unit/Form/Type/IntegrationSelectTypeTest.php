@@ -29,7 +29,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry    = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
             ->disableOriginalConstructor()->getMock();
@@ -47,7 +47,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type, $this->registry, $this->assetHelper);
     }

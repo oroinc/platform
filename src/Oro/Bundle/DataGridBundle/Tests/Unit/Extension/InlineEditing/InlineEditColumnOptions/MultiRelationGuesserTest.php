@@ -13,7 +13,7 @@ class MultiRelationGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var MultiRelationGuesser */
     protected $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new MultiRelationGuesser();
     }

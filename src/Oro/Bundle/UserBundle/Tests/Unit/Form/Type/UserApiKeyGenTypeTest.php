@@ -21,19 +21,15 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $this->assertEquals($userApi, $form->getData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testApiKeyElementIdIsRequiredOption()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => null]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testApiKeyElementIdIsStringOption()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => new \stdClass]);
     }
 

@@ -27,7 +27,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
     /** @var SearchEntityFilterType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);

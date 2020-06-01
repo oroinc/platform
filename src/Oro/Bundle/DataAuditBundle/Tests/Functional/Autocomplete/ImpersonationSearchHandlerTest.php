@@ -27,7 +27,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

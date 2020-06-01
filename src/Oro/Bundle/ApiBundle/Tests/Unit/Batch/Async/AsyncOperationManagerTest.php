@@ -33,7 +33,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AsyncOperationManager */
     private $asyncOperationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->fileManager = $this->createMock(FileManager::class);

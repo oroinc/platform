@@ -221,12 +221,13 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The operator "exists" cannot be used together with "&" operator.
-     */
     public function testProcessorWithExistsOperatorInAndExpression()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The operator "exists" cannot be used together with "&" operator.'
+        );
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
@@ -245,12 +246,13 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The operator "!exists" cannot be used together with "|" operator.
-     */
     public function testProcessorWithExistsOperatorInOrExpression()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The operator "!exists" cannot be used together with "|" operator.'
+        );
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
@@ -269,14 +271,13 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Tag attribute "group" can be used only if the attribute "action" is specified. Service: "processor1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWithInvalidConfigurationOfCommonProcessor()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Tag attribute "group" can be used only if the attribute "action" is specified. Service: "processor1".'
+        );
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 

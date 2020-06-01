@@ -27,7 +27,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
         $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);
@@ -95,12 +95,11 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterException
-     * @expectedExceptionMessage Not allowed operator.
-     */
     public function testInvalidFilter()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectExceptionMessage('Not allowed operator.');
+
         $criteria = new Criteria();
         $this->filter->apply($criteria, new FilterValue('searchQuery', 'field1 . "test"'));
     }

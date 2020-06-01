@@ -32,7 +32,7 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scheduleArgsBuilder = $this->createMock(InvalidateCacheScheduleArgumentsBuilderInterface::class);
         $this->scheduleManager = $this->createMock(ScheduleManager::class);

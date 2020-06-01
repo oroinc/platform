@@ -15,7 +15,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var CachingTranslationLoader */
     protected $cachingLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerLoader = $this->createMock('Symfony\Component\Translation\Loader\LoaderInterface');
 

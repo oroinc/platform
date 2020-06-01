@@ -25,7 +25,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     protected $userAgent;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userAgentProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgentProvider')
             ->disableOriginalConstructor()->getMock();

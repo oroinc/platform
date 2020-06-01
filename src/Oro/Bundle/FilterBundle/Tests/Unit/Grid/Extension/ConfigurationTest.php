@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     private $processor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new Configuration(['string', 'number']);
         $this->processor = new Processor();

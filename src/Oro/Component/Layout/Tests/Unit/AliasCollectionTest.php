@@ -9,7 +9,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var AliasCollection */
     protected $aliasCollection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aliasCollection = new AliasCollection();
     }
@@ -64,14 +64,14 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->aliasCollection->has('test_alias'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\AliasAlreadyExistsException
-     * @expectedExceptionMessage The "test_alias" sting cannot be used as an alias for "another_id" item because it is already used for "test_id" item.
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedefine()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\AliasAlreadyExistsException::class);
+        $this->expectExceptionMessage(
+            'The "test_alias" sting cannot be used as an alias for "another_id" item'
+            . ' because it is already used for "test_id" item.'
+        );
+
         $this->aliasCollection->add('test_alias', 'test_id');
         $this->aliasCollection->add('test_alias', 'another_id');
     }

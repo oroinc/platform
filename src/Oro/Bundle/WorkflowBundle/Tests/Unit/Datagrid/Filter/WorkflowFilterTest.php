@@ -6,35 +6,42 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormFactoryInterface|MockObject */
     protected $formFactory;
 
-    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowTranslationHelper|MockObject */
     protected $translationHelper;
 
     /** @var WorkflowFilter */
     protected $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
 
-        $this->filter = new WorkflowFilter($this->formFactory, new FilterUtility(), $this->translationHelper);
+        $this->filter = new class(
+            $this->formFactory,
+            new FilterUtility(),
+            $this->translationHelper
+        ) extends WorkflowFilter {
+            public function xgetParams(): array
+            {
+                return $this->params;
+            }
+        };
     }
 
     public function testInit()
     {
         $this->filter->init('test', []);
 
-        $this->assertAttributeEquals(
+        static::assertEquals(
             [
                 FilterUtility::FORM_OPTIONS_KEY => [
                     'field_options' => [
@@ -46,8 +53,7 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',
             ],
-            'params',
-            $this->filter
+            $this->filter->xgetParams()
         );
     }
 
@@ -56,11 +62,11 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
         $definition = new WorkflowDefinition();
         $definition->setLabel('label');
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(static::once())
             ->method('findTranslation')
             ->with('label')
             ->willReturn('translated-label');
 
-        $this->assertEquals('translated-label', $this->filter->getLabel($definition));
+        static::assertEquals('translated-label', $this->filter->getLabel($definition));
     }
 }

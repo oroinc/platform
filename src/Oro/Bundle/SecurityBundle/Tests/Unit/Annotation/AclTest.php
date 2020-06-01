@@ -32,43 +32,33 @@ class AclTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($annotation->getIgnoreClassAcl());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAnnotationWithEmptyId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $annotation = new Acl(array('id' => ''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAnnotationWithInvalidId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $annotation = new Acl(array('id' => 'test acl'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAnnotationWithMissingId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $annotation = new Acl(array());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAnnotationWithEmptyType()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $annotation = new Acl(array('id' => 'test', 'type' => ''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAnnotationWithMissingType()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $annotation = new Acl(array('id' => 'test'));
     }
 }

@@ -24,7 +24,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var RelatedEntityTransformer */
     protected $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
@@ -72,11 +72,9 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testTransformForNotObject()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->transformer->transform('invalid_value');
     }
 

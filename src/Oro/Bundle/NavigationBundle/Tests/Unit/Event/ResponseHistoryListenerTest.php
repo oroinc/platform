@@ -25,7 +25,7 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ResponseHistoryListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationHistoryLogger = $this->createMock(NavigationHistoryLogger::class);

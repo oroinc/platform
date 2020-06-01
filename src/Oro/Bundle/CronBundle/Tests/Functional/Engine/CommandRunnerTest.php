@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CommandRunnerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -26,11 +26,11 @@ class CommandRunnerTest extends WebTestCase
 
         $result = $runner->run('debug:router');
 
-        $this->assertContains('Name', $result);
-        $this->assertContains('Method', $result);
-        $this->assertContains('Scheme', $result);
-        $this->assertContains('Host', $result);
-        $this->assertContains('Path', $result);
+        static::assertStringContainsString('Name', $result);
+        static::assertStringContainsString('Method', $result);
+        static::assertStringContainsString('Scheme', $result);
+        static::assertStringContainsString('Host', $result);
+        static::assertStringContainsString('Path', $result);
     }
 
     public function testShouldAcceptCommandArguments()
@@ -40,12 +40,12 @@ class CommandRunnerTest extends WebTestCase
 
         $result = $runner->run('debug:router', ['--help']);
 
-        $this->assertNotContains('Name', $result);
-        $this->assertNotContains('Method', $result);
-        $this->assertNotContains('Scheme', $result);
-        $this->assertNotContains('Host', $result);
-        $this->assertNotContains('Path', $result);
-        $this->assertContains('Help:', $result);
-        $this->assertContains('The debug:router displays the configured routes:', $result);
+        static::assertStringNotContainsString('Name', $result);
+        static::assertStringNotContainsString('Method', $result);
+        static::assertStringNotContainsString('Scheme', $result);
+        static::assertStringNotContainsString('Host', $result);
+        static::assertStringNotContainsString('Path', $result);
+        static::assertStringContainsString('Help:', $result);
+        static::assertStringContainsString('The debug:router displays the configured routes:', $result);
     }
 }

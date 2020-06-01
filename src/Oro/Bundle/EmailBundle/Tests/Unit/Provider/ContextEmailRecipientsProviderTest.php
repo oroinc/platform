@@ -12,8 +12,8 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     private $relatedEmailsProvider;
 
     private $emailRecipientsProvider;
-    
-    public function setUp()
+
+    protected function setUp(): void
     {
         $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
             ->disableOriginalConstructor()

@@ -26,7 +26,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $objectIdAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
 
@@ -70,12 +70,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->actionExtension, $this->selector->select('action:testAction'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: wrong:testAction. Type: testAction. Id: wrong.
-     */
     public function testSelectNotExistingExtensionByStringValue()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: wrong:testAction. Type: testAction. Id: wrong.'
+        );
+
         $this->selector->select('wrong:testAction');
     }
 
@@ -97,14 +98,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->actionExtension, $this->selector->select(new ObjectIdentity('action', 'testAction')));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: ObjectIdentity(wrong, testAction). Type: testAction. Id: wrong.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByWrongObjectIdentity()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: ObjectIdentity(wrong, testAction). Type: testAction. Id: wrong.'
+        );
+
         $this->selector->select(new ObjectIdentity('wrong', 'testAction'));
     }
 
@@ -129,14 +129,13 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: Oro\Bundle\SecurityBundle\Annotation\Acl. Type: wrong. Id: testAction.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByWrongAclAnnotation()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: Oro\Bundle\SecurityBundle\Annotation\Acl. Type: wrong. Id: testAction.'
+        );
+
         $this->selector->select(new AclAnnotation(['id' => 'wrong', 'type' => 'testAction']));
     }
 
@@ -160,14 +159,14 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: Symfony\Component\Security\Acl\Voter\FieldVote. Type: Test\Entity. Id: entity. Field: test.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSelectByFieldVoteWhenFieldAclIsNotSupported()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
+        $this->expectExceptionMessage(
+            'An ACL extension was not found for: Symfony\Component\Security\Acl\Voter\FieldVote.'
+            . ' Type: Test\Entity. Id: entity. Field: test.'
+        );
+
         $this->fieldExtension->expects(self::once())
             ->method('supports')
             ->with('Test\Entity', 'entity')
@@ -191,12 +190,11 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     * @expectedExceptionMessage An ACL extension was not found for: stdClass. Type: . Id: .
-     */
     public function testSelectByInvalidDomainObject()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
+        $this->expectExceptionMessage('An ACL extension was not found for: stdClass. Type: . Id: .');
+
         $val = new \stdClass();
 
         $this->objectIdAccessor->expects(self::once())

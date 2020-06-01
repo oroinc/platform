@@ -13,7 +13,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadata */
     private $entityMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadata = new EntityMetadata();
         $this->entityMetadata->setClassName('entityClassName');

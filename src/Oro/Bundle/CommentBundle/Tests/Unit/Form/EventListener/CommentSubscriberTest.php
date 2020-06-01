@@ -19,7 +19,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * SetUp test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new CommentSubscriber();
         $this->event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
@@ -33,7 +33,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->subscriber);
         unset($this->form);
@@ -44,7 +44,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->subscriber->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
     }
 

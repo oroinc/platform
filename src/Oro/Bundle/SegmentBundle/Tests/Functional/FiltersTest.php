@@ -16,7 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class FiltersTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
     }

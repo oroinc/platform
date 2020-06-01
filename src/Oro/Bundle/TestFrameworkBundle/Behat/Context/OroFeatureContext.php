@@ -105,7 +105,7 @@ class OroFeatureContext extends RawMinkContext
         $imageUrl = $this->locatePath($imageUrl);
         $imageUrl = filter_var($imageUrl, FILTER_VALIDATE_URL);
 
-        self::assertInternalType('string', $imageUrl, sprintf('Image src "%s" is not valid', $imageUrl));
+        self::assertIsString($imageUrl, sprintf('Image src "%s" is not valid', $imageUrl));
 
         $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client([

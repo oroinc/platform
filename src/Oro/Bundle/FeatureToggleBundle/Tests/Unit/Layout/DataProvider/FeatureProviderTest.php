@@ -17,7 +17,7 @@ class FeatureProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()

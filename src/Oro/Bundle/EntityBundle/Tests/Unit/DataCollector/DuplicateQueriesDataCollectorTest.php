@@ -14,7 +14,7 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
      */
     protected $collector;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->collector = new DuplicateQueriesDataCollector();
     }

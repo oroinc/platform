@@ -19,7 +19,7 @@ class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new Constraints\Localization();
         $this->context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContextInterface')
@@ -30,7 +30,7 @@ class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->initialize($this->context);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->constraint, $this->context, $this->validator);
     }
@@ -89,18 +89,19 @@ class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($localization1, $this->constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "string" given
-     */
     public function testUnexpectedValue()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "string" given'
+        );
+
         $this->validator->validate('test', $this->constraint);
     }
 
     public function testUnexpectedClass()
     {
-        $this->expectException('\Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );

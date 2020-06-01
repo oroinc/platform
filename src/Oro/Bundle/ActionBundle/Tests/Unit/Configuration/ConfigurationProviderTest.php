@@ -59,7 +59,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);
 

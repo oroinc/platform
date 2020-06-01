@@ -33,7 +33,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
      */
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->repository = $this->createMock(ReminderRepository::class);
@@ -148,12 +148,11 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($input, $output);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test Exception
-     */
     public function testExecuteRollbackTransation()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test Exception');
+
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 

@@ -15,7 +15,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ConstraintTextExtractor */
     private $constraintTextExtractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraintTextExtractor = new ConstraintTextExtractor();
     }

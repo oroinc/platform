@@ -32,7 +32,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
         $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);

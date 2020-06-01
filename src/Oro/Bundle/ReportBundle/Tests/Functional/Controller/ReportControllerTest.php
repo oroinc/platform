@@ -12,7 +12,7 @@ class ReportControllerTest extends WebTestCase
     private const TEST_REPORT = 'Test user report';
     private const UPDATED_TEST_REPORT = 'Updated test user report';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }
@@ -74,7 +74,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Report saved', $crawler->html());
+        static::assertStringContainsString('Report saved', $crawler->html());
     }
 
     /**
@@ -86,8 +86,8 @@ class ReportControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('reports-grid', $crawler->html());
-        $this->assertContains(self::TEST_REPORT, $result->getContent());
+        static::assertStringContainsString('reports-grid', $crawler->html());
+        static::assertStringContainsString(self::TEST_REPORT, $result->getContent());
     }
 
     /**
@@ -113,7 +113,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Report saved', $crawler->html());
+        static::assertStringContainsString('Report saved', $crawler->html());
 
         $em->clear();
 
@@ -142,7 +142,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Report saved', $crawler->html());
+        static::assertStringContainsString('Report saved', $crawler->html());
 
         $repository = $this->getContainer()
             ->get('doctrine')
@@ -179,7 +179,7 @@ class ReportControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('reports-grid', $crawler->html());
-        $this->assertContains($name, $result->getContent());
+        static::assertStringContainsString('reports-grid', $crawler->html());
+        static::assertStringContainsString($name, $result->getContent());
     }
 }

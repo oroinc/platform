@@ -38,7 +38,9 @@ class ErrorSource
      * a pointer to a property in the request document caused the error.
      *
      * @param string $pointer The property pointer.
-     *                        If it contains several elements they should be separated by the slash (/)
+     *                        If it contains several elements they should be separated by the slash (/),
+     *                        e.g. "/data" for a primary data object,
+     *                        or "/data/attributes/title" for a specific attribute
      *
      * @return ErrorSource
      */

@@ -33,7 +33,7 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ImageResizeManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resizedImageProvider = $this->createMock(ResizedImageProviderInterface::class);
         $this->resizedImagePathProvider = $this->createMock(ResizedImagePathProviderInterface::class);

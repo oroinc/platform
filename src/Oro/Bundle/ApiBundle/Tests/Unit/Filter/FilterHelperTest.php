@@ -24,7 +24,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FilterHelper */
     private $filterHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filters = new FilterCollection();
         $this->filterValues = $this->createMock(FilterValueAccessorInterface::class);

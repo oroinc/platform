@@ -22,7 +22,7 @@ class TwigServiceLocatorPassTest extends \PHPUnit\Framework\TestCase
     /** @var TwigServiceLocatorPass */
     private $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
 

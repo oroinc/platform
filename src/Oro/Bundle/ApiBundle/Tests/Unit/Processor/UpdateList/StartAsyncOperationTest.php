@@ -18,7 +18,7 @@ class StartAsyncOperationTest extends UpdateListProcessorTestCase
     /** @var StartAsyncOperation */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,12 +47,11 @@ class StartAsyncOperationTest extends UpdateListProcessorTestCase
         self::assertFalse($this->context->isProcessed(StartAsyncOperation::OPERATION_NAME));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The target file name was not set to the context.
-     */
     public function testProcessWhenNoTargetFileName()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The target file name was not set to the context.');
+
         $this->producer->expects(self::never())
             ->method('send');
 

@@ -10,7 +10,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDataAccessor */
     protected $entityDataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityDataAccessor = new EntityDataAccessor();
     }
@@ -75,10 +75,10 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider notAccessibleFieldsProvider
-     * @expectedException \RuntimeException
      */
     public function testGetValueForNotAccessibleField($fieldName)
     {
+        $this->expectException(\RuntimeException::class);
         $entity = new TestEntity('test');
         $this->entityDataAccessor->getValue($entity, $fieldName);
     }
@@ -111,11 +111,9 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->entityDataAccessor->getValue($entity, 'someName'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetValueForNotAccessibleArrayElement()
     {
+        $this->expectException(\RuntimeException::class);
         $entity = ['someName' => 'test'];
         $this->entityDataAccessor->getValue($entity, 'notExistingName');
     }

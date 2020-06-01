@@ -13,7 +13,7 @@ class ProcessControllerTest extends WebTestCase
      */
     protected $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->entityManager = $this->client->getContainer()->get('doctrine')

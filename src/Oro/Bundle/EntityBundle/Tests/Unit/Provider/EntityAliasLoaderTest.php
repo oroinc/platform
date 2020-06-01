@@ -13,7 +13,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAliasLoader */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new EntityAliasLoader();
     }

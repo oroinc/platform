@@ -14,18 +14,18 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new StepAssembler();
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */
     public function testAssembleRequiredOptionException($configuration)
     {
+        $this->expectException(\Oro\Component\Action\Exception\AssemblerException::class);
         $this->assembler->assemble($configuration, null);
     }
 

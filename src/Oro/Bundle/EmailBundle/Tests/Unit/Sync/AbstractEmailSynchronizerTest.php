@@ -32,7 +32,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $knownEmailAddressCheckerFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock('Psr\Log\LoggerInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -104,11 +104,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $sync->sync($maxConcurrentTasks, $minExecPeriodInMin);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testSyncOriginWithDoctrineError()
     {
+        $this->expectException(\Exception::class);
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $maxConcurrentTasks = 3;
         $minExecPeriodInMin = 1;
@@ -240,11 +238,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $sync->callDoSyncOrigin($origin);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testDoSyncOriginProcessFailed()
     {
+        $this->expectException(\Exception::class);
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $origin = new TestEmailOrigin(123);
 
@@ -288,11 +284,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $sync->callDoSyncOrigin($origin);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDoSyncOriginSetFailureFailed()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $origin = new TestEmailOrigin(123);
 

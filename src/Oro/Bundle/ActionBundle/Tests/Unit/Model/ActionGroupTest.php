@@ -28,7 +28,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     /** @var ActionData */
     protected $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
@@ -52,7 +52,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->data = new ActionData();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->actionGroup, $this->actionFactory, $this->conditionFactory, $this->data);
     }
@@ -90,7 +90,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $errors = new ArrayCollection();
 
         if ($exceptionMessage) {
-            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException');
+            $this->expectException(\Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException::class);
             $this->expectExceptionMessage($exceptionMessage);
         }
 
@@ -205,11 +205,11 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createActionGroup(\PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects, ActionData $data)
+    protected function createActionGroup(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects, ActionData $data)
     {
         /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
@@ -219,13 +219,13 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
      * @param ActionData $data
      * @param bool $returnValue
      * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCondition(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects,
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
         $returnValue
     ) {

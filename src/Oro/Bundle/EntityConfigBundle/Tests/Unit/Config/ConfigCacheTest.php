@@ -39,7 +39,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigCache */
     private $configCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheProvider::class);
         $this->modelCache = $this->createMock(CacheProvider::class);
@@ -1110,22 +1110,20 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage A batch already started. Nested batches are not supported.
-     */
     public function testBeginBatchWhenBatchAlreadyStarted()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('A batch already started. Nested batches are not supported.');
+
         $this->configCache->beginBatch();
         $this->configCache->beginBatch();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage A batch is not started.
-     */
     public function testSaveBatchWhenBatchIsNotStarted()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('A batch is not started.');
+
         $this->configCache->saveBatch();
     }
 
@@ -1134,32 +1132,29 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->cancelBatch();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage deleteAllConfigs() is not allowed inside a batch.
-     */
     public function testDeleteAllConfigsInBatchShouldNotBeAllowed()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('deleteAllConfigs() is not allowed inside a batch.');
+
         $this->configCache->beginBatch();
         $this->configCache->deleteAllConfigs();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage deleteAllConfigurable() is not allowed inside a batch.
-     */
     public function testDeleteAllConfigurableInBatchShouldNotBeAllowed()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
+
         $this->configCache->beginBatch();
         $this->configCache->deleteAllConfigurable();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage deleteAllConfigurable() is not allowed inside a batch.
-     */
     public function testDeleteAllInBatchShouldNotBeAllowed()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
+
         $this->configCache->beginBatch();
         $this->configCache->deleteAll();
     }

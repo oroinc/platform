@@ -18,13 +18,13 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $this->compilerPass = new OwnershipDecisionMakerPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->container, $this->compilerPass);
     }

@@ -4,8 +4,10 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Action\FlashMessage;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,55 +18,59 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FlashMessageTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
-     */
+    /** @var MockObject|TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagHelper
-     */
+    /** @var MockObject|HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
-     */
+    /** @var MockObject|RequestStack */
     protected $requestStack;
 
-    /**
-     * @var FlashMessage
-     */
+    /** @var FlashMessage */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->requestStack = new RequestStack();
-        $this->action = new FlashMessage(
+        $this->action = new class(
             $this->contextAccessor,
             $this->translator,
             $this->htmlTagHelper,
             $this->requestStack
-        );
+        ) extends FlashMessage {
+            public function xgetMessage()
+            {
+                return $this->message;
+            }
+
+            public function xgetType()
+            {
+                return $this->type;
+            }
+
+            public function xgetMessageParameters()
+            {
+                return $this->messageParameters;
+            }
+        };
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Message parameter is required
-     */
     public function testInitializeException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Message parameter is required');
+
         $options = [];
         $this->action->initialize($options);
     }
@@ -78,10 +84,10 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
                 'some' => 'other'
             ]
         ];
-        $this->assertEquals($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($options['message'], 'message', $this->action);
-        $this->assertAttributeEquals($options['type'], 'type', $this->action);
-        $this->assertAttributeEquals($options['message_parameters'], 'messageParameters', $this->action);
+        static::assertEquals($this->action, $this->action->initialize($options));
+        static::assertEquals($options['message'], $this->action->xgetMessage());
+        static::assertEquals($options['type'], $this->action->xgetType());
+        static::assertEquals($options['message_parameters'], $this->action->xgetMessageParameters());
     }
 
     public function testExecuteNoRequest()
@@ -89,8 +95,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $options = ['message' => 'test'];
         $context = [];
         $this->action->initialize($options);
-        $this->translator->expects($this->never())
-            ->method($this->anything());
+        $this->translator->expects(static::never())->method(static::anything());
 
         $this->action->execute($context);
     }
@@ -118,26 +123,22 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
 
         $flashBag = $this->createMock(FlashBagInterface::class);
-        $flashBag->expects($this->once())
+        $flashBag->expects(static::once())
             ->method('add')
             ->with('concreteType', $sanitizedMessage);
 
         $session = $this->createMock(Session::class);
-        $session->expects($this->once())
-            ->method('getFlashBag')
-            ->willReturn($flashBag);
+        $session->expects(static::once())->method('getFlashBag')->willReturn($flashBag);
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getSession')
-            ->willReturn($session);
+        $request->expects(static::once())->method('getSession')->willReturn($session);
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(static::once())
             ->method('trans')
             ->with('concreteMessage', ['%some%' => 'other', '%other%' => 'val1'])
             ->willReturn($translatedMessage);
 
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(static::once())
             ->method('sanitize')
             ->with($translatedMessage)
             ->willReturn($sanitizedMessage);

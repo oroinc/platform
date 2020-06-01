@@ -32,7 +32,7 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var TransitActionProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);

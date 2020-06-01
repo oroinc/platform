@@ -10,6 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ExtendTableTest extends TestCase
@@ -17,16 +18,16 @@ class ExtendTableTest extends TestCase
     const TABLE_NAME = 'test_table';
     const COLUMN_NAME = 'test_column';
 
-    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExtendOptionsManager|MockObject */
     private $extendOptionsManager;
 
-    /** @var DbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DbIdentifierNameGenerator|MockObject */
     private $nameGenerator;
 
     /** @var ExtendTable */
     private $table;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendOptionsManager = $this->createMock(ExtendOptionsManager::class);
 
@@ -39,79 +40,65 @@ class ExtendTableTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider addColumnWithSameExtendDataProvider
-     *
-     * @param Type $type
-     * @param array $options
-     * @param string $attribute
-     * @param string $extend
-     * @param mixed $expected
-     */
-    public function testAddColumnWithSameExtend(Type $type, array $options, $attribute, $extend, $expected)
+    public function testAddColumnWithSameExtendLength()
     {
-        $options[OroOptions::KEY]['extend'] = ['owner' => ExtendScope::OWNER_CUSTOM];
-
-        $this->extendOptionsManager->expects($this->at(0))
-            ->method('setColumnOptions')
-            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
-                'extend' => [
-                    'owner' => ExtendScope::OWNER_CUSTOM,
-                    'is_extend' => true,
-                ],
-                '_type' => $type->getName()
-            ]);
-
-        $this->extendOptionsManager->expects($this->at(1))
-            ->method('setColumnOptions')
-            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
-                'extend' => [
-                    $extend => $expected
-                ],
-                '_type' => $type->getName()
-            ]);
-
-        /** @var ExtendColumn $column */
-        $column = $this->table->addColumn(self::COLUMN_NAME, $type->getName(), $options);
-        $this->assertInstanceOf(ExtendColumn::class, $column);
-
-        $this->assertAttributeEquals($expected, $attribute, $column);
+        $this->setExpectations('string', 'length', 100);
+        $options = ['length' => 100, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
+        $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
+        static::assertInstanceOf(ExtendColumn::class, $column);
+        static::assertEquals(100, $column->getLength());
     }
 
-    /**
-     * @return array
-     */
-    public function addColumnWithSameExtendDataProvider()
+    public function testAddColumnWithSameExtendPrecision()
     {
-        return [
-            'length' => [
-                'type' => Type::getType('string'),
-                'options' => ['length' => 100],
-                'attribute' => '_length',
-                'extend' => 'length',
-                'expected' => 100,
-            ],
-            'precision' => [
-                'type' => Type::getType('float'),
-                'options' => ['precision' => 8],
-                'attribute' => '_precision',
-                'extend' => 'precision',
-                'expected' => 8,
-            ],
-            'scale' => [
-                'type' => Type::getType('float'),
-                'options' => ['scale' => 5],
-                'attribute' => '_scale',
-                'extend' => 'scale',
-                'expected' => 5,
-            ],
-            'default' => [
-                'type' => Type::getType('string'),
-                'options' => ['default' => 'N/A'],
-                'attribute' => '_default',
-                'extend' => 'default',
-                'expected' => 'N/A',
-            ],
-        ];
+        $this->setExpectations('float', 'precision', 8);
+        $options = ['precision' => 8, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
+        $column = $this->table->addColumn(self::COLUMN_NAME, 'float', $options);
+        static::assertInstanceOf(ExtendColumn::class, $column);
+        static::assertEquals(8, $column->getPrecision());
+    }
+
+    public function testAddColumnWithSameExtendScale()
+    {
+        $this->setExpectations('float', 'scale', 5);
+        $options = ['scale' => 5, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
+        $column = $this->table->addColumn(self::COLUMN_NAME, 'float', $options);
+        static::assertInstanceOf(ExtendColumn::class, $column);
+        static::assertEquals(5, $column->getScale());
+    }
+
+    public function testAddColumnWithSameExtendDefault()
+    {
+        $this->setExpectations('string', 'default', 'N/A');
+        $options = ['default' => 'N/A', OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
+        $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
+        static::assertInstanceOf(ExtendColumn::class, $column);
+        static::assertEquals('N/A', $column->getDefault());
+    }
+
+    private function setExpectations($name, string $extend, $expected): void
+    {
+        $type = Type::getType($name);
+
+        $this->extendOptionsManager->expects(static::exactly(2))
+            ->method('setColumnOptions')
+            ->withConsecutive(
+                [
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    [
+                        'extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true],
+                        '_type' => $type->getName()
+                    ]
+                ],
+                [
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    [
+                        'extend' => [$extend => $expected],
+                        '_type' => $type->getName()
+                    ]
+                ]
+            );
     }
 }

@@ -3,22 +3,26 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\ValueContainer;
 
 class ResultRecordTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAddData()
+    public function testAddDataObject()
     {
-        $originalContainer   = ['first' => 1];
-        $additionalContainer = ['second' => 2];
+        $record = new ResultRecord(['key' => 'value']);
+        $record->addData(new ValueContainer('other value'));
 
-        $resultRecord = new ResultRecord($originalContainer);
-        $resultRecord->addData($additionalContainer);
+        $this->assertSame('value', $record->getValue('key'));
+        $this->assertSame('other value', $record->getValue('something'));
+    }
 
-        $this->assertAttributeContains($originalContainer, 'valueContainers', $resultRecord);
-        $this->assertAttributeContains($additionalContainer, 'valueContainers', $resultRecord);
+    public function testAddDataArrayOfObjectsWithNumericIndices()
+    {
+        $record = new ResultRecord(['key' => 'value']);
+        $record->addData([new ValueContainer('other value')]);
 
-        $this->assertEquals($originalContainer['first'], $resultRecord->getValue('first'));
-        $this->assertEquals($additionalContainer['second'], $resultRecord->getValue('second'));
+        $this->assertSame('value', $record->getValue('key'));
+        $this->assertSame('other value', $record->getValue('something'));
     }
 
     /**
@@ -133,7 +137,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($itemValue, $resultRecord->getValue($itemName));
     }
-    
+
     public function setValueProvider()
     {
         $obj        = new \stdClass();

@@ -24,7 +24,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultOwnerSubscriber */
     protected $subscriber;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->user = $this->createMock(AbstractUser::class);
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -39,7 +39,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DefaultOwnerSubscriber($tokenAccessor, $this->typesRegistry);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->subscriber);
     }

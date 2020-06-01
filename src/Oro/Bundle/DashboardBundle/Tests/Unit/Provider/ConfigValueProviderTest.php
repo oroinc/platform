@@ -11,7 +11,7 @@ class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigValueProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $converter = new TestConverter();
 

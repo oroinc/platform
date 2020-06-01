@@ -295,7 +295,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$stopwatch = new Stopwatch();
 
@@ -310,7 +310,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (self::ENABLE_TESTS && self::SHOW_DURATIONS) {
             $result = PHP_EOL;

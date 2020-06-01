@@ -32,7 +32,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repo = $this->createMock(EntityRepository::class);
 
@@ -50,7 +50,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->repo,
@@ -119,10 +119,8 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $messages = $this->getObjectAttribute($this->output, 'messages');
-
         $found = 0;
-        foreach ($messages as $message) {
+        foreach ($this->output->messages as $message) {
             foreach ($expectedOutput as $expected) {
                 if (strpos($message, $expected) !== false) {
                     $found++;

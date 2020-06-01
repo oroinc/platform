@@ -43,7 +43,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionProvider = $this->createMock(DatagridActionProviderInterface::class);
         $this->actionFactory = $this->createMock(ActionFactory::class);
@@ -469,6 +469,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->extension->visitDatasource($config, $datasource);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testVisitDatasourceForOrmDatasource()
@@ -494,7 +495,9 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->visitDatasource($config, $datasource);
 
-        self::assertAttributeEquals($ownershipFields, 'ownershipFields', $this->extension);
+        $ownershipFieldsProperty = new \ReflectionProperty(ActionExtension::class, 'ownershipFields');
+        $ownershipFieldsProperty->setAccessible(true);
+        self::assertEquals($ownershipFields, $ownershipFieldsProperty->getValue($this->extension));
     }
 
     public function testVisitDatasourceForOrmDatasourceButNoAclProtectedActions()

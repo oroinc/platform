@@ -21,7 +21,7 @@ class ExecuteActionEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();

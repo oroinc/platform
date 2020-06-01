@@ -44,7 +44,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
     /** @var EmailRenderer */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
@@ -186,7 +186,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $result = $this->renderer->compileMessage($emailTemplate, $templateParams);
         $expectedContent = 'test <a href="http://example.com">test</a>   2 test_system N/A';
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertCount(2, $result);
         $this->assertSame($subject, $result[0]);
         $this->assertSame($expectedContent, $result[1]);

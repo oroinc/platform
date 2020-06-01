@@ -21,7 +21,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
      */
     protected $requestUrl = 'http://test';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sourceResponse = $this->getMockBuilder('Guzzle\Http\Message\Response')
             ->disableOriginalConstructor()

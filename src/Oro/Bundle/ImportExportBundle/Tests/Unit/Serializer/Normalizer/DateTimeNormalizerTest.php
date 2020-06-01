@@ -14,7 +14,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var  LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -365,12 +365,11 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid datetime "qwerty", expected format Y-m-d\TH:i:sO.
-     */
     public function testDenormalizeException()
     {
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid datetime "qwerty", expected format Y-m-d\TH:i:sO.');
+
         $this->normalizer->denormalize('qwerty', 'DateTime', null);
     }
 }

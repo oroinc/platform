@@ -21,7 +21,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mapper = new GedmoTranslationMapper();
         $this->form = $this->createMock(FormInterface::class);
@@ -51,12 +51,11 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage object, array or empty
-     */
     public function testMapDataToFormsException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('object, array or empty');
+
         $this->mapper->mapDataToForms('', [$this->form]);
     }
 

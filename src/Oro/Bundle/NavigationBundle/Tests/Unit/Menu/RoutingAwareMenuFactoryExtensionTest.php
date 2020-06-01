@@ -20,7 +20,7 @@ class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var RoutingAwareMenuFactoryExtension */
     protected $factoryExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
 

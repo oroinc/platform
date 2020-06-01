@@ -18,7 +18,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataGridManager = $this->getMockBuilder(Manager::class)->disableOriginalConstructor()->getMock();
         $this->contextConfigurator = new DatagridConfigContextConfigurator($this->dataGridManager);
@@ -84,12 +84,11 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "grid_config" value must be a string, but "array" given.
-     */
     public function testConfigureContextIfInvalidDataArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "grid_config" value must be a string, but "array" given.');
+
         $context = new LayoutContext();
         $context['grid_config'] = [['grid_name']];
         $this->contextConfigurator->configureContext($context);

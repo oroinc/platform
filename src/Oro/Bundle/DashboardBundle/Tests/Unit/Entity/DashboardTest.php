@@ -11,7 +11,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
      */
     protected $dashboard;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dashboard = new Dashboard();
     }

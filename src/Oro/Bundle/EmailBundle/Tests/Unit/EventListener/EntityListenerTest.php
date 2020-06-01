@@ -56,7 +56,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     private $entityRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailOwnerManager    =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager')

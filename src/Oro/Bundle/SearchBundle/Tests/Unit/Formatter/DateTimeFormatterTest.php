@@ -14,7 +14,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritDoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateTimeFormatter = new DateTimeFormatter();
     }
@@ -22,7 +22,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritDoc
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->dateTimeFormatter);
     }

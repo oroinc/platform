@@ -4,8 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\CountryType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\CountryType as BaseCountryType;
+use Symfony\Component\Intl\Countries;
 
 class CountryTypeTest extends FormIntegrationTestCase
 {
@@ -17,7 +17,7 @@ class CountryTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->formType = new CountryType();
@@ -25,14 +25,14 @@ class CountryTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
+        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView[] $choices */
         $choices = $this->factory->create(CountryType::class)
             ->createView()->vars['choices'];
-
-        $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('US', 'US', 'United States'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('FR', 'FR', 'France'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
+        $values = [];
+        foreach ($choices as $choice) {
+            $values[$choice->value] = $choice->label;
+        }
+        $this->assertEquals(Countries::getNames('en'), $values);
     }
 
     public function testGetParent()

@@ -40,7 +40,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $testRegions = ['one', 'two', 'three'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translatableListener = $this->createMock(TranslatableListener::class);
         $this->eventManager = $this->createMock(EventManager::class);
@@ -114,12 +114,11 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->testRegions, $actualRegions);
     }
 
-    /**
-     * @expectedException \Gedmo\Exception\RuntimeException
-     * @expectedExceptionMessage The translation listener could not be found
-     */
     public function testGetCountryRegionsException()
     {
+        $this->expectException(\Gedmo\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The translation listener could not be found');
+
         $country = new Country('iso2Code');
 
         $this->eventManager->expects($this->any())

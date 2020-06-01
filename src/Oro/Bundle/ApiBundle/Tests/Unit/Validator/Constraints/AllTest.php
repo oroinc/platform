@@ -20,19 +20,15 @@ class AllTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$childConstraint], $constraint->constraints);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\MissingOptionsException
-     */
     public function testRequiredOptions()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
         new All();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testRejectNonConstraints()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new All('test');
     }
 }

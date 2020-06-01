@@ -48,7 +48,7 @@ class ActivityManagerTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -970,12 +970,11 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The query must have at least one root entity.
-     */
     public function testAddFilterByTargetEntityWithEmptyQuery()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The query must have at least one root entity.');
+
         $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
         $targetEntityId    = 123;
 
@@ -984,12 +983,13 @@ class ActivityManagerTest extends OrmTestCase
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The $activityEntityClass must be specified if the query has several root entities.
-     */
     public function testAddFilterByTargetEntityWithSeveralRootEntitiesButWithoutActivityEntityClassSpecified()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The $activityEntityClass must be specified if the query has several root entities.'
+        );
+
         $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
         $targetEntityId    = 123;
 
@@ -1002,12 +1002,11 @@ class ActivityManagerTest extends OrmTestCase
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "Entity\NotRoot" must be the root entity.
-     */
     public function testAddFilterByTargetEntityWithInvalidActivityEntityClassSpecified()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "Entity\NotRoot" must be the root entity.');
+
         $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
         $targetEntityId    = 123;
 

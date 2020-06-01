@@ -9,7 +9,7 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetItemsChoiceTypeConverter */
     protected $converter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->converter = new WidgetItemsChoiceTypeConverter();
     }

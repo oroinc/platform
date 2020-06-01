@@ -55,7 +55,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
      */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType')
             ->setMethods(['createDefaultTransformer'])

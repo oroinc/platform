@@ -200,7 +200,7 @@ abstract class ActionTestCase extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains($message, $crawler->html());
+        static::assertStringContainsString($message, $crawler->html());
     }
 
     /**

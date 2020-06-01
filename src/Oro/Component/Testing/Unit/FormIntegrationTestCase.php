@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 
+/**
+ * Base class for writing form integration tests as unit tests.
+ */
 class FormIntegrationTestCase extends BaseTestCase
 {
     /**
@@ -27,7 +30,7 @@ class FormIntegrationTestCase extends BaseTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

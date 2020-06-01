@@ -13,7 +13,7 @@ use Symfony\Component\DomCrawler\Form;
  */
 class ControllersResetTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -34,7 +34,7 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('oro_set_password_form[password]', $content);
+        static::assertStringContainsString('oro_set_password_form[password]', $content);
 
         $form = $crawler->selectButton('Save')->form();
 
@@ -43,7 +43,7 @@ class ControllersResetTest extends WebTestCase
         $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('"triggerSuccess":true', $result->getContent());
+        static::assertStringContainsString('"triggerSuccess":true', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
 
@@ -63,8 +63,8 @@ class ControllersResetTest extends WebTestCase
         $this->assertResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
 
-        $this->assertContains('username', $content);
-        $this->assertContains('_token', $content);
+        static::assertStringContainsString('username', $content);
+        static::assertStringContainsString('_token', $content);
 
         $form = $crawler->selectButton('Request')->form();
         $form['username'] = LoadUserData::SIMPLE_USER_EMAIL;
@@ -73,7 +73,10 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 200);
-        $this->assertContains('If there is a user account associated with ...@example.com', $result->getContent());
+        static::assertStringContainsString(
+            'If there is a user account associated with ...@example.com',
+            $result->getContent()
+        );
     }
 
     public function testSendEmailAction()
@@ -93,7 +96,7 @@ class ControllersResetTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('If there is a user account associated with', $result->getContent());
+        static::assertStringContainsString('If there is a user account associated with', $result->getContent());
 
         /** @var User $user */
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->findOneBy(
@@ -117,7 +120,10 @@ class ControllersResetTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('The CSRF token is invalid. Please try to resubmit the form.', $result->getContent());
+        static::assertStringContainsString(
+            'The CSRF token is invalid. Please try to resubmit the form.',
+            $result->getContent()
+        );
 
         /** @var User $user */
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->findOneBy(
@@ -142,13 +148,13 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('/user/send-forced-password-reset-email', $result->getContent());
+        static::assertStringContainsString('/user/send-forced-password-reset-email', $result->getContent());
 
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
         $result = $this->client->getResponse();
         $expectedResponse = '{"widget":{"trigger":[{"eventFunction":"execute","name":"refreshPage"}],"remove":true}}';
-        $this->assertContains($expectedResponse, $result->getContent());
+        static::assertStringContainsString($expectedResponse, $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
         $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
@@ -177,9 +183,9 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $response = json_decode($result->getContent(), true);
+        $response = \json_decode($result->getContent(), true);
 
-        $this->assertContains(
+        static::assertContainsEquals(
             [
                 'successful' => true,
                 'count' => 1,
@@ -212,8 +218,8 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
-        $this->assertContains('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
+        static::assertStringContainsString('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
+        static::assertStringContainsString('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
 
         /** @var Form $form */
         $form = $crawler->selectButton('Reset')->form();
@@ -233,7 +239,7 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('The passwords must match.', $result->getContent());
+        static::assertStringContainsString('The passwords must match.', $result->getContent());
 
         // @codingStandardsIgnoreStart
         $errorDiv = $crawler->filterXPath(
@@ -251,7 +257,10 @@ class ControllersResetTest extends WebTestCase
         $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Your password was successfully reset. You may log in now.', $result->getContent());
+        static::assertStringContainsString(
+            'Your password was successfully reset. You may log in now.',
+            $result->getContent()
+        );
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
 
@@ -272,8 +281,8 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
-        $this->assertContains('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
+        static::assertStringContainsString('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
+        static::assertStringContainsString('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
 
         /** @var Form $form */
         $form = $crawler->selectButton('Reset')->form();
@@ -293,7 +302,7 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('This value should not be blank.', $result->getContent());
+        static::assertStringContainsString('This value should not be blank.', $result->getContent());
 
         // @codingStandardsIgnoreStarts
         $errorDiv = $crawler->filterXPath(

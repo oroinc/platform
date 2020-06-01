@@ -10,7 +10,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var DataContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new DataContextConfigurator();
     }
@@ -60,35 +60,34 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "data" does not exist.
-     */
     public function testShouldThrowExceptionIfDataNotArray()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Failed to resolve the context variables. Reason: The option "data" does not exist.'
+        );
+
         $context         = new LayoutContext();
         $context['data'] = 123;
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data key "0" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidDataArray()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data key "0" must be a string, but "integer" given.');
+
         $context         = new LayoutContext();
         $context['data'] = [123];
         $this->contextConfigurator->configureContext($context);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The data item "test" must have "data" key.
-     */
     public function testShouldThrowExceptionIfNoDataValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data item "test" must have "data" key.');
+
         $context         = new LayoutContext();
         $context['data'] = ['test' => ['identifier' => 'dataId']];
         $this->contextConfigurator->configureContext($context);

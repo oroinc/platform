@@ -18,7 +18,7 @@ class EntityClassValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

@@ -18,7 +18,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeAssembler */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionData = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
             ->disableOriginalConstructor()

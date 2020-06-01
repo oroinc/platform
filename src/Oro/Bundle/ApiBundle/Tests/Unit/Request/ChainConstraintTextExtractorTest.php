@@ -14,7 +14,7 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ConstraintTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $extractors = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $firstExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
         $secondExtractor = $this->createMock(ConstraintTextExtractorInterface::class);

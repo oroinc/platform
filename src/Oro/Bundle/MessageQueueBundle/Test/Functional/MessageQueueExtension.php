@@ -29,7 +29,7 @@ trait MessageQueueExtension
      *
      * After triggered after client removed
      */
-    public function tearDown()
+    protected function tearDown(): void
     {
         if (null !== self::getContainer()) {
             self::getMessageCollector()->clear();

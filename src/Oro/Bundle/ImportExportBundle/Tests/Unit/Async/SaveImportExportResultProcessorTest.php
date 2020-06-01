@@ -32,7 +32,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
         $this->userManager = $this->createMock(UserManager::class);

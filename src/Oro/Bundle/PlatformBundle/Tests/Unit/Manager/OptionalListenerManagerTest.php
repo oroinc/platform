@@ -22,7 +22,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $testListeners;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->testListeners = [
             'test.listener1',
@@ -54,12 +54,11 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($testListener->enabled);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Listener "test.bad_listener" does not exist or not optional
-     */
     public function testDisableNonExistsListener()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Listener "test.bad_listener" does not exist or not optional');
+
         $this->manager->disableListener('test.bad_listener');
     }
 

@@ -27,7 +27,7 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Event\\BuildAfter')
             ->disableOriginalConstructor()

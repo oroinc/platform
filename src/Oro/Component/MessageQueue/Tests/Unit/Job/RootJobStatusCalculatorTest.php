@@ -32,7 +32,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
         $this->jobStatusChecker = $this->createMock(JobStatusChecker::class);

@@ -23,7 +23,7 @@ class SqlWalkerTest extends OrmTestCase
      */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -231,7 +231,7 @@ class SqlWalkerTest extends OrmTestCase
         $query->setHint(UnionOutputResultModifier::HINT_UNION_KEY, "'union_id' = 'union_id'");
         $query->setHint(UnionOutputResultModifier::HINT_UNION_VALUE, $unionSQL);
 
-        $this->assertNotContains($unionSQL, $query->getSQL());
+        $this->assertStringNotContainsString($unionSQL, $query->getSQL());
     }
 
     public function testWalkSubselectWithUnionHook()

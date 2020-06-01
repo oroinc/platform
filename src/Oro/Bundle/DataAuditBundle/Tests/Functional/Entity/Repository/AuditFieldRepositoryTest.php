@@ -26,7 +26,7 @@ class AuditFieldRepositoryTest extends WebTestCase
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->repository = $this->getContainer()->get('doctrine')
@@ -69,7 +69,7 @@ class AuditFieldRepositoryTest extends WebTestCase
         );
 
         $audits = $this->auditRepository->findAll();
-        $this->assertInternalType('array', $audits);
+        $this->assertIsArray($audits);
         $this->assertNotEmpty($audits);
         $this->assertCount(1, $audits);
 
@@ -77,12 +77,12 @@ class AuditFieldRepositoryTest extends WebTestCase
         $this->assertInstanceOf(Audit::class, $audit);
 
         $fieldsByAudit = $this->repository->getVisibleFieldsByAuditIds([$audit->getId()]);
-        $this->assertInternalType('array', $fieldsByAudit);
+        $this->assertIsArray($fieldsByAudit);
         $this->assertNotEmpty($fieldsByAudit);
         $this->assertCount(1, $fieldsByAudit);
 
         $fields = reset($fieldsByAudit);
-        $this->assertInternalType('array', $fields);
+        $this->assertIsArray($fields);
         $this->assertNotEmpty($fields);
         $this->assertCount(1, $fields);
 
@@ -117,7 +117,7 @@ class AuditFieldRepositoryTest extends WebTestCase
         );
 
         $audits = $this->auditRepository->findAll();
-        $this->assertInternalType('array', $audits);
+        $this->assertIsArray($audits);
         $this->assertNotEmpty($audits);
         $this->assertCount(1, $audits);
 
@@ -133,7 +133,7 @@ class AuditFieldRepositoryTest extends WebTestCase
             ->execute();
 
         $fieldsByAudit = $this->repository->getVisibleFieldsByAuditIds([$audit->getId()]);
-        $this->assertInternalType('array', $fieldsByAudit);
+        $this->assertIsArray($fieldsByAudit);
         $this->assertEmpty($fieldsByAudit);
     }
 }

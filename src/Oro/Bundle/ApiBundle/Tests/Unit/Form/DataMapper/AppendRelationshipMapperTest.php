@@ -27,7 +27,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     /** @var AppendRelationshipMapper */
     private $mapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);

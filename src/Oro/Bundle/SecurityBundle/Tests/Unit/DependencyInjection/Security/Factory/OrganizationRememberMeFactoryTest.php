@@ -11,7 +11,7 @@ class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $factory;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->factory = new OrganizationRememberMeFactory();
     }

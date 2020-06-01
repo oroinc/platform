@@ -17,7 +17,7 @@ class AddressTest extends RestJsonApiTestCase
     private const IS_REGION_REQUIRED         = false;
     private const COUNTRY_REGION_ADDRESS_REF = 'address1';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures(['@OroAddressBundle/Tests/Functional/DataFixtures/addresses.yml']);

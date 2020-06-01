@@ -30,7 +30,7 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

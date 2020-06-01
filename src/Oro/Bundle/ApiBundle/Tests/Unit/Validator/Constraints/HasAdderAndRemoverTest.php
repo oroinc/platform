@@ -7,12 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HasAdderAndRemoverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\MissingOptionsException
-     * @expectedExceptionMessage The options "class", "property" must be set
-     */
     public function testRequiredOptions()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('The options "class", "property" must be set');
+
         new HasAdderAndRemover();
     }
 

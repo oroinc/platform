@@ -16,7 +16,7 @@ class PermissionRepositoryTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -27,7 +27,7 @@ class PermissionRepositoryTest extends WebTestCase
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroSecurityBundle:Permission');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
 

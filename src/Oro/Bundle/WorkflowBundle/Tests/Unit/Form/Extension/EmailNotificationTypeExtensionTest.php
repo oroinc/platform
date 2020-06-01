@@ -19,7 +19,7 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
     /** @var EmailNotificationTypeExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = $this->createMock(EmailNotificationTypeListener::class);
 

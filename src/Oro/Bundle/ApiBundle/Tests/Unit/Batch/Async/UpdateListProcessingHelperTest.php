@@ -27,7 +27,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListProcessingHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->producer = $this->createMock(MessageProducerInterface::class);
@@ -65,7 +65,10 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $startTimestamp = microtime(true);
         usleep(10000);
         $calculatedAggregateTime = $this->helper->calculateAggregateTime($startTimestamp, 5);
-        self::assertEqualsWithDelta(15, $calculatedAggregateTime, 3);
+        // expected value is 15, but do test with some delta
+        // due to the calculated time may depends on the server performance
+        self::assertGreaterThanOrEqual(15, $calculatedAggregateTime);
+        self::assertLessThan(30, $calculatedAggregateTime);
     }
 
     public function testSafeDeleteFile()

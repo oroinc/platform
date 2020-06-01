@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\Input;
 
 class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
@@ -18,22 +19,22 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
     /** @var HandleProcessTriggerCommand */
     private $command;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var MockObject|ManagerRegistry */
     private $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessHandler */
+    /** @var MockObject|ProcessHandler */
     private $processHandler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Input */
+    /** @var MockObject|Input */
     private $input;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
+    /** @var MockObject|EntityRepository */
     private $repo;
 
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
@@ -56,7 +57,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->repo, $this->processHandler, $this->managerRegistry, $this->input, $this->output, $this->command);
     }
@@ -108,10 +109,8 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $messages = $this->getObjectAttribute($this->output, 'messages');
-
         $found = 0;
-        foreach ($messages as $message) {
+        foreach ($this->output->messages as $message) {
             foreach ($expectedOutput as $expected) {
                 if (strpos($message, $expected) !== false) {
                     $found++;
@@ -128,20 +127,18 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected function createProcessTrigger($id)
     {
-        $definition = new ProcessDefinition();
-        $definition
+        $definition = (new ProcessDefinition())
             ->setName('name')
             ->setLabel('label')
             ->setRelatedEntity('\StdClass');
 
-        $processTrigger = new ProcessTrigger();
+        $processTrigger = new class($id) extends ProcessTrigger {
+            public function __construct($id)
+            {
+                $this->id = $id;
+            }
+        };
         $processTrigger->setDefinition($definition);
-
-        $class = new \ReflectionClass($processTrigger);
-        $prop = $class->getProperty('id');
-        $prop->setAccessible(true);
-
-        $prop->setValue($processTrigger, $id);
 
         return $processTrigger;
     }
@@ -181,7 +178,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(['Process trigger not found'], 'messages', $this->output);
+        static::assertEquals("Process trigger not found\n", $this->output->getOutput());
     }
 
     public function testExecuteEmptyNoIdSpecified()
@@ -197,7 +194,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(['No process trigger identifier defined'], 'messages', $this->output);
+        static::assertEquals("No process trigger identifier defined\n", $this->output->getOutput());
     }
 
     public function testExecuteWrongNameSpecified()
@@ -221,10 +218,6 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(
-            ['Trigger not found in process definition "wrong_name"'],
-            'messages',
-            $this->output
-        );
+        static::assertEquals('Trigger not found in process definition "wrong_name"' . "\n", $this->output->getOutput());
     }
 }

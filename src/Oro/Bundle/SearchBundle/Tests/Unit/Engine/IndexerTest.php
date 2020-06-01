@@ -36,7 +36,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
         $this->engine = $this->createMock(ExtendedEngineInterface::class);

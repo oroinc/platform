@@ -22,7 +22,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->firstProvider = $this->createMock(EntityOverrideProviderInterface::class);
@@ -44,12 +44,11 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an entity override provider for the request "rest,another".
-     */
     public function testGetEntityOverrideProviderForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an entity override provider for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getEntityOverrideProvider($requestType);

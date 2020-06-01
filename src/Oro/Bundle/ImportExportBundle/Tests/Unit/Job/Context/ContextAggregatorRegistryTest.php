@@ -29,12 +29,11 @@ class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($aggregator1, $contextAggregatorRegistry->getAggregator('aggregator1'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The context aggregator "aggregator2" does not exist.
-     */
     public function testGetAggregatorForNotExistingAggregator()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The context aggregator "aggregator2" does not exist.');
+
         $aggregator1 = $this->createMock(ContextAggregatorInterface::class);
         $aggregator1->expects(self::once())
             ->method('getType')

@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DashboardControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -35,7 +35,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard', $html);
+        static::assertStringContainsString('Test Dashboard', $html);
     }
 
     /**
@@ -60,7 +60,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard Update', $html);
+        static::assertStringContainsString('Test Dashboard Update', $html);
     }
 
     /**
@@ -75,7 +75,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Test Dashboard Update', $crawler->html());
+        static::assertStringContainsString('Test Dashboard Update', $crawler->html());
     }
 
     /**

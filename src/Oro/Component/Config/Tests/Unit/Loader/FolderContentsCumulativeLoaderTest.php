@@ -21,7 +21,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
         $this->bundleDir = $tmpDir . $this->getPath('/Bundle/TestBundle1');
@@ -97,9 +97,6 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
         $unserialized = unserialize(serialize($loader));
         $this->assertEquals($loader, $unserialized);
-        $this->assertNotSame($loader, $unserialized);
-        $this->assertAttributeEquals($fileMatcher, 'fileMatcher', $unserialized);
-        $this->assertAttributeNotSame($fileMatcher, 'fileMatcher', $unserialized);
     }
 
     /**

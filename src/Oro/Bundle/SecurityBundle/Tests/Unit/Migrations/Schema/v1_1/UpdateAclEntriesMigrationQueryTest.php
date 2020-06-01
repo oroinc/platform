@@ -34,7 +34,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
     protected $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
         'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
         $this->connection->expects($this->any())
@@ -64,7 +64,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->setConnection($this->connection);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->query, $this->connection, $this->aclManager, $this->aclCache);
     }
@@ -147,7 +147,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
                     $index = array_search($params, $data, true);
 
                     $this->assertTrue($index !== false);
-                    $this->assertContains(
+                    static::assertStringContainsString(
                         (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
                         $query
                     );

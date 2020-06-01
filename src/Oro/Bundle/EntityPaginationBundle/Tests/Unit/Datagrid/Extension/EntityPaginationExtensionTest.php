@@ -13,7 +13,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension  = new EntityPaginationExtension();
         $this->extension->setParameters(new ParameterBag());
@@ -52,12 +52,11 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Entity pagination is not boolean
-     */
     public function testProcessException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Entity pagination is not boolean');
+
         $config = DatagridConfiguration::create(
             [
                 'options' => [

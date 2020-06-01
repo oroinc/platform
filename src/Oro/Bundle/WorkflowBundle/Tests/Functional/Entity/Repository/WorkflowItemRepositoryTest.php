@@ -20,7 +20,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
      */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities']);
@@ -51,8 +51,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
     {
         $entityIds = $this->getEntityIdsByWorkflow();
         $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
-        $this->assertInternalType(
-            'array',
+        $this->assertIsArray(
             $this->repository->findAllByEntityMetadata(
                 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
                 $entityId

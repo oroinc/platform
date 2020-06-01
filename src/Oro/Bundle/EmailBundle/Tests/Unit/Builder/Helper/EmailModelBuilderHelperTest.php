@@ -64,7 +64,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $templating;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()

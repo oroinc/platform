@@ -24,7 +24,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 

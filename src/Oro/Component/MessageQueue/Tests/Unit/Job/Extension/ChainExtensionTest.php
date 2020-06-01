@@ -14,7 +14,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $subExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subExtension = $this->createMock(ExtensionInterface::class);
         $this->chainExtension = new ChainExtension([$this->subExtension]);

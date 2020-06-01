@@ -9,7 +9,7 @@ class HateoasConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var HateoasConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new HateoasConfigExtra();
     }

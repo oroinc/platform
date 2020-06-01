@@ -36,7 +36,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
         $this->helper = $this->createMock(Helper::class);
@@ -120,12 +120,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The menu has no child named "path"
-     */
     public function testGetMenuException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The menu has no child named "path"');
+
         $options = [];
         $menuInstance = $this->getMockBuilder(ItemInterface::class)
             ->setMethods(['getChild'])
@@ -138,12 +137,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction($this->extension, 'oro_menu_get', [$menuInstance, ['path'], $options]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The array cannot be empty
-     */
     public function testRenderException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The array cannot be empty');
+
         self::callTwigFunction($this->extension, 'oro_menu_render', [[]]);
     }
 

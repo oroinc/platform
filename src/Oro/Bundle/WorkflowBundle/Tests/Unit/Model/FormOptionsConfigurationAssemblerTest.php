@@ -36,7 +36,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistryInterface::class);
         $this->formHandlerRegistry = $this->createMock(FormHandlerRegistry::class);
@@ -58,7 +58,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
             'Form type should be FQCN or class not found got "%s"',
             $transitionConfiguration['form_type']
         );
-        $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\AssemblerException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($transitionConfiguration);
     }
@@ -69,7 +69,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
             'Unable to resolve form type "%s"',
             self::$transitionConfiguration['form_type']
         );
-        $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\AssemblerException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(false);
         $this->assembler->assemble(self::$transitionConfiguration);
@@ -82,7 +82,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
             'Unable to resolve form handler with alias "%s"',
             $formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['handler']
         );
-        $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\AssemblerException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(false);
@@ -96,7 +96,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
             'Unable to resolve form data provider with alias "%s"',
             $formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_provider']
         );
-        $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\AssemblerException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(true);

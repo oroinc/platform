@@ -17,7 +17,7 @@ class IntegrationProcessTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

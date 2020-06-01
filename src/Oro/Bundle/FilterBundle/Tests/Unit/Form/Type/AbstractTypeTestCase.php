@@ -33,7 +33,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected $formExtensions = array();
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         if ($this->defaultTimezone) {
@@ -42,7 +42,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         if ($this->defaultTimezone) {

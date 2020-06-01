@@ -13,12 +13,12 @@ class RecipientListTest extends \PHPUnit\Framework\TestCase
      */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new RecipientList();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }
@@ -101,21 +101,21 @@ class RecipientListTest extends \PHPUnit\Framework\TestCase
 
         // test when email filled
         $this->entity->setEmail('test email');
-        $this->assertInternalType('string', $this->entity->__toString());
+        $this->assertIsString($this->entity->__toString());
         $this->assertNotEmpty($this->entity->__toString());
         // clear email
         $this->entity->setEmail(null);
 
         // test when users filled
         $this->entity->addUser($user);
-        $this->assertInternalType('string', $this->entity->__toString());
+        $this->assertIsString($this->entity->__toString());
         $this->assertNotEmpty($this->entity->__toString());
         // clear users
         $this->entity->getUsers()->clear();
 
         // test when groups filled
         $this->entity->addGroup($group);
-        $this->assertInternalType('string', $this->entity->__toString());
+        $this->assertIsString($this->entity->__toString());
         $this->assertNotEmpty($this->entity->__toString());
         // clear groups
         $this->entity->getGroups()->clear();

@@ -33,7 +33,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $attachment;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

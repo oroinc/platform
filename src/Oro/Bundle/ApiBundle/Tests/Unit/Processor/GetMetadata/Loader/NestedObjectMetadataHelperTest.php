@@ -22,7 +22,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var NestedObjectMetadataHelper */
     private $nestedObjectMetadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = $this->createMock(MetadataHelper::class);
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
@@ -79,14 +79,13 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetEntityMetadata, $result->getTargetMetadata());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data_class" form option should be specified for the nested object. Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedObjectAssociationShouldThrowExceptionWhenNoDataClassFormOption()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "data_class" form option should be specified for the nested object. Field: Test\Class::testField.'
+        );
+
         $config = new EntityDefinitionConfig();
 
         $entityMetadata = new EntityMetadata();
@@ -110,14 +109,14 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "association.field1" property path is not supported for the nested object. Parent Field: Test\ParentClass::parentField. Target Field: targetField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociationField()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "association.field1" property path is not supported for the nested object.'
+            . ' Parent Field: Test\ParentClass::parentField. Target Field: targetField.'
+        );
+
         $parentConfig = new EntityDefinitionConfig();
         $parentClassName = 'Test\ParentClass';
         $parentFieldName = 'parentField';
@@ -138,14 +137,14 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An association is not supported for the nested object. Parent Field: Test\ParentClass::parentField. Target Field: targetField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociation()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'An association is not supported for the nested object.'
+            . ' Parent Field: Test\ParentClass::parentField. Target Field: targetField.'
+        );
+
         $parentConfig = new EntityDefinitionConfig();
         $parentClassName = 'Test\ParentClass';
         $parentFieldName = 'parentField';

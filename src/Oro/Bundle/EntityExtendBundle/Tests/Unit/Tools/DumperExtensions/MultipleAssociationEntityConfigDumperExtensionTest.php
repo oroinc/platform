@@ -18,7 +18,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $associationBuilder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

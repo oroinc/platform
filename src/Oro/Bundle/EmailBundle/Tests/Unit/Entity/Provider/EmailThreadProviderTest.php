@@ -11,7 +11,7 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailThreadProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new EmailThreadProvider();
     }

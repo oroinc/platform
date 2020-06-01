@@ -9,44 +9,43 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessConfigurationBuilder|MockObject */
     private $configurationBuilder;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     private $managerRegistry;
 
-    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var string|MockObject */
     private $definitionClass;
 
     /** @var ProcessDefinitionsConfigurator */
     private $processDefinitionsConfigurator;
 
-    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectRepository|MockObject */
     private $repository;
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectManager|MockObject */
     private $objectManager;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationBuilder = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'
-        );
+        $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);
 
-        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->repository = $this->createMock(ObjectRepository::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
 
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->definitionClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->definitionClass = ProcessDefinition::class;
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -98,8 +97,8 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration);
         $this->assertEquals($newDefinitionExistent, $definitionStoredExistent);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processDefinitionsConfigurator);
-        $this->assertAttributeEquals([$newDefinitionNonExistent], 'toPersist', $this->processDefinitionsConfigurator);
+        static::assertTrue($this->getDirtyPropertyValue());
+        static::assertEquals([$newDefinitionNonExistent], $this->getToPersistPropertyValue());
     }
 
     public function testFlush()
@@ -135,7 +134,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processDefinitionsConfigurator->flush();
 
-        $this->assertAttributeEquals(false, 'dirty', $this->processDefinitionsConfigurator);
+        static::assertFalse($this->getDirtyPropertyValue());
     }
 
     public function testEmptyFlush()
@@ -194,7 +193,40 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processDefinitionsConfigurator->removeDefinition($definitionName);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processDefinitionsConfigurator);
-        $this->assertAttributeEquals([$definitionObject], 'toRemove', $this->processDefinitionsConfigurator);
+        static::assertTrue($this->getDirtyPropertyValue());
+        static::assertEquals([$definitionObject], $this->getToRemovePropertyValue());
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDirtyPropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'dirty');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processDefinitionsConfigurator);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getToRemovePropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'toRemove');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processDefinitionsConfigurator);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getToPersistPropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'toPersist');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processDefinitionsConfigurator);
     }
 }

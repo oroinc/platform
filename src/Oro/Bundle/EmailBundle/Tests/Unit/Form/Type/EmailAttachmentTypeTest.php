@@ -32,7 +32,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
     protected $emailAttachmentTransformer;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->emailAttachmentTransformer = $this->createMock(EmailAttachmentTransformer::class);

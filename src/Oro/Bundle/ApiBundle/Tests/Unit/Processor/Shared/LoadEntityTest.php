@@ -28,7 +28,7 @@ class LoadEntityTest extends GetProcessorTestCase
     /** @var LoadEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -165,12 +165,11 @@ class LoadEntityTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to the entity.
-     */
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to the entity.');
+
         $entityClass = 'Test\Entity';
         $entityId = 123;
         $config = new EntityDefinitionConfig();

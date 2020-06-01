@@ -87,7 +87,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
      */
     abstract protected function getFilePath($fileName);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -116,7 +116,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $this->searchProvider = $this->createMock(ChainSearchProvider::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($this->authorizationChecker, $this->translator);
@@ -138,12 +138,11 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException
-     * @expectedExceptionMessage Config API section "undefined.sub_section" is not defined.
-     */
     public function testGetApiTreeForUndefinedSection()
     {
+        $this->expectException(\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException::class);
+        $this->expectExceptionMessage('Config API section "undefined.sub_section" is not defined.');
+
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
 
         $provider->getApiTree('undefined.sub_section');
@@ -466,7 +465,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
         $provider->setFeatureChecker($featureChecker);
         $tree = $this->getNodeNamesTree($provider->getTree());
-        $this->assertEquals($expected, $tree, '', 0.0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, $tree);
     }
 
     public function testGetJsTree()

@@ -24,7 +24,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * SetUp test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->formBuilder = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
@@ -36,7 +36,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->subscriber->getSubscribedEvents();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }

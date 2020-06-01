@@ -15,7 +15,7 @@ class SetEntityIdTest extends FormProcessorTestCase
     /** @var SetEntityId */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

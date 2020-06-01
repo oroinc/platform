@@ -15,7 +15,7 @@ class LoadDataFromFileTest extends BatchUpdateProcessorTestCase
     /** @var LoadDataFromFile */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fileManager = $this->createMock(FileManager::class);

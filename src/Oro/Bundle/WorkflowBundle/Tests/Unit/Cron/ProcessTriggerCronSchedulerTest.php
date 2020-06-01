@@ -16,7 +16,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTriggerCronScheduler */
     protected $processCronScheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deferredScheduler = $this->getMockBuilder(DeferredScheduler::class)
             ->disableOriginalConstructor()
@@ -75,7 +75,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $mockTrigger = $this->createMock(ProcessTrigger::class);
         $mockTrigger->expects($this->exactly(1))->method('getCron')->willReturn(null);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler supports only cron schedule triggers.'
         );
@@ -89,7 +89,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->once())->method('getCron')->willReturn(null);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler supports only cron schedule triggers.'
         );

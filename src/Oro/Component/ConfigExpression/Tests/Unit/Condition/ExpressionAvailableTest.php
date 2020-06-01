@@ -17,7 +17,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionAvailable */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(FactoryWithTypesInterface::class);
         $this->factory->expects($this->any())
@@ -31,7 +31,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->condition = new ExpressionAvailable($this->factory, self::NAME);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->condition, $this->factory);
     }
@@ -84,12 +84,11 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['message' => $message, 'parameters' => ['{{ type }}' => 'test']], $errors->first());
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 element, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
+
         $this->condition->initialize([]);
     }
 

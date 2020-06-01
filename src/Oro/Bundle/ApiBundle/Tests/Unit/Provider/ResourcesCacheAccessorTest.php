@@ -16,7 +16,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateRegistry */
     private $configCacheStateRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheProvider::class);
         $this->configCacheStateRegistry = $this->createMock(ConfigCacheStateRegistry::class);

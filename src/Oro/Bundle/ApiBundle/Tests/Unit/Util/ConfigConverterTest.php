@@ -17,7 +17,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigConverter */
     private $configConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
 

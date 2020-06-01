@@ -20,7 +20,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 

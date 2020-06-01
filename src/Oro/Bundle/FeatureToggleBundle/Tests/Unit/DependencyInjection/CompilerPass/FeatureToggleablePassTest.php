@@ -14,7 +14,7 @@ class FeatureToggleablePassTest extends \PHPUnit\Framework\TestCase
      */
     protected $featureToggleablePass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureToggleablePass = new FeatureToggleablePass();
     }

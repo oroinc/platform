@@ -76,7 +76,7 @@ class OroConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->configuration->getParameter($key), sprintf('%s parameter is correct', $key));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->configuration);
     }

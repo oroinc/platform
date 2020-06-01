@@ -18,7 +18,7 @@ class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var RelatedEntityValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

@@ -13,7 +13,7 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ApiSubRequestListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new ApiSubRequestListener();
         $this->listener->addRule(new RequestMatcher('^/api/rest'), ['stop' => false]);

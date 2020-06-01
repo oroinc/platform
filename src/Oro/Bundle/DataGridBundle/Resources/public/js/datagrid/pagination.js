@@ -120,8 +120,13 @@ define([
                 return;
             }
 
-            const direction = $.trim($(e.target).closest('[data-grid-pagination-trigger]')
-                .data('grid-pagination-direction'));
+            let direction = $(e.target).closest('[data-grid-pagination-trigger]')
+                .data('grid-pagination-direction');
+
+            if (typeof direction === 'string') {
+                direction = direction.trim();
+            }
+
             const ffConfig = this.fastForwardHandleConfig;
 
             const collection = this.collection;

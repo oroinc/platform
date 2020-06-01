@@ -46,7 +46,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var LoadFromConfigBag */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -533,14 +533,14 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid configuration for "subresource1" subresource of "Test\Class" entity. The target class should be specified in config.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessCustomSubresourceWithoutTargetClass()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for "subresource1" subresource of "Test\Class" entity'
+            . '. The target class should be specified in config.'
+        );
+
         $entityClass = 'Test\Class';
         $resource = new ApiResource($entityClass);
         $subresources = $this->getApiResourceSubresources($resource);

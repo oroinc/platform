@@ -10,7 +10,7 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FieldTypeHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
         $entityExtendConfigurationProvider->expects(self::any())

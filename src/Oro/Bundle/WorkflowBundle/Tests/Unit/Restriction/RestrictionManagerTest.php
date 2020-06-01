@@ -22,7 +22,7 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowRestrictionRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)->disableOriginalConstructor()
             ->getMock();

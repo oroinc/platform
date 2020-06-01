@@ -14,6 +14,8 @@ define(function(require, exports, module) {
 
     const original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
 
+    const ERROR_CLASS_NAME = 'error';
+
     /**
      * Collects all ancestor elements that have validation rules
      *
@@ -267,7 +269,7 @@ define(function(require, exports, module) {
          */
         bindInitialErrors: function(container) {
             this.elementsOf(container || this.currentForm).each(function(i, element) {
-                if (element.name && element.classList.contains('error')) {
+                if (element.name && element.classList.contains(ERROR_CLASS_NAME)) {
                     let $label;
                     const classesSelector = this.settings.errorClass.split(' ').join('.');
                     const selector = this.settings.errorElement + '.' + classesSelector + ':not([id])';
@@ -279,7 +281,7 @@ define(function(require, exports, module) {
                         $label = $(element).nextAll(selector);
                     }
 
-                    element.classList.remove('error');
+                    element.classList.remove(ERROR_CLASS_NAME);
                     this.settings.highlight(element);
 
                     if ($label.length) {
@@ -458,9 +460,12 @@ define(function(require, exports, module) {
                 this.settings.errorPlacement(label, element);
             }
 
-            message = '<span>' +
-                '<span class="validation-failed__icon" aria-hidden="true"></span>' +
-                '<span>' + message + '</span></span>';
+            message = `
+                <span role="alert">
+                    <span class="validation-failed__icon" aria-hidden="true"></span>
+                    <span>${message}</span>
+                </span>
+            `;
 
             original.showLabel.call(this, element, message);
 
@@ -477,6 +482,33 @@ define(function(require, exports, module) {
             original.defaultShowErrors.call(this);
 
             this.addWrapper(this.toShow).css('display', '');
+
+            const updateListElement = ($element, isValid) => {
+                $element.attr('aria-invalid', isValid);
+                $element.trigger({
+                    type: 'validate-element',
+                    errorClass: ERROR_CLASS_NAME,
+                    isValid: isValid
+                });
+            };
+
+            if (this.errorList.length) {
+                this.errorList
+                    .forEach(item => updateListElement($(item.element), true));
+            }
+
+            if (this.toHide.length) {
+                this.toHide.each((i, el) => {
+                    const id = el.getAttribute('id');
+
+                    if (!id) {
+                        return;
+                    }
+
+                    // find element by original ID without "-error" postfix
+                    updateListElement($('#' + el.getAttribute('id').slice(0, -6)), false);
+                });
+            }
         },
 
         /**
@@ -533,7 +565,12 @@ define(function(require, exports, module) {
         },
         highlight: function(element) {
             const $el = getErrorTarget(element);
-            $el.addClass('error')
+
+            if (element !== $el[0]) {
+                $(element).addClass(ERROR_CLASS_NAME);
+            }
+
+            $el.addClass(ERROR_CLASS_NAME)
                 .closest('.controls').addClass('validation-error');
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
@@ -557,7 +594,11 @@ define(function(require, exports, module) {
             }
 
             if (validGroup) {
-                $target.removeClass('error')
+                if (element !== $target[0]) {
+                    $(element).removeClass(ERROR_CLASS_NAME);
+                }
+
+                $target.removeClass(ERROR_CLASS_NAME)
                     .closest('.controls')
                     .removeClass('validation-error');
                 $target.closest('.control-group').find('.control-label').removeClass('validation-error');

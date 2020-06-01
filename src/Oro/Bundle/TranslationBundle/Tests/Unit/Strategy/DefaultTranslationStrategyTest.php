@@ -18,7 +18,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->languageProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\LanguageProvider')
             ->disableOriginalConstructor()

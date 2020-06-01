@@ -16,7 +16,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendColumnOptionsGuesser */
     protected $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

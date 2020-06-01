@@ -47,7 +47,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $expression;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -195,12 +195,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($identifiers['id'], $this->doctrineHelper->getEntityIdentifierValue($entity));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Multiple id is not supported.
-     */
     public function testGetEntityIdentifierValueFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Multiple id is not supported.');
+
         $entityClass = 'stdClass';
         $entity = new \stdClass();
         $identifiers = array('id1' => 1, 'id2' => 2);
@@ -311,21 +310,19 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->doctrineHelper->isEntityEqual(new EntityStub(), new \stdClass()));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage $entity argument must be an object, "string" given.
-     */
     public function testIsEntityEqualFailsForFirstNotObject()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$entity argument must be an object, "string" given.');
+
         $this->doctrineHelper->isEntityEqual('scalar', new \stdClass());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage $other argument must be an object, "string" given.
-     */
     public function testIsEntityEqualFailsForSecondNotObject()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$other argument must be an object, "string" given.');
+
         $this->doctrineHelper->isEntityEqual(new \stdClass(), 'scalar');
     }
 

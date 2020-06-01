@@ -21,7 +21,7 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $this->listener = new EntityAliasStructureOptionsListener($this->entityAliasResolver);

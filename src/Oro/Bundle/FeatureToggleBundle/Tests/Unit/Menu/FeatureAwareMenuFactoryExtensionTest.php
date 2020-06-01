@@ -17,7 +17,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var FeatureChecker $featureChecker */
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();

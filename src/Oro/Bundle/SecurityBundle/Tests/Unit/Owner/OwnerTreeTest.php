@@ -10,11 +10,11 @@ class OwnerTreeTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerTreeBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $tree;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
     }
-    
+
     /**
      * @dataProvider setSubordinateBusinessUnitIdsProvider
      */

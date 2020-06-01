@@ -33,7 +33,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(MassActionFactory::class);
         $this->actionMetadataFactory = $this->createMock(MassActionMetadataFactory::class);
@@ -186,14 +186,14 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Action parameter "allowedRequestTypes" contains wrong HTTP method. Given "POST, DELETE, WRONG", allowed: "GET, POST, DELETE, PUT, PATCH".
-     */
-    // @codingStandardsIgnoreEnd
     public function testVisitMetadataWithMassActionsAndNotValidHTTPMethods()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Action parameter "allowedRequestTypes" contains wrong HTTP method.'
+            . ' Given "POST, DELETE, WRONG", allowed: "GET, POST, DELETE, PUT, PATCH".'
+        );
+
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
         $expectedActionConfig = ['type' => 'type1'];

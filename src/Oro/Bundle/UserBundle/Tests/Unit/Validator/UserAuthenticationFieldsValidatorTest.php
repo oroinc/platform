@@ -37,7 +37,7 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $validator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
@@ -55,7 +55,7 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->initialize($this->context);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->constraint, $this->context);
     }

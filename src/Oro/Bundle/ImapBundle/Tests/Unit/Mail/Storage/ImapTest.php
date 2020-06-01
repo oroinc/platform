@@ -31,12 +31,11 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(3, $imap->getNumberByUniqueId($id));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage unique id not found
-     */
     public function testExceptionForGetNumberByUniqueId()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('unique id not found');
+
         $ids = [
             1 => 1,
             2 => 2,
@@ -56,12 +55,11 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         $imap->getNumberByUniqueId($id);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage unique id not found
-     */
     public function testCacheForGetNumberByUniqueIdNotArray()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('unique id not found');
+
         $ids = 3;
 
         $protocolImap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Protocol\Imap')

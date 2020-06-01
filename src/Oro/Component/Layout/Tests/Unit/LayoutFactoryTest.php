@@ -19,7 +19,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutFactory */
     protected $layoutFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry            = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->rendererRegistry    = $this->createMock('Oro\Component\Layout\LayoutRendererRegistryInterface');

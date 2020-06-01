@@ -30,7 +30,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /** @var WorkflowVariablesType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);

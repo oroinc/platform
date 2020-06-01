@@ -14,7 +14,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
     protected $relatedEmailsProvider;
     protected $mailboxManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 

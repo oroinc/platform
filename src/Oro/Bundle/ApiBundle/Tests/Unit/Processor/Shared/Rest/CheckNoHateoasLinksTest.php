@@ -10,7 +10,7 @@ class CheckNoHateoasLinksTest extends GetListProcessorTestCase
     /** @var CheckNoHateoasLinks */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->context->setHateoas(true);

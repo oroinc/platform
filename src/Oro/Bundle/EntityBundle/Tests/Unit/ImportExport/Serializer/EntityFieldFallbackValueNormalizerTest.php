@@ -22,7 +22,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleSettings|MockObject */
     private $localeSettings;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->resolver = $this->createMock(EntityFallbackResolver::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);

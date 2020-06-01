@@ -15,8 +15,6 @@ class CommandOutputContains extends Constraint
 
     public function __construct(string $expectedText)
     {
-        parent::__construct();
-
         $this->expectedText = $expectedText;
     }
 
@@ -38,6 +36,6 @@ class CommandOutputContains extends Constraint
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
         $output = CommandOutputNormalizer::toSingleLine($commandTester);
 
-        return \sprintf('%s contains %s', $this->exporter->export($output), $this->expectedText);
+        return \sprintf('%s contains %s', $this->exporter()->export($output), $this->expectedText);
     }
 }

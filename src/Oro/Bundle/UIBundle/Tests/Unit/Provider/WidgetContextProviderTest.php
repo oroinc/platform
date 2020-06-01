@@ -14,13 +14,13 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RequestStack */
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
         $this->provider = new WidgetContextProvider($this->requestStack);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider);
     }

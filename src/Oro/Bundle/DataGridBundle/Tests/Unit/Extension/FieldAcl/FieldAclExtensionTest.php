@@ -22,7 +22,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FieldAclExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);

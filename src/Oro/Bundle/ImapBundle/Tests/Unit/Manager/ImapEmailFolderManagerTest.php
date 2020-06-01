@@ -9,7 +9,7 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
             ->disableOriginalConstructor()

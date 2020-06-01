@@ -17,7 +17,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagHelper */
     protected $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 
@@ -70,11 +70,9 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attribute->getValue($this->action), '$.attribute');
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     */
     public function testInitializeWithMissingOption()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $options = [
             '$.attribute'
         ];

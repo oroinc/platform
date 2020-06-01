@@ -29,7 +29,7 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
         $this->jobExecutor       = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
@@ -40,7 +40,7 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher   = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->processorRegistry,

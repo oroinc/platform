@@ -180,7 +180,7 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
         $packageVersion = '*';
 
         // guard. Platform requirement is the one that matches following regexp
-        $this->assertRegExp(PlatformRepository::PLATFORM_PACKAGE_REGEX, $platformRequirement);
+        $this->assertMatchesRegularExpression(PlatformRepository::PLATFORM_PACKAGE_REGEX, $platformRequirement);
 
         $requirementLinkMock1 = $this->createComposerPackageLinkMock();
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();
@@ -660,11 +660,12 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      *
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot find package my/package
      */
     public function throwExceptionWhenCanNotFindPreferredPackage()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot find package my/package');
+
         $composer = $this->createComposerMock();
 
         $repositoryManager = $this->createRepositoryManagerMock();
@@ -870,11 +871,12 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      *
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Package oro/platform is not deletable
      */
     public function throwsExceptionWhenTryingToUninstallPlatform()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Package oro/platform is not deletable');
+
         $logger = $this->createLoggerMock();
         $logger->expects($this->once())
             ->method('info')
@@ -890,11 +892,12 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      *
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Package oro/platform-dist is not deletable
      */
     public function throwsExceptionWhenTryingToUninstallPlatformDist()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Package oro/platform-dist is not deletable');
+
         $logger = $this->createLoggerMock();
         $logger->expects($this->once())
             ->method('info')
@@ -1127,12 +1130,13 @@ class PackageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @test
      *
-     * @expectedException \Oro\Bundle\DistributionBundle\Exception\VerboseException
-     * @expectedExceptionMessage vendor1/package1 can't be updated
      *
      */
     public function throwsExceptionIfDoInstallReturnsFalse()
     {
+        $this->expectException(\Oro\Bundle\DistributionBundle\Exception\VerboseException::class);
+        $this->expectExceptionMessage("vendor1/package1 can't be updated");
+
         $packageName = 'vendor1/package1';
 
         $composer = $this->createComposerMock();

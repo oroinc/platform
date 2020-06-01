@@ -28,7 +28,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
         $this->event = $this->createMock(MigrationDataFixturesEvent::class);

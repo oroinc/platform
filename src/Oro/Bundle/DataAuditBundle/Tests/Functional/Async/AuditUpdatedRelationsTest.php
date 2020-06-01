@@ -17,7 +17,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

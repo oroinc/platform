@@ -16,7 +16,7 @@ class PinbarTabRepositoryTest extends WebTestCase
     /** @var PinbarTabRepository */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->client->useHashNavigation(true);

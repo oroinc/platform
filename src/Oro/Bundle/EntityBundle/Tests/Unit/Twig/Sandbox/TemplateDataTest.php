@@ -14,7 +14,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $entityDataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityVariableComputer = $this->createMock(EntityVariableComputer::class);
         $this->entityDataAccessor = $this->createMock(EntityDataAccessor::class);
@@ -56,12 +56,11 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($templateData->hasSystemVariables());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage This object does not contain values of system variables.
-     */
     public function testGetSystemVariablesWhenTheyDoNotExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This object does not contain values of system variables.');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getSystemVariables();
     }
@@ -92,42 +91,38 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity, $templateData->getRootEntity());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage This object does not contain the root entity.
-     */
     public function testGetRootEntityWhenTheyDoNotExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This object does not contain the root entity.');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getRootEntity();
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Expected "entity" variable, got "system".
-     */
     public function testGetEntityVariableForNotRootEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Expected "entity" variable, got "system".');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getEntityVariable('system');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The variable "system.test" must start with "entity.".
-     */
     public function testGetEntityVariableForNotEntityRelatedVariablePath()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The variable "system.test" must start with "entity.".');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getEntityVariable('system.test');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage This object does not contain the root entity.
-     */
     public function testGetEntityVariableForRootEntityWhenItDoesNotExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This object does not contain the root entity.');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getEntityVariable('entity');
     }
@@ -251,12 +246,11 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The variable "entity" must have at least 2 elements delimited by ".".
-     */
     public function testGetParentVariablePathForInvalidVariable()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The variable "entity" must have at least 2 elements delimited by ".".');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getParentVariablePath('entity');
     }
@@ -295,22 +289,20 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($templateData->hasComputedVariable('entity.field1'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The computed variable "entity.field1" does not exist.
-     */
     public function testGetComputedVariableWhenNoAnyComputedVariablesExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The computed variable "entity.field1" does not exist.');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getComputedVariable('entity.field1');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The computed variable "entity.field1" does not exist.
-     */
     public function testGetComputedVariableWhenItDoesNotExist()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The computed variable "entity.field1" does not exist.');
+
         $data = [
             'computed' => [
                 'entity__field2' => 'val1'
@@ -381,12 +373,11 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame('entity.field1', $templateData->getVariablePath('computed.entity__field1'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The computed variable "entity.field1" must start with "computed.".
-     */
     public function testGetVariablePathForNotComputedPath()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The computed variable "entity.field1" must start with "computed.".');
+
         $templateData = $this->getTemplateData([]);
         $templateData->getVariablePath('entity.field1');
     }

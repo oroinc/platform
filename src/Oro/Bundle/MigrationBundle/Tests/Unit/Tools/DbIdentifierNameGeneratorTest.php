@@ -99,11 +99,12 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyTableNameProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A table name must not be empty.
      */
     public function testGenerateIdentifierNameWithEmptyTableName($tableNames)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A table name must not be empty.');
+
         $generator = new DbIdentifierNameGenerator();
         $generator->generateIdentifierName($tableNames, ['test'], 'test');
     }

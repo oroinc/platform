@@ -10,7 +10,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
     /** @var WindowsState */
     private $windowState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->windowState = new WindowsState();
     }

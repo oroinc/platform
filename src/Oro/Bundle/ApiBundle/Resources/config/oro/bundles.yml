@@ -1,2 +1,2 @@
 bundles:
-    - {name: Oro\Bundle\ApiBundle\OroApiBundle, kernel: true }
+    - {name: Oro\Bundle\ApiBundle\OroApiBundle}

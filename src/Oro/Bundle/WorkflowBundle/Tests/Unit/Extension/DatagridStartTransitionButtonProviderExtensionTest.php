@@ -42,7 +42,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
@@ -62,7 +62,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->workflowRegistry,

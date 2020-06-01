@@ -3,42 +3,41 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\AssignUrl;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 class AssignUrlTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface
-     */
+    /** @var MockObject|RouterInterface */
     protected $router;
 
-    /**
-     * @var AssignUrl
-     */
+    /** @var AssignUrl */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
+        $this->router = $this->getMockBuilder(RouterInterface::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->router->expects($this->any())
-            ->method('generate')
-            ->will($this->returnCallback(array($this, 'generateTestUrl')));
+        $this->router->method('generate')->willReturnCallback([$this, 'generateTestUrl']);
 
-        $this->action = new AssignUrl(new ContextAccessor(), $this->router);
+        $this->action = new class(new ContextAccessor(), $this->router) extends AssignUrl {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->router, $this->action);
     }
@@ -50,7 +49,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     /**
@@ -58,23 +57,23 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
      */
     public function optionsDataProvider()
     {
-        return array(
-            'route' => array(
-                'options' => array(
+        return [
+            'route' => [
+                'options' => [
                     'route' => 'test_route_name',
                     'attribute' => 'test'
-                ),
+                ],
                 'expectedUrl' => $this->generateTestUrl('test_route_name'),
-            ),
-            'route with parameters' => array(
-                'options' => array(
+            ],
+            'route with parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
-                    'route_parameters' => array('id' => 1),
+                    'route_parameters' => ['id' => 1],
                     'attribute' => 'test'
-                ),
-                'expectedUrl' => $this->generateTestUrl('test_route_name', array('id' => 1)),
-            )
-        );
+                ],
+                'expectedUrl' => $this->generateTestUrl('test_route_name', ['id' => 1]),
+            ]
+        ];
     }
 
     /**
@@ -95,29 +94,29 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
      */
     public function initializeExceptionDataProvider()
     {
-        return array(
-            'no name' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no name' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Route parameter must be specified',
-            ),
-            'invalid route parameters' => array(
-                'options' => array(
+            ],
+            'invalid route parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
                     'route_parameters' => 'stringData',
                     'attribute' => 'test'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Route parameters must be an array',
-            ),
-            'no attribute' => array(
-                'options' => array(
+            ],
+            'no attribute' => [
+                'options' => [
                     'route' => 'test_route_name'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribiute parameters is required',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -133,7 +132,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $urlProperty = $options['attribute'];
-        $this->assertEquals($expectedUrl, $context->$urlProperty);
+        static::assertEquals($expectedUrl, $context->$urlProperty);
     }
 
     /**
@@ -141,11 +140,11 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
      * @param array $routeParameters
      * @return string
      */
-    public function generateTestUrl($routeName, array $routeParameters = array())
+    public function generateTestUrl($routeName, array $routeParameters = [])
     {
         $url = 'url:' . $routeName;
         if ($routeParameters) {
-            $url .= ':' . serialize($routeParameters);
+            $url .= ':' . \serialize($routeParameters);
         }
 
         return $url;

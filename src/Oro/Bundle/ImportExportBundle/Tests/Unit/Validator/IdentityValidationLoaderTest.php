@@ -25,7 +25,7 @@ class IdentityValidationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->fieldConfigProvider = $this->createMock(ConfigProvider::class);

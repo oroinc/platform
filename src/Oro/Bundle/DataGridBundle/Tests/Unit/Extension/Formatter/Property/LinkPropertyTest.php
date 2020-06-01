@@ -24,7 +24,7 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
      */
     protected $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
         $this->twig = $this->createMock('Oro\Bundle\UIBundle\Twig\Environment');

@@ -6,14 +6,15 @@ use Oro\Bundle\ChartBundle\Model\Data\MappedData;
 
 class MappedDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Neither the property "unknownProperty" nor one of the methods "getUnknownProperty()",
-     * "isUnknownProperty()", "hasUnknownProperty()", "__get()" or "__call()" exist and have public access in class
-     * "dataSourceClassName".
-     */
     public function testToArraySourceHasNoMappedField()
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectExceptionMessage(
+            'Neither the property "unknownProperty" nor one of the methods "getUnknownProperty()",'
+            . ' "unknownProperty()", "isUnknownProperty()", "hasUnknownProperty()", "__get()" exist'
+            .' and have public access in class "'
+        );
+
         $mapping = array('label' => 'unknownProperty');
         $source = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $sourceData = array($this->createMock(MappedData::class));

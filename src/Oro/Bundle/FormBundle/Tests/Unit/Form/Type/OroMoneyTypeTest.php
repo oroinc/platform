@@ -24,7 +24,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
      */
     protected $numberFormatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -40,7 +40,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

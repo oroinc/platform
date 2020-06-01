@@ -17,7 +17,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendedContainerBuilder */
     private $builder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);

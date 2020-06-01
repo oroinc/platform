@@ -13,7 +13,7 @@ class SegmentControllerTest extends WebTestCase
 {
     use RolePermissionExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 

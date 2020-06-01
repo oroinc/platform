@@ -19,7 +19,7 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->createMock(\JMS\Serializer\Twig\SerializerExtension::class);
         $this->container  = self::getContainerBuilder()

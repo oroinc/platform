@@ -19,7 +19,7 @@ class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationRouteHelper = $this->createMock(TranslationsDatagridRouteHelper::class);
 

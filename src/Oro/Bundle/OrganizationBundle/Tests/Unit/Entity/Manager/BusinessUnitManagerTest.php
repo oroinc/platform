@@ -36,7 +36,7 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->buRepo = $this->createMock(BusinessUnitRepository::class);
         $this->userRepo = $this->createMock(EntityRepository::class);

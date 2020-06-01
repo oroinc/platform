@@ -11,7 +11,7 @@ class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectLabelType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
             ->disableOriginalConstructor()->getMock();

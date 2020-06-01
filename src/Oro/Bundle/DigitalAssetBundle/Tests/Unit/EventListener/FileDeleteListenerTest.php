@@ -24,14 +24,16 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->innerFileDeleteListener = $this->createMock(BaseFileDeleteListener::class);
 
         $this->listener = new FileDeleteListener($this->innerFileDeleteListener);
 
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->file = $this->createPartialMock(File::class, ['getDigitalAsset']);
+        $this->file = $this->getMockBuilder(File::class)
+            ->addMethods(['getDigitalAsset'])
+            ->getMock();
     }
 
     public function testPreRemove(): void

@@ -9,7 +9,7 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
     /** @var ExcludeCustomFieldsByDefault */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new ExcludeCustomFieldsByDefault();

@@ -30,7 +30,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(CollectResourcesProcessor::class);
         $this->resourcesCache = $this->createMock(ResourcesCache::class);

@@ -25,7 +25,7 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCas
      */
     private $decoratorProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobRunner = new JobRunner();
         $this->processor = $this->createMock(MessageProcessorInterface::class);

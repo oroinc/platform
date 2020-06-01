@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * Provides a set of static methods that can be used to simplify converting
@@ -78,7 +79,7 @@ class ValueNormalizerUtil
                 DataType::ENTITY_TYPE,
                 $requestType
             );
-        } catch (\Exception $e) {
+        } catch (EntityAliasNotFoundException $e) {
             if ($throwException) {
                 throw $e;
             }
@@ -111,7 +112,7 @@ class ValueNormalizerUtil
                 DataType::ENTITY_CLASS,
                 $requestType
             );
-        } catch (\Exception $e) {
+        } catch (EntityAliasNotFoundException $e) {
             if ($throwException) {
                 throw $e;
             }

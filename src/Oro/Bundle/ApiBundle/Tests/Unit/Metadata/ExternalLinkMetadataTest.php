@@ -129,12 +129,11 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException
-     * @expectedExceptionMessage Cannot build URL for a link. Missing Parameters: filter,version.
-     */
     public function testGetHrefWhenOnlyPartOfUrlParamsAreResolved()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectExceptionMessage('Cannot build URL for a link. Missing Parameters: filter,version.');
+
         $linkMetadata = new ExternalLinkMetadata(
             'http://test.com/api/{version}/{resource}?filter={filter}',
             ['resource' => DataAccessorInterface::ENTITY_TYPE, 'filter' => null, 'version' => '_.version']

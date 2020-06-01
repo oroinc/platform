@@ -11,7 +11,7 @@ class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AclRoleType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new AclRoleType(array('field' => 'field_config'));
     }

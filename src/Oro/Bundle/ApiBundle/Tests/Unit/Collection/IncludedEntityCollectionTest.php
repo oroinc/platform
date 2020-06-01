@@ -14,17 +14,11 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var IncludedEntityData */
     private $entityData;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityData = $this->createMock(IncludedEntityData::class);
 
         $this->collection = new IncludedEntityCollection();
-    }
-
-    public function testShouldSetPrimaryEntityId()
-    {
-        $this->collection->setPrimaryEntityId('Test\Class', '123');
-        self::assertAttributeSame(['Test\Class', '123', null, null], 'primaryEntity', $this->collection);
     }
 
     public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNotSet()
@@ -57,12 +51,11 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '456'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The primary entity identifier must be set before.
-     */
     public function testShouldSetPrimaryEntityThrowExceptionIfPrimaryEntityIdIsNotSetYet()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The primary entity identifier must be set before.');
+
         $this->collection->setPrimaryEntity(new \stdClass(), null);
     }
 
@@ -74,11 +67,9 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata();
         $this->collection->setPrimaryEntityId($entityClass, $entityId);
         $this->collection->setPrimaryEntity($entity, $metadata);
-        self::assertAttributeSame(
-            [$entityClass, $entityId, $entity, $metadata],
-            'primaryEntity',
-            $this->collection
-        );
+        self::assertTrue($this->collection->isPrimaryEntity('Test\Class', '123'));
+        self::assertSame($entity, $this->collection->getPrimaryEntity());
+        self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
     }
 
     public function testShouldBePossibleToGetAlreadySetPrimaryEntity()
@@ -89,16 +80,6 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->setPrimaryEntity($entity, $metadata);
         self::assertSame($entity, $this->collection->getPrimaryEntity());
         self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
-    }
-
-    public function testShouldAddEntity()
-    {
-        $this->collection->add(new \stdClass(), 'Test\Class', 'testId', $this->entityData);
-        self::assertAttributeSame(
-            ['Test\Class:testId' => ['Test\Class', 'testId']],
-            'keys',
-            $this->collection
-        );
     }
 
     public function testShouldGetReturnNullForUnknownEntity()
@@ -223,9 +204,11 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldClearAllData()
     {
-        $this->collection->add(new \stdClass(), 'Test\Class', 'testId', $this->entityData);
+        $entity = new \stdClass();
+        $this->collection->add($entity, 'Test\Class', 'testId', $this->entityData);
         $this->collection->clear();
-        self::assertAttributeSame([], 'keys', $this->collection);
+        self::assertNull($this->collection->getId($entity));
+        self::assertNull($this->collection->getData($entity));
         self::assertTrue($this->collection->isEmpty());
     }
 
@@ -241,7 +224,8 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $entityId = 'testId';
         $this->collection->add($entity, $entityClass, $entityId, $this->entityData);
         $this->collection->remove($entityClass, $entityId);
-        self::assertAttributeSame([], 'keys', $this->collection);
+        self::assertNull($this->collection->getId($entity));
+        self::assertNull($this->collection->getData($entity));
         self::assertTrue($this->collection->isEmpty());
     }
 }

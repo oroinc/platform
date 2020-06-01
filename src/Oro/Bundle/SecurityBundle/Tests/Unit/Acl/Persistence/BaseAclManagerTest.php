@@ -11,7 +11,7 @@ class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractAclManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = new BaseAclManager();
     }
@@ -54,7 +54,7 @@ class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
             $this->manager->getSid($src)
         );
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->manager->getSid(new \stdClass());
     }
 }

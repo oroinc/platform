@@ -34,7 +34,7 @@ class AssociationManagerTest extends WebTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([
@@ -55,7 +55,7 @@ class AssociationManagerTest extends WebTestCase
     /**
      * {@inheritDoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatched = [];
     }
@@ -167,7 +167,7 @@ class AssociationManagerTest extends WebTestCase
      */
     protected function assertDispatchedEvents(array $expected)
     {
-        $this->assertEquals($expected, $this->dispatched, '', 0.0, 1, true);
+        static::assertEqualsCanonicalizing($expected, $this->dispatched);
     }
 
     /**

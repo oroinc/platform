@@ -29,7 +29,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var  UserImapConfigSubscriber */
     protected $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->requestStack = new RequestStack();

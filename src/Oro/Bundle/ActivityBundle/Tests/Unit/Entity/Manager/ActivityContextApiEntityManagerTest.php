@@ -50,7 +50,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityContextApiEntityManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $objectManager */
         $objectManager = $this->createMock(ObjectManager::class);

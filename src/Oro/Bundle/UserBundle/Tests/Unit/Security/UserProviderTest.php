@@ -23,7 +23,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UserProvider */
     private $userProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userLoader = $this->createMock(UserLoaderInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -51,11 +51,9 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserForNotExistingUsername()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
         $username = 'foobar';
         $this->userLoader->expects(self::once())
             ->method('loadUser')
@@ -65,11 +63,9 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
         $this->userProvider->loadUserByUsername($username);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testRefreshUserNotFound()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
         $user = $this->createMock(self::USER_CLASS);
         $user->expects(self::any())
             ->method('getId')
@@ -137,12 +133,11 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
         $this->userProvider->refreshUser($user);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
-     * @expectedExceptionMessage Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got
-     */
     public function testRefreshUserNotOroUser()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\UnsupportedUserException::class);
+        $this->expectExceptionMessage('Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got');
+
         $user = $this->createMock(RegularUser::class);
         $this->userProvider->refreshUser($user);
     }

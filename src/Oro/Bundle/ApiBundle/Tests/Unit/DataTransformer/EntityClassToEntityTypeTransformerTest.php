@@ -16,7 +16,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassToEntityTypeTransformer */
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 

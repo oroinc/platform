@@ -22,7 +22,7 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new FakeRestClientFactory();
         $this->fixtureFileName = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'foo.yml';

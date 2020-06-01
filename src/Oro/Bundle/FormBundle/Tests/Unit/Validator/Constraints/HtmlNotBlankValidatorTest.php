@@ -36,6 +36,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'html' => ['<p>some content</p>'],
+            'image' => ['<p><img src="/"/></p>'],
             'text' => ['some content'],
         ];
     }
@@ -76,12 +77,12 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function invalidItemsDataProvider()
     {
-        return array(
+        return [
             'empty string' => [''],
             'false' => [false],
             'null' => [null],
             'empty html' => ['<p></p>'],
             'empty html with attr' => ['<p class="empty"></p>'],
-        );
+        ];
     }
 }

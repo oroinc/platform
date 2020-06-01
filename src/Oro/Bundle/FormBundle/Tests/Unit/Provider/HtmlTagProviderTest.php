@@ -16,7 +16,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->purifierConfig = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/purifier_config.yml'));
 

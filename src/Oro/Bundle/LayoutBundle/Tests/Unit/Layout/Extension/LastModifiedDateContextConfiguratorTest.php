@@ -15,7 +15,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
     /** @var \PHPUnit\Framework\MockObject\MockObject|LastModificationDateProvider */
     private $lastModificationDateProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
         $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->lastModificationDateProvider);

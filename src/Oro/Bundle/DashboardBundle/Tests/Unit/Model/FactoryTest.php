@@ -27,7 +27,7 @@ class FactoryTest extends \PHPUnit\Framework\TestCase
      */
     protected $widgetConfigs;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')

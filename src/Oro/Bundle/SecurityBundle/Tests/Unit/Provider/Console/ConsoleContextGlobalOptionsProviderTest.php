@@ -33,7 +33,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     /** @var ConsoleContextGlobalOptionsProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenStorage = new TokenStorage();

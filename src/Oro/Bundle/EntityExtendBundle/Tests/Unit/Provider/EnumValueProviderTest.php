@@ -25,7 +25,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->cache = $this->createMock(EnumTranslationCache::class);

@@ -10,7 +10,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainEntityOverrideProvider */
     private $chainEntityOverrideProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chainEntityOverrideProvider = new ChainEntityOverrideProvider([
             new MutableEntityOverrideProvider([

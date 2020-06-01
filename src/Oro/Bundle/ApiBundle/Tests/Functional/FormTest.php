@@ -21,12 +21,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->switchToDefaultFormExtension();
         $this->setMetadataAccessor();
@@ -80,14 +80,13 @@ class FormTest extends WebTestCase
         self::assertSame('test', $object->getTitle());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The form type "Symfony\Component\Form\Extension\Core\Type\HiddenType" is not configured to be used in API.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApiFormWithFormTypeThatDoesNotExistInApi()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The form type "Symfony\Component\Form\Extension\Core\Type\HiddenType" is not configured to be used in API.'
+        );
+
         $this->switchToApiFormExtension();
 
         $form = $this->getRootForm();
@@ -216,11 +215,10 @@ class FormTest extends WebTestCase
         self::assertTrue($form->isSynchronized(), 'isSynchronized');
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testApiFormShouldNotHaveCsrfExtension()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
+
         $this->switchToApiFormExtension();
 
         $this->getForm(['csrf_protection' => false]);

@@ -19,19 +19,15 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDefaultValues, $config->defaultValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     */
     public function testIncorrectMode()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\AnnotationException::class);
         new ConfigField(['mode' => 'some mode']);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     */
     public function testIncorrectDefaultValues()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\AnnotationException::class);
         new ConfigField(['defaultValues' => 'some string']);
     }
 

@@ -30,7 +30,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $massActionHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->massActionHelper = new MassActionHelper($this->container);

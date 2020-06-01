@@ -30,7 +30,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);

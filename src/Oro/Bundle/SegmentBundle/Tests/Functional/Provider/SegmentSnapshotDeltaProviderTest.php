@@ -14,7 +14,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
      */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentDeltaData::class]);

@@ -14,7 +14,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config = $this->getMockBuilder(DatagridConfiguration::class)
             ->disableOriginalConstructor()

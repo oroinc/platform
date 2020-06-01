@@ -33,7 +33,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceProviderInterface */
     protected $resourceProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pathProvider = $this
             ->createMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');

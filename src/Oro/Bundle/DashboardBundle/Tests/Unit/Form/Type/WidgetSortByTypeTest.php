@@ -14,7 +14,7 @@ class WidgetSortByTypeTest extends TypeTestCase
      */
     private $fieldProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
 

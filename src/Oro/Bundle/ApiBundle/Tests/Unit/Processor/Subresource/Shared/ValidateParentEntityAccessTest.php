@@ -26,7 +26,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
     /** @var ValidateParentEntityAccess */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -121,12 +121,11 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage The parent entity does not exist.
-     */
     public function testProcessForManageableEntityWhenEntityNotFound()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('The parent entity does not exist.');
+
         $parentClass = 'Test\Class';
         $parentId = 123;
         $associationName = 'association';
@@ -180,12 +179,11 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to the parent entity.
-     */
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to the parent entity.');
+
         $parentClass = 'Test\Class';
         $parentId = 123;
         $associationName = 'association';

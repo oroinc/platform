@@ -28,7 +28,7 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     private $filterAwareGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->filterConfiguration = $this->createMock(FilterConfiguration::class);

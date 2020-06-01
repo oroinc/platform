@@ -22,7 +22,7 @@ class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritDoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock('Symfony\Component\HttpFoundation\RequestStack');
 

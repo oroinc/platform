@@ -19,14 +19,14 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceLink = $this->createMock(ServiceLink::class);
 
         $this->listener = new RoleListener($this->serviceLink);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->serviceLink, $this->listener);
     }
@@ -65,12 +65,12 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test prePersist role that generate exception \LogicException
-     *
-     * @expectedException \LogicException
-     * @expectedExceptionMessage 10 attempts to generate unique role are failed.
      */
     public function testPrePersistInValid()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('10 attempts to generate unique role are failed.');
+
         $entity = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Role')
             ->disableOriginalConstructor()
             ->getMock();

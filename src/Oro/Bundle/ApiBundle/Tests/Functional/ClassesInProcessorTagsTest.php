@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 
 class ClassesInProcessorTagsTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

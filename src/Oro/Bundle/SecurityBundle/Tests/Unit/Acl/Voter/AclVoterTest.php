@@ -44,7 +44,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
     /** @var AclVoter */
     private $voter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->permissionMap = $this->createMock(PermissionMapInterface::class);
         $this->extensionSelector = $this->createMock(AclExtensionSelector::class);

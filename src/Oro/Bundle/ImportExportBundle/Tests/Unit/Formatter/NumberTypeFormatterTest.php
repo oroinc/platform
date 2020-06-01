@@ -13,7 +13,7 @@ class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
      */
     protected $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $numberFormatter */
         $numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')

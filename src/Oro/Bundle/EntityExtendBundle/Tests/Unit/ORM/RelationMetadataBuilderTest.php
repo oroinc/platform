@@ -30,7 +30,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var RelationMetadataBuilder */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();

@@ -26,7 +26,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityDetachFixer */
     protected $fixer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock('Doctrine\ORM\EntityManager');
 

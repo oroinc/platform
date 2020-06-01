@@ -27,7 +27,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -41,7 +41,7 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $container = $this->getContainer();
         CumulativeResourceManager::getInstance()->setBundles($this->initialBundles);

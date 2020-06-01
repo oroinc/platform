@@ -20,7 +20,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
     /** @var SetDataTransformers */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

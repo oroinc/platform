@@ -12,7 +12,7 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityFieldFallbackTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityFieldFallbackTransformer = new EntityFieldFallbackTransformer();
     }

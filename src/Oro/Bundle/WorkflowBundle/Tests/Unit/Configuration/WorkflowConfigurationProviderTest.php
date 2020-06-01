@@ -28,7 +28,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
     }
@@ -64,32 +64,27 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $bundles = [new Stub\IncorrectConfiguration\IncorrectConfigurationBundle()];
         $configurationProvider = $this->buildProvider($bundles);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Resource "first_workflow.yml" is unreadable
-     */
     public function testGetWorkflowDefinitionsIncorrectSplitConfig()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Resource "first_workflow.yml" is unreadable');
+
         $bundles = [new Stub\IncorrectSplitConfig\IncorrectSplitConfigBundle()];
         $configurationProvider = $this->buildProvider($bundles);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $bundles = [
             new Stub\CorrectConfiguration\CorrectConfigurationBundle(),
             new Stub\DuplicateConfiguration\DuplicateConfigurationBundle()

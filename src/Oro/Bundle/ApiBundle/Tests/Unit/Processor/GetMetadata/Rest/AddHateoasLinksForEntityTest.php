@@ -18,7 +18,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
     /** @var AddHateoasLinksForEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $routes = new RestRoutes('item', 'list', 'subresource', 'relationship');

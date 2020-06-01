@@ -78,12 +78,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($attribute, $attributeManager->getEntityAttribute());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\UnknownAttributeException
-     * @expectedExceptionMessage There is no entity attribute
-     */
     public function testEntityAttributeException()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\UnknownAttributeException::class);
+        $this->expectExceptionMessage('There is no entity attribute');
+
         $attributeManager = new AttributeManager();
         $entityAttributeName = 'test';
         $attributeManager->setEntityAttributeName($entityAttributeName);

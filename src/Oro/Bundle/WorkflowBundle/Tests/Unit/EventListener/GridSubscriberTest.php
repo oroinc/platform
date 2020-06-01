@@ -25,7 +25,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featurechecker = $this->createMock(FeatureChecker::class);
         $this->gridSubscriber = new GridsSubscriber($this->featurechecker);
@@ -117,7 +117,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->featurechecker, $this->gridSubscriber, $this->event, $this->queryBuilder);
     }

@@ -19,7 +19,7 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Translator */
     private $translatorMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->themeManagerMock = $this->createMock(ThemeManager::class);
         $this->translatorMock = $this->createMock(Translator::class);

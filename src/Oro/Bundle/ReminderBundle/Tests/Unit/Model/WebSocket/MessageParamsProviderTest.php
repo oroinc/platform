@@ -31,7 +31,7 @@ class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $urlProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -98,7 +98,7 @@ class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFormattedExpireAt, $result['expireAt']);
         $this->assertEquals($expectedIdentifier, $result['templateId']);
         $this->assertArrayHasKey('uniqueId', $result);
-        $this->assertInternalType('string', $result['uniqueId']);
+        $this->assertIsString($result['uniqueId']);
     }
 
     public function testGetMessageParamsForRemindersSetupCorrectParams()

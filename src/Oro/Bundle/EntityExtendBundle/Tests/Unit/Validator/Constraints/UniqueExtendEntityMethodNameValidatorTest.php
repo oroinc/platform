@@ -31,7 +31,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classMethodNameChecker = $this->createMock(ClassMethodNameChecker::class);
         $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);
@@ -74,12 +74,13 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         return $field;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel supported only, string given
-     */
     public function testAssertValidatingValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel supported only, string given'
+        );
+
         $field = '';
         $constraint = new UniqueExtendEntityMethodName();
 

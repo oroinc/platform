@@ -8,22 +8,28 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CopyValuesTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CopyValues
-     */
+    /** @var CopyValues */
     protected $action;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->action = new CopyValues(new ContextAccessor());
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->action = new class(new ContextAccessor()) extends CopyValues {
+            public function xgetAttribute(): PropertyPathInterface
+            {
+                return $this->attribute;
+            }
+
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
@@ -35,8 +41,8 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
             []
         ]);
 
-        $this->assertAttributeEquals(new PropertyPath('attr'), 'attribute', $this->action);
-        $this->assertAttributeEquals([new PropertyPath('prop1'), []], 'options', $this->action);
+        static::assertEquals(new PropertyPath('attr'), $this->action->xgetAttribute());
+        static::assertEquals([new PropertyPath('prop1'), []], $this->action->xgetOptions());
     }
 
     public function testInitializeWithEmptyOptions()
@@ -67,7 +73,7 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        $this->assertEquals($expectedData, $context->getData());
+        static::assertEquals($expectedData, $context->getData());
     }
 
     /**

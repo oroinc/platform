@@ -24,34 +24,32 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         return new ActionFactory($containerBuilder->getContainer($this));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "type" option must be defined. Action: action1.
-     */
     public function testCreateActionWithoutType()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
+
         $factory = $this->getActionFactory([]);
         $factory->createAction('action1', []);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Unknown action type "type1". Action: action1.
-     */
     public function testCreateUnregisteredAction()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
+
         $factory = $this->getActionFactory([]);
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An action should be an instance of "Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface", got "stdClass".
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateActionForInvalidActionClass()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'An action should be an instance of "%s", got "stdClass".',
+            \Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface::class
+        ));
+
         $factory = $this->getActionFactory(['type1' => new \stdClass()]);
         $factory->createAction('action1', ['type' => 'type1']);
     }

@@ -59,6 +59,8 @@ class ConfigurationLoader
                 ->register(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID, ConfigCacheStateRegistry::class)
                 ->setPublic(false)
                 ->setArguments([[], new Reference('oro_api.request_expression_matcher')]);
+            $this->container->getDefinition('oro_api.config_cache_factory')
+                ->addMethodCall('addDependency', [new Reference('oro_entity.entity_configuration.provider')]);
         }
 
         $configBagsConfig = [];

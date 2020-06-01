@@ -30,11 +30,9 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($extension->supports(['class' => 'testClass']));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMethodNotGenerated()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $class = PhpClass::create('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
@@ -46,11 +44,9 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $class->getMethod('defaultTestGetter');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMethodNotGeneratedIncompleteFields()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $class = PhpClass::create('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'

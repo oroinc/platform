@@ -26,7 +26,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this
             ->getMockBuilder('Doctrine\ORM\Event\LoadClassMetadataEventArgs')

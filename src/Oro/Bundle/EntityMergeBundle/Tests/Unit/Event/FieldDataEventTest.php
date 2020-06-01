@@ -16,7 +16,7 @@ class FieldDataEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')
             ->disableOriginalConstructor()

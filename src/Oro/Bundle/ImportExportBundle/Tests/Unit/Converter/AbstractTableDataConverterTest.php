@@ -45,7 +45,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $dataConverter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter')
             ->getMockForAbstractClass();
@@ -59,7 +59,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->dataConverter = $dataConverter;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->dataConverter);
     }
@@ -260,12 +260,11 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Backend header doesn't contain fields: fax
-     */
     public function testConvertToExportFormatExtraFields()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectExceptionMessage("Backend header doesn't contain fields: fax");
+
         $importedRecordWithExtraData = array(
             'firstName' => 'John',
             'lastName'  => 'Doe',

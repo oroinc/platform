@@ -19,7 +19,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
      */
     protected $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!Type::hasType(ConfigObjectType::TYPE)) {
             Type::addType(ConfigObjectType::TYPE, 'Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType');
@@ -40,7 +40,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
     public function testConvertToPHPValue($inputData, $expectedResult, $exception = false)
     {
         if ($exception) {
-            $this->expectException('Doctrine\DBAL\Types\ConversionException');
+            $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
             $this->expectExceptionMessage(
                 'Could not convert database value "' . $inputData . '" to Doctrine Type config_object'
             );

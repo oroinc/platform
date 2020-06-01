@@ -17,7 +17,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
 

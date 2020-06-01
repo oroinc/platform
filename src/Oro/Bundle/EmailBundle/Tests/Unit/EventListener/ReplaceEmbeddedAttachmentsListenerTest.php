@@ -14,7 +14,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ReplaceEmbeddedAttachmentsListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listener = new ReplaceEmbeddedAttachmentsListener();
     }

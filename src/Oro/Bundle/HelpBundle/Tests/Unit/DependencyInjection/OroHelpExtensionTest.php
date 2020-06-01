@@ -12,7 +12,7 @@ class OroHelpExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new OroHelpExtension();
     }

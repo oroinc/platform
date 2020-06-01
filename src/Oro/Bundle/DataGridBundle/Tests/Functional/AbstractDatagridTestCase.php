@@ -23,7 +23,7 @@ abstract class AbstractDatagridTestCase extends WebTestCase
      */
     protected $isRealGridRequest = true;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],

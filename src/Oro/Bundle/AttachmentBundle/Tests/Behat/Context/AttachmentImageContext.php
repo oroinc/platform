@@ -103,7 +103,7 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);
-        self::assertContains('text/html', $response->getHeader('Content-Type')[0]);
+        static::assertStringContainsString('text/html', $response->getHeader('Content-Type')[0]);
     }
 
     /**
@@ -117,7 +117,7 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
         $url = $attachmentLink->getAttribute('href');
         $response = $this->downloadAttachment($url);
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        self::assertContains('application/force-download', $response->getHeader('Content-Type')[0]);
+        static::assertStringContainsString('application/force-download', $response->getHeader('Content-Type')[0]);
     }
 
     /**
@@ -248,7 +248,7 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
             $paths = $this->imagePaths[$imageName];
 
             foreach ($paths as $path) {
-                $this->assertFileNotExists($path);
+                $this->assertFileDoesNotExist($path);
             }
         }
     }

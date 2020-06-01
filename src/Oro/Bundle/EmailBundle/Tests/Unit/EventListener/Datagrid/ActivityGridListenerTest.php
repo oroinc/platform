@@ -17,7 +17,7 @@ class ActivityGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityRoutingHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailGridHelper     = $this->getMockBuilder('Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper')
             ->disableOriginalConstructor()

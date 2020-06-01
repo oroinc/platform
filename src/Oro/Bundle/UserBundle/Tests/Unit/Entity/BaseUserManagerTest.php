@@ -26,7 +26,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /** @var BaseUserManager */
     private $userManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userLoader = $this->createMock(UserLoaderInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -155,7 +155,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     {
         $password = $this->userManager->generatePassword();
         self::assertNotEmpty($password);
-        self::assertRegExp('/[\w\-]+/', $password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
         self::assertLessThanOrEqual(30, strlen($password));
 
         self::assertNotEquals($password, $this->userManager->generatePassword());
@@ -166,7 +166,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $maxLength = 10;
         $password = $this->userManager->generatePassword($maxLength);
         self::assertNotEmpty($password);
-        self::assertRegExp('/[\w\-]+/', $password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
         self::assertLessThanOrEqual($maxLength, strlen($password));
 
         self::assertNotEquals($password, $this->userManager->generatePassword($maxLength));

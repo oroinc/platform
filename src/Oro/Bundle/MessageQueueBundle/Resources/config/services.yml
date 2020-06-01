@@ -172,6 +172,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
+    oro_message_queue.listener.console_fatal_error:
+        class: Oro\Bundle\MessageQueueBundle\EventListener\ConsoleFatalErrorListener
+        arguments:
+            - '@monolog.logger.consumer'
+        tags:
+            - { name: kernel.event_subscriber }
+
     oro_message_queue.topic.message_queue_heartbeat:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
         arguments:

@@ -18,7 +18,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
 
@@ -28,12 +28,11 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->addExtension($this->extension);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The expression "test" does not exist.
-     */
     public function testCreateNoExpression()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The expression "test" does not exist.');
+
         $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')
@@ -44,14 +43,14 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->create('test');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid type of expression "test". Expected "Oro\Component\ConfigExpression\ExpressionInterface", "stdClass" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateIncorrectExpressionType()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Invalid type of expression "test". Expected "%s", "stdClass" given.',
+            \Oro\Component\ConfigExpression\ExpressionInterface::class
+        ));
+
         $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')

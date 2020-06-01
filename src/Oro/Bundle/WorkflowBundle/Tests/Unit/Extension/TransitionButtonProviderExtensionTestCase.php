@@ -129,11 +129,9 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException
-     */
     public function testIsAvailableWhenButtonNotSupported()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException::class);
         $this->extension->isAvailable(
             $this->createMock(ButtonInterface::class),
             $this->createMock(ButtonSearchContext::class)

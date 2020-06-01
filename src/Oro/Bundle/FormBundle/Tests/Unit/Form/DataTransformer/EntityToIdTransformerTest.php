@@ -44,12 +44,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessageExpected Expected argument of type "array", "string" given
-     */
     public function testTransformFailsWhenValueInNotAnArray()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "object", "string" given');
+
         $transformer = new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
         $transformer->transform('invalid value');
     }
@@ -84,12 +83,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entity, $transformer->reverseTransform(1));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The value "1" does not exist or not unique.
-     */
     public function testReverseTransformFailsNotFindEntity()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('The value "1" does not exist or not unique.');
+
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -153,12 +151,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entity, $transformer->reverseTransform(1));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The value "1" does not exist or not unique.
-     */
     public function testReverseTransformTransformationFailedException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('The value "1" does not exist or not unique.');
+
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -196,12 +193,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given
-     */
     public function testReverseTransformQueryBuilderUnexpectedTypeException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given');
+
         $entity = $this->createMockEntity('id', 1);
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -243,12 +239,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         new EntityToIdTransformer($em, 'TestClass', null, null);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FormBundle\Form\Exception\FormException
-     * @expectedExceptionMessage Cannot get id property path of entity. "TestClass" has composite primary key.
-     */
     public function testPropertyConstructionException()
     {
+        $this->expectException(\Oro\Bundle\FormBundle\Form\Exception\FormException::class);
+        $this->expectExceptionMessage('Cannot get id property path of entity. "TestClass" has composite primary key.');
+
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -272,12 +267,11 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         new EntityToIdTransformer($em, 'TestClass', null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "callable", "string" given
-     */
     public function testCallbackException()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "callable", "string" given');
+
         new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', 'uncallable');
     }
 

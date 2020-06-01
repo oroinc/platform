@@ -20,7 +20,7 @@ class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
     protected $metadataProvider;
 
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

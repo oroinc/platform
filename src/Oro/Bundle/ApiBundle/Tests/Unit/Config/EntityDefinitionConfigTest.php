@@ -656,11 +656,9 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    /**
-     * @expectedException \TypeError
-     */
     public function testSetInvalidValueToFormEventSubscribers()
     {
+        $this->expectException(\TypeError::class);
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers('subscriber1');
     }

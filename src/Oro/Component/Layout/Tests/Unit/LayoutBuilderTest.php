@@ -44,7 +44,7 @@ class LayoutBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockViewCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry            = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->rawLayoutBuilder    = $this->createMock('Oro\Component\Layout\RawLayoutBuilderInterface');

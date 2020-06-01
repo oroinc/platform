@@ -16,7 +16,7 @@ class DbLogsHandlerTest extends WebTestCase
     /** @var EntityRepository */
     protected $repo;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->logger = $this->getContainer()->get('monolog.logger.oro_account_security');

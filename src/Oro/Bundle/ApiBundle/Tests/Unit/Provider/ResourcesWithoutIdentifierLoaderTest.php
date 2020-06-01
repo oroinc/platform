@@ -20,7 +20,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var ResourcesWithoutIdentifierLoader */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
 

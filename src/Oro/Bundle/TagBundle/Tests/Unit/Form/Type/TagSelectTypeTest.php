@@ -19,7 +19,7 @@ class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
@@ -35,7 +35,7 @@ class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new TagSelectType($this->authorizationChecker, $this->transformer, $this->subscriber);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->authorizationChecker, $this->transformer, $this->subscriber, $this->type);
     }

@@ -16,7 +16,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
     /** @var File */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new File();
     }

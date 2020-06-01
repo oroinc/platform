@@ -32,7 +32,7 @@ class RenderTemplateTest extends \PHPUnit\Framework\TestCase
      */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->twig = $this->createMock(Environment::class);

@@ -18,7 +18,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $serializedFieldProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
@@ -125,7 +125,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerializedByData($fieldConfigModel, $data);
-        
+
         $this->assertTrue($isSerialized);
     }
 

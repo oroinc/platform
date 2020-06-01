@@ -26,7 +26,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
     /** @var FileType */
     private $type;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->type = new FileType();
     }

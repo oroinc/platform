@@ -9,13 +9,12 @@ use Oro\Component\Action\Event\ExtendableActionEvent;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ExtendableActionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EventDispatcherInterface|MockObject */
     private $dispatcher;
 
     /**
@@ -26,9 +25,14 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->action = new ExtendableAction(new ContextAccessor());
+        $this->action = new class(new ContextAccessor()) extends ExtendableAction {
+            public function xgetSubscribedEvents(): array
+            {
+                return $this->subscribedEvents;
+            }
+        };
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->action->setDispatcher($this->dispatcher);
     }
@@ -66,8 +70,8 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     {
         $events = ['some_event_name'];
         $result = $this->action->initialize(['events' => $events]);
-        $this->assertAttributeEquals($events, 'subscribedEvents', $this->action);
-        $this->assertInstanceOf(ActionInterface::class, $result);
+        static::assertEquals($events, $this->action->xgetSubscribedEvents());
+        static::assertInstanceOf(ActionInterface::class, $result);
     }
 
     public function testExecute()
@@ -77,19 +81,19 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $eventWithListeners = 'some_event_with_listeners';
         $event = new ExtendableActionEvent($context);
 
-        $this->dispatcher->expects($this->exactly(2))
+        $this->dispatcher->expects(static::exactly(2))
             ->method('hasListeners')
             ->withConsecutive(
                 [$eventWithoutListeners],
                 [$eventWithListeners]
             )
             ->willReturn(false, true);
-        $this->dispatcher->expects($this->exactly(3))
+        $this->dispatcher->expects(static::exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [ExecuteActionEvents::HANDLE_BEFORE, $this->anything()],
+                [ExecuteActionEvents::HANDLE_BEFORE, static::anything()],
                 [$eventWithListeners, $event],
-                [ExecuteActionEvents::HANDLE_AFTER, $this->anything()]
+                [ExecuteActionEvents::HANDLE_AFTER, static::anything()]
             );
 
         $this->action->initialize(['events' => [$eventWithoutListeners, $eventWithListeners]]);

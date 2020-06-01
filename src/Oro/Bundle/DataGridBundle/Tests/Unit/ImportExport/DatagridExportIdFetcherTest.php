@@ -30,7 +30,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     /** @var QueryExecutorInterface */
     protected $queryExecutor;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -56,12 +56,11 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of datagrid export reader must contain "gridName".
-     */
     public function testThrowInvalidConfigurationExceptionIfSettingContextWithoutGridName()
     {
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of datagrid export reader must contain "gridName".');
+
         $context = $this->createContextMock();
         $context
             ->expects($this->once())

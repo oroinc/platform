@@ -20,7 +20,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $calendar;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()

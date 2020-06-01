@@ -30,7 +30,7 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
      */
     private $sender;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailTemplateManager  = $this->createMock(EmailTemplateManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

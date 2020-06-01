@@ -30,7 +30,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
      */
     protected $process;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition')
             ->disableOriginalConstructor()

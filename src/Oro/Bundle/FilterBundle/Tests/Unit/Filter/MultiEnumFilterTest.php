@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -14,19 +15,22 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Test\FormInterface;
 
 class MultiEnumFilterTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
     protected $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     protected $formFactory;
 
     /** @var MultiEnumFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -42,105 +46,87 @@ class MultiEnumFilterTest extends OrmTestCase
             ]
         );
 
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+        /** @var ManagerRegistry|MockObject $doctrine */
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
+        $doctrine->expects(static::any())->method('getManagerForClass')->willReturn($this->em);
 
         $manyRelationBuilder = new ManyRelationBuilder();
         $manyRelationBuilder->addBuilder(new OrmManyRelationBuilder($doctrine));
 
-        $this->filter = new MultiEnumFilter(
+        $this->filter = new class(
             $this->formFactory,
             new FilterUtility(),
             $manyRelationBuilder
-        );
+        ) extends MultiEnumFilter {
+            public function xgetParams(): array
+            {
+                return $this->params;
+            }
+        };
     }
 
     public function testInit()
     {
-        $params = [];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
-            [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options' => []
-            ],
-            'params',
-            $this->filter
+        $this->filter->init('test', []);
+        static::assertEquals(
+            [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithNullValue()
     {
-        $params = [
-            'null_value' => ':empty:'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
+        $this->filter->init('test', ['null_value' => ':empty:']);
+        static::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'null_value' => ':empty:',
                 'options' => []
             ],
-            'params',
-            $this->filter
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithClass()
     {
-        $params = [
-            'class' => 'Test\EnumValue'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
+        $this->filter->init('test', ['class' => 'Test\EnumValue']);
+        static::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options' => [
                     'class' => 'Test\EnumValue'
                 ]
             ],
-            'params',
-            $this->filter
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithEnumCode()
     {
-        $params = [
-            'enum_code' => 'test_enum'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
+        $this->filter->init('test', ['enum_code' => 'test_enum']);
+        static::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options' => [
                     'enum_code' => 'test_enum'
                 ]
             ],
-            'params',
-            $this->filter
+            $this->filter->xgetParams()
         );
     }
 
     public function testGetForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(static::once())
             ->method('create')
             ->with(EnumFilterType::class)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
-        $this->assertSame(
-            $form,
-            $this->filter->getForm()
-        );
+        static::assertSame($form, $this->filter->getForm());
     }
 
     /**
@@ -167,20 +153,20 @@ class MultiEnumFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName'])
+        /** @var OrmFilterDatasourceAdapter|MockObject $ds */
+        $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
+            ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
             ->getMock();
 
-        $ds->expects($this->any())
+        $ds->expects(static::any())
             ->method('generateParameterName')
-            ->will($this->returnValue('param1'));
+            ->willReturn('param1');
 
         $this->filter->apply($ds, $data);
 
-        $this->assertEquals($expectedDQL, $qb->getQuery()->getDQL());
-        $this->assertEquals($values, $qb->getParameter('param1')->getValue());
+        static::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
+        static::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
     /**

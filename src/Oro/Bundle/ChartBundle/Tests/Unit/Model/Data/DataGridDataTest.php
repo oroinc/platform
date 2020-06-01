@@ -21,7 +21,7 @@ class DataGridDataTest extends \PHPUnit\Framework\TestCase
      */
     protected $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $this->resultObject = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject')

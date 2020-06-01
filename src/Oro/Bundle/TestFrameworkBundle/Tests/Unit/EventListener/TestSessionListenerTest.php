@@ -26,7 +26,7 @@ class TestSessionListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $testSessionListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->getMockBuilder(GetResponseEvent::class)
             ->disableOriginalConstructor()

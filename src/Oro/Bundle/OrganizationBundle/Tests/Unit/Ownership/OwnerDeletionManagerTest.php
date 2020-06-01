@@ -33,7 +33,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerDeletionManager */
     private $ownerDeletionManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->checkerContainer = $this->createMock(ContainerInterface::class);
         $this->ownershipProvider = $this->createMock(ConfigProvider::class);

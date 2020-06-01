@@ -74,14 +74,15 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "axes()", "__set()" or "__call()" exist and have public access in class "Mock_CarNoAdderAndRemover
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectExceptionMessage(
+            'Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()",'
+            . ' "addAxis()"/"removeAxis()", "setAxes()", "axes()", "__set()" or "__call()" exist'
+            . ' and have public access in class "Mock_CarNoAdderAndRemover'
+        );
+
         $car        = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover');
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter  = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));

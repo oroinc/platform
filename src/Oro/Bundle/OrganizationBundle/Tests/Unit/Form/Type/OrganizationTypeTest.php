@@ -10,7 +10,7 @@ class OrganizationTypeTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 

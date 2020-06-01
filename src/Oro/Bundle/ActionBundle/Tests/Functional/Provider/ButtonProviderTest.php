@@ -32,7 +32,7 @@ class ButtonProviderTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->buttonProvider = $this->getContainer()->get('oro_action.provider.button');
@@ -40,7 +40,7 @@ class ButtonProviderTest extends WebTestCase
         $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->getContainer()->get('oro_action.tests.provider.button.extension')
             ->setDecoratedExtension(null);

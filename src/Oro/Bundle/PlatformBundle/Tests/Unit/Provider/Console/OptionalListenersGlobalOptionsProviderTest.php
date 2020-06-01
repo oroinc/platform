@@ -22,7 +22,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
      */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenersManager = $this->createMock(OptionalListenerManager::class);
         $this->provider = new OptionalListenersGlobalOptionsProvider($this->listenersManager);

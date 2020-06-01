@@ -36,7 +36,7 @@ trait ResponseExtension
         $this->assertInstanceOfResponse($response);
 
         $this->assertTrue($response->headers->has('Content-Type'));
-        $this->assertContains(
+        static::assertStringContainsString(
             'text/html',
             $response->headers->get('Content-Type'),
             $this->getAssertMessage($response)

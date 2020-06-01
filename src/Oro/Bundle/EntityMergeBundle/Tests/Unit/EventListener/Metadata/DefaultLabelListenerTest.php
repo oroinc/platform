@@ -19,7 +19,7 @@ class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $entityConfigHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigHelper = $this
             ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\EventListener\\Metadata\\EntityConfigHelper')

@@ -21,7 +21,7 @@ class ScopeManagerTest extends WebTestCase
 {
     private const TEST_SCOPE = 'test_scope';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadScopeData::class]);

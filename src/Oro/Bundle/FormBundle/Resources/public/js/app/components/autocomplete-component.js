@@ -229,7 +229,7 @@ define(function(require) {
             const self = this;
             this.resultsMapping = {};
             return _.map(response.results || [], function(item) {
-                const result = $.trim(self.options.selection_template(item));
+                const result = self.options.selection_template(item).trim();
                 self.resultsMapping[result] = item;
                 return result;
             });

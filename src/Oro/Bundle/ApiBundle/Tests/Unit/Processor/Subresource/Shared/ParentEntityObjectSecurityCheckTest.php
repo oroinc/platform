@@ -15,7 +15,7 @@ class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTes
     /** @var ParentEntityObjectSecurityCheck */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,12 +46,11 @@ class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTes
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access by "VIEW" permission to the parent entity.
-     */
     public function testProcessWhenAccessDenied()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access by "VIEW" permission to the parent entity.');
+
         $parentEntity = new Product();
 
         $this->authorizationChecker->expects(self::once())

@@ -18,7 +18,7 @@ class TestSessionListenerCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var Definition|\PHPUnit\Framework\MockObject\MockObject */
     protected $definition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new TestSessionListenerCompilerPass();
 

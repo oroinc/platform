@@ -20,7 +20,7 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 

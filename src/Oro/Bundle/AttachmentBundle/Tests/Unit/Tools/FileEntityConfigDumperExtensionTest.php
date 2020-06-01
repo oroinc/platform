@@ -30,7 +30,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);

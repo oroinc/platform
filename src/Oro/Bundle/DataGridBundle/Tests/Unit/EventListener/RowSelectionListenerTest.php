@@ -39,7 +39,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->getMockBuilder(BuildAfter::class)
             ->disableOriginalConstructor()

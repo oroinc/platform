@@ -15,7 +15,7 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
      */
     protected $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -170,7 +170,7 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn(10);
 
-        $this->expectException('\Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException');
+        $this->expectException(\Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException::class);
         $this->expectExceptionMessage('The type of the rounding is not valid "intl" rounding mode.');
 
         $this->service->round(1.15, 10);

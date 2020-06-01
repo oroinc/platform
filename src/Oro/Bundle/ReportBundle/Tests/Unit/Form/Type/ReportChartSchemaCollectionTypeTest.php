@@ -19,7 +19,7 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $chartConfigs = [
             'line_chart' => [

@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension;
 
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
 class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
@@ -23,12 +24,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $extension->getType($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The type "unknown" can not be loaded by this extension.');
+
         $extension = new PreloadedExtension([]);
 
         $extension->getType('unknown');
@@ -160,23 +160,21 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $extension->getDataProvider($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The data provider "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownDataProvider()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
+
         $extension = new PreloadedExtension([], [], [], [], []);
 
         $extension->getDataProvider('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $types array must be strings.
-     */
     public function testConstructWithInvalidKeysForBlockTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $types array must be strings.');
+
         new PreloadedExtension(
             [
                 'test' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
@@ -185,12 +183,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $types array must be BlockTypeInterface.
-     */
     public function testConstructWithInvalidBlockTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $types array must be BlockTypeInterface.');
+
         new PreloadedExtension(
             [
                 'test1' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
@@ -199,12 +196,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $typeExtensions array must be strings.
-     */
     public function testConstructWithInvalidKeysForBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $typeExtensions array must be strings.');
+
         new PreloadedExtension(
             [],
             [
@@ -214,12 +210,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.
-     */
     public function testConstructWithInvalidBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.');
+
         new PreloadedExtension(
             [],
             [
@@ -229,12 +224,13 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.
-     */
     public function testConstructWithSingleBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.'
+        );
+
         new PreloadedExtension(
             [],
             [
@@ -243,12 +239,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $layoutUpdates array must be strings.
-     */
     public function testConstructWithInvalidKeysForLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $layoutUpdates array must be strings.');
+
         new PreloadedExtension(
             [],
             [],
@@ -259,12 +254,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $layoutUpdates[] array must be LayoutUpdateInterface.
-     */
     public function testConstructWithInvalidLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $layoutUpdates[] array must be LayoutUpdateInterface.');
+
         new PreloadedExtension(
             [],
             [],
@@ -275,12 +269,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $layoutUpdates array must be array of LayoutUpdateInterface.
-     */
     public function testConstructWithSingleLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $layoutUpdates array must be array of LayoutUpdateInterface.');
+
         new PreloadedExtension(
             [],
             [],
@@ -290,12 +283,13 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $contextConfigurators array must be ContextConfiguratorInterface.
-     */
     public function testConstructWithInvalidContextConfiguratorType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Each item of $contextConfigurators array must be ContextConfiguratorInterface.'
+        );
+
         new PreloadedExtension(
             [],
             [],
@@ -307,12 +301,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $dataProviders array must be strings.
-     */
     public function testConstructWithInvalidKeysForDataProviders()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $dataProviders array must be strings.');
+
         new PreloadedExtension(
             [],
             [],

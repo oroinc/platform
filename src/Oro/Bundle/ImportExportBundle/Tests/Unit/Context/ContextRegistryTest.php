@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ContextRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextRegistry
-     */
+    /** @var ContextRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new ContextRegistry();
     }
@@ -22,48 +23,35 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $fooStepExecution = $this->createStepExecution();
         $fooContext = $this->registry->getByStepExecution($fooStepExecution);
-        $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext', $fooContext);
-        $this->assertAttributeEquals($fooStepExecution, 'stepExecution', $fooContext);
-        $this->assertSame($fooContext, $this->registry->getByStepExecution($fooStepExecution));
+        static::assertInstanceOf(StepExecutionProxyContext::class, $fooContext);
+        static::assertSame($fooContext, $this->registry->getByStepExecution($fooStepExecution));
 
         $barStepExecution = $this->createStepExecution('job2');
         $barContext = $this->registry->getByStepExecution($barStepExecution);
-        $this->assertNotSame($barContext, $fooContext);
+        static::assertNotSame($barContext, $fooContext);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|JobInstance $jobInstance */
-        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
-        $jobInstance->expects($this->any())
-            ->method('getAlias')
-            ->will($this->returnValue('job2'));
+        /** @var MockObject|JobInstance $jobInstance */
+        $jobInstance = $this->createMock(JobInstance::class);
+        $jobInstance->method('getAlias')->willReturn('job2');
         $this->registry->clear($jobInstance);
         $barContext2 = $this->registry->getByStepExecution($barStepExecution);
-        $this->assertNotSame($barContext, $barContext2);
+        static::assertNotSame($barContext, $barContext2);
     }
 
     /**
      * @param string $alias
-     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
+     * @return MockObject|StepExecution
      */
     protected function createStepExecution($alias = null)
     {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
 
         if ($alias) {
-            $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-            $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
-            $jobExecution->expects($this->any())
-                ->method('getJobInstance')
-                ->will($this->returnValue($jobInstance));
-
-            $stepExecution->expects($this->any())
-                ->method('getJobExecution')
-                ->will($this->returnValue($jobExecution));
-
-            $jobInstance->expects($this->any())
-                ->method('getAlias')
-                ->will($this->returnValue($alias));
+            $jobExecution = $this->createMock(JobExecution::class);
+            $jobInstance = $this->createMock(JobInstance::class);
+            $jobExecution->method('getJobInstance')->willReturn($jobInstance);
+            $stepExecution->method('getJobExecution')->willReturn($jobExecution);
+            $jobInstance->method('getAlias')->willReturn($alias);
         }
 
         return $stepExecution;

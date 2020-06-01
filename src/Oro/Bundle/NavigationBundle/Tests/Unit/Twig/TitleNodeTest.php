@@ -28,7 +28,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * Set up test environment
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->node = $this->createMock(Node::class);
         $this->compiler = $this->createMock(Compiler::class);
@@ -38,11 +38,10 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests error in twig tag call
-     *
-     * @expectedException \Twig\Error\SyntaxError
      */
     public function testFailedCompile()
     {
+        $this->expectException(\Twig\Error\SyntaxError::class);
         $this->node->expects($this->once())->method('getIterator')->willReturn([]);
 
         $this->titleNode->compile($this->compiler);

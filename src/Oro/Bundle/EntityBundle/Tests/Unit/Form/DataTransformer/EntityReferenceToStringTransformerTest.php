@@ -10,7 +10,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityReferenceToStringTransformer */
     protected $transformer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
@@ -58,12 +58,11 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "object", "integer" given
-     */
     public function testTransformWhenInvalidValueType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "object", "integer" given');
+
         $this->transformer->transform(123);
     }
 
@@ -92,21 +91,19 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a string.
-     */
     public function testReverseTransformWithInvalidValueType()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a string.');
+
         $this->transformer->reverseTransform(123);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "entityClass" element after decoding a string.
-     */
     public function testReverseTransformWithMissingEntityClass()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "entityClass" element after decoding a string.');
+
         $this->transformer->reverseTransform(
             json_encode([
                 'entityId' => 1
@@ -114,12 +111,11 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected an array with "entityId" element after decoding a string.
-     */
     public function testReverseTransformWithMissingEntityId()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array with "entityId" element after decoding a string.');
+
         $this->transformer->reverseTransform(
             json_encode([
                 'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',

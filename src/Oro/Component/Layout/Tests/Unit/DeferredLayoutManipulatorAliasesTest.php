@@ -292,14 +292,15 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "test_alias" alias for "root" item. Reason: The "test_alias" sting cannot be used as an alias for "root" item because it is already used for "header" item.
-     */
-    // @codingStandardsIgnoreEnd
     public function testRedefineAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "test_alias" alias for "root" item.'
+            . ' Reason: The "test_alias" sting cannot be used as an alias for "root" item'
+            . ' because it is already used for "header" item.'
+        );
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')

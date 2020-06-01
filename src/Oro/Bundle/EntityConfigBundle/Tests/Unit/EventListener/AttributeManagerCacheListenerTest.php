@@ -16,7 +16,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->listener = new AttributeManagerCacheListener($this->attributeManager);

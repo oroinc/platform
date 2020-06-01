@@ -22,8 +22,6 @@ class CommandProducedWarning extends Constraint
      */
     public function __construct(?string $expectedWarningMessage)
     {
-        parent::__construct();
-
         $this->expectedWarningMessage = $expectedWarningMessage;
     }
 

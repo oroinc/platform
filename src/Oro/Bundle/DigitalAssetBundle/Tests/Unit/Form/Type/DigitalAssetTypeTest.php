@@ -145,7 +145,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        $this->assertContains('This value should not be blank', (string)$form->getErrors(true, false));
+        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     public function testSubmitWhenNoTitle(): void
@@ -165,7 +165,7 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        $this->assertContains('This value should not be blank', (string)$form->getErrors(true, false));
+        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     /**

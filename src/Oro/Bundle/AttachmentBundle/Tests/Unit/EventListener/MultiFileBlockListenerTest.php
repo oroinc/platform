@@ -29,7 +29,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);

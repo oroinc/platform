@@ -31,7 +31,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 {
     use RolePermissionExtension;
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->getBatchUpdateExceptionController()->clear();
         parent::tearDown();

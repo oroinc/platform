@@ -20,7 +20,7 @@ class WorkflowManagerRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
@@ -62,12 +62,11 @@ class WorkflowManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->getWorkflowManager('def'), $this->registry->getManager());
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Workflow manager with name "unkonwn" not registered
-     */
     public function testGetUnknownManager()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Workflow manager with name "unkonwn" not registered');
+
         $this->registry->getManager('unkonwn');
     }
 

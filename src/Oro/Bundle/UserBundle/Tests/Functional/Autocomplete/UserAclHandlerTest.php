@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
 class UserAclHandlerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadUserACLData::class]);

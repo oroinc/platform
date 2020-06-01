@@ -9,7 +9,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
     /** @var AssertHasResult */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,31 +22,28 @@ class AssertHasResultTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Getting a list of entities failed.
-     */
     public function testProcessOnExistingResult()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('Getting a list of entities failed.');
+
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Unsupported request.
-     */
     public function testProcessOnEmptyQuery()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('Unsupported request.');
+
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Unsupported query type: stdClass.
-     */
     public function testProcessOnWrongQuery()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('Unsupported query type: stdClass.');
+
         $this->context->setQuery(new \stdClass());
         $this->processor->process($this->context);
     }

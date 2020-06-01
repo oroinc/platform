@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityEntityControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(
@@ -151,6 +151,6 @@ class EmailActivityEntityControllerTest extends WebTestCase
         // Check that user has activity list target(email) on view page
         $this->client->request('GET', $this->getUrl('oro_user_view', ['id' => $user->getId()]));
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains($email['subject'], $content);
+        static::assertStringContainsString($email['subject'], $content);
     }
 }

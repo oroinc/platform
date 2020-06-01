@@ -29,7 +29,7 @@ class LocalizationControllerTest extends WebTestCase
     /** @var LocalizationManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadLocalizationData::class]);
@@ -42,7 +42,7 @@ class LocalizationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('oro-locale-localizations-grid', $crawler->html());
+        static::assertStringContainsString('oro-locale-localizations-grid', $crawler->html());
     }
 
     public function testCreate()
@@ -72,7 +72,7 @@ class LocalizationControllerTest extends WebTestCase
         $this->assertEquals($localizationId, $cachedLocalization->getId());
 
         $html = $crawler->html();
-        $this->assertContains('Localization has been saved', $html);
+        static::assertStringContainsString('Localization has been saved', $html);
     }
 
     /**
@@ -90,10 +90,10 @@ class LocalizationControllerTest extends WebTestCase
 
         $html = $crawler->html();
 
-        $this->assertContains(self::NAME, $html);
-        $this->assertContains(self::DEFAULT_TITLE, $html);
-        $this->assertContains(self::LANGUAGE_CODE, $html);
-        $this->assertContains($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
+        static::assertStringContainsString(self::NAME, $html);
+        static::assertStringContainsString(self::DEFAULT_TITLE, $html);
+        static::assertStringContainsString(self::LANGUAGE_CODE, $html);
+        static::assertStringContainsString($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -124,7 +124,7 @@ class LocalizationControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        $this->assertContains('Localization has been saved', $html);
+        static::assertStringContainsString('Localization has been saved', $html);
 
         $localizationId = $this->getLocalization(self::UPDATED_NAME)->getId();
         $cachedLocalization = $this->manager->getLocalization($localizationId);
@@ -152,11 +152,17 @@ class LocalizationControllerTest extends WebTestCase
         $parent = $this->getReference(self::PARENT_LOCALIZATION);
 
         $html = $crawler->html();
-        $this->assertContains(self::UPDATED_NAME, $html);
-        $this->assertContains(self::UPDATED_DEFAULT_TITLE, $html);
-        $this->assertContains($this->getLanguageFormatter()->formatLocale(self::UPDATED_LANGUAGE_CODE), $html);
-        $this->assertContains($this->getFormattingFormatter()->format(self::UPDATED_FORMATTING_CODE), $html);
-        $this->assertContains($parent->getName(), $html);
+        static::assertStringContainsString(self::UPDATED_NAME, $html);
+        static::assertStringContainsString(self::UPDATED_DEFAULT_TITLE, $html);
+        static::assertStringContainsString(
+            $this->getLanguageFormatter()->formatLocale(self::UPDATED_LANGUAGE_CODE),
+            $html
+        );
+        static::assertStringContainsString(
+            $this->getFormattingFormatter()->format(self::UPDATED_FORMATTING_CODE),
+            $html
+        );
+        static::assertStringContainsString($parent->getName(), $html);
 
         return $id;
     }

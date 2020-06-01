@@ -11,7 +11,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
     /** @var CryptedStringType */
     protected $fieldType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $crypter = $this->createMock(SymmetricCrypterInterface::class);
         $crypter->expects($this->any())

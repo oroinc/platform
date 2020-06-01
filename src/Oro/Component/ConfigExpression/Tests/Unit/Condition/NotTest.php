@@ -10,7 +10,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\Not */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Not();
     }
@@ -56,23 +56,21 @@ class NotTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid option type. Expected "Oro\Component\ConfigExpression\ExpressionInterface", "string" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testInitializeFailsWhenOptionNotExpressionInterface()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Invalid option type. Expected "Oro\Component\ConfigExpression\ExpressionInterface", "string" given.'
+        );
+
         $this->condition->initialize(['anything']);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 element, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
+
         $this->condition->initialize([]);
     }
 

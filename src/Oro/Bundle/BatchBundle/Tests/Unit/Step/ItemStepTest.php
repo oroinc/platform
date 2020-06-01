@@ -32,7 +32,7 @@ class ItemStepTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
         $this->jobRepository   = $this->createMock('Akeneo\\Bundle\\BatchBundle\\Job\\JobRepositoryInterface');

@@ -8,12 +8,11 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 
 class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "callable", "integer" given.
-     */
     public function testInvalidCallbackType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "callable", "integer" given.');
+
         new CallbackLayoutUpdate(123);
     }
 

@@ -14,7 +14,7 @@ class MessageSelectorTest extends \PHPUnit\Framework\TestCase
     /** @var MessageSelector */
     protected $messageSelector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->messageSelector = new MessageSelector($this->logger);

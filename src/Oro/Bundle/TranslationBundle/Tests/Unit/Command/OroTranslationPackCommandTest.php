@@ -31,7 +31,7 @@ class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationAdaptersCollection */
     private $translationAdaptersCollection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationDumper = $this->createMock(TranslationPackDumper::class);
         $this->translationServiceProvider = $this->createMock(TranslationServiceProvider::class);

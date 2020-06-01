@@ -21,7 +21,7 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ColumnConfigListener  */
     protected $columnListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()

@@ -22,7 +22,7 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
      */
     protected $fieldData;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()

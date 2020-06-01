@@ -23,7 +23,7 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->themeRegistry = new ThemeRegistry($this->themeSettings);
     }
@@ -52,12 +52,11 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException
-     * @expectedExceptionMessage Theme "baz" not found.
-     */
     public function testGetThemeNotFoundException()
     {
+        $this->expectException(\Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException::class);
+        $this->expectExceptionMessage('Theme "baz" not found.');
+
         $this->themeRegistry->getTheme('baz');
     }
 

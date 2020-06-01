@@ -21,7 +21,7 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * prepare mocks
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->om = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

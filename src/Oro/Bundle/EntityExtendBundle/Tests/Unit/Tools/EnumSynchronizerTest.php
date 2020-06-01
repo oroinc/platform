@@ -48,7 +48,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EnumSynchronizer */
     protected $synchronizer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -389,12 +389,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $enumValueClassName must not be empty.
-     */
     public function testApplyEnumEntityOptionsWithEmptyClassName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$enumValueClassName must not be empty.');
+
         $this->synchronizer->applyEnumEntityOptions('', false);
     }
 
@@ -482,21 +481,19 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $enumValueClassName must not be empty.
-     */
     public function testApplyEnumOptionsWithEmptyClassName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$enumValueClassName must not be empty.');
+
         $this->synchronizer->applyEnumOptions('', [], 'en');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $locale must not be empty.
-     */
     public function testApplyEnumOptionsWithEmptyLocale()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$locale must not be empty.');
+
         $this->synchronizer->applyEnumOptions('Test\EnumValue', [], null);
     }
 

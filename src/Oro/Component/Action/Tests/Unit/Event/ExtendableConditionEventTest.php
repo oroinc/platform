@@ -16,7 +16,7 @@ class ExtendableConditionEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $extendableConditionEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendableConditionEvent = new ExtendableConditionEvent($this->context);
     }

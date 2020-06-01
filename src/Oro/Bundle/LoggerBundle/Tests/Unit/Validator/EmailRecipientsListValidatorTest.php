@@ -32,7 +32,7 @@ class EmailRecipientsListValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = new EmailRecipientsListValidator();
         $this->constraint = new EmailRecipientsListConstraint();

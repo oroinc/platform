@@ -11,7 +11,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationChecker */
     protected $checker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->checker = new ConfigurationChecker(new ContextAccessor());
     }
@@ -47,7 +47,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
             'expected' => true
         ];
 
-        yield 'empty configuration' => [
+        yield 'non-empty nodes configuration' => [
             'configuration' => [
                 WorkflowConfiguration::NODE_TRANSITIONS => [
                     'test_transition' => [

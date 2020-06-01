@@ -57,7 +57,7 @@ class MapPrimaryFieldTest extends TypeTestCase
     /** @var MapPrimaryField */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->customizationHandler = new CustomizeFormDataHandler($this->customizationProcessor);

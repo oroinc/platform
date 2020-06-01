@@ -20,7 +20,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         'double' => 'float',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver = new ParametersResolver();
     }

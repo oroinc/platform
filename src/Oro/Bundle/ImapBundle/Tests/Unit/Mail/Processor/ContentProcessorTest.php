@@ -13,7 +13,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContentProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
             ->disableOriginalConstructor()

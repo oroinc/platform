@@ -33,7 +33,7 @@ class PreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PreviewMetadataProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
         $this->mimeTypeChecker = $this->createMock(MimeTypeChecker::class);

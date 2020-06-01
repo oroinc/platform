@@ -15,7 +15,7 @@ class NotSqlKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var NotSqlKeywordValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(ExecutionContextInterface::class);
 

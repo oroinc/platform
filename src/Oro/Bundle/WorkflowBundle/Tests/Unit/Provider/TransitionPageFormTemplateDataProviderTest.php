@@ -16,7 +16,7 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\Test
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new TransitionPageFormTemplateDataProvider();
     }

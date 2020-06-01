@@ -24,7 +24,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationMostviewedBuilder */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);

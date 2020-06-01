@@ -22,7 +22,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = $this->createMock(DbalSessionInterface::class);
 

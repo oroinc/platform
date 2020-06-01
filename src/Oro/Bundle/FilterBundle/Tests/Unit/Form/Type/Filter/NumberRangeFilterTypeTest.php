@@ -22,7 +22,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $localeSettings = $this->createMockLocaleSettings();

@@ -10,93 +10,88 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ClearerInterface */
-    private $clearer;
+    /** @var MockObject|ClearerInterface */
+    private $clearer1;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ChainExtensionAwareClearer */
+    /** @var MockObject|ClearerInterface */
+    private $clearer2;
+
+    /** @var ChainExtensionAwareClearer|MockObject */
     private $chainExtensionAwareClearer;
 
     /** @var ContainerResetExtension */
     private $extension;
 
-    protected function setUp()
+    /** @var MockObject|LoggerInterface */
+    private $logger;
+
+    protected function setUp(): void
     {
-        $this->clearer = $this->createMock(ClearerInterface::class);
+        $this->clearer1 = $this->getMockBuilder(ClearerInterface::class)
+            ->addMethods(['setChainExtension'])
+            ->getMockForAbstractClass();
+        $this->clearer2 = $this->getMockBuilder(ClearerInterface::class)
+            ->addMethods(['setChainExtension'])
+            ->getMockForAbstractClass();
         $this->chainExtensionAwareClearer = $this->createMock(ChainExtensionAwareClearer::class);
 
-        $this->extension = new ContainerResetExtension(
-            [$this->clearer, $this->chainExtensionAwareClearer]
-        );
+        $this->extension = new ContainerResetExtension([
+            $this->clearer1,
+            $this->clearer2,
+            $this->chainExtensionAwareClearer
+        ]);
+
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
-    public function testSetPersistentProcessors()
+    public function testOnPostReceivedForPersistentAndNonPersistentProcessors()
     {
-        self::assertAttributeSame([], 'persistentProcessors', $this->extension);
+        $this->extension->setPersistentProcessors(['persistent_processor1']);
+        $this->extension->setPersistentProcessors(['persistent_processor2']);
 
-        $this->extension->setPersistentProcessors(['processor1']);
-        self::assertAttributeEquals(['processor1' => true], 'persistentProcessors', $this->extension);
+        // verify that clearers are called only for non-persistent processors
+        $this->clearer1->expects(static::exactly(1))->method('clear')->with(static::identicalTo($this->logger));
+        $this->clearer2->expects(static::exactly(1))->method('clear')->with(static::identicalTo($this->logger));
 
-        $this->extension->setPersistentProcessors(['processor2']);
-        self::assertAttributeEquals(
-            ['processor1' => true, 'processor2' => true],
-            'persistentProcessors',
-            $this->extension
-        );
+        $this->extension->onPostReceived($this->createMessageContextForProcessor('non_persistent_processor'));
+
+        $this->clearer1->expects(static::never())->method('clear');
+        $this->clearer2->expects(static::never())->method('clear');
+
+        // processing in different order to verify that subsequent calls to setPersistentProcessors
+        // did not wipe out previously set persistent processors
+        $this->extension->onPostReceived($this->createMessageContextForProcessor('persistent_processor2'));
+        $this->extension->onPostReceived($this->createMessageContextForProcessor('persistent_processor1'));
     }
 
-    public function testSetChainExtension()
+    public function testSetChainExtensionSetsItOnlyOnChainExtensionAwareInterfaceClearers()
     {
         $chainExtension = $this->createMock(ExtensionInterface::class);
 
-        $this->chainExtensionAwareClearer->expects(self::once())
+        $this->clearer1->expects(static::never())->method('setChainExtension');
+        $this->clearer2->expects(static::never())->method('setChainExtension');
+        $this->chainExtensionAwareClearer->expects(static::once())
             ->method('setChainExtension')
-            ->with(self::identicalTo($chainExtension));
+            ->with(static::identicalTo($chainExtension));
 
         $this->extension->setChainExtension($chainExtension);
     }
 
-    public function testOnPostReceivedShouldCallClearersForPersistentProcessor()
+    private function createMessageContextForProcessor(string $processorName): Context
     {
         $message = new Message();
-        $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => 'test_processor']);
-
-        $logger = $this->createMock(LoggerInterface::class);
+        $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => $processorName]);
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
-        $context->setLogger($logger);
 
-        $this->clearer->expects(self::once())
-            ->method('clear')
-            ->with(self::isInstanceOf(LoggerInterface::class));
-        $this->chainExtensionAwareClearer->expects(self::once())
-            ->method('clear')
-            ->with(self::isInstanceOf(LoggerInterface::class));
+        $context->setLogger($this->logger);
 
-        $this->extension->onPostReceived($context);
-    }
-
-    public function testOnPostReceivedShouldNotCallClearersForPersistentProcessor()
-    {
-        $message = new Message();
-        $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => 'test_processor']);
-
-        $logger = $this->createMock(LoggerInterface::class);
-
-        $context = new Context($this->createMock(SessionInterface::class));
-        $context->setMessage($message);
-        $context->setLogger($logger);
-
-        $this->clearer->expects(self::never())
-            ->method('clear');
-        $this->chainExtensionAwareClearer->expects(self::never())
-            ->method('clear');
-
-        $this->extension->setPersistentProcessors(['test_processor']);
-        $this->extension->onPostReceived($context);
+        return $context;
     }
 }

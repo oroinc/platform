@@ -19,7 +19,7 @@ class EnumFilterTypeTest extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -245,12 +245,11 @@ class EnumFilterTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage Either "class" or "enum_code" must option must be set.
-     */
     public function testClassNormalizerOptionsException()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectExceptionMessage('Either "class" or "enum_code" must option must be set.');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([
@@ -260,12 +259,11 @@ class EnumFilterTypeTest extends TypeTestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"
-     */
     public function testClassNormalizerUnexpectedEnumException()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([

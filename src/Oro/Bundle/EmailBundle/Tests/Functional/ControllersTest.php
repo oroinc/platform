@@ -12,7 +12,7 @@ class ControllersTest extends WebTestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -47,7 +47,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Template saved", $crawler->html());
+        static::assertStringContainsString("Template saved", $crawler->html());
     }
 
     /**

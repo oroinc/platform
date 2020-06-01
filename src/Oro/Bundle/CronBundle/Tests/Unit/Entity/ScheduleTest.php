@@ -6,32 +6,37 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Schedule */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->object = new Schedule();
+        $this->object = new class() extends Schedule {
+            public function xsetId(int $id): void
+            {
+                $this->id = $id;
+            }
+        };
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->object);
     }
 
-    public function testConstructor()
+    public function testConstructorSetsDefaultArguments()
     {
-        $this->assertAttributes([]);
+        static::assertEquals([], $this->object->getArguments());
+        static::assertEquals(\md5(\json_encode([])), $this->object->getArgumentsHash());
     }
 
     public function testGetId()
     {
-        $this->assertNull($this->object->getId());
+        static::assertNull($this->object->getId());
 
         $testValue = 42;
-        $this->setProperty($this->object, 'id', $testValue);
+        $this->object->xsetId($testValue);
 
-        $this->assertEquals($testValue, $this->object->getId());
+        static::assertEquals($testValue, $this->object->getId());
     }
 
     /**
@@ -44,12 +49,12 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetGetEntity($propertyName, $testValue, $defaultValue = null, $expectedValue = null)
     {
-        $setter = 'set' . ucfirst($propertyName);
-        $getter = 'get' . ucfirst($propertyName);
+        $setter = 'set' . \ucfirst($propertyName);
+        $getter = 'get' . \ucfirst($propertyName);
 
-        $this->assertEquals($defaultValue, $this->object->$getter());
-        $this->assertSame($this->object, $this->object->$setter($testValue));
-        $this->assertSame($expectedValue !== null ? $expectedValue : $testValue, $this->object->$getter());
+        static::assertEquals($defaultValue, $this->object->$getter());
+        static::assertSame($this->object, $this->object->$setter($testValue));
+        static::assertSame($expectedValue !== null ? $expectedValue : $testValue, $this->object->$getter());
     }
 
     /**
@@ -77,9 +82,12 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testSetArguments()
     {
-        $this->object->setArguments(['test' => 'value', 'some' => 'data']);
+        $args = ['test' => 'value', 'some' => 'data'];
+        $this->object->setArguments($args);
 
-        $this->assertAttributes(['data', 'value']);
+        sort($args);
+        static::assertEquals($args, $this->object->getArguments());
+        static::assertEquals(\md5(\json_encode($args)), $this->object->getArgumentsHash());
     }
 
     public function testGetHash()
@@ -88,35 +96,14 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $this->object->setArguments($args);
 
         sort($args);
-        $this->assertSame(md5(json_encode($args)), $this->object->getArgumentsHash());
-    }
-
-    /**
-     * @param array $attributes
-     */
-    protected function assertAttributes(array $attributes = [])
-    {
-        $this->assertAttributeEquals($attributes, 'arguments', $this->object);
-        $this->assertAttributeEquals(md5(json_encode($attributes)), 'argumentsHash', $this->object);
+        $this->assertSame(\md5(\json_encode($args)), $this->object->getArgumentsHash());
     }
 
     public function testToString()
     {
         $testValue = 42;
-        $this->setProperty($this->object, 'id', $testValue);
+        $this->object->xsetId($testValue);
 
-        $this->assertSame('42', (string)$this->object);
-    }
-
-    /**
-     * @param Schedule $object
-     * @param string $name
-     * @param mixed $value
-     */
-    protected function setProperty(Schedule $object, $name, $value)
-    {
-        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\CronBundle\Entity\Schedule', $name);
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($object, $value);
+        static::assertSame('42', (string)$this->object);
     }
 }

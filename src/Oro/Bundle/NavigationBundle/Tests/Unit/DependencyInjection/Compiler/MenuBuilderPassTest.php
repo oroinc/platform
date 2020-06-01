@@ -23,7 +23,7 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
     /** @var MenuBuilderPass */
     private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->chainMenuBuilder = $this->container->register('oro_menu.builder_chain');

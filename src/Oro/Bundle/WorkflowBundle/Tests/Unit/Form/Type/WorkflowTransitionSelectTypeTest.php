@@ -29,7 +29,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowTransitionSelectType */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -89,11 +89,10 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
      *
      * @param array $options
      * @param string $exceptionMessage
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testNormalizersException(array $options, $exceptionMessage)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->factory->create(WorkflowTransitionSelectType::class, null, $options);

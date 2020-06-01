@@ -20,7 +20,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var User */
     protected $user;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->user = new User();
         $this->token = $this->createMock(TokenInterface::class);

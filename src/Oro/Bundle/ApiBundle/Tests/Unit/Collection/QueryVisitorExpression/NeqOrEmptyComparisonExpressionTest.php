@@ -14,12 +14,11 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
 {
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage The value for "e.test" must not be NULL.
-     */
     public function testWalkComparisonExpressionForNullValue()
     {
+        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectExceptionMessage('The value for "e.test" must not be NULL.');
+
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
             [],

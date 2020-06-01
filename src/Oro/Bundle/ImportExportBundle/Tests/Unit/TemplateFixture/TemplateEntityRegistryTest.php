@@ -9,7 +9,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateEntityRegistry */
     protected $entityRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRegistry = new TemplateEntityRegistry();
     }
@@ -44,7 +44,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(
             $this->entityRegistry->hasEntity('Test\Entity', 'test3')
         );
-        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test3" does not exist.');
         $this->entityRegistry->getEntity('Test\Entity', 'test3');
     }
@@ -56,7 +56,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity1);
 
-        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test1" is already exist.');
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity2);
     }

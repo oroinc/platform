@@ -36,7 +36,7 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
             ->getMock();
@@ -66,7 +66,7 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);
-        
+
         $relation1 = new AttributeGroupRelation();
         $relation1->setEntityConfigFieldId(1);
         $group1->addAttributeRelation($relation1);
@@ -99,7 +99,7 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $relation2 = new AttributeGroupRelation();
         $relation2->setEntityConfigFieldId(2);
         $group2->addAttributeRelation($relation2);
-        
+
         $systemAttribute = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
 
         $this->context->expects($this->once())

@@ -21,7 +21,7 @@ class MenuContentProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->menuExtension = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Twig\MenuExtension')
             ->disableOriginalConstructor()

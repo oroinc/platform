@@ -15,7 +15,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
@@ -33,14 +33,19 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityName()
     {
-        $this->assertInternalType('string', $this->searchHandler->getEntityName());
+        $this->assertIsString($this->searchHandler->getEntityName());
         $this->assertSame(Impersonation::class, $this->searchHandler->getEntityName());
     }
 
     public function testGetProperties()
     {
-        $this->assertInternalType('array', $this->searchHandler->getProperties());
-        $this->assertArraySubset(['ipAddress', 'token', 'ipAddressToken'], $this->searchHandler->getProperties());
+        $this->assertIsArray($this->searchHandler->getProperties());
+
+        $properties = $this->searchHandler->getProperties();
+
+        $this->assertSame('ipAddress', $properties[0]);
+        $this->assertSame('token', $properties[1]);
+        $this->assertSame('ipAddressToken', $properties[2]);
     }
 
     public function testConvertItemInvalidType()

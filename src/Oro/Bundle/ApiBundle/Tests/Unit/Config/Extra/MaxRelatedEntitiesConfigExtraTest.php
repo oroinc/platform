@@ -12,7 +12,7 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var MaxRelatedEntitiesConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new MaxRelatedEntitiesConfigExtra(self::MAX_RELATED_ENTITIES);
     }

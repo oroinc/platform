@@ -29,7 +29,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->navigation =$this->getMockBuilder(EntityPaginationNavigation::class)
             ->disableOriginalConstructor()

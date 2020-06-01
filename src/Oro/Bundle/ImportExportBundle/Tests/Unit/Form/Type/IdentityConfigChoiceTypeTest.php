@@ -23,7 +23,7 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

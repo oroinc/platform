@@ -22,7 +22,7 @@ class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $formatterProvider = $this->createMock(FormatterProvider::class);

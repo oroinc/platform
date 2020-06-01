@@ -15,7 +15,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,11 +50,10 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $this->assertSameResult($queryBuilder);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testInconsistentKey()
     {
+        $this->expectException(\LogicException::class);
+
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */

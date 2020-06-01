@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData;
 
 class MailboxTypeTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadUserData::class, LoadAllRolesData::class]);
@@ -45,7 +45,7 @@ class MailboxTypeTest extends WebTestCase
         $crawler = $this->client->followRedirect();
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Test Mailbox has been saved', $crawler->html());
+        static::assertStringContainsString('Test Mailbox has been saved', $crawler->html());
 
         /** @var Mailbox $mailbox */
         $mailbox = $this->getRepository()->findOneBy(['label' => 'Test Mailbox']);

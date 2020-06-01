@@ -11,7 +11,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /** @var Parser */
     protected $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $localeSettingsMock = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()->getMock();
@@ -21,7 +21,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $this->parser = new Parser($localeSettingsMock);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->parser);
     }

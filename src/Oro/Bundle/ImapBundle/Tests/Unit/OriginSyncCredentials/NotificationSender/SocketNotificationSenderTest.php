@@ -23,7 +23,7 @@ class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
      */
     private $connectionChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);

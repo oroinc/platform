@@ -21,7 +21,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
     /** @var SetHttpAllowHeaderForRelationship */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

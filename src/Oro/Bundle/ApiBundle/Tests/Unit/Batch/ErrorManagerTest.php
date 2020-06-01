@@ -28,7 +28,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ErrorManager */
     private $errorManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->fileManager = $this->createMock(FileManager::class);

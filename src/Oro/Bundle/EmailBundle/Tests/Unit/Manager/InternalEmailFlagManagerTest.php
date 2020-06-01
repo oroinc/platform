@@ -11,7 +11,7 @@ class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var InternalEmailFlagManager */
     private $flagManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->flagManager = new InternalEmailFlagManager();
     }

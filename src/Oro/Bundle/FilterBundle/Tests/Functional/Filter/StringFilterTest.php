@@ -19,7 +19,7 @@ class StringFilterTest extends WebTestCase
     /** @var StringFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserData::class]);
@@ -161,8 +161,8 @@ class StringFilterTest extends WebTestCase
 
         $whereParts = $qb->getDQLPart('where')->getParts();
         $this->assertCount(1, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[0]);
-        $this->assertNotContains('GROUP BY ', $whereParts[0]);
+        static::assertStringContainsString('EXISTS(SELECT', $whereParts[0]);
+        static::assertStringNotContainsString('GROUP BY ', $whereParts[0]);
     }
 
     public function testStringInHasGroupBy()
@@ -193,8 +193,8 @@ class StringFilterTest extends WebTestCase
 
         $whereParts = $qb->getDQLPart('where')->getParts();
         $this->assertCount(2, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[1]);
-        $this->assertContains('GROUP BY ', $whereParts[1]);
+        static::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        static::assertStringContainsString('GROUP BY ', $whereParts[1]);
     }
 
     public function testStringNotInHasRelatedJoinWithWhere()
@@ -223,8 +223,8 @@ class StringFilterTest extends WebTestCase
         $this->assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
         $whereParts = $qb->getDQLPart('where')->getParts();
         $this->assertCount(2, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[1]);
-        $this->assertNotContains('GROUP BY ', $whereParts[1]);
+        static::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        static::assertStringNotContainsString('GROUP BY ', $whereParts[1]);
     }
 
     /**

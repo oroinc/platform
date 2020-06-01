@@ -14,7 +14,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
     private $datagridUrlConverter;
 
     /** {@inheritdoc} */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->datagridUrlConverter = new UrlConverter($this->router);

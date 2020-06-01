@@ -17,7 +17,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
     protected $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->helper = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')

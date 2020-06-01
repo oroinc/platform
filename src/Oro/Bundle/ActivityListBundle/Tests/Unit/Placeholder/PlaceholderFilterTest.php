@@ -33,7 +33,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderFilter */
     private $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->activityListProvider = $this->createMock(ActivityListChainProvider::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -286,11 +286,9 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testIsAllowedButtonWithUnknownPageConstant()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $entity = new TestTarget(1);
 
         $config = new Config(

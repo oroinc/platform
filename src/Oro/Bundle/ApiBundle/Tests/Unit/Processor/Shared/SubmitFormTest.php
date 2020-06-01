@@ -14,7 +14,7 @@ class SubmitFormTest extends FormProcessorTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

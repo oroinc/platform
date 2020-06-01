@@ -11,23 +11,25 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ServiceLink|MockObject */
     private $gridManagerLink;
 
-    /**
-     * @var DatagridExportConnector
-     */
+    /** @var DatagridExportConnector */
     private $connector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->gridManagerLink = $this->createMock(ServiceLink::class);
-        $this->connector = new DatagridExportConnector($this->gridManagerLink);
+        $this->connector = new class($this->gridManagerLink) extends DatagridExportConnector {
+            public function xgetPageSize(): int
+            {
+                return $this->pageSize;
+            }
+        };
     }
 
     public function testSetImportExportContext()
@@ -39,36 +41,24 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
 
         $config = DatagridConfiguration::create(['columns' => ['id']]);
 
-        /** @var ResultsObject|\PHPUnit\Framework\MockObject\MockObject $resultObject */
+        /** @var ResultsObject|MockObject $resultObject */
         $resultObject = $this->createMock(ResultsObject::class);
 
-        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
+        /** @var DatasourceInterface|MockObject $dataSource */
         $dataSource = $this->createMock(DatasourceInterface::class);
 
-        /** @var Datagrid|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
+        /** @var Datagrid|MockObject $dataGrid */
         $dataGrid = $this->createMock(Datagrid::class);
-        $dataGrid->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($config);
-        $dataGrid->expects($this->any())
-            ->method('getDatasource')
-            ->willReturn($dataSource);
-        $dataGrid->expects($this->any())
-            ->method('getParameters')
-            ->willReturn($gridParametersBag);
-        $dataGrid->expects($this->any())
-            ->method('getData')
-            ->willReturn($resultObject);
+        $dataGrid->expects(static::once())->method('getConfig')->willReturn($config);
+        $dataGrid->method('getDatasource')->willReturn($dataSource);
+        $dataGrid->method('getParameters')->willReturn($gridParametersBag);
+        $dataGrid->method('getData')->willReturn($resultObject);
 
-        /** @var Manager|\PHPUnit\Framework\MockObject\MockObject $gridManager */
+        /** @var Manager|MockObject $gridManager */
         $gridManager = $this->createMock(Manager::class);
-        $gridManager->expects($this->once())
-            ->method('getDatagrid')
-            ->willReturn($dataGrid);
+        $gridManager->expects(static::once())->method('getDatagrid')->willReturn($dataGrid);
 
-        $this->gridManagerLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($gridManager);
+        $this->gridManagerLink->expects(static::once())->method('getService')->willReturn($gridManager);
 
         $context = new Context([
             'pageSize' => $batchSize,
@@ -79,7 +69,7 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
         $this->connector->setImportExportContext($context);
         $this->connector->count();
 
-        $this->assertAttributeEquals($batchSize, 'pageSize', $this->connector);
-        $this->assertEquals(['id'], $context->getValue('columns'));
+        static::assertEquals($batchSize, $this->connector->xgetPageSize());
+        static::assertEquals(['id'], $context->getValue('columns'));
     }
 }

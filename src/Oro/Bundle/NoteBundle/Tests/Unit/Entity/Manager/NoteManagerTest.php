@@ -36,7 +36,7 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
     /** @var NoteManager */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

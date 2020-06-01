@@ -29,7 +29,7 @@ class IterableResultFactoryTest extends WebTestCase
 
     const GRID_NAME = 'test-entity-grid';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], static::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, 'simple_password'));
         $this->loadFixtures([LoadTestEntitiesData::class]);

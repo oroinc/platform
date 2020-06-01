@@ -17,7 +17,7 @@ class ThemeImageTypeDimensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $imageTypeDimension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT);
     }

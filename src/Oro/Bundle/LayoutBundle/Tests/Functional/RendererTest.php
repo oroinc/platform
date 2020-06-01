@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 
 class RendererTest extends LayoutTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

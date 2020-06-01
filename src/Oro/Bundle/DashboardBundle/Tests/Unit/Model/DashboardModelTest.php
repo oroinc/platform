@@ -33,7 +33,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $dashboardModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 

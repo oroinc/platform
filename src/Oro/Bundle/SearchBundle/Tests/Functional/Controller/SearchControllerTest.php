@@ -13,7 +13,7 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 class SearchControllerTest extends SearchBundleWebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

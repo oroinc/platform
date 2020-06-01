@@ -12,13 +12,13 @@ class WorkflowAwareCacheTest extends WorkflowTestCase
      */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([]);
         $this->cache = self::getContainer()->get('oro_workflow.cache.entity_aware');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->cache->invalidateRelated();
         $this->cache->invalidateActiveRelated();

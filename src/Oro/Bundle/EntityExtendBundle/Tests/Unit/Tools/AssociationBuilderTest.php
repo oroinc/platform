@@ -26,7 +26,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $relationBuilder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrine        = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()

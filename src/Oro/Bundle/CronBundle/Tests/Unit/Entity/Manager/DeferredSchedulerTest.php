@@ -33,7 +33,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var SchedulesByArgumentsFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $schedulesByArgumentsFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scheduleManager = $this->getMockBuilder(ScheduleManager::class)
             ->disableOriginalConstructor()
@@ -161,7 +161,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($this->scheduleClass)
             ->willReturn(null);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Please provide manageable schedule entity class');
 
         $this->deferredScheduler->flush();

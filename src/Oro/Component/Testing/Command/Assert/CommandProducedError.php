@@ -19,8 +19,6 @@ class CommandProducedError extends Constraint
 
     public function __construct(?string $expectedErrorMessage)
     {
-        parent::__construct();
-
         $this->expectedErrorMessage = $expectedErrorMessage;
     }
 

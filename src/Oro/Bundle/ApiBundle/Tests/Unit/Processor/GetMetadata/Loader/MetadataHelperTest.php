@@ -12,7 +12,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataHelper */
     private $metadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = new MetadataHelper();
     }
@@ -26,14 +26,14 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "testField" field of the "Test\Class" entity.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAssertDataTypeForEmptyDataType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "data_type" configuration attribute should be specified'
+            . ' for the "testField" field of the "Test\Class" entity.'
+        );
+
         $this->metadataHelper->assertDataType('', 'Test\Class', 'testField');
     }
 

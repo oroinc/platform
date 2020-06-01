@@ -12,13 +12,13 @@ class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var BatchLogHandler */
     protected $batchLogHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->batchLogHandler = new BatchLogHandler($this->getTempDir('batch_log_handler'));
         $this->batchLogHandler->setSubDirectory('batch_test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->batchLogHandler->close();
     }

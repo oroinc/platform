@@ -26,7 +26,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     protected $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->createMock(FactoryWithTypesInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
@@ -76,7 +76,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
 
         $outputContent = implode("\n", $this->output->messages);
         foreach ($expected as $message) {
-            $this->assertContains($message, $outputContent);
+            static::assertStringContainsString($message, $outputContent);
         }
     }
 

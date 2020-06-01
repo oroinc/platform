@@ -14,7 +14,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationRepository */
     protected $configRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigApiManager')
             ->disableOriginalConstructor()

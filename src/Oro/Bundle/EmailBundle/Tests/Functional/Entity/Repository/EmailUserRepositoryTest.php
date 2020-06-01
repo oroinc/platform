@@ -17,7 +17,7 @@ class EmailUserRepositoryTest extends WebTestCase
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadEmailData::class]);

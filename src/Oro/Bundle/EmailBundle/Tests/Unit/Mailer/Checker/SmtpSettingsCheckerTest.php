@@ -17,7 +17,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailerTransport;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mailerTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()

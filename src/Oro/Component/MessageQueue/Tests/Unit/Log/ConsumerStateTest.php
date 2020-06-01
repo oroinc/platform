@@ -78,7 +78,7 @@ class ConsumerStateTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($consumerState->getMessage());
         
         $this->assertGreaterThanOrEqual($time, $consumerState->getStartTime());
-        $this->assertInternalType('int', $consumerState->getStartMemoryUsage());
+        $this->assertIsInt($consumerState->getStartMemoryUsage());
         $this->assertEquals($consumerState->getStartMemoryUsage(), $consumerState->getPeakMemory());
     }
 

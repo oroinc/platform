@@ -15,7 +15,7 @@ class CronCommandTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -27,8 +27,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('Scheduling run for command ', $result);
-        $this->assertContains('All commands scheduled', $result);
+        static::assertStringContainsString('Scheduling run for command ', $result);
+        static::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldRunAndNotScheduleIfNotCommandDue()
@@ -38,8 +38,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        $this->assertContains('Skipping not due command', $result);
-        $this->assertContains('All commands scheduled', $result);
+        static::assertStringContainsString('Skipping not due command', $result);
+        static::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldSendMessageIfCommandDue()
@@ -54,9 +54,9 @@ class CronCommandTest extends WebTestCase
 
         $message = $messages[0];
 
-        $this->assertInternalType('array', $message);
+        $this->assertIsArray($message);
         $this->assertArrayHasKey('message', $message);
-        $this->assertInternalType('array', $message['message']);
+        $this->assertIsArray($message['message']);
         $this->assertArrayHasKey('command', $message['message']);
         $this->assertArrayHasKey('arguments', $message['message']);
     }
@@ -80,7 +80,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('The feature that enables this command is turned off', $result);
+        static::assertStringContainsString('The feature that enables this command is turned off', $result);
     }
 
     /**

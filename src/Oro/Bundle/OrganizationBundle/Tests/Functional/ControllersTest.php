@@ -7,7 +7,7 @@ use Symfony\Component\DomCrawler\Form;
 
 class ControllersTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -66,7 +66,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         self::assertHtmlResponseStatusCodeEquals($result, 200);
-        self::assertContains('Business Unit saved', $crawler->html());
+        static::assertStringContainsString('Business Unit saved', $crawler->html());
 
         return $user;
     }
@@ -99,7 +99,7 @@ class ControllersTest extends WebTestCase
         $result = $this->client->getResponse();
 
         self::assertHtmlResponseStatusCodeEquals($result, 200);
-        self::assertContains('Business Unit saved', $crawler->html());
+        static::assertStringContainsString('Business Unit saved', $crawler->html());
 
         $response = $this->client->requestGrid(
             'business-unit-grid',
@@ -125,7 +125,10 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         self::assertHtmlResponseStatusCodeEquals($result, 200);
-        self::assertContains('testBU_Updated - Business Units - User Management - System', $crawler->html());
+        static::assertStringContainsString(
+            'testBU_Updated - Business Units - User Management - System',
+            $crawler->html()
+        );
     }
 
     /**

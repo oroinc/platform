@@ -20,7 +20,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionsAssembler = $this->createMock(OptionsAssembler::class);
         $this->contextAccessor = $this->createMock(ContextAccessor::class);

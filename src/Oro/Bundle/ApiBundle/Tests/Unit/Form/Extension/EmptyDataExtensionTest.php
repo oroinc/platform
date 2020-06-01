@@ -16,7 +16,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EmptyDataExtension */
     private $emptyDataExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityInstantiator = $this->createMock(EntityInstantiator::class);
 

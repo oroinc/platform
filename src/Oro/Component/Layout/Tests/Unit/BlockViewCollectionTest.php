@@ -15,22 +15,20 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('a', $collection['A']);
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: unknown.
-     */
     public function testGetUnknown()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: unknown.');
+
         $collection = new BlockViewCollection();
         $collection['unknown'];
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testSet()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $collection = new BlockViewCollection();
         $collection['exist'] = 'New exist';
     }
@@ -45,12 +43,11 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($collection['null']));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
     public function testUnset()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $elements = ['exist' => true];
         $collection = new BlockViewCollection($elements);
         unset($collection['exist']);

@@ -40,7 +40,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repo = $this->createMock(ConfigRepository::class);
 

@@ -34,7 +34,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $fileManagerMock = $this->getMockBuilder(FileManager::class)
             ->disableOriginalConstructor()

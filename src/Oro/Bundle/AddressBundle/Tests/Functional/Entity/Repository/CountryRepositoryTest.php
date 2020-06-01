@@ -12,7 +12,7 @@ class CountryRepositoryTest extends WebTestCase
     /** @var CountryRepository */
     protected $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

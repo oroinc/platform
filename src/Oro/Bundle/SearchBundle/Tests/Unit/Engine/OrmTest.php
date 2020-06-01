@@ -30,7 +30,7 @@ class OrmTest extends \PHPUnit\Framework\TestCase
     /** @var Orm */
     protected $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(SearchIndexRepository::class);
 

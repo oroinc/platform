@@ -58,12 +58,13 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
         $this->dataMapper->mapDataToForms(null, $this->forms);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given
-     */
     public function testMapDataToFormsWithIncorrectData(): void
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given'
+        );
+
         $this->dataMapper->mapDataToForms([], $this->forms);
     }
 
@@ -104,12 +105,13 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
         $this->dataMapper->mapFormsToData($this->forms, $data);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given
-     */
     public function testMapFormsToDataWithIncorrectData(): void
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given'
+        );
+
         $data = [];
         $this->dataMapper->mapFormsToData($this->forms, $data);
     }

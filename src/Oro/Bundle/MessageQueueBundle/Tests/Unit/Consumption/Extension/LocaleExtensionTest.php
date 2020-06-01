@@ -21,7 +21,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->translatableListener = new TranslatableListener();
