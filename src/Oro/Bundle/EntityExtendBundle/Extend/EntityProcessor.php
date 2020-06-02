@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * This Processor provide functionality to updates database and all related caches
  * according to changes of extended entities
+ * @deprecated since 4.2. Use EntityExtendUpdateProcessor instead
  */
 class EntityProcessor
 {
@@ -23,6 +24,9 @@ class EntityProcessor
 
     /** @var LoggerInterface */
     protected $logger;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /** @var Profiler */
     protected $profiler;
@@ -56,6 +60,8 @@ class EntityProcessor
      * @param bool $updateRouting     Whether routes should be updated after database schema is changed
      *
      * @return bool
+     *
+     * @deprecated since 4.2. Use EntityExtendUpdateProcessor::processUpdate() instead
      */
     public function updateDatabase($warmUpConfigCache = false, $updateRouting = false)
     {
@@ -67,61 +73,29 @@ class EntityProcessor
             $this->profiler->disable();
         }
 
-        $this->maintenance->activate();
-        $commands = $this->getCommandsToExecute($warmUpConfigCache, $updateRouting);
-        $result = $this->executeCommands($commands);
-        if ($result) {
-            try {
-                $this->dispatcher->dispatch(
-                    UpdateSchemaEvent::NAME,
-                    new UpdateSchemaEvent($this->commandExecutor, $this->logger)
-                );
-            } catch (\Exception $e) {
-                $result = false;
-                $this->logger->error(
-                    sprintf('The processing of "%s" event failed.', UpdateSchemaEvent::NAME),
-                    ['exception' => $e]
-                );
+        try {
+            $this->maintenance->activate();
+            $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true]);
+            $this->executeCommand('oro:entity-extend:cache:warmup');
+            $this->executeCommand('oro:entity-extend:update-schema');
+            if ($warmUpConfigCache) {
+                $this->executeCommand('oro:entity-config:cache:warmup');
             }
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * @param bool $warmUpConfigCache
-     * @param bool $updateRouting
-     * @return array
-     */
-    private function getCommandsToExecute($warmUpConfigCache = false, $updateRouting = false)
-    {
-        $commands = [
-            'oro:entity-extend:update-config' => ['--update-custom' => true],
-            'oro:entity-extend:cache:warmup' => [],
-            'oro:entity-extend:update-schema' => []
-        ];
-
-        if ($warmUpConfigCache) {
-            $commands = array_merge(
-                $commands,
-                [
-                    'oro:entity-config:cache:warmup' => []
-                ]
+            if ($updateRouting) {
+                $this->executeCommand('router:cache:clear');
+                $this->executeCommand('fos:js-routing:dump');
+            }
+            $this->dispatchUpdateSchemaEvent();
+        } catch (\RuntimeException $e) {
+            $this->logger->error(
+                'Failed to update the database and all related caches to reflect changes made in extended entities.',
+                ['exception' => $e]
             );
+
+            return false;
         }
 
-        if ($updateRouting) {
-            $commands = array_merge(
-                $commands,
-                [
-                    'router:cache:clear' => [],
-                    'fos:js-routing:dump' => []
-                ]
-            );
-        }
-
-        return $commands;
+        return true;
     }
 
     /**
@@ -146,5 +120,34 @@ class EntityProcessor
         }
 
         return $exitCode === 0;
+    }
+
+    /**
+     * @param string $command
+     * @param array  $options
+     */
+    private function executeCommand($command, array $options = [])
+    {
+        try {
+            $this->commandExecutor->runCommand($command, $options, $this->logger);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(sprintf('The command "%s" failed. Reason: %s', $command, $e->getMessage()));
+        }
+    }
+
+    private function dispatchUpdateSchemaEvent()
+    {
+        try {
+            $this->dispatcher->dispatch(
+                UpdateSchemaEvent::NAME,
+                new UpdateSchemaEvent($this->commandExecutor, $this->logger)
+            );
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(
+                sprintf('The processing of "%s" event failed. Reason: %s', UpdateSchemaEvent::NAME, $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 }

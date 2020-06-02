@@ -69,7 +69,13 @@ define(function(require) {
 
                     $.post({
                         url: url,
-                        errorHandlerMessage: __('oro.entity_extend.schema_update_failed')
+                        errorHandlerMessage: function(event, xhr) {
+                            let message = __('oro.entity_extend.schema_update_failed');
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message += ' ' + xhr.responseJSON.message;
+                            }
+                            return message;
+                        }
                     }).done(function() {
                         modal.close();
                         mediator.execute(
