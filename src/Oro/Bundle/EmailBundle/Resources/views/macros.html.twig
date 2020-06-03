@@ -319,7 +319,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title|oro_html_strip_tags }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" aria-label="{{ 'oro.email.emailuser.email.aria_label'|trans({'%email%': title|oro_html_strip_tags }) }}" title="{{ title|e('html_attr') }}" class="email">{{ title|oro_html_strip_tags }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
