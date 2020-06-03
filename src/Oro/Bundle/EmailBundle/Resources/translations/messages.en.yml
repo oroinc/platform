@@ -361,6 +361,7 @@ oro:
             entity_plural_label:      Email-User Relations
             entity_grid_all_view_label: All %entity_plural_label%
             email.label:              Email
+            email.aria_label:         "Opens a default email client to write an email to %email%"
             folder.label:             Folder
             id.label:                 Id
             organization.label:       Organization
