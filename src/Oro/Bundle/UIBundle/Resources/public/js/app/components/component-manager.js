@@ -25,12 +25,13 @@ define(function(require) {
          * Initializes Page Components for DOM element
          *
          * @param {Object?} options
+         * @param {jQuery?} $container
          * @return {Promise}
          */
-        init: function(options) {
+        init: function(options, $container) {
             this.initOptions = options || {};
 
-            const elements = this._collectElements();
+            const elements = this._collectElements($container);
             const elementsData = this._readElementsData(elements);
 
             // collect nested elements' data
@@ -93,44 +94,59 @@ define(function(require) {
                     });
                 });
             });
+
+            const initOnEvent = event => {
+                const $container = $(event.currentTarget);
+                $container.removeAttr('data-page-component-init-on');
+                this.init(this.initOptions, $container)
+                    .done(() => $(event.target).trigger(event));
+            };
+
+            this.$el.on('click' + this.eventNamespace, '[data-page-component-init-on*="click"]', initOnEvent);
+            this.$el.on('mouseover' + this.eventNamespace, '[data-page-component-init-on*="mouseover"]', initOnEvent);
+            this.$el.on('focusin' + this.eventNamespace, '[data-page-component-init-on*="focusin"]', initOnEvent);
         },
 
         /**
          * Collect all elements that have components declaration from current layout
          *
+         * @param {jQuery?} $container
          * @returns {Array.<jQuery>} elements
          * @protected
          */
-        _collectElements: function() {
+        _collectElements: function($container) {
             const elements = [];
-            const self = this;
 
             const shortcuts = Object.values(ComponentShortcutsManager.getAll());
             const selector = _.map(shortcuts, function(shortcut) {
                 return '[' + shortcut.dataAttr + ']';
             });
 
-            this.$el.find(selector.join(',')).each(function() {
-                const $elem = $(this);
-                if (self._isInOwnLayout($elem)) {
-                    return;
-                }
 
-                const elemData = $elem.data();
-                const shortcut = _.find(shortcuts, function(shortcut) {
-                    return shortcut.dataKey in elemData;
+            ($container || this.$el)
+                .find(selector.join(','))
+                .addBack(selector.join(','))
+                .each((i, elem) => {
+                    const $elem = $(elem);
+                    if (!this._isReadyToInit($elem) || this._isInOwnLayout($elem)) {
+                        return;
+                    }
+
+                    const elemData = $elem.data();
+                    const shortcut = _.find(shortcuts, function(shortcut) {
+                        return shortcut.dataKey in elemData;
+                    });
+
+                    if (shortcut) {
+                        const dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
+                        $elem
+                            .removeAttr(shortcut.dataAttr)
+                            .removeData(shortcut.dataKey)
+                            .data(dataUpdate);
+                    }
+
+                    elements.push($elem);
                 });
-
-                if (shortcut) {
-                    const dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
-                    $elem
-                        .removeAttr(shortcut.dataAttr)
-                        .removeData(shortcut.dataKey)
-                        .data(dataUpdate);
-                }
-
-                elements.push($elem);
-            });
 
             return elements;
         },
@@ -147,6 +163,18 @@ define(function(require) {
             const $separateLayout = $element.parents('[data-layout="separate"]:first');
             // collects container elements from current layout
             return $separateLayout.length && _.contains($separateLayout.parents(), this.$el[0]);
+        },
+
+        /**
+         * Check if the declaration of component on the element is ready to be initialized
+         *  - filter out elements with components that have to be initialized on DOM event (click, focusin, mouseover)
+         *
+         * @param {jQuery} $element
+         * @return {boolean}
+         * @protected
+         */
+        _isReadyToInit: function($element) {
+            return !$element.is('[data-page-component-init-on], [data-page-component-init-on] *');
         },
 
         /**
