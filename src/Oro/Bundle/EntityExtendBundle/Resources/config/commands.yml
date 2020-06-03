@@ -60,3 +60,9 @@ services:
             - '@oro_entity_extend.enum_synchronizer'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\UpdateCommand:
+        arguments:
+            - '@oro_entity_extend.extend.update_processor'
+        tags:
+            - { name: console.command }

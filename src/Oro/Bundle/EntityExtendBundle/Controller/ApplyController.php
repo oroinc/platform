@@ -2,19 +2,29 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Apply entity config controller.
+ * Updates the database and all related caches to reflect changes made in extended entities.
  *
  * @Route("/entity/extend")
  */
-class ApplyController extends Controller
+class ApplyController
 {
+    /** @var EntityExtendUpdateHandlerInterface */
+    private $entityExtendUpdateHandler;
+
+    /**
+     * @param EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler
+     */
+    public function __construct(EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler)
+    {
+        $this->entityExtendUpdateHandler = $entityExtendUpdateHandler;
+    }
+
     /**
      * @Route(
      *      "/update/{id}",
@@ -22,15 +32,19 @@ class ApplyController extends Controller
      *      defaults={"id"=0}
      * )
      */
-    public function updateAction()
+    public function updateAction(): JsonResponse
     {
-        /** @var EntityProcessor $entityProcessor */
-        $entityProcessor = $this->get('oro_entity_extend.extend.entity_processor');
-
-        if (!$entityProcessor->updateDatabase(true, true)) {
-            throw new HttpException(500, 'Update failed');
+        $result = $this->entityExtendUpdateHandler->update();
+        if ($result->isSuccessful()) {
+            return new JsonResponse();
         }
 
-        return new Response();
+        $responseData = [];
+        $failedMessage = $result->getFailedMessage();
+        if ($failedMessage) {
+            $responseData['message'] = $failedMessage;
+        }
+
+        return new JsonResponse($responseData, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

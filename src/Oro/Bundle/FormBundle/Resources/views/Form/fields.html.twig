@@ -624,7 +624,7 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn btn-icon btn-square-default entity-select-btn">
+                <button class="add-on btn btn-icon btn-square-default entity-select-btn" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
                     <span class="fa-bars"></span>
                 </button>
 
