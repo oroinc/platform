@@ -74,7 +74,7 @@ class SuiteController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $tested = $input->getOption('available-suite-sets') ? [] : [];//$this->featureStatisticManager->getTested();
+        $tested = $input->getOption('available-suite-sets') ? [] : $this->featureStatisticManager->getTested();
         $skipped = [];
 
         $suiteName = $input->getOption('suite');
