@@ -17,6 +17,6 @@ class HtmlNotBlankValidator extends NotBlankValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        parent::validate(strip_tags($value, '<img>'), $constraint);
+        parent::validate(preg_replace('/\s/u', '', strip_tags($value, '<img>')), $constraint);
     }
 }
