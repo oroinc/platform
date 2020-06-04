@@ -42,6 +42,7 @@
         "sensio/framework-extra-bundle": "5.2.*",
         "incenteev/composer-parameter-handler": "2.1.*",
         "jms/serializer": "3.4.*",
+        "jms/metadata": "2.1.0",
         "jms/serializer-bundle": "3.5.*",
         "knplabs/knp-menu": "2.3.*",
         "knplabs/knp-menu-bundle": "2.2.*",

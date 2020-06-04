@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a78a1fa45b5bd358353b1f18af633d36",
+    "content-hash": "4830ad4529972ab71f76cd24e6845e1c",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -11647,7 +11647,7 @@
         },
         {
             "name": "symfony/class-loader",
-            "version": "v3.4.40",
+            "version": "v3.4.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/class-loader.git",
