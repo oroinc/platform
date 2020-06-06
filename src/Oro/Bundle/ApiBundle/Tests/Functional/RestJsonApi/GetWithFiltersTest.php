@@ -194,6 +194,26 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         );
     }
 
+    public function testMetaTitlesWithEndingComma()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title,'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given "title,".',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testFilterByField()
     {
         $entityType = $this->getEntityType(TestEmployee::class);

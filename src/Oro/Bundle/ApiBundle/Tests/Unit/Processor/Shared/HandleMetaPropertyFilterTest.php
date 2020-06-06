@@ -55,7 +55,9 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
     public function testProcessWhenNoMetaFilter()
     {
-        $this->context->getFilterValues()->set('meta', new FilterValue('meta', 'test'));
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test');
+
+        $this->context->getFilterValues()->set('meta', $filterValue);
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
@@ -63,7 +65,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
     public function testProcessForEmptyMetaFilterValue()
     {
-        $filterValue = new FilterValue('meta', '');
+        $filterValue = FilterValue::createFromSource('meta', 'meta', '');
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test1', 'string');
 
@@ -81,7 +83,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
     public function testProcessWhenMetaFilterValueExists()
     {
-        $filterValue = new FilterValue('meta', 'test1,test2');
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', null);
@@ -106,9 +108,36 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
+    public function testProcessWhenMetaFilterHasInvalidValue()
+    {
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,');
+        $filter = new MetaPropertyFilter('string');
+        $filter->addAllowedMetaProperty('test2', 'string');
+        $filter->addAllowedMetaProperty('test3', null);
+
+        $exception = new \UnexpectedValueException('invalid value');
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('test1,', DataType::STRING, $this->context->getRequestType(), true)
+            ->willThrowException($exception);
+
+        $this->context->getFilterValues()->set('meta', $filterValue);
+        $this->context->getFilters()->set('meta', $filter);
+        $this->processor->process($this->context);
+
+        $expectedErrors = [];
+        $expectedErrors[] =
+            Error::createValidationError(Constraint::FILTER)
+                ->setInnerException($exception)
+                ->setSource(ErrorSource::createByParameter('meta'));
+
+        self::assertNull($this->context->getConfigExtra(MetaPropertiesConfigExtra::NAME));
+        self::assertEquals($expectedErrors, $this->context->getErrors());
+    }
+
     public function testProcessWhenNotAllowedMetaPropertyIsRequested()
     {
-        $filterValue = new FilterValue('meta', 'test1,test2');
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test2', 'string');
         $filter->addAllowedMetaProperty('test3', null);
