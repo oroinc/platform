@@ -11,7 +11,7 @@ use Doctrine\ORM\Query;
 class SqlQuery extends AbstractQuery
 {
     /** @var SqlQueryBuilder */
-    protected $qb;
+    private $qb;
 
     /**
      * @param SqlQueryBuilder $qb

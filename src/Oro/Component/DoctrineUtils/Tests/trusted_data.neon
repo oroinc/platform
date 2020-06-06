@@ -16,12 +16,21 @@ trusted_data:
             getParameterType: true
             getParameterTypes: true
             getQuery: true
-        Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
             getSQL: true
-            setParameter: true
-            setParameters: true
-            setMaxResults: true
+            getType: true
+        Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
+            getQuery: true
+            getQueryBuilder: true
+            getAlias: true
+            getUnionAll: true
+            setUnionAll: true
+            addSubQuery: true
+            getSubQueries: true
+            getFirstResult: true
             setFirstResult: true
+            getMaxResults: true
+            setMaxResults: true
+            getOrderBy: true
     check_static_methods_safety:
         Oro\Component\DoctrineUtils\ORM\QueryUtil:
             cloneQuery: true
@@ -40,8 +49,7 @@ trusted_data:
             generateParameterName: true
     check_methods:
         Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
-            addOrderBy: true
-            setAlias: true
+            __all__: true
             addSelect: [0, 1]
         Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder:
             __all__: true

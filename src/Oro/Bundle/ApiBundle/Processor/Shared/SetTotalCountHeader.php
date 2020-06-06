@@ -136,9 +136,11 @@ class SetTotalCountHeader implements ProcessorInterface
                 ->setFirstResult(null);
         } else {
             throw new \RuntimeException(sprintf(
-                'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
-                . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'
-                . ' or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given.',
+                'Expected instance of %s, %s, %s or %s, "%s" given.',
+                QueryBuilder::class,
+                Query::class,
+                SqlQueryBuilder::class,
+                SqlQuery::class,
                 \is_object($query) ? \get_class($query) : gettype($query)
             ));
         }
