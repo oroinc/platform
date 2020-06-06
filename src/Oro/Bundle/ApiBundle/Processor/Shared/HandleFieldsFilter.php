@@ -62,12 +62,15 @@ class HandleFieldsFilter implements ProcessorInterface
         $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
         foreach ($filterValues as $filterValue) {
             try {
-                $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
+                $normalizedValue = $this->valueNormalizer->normalizeValue(
                     $filterValue->getValue(),
                     DataType::STRING,
                     $requestType,
                     true
                 );
+                if ($normalizedValue) {
+                    $fields[$filterValue->getPath()] = (array)$normalizedValue;
+                }
             } catch (\Exception $e) {
                 $context->addError(
                     Error::createValidationError(Constraint::FILTER)

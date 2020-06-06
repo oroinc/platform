@@ -63,7 +63,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
         }
 
         try {
-            $names = (array)$this->valueNormalizer->normalizeValue(
+            $names = $this->valueNormalizer->normalizeValue(
                 $filterValue->getValue(),
                 DataType::STRING,
                 $requestType,
@@ -83,6 +83,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
+        $names = (array)$names;
         $configExtra = $context->getConfigExtra(MetaPropertiesConfigExtra::NAME);
         if (null === $configExtra) {
             $configExtra = new MetaPropertiesConfigExtra();
