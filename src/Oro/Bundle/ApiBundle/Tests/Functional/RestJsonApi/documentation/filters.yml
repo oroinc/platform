@@ -23,7 +23,7 @@ filters:
         requirement: '\d+'
         default: '1'
     'page[size]':
-        requirement: '-?\d+'
+        requirement: '\d+'
         default: '10'
     'sort':
         requirement: '-?[\w\.]+(,-?[\w\.]+)*'
