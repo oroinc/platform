@@ -47,6 +47,8 @@ trusted_data:
                 sql: true
             updateOldAceProperty:
                 sql: true
+            updateAce:
+                sql: true
         Oro\Bundle\SecurityBundle\Search\AclHelper:
             apply:
                 orExpression: true
@@ -67,8 +69,3 @@ trusted_data:
             getOwnerFieldName: true
             getOrganizationFieldName: true
             getOrganizationColumnName: true
-        Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider:
-            getUpdateSecurityIdentitySql: true
-            getDeleteSecurityIdentityIdSql: true
-            getDeleteClassIdSql: true
-            getUpdateAccessControlEntrySql: true
