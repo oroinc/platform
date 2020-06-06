@@ -64,7 +64,7 @@ class HandleIncludeFilter implements ProcessorInterface
         }
 
         try {
-            $includes = (array)$this->valueNormalizer->normalizeValue(
+            $includes = $this->valueNormalizer->normalizeValue(
                 $filterValue->getValue(),
                 DataType::STRING,
                 $requestType,
@@ -85,6 +85,6 @@ class HandleIncludeFilter implements ProcessorInterface
             return;
         }
 
-        $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra($includes));
+        $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
     }
 }

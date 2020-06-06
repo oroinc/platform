@@ -108,6 +108,26 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
+    public function testProcessWhenMetaFilterValueExistsAndItIsEmptyString()
+    {
+        $filterValue = FilterValue::createFromSource('meta', 'meta', '');
+        $filter = new MetaPropertyFilter('string');
+        $filter->addAllowedMetaProperty('test1', 'string');
+        $filter->addAllowedMetaProperty('test2', null);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('', DataType::STRING, $this->context->getRequestType(), true)
+            ->willReturn('');
+
+        $this->context->getFilterValues()->set('meta', $filterValue);
+        $this->context->getFilters()->set('meta', $filter);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getConfigExtra(MetaPropertiesConfigExtra::NAME));
+        self::assertFalse($this->context->hasErrors());
+    }
+
     public function testProcessWhenMetaFilterHasInvalidValue()
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,');
