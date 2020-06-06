@@ -5,8 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\UnionQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -16,6 +14,8 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 /**
  * Provides a set of methods to manage extended associations (see "Resources/doc/associations.md").
@@ -434,6 +434,7 @@ class AssociationManager
     private function setSorting(UnionQueryBuilder $qb, $orderBy = null)
     {
         if ($orderBy) {
+            QueryBuilderUtil::checkField($orderBy);
             $qb->addOrderBy($orderBy);
         }
     }
