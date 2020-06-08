@@ -44,7 +44,8 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->typeGuesser = new MetadataTypeGuesser(
             [
                 'integer'  => ['integer', []],
-                'datetime' => ['test_datetime', ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']]
+                'datetime' => ['test_datetime', ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']],
+                'array'    => ['array', []]
             ],
             $this->doctrineHelper
         );
@@ -213,6 +214,45 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
                 ['model_timezone' => 'UTC', 'view_timezone' => 'UTC'],
                 TypeGuess::HIGH_CONFIDENCE
             ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForNotMappedFieldType()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'string'));
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        self::assertEquals(
+            new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForArrayField()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'array'));
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        self::assertEquals(
+            new TypeGuess('array', [], TypeGuess::HIGH_CONFIDENCE),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForTypedArrayField()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'currency[]'));
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        self::assertEquals(
+            new TypeGuess('array', [], TypeGuess::HIGH_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
