@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
@@ -20,6 +21,9 @@ class PageNumberFilter extends StandaloneFilterWithDefaultValue
             ? $value->getValue()
             : $this->getDefaultValue();
         if (null !== $val) {
+            if ($val < 1) {
+                throw new RuntimeException('The value should should be greater than or equals to 1.');
+            }
             $pageSize = $criteria->getMaxResults();
             if (null !== $pageSize) {
                 $criteria->setFirstResult(QueryBuilderUtil::getPageOffset($val, $pageSize));
