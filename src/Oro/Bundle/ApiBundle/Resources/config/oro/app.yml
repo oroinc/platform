@@ -104,16 +104,38 @@ oro_api:
     # default data-type mapping for all views
     api_doc_data_types:
         unsignedInteger: integer
+        unsignedInteger[]: array of integers
         text: string
+        text[]: array of strings
         guid: string
+        guid[]: array of strings
         json_array: object
         simple_array: array
         percent: float
+        percent[]: array of floats
         currency: string
+        currency[]: array of strings
         money_value: money
+        money_value[]: array of moneys
         duration: integer
+        duration[]: array of integers
         entityType: string
+        entityType[]: array of strings
         objects: array of objects
+        object[]: array of objects
+        strings: array of strings
+        string[]: array of strings
+        integer[]: array of integers
+        smallint[]: array of smallints
+        bigint[]: array of bigints
+        boolean[]: array of booleans
+        decimal[]: array of decimals
+        float[]: array of floats
+        datetime[]: array of datetimes
+        date[]: array of dates
+        time[]: array of times
+        money[]: array of moneys
+        scalar[]: array of scalars
 
     api_doc_cache:
         excluded_features: [ web_api ]

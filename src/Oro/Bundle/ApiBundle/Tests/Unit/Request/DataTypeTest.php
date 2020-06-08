@@ -7,6 +7,33 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 class DataTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @dataProvider arrayProvider
+     */
+    public function testIsArray($dataType, $expected)
+    {
+        self::assertSame($expected, DataType::isArray($dataType));
+    }
+
+    public function arrayProvider()
+    {
+        return [
+            ['array', true],
+            ['objects', true],
+            ['object[]', true],
+            ['strings', true],
+            ['string[]', true],
+            ['scalar', false],
+            ['object', false],
+            ['nestedObject', false],
+            ['string', false],
+            ['string[]t', false],
+            ['[]string', false],
+            [null, false],
+            ['', false]
+        ];
+    }
+
+    /**
      * @dataProvider nestedObjectProvider
      */
     public function testIsNestedObject($dataType, $expected)
@@ -58,8 +85,13 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['object', true],
             ['array', true],
             ['objects', true],
+            ['object[]', true],
+            ['strings', true],
+            ['string[]', true],
             ['nestedObject', true],
             ['string', false],
+            ['string[]t', false],
+            ['[]string', false],
             [null, false],
             ['', false]
         ];
@@ -119,7 +151,6 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['association:'],
             ['association::'],
             ['association:manyToOne:'],
-            [null],
             ['']
         ];
     }

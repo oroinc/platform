@@ -50,11 +50,11 @@ api:
                         relatedEntityName:
                             data_type: string
                         options:
-                            data_type: array
+                            data_type: object
                 options:
-                    data_type: array
+                    data_type: object
                 routes:
-                    data_type: array
+                    data_type: object
             actions:
                 get_list:
                     page_size: -1 # disable paging
