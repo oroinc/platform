@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
@@ -207,7 +208,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessFilterWithDefaultValue()
     {
-        $filter = new PageSizeFilter('integer');
+        $filter = new PageSizeFilter(DataType::UNSIGNED_INTEGER);
         $filter->setDefaultValue(5);
 
         $filers = $this->context->getFilters();
