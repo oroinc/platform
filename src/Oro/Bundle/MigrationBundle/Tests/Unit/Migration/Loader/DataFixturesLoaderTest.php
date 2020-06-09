@@ -22,7 +22,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fixtureRepo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
 
@@ -30,7 +30,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()->getMock();
         $this->em          = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->em->expects($this->any())->method('getRepository')->with('OroMigrationBundle:DataFixture')
+        $this->em->expects($this->any())->method('getRepository')->with(DataFixture::class)
             ->willReturn($this->fixtureRepo);
 
         $this->loader = new DataFixturesLoader($this->em, $this->container);
@@ -85,6 +85,9 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getFixturesProvider()
     {
         $test1BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle';
@@ -177,7 +180,30 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
                     $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData2' => '1.0'
                 ],
                 []
-            ]
+            ],
+            'Rename and perform' => [
+                [new TestPackageTest3Bundle()],
+                [
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData1OldName' => '0.0',
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData2OldName' => '0.0'
+                ],
+                [
+                    'Oro\Bundle\MigrationBundle\Migration\RenameDataFixturesFixture',
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData1',
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData2',
+                    'Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture',
+                ]
+            ],
+            'Only rename' => [
+                [new TestPackageTest3Bundle()],
+                [
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData1OldName' => '2.0',
+                    $test3BundleNamespace . '\Migrations\Data\ORM\LoadTest3BundleData2OldName' => '1.0'
+                ],
+                [
+                    'Oro\Bundle\MigrationBundle\Migration\RenameDataFixturesFixture',
+                ]
+            ],
         ];
     }
 }

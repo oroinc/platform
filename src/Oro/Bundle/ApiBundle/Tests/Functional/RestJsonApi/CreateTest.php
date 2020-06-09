@@ -31,33 +31,29 @@ class CreateTest extends RestJsonApiTestCase
             || $provider->isSkippedEntity($entityClass, ApiAction::CREATE);
     }
 
-    /**
-     * @param string   $entityClass
-     * @param string[] $excludedActions
-     *
-     * @dataProvider getEntities
-     */
-    public function testCreateWithEmptyData($entityClass, $excludedActions)
+    public function testCreateWithEmptyData()
     {
-        if (in_array(ApiAction::CREATE, $excludedActions, true)) {
-            return;
-        }
+        $this->runForEntities(function (string $entityClass, array $excludedActions) {
+            if (in_array(ApiAction::CREATE, $excludedActions, true)) {
+                return;
+            }
 
-        $entityType = $this->getEntityType($entityClass);
-        if ($this->isSkippedEntity($entityClass, $entityType)) {
-            return;
-        }
+            $entityType = $this->getEntityType($entityClass);
+            if ($this->isSkippedEntity($entityClass, $entityType)) {
+                return;
+            }
 
-        $response = $this->post(
-            ['entity' => $entityType],
-            ['data' => ['type' => $entityType]],
-            [],
-            false
-        );
-        self::assertResponseStatusCodeNotEquals($response, 500);
+            $response = $this->post(
+                ['entity' => $entityType],
+                ['data' => ['type' => $entityType]],
+                [],
+                false
+            );
+            self::assertResponseStatusCodeNotEquals($response, 500);
 
-        // test create with NULL value for read-only timestampable fields
-        $this->createWithNullValueForReadOnlyTimestampableFields($entityClass, $entityType);
+            // test create with NULL value for read-only timestampable fields
+            $this->createWithNullValueForReadOnlyTimestampableFields($entityClass, $entityType);
+        });
     }
 
     /**

@@ -13,7 +13,7 @@ abstract class AbstractAclPrivilegeFilterTestCase extends \PHPUnit\Framework\Tes
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->filter = $this->createFilter();
     }

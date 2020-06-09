@@ -32,9 +32,16 @@ class LocaleExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onStart(Context $context): void
     {
         \Locale::setDefault($this->localeSettings->getLocale());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onPreReceived(Context $context): void
+    {
         $this->translatableListener->setTranslatableLocale($this->localeSettings->getLanguage());
     }
 }

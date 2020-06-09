@@ -10,7 +10,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
     /** @var FixFieldNaming */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -343,14 +343,14 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "id" reserved word cannot be used as a field name and it cannot be renamed to "classId" because a field with this name already exists.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenIdFieldWithGuessedNameAlreadyExists()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "id" reserved word cannot be used as a field name'
+            . ' and it cannot be renamed to "classId" because a field with this name already exists.'
+        );
+
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['name'],
@@ -365,14 +365,14 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "type" reserved word cannot be used as a field name and it cannot be renamed to "classType" because a field with this name already exists.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenTypeFieldWithGuessedNameAlreadyExists()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "type" reserved word cannot be used as a field name'
+            . ' and it cannot be renamed to "classType" because a field with this name already exists.'
+        );
+
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [

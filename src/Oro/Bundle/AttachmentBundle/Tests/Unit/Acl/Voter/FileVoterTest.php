@@ -50,7 +50,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
     /** @var TokenInterface */
     private $token;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->fileApplicationsProvider = $this->createMock(FileApplicationsProvider::class);

@@ -26,7 +26,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeImagePlaceholderProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextHolder = $this->createMock(LayoutContextHolder::class);
         $this->themeManager = $this->createMock(ThemeManager::class);

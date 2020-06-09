@@ -52,19 +52,19 @@ Retrieve the ID's of service records that store the localization titles localize
 
 ### get
 
-Retrieve a specific LocalizedFallbackValue record.
+Retrieve a specific localized fallback value record.
 
 {@inheritdoc}
 
 ### get_list
 
-Retrieve a collection of LocalizedFallbackValue records.
+Retrieve a collection of localized fallback value records.
 
 {@inheritdoc}
 
 ### create
 
-Create a new LocalizedFallbackValue record.
+Create a new localized fallback value record.
 
 The created record is returned in the response.
 
@@ -97,7 +97,7 @@ Example:
 
 ### update
 
-Edit a specific LocalizedFallbackValue record.
+Edit a specific localized fallback value record.
 
 The updated record is returned in the response.
 

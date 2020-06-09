@@ -33,7 +33,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /** @var QueryExpressionVisitorFactory */
     private $expressionVisitorFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

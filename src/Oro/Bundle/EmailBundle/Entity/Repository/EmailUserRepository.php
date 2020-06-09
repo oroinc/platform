@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -104,7 +105,7 @@ class EmailUserRepository extends EntityRepository
 
         if ($date) {
             $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
-                ->setParameter('date', $date);
+                ->setParameter('date', $date, Type::DATETIME);
         }
 
         $emailUserIds = $qb->getQuery()->getArrayResult();

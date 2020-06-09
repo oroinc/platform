@@ -86,7 +86,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $attachmentAssociationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()

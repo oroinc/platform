@@ -97,7 +97,7 @@ Entity name providers are registered in the DI container by `oro_entity.name_pro
         class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider
         public: false
         arguments:
-            - @doctrine
+            - '@doctrine'
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
 ```

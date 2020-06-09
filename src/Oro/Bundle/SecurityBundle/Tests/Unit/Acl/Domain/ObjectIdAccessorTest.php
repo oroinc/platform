@@ -15,7 +15,7 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
@@ -51,11 +51,9 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('getId()', $id);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetIdNull()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -65,11 +63,9 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getId(null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetIdNonValidObject()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
         $accessor->getId(new \stdClass());
     }

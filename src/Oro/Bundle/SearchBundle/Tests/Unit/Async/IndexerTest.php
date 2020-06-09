@@ -269,11 +269,9 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent(Topics::REINDEX, []);
     }
 
-    /**
-     * @expectedException \ReflectionException
-     */
     public function testReindexShouldNotAcceptInvalidEntity()
     {
+        $this->expectException(\ReflectionException::class);
         $entities = [new \stdClass()];
 
         $doctrineHelper = $this->createDoctrineHelperMock();

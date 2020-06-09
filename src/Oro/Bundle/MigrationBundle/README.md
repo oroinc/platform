@@ -361,6 +361,47 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
 }
 ```
 
+## Rename fixtures
+
+When refactoring, you may need to change the fixture namespace or class name.
+
+In order to prevent the fixture from loading again, this fixture must implement [RenamedFixtureInterface](./Fixture/RenamedFixtureInterface.php) and the `getPreviousClassNames` method which returns a list of all previous fully specified class names.
+
+Example:
+
+``` php
+
+<?php
+
+namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
+
+class LoadSomeDataFixture extends AbstractFixture implements RenamedFixtureInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            'Acme\PreviousBundle\Migrations\DataFixtures\ORM\PreviousClassNameOfDataFixture'
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // Here we can use fixture data code which will be run once
+    }
+}
+```
+
   [1]: http://php.net/manual/en/function.version-compare.php
   [2]: https://github.com/doctrine/data-fixtures#fixture-ordering
   [3]: ./Migration/Extension/DatabasePlatformAwareInterface.php

@@ -29,7 +29,7 @@ class NumberFormatterTest extends TestCase
      */
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 
@@ -134,12 +134,11 @@ class NumberFormatterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage NumberFormatter has no constant 'UNKNOWN_ATTRIBUTE'
-     */
     public function testFormatFails()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("NumberFormatter has no constant 'UNKNOWN_ATTRIBUTE'");
+
         $this->formatter->format(
             '123',
             \NumberFormatter::DECIMAL,
@@ -550,12 +549,11 @@ class NumberFormatterTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage NumberFormatter style '19' is invalid
-     */
     public function testFormatWithInvalidStyle()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("NumberFormatter style '19' is invalid");
+
         $this->formatter->format(123, \NumberFormatter::LENIENT_PARSE);
     }
 

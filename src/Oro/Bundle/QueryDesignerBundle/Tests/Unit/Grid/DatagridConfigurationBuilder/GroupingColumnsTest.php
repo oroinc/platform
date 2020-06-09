@@ -100,12 +100,11 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The grouping column "column2" must be declared in SELECT clause.
-     */
     public function testInvalidGrouping()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The grouping column "column2" must be declared in SELECT clause.');
+
         $en               = 'Acme\Entity\TestEntity';
         $definition       = [
             'columns'          => [

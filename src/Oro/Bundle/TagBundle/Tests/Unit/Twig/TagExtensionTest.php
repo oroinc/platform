@@ -23,7 +23,7 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder(TagManager::class)
             ->disableOriginalConstructor()
@@ -40,7 +40,7 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TagExtension($container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->manager);
         unset($this->extension);

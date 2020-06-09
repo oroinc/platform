@@ -29,7 +29,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
      */
     protected $fieldMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = array('foo' => 'bar');
         $this->doctrineMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
@@ -45,12 +45,11 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entityMetadata, $this->fieldMetadata->getEntityMetadata());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Entity metadata is not configured.
-     */
     public function testGetEntityMetadataFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entity metadata is not configured.');
+
         $this->fieldMetadata->getEntityMetadata();
     }
 
@@ -59,12 +58,11 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->doctrineMetadata, $this->fieldMetadata->getDoctrineMetadata());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Doctrine metadata is not configured.
-     */
     public function testGetDoctrineMetadataFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Doctrine metadata is not configured.');
+
         $metadata = new FieldMetadata();
         $metadata->getDoctrineMetadata();
     }
@@ -148,12 +146,11 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->fieldMetadata->isDefinedBySourceEntity());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot get field name from merge field metadata.
-     */
     public function testGetFieldNameFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot get field name from merge field metadata.');
+
         $this->fieldMetadata->getFieldName();
     }
 

@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -29,7 +29,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendedAssociationFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->associationManager = $this->createMock(AssociationManager::class);
@@ -67,12 +67,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage The target type of an association is not specified.
-     */
     public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('The target type of an association is not specified.');
+
         $filterValues = [
             'filter[target]' => new FilterValue('target', '123')
         ];
@@ -82,12 +81,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage The target type of an association is not specified.
-     */
     public function testSearchFilterKeyWhenAssociationTargetIsEmpty()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('The target type of an association is not specified.');
+
         $filterValues = [
             'filter[target.]' => new FilterValue('target.', '123')
         ];
@@ -97,12 +95,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException
-     * @expectedExceptionMessage Replace "type" placeholder with the target type of an association.
-     */
     public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectExceptionMessage('Replace "type" placeholder with the target type of an association.');
+
         $filterValues = [
             'filter[target.type]' => new FilterValue('target.type', '123')
         ];
@@ -180,12 +177,11 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An association with "users" is not supported.
-     */
     public function testApplyFilterWhenAssociationTargetIsNotSupported()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('An association with "users" is not supported.');
+
         $filterValue = new FilterValue('target.users', '123');
         $requestType = new RequestType([RequestType::REST]);
         $associationOwnerClass = 'Test\OwnerClass';
@@ -245,7 +241,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterWithManyToManyAssociationAndNotOperator()
     {
-        $filterValue = new FilterValue('target.users', '123', ComparisonFilter::NEQ);
+        $filterValue = new FilterValue('target.users', '123', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
         $associationOwnerClass = 'Test\OwnerClass';
         $associationType = 'manyToMany';
@@ -256,7 +252,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setAssociationOwnerClass($associationOwnerClass);
         $this->filter->setAssociationType($associationType);
         $this->filter->setAssociationKind($associationKind);
-        $this->filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $this->filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')

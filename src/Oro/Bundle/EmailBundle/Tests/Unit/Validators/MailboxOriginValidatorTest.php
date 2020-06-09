@@ -22,7 +22,7 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var MailboxOriginValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new MailboxOrigin();
 

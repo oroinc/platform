@@ -1,17 +1,17 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
+/**
+ * The message producer that collects sent messages.
+ */
 class TraceableMessageProducer implements MessageProducerInterface
 {
-    /**
-     * @var MessageProducerInterface
-     */
+    /** @var MessageProducerInterface */
     private $messageProducer;
 
-    /**
-     * @var array
-     */
-    protected $traces = [];
+    /** @var array */
+    private $traces = [];
 
     /**
      * @param MessageProducerInterface $messageProducer
@@ -36,6 +36,13 @@ class TraceableMessageProducer implements MessageProducerInterface
      */
     public function getTraces()
     {
+        foreach ($this->traces as $key => $trace) {
+            $message = $trace['message'];
+            if ($message instanceof MessageBuilderInterface) {
+                $this->traces[$key]['message'] = $message->getMessage();
+            }
+        }
+
         return $this->traces;
     }
 
@@ -48,11 +55,11 @@ class TraceableMessageProducer implements MessageProducerInterface
     {
         $topicTraces = [];
         foreach ($this->getTraces() as $trace) {
-            if ($topic == $trace['topic']) {
+            if ($topic === $trace['topic']) {
                 $topicTraces[] = $trace;
             }
         }
-        
+
         return $topicTraces;
     }
 

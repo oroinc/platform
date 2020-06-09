@@ -22,7 +22,7 @@ class ImapEmailIteratorTest extends TestCase
     /** @var ImapEmailIterator */
     private $iterator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->messageIterator = $this->createMock(ImapMessageIterator::class);
         $this->manager = $this->createMock(ImapEmailManager::class);

@@ -24,7 +24,7 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
     private $datagridUrlConverter;
 
     /** {@inheritdoc} */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);

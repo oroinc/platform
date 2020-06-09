@@ -27,7 +27,7 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var Config */
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new OwnershipMetadataProviderStub($this);
         $this->configManager = $this->provider->getConfigManagerMock();

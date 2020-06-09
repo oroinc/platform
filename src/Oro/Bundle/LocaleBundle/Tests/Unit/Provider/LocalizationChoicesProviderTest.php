@@ -30,7 +30,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationChoicesProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
@@ -95,7 +95,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
 
         $choices = $this->provider->getFormattingChoices();
 
-        $this->assertInternalType('array', $choices);
+        $this->assertIsArray($choices);
         $this->assertContains('br_FR', $choices);
         $this->assertNotContains('ho', $choices);
         $this->assertEquals('br_FR', $choices['bretón (Francia)']);

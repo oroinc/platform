@@ -27,7 +27,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
     /** @var LoadNormalizedIncludedEntities */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

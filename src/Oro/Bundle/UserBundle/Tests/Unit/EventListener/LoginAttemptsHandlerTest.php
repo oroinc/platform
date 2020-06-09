@@ -26,7 +26,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var LoginAttemptsHandler */
     private $handler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->infoProvider = $this->createMock(UserLoggingInfoProvider::class);

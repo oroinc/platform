@@ -41,7 +41,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
     /** @var GridViewsLoadListener */
     private $gridViewsLoadListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->registry = $this->createMock(ManagerRegistry::class);

@@ -20,12 +20,11 @@ class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame($processor, $actionProcessorBag->getProcessor('test'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A processor for "unknown" action was not found.
-     */
     public function testGetUnknownProcessor()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A processor for "unknown" action was not found.');
+
         $processor = $this->createMock(ActionProcessor::class);
         $processor->expects(self::once())
             ->method('getAction')

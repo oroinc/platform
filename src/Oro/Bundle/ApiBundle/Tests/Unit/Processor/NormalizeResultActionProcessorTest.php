@@ -49,7 +49,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var NormalizeResultActionProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();

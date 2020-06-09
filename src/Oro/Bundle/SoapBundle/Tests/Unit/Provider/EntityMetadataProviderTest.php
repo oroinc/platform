@@ -19,7 +19,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMetadataProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cm         = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -27,7 +27,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider   = new EntityMetadataProvider($this->cm, $this->translator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider, $this->cm, $this->translator);
     }
@@ -36,7 +36,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->provider->getMetadataFor(new \stdClass());
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 
@@ -70,7 +70,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         }
 
         $result = $this->provider->getMetadataFor($object);
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals($expectedResult, $result);
     }
 

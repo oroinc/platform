@@ -43,7 +43,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TestFile */
     private $file;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
         $this->fileIconProvider = $this->createMock(FileIconProvider::class);

@@ -24,7 +24,7 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
     /** @var PinbarTabTitleProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->titleService = $this->createMock(TitleService::class);

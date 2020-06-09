@@ -7,6 +7,9 @@ use Oro\Bundle\MessageQueueBundle\Consumption\InterruptConsumptionExtensionTrait
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
+/**
+ * Checks if cache was cleared and interrupt consumer.
+ */
 class InterruptConsumptionExtension extends AbstractExtension
 {
     use InterruptConsumptionExtensionTrait;
@@ -21,7 +24,7 @@ class InterruptConsumptionExtension extends AbstractExtension
      *
      * @var \DateTime
      */
-    protected $startTime;
+    protected static $startTime;
 
     /**
      * @var CacheState
@@ -30,6 +33,7 @@ class InterruptConsumptionExtension extends AbstractExtension
 
     /**
      * @param string $filePath
+     * @param CacheState $cacheState
      */
     public function __construct($filePath, CacheState $cacheState)
     {
@@ -37,14 +41,21 @@ class InterruptConsumptionExtension extends AbstractExtension
 
         $this->filePath = $filePath;
         $this->timestamp = filemtime($filePath);
-        $this->startTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->cacheState = $cacheState;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onStart(Context $context): void
+    {
+        self::$startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context): void
     {
         if (!file_exists($this->filePath)) {
             $this->interruptExecution($context, 'The cache was cleared.');
@@ -60,16 +71,16 @@ class InterruptConsumptionExtension extends AbstractExtension
         }
 
         $cacheChangeDate = $this->cacheState->getChangeDate();
-        if ($cacheChangeDate && $cacheChangeDate > $this->startTime) {
+        if ($cacheChangeDate && $cacheChangeDate > self::$startTime) {
             $this->interruptExecution($context, 'The cache has changed.');
         }
     }
 
     /**
      * @param Context $context
-     * @param string  $reason
+     * @param string $reason
      */
-    private function interruptExecution(Context $context, $reason)
+    private function interruptExecution(Context $context, string $reason): void
     {
         $context->getLogger()->info(
             'Execution interrupted: ' . $reason,

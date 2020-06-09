@@ -34,6 +34,12 @@ class QueryResolver
         // but with different partial fields
         if (!$query->hasHint(Query::HINT_REFRESH)) {
             $query->setHint(Query::HINT_REFRESH, true);
+        } elseif (false === $query->getHint(Query::HINT_REFRESH)) {
+            /**
+             * Doctrine considers any value except NULL as enabled HINT_REFRESH hint
+             * @see \Doctrine\ORM\UnitOfWork::createEntity
+             */
+            $query->setHint(Query::HINT_REFRESH, null);
         }
     }
 }

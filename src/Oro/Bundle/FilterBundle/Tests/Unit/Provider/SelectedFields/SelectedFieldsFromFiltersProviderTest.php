@@ -8,7 +8,7 @@ use Oro\Bundle\FilterBundle\Provider\SelectedFields\SelectedFieldsFromFiltersPro
 
 class SelectedFieldsFromFiltersProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

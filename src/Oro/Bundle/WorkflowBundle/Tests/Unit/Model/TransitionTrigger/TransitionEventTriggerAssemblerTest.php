@@ -20,7 +20,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->verifier = $this->createMock(TransitionEventTriggerVerifierInterface::class);
         $this->assembler = new TransitionEventTriggerAssembler($this->verifier);

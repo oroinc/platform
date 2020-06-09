@@ -22,24 +22,22 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The expression "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownExpression()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The expression "unknown" can not be loaded by this extension.');
+
         $extension = $this->getAbstractExtension();
         $extension->getExpression('unknown');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\ConfigExpression\ExpressionInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testLoadInvalidExpressions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Component\ConfigExpression\ExpressionInterface", "integer" given.'
+        );
+
         $extension = new AbstractExtensionStub([123]);
         $extension->hasExpression('test');
     }

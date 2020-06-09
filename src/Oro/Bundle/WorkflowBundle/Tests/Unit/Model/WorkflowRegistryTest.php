@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -22,28 +23,28 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
     const ENTITY_CLASS = 'testEntityClass';
     const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowDefinitionRepository|MockObject */
     private $entityRepository;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $entityManager;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
-    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowAssembler|MockObject */
     private $assembler;
 
-    /** @var WorkflowDefinitionFilters|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowDefinitionFilters|MockObject */
     private $filters;
 
-    /** @var WorkflowDefinitionFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowDefinitionFilterInterface|MockObject */
     private $filter;
 
     /** @var WorkflowRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRepository
             = $this->getMockBuilder(WorkflowDefinitionRepository::class)
@@ -77,10 +78,15 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->filter = $this->createMock(WorkflowDefinitionFilterInterface::class);
 
-        $this->registry = new WorkflowRegistry($this->doctrineHelper, $this->assembler, $this->filters);
+        $this->registry = new class($this->doctrineHelper, $this->assembler, $this->filters) extends WorkflowRegistry {
+            public function xgetWorkflowByName(): array
+            {
+                return $this->workflowByName;
+            }
+        };
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->entityRepository,
@@ -142,15 +148,14 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($workflow, $this->registry->getWorkflow(self::WORKFLOW_NAME));
         $this->assertEquals($newDefinition, $workflow->getDefinition());
-        $this->assertAttributeEquals([self::WORKFLOW_NAME => $workflow], 'workflowByName', $this->registry);
+        static::assertEquals([self::WORKFLOW_NAME => $workflow], $this->registry->xgetWorkflowByName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "test_workflow" not found
-     */
     public function testGetWorkflowAndFilteredItem()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "test_workflow" not found');
+
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
@@ -166,12 +171,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getWorkflow(self::WORKFLOW_NAME);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "test_workflow" not found
-     */
     public function testGetWorkflowNoUpdatedEntity()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "test_workflow" not found');
+
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
@@ -440,7 +444,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * @param Collection $in
      * @param Collection $out
-     * @return WorkflowDefinitionFilterInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return WorkflowDefinitionFilterInterface|MockObject
      */
     private function createDefinitionFilterMock(Collection $in, Collection $out)
     {
@@ -481,7 +485,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
      * @param string $workflowName
      *
      * @param string|null $relatedEntity
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
+     * @return Workflow|MockObject
      */
     protected function createWorkflow($workflowName, $relatedEntity = null)
     {
@@ -495,12 +499,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         return $this->createWorkflowFromDefinition($workflowDefinition);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "not_existing_workflow" not found
-     */
     public function testGetWorkflowNotFoundException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectExceptionMessage('Workflow "not_existing_workflow" not found');
+
         $workflowName = 'not_existing_workflow';
 
         $this->entityRepository->expects($this->once())
@@ -514,11 +517,11 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param WorkflowDefinition $definition
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
+     * @return Workflow|MockObject
      */
     private function createWorkflowFromDefinition(WorkflowDefinition $definition)
     {
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
+        /** @var Workflow|MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -13,7 +13,7 @@ class CircularReferenceSearchTest extends \PHPUnit\Framework\TestCase
             'b' => 'c',
         ]);
 
-        $this->expectException('Oro\Bundle\ActionBundle\Exception\CircularReferenceException');
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\CircularReferenceException::class);
 
         CircularReferenceSearch::assert([
             'a' => 'b',

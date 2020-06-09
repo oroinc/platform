@@ -18,7 +18,7 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
     /** @var WorkflowImportProcessorSupervisorFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->finderBuilder = $this->createMock(WorkflowConfigFinderBuilder::class);
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);

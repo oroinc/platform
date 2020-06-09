@@ -22,7 +22,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /** @var int */
     private $customizationProcessorCallIndex;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

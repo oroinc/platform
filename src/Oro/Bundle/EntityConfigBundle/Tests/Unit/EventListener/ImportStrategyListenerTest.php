@@ -26,7 +26,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportStrategyListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())

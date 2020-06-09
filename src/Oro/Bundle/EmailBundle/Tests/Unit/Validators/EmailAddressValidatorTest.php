@@ -20,7 +20,7 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailAddress();
         $this->context = $this->createMock(ExecutionContextInterface::class);

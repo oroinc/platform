@@ -16,7 +16,7 @@ class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SessionIdProvider */
     protected $sessionIdProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()

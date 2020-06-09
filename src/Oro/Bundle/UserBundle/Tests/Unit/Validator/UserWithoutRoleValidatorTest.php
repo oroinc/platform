@@ -26,7 +26,7 @@ class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new UserWithoutRole();
         $this->context = $this->createMock(ExecutionContextInterface::class);

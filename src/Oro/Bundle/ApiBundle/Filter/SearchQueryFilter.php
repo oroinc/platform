@@ -15,7 +15,7 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 /**
  * A filter that can be used to filter data by a query for a search index.
  */
-class SearchQueryFilter extends StandaloneFilter
+class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
 {
     /** @var AbstractSearchMappingProvider */
     private $searchMappingProvider;

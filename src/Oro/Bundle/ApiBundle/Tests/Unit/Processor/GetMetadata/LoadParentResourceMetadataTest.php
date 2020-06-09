@@ -19,7 +19,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
     /** @var LoadParentResourceMetadata */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -106,14 +106,14 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The class "Test\Entity" must not be a manageable entity because it is based on another API resource. Parent resource is "Test\ParentEntity".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenResourceIsBasedOnAnotherResourceButEntityIsManageable()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'The class "Test\Entity" must not be a manageable entity because it is based on another API resource.'
+            . ' Parent resource is "Test\ParentEntity".'
+        );
+
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\ParentEntity';
         $config = new EntityDefinitionConfig();

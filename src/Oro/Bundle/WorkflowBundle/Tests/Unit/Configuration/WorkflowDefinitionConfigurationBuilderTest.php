@@ -23,7 +23,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowAssembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);
     }
@@ -298,12 +298,11 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException
-     * @expectedExceptionMessage The "entity" configuration option is required.
-     */
     public function testBuildFromConfigurationWhenNoEntityInConfiguration()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException::class);
+        $this->expectExceptionMessage('The "entity" configuration option is required.');
+
         $builder = $this->getWorkflowDefinitionConfigurationBuilder();
         $builder->buildFromConfiguration(['test_workflow' => ['label' => 'My Entity']]);
     }

@@ -16,7 +16,7 @@ class TransitionEventTriggerRepositoryTest extends WebTestCase
     /** @var EntityManager */
     protected $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

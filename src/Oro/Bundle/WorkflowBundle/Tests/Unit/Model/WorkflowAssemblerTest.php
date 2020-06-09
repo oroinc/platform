@@ -74,7 +74,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAssembler */
     private $workflowAssembler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->workflow = $this->createWorkflow();
         $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
@@ -266,12 +266,13 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
-     * @expectedExceptionMessage Workflow "test_name" does not contains neither start step nor start transitions
-     */
     public function testAssembleStartTransitionException()
     {
+        $this->expectException(AssemblerException::class);
+        $this->expectExceptionMessage(
+            'Workflow "test_name" does not contains neither start step nor start transitions'
+        );
+
         $configuration = array(
             WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
             WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),

@@ -94,7 +94,7 @@ class NotificationManager implements ResetInterface
         if ($this->hasRules($entityName, $eventName)) {
             $rules = $this->getRules();
             foreach ($rules as $rule) {
-                if ($rule->getEntityName() === $entityName && $rule->getEvent()->getName() === $eventName) {
+                if ($rule->getEntityName() === $entityName && $rule->getEventName() === $eventName) {
                     $filteredRules[] = $rule;
                 }
             }
@@ -131,8 +131,7 @@ class NotificationManager implements ResetInterface
             ->createQueryBuilder()
             ->from(EmailNotification::class, 'e')
             ->distinct()
-            ->select('e.entityName, event.name as eventName')
-            ->innerJoin('e.event', 'event')
+            ->select('e.entityName, e.eventName')
             ->getQuery()
             ->getArrayResult();
 
@@ -164,8 +163,7 @@ class NotificationManager implements ResetInterface
         return $this->getEntityManager()
             ->createQueryBuilder()
             ->from(EmailNotification::class, 'e')
-            ->select(['e', 'event'])
-            ->leftJoin('e.event', 'event')
+            ->select('e')
             ->getQuery()
             ->getResult();
     }

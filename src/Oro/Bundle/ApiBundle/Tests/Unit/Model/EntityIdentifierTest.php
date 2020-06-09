@@ -53,12 +53,11 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityIdentifier->getAttributes());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "name" attribute does not exist.
-     */
     public function testGetUnknownAttribute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "name" attribute does not exist.');
+
         $entityIdentifier = new EntityIdentifier();
         $entityIdentifier->getAttribute('name');
     }
@@ -77,12 +76,11 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityIdentifier->getAttributes());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "name" attribute does not exist.
-     */
     public function testArrayAccessGetForUnknownAttribute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "name" attribute does not exist.');
+
         $entityIdentifier = new EntityIdentifier();
         $entityIdentifier['name'];
     }

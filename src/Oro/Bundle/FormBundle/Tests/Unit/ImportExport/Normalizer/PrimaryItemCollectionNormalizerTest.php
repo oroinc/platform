@@ -17,7 +17,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->createMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
         $this->normalizer = new PrimaryItemCollectionNormalizer();

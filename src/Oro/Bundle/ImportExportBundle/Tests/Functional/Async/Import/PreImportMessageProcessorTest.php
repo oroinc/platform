@@ -16,7 +16,7 @@ class PreImportMessageProcessorTest extends WebTestCase
 
     protected $fixturePath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('Re-factor in BAP-13063');
         parent::setUp();

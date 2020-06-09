@@ -34,7 +34,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
 
@@ -116,12 +116,11 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Scope "invalid" is not available.
-     */
     public function testGetStatsMessageForInvalidScope()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Scope "invalid" is not available.');
+
         $entity = new \stdClass();
         $scope = 'invalid';
 

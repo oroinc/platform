@@ -21,7 +21,7 @@ class DefaultRelationFieldValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultRelationFieldValidator */
     protected $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

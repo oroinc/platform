@@ -26,7 +26,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
     /** @var OwnershipQueryHelper */
     protected $ownershipQueryHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

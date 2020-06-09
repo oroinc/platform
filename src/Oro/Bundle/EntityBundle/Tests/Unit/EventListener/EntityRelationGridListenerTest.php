@@ -19,7 +19,7 @@ class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -30,7 +30,7 @@ class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EntityRelationGridListener($this->cm, $this->doctrineHelper);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listener, $this->cm);
     }

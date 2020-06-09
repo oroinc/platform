@@ -18,7 +18,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
      */
     private $workflowManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);
@@ -53,7 +53,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
-        $this->assertContains('workflow-definitions-grid', $crawler->html());
+        static::assertStringContainsString('workflow-definitions-grid', $crawler->html());
         $this->assertContainGroups($crawler->html());
     }
 
@@ -89,7 +89,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('"availableDestinations":', $crawler->html());
+        static::assertStringContainsString('"availableDestinations":', $crawler->html());
     }
 
     public function testViewAction()
@@ -111,10 +111,13 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::MULTISTEP);
 
-        $this->assertContains($workflow->getLabel(), $crawler->html());
+        static::assertStringContainsString($workflow->getLabel(), $crawler->html());
 
         if ($workflow->getStepManager()->getStartStep()) {
-            $this->assertContains($workflow->getStepManager()->getStartStep()->getName(), $crawler->html());
+            static::assertStringContainsString(
+                $workflow->getStepManager()->getStartStep()->getName(),
+                $crawler->html()
+            );
         }
     }
 
@@ -136,8 +139,8 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
 
-        $this->assertContains('Var1Value', $crawler->html());
-        $this->assertContains('test_flow', $crawler->html());
+        static::assertStringContainsString('Var1Value', $crawler->html());
+        static::assertStringContainsString('test_flow', $crawler->html());
 
         // update variable value
         $form = $crawler->selectButton('Save')->form([
@@ -149,8 +152,8 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('Var1NewValue', $crawler->html());
-        $this->assertContains('test_multistep_flow', $crawler->html());
+        static::assertStringContainsString('Var1NewValue', $crawler->html());
+        static::assertStringContainsString('test_multistep_flow', $crawler->html());
     }
 
     public function testActivateFormAction()
@@ -172,12 +175,12 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
-        $this->assertContains('name="oro_workflow_replacement"', $crawler->html());
-        $this->assertContains('Activate', $crawler->html());
-        $this->assertContains('Cancel', $crawler->html());
-        $this->assertContains('The following workflows will be deactivated', $crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS1, $crawler->html());
+        static::assertStringContainsString(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
+        static::assertStringContainsString('name="oro_workflow_replacement"', $crawler->html());
+        static::assertStringContainsString('Activate', $crawler->html());
+        static::assertStringContainsString('Cancel', $crawler->html());
+        static::assertStringContainsString('The following workflows will be deactivated', $crawler->html());
+        static::assertStringContainsString(LoadWorkflowDefinitions::WITH_GROUPS1, $crawler->html());
 
         $form = $crawler->selectButton('Activate')->form();
 
@@ -194,10 +197,10 @@ class WorkflowDefinitionControllerTest extends WebTestCase
      */
     private function assertContainGroups($content)
     {
-        $this->assertContains('active_group1', $content);
-        $this->assertContains('active_group2', $content);
-        $this->assertContains('record_group1', $content);
-        $this->assertContains('record_group2', $content);
+        static::assertStringContainsString('active_group1', $content);
+        static::assertStringContainsString('active_group2', $content);
+        static::assertStringContainsString('record_group1', $content);
+        static::assertStringContainsString('record_group2', $content);
     }
 
     /**

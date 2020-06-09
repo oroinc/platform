@@ -20,7 +20,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var ValueTransformer */
     private $valueTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataTransformerRegistry = $this->createMock(DataTransformerRegistry::class);
         $this->dataTransformer = $this->createMock(DataTransformerInterface::class);
@@ -31,12 +31,11 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The transformation context must have "requestType" attribute.
-     */
     public function testTransformValueWhenNotRequestTypeInContext()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The transformation context must have "requestType" attribute.');
+
         $value = 'value';
         $dataType = 'test_data_type';
         $context = ['context_key' => 'context_value'];

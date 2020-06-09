@@ -10,7 +10,7 @@ class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionContextConfigurator */
     protected $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new ExpressionContextConfigurator();
     }

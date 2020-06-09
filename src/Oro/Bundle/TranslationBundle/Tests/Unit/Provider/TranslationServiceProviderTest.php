@@ -28,7 +28,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $testPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adapter = $this->createMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
         $this->dumper  = $this->createMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper');
@@ -154,11 +154,9 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $service->loadTranslatesFromFile($path, 'en');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDownloadException()
     {
+        $this->expectException(\RuntimeException::class);
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
             [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
@@ -203,7 +201,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $method->invoke($this->service, $dir);
         $method->invoke($this->service, $dir . '1');
 
-        $this->assertFileNotExists($fileName);
+        $this->assertFileDoesNotExist($fileName);
     }
 
     public function testApply()
@@ -314,7 +312,7 @@ class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
         $method->invoke($service, '.en.', '.en_US.', $targetPath);
 
         foreach ($files as $k => $file) {
-            $this->assertFileNotExists($file);
+            $this->assertFileDoesNotExist($file);
             $this->assertFileExists($filesExpected[$k]);
         }
     }

@@ -26,7 +26,7 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
     /** @var \stdClass */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = new ArrayCache();
         $this->entity = new \stdClass();

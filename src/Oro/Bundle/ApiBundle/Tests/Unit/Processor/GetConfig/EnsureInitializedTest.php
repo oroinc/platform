@@ -13,7 +13,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
     /** @var EnsureInitialized */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

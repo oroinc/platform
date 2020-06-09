@@ -15,7 +15,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdTransformer */
     private $entityIdTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
@@ -146,14 +146,14 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage The entity identifier contains the key "anotherId" which is not defined in composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierWithInvalidField()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'The entity identifier contains the key "anotherId" which is not defined'
+            . ' in composite identifier of the entity "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123;anotherId=456';
 
@@ -171,14 +171,14 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->entityIdTransformer->reverseTransform($value, $metadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage The entity identifier does not contain all keys defined in composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierWhenItDoesNotContainAllIdentifierFields()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'The entity identifier does not contain all keys defined in composite identifier of the entity'
+            . ' "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123';
 
@@ -196,14 +196,13 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->entityIdTransformer->reverseTransform($value, $metadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Unexpected identifier value "id1=123;id2" for composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierThatDoesNotHaveFieldValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Unexpected identifier value "id1=123;id2" for composite identifier of the entity "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2';
 

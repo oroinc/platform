@@ -23,7 +23,7 @@ class UseDefaultConfiguratorTest extends FormIntegrationTestCase
      */
     private $configurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -21,7 +21,7 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuUpdateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $menuUpdateProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()
@@ -37,12 +37,11 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException
-     * @expectedExceptionMessage Item "ChildMenuItem" exceeded max nesting level in menu "MainMenuItem".
-     */
     public function testMaxNestingLevelExceededException()
     {
+        $this->expectException(\Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException::class);
+        $this->expectExceptionMessage('Item "ChildMenuItem" exceeded max nesting level in menu "MainMenuItem".');
+
         $this->menuUpdateProvider->expects(static::once())
             ->method('getMenuUpdatesForMenuItem')
             ->with($this->menuItem)

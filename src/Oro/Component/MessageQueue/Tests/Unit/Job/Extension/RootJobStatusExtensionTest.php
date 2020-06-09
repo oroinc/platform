@@ -17,7 +17,7 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rootJobStatusCalculator = $this->createMock(RootJobStatusCalculator::class);
         $this->extension = new RootJobStatusExtension($this->rootJobStatusCalculator);

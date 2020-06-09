@@ -12,7 +12,7 @@ class DefaultFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultFormOptionsProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new DefaultFormOptionsProcessor();
     }

@@ -12,27 +12,21 @@ class AclAncestorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_acl', $aclAncestor->getId());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithEmptyId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $aclAncestor = new AclAncestor(array('value' => ''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithInvalidId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $aclAncestor = new AclAncestor(array('value' => 'test acl'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithMissingId()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $aclAncestor = new AclAncestor(array());
     }
 }

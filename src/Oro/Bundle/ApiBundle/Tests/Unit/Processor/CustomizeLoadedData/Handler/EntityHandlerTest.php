@@ -16,7 +16,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $customizationProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
     }

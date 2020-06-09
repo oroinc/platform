@@ -4,7 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -46,8 +49,9 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         $filterGroupName = $this->filterNamesRegistry
-            ->getFilterNames($context->getRequestType())
+            ->getFilterNames($requestType)
             ->getFieldsFilterGroupName();
         if (!$filterGroupName) {
             // the "fields" filter is not supported
@@ -57,15 +61,26 @@ class HandleFieldsFilter implements ProcessorInterface
         $fields = [];
         $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
         foreach ($filterValues as $filterValue) {
-            $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
-                $filterValue->getValue(),
-                DataType::STRING,
-                $context->getRequestType(),
-                true
-            );
+            try {
+                $normalizedValue = $this->valueNormalizer->normalizeValue(
+                    $filterValue->getValue(),
+                    DataType::STRING,
+                    $requestType,
+                    true
+                );
+                if ($normalizedValue) {
+                    $fields[$filterValue->getPath()] = (array)$normalizedValue;
+                }
+            } catch (\Exception $e) {
+                $context->addError(
+                    Error::createValidationError(Constraint::FILTER)
+                        ->setInnerException($e)
+                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+                );
+            }
         }
-        if (empty($fields)) {
-            // filtering of fields was not requested
+        if (!$fields || $context->hasErrors()) {
+            // filtering of fields was not requested or detected errors in filter values
             return;
         }
 

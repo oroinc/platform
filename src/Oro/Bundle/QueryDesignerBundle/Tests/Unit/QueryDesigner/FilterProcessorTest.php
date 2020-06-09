@@ -17,7 +17,7 @@ class FilterProcessorTest extends OrmQueryConverterTest
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')

@@ -11,7 +11,7 @@ class AttachmentTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentType */
     protected $attachmentType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->attachmentType = new AttachmentType();
     }

@@ -9,9 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
-use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
@@ -53,7 +51,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     /** @var EmailNotificationType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage */
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -88,7 +86,11 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
             new BuildTemplateFormSubscriber($tokenStorage),
             new AdditionalEmailsSubscriber($this->createMock(ChainAdditionalEmailAssociationProvider::class)),
             $router,
-            new ContactInformationEmailsSubscriber($contactInformationEmailsProvider)
+            new ContactInformationEmailsSubscriber($contactInformationEmailsProvider),
+            [
+                'test_1',
+                'test_2'
+            ]
         );
 
         parent::setUp();
@@ -132,7 +134,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                 'defaultData' => $this->getEntity(EmailNotification::class, ['id' => 42]),
                 'submittedData' => [
                     'entityName' => 'user',
-                    'event' => 100,
+                    'eventName' => 'test_1',
                     'template' => 200,
                     'recipientList' => [
                         'groups' => [1],
@@ -145,7 +147,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                     [
                         'id' => 42,
                         'entityName' => User::class,
-                        'event' => new Event('test'),
+                        'eventName' => 'test_1',
                         'template' => new EmailTemplate('test'),
                         'recipientList' => $this->getEntity(
                             RecipientList::class,
@@ -199,12 +201,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $select2EntityType = new EntityTypeStub(
-            [100 => new Event('test')],
-            'oro_select2_entity',
-            ['configs' => [], 'property' => null]
-        );
-
         $select2TranslatableEntityType = new Select2TranslatableEntityTypeStub(
             [200 => new EmailTemplate('test')],
             'oro_select2_translatable_entity',
@@ -230,7 +226,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                         EmailNotificationEntityChoiceType::NAME,
                         ['configs' => []]
                     ),
-                    Select2EntityType::class => $select2EntityType,
                     Select2TranslatableEntityType::class => $select2TranslatableEntityType,
                     EntityType::class => $entityType,
                     RecipientListType::class => $recipientListType,

@@ -14,7 +14,7 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OroDistributionExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
 

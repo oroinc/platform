@@ -26,7 +26,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /** @var Context */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request          = Request::create(uniqid('uri'));
         $this->response         = new Response();
@@ -42,7 +42,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->context, $this->request, $this->response, $this->controllerObject, $this->action);
     }

@@ -24,7 +24,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineEventListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scheduledForInsertScopes = $this->createMock(ScopeCollection::class);
         $this->scopeCache = $this->createMock(CacheProvider::class);

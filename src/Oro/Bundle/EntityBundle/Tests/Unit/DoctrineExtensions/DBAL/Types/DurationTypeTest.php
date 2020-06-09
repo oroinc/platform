@@ -13,7 +13,7 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPlatform */
     protected $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // class has private constructor
         $this->type = $this

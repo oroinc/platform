@@ -12,7 +12,7 @@ class AclManagerSidTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
             ->disableOriginalConstructor()

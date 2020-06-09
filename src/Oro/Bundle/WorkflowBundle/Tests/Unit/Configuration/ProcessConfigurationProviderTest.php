@@ -24,22 +24,20 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $triggerConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->definitionConfiguration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
         $this->triggerConfiguration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->definitionConfiguration, $this->triggerConfiguration);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $bundles = array(new IncorrectConfigurationBundle());
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,

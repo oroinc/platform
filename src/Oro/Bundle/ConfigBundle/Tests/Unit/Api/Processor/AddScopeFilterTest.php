@@ -11,7 +11,7 @@ class AddScopeFilterTest extends GetListProcessorTestCase
     /** @var AddScopeFilter */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

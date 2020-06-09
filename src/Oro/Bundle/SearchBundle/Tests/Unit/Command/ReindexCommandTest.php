@@ -21,7 +21,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ReindexCommand */
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->asyncIndexer = $this->createMock(IndexerInterface::class);
@@ -39,8 +39,8 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        $this->assertContains('Started reindex task for all mapped entities', $tester->getDisplay());
-        $this->assertContains('Reindex finished successfully', $tester->getDisplay());
+        static::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
+        static::assertStringContainsString('Reindex finished successfully', $tester->getDisplay());
     }
 
     public function testShouldReindexOnlySingleClassIfClassArgumentExists()
@@ -62,7 +62,10 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
             'class' => $shortClassName
         ]);
 
-        $this->assertContains(sprintf('Started reindex task for "%s" entity', $fullClassName), $tester->getDisplay());
+        static::assertStringContainsString(
+            sprintf('Started reindex task for "%s" entity', $fullClassName),
+            $tester->getDisplay()
+        );
     }
 
     public function testShouldReindexAsynchronouslyIfParameterSpecified()
@@ -74,6 +77,6 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['--scheduled' => true]);
 
-        $this->assertContains('Started reindex task for all mapped entities', $tester->getDisplay());
+        static::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
     }
 }

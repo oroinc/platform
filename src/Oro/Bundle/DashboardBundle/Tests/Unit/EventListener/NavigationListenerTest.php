@@ -18,7 +18,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 

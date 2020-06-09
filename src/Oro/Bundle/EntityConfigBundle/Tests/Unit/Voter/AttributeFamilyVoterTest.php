@@ -29,7 +29,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeFamilyVoter */
     private $voter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)

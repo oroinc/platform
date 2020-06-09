@@ -28,12 +28,11 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A resource for "Test\Class1" already exists.
-     */
     public function testAddAlreadyExisting()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A resource for "Test\Class1" already exists.');
+
         $collection = new ApiResourceCollection();
         $collection->add(new ApiResource('Test\Class1'));
         $collection->add(new ApiResource('Test\Class1'));

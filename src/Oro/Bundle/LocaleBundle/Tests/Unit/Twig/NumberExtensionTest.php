@@ -16,7 +16,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = $this->getMockBuilder(NumberFormatter::class)
             ->disableOriginalConstructor()

@@ -19,7 +19,7 @@ class OriginTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritDoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManagerMock = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->setMethods(['find'])

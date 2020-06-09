@@ -45,7 +45,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $repositoryLocalization = $this->createMock(ObjectRepository::class);
         $repositoryLocalization->expects($this->any())

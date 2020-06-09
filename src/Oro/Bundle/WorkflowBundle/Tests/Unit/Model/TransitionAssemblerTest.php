@@ -84,7 +84,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var FormOptionsConfigurationAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigurationAssembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
             ->disableOriginalConstructor()
@@ -112,13 +112,13 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider missedTransitionDefinitionDataProvider
      *
      * @param array $configuration
      */
     public function testAssembleNoRequiredTransitionDefinitionException($configuration)
     {
+        $this->expectException(\Oro\Component\Action\Exception\AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
     }
 
@@ -152,13 +152,13 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectTransitionDefinitionDataProvider
      *
      * @param array $configuration
      */
     public function testUnknownTransitionDefinitionAssembler($configuration)
     {
+        $this->expectException(\Oro\Component\Action\Exception\AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
     }
 
@@ -190,13 +190,13 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectStepsDataProvider
      *
      * @param array $steps
      */
     public function testUnknownStepException($steps)
     {
+        $this->expectException(\Oro\Component\Action\Exception\AssemblerException::class);
         $configuration = [
             'transitions' => [
                 'test_transition' => [

@@ -16,7 +16,7 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);
         $this->transactionWatcher = new DbalTransactionWatcher($this->bufferedProducer);
@@ -30,17 +30,17 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
         $this->transactionWatcher->onTransactionStarted();
     }
 
-    public function testShouldFlushBufferAndThenDisableBufferingWhenTransactionCommited()
+    public function testShouldFlushBufferAndThenDisableBufferingWhenTransactionCommitted()
     {
         $this->bufferedProducer->expects(self::at(0))
             ->method('flushBuffer');
         $this->bufferedProducer->expects(self::at(1))
             ->method('disableBuffering');
 
-        $this->transactionWatcher->onTransactionCommited();
+        $this->transactionWatcher->onTransactionCommitted();
     }
 
-    public function testShouldDisableBufferingEvenIfFlushBufferFailedWhenTransactionCommited()
+    public function testShouldDisableBufferingEvenIfFlushBufferFailedWhenTransactionCommitted()
     {
         $exception = new \Exception('some error');
 
@@ -51,8 +51,8 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
             ->method('disableBuffering');
 
         try {
-            $this->transactionWatcher->onTransactionCommited();
-            self::fail('The exception should not be catched');
+            $this->transactionWatcher->onTransactionCommitted();
+            self::fail('The exception should not be caught');
         } catch (\PHPUnit\Framework\AssertionFailedError $e) {
             throw $e;
         } catch (\Exception $e) {

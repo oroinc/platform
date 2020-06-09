@@ -10,7 +10,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
     /** @var ReadonlyResourceStream */
     private $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resource = fopen(__DIR__ . '/../Fixtures/test.txt', 'rb');
         $this->stream = new ReadonlyResourceStream($resource);
@@ -21,21 +21,19 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->open(new StreamMode('r'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The ReadonlyResourceStream does not allow write.
-     */
     public function testOpenReadAndCreate()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
+
         $this->stream->open(new StreamMode('r+'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The ReadonlyResourceStream does not allow write.
-     */
     public function testOpenWrite()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
+
         $this->stream->open(new StreamMode('w'));
     }
 
@@ -46,12 +44,11 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->stream->eof());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The ReadonlyResourceStream does not allow write.
-     */
     public function testWrite()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
+
         $this->stream->write('test');
     }
 
@@ -63,12 +60,11 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(is_resource($this->stream->cast(1)));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The ReadonlyResourceStream does not allow write.
-     */
     public function testFlush()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
+
         $this->stream->flush();
     }
 
@@ -88,12 +84,11 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(9, $stat['size']);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The ReadonlyResourceStream does not allow unlink.
-     */
     public function testUnlink()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The ReadonlyResourceStream does not allow unlink.');
+
         $this->stream->unlink();
     }
 }

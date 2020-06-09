@@ -3,12 +3,22 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
+use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
+use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
+use Psr\Log\LoggerInterface;
 
 class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $inner;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var MessageFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageFilter;
 
     /** @var BufferedMessageProducer */
     private $producer;
@@ -16,10 +26,13 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->inner = $this->createMock(MessageProducerInterface::class);
-        $this->producer = new BufferedMessageProducer($this->inner);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->messageFilter = $this->createMock(MessageFilterInterface::class);
+
+        $this->producer = new BufferedMessageProducer($this->inner, $this->logger, $this->messageFilter);
     }
 
     public function testBufferDisabledByDefault()
@@ -40,6 +53,71 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->producer->isBufferingEnabled());
     }
 
+    public function testDisableBufferingWhenItIsAlreadyDisabled()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The buffering of messages is already disabled.');
+
+        $this->logger->expects(self::once())
+            ->method('critical')
+            ->with('The buffered message producer fails because the buffering of messages is already disabled.');
+
+        $this->producer->disableBuffering();
+    }
+
+    public function testEnableBufferingNestingLevel()
+    {
+        self::assertFalse($this->producer->isBufferingEnabled());
+
+        $this->producer->enableBuffering();
+        self::assertTrue($this->producer->isBufferingEnabled());
+
+        $this->producer->enableBuffering();
+        self::assertTrue($this->producer->isBufferingEnabled());
+
+        $this->producer->disableBuffering();
+        self::assertTrue($this->producer->isBufferingEnabled());
+
+        $this->producer->disableBuffering();
+        self::assertFalse($this->producer->isBufferingEnabled());
+    }
+
+    public function testSendWhenBufferingIsDisabled()
+    {
+        $topic = 'test1';
+        $message = ['test_data'];
+
+        $this->messageFilter->expects(self::once())
+            ->method('apply')
+            ->willReturnCallback(function (MessageBuffer $buffer) use ($topic, $message) {
+                self::assertEquals([[$topic, $message]], $buffer->getMessages());
+            });
+        $this->inner->expects(self::once())
+            ->method('send')
+            ->with($topic, $message);
+
+        $this->producer->send($topic, $message);
+    }
+
+    public function testHasBufferedMessages()
+    {
+        $this->producer->enableBuffering();
+
+        self::assertFalse($this->producer->hasBufferedMessages());
+
+        $this->producer->send('test', ['test_data']);
+        self::assertTrue($this->producer->hasBufferedMessages());
+
+        $this->producer->flushBuffer();
+        self::assertFalse($this->producer->hasBufferedMessages());
+
+        $this->producer->send('test', ['test_data']);
+        self::assertTrue($this->producer->hasBufferedMessages());
+
+        $this->producer->clearBuffer();
+        self::assertFalse($this->producer->hasBufferedMessages());
+    }
+
     public function testClearBuffer()
     {
         // send several messages to fill the buffer
@@ -48,14 +126,17 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
             ['test2', [new \stdClass()]]
         ];
         $this->producer->enableBuffering();
-        foreach ($messages as list($topic, $message)) {
+        foreach ($messages as [$topic, $message]) {
             $this->producer->send($topic, $message);
         }
-        self::assertAttributeEquals($messages, 'buffer', $this->producer);
+
+        $this->inner->expects(self::never())
+            ->method('send');
 
         // do the test
         $this->producer->clearBuffer();
-        self::assertAttributeEquals([], 'buffer', $this->producer);
+        // test that the buffer is cleared up
+        $this->producer->flushBuffer();
     }
 
     public function testFlushBuffer()
@@ -63,46 +144,87 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         // send several messages to fill the buffer
         $messages = [
             ['test1', ['test_data']],
-            ['test2', [new \stdClass()]]
+            ['test2', [new \stdClass()]],
+            ['test3', ['to_be_filtered']]
         ];
         $this->producer->enableBuffering();
-        foreach ($messages as list($topic, $message)) {
+        foreach ($messages as [$topic, $message]) {
             $this->producer->send($topic, $message);
         }
-        self::assertAttributeEquals($messages, 'buffer', $this->producer);
+
+        $this->messageFilter->expects(self::once())
+            ->method('apply')
+            ->willReturnCallback(function (MessageBuffer $buffer) {
+                foreach ($buffer->getMessagesForTopic('test3') as $messageId => $message) {
+                    $buffer->removeMessage($messageId);
+                }
+            });
 
         // do the test
         $this->inner->expects(self::exactly(2))
             ->method('send');
-        list($topic, $message) = $messages[0];
+        [$topic, $message] = $messages[0];
         $this->inner->expects(self::at(0))
             ->method('send')
             ->with($topic, $message);
-        list($topic, $message) = $messages[1];
+        [$topic, $message] = $messages[1];
         $this->inner->expects(self::at(1))
             ->method('send')
             ->with($topic, $message);
+
         $this->producer->flushBuffer();
-        self::assertAttributeEquals([], 'buffer', $this->producer);
+        // test that the buffer is cleared up
+        $this->producer->flushBuffer();
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The buffering of messages is disabled.
-     */
+    public function testFlushBufferWhenInnerProducerThrowsException()
+    {
+        $exception = new Exception('some error');
+
+        $this->expectException(get_class($exception));
+        $this->expectExceptionMessage($exception->getMessage());
+
+        $this->producer->enableBuffering();
+        $this->producer->send('test1', ['test_data']);
+
+        $this->messageFilter->expects(self::once())
+            ->method('apply');
+
+        $this->inner->expects(self::once())
+            ->method('send')
+            ->willThrowException($exception);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'The buffered message producer fails to send messages to the queue.',
+                ['exception' => $exception]
+            );
+
+        $this->producer->flushBuffer();
+    }
+
     public function testDisableBufferingThrowExceptionOnFlush()
     {
-        $this->producer->disableBuffering();
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The buffering of messages is disabled.');
+
+        $this->logger->expects(self::once())
+            ->method('critical')
+            ->with('The buffered message producer fails because the buffering of messages is disabled.');
+
         $this->producer->flushBuffer();
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The buffering of messages is disabled.
-     */
     public function testDisableBufferingThrowExceptionOnClear()
     {
-        $this->producer->disableBuffering();
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The buffering of messages is disabled.');
+
+        $this->logger->expects(self::once())
+            ->method('critical')
+            ->with('The buffered message producer fails because the buffering of messages is disabled.');
+
         $this->producer->clearBuffer();
     }
 }

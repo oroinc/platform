@@ -44,7 +44,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeClassMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->scopeDataAccessor = $this->createMock(ScopeDataAccessor::class);
         $this->scheduledForInsertScopes = $this->createMock(ScopeCollection::class);
@@ -290,14 +290,13 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope', $context));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException
-     * @expectedExceptionMessage The type string is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".
-     */
-    // @codingStandardsIgnoreEnd
     public function testFindWithInvalidScalarValueInContext()
     {
+        $this->expectException(\Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException::class);
+        $this->expectExceptionMessage(
+            'The type string is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".'
+        );
+
         $context = ['field' => 'test'];
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);
@@ -309,14 +308,14 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $manager->find('testScope', $context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException
-     * @expectedExceptionMessage The type Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".
-     */
-    // @codingStandardsIgnoreEnd
     public function testFindWithInvalidObjectValueInContext()
     {
+        $this->expectException(\Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The type %s is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".',
+            \Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope::class
+        ));
+
         $context = ['field' => new StubScope()];
 
         $provider = new StubScopeCriteriaProvider('field', null, \stdClass::class);

@@ -33,7 +33,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
     /** @var SyncFailTopic */
     protected $syncFailTopic;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->conn = $this->createMock(ConnectionInterface::class);
         $this->topic = $this->createMock(Topic::class);

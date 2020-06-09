@@ -12,12 +12,12 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
      */
     protected $address;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->address);
     }

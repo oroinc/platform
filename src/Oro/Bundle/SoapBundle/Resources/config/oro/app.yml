@@ -9,4 +9,13 @@ security:
                 realm:    "Secured API"
                 profile:  "UsernameToken"
             context: main
+            organization-remember-me:
+                secret:                     '%secret%'
+                name:                       BAPRM
+                lifetime:                   1209600   # stay logged for two weeks
+                httponly:                   true
+                csrf_protected_mode:        true
+            guard:
+                authenticators:
+                    - oro_user.impersonation_authenticator
             logout_on_user_change: true

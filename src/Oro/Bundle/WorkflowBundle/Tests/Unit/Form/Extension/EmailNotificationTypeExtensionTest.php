@@ -19,7 +19,7 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
     /** @var EmailNotificationTypeExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = $this->createMock(EmailNotificationTypeListener::class);
 
@@ -49,12 +49,12 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 
     public function testFinishView()
     {
-        $childView1 = $this->getFormView('event');
+        $childView1 = $this->getFormView('eventName');
         $childView2 = $this->getFormView('unsupported');
         $childView3 = $this->getFormView('workflow_definition');
 
         $formView = new FormView();
-        $formView->vars['listenChangeElements'] = ['#entity_name_id'];
+        $formView->vars['listenChangeElements'] = ['#entity_name'];
         $formView->children = [
             $childView1->vars['name'] => $childView1,
             $childView2->vars['name'] => $childView2,
@@ -68,7 +68,7 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 
         $this->assertArrayHasKey('listenChangeElements', $formView->vars);
         $this->assertEquals(
-            ['#entity_name_id', '#event_id', '#workflow_definition_id'],
+            ['#entity_name', '#eventName_id', '#workflow_definition_id'],
             $formView->vars['listenChangeElements']
         );
     }

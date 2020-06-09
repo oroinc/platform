@@ -13,7 +13,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
@@ -72,12 +72,11 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an error completer for the request "another".
-     */
     public function testShouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an error completer for the request "another".');
+
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api']
         ]);

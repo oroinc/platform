@@ -20,7 +20,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
     /** @var CompleteStatusCodes */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

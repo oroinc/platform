@@ -3,46 +3,35 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Collection;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ReminderManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|EntityManager */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
+    /** @var MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var ReminderManager
-     */
+    /** @var ReminderManager */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this
-            ->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getEntityManager')
-            ->will($this->returnValue($this->entityManager));
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper->method('getEntityManager')->willReturn($this->entityManager);
 
         $this->manager = new ReminderManager($this->doctrineHelper);
     }
@@ -56,55 +45,32 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
         $reminderData = $this->createReminderData();
 
         $entityId = 101;
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RemindableInterface $entity */
-        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
-        $entityClass = get_class($entity);
+        /** @var MockObject|RemindableInterface $entity */
+        $entity = $this->createMock(RemindableInterface::class);
+        $entityClass = \get_class($entity);
 
-        $entity->expects($this->once())
-            ->method('getReminders')
-            ->will($this->returnValue($reminders));
-
-        $entity->expects($this->once())
-            ->method('getReminderData')
-            ->will($this->returnValue($reminderData));
+        $entity->expects(static::once())->method('getReminders')->willReturn($reminders);
+        $entity->expects(static::once())->method('getReminderData')->willReturn($reminderData);
 
         $this->expectReminderSync($fooReminder, $entityClass, $entityId, $reminderData);
         $this->expectReminderSync($barReminder, $entityClass, $entityId, $reminderData);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue($entityId));
+        $this->doctrineHelper->expects(static::once())->method('getSingleEntityIdentifier')->willReturn($entityId);
+        $this->doctrineHelper->expects(static::once())->method('getEntityClass')->willReturn($entityClass);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityClass')
-            ->will($this->returnValue($entityClass));
-
-        $this->entityManager->expects($this->at(0))
-            ->method('persist')
-            ->with($fooReminder);
-
-        $this->entityManager->expects($this->at(1))
-            ->method('persist')
-            ->with($barReminder);
+        $this->entityManager->expects(static::at(0))->method('persist')->with($fooReminder);
+        $this->entityManager->expects(static::at(1))->method('persist')->with($barReminder);
 
         $this->manager->saveReminders($entity);
     }
 
     public function testSaveEmptyEntityId()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RemindableInterface $entity */
-        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        /** @var MockObject|RemindableInterface $entity */
+        $entity = $this->createMock(RemindableInterface::class);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue(null));
-
-        $this->entityManager
-            ->expects($this->never())
-            ->method('persist');
+        $this->doctrineHelper->expects(static::once())->method('getSingleEntityIdentifier')->willReturn(null);
+        $this->entityManager->expects(static::never())->method('persist');
 
         $this->manager->saveReminders($entity);
     }
@@ -113,63 +79,35 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     {
         $fooReminder = $this->createReminder(100);
         $barReminder = $this->createReminder(200);
-        $remindersCollection =
-            $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $remindersCollection = $this->getMockBuilder(RemindersPersistentCollection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $remindersCollection->expects($this->once())
+        $remindersCollection->expects(static::once())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator([$fooReminder])));
+            ->willReturn(new \ArrayIterator([$fooReminder]));
 
-        $remindersCollection->expects($this->once())
-            ->method('isDirty')
-            ->will($this->returnValue(true));
-
-        $remindersCollection->expects($this->once())
-            ->method('getInsertDiff')
-            ->will($this->returnValue([$fooReminder]));
-
-        $remindersCollection->expects($this->once())
-            ->method('getDeleteDiff')
-            ->will($this->returnValue([$barReminder]));
+        $remindersCollection->expects(static::once())->method('isDirty')->willReturn(true);
+        $remindersCollection->expects(static::once())->method('getInsertDiff')->willReturn([$fooReminder]);
+        $remindersCollection->expects(static::once())->method('getDeleteDiff')->willReturn([$barReminder]);
 
         $reminderData = $this->createReminderData();
 
         $entityId = 101;
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RemindableInterface $entity */
-        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        /** @var MockObject|RemindableInterface $entity */
+        $entity = $this->createMock(RemindableInterface::class);
         $entityClass = get_class($entity);
 
-        $entity->expects($this->once())
-            ->method('getReminders')
-            ->will($this->returnValue($remindersCollection));
-
-        $entity->expects($this->once())
-            ->method('getReminderData')
-            ->will($this->returnValue($reminderData));
+        $entity->expects(static::once())->method('getReminders')->willReturn($remindersCollection);
+        $entity->expects(static::once())->method('getReminderData')->willReturn($reminderData);
 
         $this->expectReminderSync($fooReminder, $entityClass, $entityId, $reminderData);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue($entityId));
+        $this->doctrineHelper->expects(static::once())->method('getSingleEntityIdentifier')->willReturn($entityId);
+        $this->doctrineHelper->expects(static::once())->method('getEntityClass')->willReturn($entityClass);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityClass')
-            ->will($this->returnValue($entityClass));
-
-        $this->entityManager
-            ->expects($this->at(0))
-            ->method('persist')
-            ->with($fooReminder);
-
-        $this->entityManager
-            ->expects($this->at(1))
-            ->method('remove')
-            ->with($barReminder);
+        $this->entityManager->expects(static::at(0))->method('persist')->with($fooReminder);
+        $this->entityManager->expects(static::at(1))->method('remove')->with($barReminder);
 
         $this->manager->saveReminders($entity);
     }
@@ -180,39 +118,25 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     public function testSaveRemindersEmpty($reminders)
     {
         $entityId = 101;
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RemindableInterface $entity */
-        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        /** @var MockObject|RemindableInterface $entity */
+        $entity = $this->createMock(RemindableInterface::class);
         $entityClass = get_class($entity);
 
-        $entity->expects($this->once())
-            ->method('getReminders')
-            ->will($this->returnValue($reminders));
+        $entity->expects(static::once())->method('getReminders')->willReturn($reminders);
+        $entity->expects(static::never())->method('getReminderData');
 
-        $entity->expects($this->never())
-            ->method('getReminderData');
-
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityClass')
-            ->will($this->returnValue($entityClass));
+        $this->doctrineHelper->expects(static::once())->method('getSingleEntityIdentifier')->willReturn($entityId);
+        $this->doctrineHelper->expects(static::once())->method('getEntityClass')->willReturn($entityClass);
 
         $this->manager->saveReminders($entity);
     }
 
     public function emptyRemindersProvider()
     {
-        $remindersPersistentCollection =
-            $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $remindersPersistentCollection->expects($this->any())
-            ->method('isEmpty')
-            ->will($this->returnValue(true));
+        $remindersPersistentCollection = $this->getMockBuilder(RemindersPersistentCollection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $remindersPersistentCollection->expects(static::any())->method('isEmpty')->willReturn(true);
 
         return [
             [$remindersPersistentCollection],
@@ -224,40 +148,27 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     public function testLoadReminders()
     {
         $entityId = 101;
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RemindableInterface $entity */
-        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        /** @var MockObject|RemindableInterface $entity */
+        $entity = $this->createMock(RemindableInterface::class);
         $entityClass = get_class($entity);
 
         $repository = $this->getReminderRepository();
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('getRepository')
             ->with('OroReminderBundle:Reminder')
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue($entityId));
+        $this->doctrineHelper->expects(static::once())->method('getSingleEntityIdentifier')->willReturn($entityId);
+        $this->doctrineHelper->expects(static::once())->method('getEntityClass')->willReturn($entityClass);
 
-        $this->doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityClass')
-            ->will($this->returnValue($entityClass));
-
-        $entity->expects($this->once())
+        $entity->expects(static::once())
             ->method('setReminders')
             ->with(
-                $this->callback(
-                    function ($reminders) use ($repository, $entityId, $entityClass) {
-                        $this->assertInstanceOf(
-                            'Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection',
-                            $reminders
-                        );
-                        $this->assertAttributeEquals($entityClass, 'className', $reminders);
-                        $this->assertAttributeEquals($entityId, 'identifier', $reminders);
-
+                static::callback(
+                    function ($reminders) {
+                        static::assertInstanceOf(RemindersPersistentCollection::class, $reminders);
                         return true;
                     }
                 )
@@ -271,8 +182,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
         $entityClassName = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
         $items           = [];
 
-        $this->entityManager->expects($this->never())
-            ->method('getRepository');
+        $this->entityManager->expects(static::never())->method('getRepository');
 
         $this->manager->applyReminders($items, $entityClassName);
     }
@@ -291,8 +201,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->entityManager->expects($this->never())
-            ->method('getRepository');
+        $this->entityManager->expects(static::never())->method('getRepository');
 
         $this->manager->applyReminders($items, $entityClassName);
     }
@@ -318,58 +227,52 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $query        = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+        $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getArrayResult'])
+            ->onlyMethods(['getArrayResult'])
             ->getMockForAbstractClass();
-        $qb           = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
         $reminderRepo = $this->getReminderRepository();
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(static::once())
             ->method('getRepository')
             ->with('OroReminderBundle:Reminder')
-            ->will($this->returnValue($reminderRepo));
-        $reminderRepo->expects($this->once())
+            ->willReturn($reminderRepo);
+        $reminderRepo->expects(static::once())
             ->method('findRemindersByEntitiesQueryBuilder')
             ->with($entityClassName, [1, 2, 3])
-            ->will($this->returnValue($qb));
-        $qb->expects($this->once())
+            ->willReturn($qb);
+        $qb->expects(static::once())
             ->method('select')
             ->with('reminder.relatedEntityId, reminder.method, reminder.intervalNumber, reminder.intervalUnit')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
-        $query->expects($this->once())
+            ->willReturnSelf();
+        $qb->expects(static::once())->method('getQuery')->willReturn($query);
+        $query->expects(static::once())
             ->method('getArrayResult')
-            ->will(
-                $this->returnValue(
+            ->willReturn(
+                [
                     [
-                        [
-                            'relatedEntityId' => 3,
-                            'method'          => 'email',
-                            'intervalNumber'  => 1,
-                            'intervalUnit'    => ReminderInterval::UNIT_HOUR
-                        ],
-                        [
-                            'relatedEntityId' => 2,
-                            'method'          => 'email',
-                            'intervalNumber'  => 15,
-                            'intervalUnit'    => ReminderInterval::UNIT_MINUTE
-                        ],
-                        [
-                            'relatedEntityId' => 2,
-                            'method'          => 'flash',
-                            'intervalNumber'  => 10,
-                            'intervalUnit'    => ReminderInterval::UNIT_MINUTE
-                        ],
-                    ]
-                )
+                        'relatedEntityId' => 3,
+                        'method'          => 'email',
+                        'intervalNumber'  => 1,
+                        'intervalUnit'    => ReminderInterval::UNIT_HOUR
+                    ],
+                    [
+                        'relatedEntityId' => 2,
+                        'method'          => 'email',
+                        'intervalNumber'  => 15,
+                        'intervalUnit'    => ReminderInterval::UNIT_MINUTE
+                    ],
+                    [
+                        'relatedEntityId' => 2,
+                        'method'          => 'flash',
+                        'intervalNumber'  => 10,
+                        'intervalUnit'    => ReminderInterval::UNIT_MINUTE
+                    ],
+                ]
             );
 
         $this->manager->applyReminders($items, $entityClassName);
-        $this->assertEquals(
+        static::assertEquals(
             [
                 [
                     'id'      => 1,
@@ -414,59 +317,47 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $reminder
+     * @param MockObject $reminder
      * @param string $entityClassName
      * @param int $entityId
      * @param ReminderDataInterface $reminderData
      */
     protected function expectReminderSync(
-        \PHPUnit\Framework\MockObject\MockObject $reminder,
+        MockObject $reminder,
         $entityClassName,
         $entityId,
         ReminderDataInterface $reminderData
     ) {
-        $reminder->expects($this->once())
-            ->method('setRelatedEntityClassName')
-            ->with($entityClassName);
-
-        $reminder->expects($this->once())
-            ->method('setRelatedEntityId')
-            ->with($entityId);
-
-        $reminder->expects($this->once())
-            ->method('setReminderData')
-            ->with($reminderData);
+        $reminder->expects(static::once())->method('setRelatedEntityClassName')->with($entityClassName);
+        $reminder->expects(static::once())->method('setRelatedEntityId')->with($entityId);
+        $reminder->expects(static::once())->method('setReminderData')->with($reminderData);
     }
 
     /**
      * @param int $id
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return MockObject
      */
     protected function createReminder($id)
     {
-        $result = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $result->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($id));
+        $result = $this->createMock(Reminder::class);
+        $result->expects(static::any())->method('getId')->willReturn($id);
 
         return $result;
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ReminderDataInterface
+     * @return MockObject|ReminderDataInterface
      */
     protected function createReminderData()
     {
-        return $this->createMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
+        return $this->createMock(ReminderDataInterface::class);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ReminderRepository
+     * @return MockObject|ReminderRepository
      */
     protected function getReminderRepository()
     {
-        return $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(ReminderRepository::class)->disableOriginalConstructor()->getMock();
     }
 }

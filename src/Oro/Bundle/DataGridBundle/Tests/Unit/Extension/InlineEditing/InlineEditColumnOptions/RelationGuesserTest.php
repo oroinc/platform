@@ -13,7 +13,7 @@ class RelationGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var RelationGuesser */
     protected $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new RelationGuesser();
     }

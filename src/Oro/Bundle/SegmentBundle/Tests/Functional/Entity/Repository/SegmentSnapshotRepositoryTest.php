@@ -20,7 +20,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentSnapshotData::class]);
@@ -241,7 +241,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
 
-        $this->assertContains(
+        static::assertStringContainsString(
             'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $repository->getIdentifiersSelectQueryBuilder($segment)->getDQL()
         );

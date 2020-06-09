@@ -22,7 +22,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->createMock(Logger::class);
 

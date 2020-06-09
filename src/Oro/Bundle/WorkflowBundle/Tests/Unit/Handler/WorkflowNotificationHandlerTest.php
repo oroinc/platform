@@ -44,7 +44,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowNotificationHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->entity = new \stdClass();

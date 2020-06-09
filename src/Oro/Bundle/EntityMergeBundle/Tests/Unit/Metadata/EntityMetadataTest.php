@@ -23,7 +23,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
      */
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = array('foo' => 'bar');
         $this->doctrineMetadata = $this->createDoctrineMetadata();
@@ -40,12 +40,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Doctrine metadata is not configured.
-     */
     public function testGetDoctrineMetadataFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Doctrine metadata is not configured.');
+
         $metadata = new EntityMetadata();
         $metadata->getDoctrineMetadata();
     }
@@ -77,12 +76,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($className, $this->metadata->getClassName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot get class name from merge entity metadata.
-     */
     public function testGetClassNameFails()
     {
+        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot get class name from merge entity metadata.');
+
         $this->doctrineMetadata->expects($this->once())
             ->method('has')
             ->with('name')

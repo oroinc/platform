@@ -47,7 +47,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->createMock(ManagerInterface::class);
         $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
@@ -316,7 +316,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getScope')
             ->will($this->returnValue($gridScope));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             $expectedPattern,
             self::callTwigFunction($this->extension, 'oro_datagrid_generate_element_id', [$grid])
         );

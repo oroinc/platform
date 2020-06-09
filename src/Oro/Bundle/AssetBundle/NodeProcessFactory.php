@@ -28,7 +28,7 @@ class NodeProcessFactory
      * @param int|float|null $timeout The timeout in seconds or null to disable
      * @return Process
      */
-    public function create(array $command, string $cwd, $timeout = 60): Process
+    public function create(array $command, string $cwd, $timeout = null): Process
     {
         if (!$this->jsEngine) {
             throw new \RuntimeException('JS engine not found');

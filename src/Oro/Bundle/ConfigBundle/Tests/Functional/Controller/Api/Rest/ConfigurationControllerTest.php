@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }

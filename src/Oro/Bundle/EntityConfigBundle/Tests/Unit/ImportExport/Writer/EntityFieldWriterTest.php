@@ -40,7 +40,7 @@ class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
      */
     private $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);

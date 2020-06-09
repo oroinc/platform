@@ -10,9 +10,6 @@ use Doctrine\Common\Collections\Criteria;
  */
 class StandaloneFilter implements FilterInterface
 {
-    /** @var string "equal to" operator */
-    public const EQ = 'eq';
-
     /** @var string */
     private $dataType;
 
@@ -36,7 +33,7 @@ class StandaloneFilter implements FilterInterface
     {
         $this->dataType = $dataType;
         $this->description = $description;
-        $this->operators = [self::EQ];
+        $this->operators = [FilterOperator::EQ];
     }
 
     /**

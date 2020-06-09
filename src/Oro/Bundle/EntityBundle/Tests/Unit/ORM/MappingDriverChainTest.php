@@ -10,7 +10,7 @@ class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
     /** @var MappingDriverChain */
     protected $chain;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chain = new MappingDriverChain();
     }

@@ -23,7 +23,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $managerMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerMock = $this->createMock(AttributeManager::class);
 
@@ -199,14 +199,15 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Field config attribute "field_name" can not be empty.
      * @dataProvider formChoicesWithFieldsWithoutFieldNameAttributeDataProvider
      *
      * @param array $fields
      */
     public function testFormChoicesWithFieldsWithoutFieldNameAttribute(array $fields)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field config attribute "field_name" can not be empty.');
+
         $this->managerMock->expects($this->atLeastOnce())
             ->method('getActiveAttributesByClass')
             ->with('')

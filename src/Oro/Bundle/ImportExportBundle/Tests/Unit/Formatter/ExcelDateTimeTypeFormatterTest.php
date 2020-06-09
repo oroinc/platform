@@ -13,7 +13,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
      */
     protected $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')

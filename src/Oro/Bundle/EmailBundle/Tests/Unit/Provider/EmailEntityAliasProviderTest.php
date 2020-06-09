@@ -14,7 +14,7 @@ class EmailEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailEntityAliasProvider */
     protected $entityAliasProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()

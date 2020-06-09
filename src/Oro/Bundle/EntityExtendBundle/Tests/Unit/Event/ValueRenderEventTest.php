@@ -22,7 +22,7 @@ class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $fieldConfigId;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldConfigId = $this->getMockBuilder(FieldConfigId::class)
             ->disableOriginalConstructor()

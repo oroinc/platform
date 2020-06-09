@@ -9,12 +9,11 @@ use Symfony\Component\ExpressionLanguage\Node;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
-     * @expectedExceptionMessage Array calls on a method call is not allowed around position 11.
-     */
     public function testParseWithInvalidName()
     {
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
+        $this->expectExceptionMessage('Array calls on a method call is not allowed around position 11.');
+
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize('foo.any(1)[3]'));
@@ -23,13 +22,13 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseOneArgumentRequiredDataProvider
      *
-     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
-     * @expectedExceptionMessage Method should have exactly one argument around position 5.
-     *
      * @param string $expression
      */
     public function testParseOneArgumentRequired($expression)
     {
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
+        $this->expectExceptionMessage('Method should have exactly one argument around position 5.');
+
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize($expression));
@@ -274,13 +273,13 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getInvalidPostfixData
-     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
      *
      * @param string $expr
      * @param array $names
      */
     public function testParseWithInvalidPostfixData($expr, array $names = [])
     {
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize($expr), $names);

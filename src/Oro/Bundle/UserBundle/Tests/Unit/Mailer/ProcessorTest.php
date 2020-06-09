@@ -24,7 +24,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private $mailProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->user = new User();
         $this->user

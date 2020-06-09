@@ -19,7 +19,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationPass = $this->createMock(
             'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'

@@ -32,7 +32,7 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
      */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->filterUtility = $this->createMock(FilterUtility::class);

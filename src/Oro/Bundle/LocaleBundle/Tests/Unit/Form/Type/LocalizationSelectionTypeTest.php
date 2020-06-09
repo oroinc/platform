@@ -33,7 +33,7 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localizationManager->expects($this->any())

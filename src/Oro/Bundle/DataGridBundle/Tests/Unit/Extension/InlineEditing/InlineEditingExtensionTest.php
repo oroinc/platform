@@ -29,7 +29,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditingExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = $this->createMock(InlineEditColumnOptionsGuesser::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
@@ -80,7 +80,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => true]]);
 
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->extension->processConfigs($config);
     }
 

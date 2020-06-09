@@ -19,7 +19,7 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ContentProviderListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->createMock(GetResponseEvent::class);
         $this->event->expects($this->any())

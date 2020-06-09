@@ -21,7 +21,7 @@ class DbalTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var DbalTranslationLoader */
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

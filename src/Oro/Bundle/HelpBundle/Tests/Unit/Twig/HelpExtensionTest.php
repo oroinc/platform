@@ -16,7 +16,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var HelpExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->linkProvider = $this->getMockBuilder(HelpLinkProvider::class)
             ->disableOriginalConstructor()

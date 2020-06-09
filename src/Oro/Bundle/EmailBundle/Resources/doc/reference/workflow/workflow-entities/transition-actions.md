@@ -26,7 +26,7 @@ Send Email Action
 
 **Configuration Example**
 ```
-- @send_email:
+- '@send_email':
     attribute: $attr
     from: 'email@address.com'
     to: 'email@address.com'
@@ -55,7 +55,7 @@ Send Email Template Action
 
 **Configuration Example**
 ```
-- @send_email_template:
+- '@send_email_template':
     attribute: $attr
     from: 'email@address.com'
     to: 'email@address.com'

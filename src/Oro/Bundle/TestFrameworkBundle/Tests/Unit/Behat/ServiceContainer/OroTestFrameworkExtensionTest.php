@@ -26,7 +26,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $sharedContexts = [OroMainContext::class];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tempDir = $this->getTempDir('behat');
         mkdir($this->tempDir . '/bundle1/Tests/Behat', 0777, true);
@@ -189,12 +189,11 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Configuration with "MyElement" key is already defined
-     */
     public function testExceptionForElementsWithSameName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Configuration with "MyElement" key is already defined');
+
         $config = [
             'oro_behat_extension' => [
                 'elements' => [

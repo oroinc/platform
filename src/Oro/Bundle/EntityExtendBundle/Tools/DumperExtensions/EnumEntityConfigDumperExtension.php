@@ -112,7 +112,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         ? ExtendHelper::buildEnumCode($enumName)
                         : ExtendHelper::generateEnumCode(
                             $fieldConfigId->getClassName(),
-                            $fieldConfigId->getFieldName()
+                            $fieldConfigId->getFieldName(),
+                            $this->nameGenerator->getMaxEnumCodeSize()
                         );
 
                     $fieldOptions['enum']['enum_code'] = $enumCode;

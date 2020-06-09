@@ -35,7 +35,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extensionSelector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectIdentityFactory =
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory')
@@ -258,11 +258,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->setPermission($sid, $oid, $mask, $granting, $strategy);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetFieldPermissionForRootOid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
@@ -427,11 +425,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->deletePermission($sid, $oid, $mask, $granting, $strategy);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDeleteFieldPermissionForRootOid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $granting = true;
@@ -568,11 +564,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->deleteAllPermissions($sid, $oid);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDeleteAllFieldPermissionsForRootOid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $oid = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $field = 'TestField';

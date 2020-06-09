@@ -190,9 +190,6 @@ oro:
         google_id:
             label:                   Google ID
             description:             The user's google ID used for the 'login using Google' functionality.
-        ldap_distinguished_names:
-            label:                   LDAP Distinguished Names
-            description:             The value of the Distinguished Name (DN) LDAP field. This field is not empty for the user only if their record has been imported from the LDAP server.
         groups:
             label:                   Groups
             description:             The groups that the user belongs to.

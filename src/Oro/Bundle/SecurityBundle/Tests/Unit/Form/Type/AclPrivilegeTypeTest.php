@@ -2,71 +2,58 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclPrivilegeType */
-    protected $formType;
-
-    protected function setUp()
-    {
-        $this->formType = new AclPrivilegeType();
-    }
-
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $builder->expects($this->at(0))->method('add')->with(
-            'identity',
-            $this->isInstanceOf('Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType'),
-            array('required' => false)
-        );
-        $options = array(
-            'privileges_config' => array(
-                'field_type' => 'grid'
-            )
-        );
-        $builder->expects($this->at(1))->method('add')->with(
-            'permissions',
-            PermissionCollectionType::class,
-            $this->contains($options)
-        );
-        $this->formType->buildForm($builder, $options);
+        /** @var FormBuilder|MockObject $builder */
+        $builder = $this->getMockBuilder(FormBuilder::class)->disableOriginalConstructor()->getMock();
+        $options = ['privileges_config' => ['field_type' => 'grid']];
+        $builder->expects(static::exactly(2))
+            ->method('add')
+            ->withConsecutive(
+                ['identity', static::isInstanceOf(AclPrivilegeIdentityType::class), ['required' => false]],
+                ['permissions', PermissionCollectionType::class, static::containsEqual($options)]
+            );
+
+        (new AclPrivilegeType())->buildForm($builder, $options);
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var OptionsResolver|MockObject $resolver */
+        $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
 
-        $resolver->expects($this->once())->method('setDefaults')
-            ->with(
-                array(
-                    'privileges_config' => array(),
-                    'data_class' => 'Oro\Bundle\SecurityBundle\Model\AclPrivilege',
-                )
-            );
-        $this->formType->configureOptions($resolver);
+        $resolver->expects(static::once())
+            ->method('setDefaults')
+            ->with(['privileges_config' => [], 'data_class' => AclPrivilege::class,]);
+
+        (new AclPrivilegeType())->configureOptions($resolver);
     }
 
     public function testBuildView()
     {
-        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $privileges_config = array("test");
-        $options = array(
-            'privileges_config' => $privileges_config
-        );
-        $this->formType->buildView($view, $form, $options);
-        $this->assertAttributeContains($privileges_config, 'vars', $view);
+        /** @var FormView|MockObject $view */
+        $view = $this->getMockBuilder(FormView::class)->disableOriginalConstructor()->getMock();
+
+        /** @var FormInterface|MockObject $form */
+        $form = $this->getMockBuilder(FormInterface::class)->disableOriginalConstructor()->getMock();
+
+        $privilegesConfig = ['test'];
+        $options = ['privileges_config' => $privilegesConfig];
+
+        (new AclPrivilegeType())->buildView($view, $form, $options);
+
+        static::assertSame($privilegesConfig, $view->vars['privileges_config']);
     }
 }

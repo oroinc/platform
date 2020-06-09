@@ -9,7 +9,7 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
@@ -32,23 +32,24 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
             ['test', false, $prefix . 'test'],
             ['test_123', false, $prefix . 'test_123'],
             ['test_5678901234567890', false, $prefix . 'test_5678901234567890'],
-            ['test_567890123456789012345', true, $prefix . '6ccda6fa_456789012345'],
-            ['acme_customer_status_f1145bcc', true, $prefix . '703594ff_f1145bcc'],
-            ['acme_synchronization_direction', true, $prefix . '8575c282_direction'],
-            ['acme_synchronization_status', true, $prefix . '2518c27d_status'],
-            ['acme_synchronization_status1234567', true, $prefix . '46e0e484_tatus1234567'],
-            ['acme_synchronization_key', true, $prefix . '54b8a71a_key'],
-            ['acme_synchronization_some_status1', true, $prefix . 'ad2cd284_some_status1'],
-            ['acme_synchronization_some_status12', true, $prefix . 'f0add5e6_status12'],
+            ['test_567890123456789012345', true, $prefix . 'test_567890123456789012345'],
+            ['acme_customer_status_f1145bcc', true, $prefix . 'acme_customer_status_f1145bcc'],
+            ['acme_synchronization_direction', true, $prefix . 'acme_synchronization_direction'],
+            ['acme_synchronization_status', true, $prefix . 'acme_synchronization_status'],
+            ['acme_synchronization_status1234567', true, $prefix . 'acme_synchronization_status1234567'],
+            ['acme_synchronization_key', true, $prefix . 'acme_synchronization_key'],
+            ['acme_synchronization_some_status1', true, $prefix . 'acme_synchronization_some_status1'],
+            ['acme_synchronization_some_status12', true, $prefix . 'acme_synchronization_some_status12'],
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The enum code length must be less or equal 21 characters. Code: test_56789012345678901
-     */
     public function testGenerateEnumTableNameWithTooLongEnumCode()
     {
-        $this->nameGenerator->generateEnumTableName('test_56789012345678901');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The enum code length must be less or equal 54 characters.'
+            . ' Code: extra_long_enum_entity_table_name_test_5678901'
+        );
+        $this->nameGenerator->generateEnumTableName('extra_long_enum_entity_table_name_test_5678901234567890');
     }
 }

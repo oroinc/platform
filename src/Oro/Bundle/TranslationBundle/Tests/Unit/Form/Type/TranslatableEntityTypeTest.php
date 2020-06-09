@@ -78,7 +78,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     /** @var MockObject */
     private $aclHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()
@@ -147,7 +147,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->classMetadata);
         unset($this->ormConfiguration);
@@ -401,12 +401,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(TranslatableEntityType::class, null, ['class' => self::TEST_CLASS]);
 
-        $this->assertArraySubset(
-            [
-                'class' => self::TEST_CLASS,
-                'choice_value' => 'testId'
-            ],
-            $form->getConfig()->getOptions()
-        );
+        $options = $form->getConfig()->getOptions();
+
+        $this->assertSame(self::TEST_CLASS, $options['class']);
+        $this->assertSame('testId', $options['choice_value']);
     }
 }

@@ -23,7 +23,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->defaultStrategy = $this->getStrategy('default');
         $this->customStrategy = $this->getStrategy('custom');

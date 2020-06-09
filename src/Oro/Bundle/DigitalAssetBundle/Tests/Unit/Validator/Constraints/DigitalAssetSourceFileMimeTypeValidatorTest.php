@@ -50,7 +50,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(ConfigManager::class);
         $this->mimeTypeChecker = $this->createMock(MimeTypeChecker::class);

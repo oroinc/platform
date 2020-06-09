@@ -20,7 +20,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
         $this->extension = new JsValidationExtension($this->constraintsProvider);

@@ -9,7 +9,7 @@ class OwnerTest extends \PHPUnit\Framework\TestCase
     /** @var Owner */
     protected $owner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->owner = new Owner();
     }

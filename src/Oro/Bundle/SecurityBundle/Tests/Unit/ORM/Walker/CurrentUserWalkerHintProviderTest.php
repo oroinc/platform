@@ -15,7 +15,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CurrentUserWalkerHintProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 

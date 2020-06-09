@@ -43,7 +43,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridParameters;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(RawConfigurationProvider::class);
         $this->filterBag = new FilterBagStub();
@@ -98,9 +98,9 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 
-        self::assertArraySubset(
-            [MetadataObject::REQUIRED_MODULES_KEY => ['orofilter/js/datafilter-builder']],
-            $metadata->toArray()
+        $this->assertSame(
+            ['orofilter/js/datafilter-builder'],
+            $metadata->toArray()[MetadataObject::REQUIRED_MODULES_KEY]
         );
     }
 
@@ -405,7 +405,10 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 
-        self::assertArraySubset($expectedMetadata, $metadata->toArray());
+        $metadataAsArray = $metadata->toArray();
+        foreach ($expectedMetadata as $key => $expectedValue) {
+            $this->assertSame($expectedValue, $metadataAsArray[$key]);
+        }
     }
 
     /**
@@ -458,12 +461,12 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
      *
      * @param array $filterMetadata
      * @param array $rawDatagridConfig
-     * @param array $expectedMetadata
+     * @param array $expectedFiltersMetadata
      */
     public function testVisitMetadataFiltersMetadataUpdated(
         array $filterMetadata,
         array $rawDatagridConfig,
-        array $expectedMetadata
+        array $expectedFiltersMetadata
     ): void {
         $datagridConfig = $this->createCommonDatagridConfig();
         $filter = $this->assertFilterInitialized();
@@ -486,9 +489,14 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
         $this->extension->setParameters($this->datagridParameters);
-        $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
+        $metadata = $this->createMetadataObject([]);
+        $this->extension->visitMetadata($datagridConfig, $metadata);
 
-        self::assertArraySubset($expectedMetadata, $metadata->toArray());
+        foreach ($metadata->toArray()['filters'] as $filterMetadata) {
+            foreach ($expectedFiltersMetadata as $key => $expectedValue) {
+                $this->assertEquals($expectedValue, $filterMetadata[$key]);
+            }
+        }
     }
 
     /**
@@ -500,14 +508,10 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             'cachedId is empty when filter is not lazy' => [
                 'filterMetadata' => ['lazy' => false],
                 'rawDatagridConfig' => [],
-                'expectedMetadata' => [
-                    'filters' => [
-                        [
-                            'lazy' => false,
-                            'label' => '',
-                            'cacheId' => null,
-                        ]
-                    ]
+                'expectedFiltersMetadata' => [
+                    'lazy' => false,
+                    'label' => '',
+                    'cacheId' => null,
                 ],
             ],
             'cachedId is not empty when filter is lazy' => [
@@ -521,13 +525,9 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
                         ],
                     ],
                 ],
-                'expectedMetadata' => [
-                    'filters' => [
-                        [
-                            'lazy' => true,
-                            'cacheId' => '49562a7117e315def0e023a9008f844c',
-                        ]
-                    ]
+                'expectedFiltersMetadata' => [
+                    'lazy' => true,
+                    'cacheId' => '49562a7117e315def0e023a9008f844c',
                 ],
             ],
             'label is translated when translatable is true' => [
@@ -537,14 +537,10 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
                     FilterUtility::TRANSLATABLE_KEY => true,
                 ],
                 'rawDatagridConfig' => [],
-                'expectedMetadata' => [
-                    'filters' => [
-                        [
-                            'lazy' => false,
-                            'label' => self::TRANSLATED_FILTER_LABEL,
-                            FilterUtility::TRANSLATABLE_KEY => true,
-                        ]
-                    ]
+                'expectedFiltersMetadata' => [
+                    'lazy' => false,
+                    'label' => self::TRANSLATED_FILTER_LABEL,
+                    FilterUtility::TRANSLATABLE_KEY => true,
                 ],
             ],
             'label is not translated when translatable is false' => [
@@ -554,14 +550,10 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
                     FilterUtility::TRANSLATABLE_KEY => false,
                 ],
                 'rawDatagridConfig' => [],
-                'expectedMetadata' => [
-                    'filters' => [
-                        [
-                            'lazy' => false,
-                            'label' => self::FILTER_LABEL,
-                            FilterUtility::TRANSLATABLE_KEY => false,
-                        ]
-                    ]
+                'expectedFiltersMetadata' => [
+                    'lazy' => false,
+                    'label' => self::FILTER_LABEL,
+                    FilterUtility::TRANSLATABLE_KEY => false,
                 ],
             ],
         ];

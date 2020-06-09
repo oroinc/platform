@@ -4,18 +4,19 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
+    /** @var MockObject|Container */
     private $container;
 
     /** @var ContainerClearer */
     private $clearer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);
 
@@ -24,17 +25,35 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPersistentServices()
     {
-        self::assertAttributeSame([], 'persistentServices', $this->clearer);
+        $service1 = new \stdClass();
+        $serviceId1 = 'foo_service';
+        $service2 = new \stdClass();
+        $serviceId2 = 'bar_service';
+        $this->container->expects(static::exactly(2))
+            ->method('initialized')
+            ->withConsecutive(
+                [$serviceId1],
+                [$serviceId2]
+            )
+            ->willReturn(true);
+        $this->container->expects(static::exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                [$serviceId1, Container::EXCEPTION_ON_INVALID_REFERENCE, $service1],
+                [$serviceId2, Container::EXCEPTION_ON_INVALID_REFERENCE, $service2],
+            ]);
 
-        $this->clearer->setPersistentServices(['foo_service']);
-        self::assertAttributeEquals(['foo_service'], 'persistentServices', $this->clearer);
+        // expectations
+        $this->container->expects(static::exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                [$serviceId1, $service1],
+                [$serviceId2, $service2]
+            );
 
-        $this->clearer->setPersistentServices(['bar_service']);
-        self::assertAttributeEquals(
-            ['foo_service', 'bar_service'],
-            'persistentServices',
-            $this->clearer
-        );
+        $this->clearer->setPersistentServices([$serviceId1]);
+        $this->clearer->setPersistentServices([$serviceId2]);
+        $this->clearer->clear($this->createMock(LoggerInterface::class));
     }
 
     public function testClearShouldWriteToLogAppropriateMessage()

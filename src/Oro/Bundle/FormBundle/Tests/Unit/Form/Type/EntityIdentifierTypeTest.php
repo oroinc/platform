@@ -5,47 +5,40 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityIdentifierTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var EntityIdentifierType
-     */
+     * @var EntityIdentifierType */
     private $type;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|MockObject */
     private $managerRegistry;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManager|MockObject */
     private $entityManager;
 
-    /**
-     * @var EntitiesToIdsTransformer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntitiesToIdsTransformer|MockObject */
     private $entitiesToIdsTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType')
-            ->setMethods(array('createEntitiesToIdsTransformer'))
-            ->setConstructorArgs(array($this->getMockManagerRegistry()))
+        $this->type = $this->getMockBuilder(EntityIdentifierType::class)
+            ->onlyMethods(['createEntitiesToIdsTransformer'])
+            ->setConstructorArgs([$this->getMockManagerRegistry()])
             ->getMock();
-        $this->type->expects($this->any())->method('createEntitiesToIdsTransformer')
-            ->will($this->returnValue($this->getMockEntitiesToIdsTransformer()));
+        $this->type->method('createEntitiesToIdsTransformer')->willReturn($this->getMockEntitiesToIdsTransformer());
         parent::setUp();
     }
 
-    /**
-     * @return array
-     */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([
@@ -54,9 +47,6 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function getTestFormType()
     {
         return $this->type;
@@ -104,97 +94,96 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      */
     public function bindDataProvider()
     {
-        $self = $this;
-        $entitiesId1234 = $this->createMockEntityList('id', array(1, 2, 3, 4));
+        $entitiesId1234 = $this->createMockEntityList('id', [1, 2, 3, 4]);
 
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 '1,2,3,4',
                 $entitiesId1234,
                 '1,2,3,4',
-                array('class' => 'TestClass'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManagerForClass', array('TestClass'), array('self', 'getMockEntityManager')),
-                    ),
-                    'entitiesToIdsTransformer' => array(
-                        array('transform', array(null), array()),
-                        array('reverseTransform', array(array(1, 2, 3, 4)), $entitiesId1234),
-                        array('transform', array($entitiesId1234), array(1, 2, 3, 4)),
-                    )
-                )
-            ),
-            'accept array' => array(
-                array(1, 2, 3, 4),
+                ['class' => 'TestClass'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManagerForClass', ['TestClass'], ['self', 'getMockEntityManager']],
+                    ],
+                    'entitiesToIdsTransformer' => [
+                        ['transform', [null], []],
+                        ['reverseTransform', [[1, 2, 3, 4]], $entitiesId1234],
+                        ['transform', [$entitiesId1234], [1, 2, 3, 4]],
+                    ]
+                ]
+            ],
+            'accept array' => [
+                [1, 2, 3, 4],
                 $entitiesId1234,
                 '1,2,3,4',
-                array('class' => 'TestClass'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManagerForClass', array('TestClass'), array('self', 'getMockEntityManager')),
-                    ),
-                    'entitiesToIdsTransformer' => array(
-                        array('transform', array(null), array()),
-                        array('reverseTransform', array(array(1, 2, 3, 4)), $entitiesId1234),
-                        array('transform', array($entitiesId1234), array(1, 2, 3, 4)),
-                    )
-                )
-            ),
-            'custom entity manager name' => array(
-                '1,2,3,4',
-                $entitiesId1234,
-                '1,2,3,4',
-                array('class' => 'TestClass', 'em' => 'custom_entity_manager'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManager', array('custom_entity_manager'), array('self', 'getMockEntityManager')),
-                    ),
-                    'entitiesToIdsTransformer' => array(
-                        array('transform', array(null), array()),
-                        array('reverseTransform', array(array(1, 2, 3, 4)), $entitiesId1234),
-                        array('transform', array($entitiesId1234), array(1, 2, 3, 4)),
-                    )
-                )
-            ),
-            'custom entity manager object' => array(
+                ['class' => 'TestClass'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManagerForClass', ['TestClass'], ['self', 'getMockEntityManager']],
+                    ],
+                    'entitiesToIdsTransformer' => [
+                        ['transform', [null], []],
+                        ['reverseTransform', [[1, 2, 3, 4]], $entitiesId1234],
+                        ['transform', [$entitiesId1234], [1, 2, 3, 4]],
+                    ]
+                ]
+            ],
+            'custom entity manager name' => [
                 '1,2,3,4',
                 $entitiesId1234,
                 '1,2,3,4',
-                array('class' => 'TestClass', 'em' => array('self', 'getMockEntityManager')),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(),
-                    'entitiesToIdsTransformer' => array(
-                        array('transform', array(null), array()),
-                        array('reverseTransform', array(array(1, 2, 3, 4)), $entitiesId1234),
-                        array('transform', array($entitiesId1234), array(1, 2, 3, 4)),
-                    )
-                )
-            ),
-            'custom query builder callback' => array(
+                ['class' => 'TestClass', 'em' => 'custom_entity_manager'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManager', ['custom_entity_manager'], ['self', 'getMockEntityManager']],
+                    ],
+                    'entitiesToIdsTransformer' => [
+                        ['transform', [null], []],
+                        ['reverseTransform', [[1, 2, 3, 4]], $entitiesId1234],
+                        ['transform', [$entitiesId1234], [1, 2, 3, 4]],
+                    ]
+                ]
+            ],
+            'custom entity manager object' => [
                 '1,2,3,4',
                 $entitiesId1234,
                 '1,2,3,4',
-                array(
+                ['class' => 'TestClass', 'em' => ['self', 'getMockEntityManager']],
+                'expectedCalls' => [
+                    'managerRegistry' => [],
+                    'entitiesToIdsTransformer' => [
+                        ['transform', [null], []],
+                        ['reverseTransform', [[1, 2, 3, 4]], $entitiesId1234],
+                        ['transform', [$entitiesId1234], [1, 2, 3, 4]],
+                    ]
+                ]
+            ],
+            'custom query builder callback' => [
+                '1,2,3,4',
+                $entitiesId1234,
+                '1,2,3,4',
+                [
                     'class' => 'TestClass',
-                    'queryBuilder' => function ($repository, array $ids) use ($self) {
+                    'queryBuilder' => function ($repository, array $ids) {
                         $result = $repository->createQueryBuilder('o');
                         $result->where('o.id IN (:values)')->setParameter('values', $ids);
 
                         return $result;
                     }
-                ),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManagerForClass', array('TestClass'), array('self', 'getMockEntityManager')),
-                    ),
-                    'entitiesToIdsTransformer' => array(
-                        array('transform', array(null), array()),
-                        array('reverseTransform', array(array(1, 2, 3, 4)), $entitiesId1234),
-                        array('transform', array($entitiesId1234), array(1, 2, 3, 4)),
-                    )
-                )
-            ),
-        );
+                ],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManagerForClass', ['TestClass'], ['self', 'getMockEntityManager']],
+                    ],
+                    'entitiesToIdsTransformer' => [
+                        ['transform', [null], []],
+                        ['reverseTransform', [[1, 2, 3, 4]], $entitiesId1234],
+                        ['transform', [$entitiesId1234], [1, 2, 3, 4]],
+                    ]
+                ]
+            ],
+        ];
     }
 
     /**
@@ -226,50 +215,50 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      */
     public function createErrorsDataProvider()
     {
-        return array(
-            'cannot resolve entity manager by class' => array(
-                array('class' => 'TestClass'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManagerForClass', array('TestClass'), null),
-                    )
-                ),
-                'expectedException' => 'Oro\Bundle\FormBundle\Form\Exception\FormException',
+        return [
+            'cannot resolve entity manager by class' => [
+                ['class' => 'TestClass'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManagerForClass', ['TestClass'], null],
+                    ]
+                ],
+                'expectedException' => FormException::class,
                 'expectedExceptionMessage'
                     => 'Class "TestClass" is not a managed Doctrine entity. Did you forget to map it?'
-            ),
-            'cannot resolve entity manager by name' => array(
-                array('class' => 'TestClass', 'em' => 'custom_entity_manager'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManager', array('custom_entity_manager'), null),
-                    )
-                ),
-                'expectedException' => 'Oro\Bundle\FormBundle\Form\Exception\FormException',
+            ],
+            'cannot resolve entity manager by name' => [
+                ['class' => 'TestClass', 'em' => 'custom_entity_manager'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManager', ['custom_entity_manager'], null],
+                    ]
+                ],
+                'expectedException' => FormException::class,
                 'expectedExceptionMessage'
                     => 'Class "TestClass" is not a managed Doctrine entity. Did you forget to map it?'
-            ),
-            'invalid em' => array(
-                array('class' => 'TestClass', 'em' => new \stdClass()),
-                'expectedCalls' => array(
-                    'managerRegistry' => array()
-                ),
-                'expectedException' => 'Oro\Bundle\FormBundle\Form\Exception\FormException',
+            ],
+            'invalid em' => [
+                ['class' => 'TestClass', 'em' => new \stdClass()],
+                'expectedCalls' => [
+                    'managerRegistry' => []
+                ],
+                'expectedException' => FormException::class,
                 'expectedExceptionMessage'
                     => 'Option "em" should be a string or entity manager object, stdClass given'
-            ),
-            'invalid queryBuilder' => array(
-                array('class' => 'TestClass', 'queryBuilder' => 'invalid'),
-                'expectedCalls' => array(
-                    'managerRegistry' => array(
-                        array('getManagerForClass', array('TestClass'), array('self', 'getMockEntityManager')),
-                    ),
-                ),
-                'expectedException' => 'Oro\Bundle\FormBundle\Form\Exception\FormException',
+            ],
+            'invalid queryBuilder' => [
+                ['class' => 'TestClass', 'queryBuilder' => 'invalid'],
+                'expectedCalls' => [
+                    'managerRegistry' => [
+                        ['getManagerForClass', ['TestClass'], ['self', 'getMockEntityManager']],
+                    ],
+                ],
+                'expectedException' => FormException::class,
                 'expectedExceptionMessage'
                     => 'Option "queryBuilder" should be a callable, string given'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -278,7 +267,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      */
     public function testCreateEntitiesToIdsTransformer($isMultiple)
     {
-        $options = array(
+        $options = [
             'em' => $this->getMockEntityManager(),
             'multiple' => $isMultiple,
             'class' => 'TestClass',
@@ -287,70 +276,140 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
                 return $repository->createQueryBuilder('o')->where('o.id IN (:values)')->setParameter('values', $ids);
             },
             'values_delimiter' => ','
-        );
-        $builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')
-            ->setMethods(array('addViewTransformer', 'addEventSubscriber'))
+        ];
+        /** @var FormBuilderInterface|MockObject $builder */
+        $builder = $this->getMockBuilder(FormBuilderInterface::class)
+            ->onlyMethods(['addViewTransformer', 'addEventSubscriber'])
             ->getMockForAbstractClass();
 
-        $builder->expects($this->at(0))
-            ->method('addViewTransformer')
-            ->with(
-                $this->callback(
-                    function ($transformer) use ($options, $isMultiple) {
-                        if ($isMultiple) {
-                            \PHPUnit\Framework\TestCase::assertInstanceOf(
-                                'Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer',
-                                $transformer
-                            );
-                        } else {
-                            \PHPUnit\Framework\TestCase::assertInstanceOf(
-                                'Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer',
-                                $transformer
-                            );
-                        }
-                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
-                            $options['em'],
-                            'em',
-                            $transformer
-                        );
-                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
-                            $options['class'],
-                            'className',
-                            $transformer
-                        );
-                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
-                            $options['property'],
-                            'property',
-                            $transformer
-                        );
-                        \PHPUnit\Framework\TestCase::assertAttributeEquals(
-                            $options['queryBuilder'],
-                            'queryBuilderCallback',
-                            $transformer
-                        );
+        $viewTransformer = $this->createMock(
+            $isMultiple ? EntitiesToIdsTransformer::class : EntityToIdTransformer::class
+        );
 
-                        return true;
-                    }
-                )
-            )
-            ->will($this->returnSelf());
+        $builder->expects(static::at(0))
+            ->method('addViewTransformer')
+            ->with($viewTransformer)
+            ->willReturnSelf();
 
         if ($isMultiple) {
-            $builder->expects($this->at(1))
+            $builder->expects(static::at(1))
                 ->method('addViewTransformer')
-                ->will($this->returnSelf());
+                ->willReturnSelf();
         }
 
-        $this->type = new EntityIdentifierType($this->getMockManagerRegistry());
+        $this->type = $this->getMockBuilder(EntityIdentifierType::class)
+            ->setConstructorArgs([$this->getMockManagerRegistry()])
+            ->onlyMethods(['createEntitiesToIdsTransformer'])
+            ->getMock();
+
+        $this->type->expects(static::once())
+            ->method('createEntitiesToIdsTransformer')
+            ->with($options)
+            ->willReturn($viewTransformer);
+
         $this->type->buildForm($builder, $options);
     }
 
     public function multipleTypeDataProvider()
     {
-        return array(
-            array(true),
-            array(false)
-        );
+        return [
+            [true],
+            [false]
+        ];
+    }
+
+    public function testCreateEntitiesToIdsTransformerMultiple()
+    {
+        $options = [
+            'multiple' => true,
+            'em' => $this->getMockEntityManager(),
+            'class' => 'TestClass',
+            'property' => 'id',
+            'queryBuilder' => function ($repository, array $ids) {
+                return $repository->createQueryBuilder('o')->where('o.id IN (:values)')->setParameter('values', $ids);
+            },
+        ];
+        $type = new class($this->getMockManagerRegistry()) extends EntityIdentifierType {
+            public function xcreateEntitiesToIdsTransformer(array $options)
+            {
+                return parent::createEntitiesToIdsTransformer($options);
+            }
+        };
+        $transformer = $type->xcreateEntitiesToIdsTransformer($options);
+        static::assertInstanceOf(EntitiesToIdsTransformer::class, $transformer);
+        $accessor = new class($this->getMockEntityManager(), 'anything', 'anything') extends EntitiesToIdsTransformer {
+            public function getEm(EntitiesToIdsTransformer $transformer): EntityManager
+            {
+                return $transformer->em;
+            }
+
+            public function getClassName(EntitiesToIdsTransformer $transformer): string
+            {
+                return $transformer->className;
+            }
+
+            public function getProperty(EntitiesToIdsTransformer $transformer): string
+            {
+                return $transformer->property;
+            }
+
+            public function getQueryBuilderCallback(EntitiesToIdsTransformer $transformer): callable
+            {
+                return $transformer->queryBuilderCallback;
+            }
+        };
+        static::assertSame($options['em'], $accessor->getEm($transformer));
+        static::assertSame($options['class'], $accessor->getClassName($transformer));
+        static::assertSame($options['property'], $accessor->getProperty($transformer));
+        static::assertSame($options['queryBuilder'], $accessor->getQueryBuilderCallback($transformer));
+    }
+
+    public function testCreateEntitiesToIdsTransformerNotMultiple()
+    {
+        $options = [
+            'multiple' => false,
+            'em' => $this->getMockEntityManager(),
+            'class' => 'TestClass',
+            'property' => 'id',
+            'queryBuilder' => function ($repository, array $ids) {
+                return $repository->createQueryBuilder('o')->where('o.id IN (:values)')->setParameter('values', $ids);
+            },
+        ];
+        $type = new class($this->getMockManagerRegistry()) extends EntityIdentifierType {
+            public function xcreateEntitiesToIdsTransformer(array $options)
+            {
+                return parent::createEntitiesToIdsTransformer($options);
+            }
+        };
+        $transformer = $type->xcreateEntitiesToIdsTransformer($options);
+        static::assertInstanceOf(EntityToIdTransformer::class, $transformer);
+        static::assertNotInstanceOf(EntitiesToIdsTransformer::class, $transformer);
+
+        $accessor = new class($this->getMockEntityManager(), 'anything', 'anything') extends EntityToIdTransformer {
+            public function getEm(EntityToIdTransformer $transformer): EntityManager
+            {
+                return $transformer->em;
+            }
+
+            public function getClassName(EntityToIdTransformer $transformer): string
+            {
+                return $transformer->className;
+            }
+
+            public function getProperty(EntityToIdTransformer $transformer): string
+            {
+                return $transformer->property;
+            }
+
+            public function getQueryBuilderCallback(EntityToIdTransformer $transformer): callable
+            {
+                return $transformer->queryBuilderCallback;
+            }
+        };
+        static::assertSame($options['em'], $accessor->getEm($transformer));
+        static::assertSame($options['class'], $accessor->getClassName($transformer));
+        static::assertSame($options['property'], $accessor->getProperty($transformer));
+        static::assertSame($options['queryBuilder'], $accessor->getQueryBuilderCallback($transformer));
     }
 
     /**
@@ -358,11 +417,11 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      *
      * @param string $property
      * @param array $values
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
+     * @return MockObject[]
      */
     private function createMockEntityList($property, array $values)
     {
-        $result = array();
+        $result = [];
         foreach ($values as $value) {
             $result[] = $this->createMockEntity($property, $value);
         }
@@ -375,19 +434,19 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
      *
      * @param string $property
      * @param mixed $value
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return MockObject
      */
     private function createMockEntity($property, $value)
     {
         $getter = 'get' . ucfirst($property);
-        $result = $this->createPartialMock(\stdClass::class, array($getter));
-        $result->expects($this->any())->method($getter)->will($this->returnValue($value));
+        $result = $this->createPartialMock(\stdClass::class, [$getter]);
+        $result->method($getter)->willReturn($value);
 
         return $result;
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|string $mock
+     * @param MockObject|string $mock
      * @param array $expectedCalls
      */
     private function addMockExpectedCalls($mock, array $expectedCalls)
@@ -405,36 +464,36 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
                     $result = call_user_func($result);
                 }
 
-                $methodExpectation = $mock->expects($this->at($index++))->method($method);
-                $methodExpectation = call_user_func_array(array($methodExpectation, 'with'), $arguments);
-                $methodExpectation->will($this->returnValue($result));
+                $methodExpectation = $mock->expects(static::at($index++))->method($method);
+                $methodExpectation = call_user_func_array([$methodExpectation, 'with'], $arguments);
+                $methodExpectation->willReturn($result);
             }
         } else {
-            $mock->expects($this->never())->method($this->anything());
+            $mock->expects(static::never())->method(static::anything());
         }
     }
 
     /**
-     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
+     * @return ManagerRegistry|MockObject
      */
     protected function getMockManagerRegistry()
     {
         if (!$this->managerRegistry) {
-            $this->managerRegistry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
+            $this->managerRegistry = $this->getMockForAbstractClass(ManagerRegistry::class);
         }
 
         return $this->managerRegistry;
     }
 
     /**
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     * @return EntityManager|MockObject
      */
     protected function getMockEntityManager()
     {
         if (!$this->entityManager) {
-            $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            $this->entityManager = $this->getMockBuilder(EntityManager::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('getClassMetadata', 'getRepository'))
+                ->onlyMethods(['getClassMetadata', 'getRepository'])
                 ->getMockForAbstractClass();
         }
 
@@ -442,15 +501,15 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return EntitiesToIdsTransformer|\PHPUnit\Framework\MockObject\MockObject
+     * @return EntitiesToIdsTransformer|MockObject
      */
     protected function getMockEntitiesToIdsTransformer()
     {
         if (!$this->entitiesToIdsTransformer) {
             $this->entitiesToIdsTransformer =
-                $this->getMockBuilder('Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer')
+                $this->getMockBuilder(EntitiesToIdsTransformer::class)
                     ->disableOriginalConstructor()
-                    ->setMethods(array('transform', 'reverseTransform'))
+                    ->onlyMethods(['transform', 'reverseTransform'])
                     ->getMockForAbstractClass();
         }
 

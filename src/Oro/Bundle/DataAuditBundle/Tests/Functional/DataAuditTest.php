@@ -31,7 +31,7 @@ class DataAuditTest extends WebTestCase
 {
     use MessageQueueAssertTrait, AuditChangedEntitiesExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $token = new UsernamePasswordOrganizationToken(
@@ -150,7 +150,7 @@ class DataAuditTest extends WebTestCase
         $this->assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertInternalType('resource', $owner->getBinaryProperty());
+        $this->assertIsResource($owner->getBinaryProperty());
     }
 
     public function testBlob()
@@ -170,7 +170,7 @@ class DataAuditTest extends WebTestCase
         $this->assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertInternalType('resource', $owner->getBlobProperty());
+        $this->assertIsResource($owner->getBlobProperty());
     }
 
     public function testBoolean()
@@ -2118,7 +2118,7 @@ class DataAuditTest extends WebTestCase
             $this->assertNotEmpty($expect);
 
             foreach ((array)$expect as $contains) {
-                $this->assertContains($contains, $audit['data']);
+                static::assertStringContainsString($contains, $audit['data']);
             }
         }
         $this->assertEquals([], $expects);

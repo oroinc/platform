@@ -16,7 +16,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
 
@@ -56,6 +56,18 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         $this->messageCollector->clear();
 
         self::assertEquals([], $this->messageCollector->getSentMessages());
+    }
+
+    public function testShouldAllowClearCollectedTopicMessages()
+    {
+        $this->messageCollector->send('test topic 1', 'test message 1');
+        $this->messageCollector->send('test topic 2', 'test message 2');
+        $this->messageCollector->clearTopicMessages('test topic 1');
+
+        self::assertEquals(
+            [['topic' => 'test topic 2', 'message' => 'test message 2']],
+            $this->messageCollector->getSentMessages()
+        );
     }
 
     public function testShouldNotCatchExceptionFromInternalMessageProducer()

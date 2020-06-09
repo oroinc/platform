@@ -20,7 +20,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowDeactivationHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);

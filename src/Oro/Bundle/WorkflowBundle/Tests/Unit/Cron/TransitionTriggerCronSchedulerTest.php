@@ -21,7 +21,7 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
      */
     private $deferredScheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deferredScheduler = $this->getMockBuilder(DeferredScheduler::class)
             ->disableOriginalConstructor()

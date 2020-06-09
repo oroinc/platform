@@ -11,6 +11,7 @@ use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -19,32 +20,27 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
     /* @var AbstractGuesser */
     protected $guesser;
 
-    /* @var \PHPUnit\Framework\MockObject\MockObject|FormRegistry */
+    /* @var MockObject|FormRegistry */
     protected $formRegistry;
 
-    /* @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /* @var MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    /* @var MockObject|ConfigProvider */
     protected $entityConfigProvider;
 
-    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    /* @var MockObject|ConfigProvider */
     protected $formConfigProvider;
 
-    /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /* @var DoctrineTypeMappingProvider|MockObject */
     protected $doctrineTypeMappingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formRegistry = $this->createMock(FormRegistry::class);
-
-        $this->managerRegistry
-            = $this->getMockForAbstractClass(ManagerRegistry::class);
-
+        $this->managerRegistry = $this->getMockForAbstractClass(ManagerRegistry::class);
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
-
         $this->formConfigProvider = $this->createMock(ConfigProvider::class);
-
         $this->doctrineTypeMappingProvider = $this->createMock(DoctrineTypeMappingProvider::class);
 
         $this->guesser = $this->getMockBuilder(AbstractGuesser::class)
@@ -59,12 +55,11 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->setDoctrineTypeMappingProvider($this->doctrineTypeMappingProvider);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\AttributeException
-     * @expectedExceptionMessage Can't get entity manager for class RootClass
-     */
     public function testGuessMetadataAndFieldNoEntityManagerException()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\AttributeException::class);
+        $this->expectExceptionMessage("Can't get entity manager for class RootClass");
+
         $rootClass = 'RootClass';
 
         $this->managerRegistry->expects($this->once())
@@ -80,10 +75,29 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $doctrineType = 'date';
         $attributeType = 'object';
         $attributeOptions = ['class' => 'DateTime'];
-        $expectedMapping = [$doctrineType => ['type' => $attributeType, 'options' => $attributeOptions]];
 
+        $this->guesser->setDoctrineTypeMappingProvider(null);
         $this->guesser->addDoctrineTypeMapping($doctrineType, $attributeType, $attributeOptions);
-        $this->assertAttributeEquals($expectedMapping, 'doctrineTypeMapping', $this->guesser);
+
+        $propertyPath = 'entity.field';
+        $rootClass = 'RootClass';
+        $fieldLabel = 'Field Label';
+
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects(static::any())->method('getName')->willReturn($rootClass);
+        $metadata->expects(static::any())->method('hasAssociation')->with('field')->willReturn(false);
+        $metadata->expects(static::any())->method('hasField')->with('field')->willReturn(true);
+        $metadata->expects(static::any())->method('getTypeOfField')->with('field')->willReturn('date');
+
+        $this->setEntityMetadata([$rootClass => $metadata]);
+        $this->setEntityConfigProvider($rootClass, 'field', false, true, $fieldLabel);
+
+        $this->assertAttributeOptions(
+            $this->guesser->guessParameters($rootClass, $propertyPath),
+            $fieldLabel,
+            'object',
+            ['class' => 'DateTime']
+        );
     }
 
     public function testGuessMetadataAndFieldOneElement()
@@ -321,7 +335,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
     protected function assertAttributeOptions($actualOptions, $label, $type, array $options = [])
     {
         $this->assertNotNull($actualOptions);
-        $this->assertInternalType('array', $actualOptions);
+        $this->assertIsArray($actualOptions);
         $this->assertArrayHasKey('label', $actualOptions);
         $this->assertArrayHasKey('type', $actualOptions);
         $this->assertArrayHasKey('options', $actualOptions);

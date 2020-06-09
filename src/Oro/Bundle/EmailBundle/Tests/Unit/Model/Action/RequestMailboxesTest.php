@@ -27,7 +27,7 @@ class RequestMailboxesTest extends \PHPUnit\Framework\TestCase
     /** @var MailboxRepository */
     protected $repository;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 

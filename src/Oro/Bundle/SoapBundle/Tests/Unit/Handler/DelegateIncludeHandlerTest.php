@@ -16,13 +16,13 @@ class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var DelegateIncludeHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new Container();
         $this->handler   = new DelegateIncludeHandler($this->container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->handler, $this->container);
     }

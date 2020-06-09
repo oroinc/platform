@@ -18,13 +18,13 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
     /** @var FormUtils */
     protected $utils;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->typesRegistry = new TypesRegistry();
         $this->utils         = new FormUtils($this->typesRegistry);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->utils, $this->typesRegistry);
     }

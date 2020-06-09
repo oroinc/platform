@@ -25,7 +25,7 @@ class FeatureStatisticSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureStatisticSubscriber */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->statisticManager = $this->createMock(FeatureStatisticManager::class);
         $this->output = $this->createMock(OutputInterface::class);

@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Form;
 
 class ControllersGroupTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -36,7 +36,7 @@ class ControllersGroupTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Group saved", $crawler->html());
+        static::assertStringContainsString("Group saved", $crawler->html());
     }
 
     public function testUpdate()
@@ -65,7 +65,7 @@ class ControllersGroupTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Group saved", $crawler->html());
+        static::assertStringContainsString("Group saved", $crawler->html());
     }
 
     public function testGridData()

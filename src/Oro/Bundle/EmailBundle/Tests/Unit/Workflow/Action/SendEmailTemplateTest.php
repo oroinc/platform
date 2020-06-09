@@ -15,6 +15,7 @@ use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -24,25 +25,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextAccessor|MockObject */
     private $contextAccessor;
 
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Processor|MockObject */
     private $emailProcessor;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameResolver|MockObject */
     private $entityNameResolver;
 
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ValidatorInterface|MockObject */
     private $validator;
 
-    /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AggregatedEmailTemplatesSender|MockObject */
     private $sender;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcher|MockObject */
     protected $dispatcher;
 
     /** @var SendEmailTemplate */
@@ -51,7 +52,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
-        $this->contextAccessor->expects($this->any())
+        $this->contextAccessor->expects(static::any())
             ->method('getValue')
             ->willReturnArgument(1);
 
@@ -63,14 +64,19 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->action = new SendEmailTemplate(
+        $this->action = new class(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
             $this->entityNameResolver,
             $this->validator,
             $this->sender
-        );
+        ) extends SendEmailTemplate {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         $this->action->setLogger($this->logger);
         $this->action->setDispatcher($this->dispatcher);
@@ -165,8 +171,8 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize($options, $expected): void
     {
-        $this->assertSame($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($expected, 'options', $this->action);
+        static::assertSame($this->action, $this->action->initialize($options));
+        static::assertEquals($expected, $this->action->xgetOptions());
     }
 
     /**
@@ -296,29 +302,16 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     {
         $violationList = $this->createMock(ConstraintViolationListInterface::class);
         $violation = $this->createMock(ConstraintViolationInterface::class);
-        $violation->expects($this->once())
-            ->method('getMessage')
-            ->willReturn($violationMessage);
-        $violationList->expects($this->once())
-            ->method('get')
-            ->willReturn($violation);
-
-        $violationList->expects($this->once())
-            ->method('count')
-            ->willReturn(1);
-
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->willReturn($violationList);
+        $violation->expects(static::once())->method('getMessage')->willReturn($violationMessage);
+        $violationList->expects(static::once())->method('get')->willReturn($violation);
+        $violationList->expects(static::once())->method('count')->willReturn(1);
+        $this->validator->expects(static::once())->method('validate')->willReturn($violationList);
     }
 
     public function testExecuteWithInvalidEmail(): void
     {
-        $this->sender->expects($this->never())
-            ->method($this->anything());
-
-        $this->emailProcessor->expects($this->never())
-            ->method($this->anything());
+        $this->sender->expects(static::never())->method(static::anything());
+        $this->emailProcessor->expects(static::never())->method(static::anything());
 
         $this->action->initialize(
             [
@@ -350,7 +343,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     {
         $context = [];
 
-        $this->entityNameResolver->expects($this->any())
+        $this->entityNameResolver->expects(static::any())
             ->method('getName')
             ->willReturnCallback(
                 static function () {
@@ -365,17 +358,15 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $emailEntity = $this->createMock(Email::class);
 
         $emailUserEntity = $this->createMock(EmailUser::class);
-        $emailUserEntity->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($emailEntity);
+        $emailUserEntity->method('getEmail')->willReturn($emailEntity);
 
-        $this->sender->expects($this->once())
+        $this->sender->expects(static::once())
             ->method('send')
             ->with(new \stdClass(), [$recipient], $expected['from'], 'test')
             ->willReturn([$emailUserEntity]);
 
         if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
+            $this->contextAccessor->expects(static::once())
                 ->method('setValue')
                 ->with($context, $options['attribute'], $emailEntity);
         }
@@ -392,9 +383,7 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     public function executeOptionsDataProvider(): array
     {
         $nameMock = $this->createMock(FirstNameInterface::class);
-        $nameMock->expects($this->any())
-            ->method('getFirstName')
-            ->willReturn('NAME');
+        $nameMock->method('getFirstName')->willReturn('NAME');
         $recipient = new EmailHolderStub('recipient@test.com');
 
         return [

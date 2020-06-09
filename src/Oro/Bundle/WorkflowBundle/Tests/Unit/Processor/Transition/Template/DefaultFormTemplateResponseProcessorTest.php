@@ -18,7 +18,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
     /** @var DefaultFormTemplateResponseProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);
 

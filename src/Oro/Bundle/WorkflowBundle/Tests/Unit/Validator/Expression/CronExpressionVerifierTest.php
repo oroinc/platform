@@ -10,12 +10,12 @@ class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var CronExpressionVerifier */
     protected $verifier;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new CronExpressionVerifier();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->verifier);
     }

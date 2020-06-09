@@ -37,7 +37,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     /** @var InitializeSubresources */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
@@ -1180,14 +1180,15 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The acceptable target class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account" should be "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" or its subclass.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessForAssociationWithInheritanceAsTargetClassAndInvalidAcceptableTargetClass()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The acceptable target class "%s" should be "%s" or its subclass.',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account::class,
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::class
+        ));
+
         $resource = new ApiResource('Test\Class');
 
         $resourceConfig = new Config();

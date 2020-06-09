@@ -11,7 +11,7 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $abstract;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->abstract = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Persistence\AbstractAclManager')
             ->getMockForAbstractClass();
@@ -58,13 +58,13 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
             $this->abstract->getSid($src)
         );
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->abstract->getSid(new \stdClass());
     }
 
     public function testNoBaseAclManager()
     {
-        $this->expectException('Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException');
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException::class);
         $this->abstract->getSid('ROLE_TEST');
     }
 }

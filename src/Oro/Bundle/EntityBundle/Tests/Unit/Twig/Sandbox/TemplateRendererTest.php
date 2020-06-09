@@ -49,18 +49,15 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateRenderer */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->environment = $this->getMockBuilder(Environment::class)
-            ->setMethods(['createTemplate'])
+            ->onlyMethods(['createTemplate'])
             ->setConstructorArgs([new ArrayLoader(), ['strict_variables' => true]])
             ->getMock();
         $this->securityPolicy = $this->getMockBuilder(SecurityPolicyInterface::class)
-            ->setMethodsExcept()
-            ->setMethods([
-                'setAllowedProperties', 'setAllowedMethods', 'checkMethodAllowed',
-                'checkPropertyAllowed', 'checkSecurity'
-            ])
+            ->onlyMethods(['checkMethodAllowed', 'checkPropertyAllowed', 'checkSecurity'])
+            ->addMethods(['setAllowedProperties', 'setAllowedMethods'])
             ->getMock();
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
         $this->variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);

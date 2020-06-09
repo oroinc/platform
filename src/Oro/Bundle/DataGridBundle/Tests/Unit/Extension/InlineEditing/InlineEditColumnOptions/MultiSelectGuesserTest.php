@@ -24,7 +24,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var MultiSelectGuesser */
     protected $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->choiceHelper = $this
             ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper')

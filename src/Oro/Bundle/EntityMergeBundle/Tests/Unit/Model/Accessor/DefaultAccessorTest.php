@@ -13,7 +13,7 @@ class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $accessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->accessor = new DefaultAccessor();
     }

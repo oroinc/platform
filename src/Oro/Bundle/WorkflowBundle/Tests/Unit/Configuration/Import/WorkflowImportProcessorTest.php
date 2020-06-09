@@ -25,7 +25,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowImportProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
         $this->finderBuilder = $this->createMock(WorkflowConfigFinderBuilder::class);

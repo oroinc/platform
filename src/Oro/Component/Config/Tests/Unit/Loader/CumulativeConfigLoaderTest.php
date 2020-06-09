@@ -35,48 +35,45 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $name must not be empty.
-     */
     public function testConstructorWithEmptyName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$name must not be empty.');
+
         new CumulativeConfigLoader('', null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $resourceLoader must not be empty.
-     */
     public function testConstructorWithNullResourceLoader()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$resourceLoader must not be empty.');
+
         new CumulativeConfigLoader('test', null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $resourceLoader must not be empty.
-     */
     public function testConstructorWithEmptyResourceLoader()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$resourceLoader must not be empty.');
+
         new CumulativeConfigLoader('test', []);
     }
 
     public function testConstructorWithOneResourceLoader()
     {
-        $resourceLoader = $this->createMock(CumulativeResourceLoader::class);
+        $this->expectNotToPerformAssertions();
 
-        $loader = new CumulativeConfigLoader('test', $resourceLoader);
-        $this->assertAttributeCount(1, 'resourceLoaders', $loader);
+        new CumulativeConfigLoader('test', $this->createMock(CumulativeResourceLoader::class));
     }
 
     public function testConstructorWithSeveralResourceLoader()
     {
-        $resourceLoader1 = $this->createMock(CumulativeResourceLoader::class);
-        $resourceLoader2 = $this->createMock(CumulativeResourceLoader::class);
+        $this->expectNotToPerformAssertions();
 
-        $loader = new CumulativeConfigLoader('test', [$resourceLoader1, $resourceLoader2]);
-        $this->assertAttributeCount(2, 'resourceLoaders', $loader);
+        new CumulativeConfigLoader('test', [
+            $this->createMock(CumulativeResourceLoader::class),
+            $this->createMock(CumulativeResourceLoader::class)
+        ]);
     }
 
     public function testRegisterResources()
@@ -337,12 +334,11 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($resource->data['test'], 'success');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Circular import detected
-     */
     public function testYamlCumulativeFileLoaderImportsInfiniteLoop()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Circular import detected');
+
         $bundle1 = new TestBundle1();
         $bundleClass = get_class($bundle1);
         $bundleDir = $this->getBundleDir($bundle1);

@@ -25,7 +25,7 @@ class OrmTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var OrmTranslationLoader */
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(TranslationRepository::class)
             ->disableOriginalConstructor()

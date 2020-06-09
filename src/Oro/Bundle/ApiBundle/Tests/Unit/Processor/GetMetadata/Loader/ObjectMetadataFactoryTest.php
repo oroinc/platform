@@ -18,7 +18,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     /** @var ObjectMetadataFactory */
     private $objectMetadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->associationManager = $this->createMock(AssociationManager::class);
 

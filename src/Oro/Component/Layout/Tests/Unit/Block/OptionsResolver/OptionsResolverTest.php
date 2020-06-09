@@ -12,7 +12,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
      */
     protected $optionResolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionResolver = new OptionsResolver();
     }
@@ -85,12 +85,11 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->optionResolver->resolve([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @expectedExceptionMessage Setting options via array access is not supported. Use setDefault() instead.
-     */
     public function testOffsetSet()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\AccessException::class);
+        $this->expectExceptionMessage('Setting options via array access is not supported. Use setDefault() instead.');
+
         $this->optionResolver->setDefault('default_option', 'default_value');
 
         $this->optionResolver->setDefault(

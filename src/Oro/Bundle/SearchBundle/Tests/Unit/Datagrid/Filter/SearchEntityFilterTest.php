@@ -32,7 +32,7 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchEntityFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
@@ -46,12 +46,11 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new SearchEntityFilter($this->formFactory, $this->filterUtility, $this->doctrineHelper);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testApplyExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid filter datasource adapter provided');
+
         /** @var FilterDatasourceAdapterInterface $datasource */
         $datasource = $this->createMock(FilterDatasourceAdapterInterface::class);
 

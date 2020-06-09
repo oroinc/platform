@@ -31,7 +31,13 @@ class ChoiceTreeInput extends Element
 
         foreach ($values as $value) {
             $this->type($value);
-            $searchResults = $this->getSearchResults();
+            $searchResults = array_filter(
+                $this->getSearchResults(),
+                static function ($element) {
+                    return !empty(trim($element->getText()));
+                }
+            );
+
             self::assertCount(
                 1,
                 $searchResults,
@@ -62,14 +68,14 @@ class ChoiceTreeInput extends Element
 
         if ($isShouldSee === true) {
             foreach ($searchResults as $searchResult) {
-                self::assertContains(
+                static::assertStringContainsString(
                     $value,
                     $searchResult->getText()
                 );
             }
         } else {
             foreach ($searchResults as $searchResult) {
-                self::assertNotContains(
+                static::assertStringNotContainsString(
                     $value,
                     $searchResult->getText()
                 );

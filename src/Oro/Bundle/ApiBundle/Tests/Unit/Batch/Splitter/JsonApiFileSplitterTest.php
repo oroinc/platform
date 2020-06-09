@@ -460,14 +460,14 @@ JSON;
         $this->assertChunkContent($result[3], $resultFileContents[3]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException
-     * @expectedExceptionMessage Failed to split the file "tmpFileName". Reason: Parsing error in [0:0]. The object with the key "jsonapi" should be the first object in the document.
-     */
-    // @codingStandardsIgnoreEnd
     public function testSplitToSeveralChunksWhenHeaderSectionIsNotFirstSectionInDocument()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException::class);
+        $this->expectExceptionMessage(
+            'Failed to split the file "tmpFileName". Reason: Parsing error in [0:0].'
+            . ' The object with the key "jsonapi" should be the first object in the document.'
+        );
+
         $inputJson = <<<JSON
 {"data":[
     {"type": "acme", "id": "1", "attributes": {"firstName": "FirstName 1"}},

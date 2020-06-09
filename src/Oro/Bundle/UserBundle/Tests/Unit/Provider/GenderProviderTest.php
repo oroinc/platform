@@ -20,7 +20,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         'oro.user.gender.female.translated' => Gender::FEMALE,
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -39,7 +39,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->genderProvider = new GenderProvider($translator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->genderProvider);
     }
@@ -57,12 +57,11 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLabel, $this->genderProvider->getLabelByName(Gender::MALE));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown gender with name "alien"
-     */
     public function testGetLabelByNameUnknownGender()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown gender with name "alien"');
+
         $this->genderProvider->getLabelByName('alien');
     }
 }

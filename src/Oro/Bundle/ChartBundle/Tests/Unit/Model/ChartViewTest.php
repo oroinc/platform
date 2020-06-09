@@ -30,7 +30,7 @@ class ChartViewTest extends \PHPUnit\Framework\TestCase
      */
     protected $chartView;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);
         $this->data = $this->createMock(DataInterface::class);

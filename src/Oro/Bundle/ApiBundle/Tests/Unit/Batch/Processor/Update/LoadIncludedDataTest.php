@@ -21,7 +21,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
     /** @var LoadIncludedData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

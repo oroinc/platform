@@ -17,7 +17,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessor */
     private $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 

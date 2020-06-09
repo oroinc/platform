@@ -35,21 +35,21 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRoutes, $config->routes);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     * @expectedExceptionMessage Annotation "Config" give invalid parameter "mode" : "some mode"
-     */
     public function testIncorrectMode()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\AnnotationException::class);
+        $this->expectExceptionMessage('Annotation "Config" give invalid parameter "mode" : "some mode"');
+
         new Config(['mode' => 'some mode']);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     * @expectedExceptionMessage Annotation "Config" parameter "defaultValues" expect "array" but "string" given
-     */
     public function testIncorrectDefaultValues()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\AnnotationException::class);
+        $this->expectExceptionMessage(
+            'Annotation "Config" parameter "defaultValues" expect "array" but "string" given'
+        );
+
         new Config(['defaultValues' => 'some string']);
     }
 

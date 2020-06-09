@@ -3,3 +3,6 @@
 $link-color: get-color('ui', 'normal') !default;
 $link-color-current: get-color('ui', 'focus') !default;
 $link-color-hover: get-color('ui', 'focus') !default;
+
+$link-link-normal-text-decoration: none !default;
+$link-link-hover-text-decoration: underline !default;

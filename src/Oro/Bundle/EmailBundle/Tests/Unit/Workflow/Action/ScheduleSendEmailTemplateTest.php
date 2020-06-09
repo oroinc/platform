@@ -16,6 +16,7 @@ use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -25,31 +26,31 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextAccessor|MockObject */
     private $contextAccessor;
 
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Processor|MockObject */
     private $emailProcessor;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameResolver|MockObject */
     private $entityNameResolver;
 
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ValidatorInterface|MockObject */
     private $validator;
 
-    /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AggregatedEmailTemplatesSender|MockObject */
     private $sender;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var MessageProducerInterface|MockObject */
     private $messageProducer;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcher|MockObject */
     protected $dispatcher;
 
     /** @var ScheduleSendEmailTemplate */
@@ -58,9 +59,7 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
-        $this->contextAccessor->expects($this->any())
-            ->method('getValue')
-            ->willReturnArgument(1);
+        $this->contextAccessor->method('getValue')->willReturnArgument(1);
 
         $this->emailProcessor = $this->createMock(Processor::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
@@ -72,7 +71,7 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->action = new ScheduleSendEmailTemplate(
+        $this->action = new class(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
@@ -81,7 +80,12 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             $this->sender,
             $this->doctrineHelper,
             $this->messageProducer
-        );
+        ) extends ScheduleSendEmailTemplate {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         $this->action->setLogger($this->logger);
         $this->action->setDispatcher($this->dispatcher);
@@ -168,8 +172,8 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize($options, $expected): void
     {
-        $this->assertSame($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($expected, 'options', $this->action);
+        static::assertSame($this->action, $this->action->initialize($options));
+        static::assertEquals($expected, $this->action->xgetOptions());
     }
 
     /**

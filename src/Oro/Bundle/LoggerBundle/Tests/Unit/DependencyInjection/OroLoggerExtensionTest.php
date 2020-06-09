@@ -13,7 +13,7 @@ class OroLoggerExtensionTest extends ExtensionTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new OroLoggerExtension();
     }

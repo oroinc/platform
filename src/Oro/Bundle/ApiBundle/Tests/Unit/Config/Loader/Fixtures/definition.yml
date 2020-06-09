@@ -89,6 +89,17 @@ enable_meta_properties:
         disable_meta_properties: false
     expected: []
 
+disable_partial_load:
+    config:
+        disable_partial_load: true
+    expected:
+        disable_partial_load: true
+
+enable_partial_load:
+    config:
+        disable_partial_load: false
+    expected: []
+
 empty_identifier_field_names:
     config:
         identifier_field_names: []
@@ -114,6 +125,11 @@ unlimited_max_results:
 empty_hints:
     config:
         hints: []
+    expected: []
+
+empty_inner_join_associations:
+    config:
+        inner_join_associations: []
     expected: []
 
 empty_post_serialize:
@@ -163,6 +179,9 @@ all_attributes:
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
         post_serialize: [class, method]
         post_serialize_collection: [class_collection, method_collection]
         description: description1
@@ -180,6 +199,9 @@ all_attributes:
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
         post_serialize: [class, method]
         post_serialize_collection: [class_collection, method_collection]
         description: description1

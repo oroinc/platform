@@ -18,7 +18,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $logger = $this->createMock(LoggerInterface::class);

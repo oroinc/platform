@@ -116,8 +116,6 @@ class TestOrder implements TestFrameworkEntityInterface
         if ($this->lineItems->contains($lineItem)) {
             $this->lineItems->removeElement($lineItem);
         }
-
-        return $this;
     }
 
     /**

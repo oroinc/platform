@@ -32,7 +32,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /** @var \stdClass */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

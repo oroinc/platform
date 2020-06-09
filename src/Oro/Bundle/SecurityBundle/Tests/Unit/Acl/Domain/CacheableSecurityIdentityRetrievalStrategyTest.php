@@ -15,7 +15,7 @@ class CacheableSecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\
     /** @var CacheableSecurityIdentityRetrievalStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerStrategy = $this->createMock(SecurityIdentityRetrievalStrategyInterface::class);
 

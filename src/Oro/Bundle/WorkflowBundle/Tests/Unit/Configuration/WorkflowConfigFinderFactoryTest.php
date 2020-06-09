@@ -14,7 +14,7 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowConfigFinderBuilder */
     private $workflowConfigFinderBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject $finderFactory */
         $this->finderFactory = $this->createMock(ConfigFinderFactory::class);

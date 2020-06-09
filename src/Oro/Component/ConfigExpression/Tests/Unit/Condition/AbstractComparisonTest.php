@@ -4,23 +4,41 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
+use Oro\Component\ConfigExpression\ContextAccessorInterface;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractComparison|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractComparison|MockObject */
     protected $condition;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|ContextAccessorInterface */
     protected $contextAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
-        $this->condition       = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\AbstractComparison')
-            ->getMockForAbstractClass();
+        $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
+        $this->condition = new class() extends AbstractComparison {
+            public function xgetLeft()
+            {
+                return $this->left;
+            }
+
+            public function xgetRight()
+            {
+                return $this->right;
+            }
+
+            protected function doCompare($left, $right)
+            {
+            }
+
+            public function getName()
+            {
+            }
+        };
         $this->condition->setContextAccessor($this->contextAccessor);
     }
 
@@ -32,7 +50,11 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
      */
     public function testEvaluate(array $options, array $context, $expectedValue)
     {
-        $this->assertSame($this->condition, $this->condition->initialize($options));
+        /** @var AbstractComparison|MockObject $condition */
+        $condition = $this->getMockBuilder(AbstractComparison::class)->getMockForAbstractClass();
+        $condition->setContextAccessor($this->contextAccessor);
+
+        $condition->initialize($options);
 
         $keys     = array_keys($context);
         $leftKey  = reset($keys);
@@ -52,30 +74,24 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
             $right = $options[1];
         }
 
-        $this->contextAccessor->expects($this->any())
-            ->method('hasValue')
-            ->will($this->returnValue(true));
+        $this->contextAccessor->method('hasValue')->willReturn(true);
 
-        $this->contextAccessor->expects($this->any())
-            ->method('getValue')
+        $this->contextAccessor->method('getValue')
             ->willReturnCallback(
                 function ($context, $value) {
                     return $value instanceof PropertyPath ? $context[(string)$value] : $value;
                 }
             );
 
-        $this->condition->expects($this->once())
+        $condition->expects(static::once())
             ->method('doCompare')
             ->with($left, $right)
-            ->will($this->returnValue($expectedValue));
+            ->willReturn($expectedValue);
 
-        $this->assertEquals($expectedValue, $this->condition->evaluate($context));
+        static::assertEquals($expectedValue, $condition->evaluate($context));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             [
@@ -113,45 +129,34 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeSuccess()
     {
-        $this->assertSame($this->condition, $this->condition->initialize(['left' => 'foo', 'right' => 'bar']));
-        $this->assertAttributeEquals('foo', 'left', $this->condition);
-        $this->assertAttributeEquals('bar', 'right', $this->condition);
+        $result = $this->condition->initialize(['left' => 'foo', 'right' => 'bar']);
+
+        static::assertSame($this->condition, $result);
+        static::assertEquals('foo', $this->condition->xgetLeft());
+        static::assertEquals('bar', $this->condition->xgetRight());
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "right" is required.
-     */
     public function testInitializeFailsWithEmptyRightOption()
     {
-        $this->condition->initialize(
-            [
-                'foo'  => 'bar',
-                'left' => 'foo'
-            ]
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "right" is required.');
+
+        $this->condition->initialize(['foo'  => 'bar', 'left' => 'foo']);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "left" is required.
-     */
     public function testInitializeFailsWithEmptyLeftOption()
     {
-        $this->condition->initialize(
-            [
-                'right' => 'foo',
-                'foo'   => 'bar',
-            ]
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "left" is required.');
+
+        $this->condition->initialize(['right' => 'foo', 'foo'   => 'bar',]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 elements, but 0 given.
-     */
     public function testInitializeFailsWithInvalidOptionsCount()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
+
         $this->condition->initialize([]);
     }
 
@@ -167,36 +172,34 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $rightKey = end($keys);
         $leftKey  = reset($keys);
 
-        $this->condition->initialize($options);
+        /** @var AbstractComparison|MockObject $condition */
+        $condition = $this->getMockBuilder(AbstractComparison::class)->getMockForAbstractClass();
+        $condition->setContextAccessor($this->contextAccessor);
+
+        $condition->initialize($options);
+
         $message = 'Compare {{ left }} with {{ right }}.';
-        $this->condition->setMessage($message);
+        $condition->setMessage($message);
 
-        $this->contextAccessor->expects($this->any())
-            ->method('hasValue')
-            ->will($this->returnValue(true));
+        $this->contextAccessor->method('hasValue')->willReturn(true);
 
-        $this->contextAccessor->expects($this->any())
-            ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$context, $left, $context[$leftKey]],
-                        [$context, $right, $context[$rightKey]],
-                    ]
-                )
-            );
+        $this->contextAccessor->method('getValue')
+            ->willReturnMap([
+            [$context, $left, $context[$leftKey]],
+            [$context, $right, $context[$rightKey]],
+        ]);
 
-        $this->condition->expects($this->once())
+        $condition->expects(static::once())
             ->method('doCompare')
             ->with($context[$leftKey], $context[$rightKey])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $errors = new ArrayCollection();
 
-        $this->assertFalse($this->condition->evaluate($context, $errors));
+        static::assertFalse($condition->evaluate($context, $errors));
 
-        $this->assertCount(1, $errors);
-        $this->assertEquals(
+        static::assertCount(1, $errors);
+        static::assertEquals(
             [
                 'message'    => $message,
                 'parameters' => ['{{ left }}' => $context[$leftKey], '{{ right }}' => $context[$rightKey]]

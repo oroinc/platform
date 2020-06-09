@@ -195,10 +195,10 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testBuildEnumCodeForInvalidEnumName($enumName)
     {
+        $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumCode($enumName);
     }
 
@@ -247,21 +247,19 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $entityClassName must not be empty.
-     */
     public function testGenerateEnumCodeForEmptyClassName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$entityClassName must not be empty.');
+
         ExtendHelper::generateEnumCode('', 'testField');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty.
-     */
     public function testGenerateEnumCodeForEmptyFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty.');
+
         ExtendHelper::generateEnumCode('Test\Entity', '');
     }
 
@@ -311,10 +309,10 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testBuildEnumValueIdForInvalidEnumValueName($enumValueName)
     {
+        $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumValueId($enumValueName);
     }
 

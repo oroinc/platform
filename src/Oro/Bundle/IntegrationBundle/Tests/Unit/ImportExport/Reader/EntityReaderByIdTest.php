@@ -26,7 +26,7 @@ class EntityReaderByIdTest extends OrmTestCase
     /** @var EntityReaderById */
     protected $reader;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
             ->disableOriginalConstructor()
@@ -57,7 +57,7 @@ class EntityReaderByIdTest extends OrmTestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->reader, $this->em, $this->managerRegistry, $this->contextRegistry);
     }

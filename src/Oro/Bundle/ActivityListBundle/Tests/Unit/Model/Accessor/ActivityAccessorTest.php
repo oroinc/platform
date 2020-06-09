@@ -16,7 +16,7 @@ class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()

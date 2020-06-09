@@ -19,7 +19,7 @@ class ResetTypeTest extends FormIntegrationTestCase
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class ResetTypeTest extends FormIntegrationTestCase
         $this->type = new ResetType(User::class, $this->optionsProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->type);
     }

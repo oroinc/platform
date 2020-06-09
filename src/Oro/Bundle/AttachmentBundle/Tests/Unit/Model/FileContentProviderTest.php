@@ -14,7 +14,7 @@ class FileContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileContentProvider */
     protected $fileContentProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()

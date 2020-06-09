@@ -2,18 +2,34 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DelegateAccessor $merger
-     */
+    /** @var DelegateAccessor $merger */
     protected $accessor;
 
-    protected function setUp()
+    /** @var FieldMetadata|MockObject */
+    private $metadata;
+
+    private $entity;
+
+    protected function setUp(): void
     {
-        $this->accessor = new DelegateAccessor();
+        $this->metadata = $this->getMockBuilder(FieldMetadata::class)->disableOriginalConstructor()->getMock();
+        $this->entity = new class() {
+            public $id = 1;
+        };
+        $this->accessor = new class() extends DelegateAccessor {
+            public function xgetElements(): array
+            {
+                return $this->elements;
+            }
+        };
     }
 
     public function testConstructor()
@@ -21,14 +37,19 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $foo = $this->createAccessor('foo');
         $bar = $this->createAccessor('bar');
 
-        $accessor = new DelegateAccessor(array($foo, $bar));
+        $accessor = new class([$foo, $bar]) extends DelegateAccessor {
+            public function xgetElements(): array
+            {
+                return $this->elements;
+            }
+        };
 
-        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $accessor);
+        static::assertEquals(['foo' => $foo, 'bar' => $bar], $accessor->xgetElements());
     }
 
     public function testGetName()
     {
-        $this->assertEquals('delegate', $this->accessor->getName());
+        static::assertEquals('delegate', $this->accessor->getName());
     }
 
     public function testAdd()
@@ -36,15 +57,14 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->add($foo = $this->createAccessor('foo'));
         $this->accessor->add($bar = $this->createAccessor('bar'));
 
-        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->accessor);
+        static::assertEquals(['foo' => $foo, 'bar' => $bar], $this->accessor->xgetElements());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot add accessor to itself.
-     */
     public function testAddFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot add accessor to itself.');
+
         $this->accessor->add($this->accessor);
     }
 
@@ -54,25 +74,22 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->add($bar = $this->createAccessor('bar'));
         $this->accessor->add($baz = $this->createAccessor('baz'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
-
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(false));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(false);
 
-        $bar->expects($this->once())
+        $bar->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(false));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(false);
 
-        $baz->expects($this->once())
+        $baz->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(true));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(true);
 
-        $this->assertTrue($this->accessor->supports($entity, $metadata));
+        static::assertTrue($this->accessor->supports($this->entity, $this->metadata));
     }
 
     public function testSupportsTrueFirst()
@@ -80,17 +97,14 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->add($foo = $this->createAccessor('foo'));
         $this->accessor->add($bar = $this->createAccessor('bar'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
-
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(true));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(true);
 
-        $bar->expects($this->never())->method('supports');
+        $bar->expects(static::never())->method('supports');
 
-        $this->assertTrue($this->accessor->supports($entity, $metadata));
+        static::assertTrue($this->accessor->supports($this->entity, $this->metadata));
     }
 
     public function testSupportsFalse()
@@ -98,107 +112,78 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->add($foo = $this->createAccessor('foo'));
         $this->accessor->add($bar = $this->createAccessor('bar'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
-
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(false));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(false);
 
-        $bar->expects($this->once())
+        $bar->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(false));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(false);
 
-        $this->assertFalse($this->accessor->supports($entity, $metadata));
+        static::assertFalse($this->accessor->supports($this->entity, $this->metadata));
     }
 
     public function testGetValue()
     {
         $this->accessor->add($foo = $this->createAccessor('foo'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
         $expectedResult = 'test';
 
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(true));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(true);
 
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('getValue')
-            ->with($entity, $metadata)
-            ->will($this->returnValue($expectedResult));
+            ->with($this->entity, $this->metadata)
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->accessor->getValue($entity, $metadata));
+        static::assertEquals($expectedResult, $this->accessor->getValue($this->entity, $this->metadata));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot find accessor for "test" field.
-     */
     public function testGetValueFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot find accessor for "test" field.');
+
         $this->accessor->add($foo = $this->createAccessor('foo'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
+        $this->metadata->expects(static::once())->method('getFieldName')->willReturn('test');
 
-        $metadata->expects($this->once())
-            ->method('getFieldName')
-            ->will($this->returnValue('test'));
-
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(false));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(false);
 
-        $this->accessor->getValue($entity, $metadata);
+        $this->accessor->getValue($this->entity, $this->metadata);
     }
 
     public function testSetValue()
     {
         $this->accessor->add($foo = $this->createAccessor('foo'));
 
-        $entity = $this->createTestEntity(1);
-        $metadata = $this->createFieldMetadata();
         $value = 'test';
 
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('supports')
-            ->with($entity, $metadata)
-            ->will($this->returnValue(true));
+            ->with($this->entity, $this->metadata)
+            ->willReturn(true);
 
-        $foo->expects($this->once())
+        $foo->expects(static::once())
             ->method('setValue')
-            ->with($entity, $metadata, $value);
+            ->with($this->entity, $this->metadata, $value);
 
-        $this->accessor->setValue($entity, $metadata, $value);
+        $this->accessor->setValue($this->entity, $this->metadata, $value);
     }
 
     protected function createAccessor($name)
     {
-        $result = $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface');
-        $result->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
+        $result = $this->createMock(AccessorInterface::class);
+        $result->method('getName')->willReturn($name);
 
-        return $result;
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createTestEntity($id)
-    {
-        $result     = new \stdClass();
-        $result->id = $id;
         return $result;
     }
 }

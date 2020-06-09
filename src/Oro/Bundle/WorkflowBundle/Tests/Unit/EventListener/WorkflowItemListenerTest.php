@@ -36,7 +36,7 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->doctrineHelper->expects($this->any())
@@ -98,12 +98,11 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem, $em));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow item does not contain related entity
-     */
     public function testUpdateWorkflowItemEntityRelationException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage('Workflow item does not contain related entity');
+
         /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('getEntity');
@@ -111,12 +110,13 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow "test_workflow" can not be started because ID of related entity is null
-     */
     public function testUpdateWorkflowItemNoEntityRelationIdException()
     {
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectExceptionMessage(
+            'Workflow "test_workflow" can not be started because ID of related entity is null'
+        );
+
         /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('getWorkflowName')->willReturn('test_workflow');

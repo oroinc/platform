@@ -52,7 +52,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /** @var CompleteEntityDefinitionHelper */
     private $completeEntityDefinitionHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

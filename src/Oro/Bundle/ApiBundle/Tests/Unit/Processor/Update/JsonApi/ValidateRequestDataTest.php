@@ -19,7 +19,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
     /** @var ValidateRequestData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -109,8 +109,8 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('products')
-            ->willReturn(Product::class);
+            ->with('test')
+            ->willReturn('Test\Entity');
 
         $this->context->setId('1');
         $this->context->setClassName(Product::class);

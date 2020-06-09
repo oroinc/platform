@@ -17,7 +17,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextMetadataAccessor */
     private $metadataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(Context::class);
 

@@ -15,7 +15,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var LinkMetadataDecorator */
     private $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->linkMetadata = $this->createMock(LinkMetadataInterface::class);
         $this->decorator = new LinkMetadataDecoratorStub($this->linkMetadata);
@@ -26,7 +26,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         $decoratorClone = clone $this->decorator;
 
         self::assertEquals($this->decorator, $decoratorClone);
-        self::assertAttributeSame($this->linkMetadata, 'link', $decoratorClone);
+        self::assertEquals($this->decorator->toArray(), $decoratorClone->toArray());
     }
 
     public function testToArray()

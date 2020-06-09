@@ -63,14 +63,14 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
-     * @expectedExceptionMessage Aggregating field is expected. Unexpected token "keyword" of value "" ("string" expected with value "") around position 1.
-     */
-    // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionFieldException()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError::class);
+        $this->expectExceptionMessage(
+            'Aggregating field is expected.'
+            . ' Unexpected token "keyword" of value "" ("string" expected with value "") around position 1.'
+        );
+
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::KEYWORD_TYPE, null],
@@ -80,14 +80,15 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
-     * @expectedExceptionMessage Aggregating function expected. Unexpected token "string" of value "test" ("string" expected with value "count, sum, max, min, avg") around position 2.
-     */
-    // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionFunctionException()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError::class);
+        $this->expectExceptionMessage(
+            'Aggregating function expected.'
+            . ' Unexpected token "string" of value "test" ("string" expected with value "count, sum, max, min, avg")'
+            . ' around position 2.'
+        );
+
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],
@@ -98,14 +99,14 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
-     * @expectedExceptionMessage Aggregating name is expected. Unexpected token "keyword" of value "select" ("string" expected with value "") around position 3.
-     */
-    // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionNameException()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError::class);
+        $this->expectExceptionMessage(
+            'Aggregating name is expected.'
+            . ' Unexpected token "keyword" of value "select" ("string" expected with value "") around position 3.'
+        );
+
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],
@@ -117,14 +118,13 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError
-     * @expectedExceptionMessage Unsupported aggregating function "sum" for field type "text" around position 3.
-     */
-    // @codingStandardsIgnoreEnd
     public function testParseAggregateExpressionUnsupportedFunctionException()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError::class);
+        $this->expectExceptionMessage(
+            'Unsupported aggregating function "sum" for field type "text" around position 3.'
+        );
+
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
             [Token::STRING_TYPE, 'test_field'],

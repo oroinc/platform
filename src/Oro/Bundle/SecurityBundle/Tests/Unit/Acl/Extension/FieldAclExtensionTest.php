@@ -104,7 +104,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -243,10 +243,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForOrganizationInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForOrganizationInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new Organization());
     }
 
@@ -260,10 +260,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForBusinessUnitInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForBusinessUnitInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new BusinessUnit());
     }
 
@@ -277,10 +277,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForUserInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new User());
     }
 
@@ -298,10 +298,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForOrganizationOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForOrganizationOwnedInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
             'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
@@ -323,10 +323,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForUserOwnedInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
             'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
             new OwnershipMetadata('USER', 'owner', 'owner_id')
@@ -336,10 +336,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
      */
     public function testValidateMaskForRootInvalid($mask)
     {
+        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
@@ -647,19 +647,15 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetClasses()
     {
+        $this->expectException(\LogicException::class);
         $this->extension->getClasses();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetObjectIdentity()
     {
+        $this->expectException(\LogicException::class);
         $this->extension->getObjectIdentity('');
     }
 

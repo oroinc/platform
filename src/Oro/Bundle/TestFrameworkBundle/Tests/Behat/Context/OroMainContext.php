@@ -529,7 +529,7 @@ class OroMainContext extends MinkContext implements
         $message = $errorElement->getText();
         $errorElement->find('css', 'button.close')->press();
 
-        self::assertContains($title, $message, sprintf(
+        static::assertStringContainsString($title, $message, \sprintf(
             'Expect that "%s" error message contains "%s" string, but it isn\'t',
             $message,
             $title
@@ -898,10 +898,10 @@ class OroMainContext extends MinkContext implements
     {
         $this->waitForAjax();
         $element = $this->elementFactory->createElement($elementName);
-        self::assertContains(
+        static::assertStringContainsString(
             $text,
             $element->getText(),
-            sprintf('Element %s does not contains text %s', $elementName, $text)
+            \sprintf('Element %s does not contains text %s', $elementName, $text)
         );
     }
 
@@ -916,10 +916,10 @@ class OroMainContext extends MinkContext implements
     {
         $this->waitForAjax();
         $element = $this->elementFactory->createElement($elementName);
-        self::assertNotContains(
+        static::assertStringNotContainsString(
             $text,
             $element->getText(),
-            sprintf('Element %s contains text %s', $elementName, $text)
+            \sprintf('Element %s contains text %s', $elementName, $text)
         );
     }
 
@@ -951,10 +951,10 @@ class OroMainContext extends MinkContext implements
             );
         }
 
-        self::assertContains(
+        static::assertStringContainsString(
             $value,
             $field->getAttribute('placeholder'),
-            sprintf('Element %s does not contains placeholder %s', $locator, $value)
+            \sprintf('Element %s does not contains placeholder %s', $locator, $value)
         );
     }
 
@@ -1034,7 +1034,7 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeLinkWithUrl($text, $url)
     {
         $link = $this->elementFactory->findElementContains('Link', $text);
-        self::assertRegExp($url, $link->getAttribute('href'));
+        self::assertMatchesRegularExpression($url, $link->getAttribute('href'));
     }
 
     /**
@@ -1045,7 +1045,7 @@ class OroMainContext extends MinkContext implements
     public function iShouldNotSeeLinkWithUrl($text, $url)
     {
         $link = $this->elementFactory->findElementContains('Link', $text);
-        self::assertNotRegExp($url, $link->getAttribute('href'));
+        static::assertDoesNotMatchRegularExpression($url, $link->getAttribute('href'));
     }
 
     /**
@@ -1076,7 +1076,7 @@ class OroMainContext extends MinkContext implements
 
             if ($expectedValue !== '~') {
                 self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
-                self::assertContains($expectedValue, $attribute);
+                static::assertStringContainsString($expectedValue, $attribute);
             } else {
                 self::assertNull($attribute, sprintf("Attribute with name '%s' shouldn't exist", $attributeName));
             }
@@ -2537,7 +2537,7 @@ JS;
         $element = $this->createElement($element);
         $this->assertNotNull($element);
         $this->assertTrue($element->isValid());
-        $this->assertContains($value, $element->getAttribute($attribute));
+        static::assertStringContainsString($value, $element->getAttribute($attribute));
     }
 
     /**
@@ -2552,7 +2552,7 @@ JS;
         $element = $this->createElement($element);
         $this->assertNotNull($element);
         $this->assertTrue($element->isValid());
-        $this->assertNotContains($value, $element->getAttribute($attribute));
+        static::assertStringNotContainsString($value, $element->getAttribute($attribute));
     }
 
     /**

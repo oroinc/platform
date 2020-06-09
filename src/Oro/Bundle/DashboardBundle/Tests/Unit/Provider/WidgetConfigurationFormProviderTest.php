@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,11 +24,9 @@ class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
             ->getFormFactory();
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException
-     */
     public function testGetFormShouldReturnExceptionIfNoFormIsDefinedForWidget()
     {
+        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException::class);
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
         $this->assertFalse($provider->hasForm('quick_launchpad_without_form'));
 

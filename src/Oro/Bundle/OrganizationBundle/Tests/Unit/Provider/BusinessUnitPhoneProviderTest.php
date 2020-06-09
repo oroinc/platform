@@ -10,7 +10,7 @@ class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
     /** @var BusinessUnitPhoneProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new BusinessUnitPhoneProvider();
     }

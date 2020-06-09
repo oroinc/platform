@@ -19,7 +19,7 @@ class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var FormFactoryProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->context = $this->createMock(TransitionContext::class);
@@ -53,12 +53,11 @@ class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Data for transition form is not defined
-     */
     public function testNoFormDataException()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Data for transition form is not defined');
+
         $this->context->expects($this->once())->method('getFormData')->willReturn(null);
         $this->context->expects($this->never())->method('getTransition');
 

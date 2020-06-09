@@ -13,8 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class SendInsertedEntitiesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
-    
-    protected function setUp()
+
+    protected function setUp(): void
     {
         $this->initClient();
     }

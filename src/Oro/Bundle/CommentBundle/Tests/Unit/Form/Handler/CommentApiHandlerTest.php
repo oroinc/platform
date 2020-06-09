@@ -39,7 +39,7 @@ class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->request = new Request();

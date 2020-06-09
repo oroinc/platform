@@ -38,7 +38,7 @@ class SearchBundleWebTestCase extends WebTestCase
     {
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (static::isDbIsolationPerTest()) {
             static::clear();
@@ -48,7 +48,7 @@ class SearchBundleWebTestCase extends WebTestCase
     }
 
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (!static::isDbIsolationPerTest()) {
             static::clear();

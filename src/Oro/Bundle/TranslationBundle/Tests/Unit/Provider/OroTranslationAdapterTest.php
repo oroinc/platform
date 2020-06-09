@@ -22,7 +22,7 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $query;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->client  = $this->createMock('Guzzle\Http\Client');
         $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')

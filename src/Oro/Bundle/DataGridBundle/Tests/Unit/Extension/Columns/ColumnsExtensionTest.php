@@ -28,7 +28,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataObject|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataObject;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->columnsStateProvider = $this->createMock(DatagridStateProviderInterface::class);
 

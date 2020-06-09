@@ -36,7 +36,7 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
      */
     private $websocketAuthenticationByTicketProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ticketAuthenticationProvider = $this->createMock(AuthenticationProviderInterface::class);
         $this->providerKey = 'sample-provider-key';

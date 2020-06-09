@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
@@ -16,6 +15,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Form type for EmailNotification entity
+ */
 class EmailNotificationType extends AbstractType
 {
     const NAME = 'emailnotification';
@@ -32,22 +34,28 @@ class EmailNotificationType extends AbstractType
     /** @var ContactInformationEmailsSubscriber */
     protected $contactInformationEmailsSubscriber;
 
+    /** @var array */
+    private $events;
+
     /**
-     * @param BuildTemplateFormSubscriber $buildTemplateSubscriber
-     * @param AdditionalEmailsSubscriber $additionalEmailsSubscriber
-     * @param RouterInterface $router
+     * @param BuildTemplateFormSubscriber        $buildTemplateSubscriber
+     * @param AdditionalEmailsSubscriber         $additionalEmailsSubscriber
+     * @param RouterInterface                    $router
      * @param ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
+     * @param array                              $events
      */
     public function __construct(
         BuildTemplateFormSubscriber $buildTemplateSubscriber,
         AdditionalEmailsSubscriber $additionalEmailsSubscriber,
         RouterInterface $router,
-        ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
+        ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber,
+        array $events
     ) {
         $this->buildTemplateSubscriber = $buildTemplateSubscriber;
         $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
         $this->router = $router;
         $this->contactInformationEmailsSubscriber = $contactInformationEmailsSubscriber;
+        $this->events = $events;
     }
 
     /**
@@ -79,15 +87,11 @@ class EmailNotificationType extends AbstractType
         );
 
         $builder->add(
-            'event',
-            Select2EntityType::class,
+            'eventName',
+            Select2ChoiceType::class,
             [
-                'label'         => 'oro.notification.emailnotification.event.label',
-                'class'         => 'OroNotificationBundle:Event',
-                'choice_label'  => 'name',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')->orderBy('c.name', 'ASC');
-                },
+                'label'         => 'oro.notification.emailnotification.event_name.label',
+                'choices'     => array_combine($this->events, $this->events),
                 'configs'       => [
                     'allowClear'  => true,
                     'placeholder' => 'oro.notification.form.choose_event',

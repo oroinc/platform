@@ -14,7 +14,7 @@ class LocalizedTemplateDTOTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizedTemplateDTO */
     private $dto;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailTemplate = new EmailTemplate();
 

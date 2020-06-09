@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -38,7 +39,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendOptionsParser */
     protected $extendOptionsParser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
@@ -99,12 +100,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Acme\AcmeBundle\Entity\Entity1.
-     */
     public function testCreateCustomEntityTableWithInvalidEntityName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid entity name. Class: Extend\Entity\Acme\AcmeBundle\Entity\Entity1.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -114,12 +114,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Extend\Entity\Entity1.
-     */
     public function testCreateCustomEntityTableWithFullClassName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid entity name. Class: Extend\Entity\Extend\Entity\Entity1.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -129,12 +128,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\1Entity.
-     */
     public function testCreateCustomEntityTableWithNameStartsWithDigit()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid entity name. Class: Extend\Entity\1Entity.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -144,12 +142,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\_Entity.
-     */
     public function testCreateCustomEntityTableWithNameStartsWithUnderscore()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid entity name. Class: Extend\Entity\_Entity.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -159,12 +156,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Entity#1.
-     */
     public function testCreateCustomEntityTableWithInvalidChars()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid entity name. Class: Extend\Entity\Entity#1.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -174,27 +170,25 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Entity name length must be less or equal 22 characters.
-     */
     public function testCreateCustomEntityTableWithTooLongName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Entity name length must be less or equal 55 characters.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
-            'E1234567891234567890123'
+            'E1234567891234567890123E1234567891234567890123456789012E'
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "extend.owner" option for a custom entity must be "Custom".
-     */
     public function testCreateCustomEntityTableWithInvalidOwner()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extend.owner" option for a custom entity must be "Custom".');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -207,12 +201,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "extend.is_extend" option for a custom entity must be TRUE.
-     */
     public function testCreateCustomEntityTableWithInvalidIsExtend()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extend.is_extend" option for a custom entity must be TRUE.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -711,12 +704,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The table "table1" must have a primary key.
-     */
     public function testAddOneToManyRelationWithNoPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('The table "table1" must have a primary key.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -739,12 +731,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage A primary key of "table1" table must include only one column.
-     */
     public function testAddOneToManyRelationWithCombinedPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('A primary key of "table1" table must include only one column.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -769,12 +760,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The table "table2" must have a primary key.
-     */
     public function testAddOneToManyRelationWithNoTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('The table "table2" must have a primary key.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -797,12 +787,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage A primary key of "table2" table must include only one column.
-     */
     public function testAddOneToManyRelationWithCombinedTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('A primary key of "table2" table must include only one column.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1118,12 +1107,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'title' on table 'table1'.
-     */
     public function testAddOneToManyInverseRelationValidateTitleColumnName()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1293,13 +1281,13 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The type of relation column "table1::rel_id" must be an integer or string. "float"
-     * type is not supported.
-     */
     public function testInvalidRelationColumnType()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage(
+            'The type of relation column "table1::rel_id" must be an integer or string. "float" type is not supported.'
+        );
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1320,12 +1308,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage At least one column must be specified.
-     */
     public function testCheckColumnsExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one column must be specified.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1349,12 +1336,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The table "table1" must have a primary key.
-     */
     public function testAddManyToManyRelationWithNoPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('The table "table1" must have a primary key.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1377,12 +1363,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage A primary key of "table1" table must include only one column.
-     */
     public function testAddManyToManyRelationWithCombinedPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('A primary key of "table1" table must include only one column.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1407,12 +1392,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The table "table2" must have a primary key.
-     */
     public function testAddManyToManyRelationWithNoTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('The table "table2" must have a primary key.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1435,12 +1419,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage A primary key of "table2" table must include only one column.
-     */
     public function testAddManyToManyRelationWithCombinedTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('A primary key of "table2" table must include only one column.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1776,12 +1759,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'title' on table 'table1'.
-     */
     public function testAddManyToManyInverseRelationValidateTitleColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1809,12 +1791,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'detailed' on table 'table1'.
-     */
     public function testAddManyToManyInverseRelationValidateDetailedColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'detailed' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -1843,12 +1824,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'grid' on table 'table1'.
-     */
     public function testAddManyToManyInverseRelationValidateGridColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'grid' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2055,12 +2035,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The table "table2" must have a primary key.
-     */
     public function testAddManyToOneRelationWithNoTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('The table "table2" must have a primary key.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2081,12 +2060,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage A primary key of "table2" table must include only one column.
-     */
     public function testAddManyToOneRelationWithCombinedTargetPrimaryKey()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('A primary key of "table2" table must include only one column.');
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2240,12 +2218,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'title' on table 'table1'.
-     */
     public function testAddManyToOneInverseRelationValidateTitleColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2273,12 +2250,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'detailed' on table 'table1'.
-     */
     public function testAddManyToOneInverseRelationValidateDetailedColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'detailed' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2307,12 +2283,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage There is no column with name 'grid' on table 'table1'.
-     */
     public function testAddManyToOneInverseRelationValidateGridColumn()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage("There is no column with name 'grid' on table 'table1'.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2532,12 +2507,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Target field can't be hidden.
-     */
     public function testAddManyToOneInverseRelationWhenFieldIsHidden()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Target field can't be hidden.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2560,12 +2534,11 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Target field can't be hidden.
-     */
     public function testAddOneToManyInverseRelationWhenFieldIsHidden()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Target field can't be hidden.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2582,18 +2555,16 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
             'OroTestRelation',
             'oro_test2',
             'users',
-            ['name'],
-            ['name'],
+            'name',
             ['name']
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Target field can't be hidden.
-     */
     public function testAddManyToManyInverseRelationWhenFieldIsHidden()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Target field can't be hidden.");
+
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
@@ -2633,6 +2604,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         if ($throwException) {
             $this->expectException(\UnexpectedValueException::class);
+        } else {
+            $this->expectNotToPerformAssertions();
         }
 
         $extension->addManyToManyRelation(
@@ -2668,6 +2641,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         if ($throwException) {
             $this->expectException(\UnexpectedValueException::class);
+        } else {
+            $this->expectNotToPerformAssertions();
         }
 
         $extension->addOneToManyRelation(
@@ -2703,6 +2678,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         if ($throwException) {
             $this->expectException(\UnexpectedValueException::class);
+        } else {
+            $this->expectNotToPerformAssertions();
         }
 
         $extension->addManyToOneRelation(

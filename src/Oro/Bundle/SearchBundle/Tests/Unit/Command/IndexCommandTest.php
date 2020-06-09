@@ -19,7 +19,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
     /** @var IndexCommand */
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->indexer = $this->createMock(IndexerInterface::class);
@@ -94,6 +94,6 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
             'identifiers' => ['id'],
         ]);
 
-        $this->assertContains('Started index update for entities.', $tester->getDisplay());
+        static::assertStringContainsString('Started index update for entities.', $tester->getDisplay());
     }
 }

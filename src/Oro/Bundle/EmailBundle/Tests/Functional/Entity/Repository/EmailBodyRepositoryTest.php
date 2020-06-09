@@ -14,7 +14,7 @@ class EmailBodyRepositoryTest extends WebTestCase
     /** @var DoctrineHelper */
     protected $doctrineHeler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadEmailData::class]);

@@ -13,7 +13,7 @@ class WorkflowAwareCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAwareCacheWarmer */
     private $warmer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowAwareCache = $this->createMock(WorkflowAwareCache::class);
 

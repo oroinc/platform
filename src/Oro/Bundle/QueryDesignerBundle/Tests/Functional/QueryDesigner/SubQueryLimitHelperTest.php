@@ -15,7 +15,7 @@ class SubQueryLimitHelperTest extends WebTestCase
     /** @var SubQueryLimitHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->helper = new SubQueryLimitHelper();
@@ -38,7 +38,7 @@ class SubQueryLimitHelperTest extends WebTestCase
             'id',
             $testQb->getQuery()->getHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_ID)
         );
-        $this->assertContains(
+        static::assertStringContainsString(
             SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY,
             $testQb->getQuery()->getHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY)
         );

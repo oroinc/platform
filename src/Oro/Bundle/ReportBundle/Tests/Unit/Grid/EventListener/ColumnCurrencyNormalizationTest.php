@@ -18,7 +18,7 @@ class ColumnCurrencyNormalizationTest extends TestCase
     /** @var DatagridConfiguration | MockObject */
     private $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagrid = $this->createMock(DatagridInterface::class);
         $this->config = $this->createMock(DatagridConfiguration::class);

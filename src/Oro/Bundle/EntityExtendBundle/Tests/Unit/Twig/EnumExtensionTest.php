@@ -16,7 +16,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EnumExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
 

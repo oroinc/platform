@@ -13,7 +13,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var ContextDataCollection */
     protected $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context    = new LayoutContext();
         $this->collection = new ContextDataCollection($this->context);

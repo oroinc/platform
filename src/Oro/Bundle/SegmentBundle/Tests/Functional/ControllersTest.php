@@ -12,7 +12,7 @@ class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -46,7 +46,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         static::assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertContains('Segment saved', $crawler->html());
+        static::assertStringContainsString('Segment saved', $crawler->html());
     }
 
     /**
@@ -113,7 +113,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Segment saved", $crawler->html());
+        static::assertStringContainsString("Segment saved", $crawler->html());
 
         if ($report['oro_segment_form[type]'] == 'static') {
             $this->ajaxRequest(

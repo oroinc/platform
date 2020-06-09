@@ -16,7 +16,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemePathProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->themeManager = $this->getMockBuilder(ThemeManager::class)
             ->disableOriginalConstructor()

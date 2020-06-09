@@ -51,7 +51,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /** @var array|null */
     protected $definitions;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(Registry::class);
         $this->emailBuilder = $this->createMock(EmailModelBuilder::class);

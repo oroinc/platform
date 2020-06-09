@@ -59,7 +59,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->configProvider->expects($this->any())
@@ -268,11 +268,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     */
     public function testGetConfigNoDatabase()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
@@ -280,11 +278,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->getConfig($configId);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     */
     public function testGetConfigForNotConfigurable()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')

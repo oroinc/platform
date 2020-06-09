@@ -29,7 +29,7 @@ class UniqueUserEmailValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var UniqueUserEmailValidator */
     private $validator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->constraintViolationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);

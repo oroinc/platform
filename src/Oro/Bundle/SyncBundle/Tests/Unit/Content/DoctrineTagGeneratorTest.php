@@ -30,7 +30,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
     protected $uow;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -69,7 +69,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new DoctrineTagGenerator($doctrine, $entityClassResolver);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->em, $this->resolver, $this->generator);
     }
@@ -247,7 +247,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
         $result = $reflection->invoke($this->generator, $testData, $metadata);
 
-        $this->assertInternalType('array', $result, 'Should always return array');
+        $this->assertIsArray($result, 'Should always return array');
         $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');
     }
 

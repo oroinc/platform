@@ -23,7 +23,7 @@ class GenderTypeTest extends FormIntegrationTestCase
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $genderProvider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\GenderProvider')
             ->disableOriginalConstructor()
@@ -37,7 +37,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

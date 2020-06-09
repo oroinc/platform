@@ -29,7 +29,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 
@@ -116,53 +116,41 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithOrganizationNullUser()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithOrganization(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithOrganizationNullObject()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithOrganization($user, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithBusinessUnitNullUser()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithBusinessUnit(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithBusinessUnitNullObject()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithBusinessUnit($user, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithUserNullUser()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithUser(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testIsAssociatedWithUserNullObject()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $user = new User('user');
         $this->decisionMaker->isAssociatedWithUser($user, null);
     }

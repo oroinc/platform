@@ -11,7 +11,7 @@ class UserEmailConfigHandlerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -32,7 +32,10 @@ class UserEmailConfigHandlerTest extends WebTestCase
         ];
 
         $crawler = $this->saveConfiguration($configuration);
-        $this->assertContains('At least one folder of mailbox is required to be selected.', $crawler->html());
+        static::assertStringContainsString(
+            'At least one folder of mailbox is required to be selected.',
+            $crawler->html()
+        );
 
         $emailOrigins = $this->getContainer()->get('doctrine')
             ->getRepository('OroEmailBundle:EmailOrigin')
@@ -67,9 +70,12 @@ class UserEmailConfigHandlerTest extends WebTestCase
         ];
 
         $crawler = $this->saveConfiguration($configuration);
-        $this->assertNotContains('At least one folder of mailbox is required to be selected.', $crawler->html());
-        $this->assertContains('Could not establish the IMAP connection', $crawler->html());
-        $this->assertContains('Could not establish the SMTP connection', $crawler->html());
+        static::assertStringNotContainsString(
+            'At least one folder of mailbox is required to be selected.',
+            $crawler->html()
+        );
+        static::assertStringContainsString('Could not establish the IMAP connection', $crawler->html());
+        static::assertStringContainsString('Could not establish the SMTP connection', $crawler->html());
 
         $emailOrigins = $this->getContainer()->get('doctrine')
             ->getRepository('OroEmailBundle:EmailOrigin')

@@ -22,7 +22,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);
         $valueNormalizer = $this->getValueNormalizer();

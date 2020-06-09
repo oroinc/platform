@@ -147,7 +147,7 @@ datagrids:
         mass_actions:
             merge:
                 type: merge
-                entity_name: %orocrm_account.account.entity.class%
+                entity_name: Oro\Bundle\AccountBundle\Entity\Account
                 data_identifier: a.id
 ```
 
@@ -164,7 +164,7 @@ services:
     oro_entity_merge.strategy.replace:
         class: Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy
         arguments:
-            - @oro_entity_merge.accessor.delegate
+            - '@oro_entity_merge.accessor.delegate'
         tags:
             - { name: oro_entity_merge.strategy, priority: 100 }
 ```
@@ -178,7 +178,7 @@ services:
     oro_entity_merge.step.validate:
         class: Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep
         arguments:
-            - @validator
+            - '@validator'
         tags:
             - { name: oro_entity_merge.step }
 ```
@@ -190,7 +190,7 @@ services:
 	oro_entity_merge.accessor.inverse_association:
         class: Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor
         arguments:
-            - @oro_entity_merge.doctrine_helper
+            - '@oro_entity_merge.doctrine_helper'
         tags:
             - { name: oro_entity_merge.accessor }
 ```

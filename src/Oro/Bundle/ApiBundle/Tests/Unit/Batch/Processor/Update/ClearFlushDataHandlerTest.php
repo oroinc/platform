@@ -10,7 +10,7 @@ class ClearFlushDataHandlerTest extends BatchUpdateProcessorTestCase
     /** @var ClearFlushDataHandler */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

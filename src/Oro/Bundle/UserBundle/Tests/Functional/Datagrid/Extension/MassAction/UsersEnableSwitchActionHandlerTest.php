@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UsersEnableSwitchActionHandlerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures(

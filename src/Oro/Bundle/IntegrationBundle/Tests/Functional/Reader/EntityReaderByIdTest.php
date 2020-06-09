@@ -20,7 +20,7 @@ class EntityReaderByIdTest extends WebTestCase
     private $entityManager;
 
     /** {@inheritdoc} */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

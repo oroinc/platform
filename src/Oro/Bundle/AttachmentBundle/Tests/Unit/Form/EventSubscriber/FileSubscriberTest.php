@@ -30,7 +30,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->validator = $this->createMock(ConfigFileValidator::class);
         $this->form = $this->createMock(FormInterface::class);

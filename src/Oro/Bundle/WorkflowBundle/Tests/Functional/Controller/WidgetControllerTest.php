@@ -35,7 +35,7 @@ class WidgetControllerTest extends WebTestCase
      */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([
@@ -65,20 +65,26 @@ class WidgetControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
-        $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
-        $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
-        $this->assertContains($this->getStepLabel('test_active_flow1', 'step1'), $crawler->html());
-        $this->assertContains($this->getStepLabel('test_active_flow2', 'step1'), $crawler->html());
-        $this->assertContains($this->getStepLabel('test_start_step_flow', 'open'), $crawler->html());
-        $this->assertContains($this->getStepLabel('test_multistep_flow', 'starting_point'), $crawler->html());
-        $this->assertContains(
+        static::assertStringContainsString(
+            'transition-test_multistep_flow-starting_point_transition',
+            $crawler->html()
+        );
+        static::assertStringContainsString('transition-test_start_step_flow-start_transition', $crawler->html());
+        static::assertStringContainsString($this->getStepLabel('test_active_flow1', 'step1'), $crawler->html());
+        static::assertStringContainsString($this->getStepLabel('test_active_flow2', 'step1'), $crawler->html());
+        static::assertStringContainsString($this->getStepLabel('test_start_step_flow', 'open'), $crawler->html());
+        static::assertStringContainsString(
+            $this->getStepLabel('test_multistep_flow', 'starting_point'),
+            $crawler->html()
+        );
+        static::assertStringContainsString(
             $this->getStepLabel(
                 LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME,
                 LoadWorkflowDefinitionsWithFormConfiguration::WFC_STEP_NAME
             ),
             $crawler->html()
         );
-        $this->assertContains(
+        static::assertStringContainsString(
             $this->getTransitionLabel(
                 LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME,
                 LoadWorkflowDefinitionsWithFormConfiguration::WFC_START_TRANSITION,
@@ -158,7 +164,7 @@ class WidgetControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains(LoadWorkflowDefinitions::WITH_INIT_OPTION, $crawler->html());
+        static::assertStringContainsString(LoadWorkflowDefinitions::WITH_INIT_OPTION, $crawler->html());
     }
 
     public function testStartTransitionFormWithConfigurationAction()
@@ -247,9 +253,9 @@ class WidgetControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains((string)$workflowItem->getId(), $crawler->html());
-        $this->assertContains($workflowItem->getWorkflowName(), $crawler->html());
-        $this->assertContains((string)$workflowItem->getEntityId() . '', $crawler->html());
+        static::assertStringContainsString((string)$workflowItem->getId(), $crawler->html());
+        static::assertStringContainsString($workflowItem->getWorkflowName(), $crawler->html());
+        static::assertStringContainsString((string)$workflowItem->getEntityId() . '', $crawler->html());
 
         $workflowItemNew = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
 
@@ -279,10 +285,13 @@ class WidgetControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         if ($workflowItem->getId()) {
-            $this->assertContains(sprintf('"id":%d', $workflowItem->getId()), $crawler->html());
+            static::assertStringContainsString(sprintf('"id":%d', $workflowItem->getId()), $crawler->html());
         }
-        $this->assertContains(sprintf('"workflow_name":"%s"', $workflowItem->getWorkflowName()), $crawler->html());
-        $this->assertContains(sprintf('"entity_id":"%s"', $workflowItem->getEntityId()), $crawler->html());
+        static::assertStringContainsString(
+            \sprintf('"workflow_name":"%s"', $workflowItem->getWorkflowName()),
+            $crawler->html()
+        );
+        static::assertStringContainsString(sprintf('"entity_id":"%s"', $workflowItem->getEntityId()), $crawler->html());
 
         $workflowItemNew = $this->getWorkflowItem($this->entity, $workflowItem->getWorkflowName());
 
@@ -308,14 +317,20 @@ class WidgetControllerTest extends WebTestCase
         $transitionButton = $crawler->selectLink('oro.workflow.test_active_flow1.transition.transition1.button_label');
         $this->assertCount(1, $transitionButton);
         $this->assertSame('#', $transitionButton->attr('href'));
-        $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
-        $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
-        $this->assertContains('transition-test_start_init_option-start_transition', $crawler->html());
-        $this->assertContains($this->getTransitionLabel(
+        static::assertStringContainsString(
+            'transition-test_multistep_flow-starting_point_transition',
+            $crawler->html()
+        );
+        static::assertStringContainsString('transition-test_start_step_flow-start_transition', $crawler->html());
+        static::assertStringContainsString('transition-test_start_init_option-start_transition', $crawler->html());
+        static::assertStringContainsString($this->getTransitionLabel(
             LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME,
             LoadWorkflowDefinitionsWithFormConfiguration::WFC_START_TRANSITION
         ), $crawler->html());
-        $this->assertNotContains('transition-test_start_init_option-start_transition_from_entities', $crawler->html());
+        static::assertStringNotContainsString(
+            'transition-test_start_init_option-start_transition_from_entities',
+            $crawler->html()
+        );
     }
 
     /**

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
@@ -22,7 +23,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var RegisterConfiguredFilters */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +46,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     private function getComparisonFilter($dataType, $isCollection = false)
     {
         $filter = new ComparisonFilter($dataType);
-        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $filter->setCollection($isCollection);
 
         return $filter;
@@ -86,7 +87,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('someField');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('someField', $expectedFilter);
 
@@ -113,7 +114,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('someField');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('someField', $expectedFilter);
 
@@ -132,7 +133,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('integer');
         $filterConfig->setPropertyPath('someField');
         $filterConfig->setArrayAllowed();
-        $filterConfig->setOperators([ComparisonFilter::EQ, '<', '>']);
+        $filterConfig->setOperators([FilterOperator::EQ, '<', '>']);
         $filtersConfig->addField('filter', $filterConfig);
 
         $this->filterFactory->expects(self::once())
@@ -153,7 +154,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setDataType('integer');
         $expectedFilter->setField('someField');
         $expectedFilter->setArrayAllowed(true);
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, '<', '>']);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, '<', '>']);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
 
@@ -270,8 +271,8 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ
+            FilterOperator::EQ,
+            FilterOperator::NEQ
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -301,8 +302,8 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ
+            FilterOperator::EQ,
+            FilterOperator::NEQ
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -318,7 +319,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('string');
         $filterConfig->setPropertyPath('category');
-        $filterConfig->setOperators([ComparisonFilter::EQ, ComparisonFilter::GT]);
+        $filterConfig->setOperators([FilterOperator::EQ, FilterOperator::GT]);
         $filtersConfig->addField('filter', $filterConfig);
 
         $this->filterFactory->expects(self::once())
@@ -333,10 +334,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::EXISTS,
-            ComparisonFilter::NEQ_OR_NULL
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::EXISTS,
+            FilterOperator::NEQ_OR_NULL
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -368,10 +369,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setCollection(true);
         $expectedFilter->setField('groups');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::CONTAINS,
-            ComparisonFilter::NOT_CONTAINS
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::CONTAINS,
+            FilterOperator::NOT_CONTAINS
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -403,10 +404,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setCollection(true);
         $expectedFilter->setField('groups.name');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::CONTAINS,
-            ComparisonFilter::NOT_CONTAINS
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::CONTAINS,
+            FilterOperator::NOT_CONTAINS
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -423,7 +424,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig->setDataType('string');
         $filterConfig->setIsCollection(true);
         $filterConfig->setPropertyPath('groups');
-        $filterConfig->setOperators([ComparisonFilter::EQ, ComparisonFilter::GT]);
+        $filterConfig->setOperators([FilterOperator::EQ, FilterOperator::GT]);
         $filtersConfig->addField('filter', $filterConfig);
 
         $this->filterFactory->expects(self::once())
@@ -439,12 +440,12 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setCollection(true);
         $expectedFilter->setField('groups');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::EXISTS,
-            ComparisonFilter::NEQ_OR_NULL,
-            ComparisonFilter::CONTAINS,
-            ComparisonFilter::NOT_CONTAINS
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::EXISTS,
+            FilterOperator::NEQ_OR_NULL,
+            FilterOperator::CONTAINS,
+            FilterOperator::NOT_CONTAINS
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
@@ -465,10 +466,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('integer');
         $filterConfig->setOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::GT,
-            ComparisonFilter::LT
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::GT,
+            FilterOperator::LT
         ]);
         $filtersConfig->addField('owner', $filterConfig);
 
@@ -488,10 +489,10 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter = new ComparisonFilter('integer');
         $expectedFilter->setField('owner');
         $expectedFilter->setSupportedOperators([
-            ComparisonFilter::EQ,
-            ComparisonFilter::NEQ,
-            ComparisonFilter::EXISTS,
-            ComparisonFilter::NEQ_OR_NULL
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::EXISTS,
+            FilterOperator::NEQ_OR_NULL
         ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('owner', $expectedFilter);

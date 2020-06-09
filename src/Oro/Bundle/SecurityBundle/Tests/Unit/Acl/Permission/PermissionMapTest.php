@@ -14,7 +14,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
      */
     private $map;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->map = new PermissionMap(
             TestHelper::get($this)->createAclExtensionSelector()

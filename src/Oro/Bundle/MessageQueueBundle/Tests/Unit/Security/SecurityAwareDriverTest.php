@@ -26,7 +26,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityAwareDriver */
     private $securityAwareDriver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

@@ -16,7 +16,7 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PhoneExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->getMockBuilder(PhoneProvider::class)
             ->disableOriginalConstructor()

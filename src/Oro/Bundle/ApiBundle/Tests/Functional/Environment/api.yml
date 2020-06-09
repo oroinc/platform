@@ -422,3 +422,15 @@ api:
                     data_type: string
             # this entity does not have own API resource
             actions: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection:
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem:
+            fields:
+                name:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~

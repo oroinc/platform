@@ -13,7 +13,7 @@ class DeduplicationHandlerCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /** @var DeduplicationHandler */
     protected $deduplicationHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deduplicationHandler = $this->createMock(DeduplicationHandler::class);
         $this->warmer = new DeduplicationHandlerCacheWarmer($this->deduplicationHandler);

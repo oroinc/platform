@@ -19,7 +19,7 @@ class StatusManagerTest extends \PHPUnit\Framework\TestCase
 
     private $user;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -22,7 +22,7 @@ class FormTypeTest extends TypeTestCase
     /** @var FormType */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(['__construct', 'preSubmit'])
@@ -76,14 +76,13 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAdditionalStaticConfiguratorWithUndefinedMethodName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected that "Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.'
+        );
+
         $form = $this->factory->create(
             FormType::class,
             null,
@@ -119,12 +118,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "@test_service::undefinedMethodName" is a callable.
-     */
     public function testAdditionalServiceConfiguratorWithUndefinedMethodName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected that "@test_service::undefinedMethodName" is a callable.');
+
         $this->container->expects(self::once())
             ->method('get')
             ->with('test_service')
@@ -144,12 +142,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertFalse($form->getConfig()->hasAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "@test_service" is a callable.
-     */
     public function testAdditionalServiceConfiguratorWithUnspecifiedMethod()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected that "@test_service" is a callable.');
+
         $this->container->expects(self::never())
             ->method('get');
 
@@ -167,12 +164,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertFalse($form->getConfig()->hasAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testInvalidTypeOfAdditionalConfigurator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $form = $this->factory->create(
             FormType::class,
             null,

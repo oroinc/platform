@@ -16,7 +16,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var string $fieldPrefix */
     private $fieldPrefix;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fieldPrefix = str_replace('\\', '_', Attachment::class) . '_';
     }

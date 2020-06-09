@@ -32,7 +32,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
     /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineTypeMappingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formRegistry = $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
             ->disableOriginalConstructor()
@@ -60,7 +60,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->setDoctrineTypeMappingProvider($this->doctrineTypeMappingProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->formRegistry,

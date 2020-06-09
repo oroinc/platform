@@ -250,10 +250,24 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      */
     private function getTypeGuessForField($dataType)
     {
-        if (!isset($this->dataTypeMappings[$dataType])) {
-            return $this->createDefaultTypeGuess();
+        if (isset($this->dataTypeMappings[$dataType])) {
+            return $this->getTypeGuessForMappedDataType($dataType);
         }
 
+        if (isset($this->dataTypeMappings[DataType::ARRAY]) && DataType::isArray($dataType)) {
+            return $this->getTypeGuessForMappedDataType(DataType::ARRAY);
+        }
+
+        return $this->createDefaultTypeGuess();
+    }
+
+    /**
+     * @param string $dataType
+     *
+     * @return TypeGuess
+     */
+    private function getTypeGuessForMappedDataType($dataType)
+    {
         [$formType, $options] = $this->dataTypeMappings[$dataType];
 
         return $this->createTypeGuess($formType, $options, TypeGuess::HIGH_CONFIDENCE);

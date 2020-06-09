@@ -22,7 +22,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
     private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reminderManager = $this->createMock(ReminderManager::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

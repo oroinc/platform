@@ -19,7 +19,7 @@ class TranslationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationListener */
     protected $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataCache = $this->getMockBuilder(DynamicTranslationMetadataCache::class)
             ->disableOriginalConstructor()
@@ -28,7 +28,7 @@ class TranslationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new TranslationListener($this->metadataCache, self::JOB_NAME);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->listener, $this->metadataCache);
     }

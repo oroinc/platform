@@ -12,7 +12,7 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new PriceTransformer();
     }

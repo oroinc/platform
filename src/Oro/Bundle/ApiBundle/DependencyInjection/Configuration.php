@@ -138,7 +138,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('request_type')
-                            ->info('The request type for which this file is applicable.')
+                            ->info('The request type to which this file is applicable.')
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()

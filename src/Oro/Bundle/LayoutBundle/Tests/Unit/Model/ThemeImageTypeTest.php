@@ -20,7 +20,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $imageType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->imageType = new ThemeImageType(
             self::NAME,

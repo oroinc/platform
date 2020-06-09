@@ -17,16 +17,16 @@ class RoleManagerTest extends \PHPUnit\Framework\TestCase
 
     private $role;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repository = $this->createPartialMock(
-            'Doctrine\Common\Persistence\ObjectRepository',
-            array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'getUserQueryBuilder')
-        );
+        $this->repository = $this->getMockBuilder(\Doctrine\Common\Persistence\ObjectRepository::class)
+            ->onlyMethods(['find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])
+            ->addMethods(['getUserQueryBuilder'])
+            ->getMock();
 
         $this->em->expects($this->any())
             ->method('getRepository')

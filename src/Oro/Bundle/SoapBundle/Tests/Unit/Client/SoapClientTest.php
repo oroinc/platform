@@ -19,7 +19,7 @@ class SoapClientTest extends TestCase
      */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clientFactory = $this->createMock(NativeSoapClientFactory::class);
 

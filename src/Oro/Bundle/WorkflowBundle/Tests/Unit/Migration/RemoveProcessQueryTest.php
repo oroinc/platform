@@ -21,7 +21,7 @@ class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->connector = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()

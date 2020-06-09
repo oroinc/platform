@@ -26,7 +26,7 @@ class ContextsSelectTypeTest extends TypeTestCase
     /* @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityTitleResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')

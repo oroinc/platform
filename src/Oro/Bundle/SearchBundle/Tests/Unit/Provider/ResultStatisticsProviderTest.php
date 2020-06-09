@@ -35,7 +35,7 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->indexer = $this->createMock(Indexer::class);
         $this->configManager = $this->createMock(ConfigManager::class);

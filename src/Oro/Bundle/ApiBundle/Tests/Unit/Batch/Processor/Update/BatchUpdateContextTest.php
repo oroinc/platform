@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update;
 
+use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
+use Oro\Bundle\ApiBundle\Batch\Processor\BatchUpdateItemProcessor;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\BatchUpdateContext;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
@@ -16,7 +18,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new BatchUpdateContext();
     }
@@ -134,6 +136,35 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getBatchItems());
     }
 
+    public function testGetBatchItemsProcessedWithoutErrors()
+    {
+        self::assertSame([], iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors()));
+
+        $updateItemProcessor = $this->createMock(BatchUpdateItemProcessor::class);
+        $updateContext = $this->createMock(BatchUpdateContext::class);
+        $batchItem1 = new BatchUpdateItem(0, $updateItemProcessor, $updateContext);
+        $batchItem2 = new BatchUpdateItem(1, $updateItemProcessor, $updateContext);
+        $batchItem3 = new BatchUpdateItem(2, $updateItemProcessor, $updateContext);
+        $batchItem4 = new BatchUpdateItem(3, $updateItemProcessor, $updateContext);
+        $batchItem5 = new BatchUpdateItem(4, $updateItemProcessor, $updateContext);
+        $this->context->setBatchItems([$batchItem1, $batchItem2, $batchItem3, $batchItem4, $batchItem5]);
+        self::assertSame([], iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors()));
+        $this->context->setProcessedItemStatuses([
+            BatchUpdateItemStatus::HAS_ERRORS,
+            BatchUpdateItemStatus::NO_ERRORS,
+            BatchUpdateItemStatus::HAS_PERMANENT_ERRORS,
+            BatchUpdateItemStatus::NOT_PROCESSED,
+            BatchUpdateItemStatus::NO_ERRORS
+        ]);
+        self::assertEquals(
+            [$batchItem2, $batchItem5],
+            iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors())
+        );
+
+        $this->context->clearBatchItems();
+        self::assertSame([], iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors()));
+    }
+
     public function testProcessedItemStatuses()
     {
         $item1 = $this->createMock(BatchUpdateItem::class);
@@ -162,6 +193,18 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setProcessedItemStatuses(null);
         self::assertNull($this->context->getProcessedItemStatuses());
         self::assertNull($this->context->getProcessedItemStatus($item1));
+    }
+
+    public function testFlushDataHandler()
+    {
+        self::assertNull($this->context->getFlushDataHandler());
+
+        $flushDataHandler = $this->createMock(BatchFlushDataHandlerInterface::class);
+        $this->context->setFlushDataHandler($flushDataHandler);
+        self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
+
+        $this->context->setFlushDataHandler(null);
+        self::assertNull($this->context->getFlushDataHandler());
     }
 
     public function testSharedData()

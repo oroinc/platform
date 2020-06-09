@@ -240,6 +240,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->enumNode(ConfigUtil::DIRECTION)
                 ->values([
                     ConfigUtil::DIRECTION_INPUT_ONLY,

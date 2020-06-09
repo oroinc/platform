@@ -24,7 +24,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     /** @var BuildListResultDocument */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

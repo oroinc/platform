@@ -11,12 +11,12 @@ class TransportTest extends \PHPUnit\Framework\TestCase
     /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->entity);
     }

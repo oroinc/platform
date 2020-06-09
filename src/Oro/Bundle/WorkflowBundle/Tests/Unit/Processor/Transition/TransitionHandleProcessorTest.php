@@ -16,7 +16,7 @@ class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionHandleProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->processor = new TransitionHandleProcessor($this->workflowManager);

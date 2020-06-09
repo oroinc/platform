@@ -10,7 +10,7 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var EntitySecurityMetadata */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EntitySecurityMetadata(
             'SomeType',

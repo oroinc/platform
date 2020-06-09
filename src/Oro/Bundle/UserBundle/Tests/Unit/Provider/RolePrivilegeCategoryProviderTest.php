@@ -14,7 +14,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RolePrivilegeCategoryProvider */
     private $categoryProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $this->categoryProvider = new RolePrivilegeCategoryProvider($translator);

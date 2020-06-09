@@ -23,7 +23,7 @@ class BusinessUnitOwnerValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $businessUnit;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->businessUnit = new BusinessUnit();
 

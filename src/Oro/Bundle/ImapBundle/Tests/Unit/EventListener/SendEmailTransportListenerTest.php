@@ -16,7 +16,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userEmailOrigin =
             $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')

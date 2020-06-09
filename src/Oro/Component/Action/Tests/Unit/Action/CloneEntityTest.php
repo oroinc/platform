@@ -41,7 +41,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -132,7 +132,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $entity->getData());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->registry, $this->action);
     }
@@ -169,12 +169,11 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteEntityNotManageable()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
         $options = array(
             CloneEntity::OPTION_KEY_TARGET     => new \stdClass(),
             CloneEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()

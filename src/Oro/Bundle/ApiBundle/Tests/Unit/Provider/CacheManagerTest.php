@@ -31,7 +31,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
         $this->configCacheWarmer = $this->createMock(ConfigCacheWarmer::class);

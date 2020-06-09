@@ -28,7 +28,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * Test setup.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $formRegistry = $this->createMock(FormRegistry::class);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
@@ -41,7 +41,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->willReturnCallback(
                 function ($id, array $parameters, $domain) {
-                    $this->assertInternalType('string', $id);
+                    $this->assertIsString($id);
                     $this->assertEquals([], $parameters);
                     $this->assertEquals('workflows', $domain);
 

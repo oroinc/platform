@@ -12,7 +12,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
      */
     private $dynamicSource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dynamicSource = new DynamicTranslationKeySource();
     }

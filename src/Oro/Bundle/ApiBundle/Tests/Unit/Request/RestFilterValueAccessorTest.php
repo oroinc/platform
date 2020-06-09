@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,20 +23,20 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             $request,
             '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [
-                ComparisonFilter::EQ              => '=',
-                ComparisonFilter::NEQ             => '!=',
-                ComparisonFilter::GT              => '>',
-                ComparisonFilter::LT              => '<',
-                ComparisonFilter::GTE             => '>=',
-                ComparisonFilter::LTE             => '<=',
-                ComparisonFilter::EXISTS          => '*',
-                ComparisonFilter::NEQ_OR_NULL     => '!*',
-                ComparisonFilter::CONTAINS        => '~',
-                ComparisonFilter::NOT_CONTAINS    => '!~',
-                ComparisonFilter::STARTS_WITH     => '^',
-                ComparisonFilter::NOT_STARTS_WITH => '!^',
-                ComparisonFilter::ENDS_WITH       => '$',
-                ComparisonFilter::NOT_ENDS_WITH   => '!$'
+                FilterOperator::EQ              => '=',
+                FilterOperator::NEQ             => '!=',
+                FilterOperator::GT              => '>',
+                FilterOperator::LT              => '<',
+                FilterOperator::GTE             => '>=',
+                FilterOperator::LTE             => '<=',
+                FilterOperator::EXISTS          => '*',
+                FilterOperator::NEQ_OR_NULL     => '!*',
+                FilterOperator::CONTAINS        => '~',
+                FilterOperator::NOT_CONTAINS    => '!~',
+                FilterOperator::STARTS_WITH     => '^',
+                FilterOperator::NOT_STARTS_WITH => '!^',
+                FilterOperator::ENDS_WITH       => '$',
+                FilterOperator::NOT_ENDS_WITH   => '!$'
             ]
         );
     }
@@ -183,7 +183,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedQueryString, $anotherQueryString);
 
         foreach ($queryStringValues as $itemKey => $itemValue) {
-            list($key, $operator, $value, $path, $sourceKey) = $itemValue;
+            [$key, $operator, $value, $path, $sourceKey] = $itemValue;
             self::assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
             self::assertEquals(
                 $this->getFilterValue($path, $value, $operator, $sourceKey),
@@ -291,7 +291,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
 
         foreach ($queryStringValues as $itemKey => $itemValue) {
-            list($key, $operator, $value, $path, $sourceKey) = $itemValue;
+            [$key, $operator, $value, $path, $sourceKey] = $itemValue;
             self::assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
             self::assertEquals(
                 $this->getFilterValue($path, $value, $operator, $sourceKey),
@@ -611,12 +611,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "integer".
-     */
     public function testRequestBodyWithNotStringScalarParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "integer".');
+
         $requestBody = [
             'prm1' => 1
         ];
@@ -627,12 +626,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "array".
-     */
     public function testRequestBodyWithArrayParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "array".');
+
         $requestBody = [
             'prm1' => []
         ];
@@ -643,12 +641,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "stdClass".
-     */
     public function testRequestBodyWithWithObjectParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "stdClass".');
+
         $requestBody = [
             'prm1' => new \stdClass()
         ];
@@ -659,12 +656,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "integer".
-     */
     public function testRequestBodyWithNotStringScalarParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "integer".');
+
         $requestBody = [
             'prm1' => ['neq' => 1]
         ];
@@ -675,12 +671,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "array".
-     */
     public function testRequestBodyWithArrayParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "array".');
+
         $requestBody = [
             'prm1' => ['neq' => []]
         ];
@@ -691,12 +686,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "prm1", given "stdClass".
-     */
     public function testRequestBodyWithObjectParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "stdClass".');
+
         $requestBody = [
             'prm1' => ['neq' => new \stdClass()]
         ];
@@ -707,12 +701,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "integer".
-     */
     public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "integer".');
+
         $requestBody = [
             'filter' => ['prm1' => 1]
         ];
@@ -723,12 +716,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "array".
-     */
     public function testRequestBodyWithNestedParameterAndArrayParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "array".');
+
         $requestBody = [
             'filter' => ['prm1' => []]
         ];
@@ -739,12 +731,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "stdClass".
-     */
     public function testRequestBodyWithNestedParameterAndObjectParameterValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "stdClass".');
+
         $requestBody = [
             'filter' => ['prm1' => new \stdClass()]
         ];
@@ -755,12 +746,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "integer".
-     */
     public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "integer".');
+
         $requestBody = [
             'filter' => ['prm1' => ['neq' => 1]]
         ];
@@ -771,12 +761,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "array".
-     */
     public function testRequestBodyWithNestedParameterAndArrayParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "array".');
+
         $requestBody = [
             'filter' => ['prm1' => ['neq' => []]]
         ];
@@ -787,12 +776,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected string value for the filter "filter[prm1]", given "stdClass".
-     */
     public function testRequestBodyWithNestedParameterAndObjectParameterValueWithOperator()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "stdClass".');
+
         $requestBody = [
             'filter' => ['prm1' => ['neq' => new \stdClass()]]
         ];

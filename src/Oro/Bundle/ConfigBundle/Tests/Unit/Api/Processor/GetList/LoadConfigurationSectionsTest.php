@@ -21,7 +21,7 @@ class LoadConfigurationSectionsTest extends GetListProcessorTestCase
     /** @var LoadConfigurationSections */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

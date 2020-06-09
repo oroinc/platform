@@ -23,7 +23,7 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $userClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper   = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

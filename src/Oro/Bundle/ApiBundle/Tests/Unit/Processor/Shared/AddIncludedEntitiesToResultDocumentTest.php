@@ -14,7 +14,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
     /** @var AddIncludedEntitiesToResultDocument */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->processor = new AddIncludedEntitiesToResultDocument();

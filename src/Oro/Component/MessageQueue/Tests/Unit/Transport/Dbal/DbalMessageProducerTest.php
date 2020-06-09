@@ -21,7 +21,7 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(DbalConnection::class);
         $this->messageProducer = new DbalMessageProducer($this->connection);

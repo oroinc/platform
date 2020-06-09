@@ -515,6 +515,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
+    public function testPartialLoadFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertTrue($config->isPartialLoadEnabled());
+
+        $config->disablePartialLoad();
+        self::assertFalse($config->isPartialLoadEnabled());
+        self::assertEquals(['disable_partial_load' => true], $config->toArray());
+
+        $config->enablePartialLoad();
+        self::assertTrue($config->isPartialLoadEnabled());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testIdentifierFieldNames()
     {
         $config = new EntityDefinitionConfig();
@@ -642,11 +656,9 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    /**
-     * @expectedException \TypeError
-     */
     public function testSetInvalidValueToFormEventSubscribers()
     {
+        $this->expectException(\TypeError::class);
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers('subscriber1');
     }
@@ -654,20 +666,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
     public function testHints()
     {
         $config = new EntityDefinitionConfig();
-        self::assertEquals([], $config->getHints());
+        self::assertSame([], $config->getHints());
 
         $config->setHints(['hint1']);
         self::assertEquals(['hint1'], $config->getHints());
         self::assertEquals(['hints' => ['hint1']], $config->toArray());
 
         $config->setHints();
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
 
         $config->setHints(['hint1']);
         $config->setHints([]);
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
     }
 
     public function testIdentifierDescription()

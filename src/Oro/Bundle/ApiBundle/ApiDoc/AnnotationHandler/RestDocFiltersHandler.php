@@ -7,7 +7,9 @@ use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterRegistry;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FieldFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
@@ -118,7 +120,7 @@ class RestDocFiltersHandler
                 $isRangeAllowed
             )
         ];
-        if ($filter instanceof FieldAwareFilterInterface) {
+        if ($filter instanceof FieldFilterInterface) {
             $options['type'] = $this->getFilterType($dataType, $isArrayAllowed, $isRangeAllowed);
         }
         $operators = $this->getFilterOperators($filter);
@@ -225,7 +227,7 @@ class RestDocFiltersHandler
         if (empty($operators)) {
             return $operators;
         }
-        if (count($operators) === 1 && $operators[0] === StandaloneFilter::EQ) {
+        if (count($operators) === 1 && $operators[0] === FilterOperator::EQ) {
             return [];
         }
 

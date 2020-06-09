@@ -25,7 +25,7 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 

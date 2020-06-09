@@ -25,7 +25,7 @@ class LimitedAccessTest extends WebTestCase
     /** @var TestEntity */
     protected $testEntity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $userName = 'test_user';
         $userEmail = 'test_user@example.com';

@@ -35,7 +35,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailNotificationManager = $this
             ->getMockBuilder(EmailNotificationManager::class)
@@ -45,28 +45,27 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->emailNotification = $this->createMock(TemplateEmailNotification::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
-        $this->processor = new EmailSendProcessor(
+        $this->processor = new class(
             $this->emailNotificationManager,
             $this->emailNotification,
             $this->eventDispatcher
-        );
+        ) extends EmailSendProcessor {
+            public function xgetReminders(): array
+            {
+                return $this->reminders;
+            }
+        };
     }
 
     public function testPush()
     {
-        /** @var Reminder $fooReminder */
         $fooReminder = $this->createMock(Reminder::class);
-        /** @var Reminder $barReminder */
         $barReminder = $this->createMock(Reminder::class);
 
         $this->processor->push($fooReminder);
         $this->processor->push($barReminder);
 
-        $this->assertAttributeEquals(
-            array($fooReminder, $barReminder),
-            'reminders',
-            $this->processor
-        );
+        static::assertEquals([$fooReminder, $barReminder], $this->processor->xgetReminders());
     }
 
     public function testProcess()

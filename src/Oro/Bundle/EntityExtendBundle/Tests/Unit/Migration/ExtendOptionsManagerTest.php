@@ -10,7 +10,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendOptionsManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = new ExtendOptionsManager();
     }

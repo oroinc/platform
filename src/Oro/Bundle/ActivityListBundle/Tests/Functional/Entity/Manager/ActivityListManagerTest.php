@@ -19,7 +19,7 @@ class ActivityListManagerTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([]);
         $this->loadFixtures([LoadOrganization::class, LoadEmailActivityData::class]);

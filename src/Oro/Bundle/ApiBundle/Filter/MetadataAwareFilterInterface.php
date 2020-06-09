@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
 /**
- * This interface should be implemented by filters that depends on an entity metadata.
+ * This interface should be implemented by filters that depend on an entity metadata.
  */
 interface MetadataAwareFilterInterface
 {

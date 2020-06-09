@@ -13,7 +13,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyInjectionExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->extension = new DependencyInjectionExtension(
@@ -47,14 +47,14 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $this->extension->getType('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type name specified for the service "block_type_service" does not match the actual name. Expected "test", given "test1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeWithInvalidAlias()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The type name specified for the service "block_type_service" does not match the actual name.'
+            . ' Expected "test", given "test1".'
+        );
+
         $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->any())
             ->method('getName')
@@ -68,12 +68,11 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getType('test');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type "unknown" is not registered with the service container.
-     */
     public function testGetUnknownType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The block type "unknown" is not registered with the service container.');
+
         $this->extension->getType('unknown');
     }
 
@@ -189,12 +188,11 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $this->extension->getDataProvider('test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The data provider "unknown" is not registered with the service container.
-     */
     public function testGetUnknownDataProvider()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data provider "unknown" is not registered with the service container.');
+
         $this->extension->getDataProvider('unknown');
     }
 

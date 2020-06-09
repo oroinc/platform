@@ -7,11 +7,14 @@ use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Send notifications on workflow transitions
+ */
 class WorkflowTransitionRecordListener implements OptionalListenerInterface
 {
     /** @var EventDispatcherInterface */
@@ -52,7 +55,7 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
         }
 
         $this->eventDispatcher->dispatch(
-            LoadWorkflowNotificationEvents::TRANSIT_EVENT,
+            WorkflowEvents::NOTIFICATION_TRANSIT_EVENT,
             $this->getNotificationEvent($transitionRecord)
         );
     }

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeEntityClassTest extends GetListProcessorTestCase
 {
@@ -20,7 +21,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     /** @var NormalizeEntityClass */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -94,11 +95,10 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         self::assertSame('Test\Class', $this->context->getClassName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException
-     */
     public function testProcessForNotAccessibleEntityType()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException::class);
+
         $entityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
@@ -121,7 +121,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->willThrowException(new EntityAliasNotFoundException($entityType));
 
         $this->context->setClassName($entityType);
         $this->processor->process($this->context);

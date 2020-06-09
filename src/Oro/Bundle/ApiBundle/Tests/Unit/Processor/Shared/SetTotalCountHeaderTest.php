@@ -25,7 +25,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     /** @var SetTotalCountHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -253,7 +253,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
             'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query, '
-            . 'Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder or Oro\Bundle\EntityBundle\ORM\SqlQuery, '
+            . 'Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder or Oro\Component\DoctrineUtils\ORM\SqlQuery, '
             . '"stdClass" given.'
         );
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
@@ -27,7 +28,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SecurityAwareConsumptionExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->tokenSerializer = $this->createMock(TokenSerializerInterface::class);
@@ -86,11 +87,9 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPreReceived($context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException
-     */
     public function testOnPreReceivedShouldRejectMessageIfSecurityTokenCannotBeDeserialized()
     {
+        $this->expectException(InvalidSecurityTokenException::class);
         $serializedToken = 'serialized';
 
         $message = new Message();

@@ -24,7 +24,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /** @var AclGranted */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -240,30 +240,27 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate($context));
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
+
         $this->condition->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage ACL attributes must not be empty.
-     */
     public function testInitializeFailsWhenEmptyAttributes()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ACL attributes must not be empty.');
+
         $this->condition->initialize(['']);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage ACL object must not be empty.
-     */
     public function testInitializeFailsWhenEmptyObject()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ACL object must not be empty.');
+
         $this->condition->initialize(['VIEW', '']);
     }
 

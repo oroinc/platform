@@ -16,7 +16,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
     /** @var AddParentEntityIdToQuery */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -132,12 +132,11 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The query is not valid. Reason: the parent entity ID is not set.
-     */
     public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The query is not valid. Reason: the parent entity ID is not set.');
+
         $associationName = 'owner';
         $parentId = 123;
 
@@ -212,12 +211,11 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The query is not valid. Reason: the parent entity ID is not set.
-     */
     public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('The query is not valid. Reason: the parent entity ID is not set.');
+
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
 

@@ -14,7 +14,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
      */
     protected $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $manager = $this
             ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')

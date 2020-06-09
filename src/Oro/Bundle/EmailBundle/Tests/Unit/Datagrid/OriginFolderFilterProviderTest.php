@@ -37,7 +37,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OriginFolderFilterProvider */
     protected $originFolderFilterProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mailboxRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository')
             ->disableOriginalConstructor()

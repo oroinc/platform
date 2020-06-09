@@ -21,7 +21,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -67,11 +67,9 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testProcessWhenAccessDeniedForManageableParentEntityWithoutConfigOfAclResource()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $parentClassName = Product::class;
         $parentConfig = new EntityDefinitionConfig();
 
@@ -102,11 +100,9 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testProcessWhenAccessDeniedForParentEntityWithConfigOfAclResource()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $parentClassName = Product::class;
         $aclResource = 'acme_product_test';
         $parentConfig = new EntityDefinitionConfig();

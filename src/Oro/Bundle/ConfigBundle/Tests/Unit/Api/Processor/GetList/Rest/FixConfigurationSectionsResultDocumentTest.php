@@ -10,7 +10,7 @@ class FixConfigurationSectionsResultDocumentTest extends GetListProcessorTestCas
     /** @var FixConfigurationSectionsResultDocument */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

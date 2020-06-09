@@ -22,7 +22,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendConfigProcessor */
     protected $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -38,12 +38,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs([]);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
-     */
     public function testModificationOfNonConfigurableEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
+
         $configs = [
             self::CLASS_NAME => [
                 'configs' => ['entity' => ['icon' => 'icon1']]
@@ -107,12 +106,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs($configs);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
-     */
     public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
+
         $configs = [
             self::CLASS_NAME => [
                 'configs' => [],
@@ -327,12 +325,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage An extend field "field1" cannot be added to non extend entity
-     */
     public function testAddExtendFieldToNonExtendEntity()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('An extend field "field1" cannot be added to non extend entity');
+
         $testFieldName = 'field1';
         $configs       = [
             self::CLASS_NAME => [

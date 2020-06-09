@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
@@ -28,7 +29,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     /** @var NormalizeRequestData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -295,7 +296,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willThrowException(new \Exception('cannot normalize entity type'));
+            ->willThrowException(new EntityAliasNotFoundException('cannot normalize entity type'));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 

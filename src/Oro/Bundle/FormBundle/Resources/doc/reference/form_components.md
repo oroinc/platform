@@ -51,8 +51,8 @@ services:
     oro_form.type.jqueryselect2_hidden:
         class: Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_form.autocomplete.configuration
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.configuration'
         tags:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
 

@@ -65,7 +65,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     /**
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = $this->createMock('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface');
 
@@ -97,7 +97,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         $this->converter = $this->createFormatConverter();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->formatter);
         unset($this->converter);

@@ -13,7 +13,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $origin;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\user')
             ->disableOriginalConstructor()

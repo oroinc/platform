@@ -22,7 +22,7 @@ class SortingValidatorTest extends ConstraintValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator        = $this->createMock(TranslatorInterface::class);
         $this->segment           = $this->createMock(Segment::class);
@@ -34,7 +34,7 @@ class SortingValidatorTest extends ConstraintValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator, $this->sortingConstraint, $this->segment);
 

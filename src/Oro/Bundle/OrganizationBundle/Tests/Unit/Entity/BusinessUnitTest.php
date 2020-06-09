@@ -14,7 +14,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
      */
     protected $unit;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->unit = new BusinessUnit();
     }

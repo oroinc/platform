@@ -40,7 +40,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigModelManager */
     protected $configModelManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -547,20 +547,20 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testGetEntityModelEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->getEntityModel($className);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A model for "Test\Entity\TestEntity" was not found
-     */
     public function testGetEntityModelForNonExistingEntity()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('A model for "Test\Entity\TestEntity" was not found');
+
         $this->prepareEntityConfigRepository();
         $this->configModelManager->getEntityModel(self::TEST_ENTITY);
     }
@@ -581,40 +581,40 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testGetFieldModelEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->getFieldModel($className, self::TEST_FIELD);
     }
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty
      */
     public function testGetFieldModelEmptyFieldName($fieldName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty');
+
         $this->configModelManager->getFieldModel(self::TEST_ENTITY, $fieldName);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A model for "Test\Entity\TestEntity::testField" was not found
-     */
     public function testGetFieldModelForNonExistingEntity()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('A model for "Test\Entity\TestEntity::testField" was not found');
+
         $this->prepareEntityConfigRepository();
         $this->configModelManager->getFieldModel(self::TEST_ENTITY, self::TEST_FIELD);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A model for "Test\Entity\TestEntity::testField" was not found
-     */
     public function testGetFieldModelForNonExistingField()
     {
+        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('A model for "Test\Entity\TestEntity::testField" was not found');
+
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $this->prepareEntityConfigRepository(
             [$entityModel],
@@ -674,21 +674,19 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid $mode: "wrongMode"
-     */
     public function testCreateEntityModelWithInvalidMode()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid $mode: "wrongMode"');
+
         $this->configModelManager->createEntityModel(self::TEST_ENTITY, 'wrongMode');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid $mode: "wrongMode"
-     */
     public function testCreateFieldModelWithInvalidMode()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid $mode: "wrongMode"');
+
         $this->configModelManager->createFieldModel(
             self::TEST_ENTITY,
             self::TEST_FIELD,
@@ -709,7 +707,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is NOT stored in a local cache
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$className must not be empty');
         $this->configModelManager->getEntityModel($className);
     }
@@ -730,11 +728,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testCreateFieldModelEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->createFieldModel($className, self::TEST_FIELD, 'int');
     }
 
@@ -763,7 +762,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is NOT stored in a local cache
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$fieldName must not be empty');
         $this->configModelManager->getFieldModel(self::TEST_ENTITY, $fieldName);
     }
@@ -802,11 +801,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testChangeFieldNameEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->changeFieldName(
             $className,
             self::TEST_FIELD,
@@ -816,11 +816,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty
      */
     public function testChangeFieldNameEmptyFieldName($fieldName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty');
+
         $this->configModelManager->changeFieldName(
             self::TEST_ENTITY,
             $fieldName,
@@ -830,11 +831,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $newFieldName must not be empty
      */
     public function testChangeFieldNameEmptyNewFieldName($newFieldName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$newFieldName must not be empty');
+
         $this->configModelManager->changeFieldName(
             self::TEST_ENTITY,
             self::TEST_FIELD,
@@ -910,11 +912,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testChangeFieldTypeEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->changeFieldType(
             $className,
             self::TEST_FIELD,
@@ -924,11 +927,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty
      */
     public function testChangeFieldTypeEmptyFieldName($fieldName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty');
+
         $this->configModelManager->changeFieldType(
             self::TEST_ENTITY,
             $fieldName,
@@ -938,11 +942,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldType must not be empty
      */
     public function testChangeFieldTypeEmptyFieldType($fieldType)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldType must not be empty');
+
         $this->configModelManager->changeFieldType(
             self::TEST_ENTITY,
             self::TEST_FIELD,
@@ -1015,11 +1020,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testChangeFieldModeEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->changeFieldMode(
             $className,
             self::TEST_FIELD,
@@ -1029,11 +1035,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty
      */
     public function testChangeFieldModeEmptyFieldName($fieldName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty');
+
         $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             $fieldName,
@@ -1043,11 +1050,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $mode must not be empty
      */
     public function testChangeFieldModeEmptyMode($mode)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$mode must not be empty');
+
         $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             self::TEST_FIELD,
@@ -1121,11 +1129,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty
      */
     public function testChangeEntityModeEmptyClassName($className)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty');
+
         $this->configModelManager->changeEntityMode(
             $className,
             ConfigModel::MODE_HIDDEN
@@ -1134,11 +1143,12 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyValueProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $mode must not be empty
      */
     public function testChangeEntityModeEmptyMode($mode)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$mode must not be empty');
+
         $this->configModelManager->changeEntityMode(
             self::TEST_ENTITY,
             $mode

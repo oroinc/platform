@@ -19,7 +19,7 @@ class DuplicateFilterTest extends WebTestCase
     /** @var DuplicateFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->filter = $this->getContainer()->get('oro_filter.duplicate_filter');
@@ -57,8 +57,8 @@ class DuplicateFilterTest extends WebTestCase
         $this->assertEquals($expected, array_map('current', $actualData));
 
         $dql = $qb->getDQL();
-        $this->assertNotContains('EXISTS(', $dql);
-        $this->assertContains('GROUP BY ', $dql);
+        static::assertStringNotContainsString('EXISTS(', $dql);
+        static::assertStringContainsString('GROUP BY ', $dql);
     }
 
     /**
@@ -93,8 +93,8 @@ class DuplicateFilterTest extends WebTestCase
         $actualData = $qb->getQuery()->getResult();
         $this->assertEquals($expected, array_map('current', $actualData));
         $dql = $qb->getDQL();
-        $this->assertContains('EXISTS(', $dql);
-        $this->assertContains('GROUP BY ', $dql);
+        static::assertStringContainsString('EXISTS(', $dql);
+        static::assertStringContainsString('GROUP BY ', $dql);
     }
 
     /**

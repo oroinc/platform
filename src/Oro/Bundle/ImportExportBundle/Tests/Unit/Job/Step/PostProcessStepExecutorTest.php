@@ -38,7 +38,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
      */
     protected $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->executor = new PostProcessStepExecutor();
 
@@ -112,7 +112,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
         $jobResult = new JobResult();
         $jobResult->setSuccessful($isJobSuccess);
         if (!$isJobSuccess) {
-            $this->expectException('Oro\Bundle\ImportExportBundle\Exception\RuntimeException');
+            $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\RuntimeException::class);
         }
 
         $this->jobExecutor->expects($this->exactly($jobExecutions))

@@ -21,7 +21,7 @@ class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 
@@ -32,39 +32,35 @@ class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($eventDispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Group name parameter is required
-     */
     public function testInitializeWithoutGroupName()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Group name parameter is required');
+
         $this->action->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Entity class parameter is required
-     */
     public function testInitializeWithoutEntityClass()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Entity class parameter is required');
+
         $this->action->initialize(['group_name' => 'group1']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute parameter is required
-     */
     public function testInitializeWithoutAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute parameter is required');
+
         $this->action->initialize(['group_name' => 'group1', 'entity_class' => 'class1']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property
-     */
     public function testInitializeWithInvalidAttribute()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property');
+
         $this->action->initialize(['group_name' => 'group1', 'entity_class' => 'class1', 'attribute' => 'attribute1']);
     }
 

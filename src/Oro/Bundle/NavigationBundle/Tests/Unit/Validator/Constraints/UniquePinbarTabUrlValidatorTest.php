@@ -35,7 +35,7 @@ class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var UniquePinbarTabUrlValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->pinbarTabUrlNormalizer = $this->createMock(PinbarTabUrlNormalizerInterface::class);

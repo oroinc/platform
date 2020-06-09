@@ -17,7 +17,7 @@ Or the same example but when the expression is defined in YAML file:
 
 ```yaml
 @empty:
-    - @trim: $foo
+    - '@trim': $foo
 ```
 
 ```php
@@ -31,17 +31,17 @@ Here is an example of more complex expression:
 
 ```yaml
 @or:
-    - @empty: [$call_timeout]
-    - @or:
-        - @and:
+    - '@empty': [$call_timeout]
+    - '@or':
+        - '@and':
             message: Call timeout must be between 60 and 100
             parameters:
-                - @gte: [$call_timeout, 60]
-                - @lt: [$call_timeout, 100]
-        - @and:
+                - '@gte': [$call_timeout, 60]
+                - '@lt': [$call_timeout, 100]
+        - '@and':
             message: Call timeout must be between 0 and 30
-            - @lte: [$call_timeout, 30]
-            - @gt: [$call_timeout, 0]
+            - '@lte': [$call_timeout, 30]
+            - '@gt': [$call_timeout, 0]
 ```
 
 All expressions provided by this component out of the box you can find in [CoreExtension](./Extension/Core/CoreExtension.php) class.

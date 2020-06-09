@@ -11,16 +11,14 @@ class DataProviderDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     protected $decorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decorator = new DataProviderDecorator(new \ArrayObject(), ['offset']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidArgumentException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new DataProviderDecorator(null, []);
     }
 
@@ -33,20 +31,17 @@ class DataProviderDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->decorator->offsetGet(0));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testCallBadMethodCallException()
     {
+        $this->expectException(\BadMethodCallException::class);
         $this->decorator->getFlags();
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method "offsetFlags" not found in "ArrayObject".
-     */
     public function testCallNotExistMethodCallException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method "offsetFlags" not found in "ArrayObject".');
+
         $this->decorator->offsetFlags();
     }
 }

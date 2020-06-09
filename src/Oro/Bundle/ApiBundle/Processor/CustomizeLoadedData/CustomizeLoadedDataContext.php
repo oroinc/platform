@@ -114,6 +114,48 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     }
 
     /**
+     * Gets the value of an entity field by the given property path from response data.
+     *
+     * @param string     $propertyPath The path to an entity field, each element is the property name in an entity
+     * @param array|null $data         Response data
+     *
+     * @return mixed
+     */
+    public function getResultFieldValueByPropertyPath(string $propertyPath, array $data)
+    {
+        $config = $this->getConfig();
+        $path = ConfigUtil::explodePropertyPath($propertyPath);
+        $lastPropertyName = array_pop($path);
+        foreach ($path as $propertyName) {
+            if (null !== $config) {
+                $fieldName = $config->findFieldNameByPropertyPath($propertyName);
+                if (!$fieldName) {
+                    return null;
+                }
+                $config = $config->getField($fieldName)->getTargetEntity();
+                $propertyName = $fieldName;
+            }
+            if (!\array_key_exists($propertyName, $data)) {
+                return null;
+            }
+            $data = $data[$propertyName];
+            if (!\is_array($data)) {
+                return null;
+            }
+        }
+
+        if (null !== $config) {
+            $fieldName = $config->findFieldNameByPropertyPath($lastPropertyName);
+            if (!$fieldName) {
+                return null;
+            }
+            $lastPropertyName = $fieldName;
+        }
+
+        return $data[$lastPropertyName] ?? null;
+    }
+
+    /**
      * Indicates whether the given field is requested to be returned in response data.
      * This method takes into account whether the "customize_loaded_data" action is executed
      * for a relationship (in this case only identifier field is returned)
@@ -150,12 +192,12 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Indicates whether at least one of the given fields is requested to be returned in response data.
      *
-     * @param string[]   $fieldNames The names under which fields should be represented in response data
+     * @see isFieldRequested
+     *
      * @param array|null $data       Response data
+     * @param string[]   $fieldNames The names under which fields should be represented in response data
      *
      * @return bool
-     *
-     * @see isFieldRequested
      */
     public function isAtLeastOneFieldRequested(array $fieldNames, array $data = null): bool
     {
@@ -172,12 +214,12 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * Indicates whether the given field is requested to be returned
      * in at least one element of response collection data.
      *
-     * @param string $fieldName The name under which a field should be represented in response data
+     * @see isFieldRequested
+     *
      * @param array  $data      Response data
+     * @param string $fieldName The name under which a field should be represented in response data
      *
      * @return bool
-     *
-     * @see isFieldRequested
      */
     public function isFieldRequestedForCollection(string $fieldName, array $data): bool
     {
@@ -194,12 +236,12 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * Indicates whether at least one of the given fields is requested to be returned
      * in at least one element of response collection data.
      *
-     * @param string[] $fieldNames The names under which fields should be represented in response data
+     * @see isAtLeastOneFieldRequested
+     *
      * @param array    $data       Response data
+     * @param string[] $fieldNames The names under which fields should be represented in response data
      *
      * @return bool
-     *
-     * @see isAtLeastOneFieldRequested
      */
     public function isAtLeastOneFieldRequestedForCollection(array $fieldNames, array $data): bool
     {

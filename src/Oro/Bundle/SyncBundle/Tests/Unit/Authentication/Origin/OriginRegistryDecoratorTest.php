@@ -17,7 +17,7 @@ class OriginRegistryDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var OriginRegistryDecorator|\PHPUnit\Framework\MockObject\MockObject */
     private $originRegistryDecorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->originProvider = $this->createMock(OriginProviderInterface::class);
         $this->baseOriginRegistry = $this->createMock(OriginRegistry::class);

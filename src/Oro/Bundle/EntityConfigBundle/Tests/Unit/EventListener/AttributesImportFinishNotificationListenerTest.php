@@ -28,7 +28,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
      */
     protected $attributesImportFinishNotificationListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->topicSender = $this->createMock(AttributesImportTopicSender::class);
         $this->attributesImportFinishNotificationListener =

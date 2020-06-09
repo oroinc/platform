@@ -7,12 +7,14 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
@@ -20,7 +22,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     /** @var BuildCriteria */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +38,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     private function getComparisonFilter($dataType, $propertyPath)
     {
         $filter = new ComparisonFilter($dataType);
-        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $filter->setField($propertyPath);
 
         return $filter;
@@ -64,11 +66,11 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[label]',
-            FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', FilterOperator::EQ)
         );
         $filterValues->set(
             'filter[name]',
-            FilterValue::createFromSource('filter[name]', 'name', 'val2', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', FilterOperator::EQ)
         );
 
         $filers = $this->context->getFilters();
@@ -96,11 +98,11 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[label]',
-            FilterValue::createFromSource('filter[label]', 'label', 'val1', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[label]', 'label', 'val1', FilterOperator::EQ)
         );
         $filterValues->set(
             'filter[name]',
-            FilterValue::createFromSource('filter[name]', 'name', 'val2', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[name]', 'name', 'val2', FilterOperator::EQ)
         );
 
         $filers = $this->context->getFilters();
@@ -128,7 +130,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[name]',
-            FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[name]', 'name', 'val', FilterOperator::EQ)
         );
 
         $this->context->setFilterValues($filterValues);
@@ -145,7 +147,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'filter[name]',
-            FilterValue::createFromSource('filter[name]', 'name', 'val', ComparisonFilter::EQ)
+            FilterValue::createFromSource('filter[name]', 'name', 'val', FilterOperator::EQ)
         );
 
         $filter = $this->createMock(ComparisonFilter::class);
@@ -178,7 +180,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set(
             'someFilter',
-            new FilterValue('someFilter', 'val', ComparisonFilter::EQ)
+            new FilterValue('someFilter', 'val', FilterOperator::EQ)
         );
 
         $filter = $this->createMock(ComparisonFilter::class);
@@ -206,7 +208,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessFilterWithDefaultValue()
     {
-        $filter = new PageSizeFilter('integer');
+        $filter = new PageSizeFilter(DataType::UNSIGNED_INTEGER);
         $filter->setDefaultValue(5);
 
         $filers = $this->context->getFilters();

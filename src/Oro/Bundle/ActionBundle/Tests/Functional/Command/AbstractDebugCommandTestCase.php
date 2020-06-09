@@ -10,7 +10,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     /** @var FactoryWithTypesInterface */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->factory = $this->getContainer()->get($this->getFactoryServiceId());
@@ -20,9 +20,9 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     {
         $typeNames = array_keys($this->factory->getTypes());
         $result = $this->runCommand($this->getCommandName());
-        $this->assertContains('Short Description', $result);
+        static::assertStringContainsString('Short Description', $result);
         foreach ($typeNames as $name) {
-            $this->assertContains($name, $result);
+            static::assertStringContainsString($name, $result);
         }
     }
 
@@ -32,9 +32,9 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $typeNames = array_keys($types);
         $name = array_shift($typeNames);
         $result = $this->runCommand($this->getCommandName(), [$name]);
-        $this->assertContains('Full Description', $result);
-        $this->assertContains($name, $result);
-        $this->assertContains(array_shift($types), $result);
+        static::assertStringContainsString('Full Description', $result);
+        static::assertStringContainsString($name, $result);
+        static::assertStringContainsString(array_shift($types), $result);
     }
 
     public function testExecuteWithNotExistsArgument(): void

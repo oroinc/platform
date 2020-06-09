@@ -19,7 +19,7 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var SendProcessorRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processors = [];
         $this->processors[self::FOO_METHOD] = $this->getMockProcessor(self::FOO_LABEL);
@@ -53,12 +53,11 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->processors[self::BAR_METHOD], $this->registry->getProcessor(self::BAR_METHOD));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException
-     * @expectedExceptionMessage Reminder method "not_exist" is not supported.
-     */
     public function testGetProcessorFails()
     {
+        $this->expectException(\Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException::class);
+        $this->expectExceptionMessage('Reminder method "not_exist" is not supported.');
+
         $this->registry->getProcessor('not_exist');
     }
 

@@ -31,7 +31,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailBodySynchronizer */
     protected $synchronizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger   = $this->createMock('Psr\Log\LoggerInterface');
         $this->selector = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector')
@@ -111,12 +111,11 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException
-     * @expectedExceptionMessage Cannot load a body for "test email" email.
-     */
     public function testSyncOneEmailBodyFailure()
     {
+        $this->expectException(\Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException::class);
+        $this->expectExceptionMessage('Cannot load a body for "test email" email.');
+
         $email = new Email();
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');
@@ -157,12 +156,11 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException
-     * @expectedExceptionMessage Cannot load a body for "test email" email.
-     */
     public function testSyncOneEmailBodyNotFound()
     {
+        $this->expectException(\Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException::class);
+        $this->expectExceptionMessage('Cannot load a body for "test email" email.');
+
         $email = new Email();
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');

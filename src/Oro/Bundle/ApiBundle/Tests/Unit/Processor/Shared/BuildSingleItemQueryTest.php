@@ -17,7 +17,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     /** @var BuildSingleItemQuery */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

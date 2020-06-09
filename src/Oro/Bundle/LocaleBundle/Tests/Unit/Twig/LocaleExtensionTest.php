@@ -19,7 +19,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleExtension */
     protected $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings =$this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
@@ -32,7 +32,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocaleExtension($container);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->localeSettings);
         unset($this->extension);

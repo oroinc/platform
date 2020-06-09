@@ -26,7 +26,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->createMock(ConfigurationProviderInterface::class);
         $this->validator = $this->createMock(ConfigurationValidatorInterface::class);

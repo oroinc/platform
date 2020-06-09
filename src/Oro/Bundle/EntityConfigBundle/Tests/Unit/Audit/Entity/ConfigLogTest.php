@@ -14,13 +14,13 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
     /** @var  ConfigLogDiff */
     private $configLogDiff;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configLog     = new ConfigLog();
         $this->configLogDiff = new ConfigLogDiff();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->configLog     = null;
         $this->configLogDiff = null;

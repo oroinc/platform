@@ -13,7 +13,7 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
     /** @var BuildQuery */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

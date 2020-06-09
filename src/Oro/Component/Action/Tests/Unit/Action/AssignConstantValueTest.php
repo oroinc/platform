@@ -4,41 +4,49 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignConstantValue;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CONSTANT = 'test_c';
 
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var ActionInterface
-     */
+    /** @var ActionInterface */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
-        $this->action = new AssignConstantValue($this->contextAccessor);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->action = new class($this->contextAccessor) extends AssignConstantValue {
+            public function xgetAttribute()
+            {
+                return $this->attribute;
+            }
+
+            public function xgetValue()
+            {
+                return $this->value;
+            }
+        };
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeException(array $options)
     {
+        $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -65,10 +73,10 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize(array $options, $attribute, $value)
     {
-        $this->assertSame($this->action, $this->action->initialize($options));
+        static::assertSame($this->action, $this->action->initialize($options));
 
-        $this->assertAttributeEquals($attribute, 'attribute', $this->action);
-        $this->assertAttributeEquals($value, 'value', $this->action);
+        static::assertEquals($attribute, $this->action->xgetAttribute());
+        static::assertEquals($value, $this->action->xgetValue());
     }
 
     /**
@@ -82,12 +90,11 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Cannot evaluate value of "someValue", constant is not exist.
-     */
     public function testExecuteIncorrectUnknownConstant()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Cannot evaluate value of "someValue", constant is not exist.');
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
@@ -99,12 +106,11 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.
-     */
     public function testExecuteIncorrectNoClass()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.');
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
@@ -116,12 +122,13 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "assign_constant_value" expects a string in parameter "value", array is given.
-     */
     public function testExecuteException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "assign_constant_value" expects a string in parameter "value", array is given.'
+        );
+
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
@@ -145,6 +152,6 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize([$attribute, $value]);
         $this->action->execute($context);
 
-        $this->assertEquals(self::TEST_CONSTANT, $context->attr);
+        static::assertEquals(self::TEST_CONSTANT, $context->attr);
     }
 }

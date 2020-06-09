@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
@@ -47,7 +48,7 @@ class EmailRecipientRepository extends EntityRepository
             ->orderBy('re.name')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
-            ->setParameter('from', new \DateTime('-30 days'));
+            ->setParameter('from', new \DateTime('-30 days'), Type::DATETIME);
 
         if ($senderEmails) {
             $recepientsQb->setParameter('senders', $senderEmails);

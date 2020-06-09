@@ -5,7 +5,6 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This extension signals (by calling the tick method) that a consumer did not fail and continue to work normally
@@ -16,11 +15,8 @@ class ConsumerHeartbeatExtension extends AbstractExtension
     /** @var int */
     private $updateHeartbeatPeriod;
 
-    /** @var ContainerInterface */
-    private $container;
-
     /** @var \DateTime */
-    private $lastUpdatedTime;
+    private static $lastUpdatedTime;
 
     /** @var ConsumerHeartbeat */
     private $consumerHeartbeat;
@@ -38,7 +34,15 @@ class ConsumerHeartbeatExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onStart(Context $context)
+    {
+        self::$lastUpdatedTime = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context): void
     {
         // do nothing if the check was disabled with 0 config option value
         if ($this->updateHeartbeatPeriod === 0) {
@@ -46,15 +50,15 @@ class ConsumerHeartbeatExtension extends AbstractExtension
         }
 
         $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
-        if (!$this->lastUpdatedTime
+        if (!self::$lastUpdatedTime
             || (
-                ($currentTime->getTimestamp() - $this->lastUpdatedTime->getTimestamp())/60
+                ($currentTime->getTimestamp() - self::$lastUpdatedTime->getTimestamp())/60
                 >= $this->updateHeartbeatPeriod
             )
         ) {
             $context->getLogger()->info('Update the consumer state time.');
             $this->consumerHeartbeat->tick();
-            $this->lastUpdatedTime = $currentTime;
+            self::$lastUpdatedTime = $currentTime;
         }
     }
 }

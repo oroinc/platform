@@ -3,24 +3,34 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ReminderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Reminder
-     */
+    /** @var Reminder */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entity = new Reminder();
+        $this->entity = new class() extends Reminder {
+            public function xgetIntervalNumber(): int
+            {
+                return $this->intervalNumber;
+            }
+
+            public function xgetIntervalUnit(): string
+            {
+                return $this->intervalUnit;
+            }
+        };
     }
 
     public function testCreate()
     {
-        $this->assertEmpty($this->entity->getId());
-        $this->assertEquals(Reminder::STATE_NOT_SENT, $this->entity->getState());
+        static::assertEmpty($this->entity->getId());
+        static::assertEquals(Reminder::STATE_NOT_SENT, $this->entity->getState());
     }
 
     public function testIntervalAndStartAt()
@@ -30,68 +40,60 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         $unit     = ReminderInterval::UNIT_DAY;
         $interval = new ReminderInterval($number, $unit);
 
-        $this->assertNull($this->entity->getStartAt());
+        static::assertNull($this->entity->getStartAt());
         $this->entity->setExpireAt($expireAt);
         $this->entity->setInterval($interval);
-        $this->assertAttributeEquals($number, 'intervalNumber', $this->entity);
-        $this->assertAttributeEquals($unit, 'intervalUnit', $this->entity);
-        $this->assertEquals(new \DateTime('2014-01-12'), $this->entity->getStartAt());
+        static::assertEquals($number, $this->entity->xgetIntervalNumber());
+        static::assertEquals($unit, $this->entity->xgetIntervalUnit());
+        static::assertEquals(new \DateTime('2014-01-12'), $this->entity->getStartAt());
     }
 
     public function testPrePersist()
     {
         $this->entity->prePersist();
 
-        $this->assertEquals($this->entity->getCreatedAt()->format('Y-m-d'), date('Y-m-d'));
+        static::assertEquals($this->entity->getCreatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
 
     public function testPreUpdate()
     {
         $this->entity->preUpdate();
 
-        $this->assertEquals($this->entity->getUpdatedAt()->format('Y-m-d'), date('Y-m-d'));
+        static::assertEquals($this->entity->getUpdatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
 
     public function testToString()
     {
         $this->entity->setSubject('subject');
 
-        $this->assertEquals('subject', (string)$this->entity);
+        static::assertEquals('subject', (string)$this->entity);
     }
 
     public function testSetSentState()
     {
         $this->entity->setState(Reminder::STATE_SENT);
 
-        $this->assertEquals(Reminder::STATE_SENT, $this->entity->getState());
-        $this->assertInstanceOf('DateTime', $this->entity->getSentAt());
+        static::assertEquals(Reminder::STATE_SENT, $this->entity->getState());
+        static::assertInstanceOf('DateTime', $this->entity->getSentAt());
     }
 
     public function testSetReminderData()
     {
         $expectedSubject   = 'subject';
         $expectedExpireAt  = new \DateTime();
-        $expectedRecipient = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $expectedRecipient = $this->createMock(User::class);
 
-        $reminderData = $this->createMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
+        $reminderData = $this->createMock(ReminderDataInterface::class);
 
-        $reminderData->expects($this->once())
-            ->method('getSubject')
-            ->will($this->returnValue($expectedSubject));
-
-        $reminderData->expects($this->once())
-            ->method('getExpireAt')
-            ->will($this->returnValue($expectedExpireAt));
-
-        $reminderData->expects($this->once())
-            ->method('getRecipient')
-            ->will($this->returnValue($expectedRecipient));
+        $reminderData->expects(static::once())->method('getSubject')->willReturn($expectedSubject);
+        $reminderData->expects(static::once())->method('getExpireAt')->willReturn($expectedExpireAt);
+        $reminderData->expects(static::once())->method('getRecipient')->willReturn($expectedRecipient);
 
         $this->entity->setReminderData($reminderData);
 
-        $this->assertEquals($expectedSubject, $this->entity->getSubject());
-        $this->assertEquals($expectedExpireAt, $this->entity->getExpireAt());
-        $this->assertEquals($expectedRecipient, $this->entity->getRecipient());
+        static::assertEquals($expectedSubject, $this->entity->getSubject());
+        static::assertEquals($expectedExpireAt, $this->entity->getExpireAt());
+        static::assertEquals($expectedRecipient, $this->entity->getRecipient());
     }
 
     public function testSetFailureException()
@@ -100,16 +102,16 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         $expectedCode    = 100;
         $exception       = new \Exception($expectedMessage, $expectedCode);
 
-        $expected = array(
+        $expected = [
             'class'   => get_class($exception),
             'message' => $expectedMessage,
             'code'    => $expectedCode,
             'trace'   => $exception->getTraceAsString(),
-        );
+        ];
 
         $this->entity->setFailureException($exception);
 
-        $this->assertEquals($expected, $this->entity->getFailureException());
+        static::assertEquals($expected, $this->entity->getFailureException());
     }
 
     /**
@@ -117,11 +119,11 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
      */
     public function testSettersAndGetters($value, $property, $getter = null, $setter = null)
     {
-        $getter = $getter ? : 'get' . ucfirst($property);
-        $setter = $setter ? : 'set' . ucfirst($property);
+        $getter = $getter ? : 'get' . \ucfirst($property);
+        $setter = $setter ? : 'set' . \ucfirst($property);
 
-        $this->assertEquals($this->entity, $this->entity->$setter($value));
-        $this->assertEquals($value, $this->entity->$getter());
+        static::assertEquals($this->entity, $this->entity->$setter($value));
+        static::assertEquals($value, $this->entity->$getter());
     }
 
     public function settersAndGettersDataProvider()
@@ -156,7 +158,7 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
                 'property' => 'relatedEntityClassName',
             ],
             'recipient'              => [
-                'value'    => $this->createMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
+                'value'    => $this->createMock(User::class),
                 'property' => 'recipient',
             ],
             'createdAt'              => [

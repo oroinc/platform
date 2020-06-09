@@ -19,20 +19,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -75,20 +70,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -131,20 +121,15 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' u1_.id AS id_2,'
-            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
-            . ' u1_.category_name AS category_name_5'
+            . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
             . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id AND (p0_.owner_id = u1_.id AND u1_.name LIKE \'a%\')'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'id_2'            => 10,
-                    'category_name_3' => 'category_name',
-                    'owner_id_4'      => 10,
-                    'category_name_5' => 'owner_category_name'
+                    'id_0'   => 1,
+                    'name_1' => 'product_name',
+                    'id_2'   => 10
                 ]
             ],
             [1 => 1],
@@ -657,16 +642,13 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' p0_.category_name AS category_name_2, p0_.owner_id AS owner_id_3'
+            'SELECT p0_.id AS id_0, p0_.name AS name_1'
             . ' FROM product_table p0_'
             . ' WHERE p0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'product_name',
-                    'category_name_2' => 'category_name',
-                    'owner_id_3'      => 10
+                    'id_0'   => 1,
+                    'name_1' => 'product_name'
                 ]
             ],
             [1 => 1],
@@ -701,29 +683,25 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
             ->setParameter('id', 1);
 
         $conn = $this->getDriverConnectionMock($this->em);
-
         $this->setQueryExpectationAt(
             $conn,
             0,
             'SELECT u0_.id AS id_0, u0_.name AS name_1,'
-            . ' c1_.name AS name_2, c1_.label AS label_3,'
-            . ' u0_.category_name AS category_name_4'
+            . ' c1_.name AS name_2, c1_.label AS label_3'
             . ' FROM user_table u0_'
             . ' LEFT JOIN category_table c1_ ON u0_.category_name = c1_.name'
             . ' WHERE u0_.id = ?',
             [
                 [
-                    'id_0'            => 1,
-                    'name_1'          => 'user_name',
-                    'name_2'          => 'category_name',
-                    'label_3'         => 'category_label',
-                    'category_name_4' => 'category_name'
+                    'id_0'    => 1,
+                    'name_1'  => 'user_name',
+                    'name_2'  => 'category_name',
+                    'label_3' => 'category_label'
                 ]
             ],
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-
         $this->setQueryExpectationAt(
             $conn,
             1,

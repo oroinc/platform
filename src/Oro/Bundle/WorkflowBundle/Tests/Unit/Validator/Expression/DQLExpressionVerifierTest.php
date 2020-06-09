@@ -12,12 +12,12 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionVerifierInterface */
     protected $verifier;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new DQLExpressionVerifier();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->verifier);
     }
@@ -67,18 +67,17 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         $query->expects($this->once())->method('setMaxResults')->with(1)->willReturnSelf();
         $query->expects($this->once())->method('execute')->willThrowException($exception);
 
-        $this->expectException('Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException');
+        $this->expectException(\Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException::class);
         $this->expectExceptionMessage($exception->getMessage());
 
         $this->verifier->verify($query);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $expression must be instance of Doctrine\ORM\AbstractQuery. "string" given
-     */
     public function testVerifyWithInvalidData()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$expression must be instance of Doctrine\ORM\AbstractQuery. "string" given');
+
         $this->verifier->verify('string');
     }
 

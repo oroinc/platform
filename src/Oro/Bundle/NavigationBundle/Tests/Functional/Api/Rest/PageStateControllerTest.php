@@ -13,7 +13,7 @@ class PageStateControllerTest extends WebTestCase
      */
     protected static $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

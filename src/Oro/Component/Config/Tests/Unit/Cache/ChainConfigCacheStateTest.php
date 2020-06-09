@@ -16,7 +16,7 @@ class ChainConfigCacheStateTest extends \PHPUnit\Framework\TestCase
     /** @var ChainConfigCacheState */
     private $chainConfigCacheState;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configCacheState1 = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheState2 = $this->createMock(ConfigCacheStateInterface::class);

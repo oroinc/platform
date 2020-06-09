@@ -7,7 +7,7 @@ abstract class AssociationTypeTestCase extends AbstractConfigTypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $groupingConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

@@ -16,7 +16,7 @@ class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->stub = new CompilerPassProviderStub();
     }

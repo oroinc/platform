@@ -28,7 +28,7 @@ class SmtpConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCa
     /** @var SmtpConnectionConfigurationValidator */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new SmtpConnectionConfiguration();
 

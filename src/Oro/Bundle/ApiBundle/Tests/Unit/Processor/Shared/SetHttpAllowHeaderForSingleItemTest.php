@@ -16,7 +16,7 @@ class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
     /** @var SetHttpAllowHeaderForSingleItem */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

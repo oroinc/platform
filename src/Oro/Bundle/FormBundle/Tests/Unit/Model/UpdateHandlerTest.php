@@ -71,7 +71,7 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
      */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
 
@@ -121,12 +121,13 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
         return $resultCallback;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument $formHandler should be an object with method "process", stdClass given.
-     */
     public function testHandleUpdateFailsWhenFormHandlerIsInvalid()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Argument $formHandler should be an object with method "process", stdClass given.'
+        );
+
         $this->form->expects($this->never())->method($this->anything());
 
         $data = $this->getObject();
@@ -319,12 +320,11 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test flush exception
-     */
     public function testHandleUpdateWorksWhenFormFlushFailed()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test flush exception');
+
         $entity = $this->getObject();
         $this->form->expects($this->once())
             ->method('setData')
@@ -365,12 +365,11 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test flush exception
-     */
     public function testUpdateWorksWhenFormFlushFailed()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test flush exception');
+
         $data = $this->getObject();
         $this->form->expects($this->once())
             ->method('setData')

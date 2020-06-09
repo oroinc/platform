@@ -5,35 +5,37 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowDataSerializer
-     */
+    /** @var WorkflowDataSerializer */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serializer = new WorkflowDataSerializer();
+        $this->serializer = new class() extends WorkflowDataSerializer {
+            public function xgetWorkflowRegistry(): WorkflowRegistry
+            {
+                return $this->workflowRegistry;
+            }
+        };
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->serializer);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return WorkflowRegistry|MockObject
      */
     protected function createWorkflowRegistryMock()
     {
-        $workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+        return $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getWorkflow'))
+            ->onlyMethods(['getWorkflow'])
             ->getMock();
-
-        return $workflowRegistry;
     }
 
     public function testSetWorkflowRegistry()
@@ -41,42 +43,40 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         /** @var WorkflowRegistry $workflowRegistry */
         $workflowRegistry = $this->createWorkflowRegistryMock();
         $this->serializer->setWorkflowRegistry($workflowRegistry);
-        $this->assertAttributeEquals($workflowRegistry, 'workflowRegistry', $this->serializer);
+        static::assertEquals($workflowRegistry, $this->serializer->xgetWorkflowRegistry());
     }
 
     public function testSetWorkflowName()
     {
-        $this->assertAttributeEmpty('workflowName', $this->serializer);
+        static::assertEmpty($this->serializer->getWorkflowName());
         $workflowName = 'test_workflow';
         $this->serializer->setWorkflowName($workflowName);
-        $this->assertAttributeEquals($workflowName, 'workflowName', $this->serializer);
+        static::assertEquals($workflowName, $this->serializer->getWorkflowName());
     }
 
     public function testGetWorkflowName()
     {
-        $this->assertNull($this->serializer->getWorkflowName());
+        static::assertNull($this->serializer->getWorkflowName());
         $workflowName = 'test_workflow';
         $this->serializer->setWorkflowName($workflowName);
-        $this->assertEquals($workflowName, $this->serializer->getWorkflowName());
+        static::assertEquals($workflowName, $this->serializer->getWorkflowName());
     }
 
     public function testGetWorkflow()
     {
         $workflowName = 'test_workflow';
         /** @var Workflow $workflow */
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
 
         $workflowRegistry = $this->createWorkflowRegistryMock();
-        $workflowRegistry->expects($this->once())
+        $workflowRegistry->expects(static::once())
             ->method('getWorkflow')
             ->with($workflowName)
-            ->will($this->returnValue($workflow));
+            ->willReturn($workflow);
 
         /** @var WorkflowRegistry $workflowRegistry */
         $this->serializer->setWorkflowRegistry($workflowRegistry);
         $this->serializer->setWorkflowName($workflowName);
-        $this->assertEquals($workflow, $this->serializer->getWorkflow());
+        static::assertEquals($workflow, $this->serializer->getWorkflow());
     }
 }

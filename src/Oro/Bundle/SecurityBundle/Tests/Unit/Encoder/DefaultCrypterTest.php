@@ -19,7 +19,7 @@ class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
         $encryptor = new DefaultCrypter($key);
 
         $encrypted = $encryptor->encryptData($someData);
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
         $this->assertNotEquals($someData, $encrypted);
 
         $this->assertEquals($someData, $encryptor->decryptData($encrypted));

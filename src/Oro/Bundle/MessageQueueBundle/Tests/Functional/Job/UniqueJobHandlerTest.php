@@ -17,7 +17,7 @@ class UniqueJobHandlerTest extends WebTestCase
     /** @var UniqueJobHandler */
     private $uniqueJobHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->uniqueJobHandler = $this->getContainer()->get('oro_message_queue.job.unique_job_handler');

@@ -2,93 +2,92 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|TemplateManager */
     protected $templateManager;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|ContextRegistry
      */
     protected $contextRegistry;
 
-    /**
-     * @var TemplateFixtureReader
-     */
+    /** @var TemplateFixtureReader */
     protected $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->templateManager = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->templateManager = $this->getMockBuilder(TemplateManager::class)->disableOriginalConstructor()->getMock();
+        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->templateManager);
+        $this->reader = new class($this->contextRegistry, $this->templateManager) extends TemplateFixtureReader {
+            public function xgetStepExecution(): ?StepExecution
+            {
+                return $this->stepExecution;
+            }
+        };
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of fixture reader must contain "entityName".
-     */
     public function testInitializeFromContextExceptionNoOption()
     {
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Configuration of fixture reader must contain "entityName".');
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(static::once())
             ->method('hasOption')
             ->with('entityName')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contextRegistry->expects($this->once())
+        /** @var StepExecution|MockObject $stepExecution */
+        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+
+        $this->contextRegistry->expects(static::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->reader->setStepExecution($stepExecution);
     }
 
     public function testInitializeFromContext()
     {
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(static::once())
             ->method('hasOption')
             ->with('entityName')
-            ->will($this->returnValue(true));
-        $context->expects($this->atLeastOnce())
+            ->willReturn(true);
+        $context->expects(static::atLeastOnce())
             ->method('getOption')
             ->with('entityName')
-            ->will($this->returnValue('stdClass'));
+            ->willReturn('stdClass');
 
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contextRegistry->expects($this->once())
+        /** @var StepExecution|MockObject $stepExecution */
+        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+
+        $this->contextRegistry->expects(static::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
-        $iterator = new \ArrayIterator(array('test'));
-        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
-        $fixture->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($iterator));
-        $this->templateManager->expects($this->once())
+        $iterator = new \ArrayIterator(['test']);
+        $fixture = $this->createMock(TemplateFixtureInterface::class);
+        $fixture->expects(static::once())->method('getData')->willReturn($iterator);
+        $this->templateManager->expects(static::once())
             ->method('getEntityFixture')
             ->with('stdClass')
-            ->will($this->returnValue($fixture));
+            ->willReturn($fixture);
 
         $this->reader->setStepExecution($stepExecution);
-        $this->assertAttributeEquals($iterator, 'sourceIterator', $this->reader);
+        static::assertEquals($iterator, $this->reader->getSourceIterator());
     }
 }

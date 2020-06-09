@@ -32,7 +32,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdResolverRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver1 = $this->createMock(EntityIdResolverInterface::class);
         $this->resolver2 = $this->createMock(EntityIdResolverInterface::class);

@@ -30,7 +30,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder(BatchUpdateProcessor::class)
             ->disableOriginalConstructor()

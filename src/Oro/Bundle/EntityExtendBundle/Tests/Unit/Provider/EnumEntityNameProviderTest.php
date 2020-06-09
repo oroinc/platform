@@ -13,7 +13,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $enumEntityNameProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->enumEntityNameProvider = new EnumEntityNameProvider();
     }

@@ -4,9 +4,12 @@ trusted_data:
         Oro\Component\EntitySerializer\QueryFactory:
             getToManyAssociationQueryBuilder:
                 associationMapping: true
-        Oro\Component\EntitySerializer\EntitySerializer:
-            updateQuery:
-                propertyPath: true
+        Oro\Component\EntitySerializer\QueryModifier:
+            updateJoinQueryPart:
+                joinExpr: true
+                alias: true
+            updateJoinQueryPartForNestedAssociations:
+                joinExpr: true
                 alias: true
             updateSelectQueryPart:
                 alias: true
@@ -14,8 +17,6 @@ trusted_data:
         Oro\Component\EntitySerializer\DoctrineHelper:
             getRootAlias: true
             getEntityIdFieldName: true
-        Oro\Component\EntitySerializer\EntitySerializer:
-            getExistingJoinAlias: true
         Oro\Component\EntitySerializer\FieldAccessor:
             getFieldsToSelect: true
         Oro\Component\EntitySerializer\FieldConfig:

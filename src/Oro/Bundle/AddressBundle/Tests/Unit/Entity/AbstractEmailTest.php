@@ -11,12 +11,12 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
      */
     protected $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->email = $this->createEmail();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->email);
     }

@@ -11,7 +11,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionNormalizer */
     protected $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new ExpressionNormalizer();
     }

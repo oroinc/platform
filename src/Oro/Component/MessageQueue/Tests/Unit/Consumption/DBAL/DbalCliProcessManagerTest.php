@@ -12,6 +12,6 @@ class DbalCliProcessManagerTest extends \PHPUnit\Framework\TestCase
         $pids = $processManager->getListOfProcessesPids('');
 
         $this->assertGreaterThan(0, count($pids));
-        $this->assertInternalType('integer', $pids[0]);
+        $this->assertIsInt($pids[0]);
     }
 }

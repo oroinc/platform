@@ -28,7 +28,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $platform = $platform = $this->getMockBuilder(AbstractPlatform::class)
             ->setMethods(['convertBooleans'])
@@ -113,12 +113,12 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider updateSecurityIdentityNoChangesProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testUpdateSecurityIdentityShouldThrowInvalidArgumentException(
         SecurityIdentityInterface $sid,
         $oldName
     ) {
+        $this->expectException(\InvalidArgumentException::class);
         $this->provider->updateSecurityIdentity($sid, $oldName);
     }
 
@@ -192,12 +192,11 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $provider->deleteAclClass($oid);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some exception
-     */
     public function testDeleteAclClassFailure()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some exception');
+
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|MutableAclProvider $provider */

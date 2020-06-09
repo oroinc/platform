@@ -31,7 +31,7 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
      */
     private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
@@ -52,11 +52,9 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDriverException()
     {
+        $this->expectException(\RuntimeException::class);
         $this->connection->expects($this->once())
             ->method('getParams')
             ->willReturn([

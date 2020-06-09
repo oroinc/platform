@@ -27,16 +27,16 @@ use Doctrine\ORM\Query\ResultSetMapping;
 class SqlQueryBuilder
 {
     /** @var EntityManagerInterface */
-    protected $em;
+    private $em;
 
     /** @var DbalQueryBuilder */
-    protected $qb;
+    private $qb;
 
     /** @var ResultSetMapping */
-    protected $rsm;
+    private $rsm;
 
     /** @var \Doctrine\DBAL\Connection */
-    protected $connection;
+    private $connection;
 
     /**
      * @param EntityManagerInterface $em
@@ -615,7 +615,6 @@ class SqlQueryBuilder
         return $this;
     }
 
-
     /**
      * Adds a grouping expression to the query.
      *
@@ -784,7 +783,7 @@ class SqlQueryBuilder
      * @throws QueryException
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function getUpdateSQL(): string
+    private function getUpdateSQL(): string
     {
         $from = $this->getQueryPart('from');
         $table = $from['table'] . ($from['alias'] ? ' ' . $from['alias'] : '');
@@ -886,7 +885,7 @@ class SqlQueryBuilder
      *
      * @throws QueryException
      */
-    protected function getSQLForUpdateJoins($fromAlias, array &$knownAliases, array $joinParts)
+    private function getSQLForUpdateJoins($fromAlias, array &$knownAliases, array $joinParts)
     {
         $sql = '';
 

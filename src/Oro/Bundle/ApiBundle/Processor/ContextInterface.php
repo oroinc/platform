@@ -14,38 +14,14 @@ use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
  * Represents an execution context for API processors for public actions.
  */
-interface ContextInterface extends ComponentContextInterface
+interface ContextInterface extends SharedDataAwareContextInterface
 {
-    /**
-     * Gets the current request type.
-     * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @return RequestType
-     */
-    public function getRequestType();
-
-    /**
-     * Gets API version
-     *
-     * @return string
-     */
-    public function getVersion();
-
-    /**
-     * Sets API version
-     *
-     * @param string $version
-     */
-    public function setVersion($version);
-
     /**
      * Gets FQCN of an entity.
      *
@@ -208,24 +184,6 @@ interface ContextInterface extends ComponentContextInterface
      * @param bool $flag
      */
     public function setHateoas(bool $flag);
-
-    /**
-     * Gets an object that is used to share data between a primary action
-     * and actions that are executed as part of this action.
-     * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @return ParameterBagInterface
-     */
-    public function getSharedData(): ParameterBagInterface;
-
-    /**
-     * Sets an object that is used to share data between a primary action
-     * and actions that are executed as part of this action.
-     * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @param ParameterBagInterface $sharedData
-     */
-    public function setSharedData(ParameterBagInterface $sharedData): void;
 
     /**
      * Gets a context for response data normalization.

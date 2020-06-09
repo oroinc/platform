@@ -5,36 +5,40 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class StartWorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StartWorkflow
-     */
+    /** @var StartWorkflow */
     protected $action;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|
-     */
+    /** @var MockObject|WorkflowManager */
     protected $workflowManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(array())
+            ->onlyMethods(['startWorkflow'])
             ->getMock();
 
-        $this->action = new StartWorkflow(new ContextAccessor(), $this->workflowManager);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->action = new class(new ContextAccessor(), $this->workflowManager) extends StartWorkflow {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->workflowManager);
         unset($this->action);
@@ -47,7 +51,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     public function optionsDataProvider()
@@ -201,12 +205,11 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         return $workflowItem;
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Entity value must be an object
-     */
     public function testExecuteEntityNotAnObject()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Entity value must be an object');
+
         $options = array(
             'name' => 'acmeWorkflow',
             'attribute' => new PropertyPath('workflowItem'),

@@ -22,7 +22,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
      */
     private $numberFormatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->numberFormatter = $this->createMock(NumberFormatter::class);
         $this->formType = new OroHiddenNumberType($this->numberFormatter);

@@ -21,7 +21,7 @@ class MediaCacheManagerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var MediaCacheManagerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileAccessControlChecker = $this->createMock(FileAccessControlChecker::class);
         $this->publicMediaCacheManager = $this->createMock(GaufretteFileManager::class);

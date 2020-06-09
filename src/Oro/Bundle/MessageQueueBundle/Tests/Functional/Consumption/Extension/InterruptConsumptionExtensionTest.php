@@ -16,27 +16,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
-    /**
-     * @var MessageProducerInterface
-     */
-    protected $producer;
+    /** @var MessageProducerInterface */
+    private $producer;
 
-    /**
-     * @var MessageProcessorInterface
-     */
-    protected $messageProcessor;
+    /** @var MessageProcessorInterface */
+    private $messageProcessor;
 
-    /**
-     * @var TestLogger
-     */
-    protected $logger;
+    /** @var TestLogger */
+    private $logger;
 
-    /**
-     * @var QueueConsumer
-     */
-    protected $consumer;
+    /** @var QueueConsumer */
+    private $consumer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $container = self::getContainer();
@@ -47,7 +39,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->clearMessages();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->clearMessages();
     }
@@ -83,12 +75,12 @@ class InterruptConsumptionExtensionTest extends WebTestCase
     /**
      * @param string $expectedMessage
      */
-    private function assertInterruptionMessage(string $expectedMessage)
+    private function assertInterruptionMessage(string $expectedMessage): void
     {
         $this->assertTrue($this->logger->hasRecord($expectedMessage, 'warning'));
     }
 
-    private function clearMessages()
+    private function clearMessages(): void
     {
         $connection = self::getContainer()->get(
             'oro_message_queue.transport.dbal.connection',

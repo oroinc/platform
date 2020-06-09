@@ -24,6 +24,10 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
+            ->booleanNode(ConfigUtil::DISABLE_PARTIAL_LOAD)->end()
+            ->arrayNode(ConfigUtil::INNER_JOIN_ASSOCIATIONS)
+                ->prototype('scalar')->end()
+            ->end()
             ->arrayNode(ConfigUtil::DOCUMENTATION_RESOURCE)
                 ->beforeNormalization()
                     ->ifString()
@@ -43,6 +47,9 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         $config = parent::postProcessConfig($config);
         if (empty($config[ConfigUtil::IDENTIFIER_FIELD_NAMES])) {
             unset($config[ConfigUtil::IDENTIFIER_FIELD_NAMES]);
+        }
+        if (empty($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS])) {
+            unset($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS]);
         }
         if (empty($config[ConfigUtil::DOCUMENTATION_RESOURCE])) {
             unset($config[ConfigUtil::DOCUMENTATION_RESOURCE]);

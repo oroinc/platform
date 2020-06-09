@@ -18,7 +18,7 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityAssociationHelper */
     protected $activityAssociationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

@@ -63,7 +63,7 @@ define(function(require) {
         createDialog: function(title, model) {
             const dialogWidget = new DialogWidget({
                 title: title,
-                el: $('<div><div class="comment-form-container" data-layout="separate"></div>'),
+                el: $('<div class="widget-content"><div class="comment-form-container" data-layout="separate"></div>'),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {

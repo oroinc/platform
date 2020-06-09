@@ -12,7 +12,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
      */
     protected $result;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->result = new WorkflowResult();
     }

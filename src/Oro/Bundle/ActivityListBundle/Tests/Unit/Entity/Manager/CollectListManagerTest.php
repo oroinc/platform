@@ -19,7 +19,7 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
     /** @var CollectListManager */
     protected $manager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->chainProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()

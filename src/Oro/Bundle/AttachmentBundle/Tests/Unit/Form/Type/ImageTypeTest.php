@@ -10,7 +10,7 @@ class ImageTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ImageType */
     protected $type;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->type = new ImageType();
     }

@@ -32,7 +32,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
     /** @var FlushData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -179,12 +179,11 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         self::assertEquals([$item2Error], $item2->getContext()->getErrors());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The flush data handler is not registered for Test\Entity.
-     */
     public function testProcessWhenFlushDataHandlerNotFound()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The flush data handler is not registered for Test\Entity.');
+
         $item1 = $this->getBatchUpdateItem(0);
         $item2 = $this->getBatchUpdateItem(1);
         $item1->getContext()->setClassName(self::ENTITY_CLASS);
@@ -360,6 +359,9 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
 
     public function testProcessWhenExceptionOccurredInFlushDataAndOneBatchItemsInContext()
     {
+        $operationId = 123;
+        $chunkFileName = 'test.json';
+
         $item1 = $this->getBatchUpdateItem(0);
         $item1->getContext()->setClassName(self::ENTITY_CLASS);
         $items = [$item1];
@@ -387,6 +389,15 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->method('finishFlushData')
             ->with($items);
 
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Unexpected error occurred when flushing data for a batch operation chunk.',
+                ['operationId' => $operationId, 'chunkFile' => $chunkFileName, 'exception' => $exception]
+            );
+
+        $this->context->setOperationId($operationId);
+        $this->context->setFile(new ChunkFile($chunkFileName, 0, 0, 'data'));
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);

@@ -29,12 +29,11 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
         $layoutFactoryBuilder->addTypeExtension($this->extension);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Name of extended type should be provided for block type extension
-     */
     public function testGetNameException()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Name of extended type should be provided for block type extension');
+
         (new ConfigurableTypeExtension())->getExtendedType();
     }
 
@@ -43,12 +42,11 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
         $this->assertEquals(ConfigurableBlockTestCase::TYPE_NAME, $this->extension->getExtendedType());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Name of extended type should be a string, array given
-     */
     public function testSetNameExceptionType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Name of extended type should be a string, array given');
+
         $this->extension->setExtendedType([]);
     }
 }

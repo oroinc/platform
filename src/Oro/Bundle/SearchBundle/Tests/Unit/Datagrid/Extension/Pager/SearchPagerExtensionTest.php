@@ -27,7 +27,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
      */
     protected $pagerExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagridConfig = $this->createMock(DatagridConfiguration::class);
         $this->pager = $this->createMock(IndexerPager::class);
@@ -38,7 +38,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->pagerExtension->setParameters($parameterBag);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->pagerExtension);
     }

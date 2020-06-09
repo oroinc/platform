@@ -1,0 +1,5 @@
+oro_notification:
+    events:
+      - oro.notification.event.entity_post_persist
+      - oro.notification.event.entity_post_remove
+      - oro.notification.event.entity_post_update

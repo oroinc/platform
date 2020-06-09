@@ -22,7 +22,7 @@ class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
      */
     private $resolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->getMockBuilder(ScopeManager::class)
             ->disableOriginalConstructor()

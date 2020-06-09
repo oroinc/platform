@@ -16,7 +16,7 @@ class CurrentUserProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->provider = new CurrentUserProvider($this->tokenAccessor);

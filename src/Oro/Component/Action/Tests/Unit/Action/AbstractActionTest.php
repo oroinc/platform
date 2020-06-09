@@ -7,95 +7,105 @@ use Oro\Component\Action\Event\ExecuteActionEvent;
 use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AbstractActionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractAction|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AbstractAction|MockObject */
     protected $action;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|MockObject */
     protected $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->action = $this->getMockBuilder('Oro\Component\Action\Action\AbstractAction')
-            ->setConstructorArgs(array(new ContextAccessor()))
+        $this->action = $this->getMockBuilder(AbstractAction::class)
+            ->setConstructorArgs([new ContextAccessor()])
             ->getMockForAbstractClass();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+
+        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->action->setDispatcher($this->dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->action);
     }
 
     public function testSetCondition()
     {
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
+        $action = new class(new ContextAccessor()) extends AbstractAction {
+            protected function executeAction($context)
+            {
+            }
+
+            public function initialize(array $options)
+            {
+            }
+
+            public function xgetCondition(): ExpressionInterface
+            {
+                return $this->condition;
+            }
+        };
+
+        /** @var ExpressionInterface|MockObject $condition */
+        $condition = $this->getMockBuilder(ExpressionInterface::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+        $action->setCondition($condition);
 
-        $this->action->setCondition($condition);
-        $this->assertAttributeEquals($condition, 'condition', $this->action);
+        static::assertSame($condition, $action->xgetCondition());
     }
 
     /**
-     * @param boolean $expectedAllowed
-     * @param boolean|null $conditionAllowed
+     * @param bool $expectedAllowed
+     * @param bool|null $conditionAllowed
      * @dataProvider executeDataProvider
      */
     public function testExecute($expectedAllowed, $conditionAllowed = null)
     {
-        $context = array('key' => 'value');
+        $context = ['key' => 'value'];
 
         if ($expectedAllowed) {
-            $this->action->expects($this->once())
-                ->method('executeAction')
-                ->with($context);
-            $this->dispatcher->expects($this->at(0))
+            $this->action->expects(static::once())->method('executeAction')->with($context);
+            $this->dispatcher->expects(static::exactly(2))
                 ->method('dispatch')
-                ->with(ExecuteActionEvents::HANDLE_BEFORE, new ExecuteActionEvent($context, $this->action));
-            $this->dispatcher->expects($this->at(1))
-                ->method('dispatch')
-                ->with(ExecuteActionEvents::HANDLE_AFTER, new ExecuteActionEvent($context, $this->action));
+                ->withConsecutive(
+                    [ExecuteActionEvents::HANDLE_BEFORE, new ExecuteActionEvent($context, $this->action)],
+                    [ExecuteActionEvents::HANDLE_AFTER, new ExecuteActionEvent($context, $this->action)]
+                );
         } else {
-            $this->action->expects($this->never())
-                ->method('executeAction');
-            $this->dispatcher->expects($this->never())
-                ->method('dispatch');
+            $this->action->expects(static::never())->method('executeAction');
+            $this->dispatcher->expects(static::never())->method('dispatch');
         }
 
         if ($conditionAllowed !== null) {
-            $condition = new ArrayCondition(array('allowed' => $conditionAllowed));
+            $condition = new ArrayCondition(['allowed' => $conditionAllowed]);
             $this->action->setCondition($condition);
         }
 
         $this->action->execute($context);
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
-        return array(
-            'no condition' => array(
+        return [
+            'no condition' => [
                 'expectedAllowed' => true
-            ),
-            'allowed condition' => array(
+            ],
+            'allowed condition' => [
                 'expectedAllowed'  => true,
                 'conditionAllowed' => true
-            ),
-            'denied condition' => array(
+            ],
+            'denied condition' => [
                 'expectedAllowed'  => false,
                 'conditionAllowed' => false
-            ),
-        );
+            ],
+        ];
     }
 }

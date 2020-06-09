@@ -16,7 +16,7 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
      */
     protected $itemStep;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->itemStep = new PostProcessItemStep('step_name');
 

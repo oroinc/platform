@@ -10,12 +10,12 @@ class ProcessorDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessorDecorator */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new ProcessorDecorator(new Processor(), []);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->processor);
     }

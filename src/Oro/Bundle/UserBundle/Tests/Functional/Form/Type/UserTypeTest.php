@@ -19,7 +19,7 @@ class UserTypeTest extends WebTestCase
     const FIRST_NAME = 'John';
     const LAST_NAME = 'Doe';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(
             [],
@@ -116,7 +116,7 @@ class UserTypeTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('User saved', $crawler->html());
+        static::assertStringContainsString('User saved', $crawler->html());
     }
 
     public function testUserChangeUsernameToAnotherUserUsername()
@@ -135,8 +135,8 @@ class UserTypeTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('This value is already used', $crawler->html());
-        $this->assertNotContains('User saved', $crawler->html());
+        static::assertStringContainsString('This value is already used', $crawler->html());
+        static::assertStringNotContainsString('User saved', $crawler->html());
 
         /** @var User $expectedUser */
         $expectedUser = $this->getReference(LoadUserData::SIMPLE_USER);
@@ -165,15 +165,15 @@ class UserTypeTest extends WebTestCase
             key($message->getFrom())
         );
 
-        $this->assertContains('Invite user', $message->getSubject());
+        static::assertStringContainsString('Invite user', $message->getSubject());
 
         if ($configManager->get('oro_user.send_password_in_invitation_email')) {
-            $this->assertContains('Password:', $message->getBody());
-            $this->assertContains($plainPassword, $message->getBody());
+            static::assertStringContainsString('Password:', $message->getBody());
+            static::assertStringContainsString($plainPassword, $message->getBody());
         } else {
             $this->assertNotNull($user->getConfirmationToken());
-            $this->assertContains($user->getConfirmationToken(), $message->getBody());
-            $this->assertNotContains('Password:', $message->getBody());
+            static::assertStringContainsString($user->getConfirmationToken(), $message->getBody());
+            static::assertStringNotContainsString('Password:', $message->getBody());
         }
     }
 
@@ -193,7 +193,7 @@ class UserTypeTest extends WebTestCase
     protected function getUserRoleRepository()
     {
         $class = Role::class;
-        
+
         return $this->getManager($class)->getRepository($class);
     }
 

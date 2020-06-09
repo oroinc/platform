@@ -19,7 +19,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

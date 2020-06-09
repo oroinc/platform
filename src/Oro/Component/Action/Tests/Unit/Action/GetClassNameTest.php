@@ -20,7 +20,7 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
      */
     protected $contextAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
         $this->action = new GetClassName($this->contextAccessor);
@@ -31,34 +31,28 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute name parameter is required
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
-     */
     public function testInitializeAttributeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute name parameter is required');
+
         $this->assertEquals($this->action, $this->action->initialize(['object' => new \stdClass()]));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object parameter is required
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
-     */
     public function testInitializeObjectException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Object parameter is required');
+
         $this->assertEquals($this->action, $this->action->initialize([]));
     }
 
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
-     */
     public function testInitializeAttributeWrongException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->assertEquals(
             $this->action,
             $this->action->initialize(['object' => new \stdClass(), 'attribute' => 'wrong'])

@@ -23,7 +23,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
     /** @var PropertyPathSecurityHelper */
     protected $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this
             ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
@@ -94,12 +94,11 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($isGranted);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Can't get entity manager for class stdClass
-     */
     public function testIisGrantedByPropertyPathOnWrongClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Can't get entity manager for class stdClass");
+
         $this->helper->isGrantedByPropertyPath(new \stdClass(), 'somePath', 'EDIT');
     }
 }

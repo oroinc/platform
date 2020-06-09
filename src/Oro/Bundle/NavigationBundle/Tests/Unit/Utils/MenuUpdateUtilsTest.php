@@ -23,7 +23,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);
     }
@@ -52,7 +52,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu', $this->menuUpdateHelper);
         $this->assertEquals($expectedUpdate, $update);
     }
-    
+
     public function testUpdateMenuItem()
     {
         $menu = $this->getMenu();
@@ -154,7 +154,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(['test' => 'test'], $item->getChild('new')->getExtras());
     }
-    
+
     public function testFindMenuItem()
     {
         $menu = $this->getMenu();
@@ -172,7 +172,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(null, MenuUpdateUtils::findMenuItem($menu, 'item-1-1-1-1'));
     }
-    
+
     public function testGetItemExceededMaxNestingLevel()
     {
         $menu = $this->getMenu();

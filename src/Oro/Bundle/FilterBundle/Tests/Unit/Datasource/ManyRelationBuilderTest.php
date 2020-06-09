@@ -12,7 +12,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $childBuilder1;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->childBuilder1 = $this->createMock('Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface');
 
@@ -54,7 +54,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->childBuilder1->expects($this->never())
             ->method('buildComparisonExpr');
 
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf('The "%s" datasource adapter is not supported.', get_class($ds)));
 
         $this->builder->buildComparisonExpr($ds, $fieldName, $parameterName, $filterName, $inverse);
@@ -92,7 +92,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->childBuilder1->expects($this->never())
             ->method('buildNullValueExpr');
 
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf('The "%s" datasource adapter is not supported.', get_class($ds)));
 
         $this->builder->buildNullValueExpr($ds, $fieldName, $filterName, $inverse);

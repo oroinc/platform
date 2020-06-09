@@ -8,7 +8,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
@@ -24,7 +23,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(Cache::class);
         $this->em = $this->createMock(EntityManagerInterface::class);
@@ -48,11 +47,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
         $qb->expects(self::once())
             ->method('select')
-            ->with(['e', 'event'])
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('leftJoin')
-            ->with('e.event', 'event')
+            ->with('e')
             ->willReturnSelf();
         $qb->expects(self::once())
             ->method('getQuery')
@@ -86,7 +81,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $rule = new EmailNotification();
         $rule->setEntityName(get_class($entity));
-        $rule->setEvent(new Event($eventName));
+        $rule->setEventName($eventName);
 
         return $rule;
     }
@@ -178,11 +173,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
         $qb->expects(self::once())
             ->method('select')
-            ->with('e.entityName, event.name as eventName')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('innerJoin')
-            ->with('e.event', 'event')
+            ->with('e.entityName, e.eventName')
             ->willReturnSelf();
         $qb->expects(self::once())
             ->method('getQuery')

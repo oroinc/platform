@@ -13,7 +13,7 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
     /** @var IsSystemConfigEqual */
     protected $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
 
@@ -29,10 +29,10 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
      * @dataProvider initializeDataProvider
      * @param array $options
      * @param $message
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
      */
     public function testInitializeExceptions(array $options, $message)
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
         $this->condition->initialize($options);
     }

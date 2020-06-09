@@ -20,7 +20,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     protected $immutableDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

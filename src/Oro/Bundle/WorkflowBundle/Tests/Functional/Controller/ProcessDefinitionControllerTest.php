@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProcessDefinitionControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
@@ -27,7 +27,7 @@ class ProcessDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $result = $response->getContent();
-        $this->assertContains('data-page-component-name="process-definitions-grid"', $result);
+        static::assertStringContainsString('data-page-component-name="process-definitions-grid"', $result);
 
         $response = $this->client->requestGrid(
             [
@@ -39,9 +39,9 @@ class ProcessDefinitionControllerTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($response, Response::HTTP_OK);
         $result = $response->getContent();
 
-        $this->assertContains(LoadProcessEntities::FIRST_DEFINITION, $result);
-        $this->assertContains(LoadProcessEntities::SECOND_DEFINITION, $result);
-        $this->assertContains(LoadProcessEntities::DISABLED_DEFINITION, $result);
+        static::assertStringContainsString(LoadProcessEntities::FIRST_DEFINITION, $result);
+        static::assertStringContainsString(LoadProcessEntities::SECOND_DEFINITION, $result);
+        static::assertStringContainsString(LoadProcessEntities::DISABLED_DEFINITION, $result);
     }
 
     public function testViewAction()
@@ -56,6 +56,6 @@ class ProcessDefinitionControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $result = $response->getContent();
-        $this->assertContains(LoadProcessEntities::FIRST_DEFINITION, $result);
+        static::assertStringContainsString(LoadProcessEntities::FIRST_DEFINITION, $result);
     }
 }

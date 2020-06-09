@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
+use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestMessageBufferManager;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
@@ -378,6 +379,8 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $redeliveryExtension = new Definition(\stdClass::class, ['', 0]);
         $signalExtension = new Definition();
         $testBufferedMessageProducer = new Definition();
+        $testBufferedMessageProducer->setPublic(false);
+        $testMessageBufferManager = new Definition();
 
         $container = $this->getContainerMock();
         $container->expects($this->exactly(2))
@@ -390,21 +393,23 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
                 'dbal',
                 'test'
             );
-        $container->expects($this->exactly(5))
+        $container->expects($this->exactly(6))
             ->method('getDefinition')
             ->withConsecutive(
                 ['oro_message_queue.client.driver_factory'],
                 ['oro_message_queue.client.config'],
                 ['oro_message_queue.consumption.redelivery_message_extension'],
                 ['oro_message_queue.consumption.signal_extension'],
-                ['oro_message_queue.client.buffered_message_producer']
+                ['oro_message_queue.client.buffered_message_producer'],
+                ['oro_message_queue.client.message_buffer_manager']
             )
             ->willReturnOnConsecutiveCalls(
                 $driverFactoryDefinition,
                 $configDefinition,
                 $redeliveryExtension,
                 $signalExtension,
-                $testBufferedMessageProducer
+                $testBufferedMessageProducer,
+                $testMessageBufferManager
             );
         $container->expects($this->never())
             ->method('register');
@@ -439,6 +444,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
         $this->assertEquals(TestBufferedMessageProducer::class, $testBufferedMessageProducer->getClass());
         $this->assertTrue($testBufferedMessageProducer->isPublic());
+        $this->assertEquals(TestMessageBufferManager::class, $testMessageBufferManager->getClass());
     }
 
     /**
@@ -520,7 +526,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             // services.yml
             'oro_message_queue.consumption.extensions',
             'oro_message_queue.consumption.container_reset_extension',
-            'oro_message_queue.consumption.docrine_ping_connection_extension',
             'oro_message_queue.consumption.docrine_clear_identity_map_extension',
             'oro_message_queue.consumption.maintenance_extension',
             'oro_message_queue.consumption.interrupt_consumption_extension',
@@ -528,7 +533,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.consumption.security_aware_extension',
             'oro_message_queue.consumption.locale_extension',
             'oro_message_queue.consumption.clear_logger_extension',
-            'oro_message_queue.consumption.database_connections_clearer',
             'oro_message_queue.consumption.container_clearer',
             'oro_message_queue.consumption.garbage_collector_clearer',
             'oro_message_queue.consumption.queue_consumer',

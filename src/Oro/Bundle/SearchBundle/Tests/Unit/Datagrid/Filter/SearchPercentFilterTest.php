@@ -22,7 +22,7 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
     /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $datasource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->createMock(FormFactoryInterface::class);
@@ -35,12 +35,11 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
         $this->datasource = $this->createMock(SearchFilterDatasourceAdapter::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid filter datasource adapter provided');
+
         /** @var FilterDatasourceAdapterInterface $ds */
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
 

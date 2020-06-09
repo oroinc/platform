@@ -9,3 +9,7 @@ oro_user:
             fix_values: false
             default_value: 5
             show_default: true
+
+oro_notification:
+    events:
+        - oro.workflow.event.notification.workflow_transition

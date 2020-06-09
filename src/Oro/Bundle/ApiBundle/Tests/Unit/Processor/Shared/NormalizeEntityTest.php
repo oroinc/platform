@@ -15,7 +15,7 @@ class NormalizeEntityTest extends GetProcessorTestCase
     /** @var NormalizeEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

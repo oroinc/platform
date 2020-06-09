@@ -31,7 +31,7 @@ class WidgetControllerTest extends WebTestCase
      */
     protected $dashboardManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->em               = $this->getContainer()->get('doctrine.orm.entity_manager');

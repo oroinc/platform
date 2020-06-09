@@ -34,7 +34,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
      */
     protected $loaderResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
         $this->routeOptionsResolver = $this->createMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
@@ -43,7 +43,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         $this->loaderResolver = new LoaderResolver([new YamlFileLoader(new FileLocator())]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->kernel, $this->routeOptionsResolver, $this->eventDispatcher);
     }

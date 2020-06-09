@@ -30,7 +30,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
     /** @var NormalizeFilterValues */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

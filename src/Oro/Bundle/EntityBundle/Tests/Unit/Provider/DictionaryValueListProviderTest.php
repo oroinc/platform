@@ -29,7 +29,7 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DictionaryValueListProvider */
     protected $dictionaryValueListProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager          = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

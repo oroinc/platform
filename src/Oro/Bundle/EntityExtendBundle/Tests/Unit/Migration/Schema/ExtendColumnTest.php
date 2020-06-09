@@ -7,118 +7,111 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ExtendColumnTest extends \PHPUnit\Framework\TestCase
 {
     const TABLE_NAME = 'test_table';
     const COLUMN_NAME = 'test_name';
 
-    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExtendOptionsManager|MockObject */
     protected $extendOptionsManager;
 
     /** @var ExtendColumn */
     protected $column;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendOptionsManager = $this->createMock(ExtendOptionsManager::class);
 
-        $this->column = new ExtendColumn(
-            [
-                'extendOptionsManager' => $this->extendOptionsManager,
-                'tableName' => self::TABLE_NAME,
-                'column' => new BaseColumn(self::COLUMN_NAME, Type::getType('string')),
-            ]
-        );
+        $this->column = new ExtendColumn([
+            'extendOptionsManager' => $this->extendOptionsManager,
+            'tableName' => self::TABLE_NAME,
+            'column' => new BaseColumn(self::COLUMN_NAME, Type::getType('string')),
+        ]);
     }
 
     public function testSetOptions()
     {
         $options = [
-            OroOptions::KEY => [
-                'key1' => 'value1'
-            ],
+            OroOptions::KEY => ['key1' => 'value1'],
             'key2' => 'value2',
             'type' => Type::getType('integer')
         ];
 
-        $this->extendOptionsManager->expects($this->at(0))
+        $this->extendOptionsManager->expects(static::exactly(2))
             ->method('setColumnOptions')
-            ->with(self::TABLE_NAME, self::COLUMN_NAME, $options[OroOptions::KEY]);
-        $this->extendOptionsManager->expects($this->at(1))
-            ->method('setColumnOptions')
-            ->with(self::TABLE_NAME, self::COLUMN_NAME, ['_type' => 'integer']);
+            ->withConsecutive(
+                [self::TABLE_NAME, self::COLUMN_NAME, $options[OroOptions::KEY]],
+                [self::TABLE_NAME, self::COLUMN_NAME, ['_type' => 'integer']]
+            );
 
-        $this->assertAttributeEquals(Type::getType('string'), '_type', $this->column);
-
+        static::assertEquals(Type::getType('string'), $this->column->getType());
         $this->column->setOptions($options);
-
-        $this->assertAttributeEquals(Type::getType('integer'), '_type', $this->column);
+        static::assertEquals(Type::getType('integer'), $this->column->getType());
     }
 
-    /**
-     * @dataProvider setSomeOptionDataProvider
-     *
-     * @param string $name
-     * @param string $method
-     * @param array $options
-     * @param mixed $initial
-     * @param mixed $expected
-     */
-    public function testSetSomeOption($name, $method, array $options, $initial, $expected)
+    public function testSetType()
     {
-        $this->extendOptionsManager->expects($this->once())
+        $this->extendOptionsManager->expects(static::once())
             ->method('setColumnOptions')
-            ->with(self::TABLE_NAME, self::COLUMN_NAME, $options);
-
-        $this->assertAttributeEquals($initial, $name, $this->column);
-
-        $this->column->$method($expected);
-
-        $this->assertAttributeEquals($expected, $name, $this->column);
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                ExtendOptionsManager::TYPE_OPTION => 'integer'
+            ]);
+        static::assertEquals(Type::getType('string'), $this->column->getType());
+        $this->column->setType(Type::getType('integer'));
+        static::assertEquals(Type::getType('integer'), $this->column->getType());
     }
 
-    /**
-     * @return array
-     */
-    public function setSomeOptionDataProvider()
+    public function testSetLength()
     {
-        return [
-            'type' => [
-                'name' => ExtendOptionsManager::TYPE_OPTION,
-                'method' => 'setType',
-                'options' => [ExtendOptionsManager::TYPE_OPTION => 'integer'],
-                'initial' => Type::getType('string'),
-                'expected' => Type::getType('integer')
-            ],
-            'length' => [
-                'name' => '_length',
-                'method' => 'setLength',
-                'options' => ['extend' => ['length' => 100], ExtendOptionsManager::TYPE_OPTION => 'string'],
-                'initial' => null,
-                'expected' => 100
-            ],
-            'precision' => [
-                'name' => '_precision',
-                'method' => 'setPrecision',
-                'options' => ['extend' => ['precision' => 8], ExtendOptionsManager::TYPE_OPTION => 'string'],
-                'initial' => 10,
-                'expected' => 8
-            ],
-            'scale' => [
-                'name' => '_scale',
-                'method' => 'setScale',
-                'options' => ['extend' => ['scale' => 5], ExtendOptionsManager::TYPE_OPTION => 'string'],
-                'initial' => 0,
-                'expected' => 5
-            ],
-            'default' => [
-                'name' => '_default',
-                'method' => 'setDefault',
-                'options' => ['extend' => ['default' => true], ExtendOptionsManager::TYPE_OPTION => 'string'],
-                'initial' => null,
-                'expected' => true
-            ],
-        ];
+        $this->extendOptionsManager->expects(static::once())
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => ['length' => 100],
+                ExtendOptionsManager::TYPE_OPTION => 'string'
+            ]);
+        static::assertNull($this->column->getLength());
+        $this->column->setLength(100);
+        static::assertEquals(100, $this->column->getLength());
+    }
+
+    public function testSetPrecision()
+    {
+        $this->extendOptionsManager->expects(static::once())
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => ['precision' => 8],
+                ExtendOptionsManager::TYPE_OPTION => 'string'
+            ]);
+        static::assertEquals(10, $this->column->getPrecision());
+        $this->column->setPrecision(8);
+        static::assertEquals(8, $this->column->getPrecision());
+    }
+
+    public function testSetScale()
+    {
+        $this->extendOptionsManager->expects(static::once())
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => ['scale' => 5],
+                ExtendOptionsManager::TYPE_OPTION => 'string'
+            ]);
+        static::assertEquals(0, $this->column->getScale());
+        $this->column->setScale(5);
+        static::assertEquals(5, $this->column->getScale());
+    }
+
+    public function testSetDefault()
+    {
+        $this->extendOptionsManager->expects(static::once())
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => ['default' => true],
+                ExtendOptionsManager::TYPE_OPTION => 'string'
+            ]);
+        static::assertEquals(null, $this->column->getDefault());
+        $this->column->setDefault(true);
+        static::assertEquals(true, $this->column->getDefault());
     }
 }

@@ -10,7 +10,7 @@ class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
     /** @var ValidateParentEntityExists */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,12 +23,11 @@ class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage The parent entity does not exist.
-     */
     public function testProcessWhenParentEntityDoesNotExist()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage('The parent entity does not exist.');
+
         $this->processor->process($this->context);
     }
 }

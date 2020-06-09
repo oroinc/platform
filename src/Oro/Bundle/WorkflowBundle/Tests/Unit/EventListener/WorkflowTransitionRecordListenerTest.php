@@ -6,9 +6,9 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -27,7 +27,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTransitionRecordListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -60,7 +60,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(LoadWorkflowNotificationEvents::TRANSIT_EVENT, $expected);
+            ->with(WorkflowEvents::NOTIFICATION_TRANSIT_EVENT, $expected);
 
         $this->listener->postPersist($transitionRecord, $this->args);
     }

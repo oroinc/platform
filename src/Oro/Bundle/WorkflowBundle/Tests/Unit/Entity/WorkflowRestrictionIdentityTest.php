@@ -14,12 +14,12 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
      */
     protected $identity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->identity = new WorkflowRestrictionIdentity();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->identity);
     }

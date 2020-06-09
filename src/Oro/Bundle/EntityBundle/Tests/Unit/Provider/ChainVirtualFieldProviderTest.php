@@ -20,7 +20,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $highPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
             ->setMockClassName('HighPriorityVirtualFieldProvider')
@@ -222,12 +222,11 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A query for field "testField" in class "testClass" was not found.
-     */
     public function testGetVirtualFieldQueryWithoutChildProviders()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A query for field "testField" in class "testClass" was not found.');
+
         $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
         $chainProvider->getVirtualFieldQuery('testClass', 'testField');
     }

@@ -15,7 +15,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectIdentityFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new ObjectIdentityFactory(
             TestHelper::get($this)->createAclExtensionSelector()
@@ -126,19 +126,15 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(get_class($obj), $id->getType());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testFromDomainObjectNull()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get(null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetShouldCatchInvalidArgumentException()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get(new TestEntityImplementsDomainObjectInterface());
     }
 
@@ -152,35 +148,27 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedId, $id->getIdentifier());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetIncorrectClassDescriptor()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get('AcmeBundle\SomeClass');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetIncorrectEntityDescriptor()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get('AcmeBundle:SomeEntity');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetWithInvalidEntityName()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get('entity:AcmeBundle:Entity:SomeEntity');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
-     */
     public function testGetIncorrectActionDescriptor()
     {
+        $this->expectException(\Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException::class);
         $this->factory->get('Some Action');
     }
 

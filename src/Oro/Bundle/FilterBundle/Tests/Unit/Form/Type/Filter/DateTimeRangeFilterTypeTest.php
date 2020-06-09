@@ -19,7 +19,7 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
 

@@ -3,111 +3,47 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Reference;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
-class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
+class EventsCompilerPassTest extends TestCase
 {
-    const EVENT_NAME = 'test';
-    const CLASS_NAME = 'Oro\Bundle\NotificationBundle\Entity\Event';
-
-    public function testCompile()
+    public function testProcess()
     {
-        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $dispatcher = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $compilerPass = new EventsCompilerPass();
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $definition = $this->createMock(Definition::class);
 
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue(true));
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue(true));
-
-        $container->expects($this->once())
-            ->method('hasParameter')
-            ->with('installed')
-            ->will($this->returnValue(true));
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->with('installed')
-            ->will($this->returnValue(true));
-
-        $container->expects($this->once())
+        $containerBuilder->expects($this->once())
             ->method('findDefinition')
-            ->with('event_dispatcher')
-            ->will($this->returnValue($dispatcher));
+            ->with('oro_notification.manager')
+            ->willReturn($definition);
 
-        $connection = $this->configureConnectionMock();
+        $containerBuilder->expects($this->once())
+            ->method('getParameter')
+            ->with('oro_notification.events')
+            ->willReturn(['my_custom_event_1', 'my_custom_event_2']);
 
-        $container->expects($this->once())
-            ->method('get')
-            ->with('doctrine.dbal.default_connection')
-            ->will($this->returnValue($connection));
-
-        $connection->expects($this->once())
-            ->method('fetchAll')
-            ->with('SELECT name FROM ' . EventsCompilerPass::EVENT_TABLE_NAME)
-            ->will($this->returnValue(array(array('name' => self::EVENT_NAME))));
-
-        $dispatcher->expects($this->once())
-            ->method('addMethodCall')
-            ->with(
-                'addListener',
+        $definition->expects($this->exactly(2))
+            ->method('addTag')
+            ->withConsecutive(
                 [
-                    self::EVENT_NAME,
-                    [new ServiceClosureArgument(new Reference('oro_notification.manager')), 'process' ],
-                    0
+                    'kernel.event_listener',
+                    [
+                        'event' => 'my_custom_event_1',
+                        'method' => 'process',
+                    ]
+                ],
+                [
+                    'kernel.event_listener',
+                    [
+                        'event' => 'my_custom_event_2',
+                        'method' => 'process',
+                    ]
                 ]
             );
 
-        $compiler = new EventsCompilerPass();
-        $compiler->process($container);
-    }
-
-    public function testCompileManagerNotDefined()
-    {
-        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue(false));
-
-        $container->expects($this->never())
-            ->method('getDefinition');
-
-        $compiler = new EventsCompilerPass();
-        $compiler->process($container);
-    }
-
-    /**
-     * Creates and configure EM mock object
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function configureConnectionMock()
-    {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $connection->expects($this->once())
-            ->method('connect');
-
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\MySqlSchemaManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $schemaManager->expects($this->once())
-            ->method('tablesExist')
-            ->with(EventsCompilerPass::EVENT_TABLE_NAME)
-            ->will($this->returnValue(true));
-
-        $connection->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManager));
-
-        return $connection;
+        $compilerPass->process($containerBuilder);
     }
 }

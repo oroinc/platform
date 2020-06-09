@@ -15,7 +15,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

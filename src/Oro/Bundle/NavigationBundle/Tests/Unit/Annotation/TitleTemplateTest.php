@@ -18,13 +18,9 @@ class TitleTemplateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $annotation->getValue());
     }
 
-    /**
-     * Test bad annotation
-     *
-     * @expectedException \RuntimeException
-     */
     public function testBadAnnotation()
     {
+        $this->expectException(\RuntimeException::class);
         $message = 'Unknown key "test" for annotation "@Oro\Bundle\NavigationBundle\Annotation\TitleTemplate".';
         $this->expectExceptionMessage($message);
 

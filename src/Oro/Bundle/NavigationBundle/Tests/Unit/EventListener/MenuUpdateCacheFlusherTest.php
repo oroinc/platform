@@ -27,7 +27,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(MenuUpdateRepository::class);
         $this->cache = $this->createMock(CacheProvider::class);

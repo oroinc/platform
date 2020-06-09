@@ -10,7 +10,7 @@ class NotContainsTest extends \PHPUnit\Framework\TestCase
 {
     protected $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\NotContains();
         $this->condition->setContextAccessor(new ContextAccessor());

@@ -49,7 +49,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->operationRegistry = $this->getMockBuilder(OperationRegistry::class)
             ->disableOriginalConstructor()
@@ -83,7 +83,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->routeProvider);
     }

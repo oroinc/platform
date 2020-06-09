@@ -40,7 +40,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var BoardExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(BoardProcessorInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

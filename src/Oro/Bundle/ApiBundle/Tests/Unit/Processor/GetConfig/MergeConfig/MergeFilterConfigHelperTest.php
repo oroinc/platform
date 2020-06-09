@@ -9,7 +9,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MergeFilterConfigHelper */
     private $mergeFilterConfigHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mergeFilterConfigHelper = new MergeFilterConfigHelper();
     }

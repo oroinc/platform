@@ -27,7 +27,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->languageCodeFormatter = $this->getMockBuilder(LanguageCodeFormatter::class)
             ->disableOriginalConstructor()
@@ -48,7 +48,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocalizationExtension($container);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset(
             $this->languageCodeFormatter,

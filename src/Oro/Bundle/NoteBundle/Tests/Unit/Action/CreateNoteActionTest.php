@@ -33,7 +33,7 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
     /** @var CreateNoteAction */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
 

@@ -19,7 +19,7 @@ class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -30,7 +30,7 @@ class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider);
         unset($this->configManager);

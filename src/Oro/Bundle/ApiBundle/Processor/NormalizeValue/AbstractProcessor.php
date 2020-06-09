@@ -46,7 +46,7 @@ abstract class AbstractProcessor implements ProcessorInterface
      *
      * @param NormalizeValueContext $context
      */
-    public function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context)
     {
         if ($context->isArrayAllowed()) {
             $requirement = $this->getArrayRequirement($context->getArrayDelimiter());
@@ -142,13 +142,12 @@ abstract class AbstractProcessor implements ProcessorInterface
         } catch (\Exception $e) {
             if (count($values) === 1) {
                 throw $e;
-            } else {
-                throw new \UnexpectedValueException(
-                    sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
-                    0,
-                    $e
-                );
             }
+            throw new \UnexpectedValueException(
+                sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
+                0,
+                $e
+            );
         }
 
         if (count($normalizedValue) === 1) {
@@ -170,7 +169,7 @@ abstract class AbstractProcessor implements ProcessorInterface
         $delimiterPos = strpos($value, $rangeDelimiter);
         $values = [
             substr($value, 0, $delimiterPos),
-            substr($value, $delimiterPos + strlen($rangeDelimiter))
+            substr($value, $delimiterPos + \strlen($rangeDelimiter))
         ];
         try {
             $normalizedValues = $this->normalizeValues($values);

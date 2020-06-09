@@ -14,7 +14,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
      */
     protected $featureToggleVotersPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureToggleVotersPass = new FeatureToggleVotersPass();
     }

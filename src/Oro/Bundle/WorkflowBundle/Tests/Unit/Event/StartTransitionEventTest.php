@@ -26,7 +26,7 @@ class StartTransitionEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
             ->disableOriginalConstructor()

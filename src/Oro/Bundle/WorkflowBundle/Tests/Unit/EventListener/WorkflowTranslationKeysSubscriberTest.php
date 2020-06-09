@@ -18,7 +18,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowTranslationKeysSubscriber */
     private $translationKeysSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translationManager = $this->getMockBuilder(TranslationManager::class)
             ->disableOriginalConstructor()
@@ -116,12 +116,11 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Previous WorkflowDefinition expected, got null.
-     */
     public function testClearLogicExceptionOnAbsentPreviousDefinition()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Previous WorkflowDefinition expected, got null.');
+
         $this->translationKeysSubscriber->clearTranslationKeys(
             new WorkflowChangesEvent(new WorkflowDefinition(), null)
         );

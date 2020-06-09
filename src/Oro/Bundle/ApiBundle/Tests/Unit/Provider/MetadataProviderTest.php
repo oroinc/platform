@@ -19,19 +19,18 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataProvider */
     private $metadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(ActionProcessorInterface::class);
 
         $this->metadataProvider = new MetadataProvider($this->processor);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $className must not be empty.
-     */
     public function testShouldThrowExceptionIfClassNameIsEmpty()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$className must not be empty.');
+
         $this->metadataProvider->getMetadata('', '1.2', new RequestType([]), new EntityDefinitionConfig());
     }
 

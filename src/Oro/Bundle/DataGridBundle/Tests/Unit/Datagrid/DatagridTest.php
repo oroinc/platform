@@ -23,7 +23,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $parameters;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->acceptor = $this->getMockBuilder(Acceptor::class)
             ->disableOriginalConstructor()->getMock();
@@ -34,7 +34,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->grid->setAcceptor($this->acceptor);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->acceptor);
         unset($this->grid);

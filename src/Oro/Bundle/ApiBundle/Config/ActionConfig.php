@@ -36,16 +36,25 @@ class ActionConfig implements ConfigBagInterface
         if (null !== $this->exclude) {
             $result[ConfigUtil::EXCLUDE] = $this->exclude;
         }
+        if (isset($result[ConfigUtil::DISABLE_INCLUSION])
+            && false === $result[ConfigUtil::DISABLE_INCLUSION]
+        ) {
+            unset($result[ConfigUtil::DISABLE_INCLUSION]);
+        }
+        if (isset($result[ConfigUtil::DISABLE_FIELDSET])
+            && false === $result[ConfigUtil::DISABLE_FIELDSET]
+        ) {
+            unset($result[ConfigUtil::DISABLE_FIELDSET]);
+        }
         if (isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
             && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
-        if (isset($result[ConfigUtil::DISABLE_INCLUSION]) && false === $result[ConfigUtil::DISABLE_INCLUSION]) {
-            unset($result[ConfigUtil::DISABLE_INCLUSION]);
-        }
-        if (isset($result[ConfigUtil::DISABLE_FIELDSET]) && false === $result[ConfigUtil::DISABLE_FIELDSET]) {
-            unset($result[ConfigUtil::DISABLE_FIELDSET]);
+        if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
+            && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
+        ) {
+            unset($result[ConfigUtil::DISABLE_PARTIAL_LOAD]);
         }
         if (isset($result[ConfigUtil::DISABLE_SORTING]) && false === $result[ConfigUtil::DISABLE_SORTING]) {
             unset($result[ConfigUtil::DISABLE_SORTING]);
@@ -511,42 +520,6 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Indicates whether the "disable_meta_properties" option is set explicitly.
-     *
-     * @return bool
-     */
-    public function hasDisableMetaProperties()
-    {
-        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
-    }
-
-    /**
-     * Indicates whether a requesting of additional meta properties is enabled.
-     *
-     * @return bool
-     */
-    public function isMetaPropertiesEnabled()
-    {
-        return !$this->get(ConfigUtil::DISABLE_META_PROPERTIES, false);
-    }
-
-    /**
-     * Enables a requesting of additional meta properties.
-     */
-    public function enableMetaProperties()
-    {
-        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = false;
-    }
-
-    /**
-     * Disables a requesting of additional meta properties.
-     */
-    public function disableMetaProperties()
-    {
-        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
-    }
-
-    /**
      * Indicates whether the "disable_fieldset" option is set explicitly.
      *
      * @return bool
@@ -616,6 +589,42 @@ class ActionConfig implements ConfigBagInterface
     public function disableInclusion()
     {
         $this->items[ConfigUtil::DISABLE_INCLUSION] = true;
+    }
+
+    /**
+     * Indicates whether the "disable_meta_properties" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableMetaProperties()
+    {
+        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
+    }
+
+    /**
+     * Indicates whether a requesting of additional meta properties is enabled.
+     *
+     * @return bool
+     */
+    public function isMetaPropertiesEnabled()
+    {
+        return !$this->get(ConfigUtil::DISABLE_META_PROPERTIES, false);
+    }
+
+    /**
+     * Enables a requesting of additional meta properties.
+     */
+    public function enableMetaProperties()
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = false;
+    }
+
+    /**
+     * Disables a requesting of additional meta properties.
+     */
+    public function disableMetaProperties()
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
     }
 
     /**

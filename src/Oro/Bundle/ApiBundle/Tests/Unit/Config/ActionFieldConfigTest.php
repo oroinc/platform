@@ -127,14 +127,13 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The possible values for the direction are "input-only", "output-only" or "bidirectional".
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetInvalidDirection()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The possible values for the direction are "input-only", "output-only" or "bidirectional".'
+        );
+
         $config = new ActionFieldConfig();
 
         $config->setDirection('another');

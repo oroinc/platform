@@ -18,7 +18,7 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $connector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
             ->disableOriginalConstructor()
@@ -178,14 +178,15 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getUnseenEmailUIDs($startDate);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot parse email message. Subject: Subject. Error: It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned. Values: "XThrId1", "XThrId2".
-     */
-    // @codingStandardsIgnoreEnd
     public function testConvertToEmailWithUnexpectedMultiValueHeader()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse email message. Subject: Subject. Error:'
+            . ' It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned.'
+            . ' Values: "XThrId1", "XThrId2".'
+        );
+
         $msg = $this->getMessageMock(
             [
                 $this->getHeader('UID', '123'),
@@ -220,7 +221,7 @@ class ImapEmailManagerTest extends \PHPUnit\Framework\TestCase
         $email = $this->manager->convertToEmail($msg);
 
         $this->assertNotEmpty($email->getMessageId());
-        $this->assertInternalType('array', $email->getMultiMessageId());
+        $this->assertIsArray($email->getMultiMessageId());
         $this->assertCount(2, $email->getMultiMessageId());
     }
 

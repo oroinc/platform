@@ -9,53 +9,55 @@ use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverFactoryInterface */
-    private $driverFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
-    private $tokenSerializer;
-
-    /** @var SecurityAwareDriverFactory */
-    private $securityAwareDriverFactory;
-
-    protected function setUp()
-    {
-        $this->driverFactory = $this->createMock(DriverFactoryInterface::class);
-        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->tokenSerializer = $this->createMock(TokenSerializerInterface::class);
-
-        $this->securityAwareDriverFactory = new SecurityAwareDriverFactory(
-            $this->driverFactory,
-            ['security_agnostic_topic'],
-            $this->tokenStorage,
-            $this->tokenSerializer
-        );
-    }
-
     public function testCreate()
     {
         $connection = $this->createMock(ConnectionInterface::class);
         $config = $this->createMock(Config::class);
         $driver = $this->createMock(DriverInterface::class);
 
-        $this->driverFactory->expects(self::once())
+        /** @var MockObject|DriverFactoryInterface */
+        $driverFactory = $this->createMock(DriverFactoryInterface::class);
+
+        /** @var MockObject|TokenStorageInterface */
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+
+        /** @var MockObject|TokenSerializerInterface */
+        $tokenSerializer = $this->createMock(TokenSerializerInterface::class);
+
+        /** @var SecurityAwareDriverFactory */
+        $securityAwareDriverFactory = new SecurityAwareDriverFactory(
+            $driverFactory,
+            ['security_agnostic_topic'],
+            $tokenStorage,
+            $tokenSerializer
+        );
+
+        $driverFactory->expects(self::once())
             ->method('create')
             ->with(self::identicalTo($connection), self::identicalTo($config))
             ->willReturn($driver);
 
-        $result = $this->securityAwareDriverFactory->create($connection, $config);
+        $result = $securityAwareDriverFactory->create($connection, $config);
 
         self::assertInstanceOf(SecurityAwareDriver::class, $result);
-        self::assertAttributeSame($driver, 'driver', $result);
-        self::assertAttributeEquals(['security_agnostic_topic' => true], 'securityAgnosticTopics', $result);
-        self::assertAttributeSame($this->tokenStorage, 'tokenStorage', $result);
-        self::assertAttributeSame($this->tokenSerializer, 'tokenSerializer', $result);
+
+        $driverProperty = new \ReflectionProperty(SecurityAwareDriver::class, 'driver');
+        $driverProperty->setAccessible(true);
+        $securityAgnosticTopicsProperty = new \ReflectionProperty(SecurityAwareDriver::class, 'securityAgnosticTopics');
+        $securityAgnosticTopicsProperty->setAccessible(true);
+        $tokenStorageProperty = new \ReflectionProperty(SecurityAwareDriver::class, 'tokenStorage');
+        $tokenStorageProperty->setAccessible(true);
+        $tokenSerializerProperty = new \ReflectionProperty(SecurityAwareDriver::class, 'tokenSerializer');
+        $tokenSerializerProperty->setAccessible(true);
+
+        self::assertSame($driver, $driverProperty->getValue($result));
+        self::assertEquals(['security_agnostic_topic' => true], $securityAgnosticTopicsProperty->getValue($result));
+        self::assertSame($tokenStorage, $tokenStorageProperty->getValue($result));
+        self::assertSame($tokenSerializer, $tokenSerializerProperty->getValue($result));
     }
 }

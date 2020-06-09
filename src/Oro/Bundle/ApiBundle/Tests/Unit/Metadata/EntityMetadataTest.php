@@ -577,25 +577,23 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "object", "integer" given.
-     */
     public function testGetIdentifierValueForInvalidInputEntity()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "object", "integer" given.');
+
         $entityMetadata = new EntityMetadata();
 
         $entityMetadata->getIdentifierValue(123);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithoutId()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).'
+        );
+
         $entity = new Group();
 
         $entityMetadata = new EntityMetadata();
@@ -635,14 +633,14 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithSingleIdWhenIdPropertyDoesNotExist()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The class "%s" does not have property "unknownProperty".',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::class
+        ));
+
         $entity = new Group();
         $entity->setId(123);
 
@@ -687,14 +685,14 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithRenamedCompositeIdWhenIdPropertyDoesNotExist()
     {
+        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'The class "%s" does not have property "unknownProperty".',
+            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::class
+        ));
+
         $entity = new Group();
         $entity->setId(123);
         $entity->setName('test');

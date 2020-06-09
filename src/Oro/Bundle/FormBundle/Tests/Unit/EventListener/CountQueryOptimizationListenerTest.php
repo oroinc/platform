@@ -19,7 +19,7 @@ class CountQueryOptimizationListenerTest extends OrmTestCase
     /** @var EntityManagerMock */
     private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadataDriver = new AnnotationDriver(
             new AnnotationReader(),

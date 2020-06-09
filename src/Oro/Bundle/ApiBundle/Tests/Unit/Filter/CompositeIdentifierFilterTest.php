@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -22,13 +22,13 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     /** @var CompositeIdentifierFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
 
         $this->filter = new CompositeIdentifierFilter('string');
         $this->filter->setEntityIdTransformerRegistry($this->entityIdTransformerRegistry);
-        $this->filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $this->filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
     }
 
     public function testApplyFilterForNullFilterValue()
@@ -45,12 +45,11 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getWhereExpression());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The composite identifier value must not be NULL.
-     */
     public function testApplyFilterForNullIdentifier()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The composite identifier value must not be NULL.');
+
         $filterValue = new FilterValue('id', null);
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();
@@ -62,12 +61,11 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The operator ">" is not supported for composite identifier.
-     */
     public function testApplyFilterForUnsupportedOperator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The operator ">" is not supported for composite identifier.');
+
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', '>');
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();
@@ -118,7 +116,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterForNotEqualOperatorAndOneId()
     {
-        $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', ComparisonFilter::NEQ);
+        $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
@@ -206,7 +204,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterForNotEqualOperatorAndSeveralIds()
     {
-        $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4'], ComparisonFilter::NEQ);
+        $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4'], FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata();
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);

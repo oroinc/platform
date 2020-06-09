@@ -14,7 +14,7 @@ class FormHandlerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandlerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler1 = $this->createMock(FormHandlerInterface::class);
         $handlers = new ServiceLocator([
@@ -37,12 +37,11 @@ class FormHandlerRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->registry->has('unknown'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown form handler with alias "unknown".
-     */
     public function testGetForUnknownHandler()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown form handler with alias "unknown".');
+
         $this->registry->get('unknown');
     }
 }

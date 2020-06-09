@@ -11,55 +11,53 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessConfigurationBuilder|MockObject */
     protected $configurationBuilder;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     protected $managerRegistry;
 
-    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var string|MockObject */
     protected $triggerEntityClass;
 
-    /** @var ProcessTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessTriggerCronScheduler|MockObject */
     protected $processCronScheduler;
 
     /** @var ProcessTriggersConfigurator */
     protected $processTriggersConfigurator;
 
-    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessTriggerRepository|MockObject */
     protected $repository;
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectManager|MockObject */
     protected $objectManager;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|MockObject */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationBuilder = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'
-        );
+        $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);
 
-        $this->repository = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
-        )->disableOriginalConstructor()->getMock();
-
-        $this->objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->processCronScheduler = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler')
+        $this->repository = $this->getMockBuilder(ProcessTriggerRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->triggerEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger';
+        $this->objectManager = $this->createMock(ObjectManager::class);
+
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->processCronScheduler = $this->getMockBuilder(ProcessTriggerCronScheduler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->triggerEntityClass = ProcessTrigger::class;
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -93,7 +91,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
 
-        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $mockExistentTrigger */
+        /** @var ProcessTrigger|MockObject $mockExistentTrigger */
         $mockExistentTrigger = $this->createMock($this->triggerEntityClass);
 
         $nonExistentNewTrigger->setDefinition($definition)->setCron('42 * * * *');
@@ -127,10 +125,9 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processTriggersConfigurator->configureTriggers($triggersConfiguration, $definitions);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processTriggersConfigurator);
-
-        $this->assertAttributeEquals([$mockUnaffectedTrigger], 'forRemove', $this->processTriggersConfigurator);
-        $this->assertAttributeEquals([$nonExistentNewTrigger], 'forPersist', $this->processTriggersConfigurator);
+        static::assertTrue($this->getDirtyPropertyValue());
+        static::assertEquals([$mockUnaffectedTrigger], $this->getForRemovePropertyValue());
+        static::assertEquals([$nonExistentNewTrigger], $this->getForPersistPropertyValue());
     }
 
     public function testRemoveDefinitionTriggers()
@@ -156,8 +153,8 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processTriggersConfigurator->removeDefinitionTriggers($definition);
 
-        $this->assertAttributeEquals(true, 'dirty', $this->processTriggersConfigurator);
-        $this->assertAttributeEquals([$trigger], 'forRemove', $this->processTriggersConfigurator);
+        static::assertTrue($this->getDirtyPropertyValue());
+        static::assertEquals([$trigger], $this->getForRemovePropertyValue());
     }
 
     /**
@@ -182,7 +179,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processTriggersConfigurator->flush();
 
-        $this->assertAttributeEquals(false, 'dirty', $this->processTriggersConfigurator);
+        static::assertFalse($this->getDirtyPropertyValue());
     }
 
     /**
@@ -274,5 +271,38 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDirtyPropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'dirty');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processTriggersConfigurator);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getForRemovePropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'forRemove');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processTriggersConfigurator);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getForPersistPropertyValue()
+    {
+        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'forPersist');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->processTriggersConfigurator);
     }
 }

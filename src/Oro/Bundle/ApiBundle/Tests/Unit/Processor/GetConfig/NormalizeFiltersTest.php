@@ -14,7 +14,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
     /** @var NormalizeFilters */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

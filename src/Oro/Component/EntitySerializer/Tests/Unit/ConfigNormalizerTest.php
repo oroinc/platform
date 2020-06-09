@@ -515,6 +515,41 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
             ],
+            'dependency_on_not_configured_second_level_relation'      => [
+                'config'         => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.account.name']
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.account.name'],
+                        'contact'     => [
+                            'fields' => [
+                                'account' => [
+                                    'fields' => [
+                                        'name' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'configObject'   => [
+                    'fields' => [
+                        'contactName' => ['property_path' => 'contact.account.name'],
+                        'contact'     => [
+                            'fields' => [
+                                'account' => [
+                                    'fields' => [
+                                        'name' => []
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+            ],
             'dependency_on_relation_with_single_field_config'         => [
                 'config'         => [
                     'fields' => [
@@ -850,6 +885,111 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                                 'id'      => [],
                                 'account' => [
                                     'fields' => [
+                                        'name' => []
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'excluded_fields_with_dependency_on_excluded_relation'    => [
+                'config'         => [
+                    'fields' => [
+                        'phoneNumber'      => ['property_path' => 'address.phone', 'exclude' => true],
+                        'accountName'      => ['property_path' => 'contact.account.name', 'exclude' => true],
+                        'organizationName' => ['property_path' => 'user.organization.name', 'exclude' => true],
+                        'address'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'phone' => null
+                            ]
+                        ],
+                        'contact'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'account' => [
+                                    'fields' => [
+                                        'name' => null
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'user'             => [
+                            'fields' => [
+                                'organization' => [
+                                    'exclude' => true,
+                                    'fields'  => [
+                                        'name' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    '_excluded_fields' => ['phoneNumber', 'accountName', 'organizationName', 'address', 'contact'],
+                    'fields'           => [
+                        'phoneNumber'      => ['property_path' => 'address.phone', 'exclude' => true],
+                        'accountName'      => ['property_path' => 'contact.account.name', 'exclude' => true],
+                        'organizationName' => ['property_path' => 'user.organization.name', 'exclude' => true],
+                        'address'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'phone' => null
+                            ]
+                        ],
+                        'contact'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'account' => [
+                                    'fields' => [
+                                        'name' => null
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'user'             => [
+                            '_excluded_fields' => ['organization'],
+                            'fields'           => [
+                                'organization' => [
+                                    'exclude' => true,
+                                    'fields'  => [
+                                        'name' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'configObject'   => [
+                    '_excluded_fields' => ['phoneNumber', 'accountName', 'organizationName', 'address', 'contact'],
+                    'fields'           => [
+                        'phoneNumber'      => ['property_path' => 'address.phone', 'exclude' => true],
+                        'accountName'      => ['property_path' => 'contact.account.name', 'exclude' => true],
+                        'organizationName' => ['property_path' => 'user.organization.name', 'exclude' => true],
+                        'address'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'phone' => []
+                            ]
+                        ],
+                        'contact'          => [
+                            'exclude' => true,
+                            'fields'  => [
+                                'account' => [
+                                    'fields' => [
+                                        'name' => []
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'user'             => [
+                            '_excluded_fields' => ['organization'],
+                            'fields'           => [
+                                'organization' => [
+                                    'exclude' => true,
+                                    'fields'  => [
                                         'name' => []
                                     ]
                                 ]

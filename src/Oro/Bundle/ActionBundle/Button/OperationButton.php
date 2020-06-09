@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Button;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 
+/**
+ * The implementation of the operation button.
+ */
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
@@ -59,6 +62,14 @@ class OperationButton implements ButtonInterface
     public function getLabel()
     {
         return $this->operation->getDefinition()->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAriaLabel(): ?string
+    {
+        return $this->operation->getDefinition()->getDatagridOptions()['aria_label'] ?? null;
     }
 
     /**

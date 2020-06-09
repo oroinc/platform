@@ -26,7 +26,7 @@ class AddPaginationLinksTest extends GetListProcessorTestCase
     /** @var AddPaginationLinks */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

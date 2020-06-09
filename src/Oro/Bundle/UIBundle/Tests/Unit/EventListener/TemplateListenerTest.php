@@ -32,7 +32,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = Request::create('/test/url');
 

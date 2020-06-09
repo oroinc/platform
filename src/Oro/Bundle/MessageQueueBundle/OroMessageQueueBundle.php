@@ -16,6 +16,8 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerService
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
+use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -26,6 +28,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class OroMessageQueueBundle extends Bundle
 {
+    use TaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -42,6 +46,13 @@ class OroMessageQueueBundle extends Bundle
         $container->addCompilerPass(new MakeLoggerServicesPersistentPass());
         $container->addCompilerPass(new MakeAnnotationReaderServicesPersistentPass());
         $container->addCompilerPass(new ProcessorLocatorPass());
+        $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(
+            'oro_message_queue.client.message_filter',
+            'oro_message_queue.message_filter',
+            function (array $attributes, string $serviceId): array {
+                return [$serviceId, $this->getAttribute($attributes, 'topic')];
+            }
+        ));
 
         /** @var OroMessageQueueExtension $extension */
         $extension = $container->getExtension('oro_message_queue');

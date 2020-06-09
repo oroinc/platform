@@ -21,7 +21,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var BatchFlushDataHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
@@ -40,12 +40,11 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->startFlushData([$this->createMock(BatchUpdateItem::class)]);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The flush data already started.
-     */
     public function testStartFlushDataWhenHandlerIsAlreadyStarted()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The flush data already started.');
+
         $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
@@ -249,12 +248,11 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->flushData($items);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The flush data is not started.
-     */
     public function testFlushDataWhenHandlerNotStarted()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The flush data is not started.');
+
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
 

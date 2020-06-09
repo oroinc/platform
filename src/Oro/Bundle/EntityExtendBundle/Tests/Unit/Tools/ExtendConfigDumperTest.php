@@ -46,7 +46,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $extendEntityConfigProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityManagerBag = $this->createMock(EntityManagerBag::class);
         $this->configManager = $this->createMock(ConfigManager::class);

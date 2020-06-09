@@ -16,7 +16,7 @@ class FileViewSecurityCheckTest extends GetProcessorTestCase
     /** @var FileViewSecurityCheck */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,12 +41,11 @@ class FileViewSecurityCheckTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to the entity.
-     */
     public function testProcessWhenAccessDenied()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to the entity.');
+
         $fileClass = File::class;
         $fileId = 123;
 

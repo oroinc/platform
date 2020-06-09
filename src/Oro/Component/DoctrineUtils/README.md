@@ -75,9 +75,9 @@ $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [PreciseOrderByWalker::class]);
 
 ## TransactionWatcherInterface interface
 
-Sometimes it is required to perform some work only after data are commited to the database. For instance, sending
+Sometimes it is required to perform some work only after data are committed to the database. For instance, sending
 notifications to users or to external systems. In this case the [TransactionWatcherInterface](./DBAL/TransactionWatcherInterface.php)
-can be heplful.
+can be helpful.
 
 To be able to register DBAL transaction watchers you need to register the
 [AddTransactionWatcherCompilerPass](.DependencyInjection/AddTransactionWatcherCompilerPass.php) compiler pass

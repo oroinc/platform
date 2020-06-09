@@ -25,7 +25,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
      */
     private $localeSettings;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->localeSettings = $this->createMock(LocaleSettings::class);

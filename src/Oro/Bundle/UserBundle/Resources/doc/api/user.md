@@ -59,6 +59,8 @@ Example:
 
 Edit a specific user record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}

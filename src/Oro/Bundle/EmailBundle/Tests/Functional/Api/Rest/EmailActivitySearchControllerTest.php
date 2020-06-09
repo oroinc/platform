@@ -9,7 +9,7 @@ class EmailActivitySearchControllerTest extends WebTestCase
     /** @var string */
     protected $baseUrl;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('Due to BAP-8365');
 

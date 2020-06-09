@@ -21,7 +21,7 @@ class RestApiTest extends WebTestCase
         )
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }
@@ -41,7 +41,7 @@ class RestApiTest extends WebTestCase
 
         $responseData = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
-        $this->assertInternalType('array', $responseData);
+        $this->assertIsArray($responseData);
         $this->assertArrayHasKey('id', $responseData);
 
         return $responseData['id'];

@@ -10,7 +10,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MergeActionConfigHelper */
     private $mergeActionConfigHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mergeActionConfigHelper = new MergeActionConfigHelper();
     }

@@ -27,7 +27,7 @@ class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultOwnerHelper */
     protected $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->em               = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -47,7 +47,7 @@ class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new DefaultOwnerHelper($registry, $this->metadataProvider);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         unset($this->em, $this->uow, $this->metadataProvider, $this->helper);
     }

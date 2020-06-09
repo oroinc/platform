@@ -14,7 +14,7 @@ class QueryUtilTest extends OrmTestCase
     /** @var EntityManager */
     protected $em;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

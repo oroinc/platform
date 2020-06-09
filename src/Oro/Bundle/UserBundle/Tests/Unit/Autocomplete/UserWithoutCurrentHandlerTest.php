@@ -38,7 +38,7 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserWithoutCurrentHandler */
     protected $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $attachmentManager = $this->createMock(AttachmentManager::class);

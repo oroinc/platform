@@ -20,7 +20,7 @@ class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
      */
     private $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerBuilder::class);
 

@@ -12,7 +12,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new MetadataContext();
     }
@@ -82,12 +82,13 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['test'], $this->context->get(MetadataContext::EXTRA));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".
-     */
     public function testSetInvalidExtras()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected an array of "Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface".'
+        );
+
         $this->context->setExtras([new \stdClass()]);
     }
 

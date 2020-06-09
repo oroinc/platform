@@ -128,14 +128,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected['config']['images'], $result['test_theme']['config']['images']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The child node "height" at path "themes.test_theme.config.images.dimensions.test_dimension1" must be configured.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessImagesDimensionWithoutHeight()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The child node "height" at path "themes.test_theme.config.images.dimensions.test_dimension1"'
+            . ' must be configured.'
+        );
+
         $themeConfig = [
             'label'  => 'test label',
             'config' => [
@@ -151,14 +151,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The child node "width" at path "themes.test_theme.config.images.dimensions.test_dimension1" must be configured.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessImagesDimensionWithoutWidth()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The child node "width" at path "themes.test_theme.config.images.dimensions.test_dimension1"'
+            . ' must be configured.'
+        );
+
         $themeConfig = [
             'label'  => 'test label',
             'config' => [
@@ -233,14 +233,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected['config']['page_templates'], $result['test_theme']['config']['page_templates']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "themes.test_theme.config.page_templates.templates.0.route_name" cannot contain an empty value, but got "".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessPageTemplateWithEmptyRoute()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The path "themes.test_theme.config.page_templates.templates.0.route_name" cannot contain an empty value,'
+            . ' but got "".'
+        );
+
         $themeConfig = [
             'label'  => 'test label',
             'config' => [
@@ -256,14 +256,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "themes.test_theme.config.page_templates.templates.0.key" cannot contain an empty value, but got "".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessPageTemplateWithEmptyKey()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The path "themes.test_theme.config.page_templates.templates.0.key" cannot contain an empty value,'
+            . ' but got "".'
+        );
+
         $themeConfig = [
             'label'  => 'test label',
             'config' => [
@@ -279,14 +279,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "themes.test_theme.config.page_templates.templates.0.label" cannot contain an empty value, but got "".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessPageTemplateWithEmptyLabel()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The path "themes.test_theme.config.page_templates.templates.0.label" cannot contain an empty value,'
+            . ' but got "".'
+        );
+
         $themeConfig = [
             'label'  => 'test label',
             'config' => [

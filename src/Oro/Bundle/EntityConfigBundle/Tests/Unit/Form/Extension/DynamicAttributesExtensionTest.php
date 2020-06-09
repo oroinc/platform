@@ -66,7 +66,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -153,7 +153,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
                 $formConfigProvider
             );
         $this->expectsApplicable();
-        
+
         $viewConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::DATA_CLASS, 'attribute')
@@ -285,7 +285,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $form = $this->getForm();
 
         $this->setSecurityValue($this->extension, 'fields', [get_class($entity) => $fields]);
-        
+
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByFamily')
             ->with($entity->getAttributeFamily())
@@ -295,7 +295,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->willReturn(false);
         $form->expects($this->exactly($expectAdds))
             ->method('add');
-        
+
         $event = new FormEvent($form, $entity);
         $this->extension->onPreSetData($event);
     }

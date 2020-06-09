@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }

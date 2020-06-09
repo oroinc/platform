@@ -56,7 +56,7 @@ class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFallback(): void
     {
-        $this->assertInternalType('array', LocalizedFallbackValue::getFallbacks());
+        $this->assertIsArray(LocalizedFallbackValue::getFallbacks());
         $this->assertNotEmpty(LocalizedFallbackValue::getFallbacks());
     }
 

@@ -22,7 +22,7 @@ class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
     /** @var ComputeFileContent */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
@@ -158,12 +158,11 @@ class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testProcessWhenUnexpectedExceptionOccurred()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $config->addField('filename')->setExcluded();

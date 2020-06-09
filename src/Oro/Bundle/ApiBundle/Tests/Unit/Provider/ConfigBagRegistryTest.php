@@ -23,7 +23,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultConfigBag = $this->createMock(ConfigBagInterface::class);
         $this->firstConfigBag = $this->createMock(ConfigBag::class);
@@ -45,12 +45,11 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a config bag for the request "rest,another".
-     */
     public function testGetConfigBagForUnsupportedRequestType()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find a config bag for the request "rest,another".');
+
         $requestType = new RequestType(['rest', 'another']);
         $registry = $this->getRegistry([]);
         $registry->getConfigBag($requestType);

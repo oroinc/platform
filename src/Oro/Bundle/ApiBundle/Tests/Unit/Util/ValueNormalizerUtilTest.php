@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
 {
@@ -58,19 +59,19 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConvertToEntityTypeWhenExceptionOccurred()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $entityClass = 'Test\Class';
         $requestType = new RequestType([RequestType::REST]);
+
+        $this->expectException(EntityAliasNotFoundException::class);
 
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
         $valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
-            ->willThrowException(new \InvalidArgumentException());
+            ->willThrowException(new EntityAliasNotFoundException());
 
         ValueNormalizerUtil::convertToEntityType($valueNormalizer, $entityClass, $requestType);
     }
@@ -84,10 +85,96 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
         $valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
+            ->willThrowException(new EntityAliasNotFoundException());
+
+        self::assertNull(
+            ValueNormalizerUtil::convertToEntityType($valueNormalizer, $entityClass, $requestType, false)
+        );
+    }
+
+    public function testConvertToEntityTypeWhenIgnoreExceptionAndNotEntityAliasNotFoundExceptionOccurred()
+    {
+        $entityClass = 'Test\Class';
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($entityClass, DataType::ENTITY_TYPE, $requestType)
             ->willThrowException(new \InvalidArgumentException());
 
         self::assertNull(
             ValueNormalizerUtil::convertToEntityType($valueNormalizer, $entityClass, $requestType, false)
+        );
+    }
+
+    public function testConvertToEntityClass()
+    {
+        $entityType = 'test_class';
+        $entityClass = 'Test\Class';
+        $requestType = new RequestType([RequestType::REST]);
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($entityType, DataType::ENTITY_CLASS, $requestType)
+            ->willReturn($entityClass);
+
+        self::assertEquals(
+            $entityClass,
+            ValueNormalizerUtil::convertToEntityClass($valueNormalizer, $entityType, $requestType)
+        );
+    }
+
+    public function testConvertToEntityClassWhenExceptionOccurred()
+    {
+        $entityType = 'test_class';
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->expectException(EntityAliasNotFoundException::class);
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($entityType, DataType::ENTITY_CLASS, $requestType)
+            ->willThrowException(new EntityAliasNotFoundException());
+
+        ValueNormalizerUtil::convertToEntityClass($valueNormalizer, $entityType, $requestType);
+    }
+
+    public function testConvertToEntityClassWhenIgnoreException()
+    {
+        $entityType = 'test_class';
+        $requestType = new RequestType([RequestType::REST]);
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($entityType, DataType::ENTITY_CLASS, $requestType)
+            ->willThrowException(new EntityAliasNotFoundException());
+
+        self::assertNull(
+            ValueNormalizerUtil::convertToEntityClass($valueNormalizer, $entityType, $requestType, false)
+        );
+    }
+
+    public function testConvertToEntityClassWhenIgnoreExceptionAndNotEntityAliasNotFoundExceptionOccurred()
+    {
+        $entityType = 'test_class';
+        $requestType = new RequestType([RequestType::REST]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($entityType, DataType::ENTITY_CLASS, $requestType)
+            ->willThrowException(new \InvalidArgumentException());
+
+        self::assertNull(
+            ValueNormalizerUtil::convertToEntityClass($valueNormalizer, $entityType, $requestType, false)
         );
     }
 }

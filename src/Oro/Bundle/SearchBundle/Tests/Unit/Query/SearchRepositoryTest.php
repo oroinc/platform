@@ -6,24 +6,25 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\SearchRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchRepository */
     protected $repository;
 
-    /** @var QueryFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var QueryFactoryInterface|MockObject */
     protected $queryFactory;
 
-    /** @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractSearchMappingProvider|MockObject */
     protected $mappingProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(QueryFactoryInterface::class);
         $this->mappingProvider = $this->getMockBuilder(AbstractSearchMappingProvider::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntityAlias'])
+            ->onlyMethods(['getEntityAlias'])
             ->getMockForAbstractClass();
         $this->repository = new SearchRepository($this->queryFactory, $this->mappingProvider);
     }
@@ -32,14 +33,13 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->createMock(SearchQueryInterface::class);
 
-        $this->queryFactory->expects($this->once())
+        $this->queryFactory->expects(static::once())
             ->method('create')
             ->with([])
             ->willReturn($query);
-        $this->mappingProvider->expects($this->never())
-            ->method($this->anything());
+        $this->mappingProvider->expects(static::never())->method(static::anything());
 
-        $this->assertEquals($query, $this->repository->createQuery());
+        static::assertEquals($query, $this->repository->createQuery());
     }
 
     public function testCreateQueryWithEntity()
@@ -48,49 +48,45 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
         $entityAlias = 'test_class';
 
         $query = $this->createMock(SearchQueryInterface::class);
-        $query->expects($this->once())
+        $query->expects(static::once())
             ->method('setFrom')
             ->with($entityAlias);
 
-        $this->queryFactory->expects($this->once())
+        $this->queryFactory->expects(static::once())
             ->method('create')
             ->with([])
             ->willReturn($query);
 
-        $this->mappingProvider->expects($this->once())
+        $this->mappingProvider->expects(static::once())
             ->method('getEntityAlias')
             ->with($entityClass)
             ->willReturn($entityAlias);
 
         $this->repository->setEntityName($entityClass);
-        $this->assertEquals($query, $this->repository->createQuery());
+        static::assertEquals($query, $this->repository->createQuery());
     }
 
     public function testSetEntityName()
     {
-        $entityClass = 'TestClass';
-
-        $this->assertAttributeEmpty('entityName', $this->repository);
-        $this->repository->setEntityName($entityClass);
-        $this->assertAttributeEquals($entityClass, 'entityName', $this->repository);
+        static::assertEmpty($this->repository->getEntityName());
+        $this->repository->setEntityName('TestClass');
+        static::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
     public function testGetEntityName()
     {
-        $entityClass = 'TestClass';
-
-        $this->assertNull($this->repository->getEntityName());
-        $this->repository->setEntityName($entityClass);
-        $this->assertEquals($entityClass, $this->repository->getEntityName());
+        static::assertNull($this->repository->getEntityName());
+        $this->repository->setEntityName('TestClass');
+        static::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
     public function testGetQueryFactory()
     {
-        $this->assertEquals($this->queryFactory, $this->repository->getQueryFactory());
+        static::assertEquals($this->queryFactory, $this->repository->getQueryFactory());
     }
 
     public function testGetMappingProvider()
     {
-        $this->assertEquals($this->mappingProvider, $this->repository->getMappingProvider());
+        static::assertEquals($this->mappingProvider, $this->repository->getMappingProvider());
     }
 }

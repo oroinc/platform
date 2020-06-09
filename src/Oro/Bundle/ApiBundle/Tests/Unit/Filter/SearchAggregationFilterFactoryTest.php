@@ -14,7 +14,7 @@ class SearchAggregationFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAggregationFilterFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
 

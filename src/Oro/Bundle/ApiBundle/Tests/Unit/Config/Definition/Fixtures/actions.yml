@@ -611,6 +611,50 @@ field_dash_in_field_name:
                 fields:
                     test-field: []
 
+field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: path1
+    expected:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: path1
+
+null_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: null
+    expected: []
+    error: 'The path "entity.actions.create.fields.field1.property_path" cannot contain an empty value, but got null.'
+
+empty_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: ""
+    expected: []
+    error: 'The path "entity.actions.create.fields.field1.property_path" cannot contain an empty value, but got "".'
+
+invalid_field_property_path:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        property_path: []
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.fields.field1.property_path". Expected scalar, but got array.'
+
 field_form:
     config:
         actions:

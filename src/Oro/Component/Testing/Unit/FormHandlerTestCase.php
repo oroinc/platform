@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Base class for testing form handlers with some convenience test methods.
+ */
 abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
@@ -35,7 +38,7 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
      */
     protected $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()

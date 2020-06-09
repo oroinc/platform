@@ -26,7 +26,7 @@ class ExternalTranslationsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serviceProvider = $this->createMock(TranslationServiceProvider::class);
 
@@ -116,12 +116,11 @@ class ExternalTranslationsProviderTest extends \PHPUnit\Framework\TestCase
         yield 'negative' => ['return' => false, 'expected' => false];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\TranslationBundle\Exception\TranslationProviderException
-     * @expectedExceptionMessage Unable to download translations for "test_code"
-     */
     public function testDownloadTranslationsException()
     {
+        $this->expectException(\Oro\Bundle\TranslationBundle\Exception\TranslationProviderException::class);
+        $this->expectExceptionMessage('Unable to download translations for "test_code"');
+
         $language = $this->createMock(Language::class);
         $language->expects($this->any())->method('getCode')->willReturn('test_code');
 
@@ -138,12 +137,11 @@ class ExternalTranslationsProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->updateTranslations($language);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\TranslationBundle\Exception\TranslationProviderException
-     * @expectedExceptionMessage Unable to load translations for "test_code" from "test_path"
-     */
     public function testLoadTranslationsException()
     {
+        $this->expectException(\Oro\Bundle\TranslationBundle\Exception\TranslationProviderException::class);
+        $this->expectExceptionMessage('Unable to load translations for "test_code" from "test_path"');
+
         $language = $this->createMock(Language::class);
         $language->expects($this->any())->method('getCode')->willReturn('test_code');
 

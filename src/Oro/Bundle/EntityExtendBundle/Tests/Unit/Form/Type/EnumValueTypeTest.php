@@ -33,7 +33,7 @@ class EnumValueTypeTest extends TypeTestCase
      */
     protected $validators;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new EnumValueType($this->getConfigProvider());
         parent::setUp();

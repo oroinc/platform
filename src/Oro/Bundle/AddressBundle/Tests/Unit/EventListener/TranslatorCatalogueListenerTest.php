@@ -41,7 +41,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AddressTypeTranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $addressTypeTranslationRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->countryRepository = $this->createMock(CountryRepository::class);
         $this->countryTranslationRepository = $this->createMock(CountryTranslationRepository::class);
@@ -141,7 +141,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/Expected repository of type ".*IdentityAwareTranslationRepositoryInterface"/'
         );
 
@@ -181,7 +181,7 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Expected repository of type ".*TranslationRepositoryInterface"/');
+        $this->expectExceptionMessageMatches('/Expected repository of type ".*TranslationRepositoryInterface"/');
 
         $listener = new TranslatorCatalogueListener($this->configureRegistry($manager));
 

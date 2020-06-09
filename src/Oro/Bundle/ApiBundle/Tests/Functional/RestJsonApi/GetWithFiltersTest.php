@@ -10,10 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganizatio
 
 class GetWithFiltersTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -191,6 +188,26 @@ class GetWithFiltersTest extends RestJsonApiTestCase
             [
                 'title'  => 'filter constraint',
                 'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
+    public function testMetaTitlesWithEndingComma()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title,'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given "title,".',
                 'source' => ['parameter' => 'meta']
             ],
             $response
@@ -438,6 +455,117 @@ class GetWithFiltersTest extends RestJsonApiTestCase
             $response
         );
         self::assertResponseCount(21, $response);
+    }
+
+    public function testPaginationWithNegativePageSize()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => -1]],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected unsigned integer value. Given "-1".',
+                'source' => ['parameter' => 'page[size]']
+            ],
+            $response
+        );
+    }
+
+    public function testPaginationWithNotIntegerPageSize()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 'str']],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected unsigned integer value. Given "str".',
+                'source' => ['parameter' => 'page[size]']
+            ],
+            $response
+        );
+    }
+
+    public function testPaginationWithNegativePageNumber()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => -1]],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected unsigned integer value. Given "-1".',
+                'source' => ['parameter' => 'page[number]']
+            ],
+            $response
+        );
+    }
+
+    public function testPaginationWithNotIntegerPageNumber()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 'str']],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected unsigned integer value. Given "str".',
+                'source' => ['parameter' => 'page[number]']
+            ],
+            $response
+        );
+    }
+
+    public function testPaginationWithZeroPageSize()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 0]]
+        );
+
+        $this->assertResponseContains(['data' => []], $response);
+    }
+
+    public function testPaginationWithZeroPageNumber()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 0]],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The value should should be greater than or equals to 1.',
+                'source' => ['parameter' => 'page[number]']
+            ],
+            $response
+        );
     }
 
     public function testDisabledPagination()

@@ -23,7 +23,7 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
      */
     protected $dependencyVoter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
         $this->featureConfigManager = $this->createMock(ConfigurationManager::class);

@@ -18,7 +18,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
     /** @var ImpersonationAuthenticator */
     private $authenticator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadImpersonationData::class]);

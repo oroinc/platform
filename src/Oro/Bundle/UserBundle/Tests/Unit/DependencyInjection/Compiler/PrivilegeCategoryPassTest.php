@@ -14,7 +14,7 @@ class PrivilegeCategoryPassTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this
             ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
@@ -23,7 +23,7 @@ class PrivilegeCategoryPassTest extends \PHPUnit\Framework\TestCase
         $this->compilerPass = new PrivilegeCategoryPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->container, $this->compilerPass);
     }

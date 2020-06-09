@@ -20,7 +20,7 @@ class EmailCacheManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailCacheManager */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

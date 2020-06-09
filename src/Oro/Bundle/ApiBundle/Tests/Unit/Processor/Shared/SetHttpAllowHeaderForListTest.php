@@ -16,7 +16,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
     /** @var SetHttpAllowHeaderForList */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

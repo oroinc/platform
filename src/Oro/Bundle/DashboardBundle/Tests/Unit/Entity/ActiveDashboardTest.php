@@ -11,7 +11,7 @@ class ActiveDashboardTest extends \PHPUnit\Framework\TestCase
      */
     protected $activeDashboard;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->activeDashboard = new ActiveDashboard();
     }

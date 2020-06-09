@@ -111,23 +111,23 @@ operations:
                 demo_attr: $demo                                    # use attribute name and property path or simple string for attribute value
 
         form_init:                                                  # (optional) any needed actions which will execute before showing form dialog
-            - @assign_value:                                        # action alias
+            - '@assign_value':                                        # action alias
                 conditions:                                         # (optional) conditions list to allow current action
-                    @empty: $description                            # condition definition
+                    '@empty': $description                            # condition definition
                 parameters: [$.demo_attr, 'Demo Data']              # parameters of current action
 
         preactions:                                                 # (optional) any needed pre actions which will execute before pre conditions
-            - @create_datetime:                                     # action alias
+            - '@create_datetime':                                     # action alias
                 attribute: $.date                                   # action parameters
 
         preconditions:                                              # (optional) pre conditions for display Action button
-            @gt: [$updatedAt, $.date]                               # condition definition
+            - '@gt': [$updatedAt, $.date]                               # condition definition
             
         conditions:                                                 # (optional) conditions for execution Action button
-            @equal: [$expired, false]                               # condition definition
+            - '@equal': [$expired, false]                               # condition definition
 
         actions:                                                    # (optional) any needed actions which will execute after click on th button
-            - @assign_value: [$expired, true]                       # action definition
+            - '@assign_value': [$expired, true]                       # action definition
 ```
 
  This configuration describes the operation that relates to the ``MyEntity`` entity. The button with the "adme.demo.myentity.operations.myentity_operation" label is displayed on the view page (acme_demo_myentity_view) of this entity (in case the 'updatedAt' field > new DateTime('now')). If the `expired` property of the entity = false, then clicking the button triggers the "assign_value" action that sets the 'expired' field to `true`.

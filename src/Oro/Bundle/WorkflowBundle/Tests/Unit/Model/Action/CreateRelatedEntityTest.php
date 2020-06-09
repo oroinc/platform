@@ -2,49 +2,54 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity;
+use Oro\Component\Action\Exception\ActionException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MockObject|ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var CreateRelatedEntity
-     */
+    /** @var CreateRelatedEntity */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->action = new CreateRelatedEntity($this->contextAccessor, $this->registry);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->action = new class($this->contextAccessor, $this->registry) extends CreateRelatedEntity {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Object data must be an array.
-     */
     public function testInitializeException()
     {
-        $options = array(
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Object data must be an array.');
+
+        $options = [
             'data' => 'test'
-        );
+        ];
         $this->action->initialize($options);
     }
 
@@ -54,8 +59,8 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize($options)
     {
-        $this->assertSame($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertSame($this->action, $this->action->initialize($options));
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     /**
@@ -63,93 +68,65 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function optionsDataProvider()
     {
-        return array(
-            array(array()),
-            array(array('data' => null)),
-            array(array('data' => array('test' => 'data'))),
-        );
+        return [
+            [[]],
+            [['data' => null]],
+            [['data' => ['test' => 'data']]],
+        ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Context must be instance of WorkflowItem
-     */
     public function testExecuteExceptionInterface()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Context must be instance of WorkflowItem');
+
         $context = new \stdClass();
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     */
     public function testExecuteExceptionNotManaged()
     {
+        $this->expectException(NotManageableEntityException::class);
         $relatedEntity = '\stdClass';
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getRelatedEntity')
-            ->will($this->returnValue($relatedEntity));
+        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects(static::once())->method('getRelatedEntity')->willReturn($relatedEntity);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowItem->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
+        $workflowItem->expects(static::once())->method('getDefinition')->willReturn($definition);
 
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass');
+        $this->registry->expects(static::once())->method('getManagerForClass');
         $this->action->execute($workflowItem);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Can't create related entity \stdClass.
-     */
     public function testExecuteSaveException()
     {
+        $this->expectException(ActionException::class);
+        $this->expectExceptionMessage("Can't create related entity \stdClass.");
+
         $relatedEntity = '\stdClass';
         $entity = new \stdClass();
         $entity->test = null;
 
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getRelatedEntity')
-            ->will($this->returnValue($relatedEntity));
+        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects(static::once())->method('getRelatedEntity')->willReturn($relatedEntity);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowItem->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
-        $workflowItem->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
+        $workflowItem->expects(static::once())->method('getEntity')->willReturn($entity);
+        $workflowItem->expects(static::once())->method('getDefinition')->willReturn($definition);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
-            ->getMock();
-        $em->expects($this->once())
+        $em = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        $em->expects(static::once())
             ->method('persist')
             ->with($entity)
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        throw new \Exception();
-                    }
-                )
+            ->willReturnCallback(
+                function () {
+                    throw new \Exception();
+                }
             );
 
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($em));
+        $this->registry->expects(static::once())->method('getManagerForClass')->willReturn($em);
 
-        $this->action->initialize(array());
+        $this->action->initialize([]);
         $this->action->execute($workflowItem);
     }
 
@@ -163,35 +140,18 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $entity->test = null;
 
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getRelatedEntity')
-            ->will($this->returnValue($relatedEntity));
+        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects(static::once())->method('getRelatedEntity')->willReturn($relatedEntity);
 
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowItem->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
-        $workflowItem->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
+        $workflowItem->expects(static::once())->method('getEntity')->willReturn($entity);
+        $workflowItem->expects(static::once())->method('getDefinition')->willReturn($definition);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
-            ->getMock();
-        $em->expects($this->once())
-            ->method('persist')
-            ->with($entity);
-        $em->expects($this->once())
-            ->method('flush')
-            ->with($entity);
+        $em = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        $em->expects(static::once())->method('persist')->with($entity);
+        $em->expects(static::once())->method('flush')->with($entity);
 
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($em));
+        $this->registry->expects(static::once())->method('getManagerForClass')->willReturn($em);
 
         $this->action->initialize($options);
         $this->action->execute($workflowItem);

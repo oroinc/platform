@@ -19,7 +19,7 @@ class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
     /** @var WebsocketPingTopic */
     private $websocketPing;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->periodicTimer = $this->createMock(TopicPeriodicTimer::class);
 

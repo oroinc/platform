@@ -22,7 +22,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
     use SearchExtensionTrait;
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -67,7 +67,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         $this->assertEquals(Item::class, $messages[0]['entityClass']);
         $this->assertEquals(0, $messages[0]['offset']);
         $this->assertEquals(1000, $messages[0]['limit']);
-        $this->assertInternalType('integer', $messages[0]['jobId']);
+        $this->assertIsInt($messages[0]['jobId']);
     }
 
     /**

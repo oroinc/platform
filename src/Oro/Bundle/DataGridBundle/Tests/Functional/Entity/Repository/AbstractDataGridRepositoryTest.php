@@ -18,7 +18,7 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
     /** @var AclHelper */
     protected $aclHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

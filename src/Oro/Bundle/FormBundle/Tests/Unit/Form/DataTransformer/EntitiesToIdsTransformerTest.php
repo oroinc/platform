@@ -72,12 +72,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
     public function testTransformFailsWhenValueInNotAnArray()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
         $transformer = new EntitiesToIdsTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
         $transformer->transform('invalid value');
     }
@@ -340,12 +339,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\FormBundle\Form\Exception\FormException
-     * @expectedExceptionMessage Cannot get id property path of entity. "TestClass" has composite primary key.
-     */
     public function testCreateFailsWhenCannotGetIdProperty()
     {
+        $this->expectException(\Oro\Bundle\FormBundle\Form\Exception\FormException::class);
+        $this->expectExceptionMessage('Cannot get id property path of entity. "TestClass" has composite primary key.');
+
         $className = 'TestClass';
 
         $classMetadata = $this->getMockClassMetadata();
@@ -359,12 +357,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         new EntitiesToIdsTransformer($em, $className, null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "callable", "array" given
-     */
     public function testCreateFailsWhenQueryBuilderCallbackIsNotCallable()
     {
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "callable", "array" given');
+
         new EntitiesToIdsTransformer($this->getMockEntityManager(), 'TestClass', 'id', array());
     }
 

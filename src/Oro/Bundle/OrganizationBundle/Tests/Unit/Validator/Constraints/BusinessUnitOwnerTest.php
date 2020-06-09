@@ -11,7 +11,7 @@ class BusinessUnitOwnerTest extends \PHPUnit\Framework\TestCase
      */
     protected $businessUnitOwner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->businessUnitOwner = new BusinessUnitOwner();
     }

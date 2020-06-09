@@ -21,14 +21,14 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
     /** @var callable */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->listener) {
             $this->getContainer()->get('event_dispatcher')

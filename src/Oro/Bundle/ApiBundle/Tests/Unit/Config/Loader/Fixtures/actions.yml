@@ -203,6 +203,18 @@ entity_form:
             form_options:
                 option1: value1
 
+field_property_path:
+    config:
+        create:
+            fields:
+                field1:
+                    property_path: path1
+    expected:
+        create:
+            fields:
+                field1:
+                    property_path: path1
+
 field_form:
     config:
         create:

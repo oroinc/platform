@@ -17,7 +17,7 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
      */
     protected $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
@@ -32,7 +32,7 @@ abstract class AbstractTranslationImportStrategyTest extends WebTestCase
         $this->strategy->setEntityName(Translation::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->strategy);
     }

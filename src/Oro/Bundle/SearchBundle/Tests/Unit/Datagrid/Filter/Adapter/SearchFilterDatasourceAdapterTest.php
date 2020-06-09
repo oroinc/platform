@@ -16,7 +16,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchQuery;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->searchQuery = $this->createMock(SearchQueryInterface::class);
     }
@@ -65,22 +65,20 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $adapter->addRestriction($restriction, FilterUtility::CONDITION_OR);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Restriction not supported.
-     */
     public function testAddRestrictionInvalidCondition()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Restriction not supported.');
+
         $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
         $adapter->addRestriction(Criteria::expr()->eq('foo', 'bar'), 'invalid_condition');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Restriction not supported.
-     */
     public function testAddRestrictionInvalidRestriction()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Restriction not supported.');
+
         $adapter = new SearchFilterDatasourceAdapter($this->searchQuery);
         $adapter->addRestriction('foo = bar', FilterUtility::CONDITION_OR);
     }
@@ -115,52 +113,47 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $stringFilter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'bar']);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method currently not supported.
-     */
     public function testGroupBy()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method currently not supported.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->groupBy('name');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method currently not supported.
-     */
     public function testAddGroupBy()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method currently not supported.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->addGroupBy('name');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method currently not supported.
-     */
     public function testSetParameter()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method currently not supported.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->setParameter('key', 'value');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method currently not supported.
-     */
     public function testGetFieldByAlias()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method currently not supported.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->getFieldByAlias('name');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Query not initialized properly
-     */
     public function testGetWrappedSearchQueryNotInitialized()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Query not initialized properly');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->getWrappedSearchQuery();
     }
@@ -176,22 +169,20 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($ds->getWrappedSearchQuery(), $query);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Use Criteria::expr() instead.
-     */
     public function testExpr()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Use Criteria::expr() instead.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->expr();
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method currently not supported.
-     */
     public function testGetDatabasePlatform()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method currently not supported.');
+
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $ds->getDatabasePlatform();
     }

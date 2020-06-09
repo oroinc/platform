@@ -22,7 +22,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRenderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->renderer   = $this->createMock('Oro\Component\Layout\Form\FormRendererInterface');
         $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')

@@ -101,24 +101,57 @@ services:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
     oro_message_queue.profiler.message_queue_collector:
-        class: 'Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector'
-        public: false
-        arguments: ['@oro_message_queue.message_producer']
+        class: Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector
+        arguments:
+            - '@oro_message_queue.message_producer'
         tags:
             - { name: data_collector, template: 'OroMessageQueueBundle:Collector:message_queue.html.twig', id: message_queue }
 
     oro_message_queue.client.buffered_message_producer:
         class: Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer
-        public: false
         decorates: oro_message_queue.client.message_producer
         decoration_priority: -255 # the buffered producer should be at the top of the decoration chain
         arguments:
             - '@oro_message_queue.client.buffered_message_producer.inner'
+            - '@logger'
+            - '@oro_message_queue.client.message_filter'
+
+    oro_message_queue.client.message_buffer_manager:
+        class: Oro\Bundle\MessageQueueBundle\Client\MessageBufferManager
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+            - '@doctrine'
+
+    oro_message_queue.client.message_filter:
+        class: Oro\Bundle\MessageQueueBundle\Client\ChainMessageFilter
+        arguments:
+            - [] # filters
+            - ~ # container
 
     oro_message_queue.client.dbal_transaction_watcher:
         class: Oro\Bundle\MessageQueueBundle\Client\DbalTransactionWatcher
-        public: false
         arguments:
             - '@oro_message_queue.client.buffered_message_producer'
         tags:
             - { name: oro.doctrine.connection.transaction_watcher }
+
+    oro_message_queue.client.request_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\RequestWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.client.command_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\CommandWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.client.processor_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\ProcessorWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: oro_message_queue.consumption.extension, priority: 255 }

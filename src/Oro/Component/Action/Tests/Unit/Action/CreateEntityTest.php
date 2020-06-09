@@ -26,7 +26,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
      */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
@@ -43,7 +43,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->registry, $this->action);
     }
@@ -122,12 +122,11 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteEntityNotManageable()
     {
+        $this->expectException(\Oro\Component\Action\Exception\NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
+
         $options = array(
             CreateEntity::OPTION_KEY_CLASS     => 'stdClass',
             CreateEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
@@ -137,12 +136,11 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Can't create entity stdClass. Test exception.
-     */
     public function testExecuteCantCreateEntity()
     {
+        $this->expectException(\Oro\Component\Action\Exception\ActionException::class);
+        $this->expectExceptionMessage("Can't create entity stdClass. Test exception.");
+
         $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();

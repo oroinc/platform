@@ -141,6 +141,21 @@ invalid_hints:
     expected: []
     error: 'Unrecognized option "extra" under "entity.hints.0"'
 
+empty_inner_join_associations:
+    config:
+        inner_join_associations: []
+    expected: []
+
+inner_join_associations:
+    config:
+        inner_join_associations:
+            - association1
+            - association2.association21
+    expected:
+        inner_join_associations:
+            - association1
+            - association2.association21
+
 description_cannot_be_set_in_config:
     config:
         description: test
@@ -225,6 +240,24 @@ invalid_value_for_disable_meta_properties:
     expected: []
     error: 'Invalid type for path "entity.disable_meta_properties". Expected boolean, but got integer'
 
+enable_partial_load:
+    config:
+        disable_partial_load: false
+    expected:
+        disable_partial_load: false
+
+disable_partial_load:
+    config:
+        disable_partial_load: true
+    expected:
+        disable_partial_load: true
+
+invalid_value_for_disable_partial_load:
+    config:
+        disable_partial_load: 123
+    expected: []
+    error: 'Invalid type for path "entity.disable_partial_load". Expected boolean, but got integer'
+
 all_attributes:
     config:
         exclusion_policy: all
@@ -236,6 +269,9 @@ all_attributes:
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
     expected:
         exclusion_policy: all
         documentation_resource: [test.md]
@@ -246,6 +282,9 @@ all_attributes:
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
+        inner_join_associations:
+            - association1
+            - association2.association21
 
 empty_field:
     config:

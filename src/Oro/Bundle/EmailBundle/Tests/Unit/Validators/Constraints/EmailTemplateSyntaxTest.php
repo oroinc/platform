@@ -10,12 +10,12 @@ class EmailTemplateSyntaxTest extends \PHPUnit\Framework\TestCase
     /** @var EmailTemplateSyntax */
     protected $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailTemplateSyntax();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->constraint);
     }

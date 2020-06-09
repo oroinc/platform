@@ -19,7 +19,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RequestStack */
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())

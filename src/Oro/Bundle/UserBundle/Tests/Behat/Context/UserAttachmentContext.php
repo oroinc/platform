@@ -104,6 +104,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);
-        self::assertContains('text/html', $response->getHeader('Content-Type')[0]);
+        static::assertStringContainsString('text/html', $response->getHeader('Content-Type')[0]);
     }
 }

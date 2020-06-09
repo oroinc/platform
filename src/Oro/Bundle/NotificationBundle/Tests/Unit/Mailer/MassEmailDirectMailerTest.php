@@ -26,7 +26,7 @@ class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
      */
     private $mailer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->directMailer = $this->createMock(DirectMailer::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

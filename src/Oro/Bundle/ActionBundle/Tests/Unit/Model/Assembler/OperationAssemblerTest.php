@@ -16,7 +16,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var OperationAssembler */
     protected $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new OperationAssembler(
             $this->getActionFactory(),
@@ -26,7 +26,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->assembler, $this->conditionFactory, $this->attributeAssembler);
     }
@@ -46,12 +46,11 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException
-     * @expectedExceptionMessage Option "label" is required
-     */
     public function testCreateOperationWithMissedRequiredOptions()
     {
+        $this->expectException(\Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException::class);
+        $this->expectExceptionMessage('Option "label" is required');
+
         $this->assembler->createOperation('test', []);
     }
 

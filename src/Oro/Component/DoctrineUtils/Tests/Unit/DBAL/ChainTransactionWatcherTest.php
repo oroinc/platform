@@ -19,7 +19,7 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->watcher1 = $this->createMock(TransactionWatcherInterface::class);
         $this->watcher2 = $this->createMock(TransactionWatcherInterface::class);
@@ -37,14 +37,14 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
         $this->chainWatcher->onTransactionStarted();
     }
 
-    public function testOnTransactionCommited()
+    public function testOnTransactionCommitted()
     {
         $this->watcher1->expects(self::once())
-            ->method('onTransactionCommited');
+            ->method('onTransactionCommitted');
         $this->watcher2->expects(self::once())
-            ->method('onTransactionCommited');
+            ->method('onTransactionCommitted');
 
-        $this->chainWatcher->onTransactionCommited();
+        $this->chainWatcher->onTransactionCommitted();
     }
 
     public function testOnTransactionRolledback()

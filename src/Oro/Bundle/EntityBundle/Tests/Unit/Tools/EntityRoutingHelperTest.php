@@ -19,7 +19,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
             ->disableOriginalConstructor()
@@ -256,12 +256,11 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @expectedExceptionMessage Entity class "Acme\Bundle\TestClass" is not manageable.
-     */
     public function testGetEntityForNotManageableEntity()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
+        $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');
+
         $this->doctrineHelper->expects($this->once())
             ->method('getEntity')
             ->with('Acme\Bundle\TestClass', 123)
@@ -270,12 +269,11 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->getEntity('Acme_Bundle_TestClass', 123);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Record doesn't exist
-     */
     public function testGetEntityForNotExistingEntity()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectExceptionMessage("Record doesn't exist");
+
         $this->doctrineHelper->expects($this->once())
             ->method('getEntity')
             ->with('Acme\Bundle\TestClass', 123)
@@ -314,12 +312,11 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @expectedExceptionMessage Entity class "Acme\Bundle\TestClass" is not manageable.
-     */
     public function testGetEntityReferenceForNotManageableEntity()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
+        $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');
+
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityReference')
             ->with('Acme\Bundle\TestClass', 123)
@@ -329,12 +326,11 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @expectedExceptionMessage Entity class "Acme\Bundle\TestClass" is not manageable.
-     */
     public function testGetEntityReferenceForNewNotManageableEntity()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
+        $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');
+
         $this->doctrineHelper->expects($this->once())
             ->method('createEntityInstance')
             ->with('Acme\Bundle\TestClass')

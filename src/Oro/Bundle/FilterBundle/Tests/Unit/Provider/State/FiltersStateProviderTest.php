@@ -18,7 +18,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     private const DEFAULT_FILTERS_STATE = ['sampleFilter' => ['value' => 'sampleValue']];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

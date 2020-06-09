@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -39,7 +40,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */
     private $filterFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +75,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         return new RestFilterValueAccessor(
             $request,
             '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
-            [ComparisonFilter::EQ => '=', ComparisonFilter::NEQ => '!=']
+            [FilterOperator::EQ => '=', FilterOperator::NEQ => '!=']
         );
     }
 
@@ -87,7 +88,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     private function getComparisonFilter($dataType, $isCollection = false)
     {
         $filter = new ComparisonFilter($dataType);
-        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $filter->setCollection($isCollection);
 
         return $filter;
@@ -262,7 +263,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[name]', $expectedFilter);
@@ -298,7 +299,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[name]', $expectedFilter);
@@ -510,7 +511,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name]', $expectedFilter);
@@ -550,7 +551,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name]', $expectedFilter);
@@ -587,7 +588,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name]', $expectedFilter);
@@ -624,7 +625,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('groups.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[groups.name]', $expectedFilter);
@@ -685,7 +686,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category1.name]', $expectedFilter);
@@ -724,7 +725,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name1]', $expectedFilter);
@@ -764,7 +765,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
-        $expectedFilter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
+        $expectedFilter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category1.name1]', $expectedFilter);
@@ -923,12 +924,11 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testProcessForSelfIdentifiableFilterWhenSearchFilterKeyThrowsUnexpectedException()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
         $primaryEntityFilters = $this->getFiltersConfig();
 

@@ -79,14 +79,14 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The undefined text representation format "unknown" cannot be used as a fallback format for the format "long".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEntityNameFormatsForFallbackToUndefinedType()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The undefined text representation format "unknown" cannot be used as a fallback format for the format'
+            . ' "long".'
+        );
+
         $this->processConfiguration(
             [
                 'entity_name_formats' => [
@@ -98,12 +98,11 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The text representation format "long" have a cyclic dependency on itself.
-     */
     public function testEntityNameFormatsForSelfCyclicDependency()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The text representation format "long" have a cyclic dependency on itself.');
+
         $this->processConfiguration(
             [
                 'entity_name_formats' => [
@@ -115,12 +114,13 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The text representation format "short" have a cyclic dependency "long -> short".
-     */
     public function testEntityNameFormatsForOneLevelCyclicDependency()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The text representation format "short" have a cyclic dependency "long -> short".'
+        );
+
         $this->processConfiguration(
             [
                 'entity_name_formats' => [
@@ -135,12 +135,13 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The text representation format "html" have a cyclic dependency "long -> short -> html".
-     */
     public function testEntityNameFormatsForTwoLevelCyclicDependency()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The text representation format "html" have a cyclic dependency "long -> short -> html".'
+        );
+
         $this->processConfiguration(
             [
                 'entity_name_formats' => [
@@ -158,14 +159,13 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The text representation format "short" have a cyclic dependency "html -> full -> long -> short".
-     */
-    // @codingStandardsIgnoreEnd
     public function testEntityNameFormatsForCyclicDependency()
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'The text representation format "short" have a cyclic dependency "html -> full -> long -> short".'
+        );
+
         $this->processConfiguration(
             [
                 'entity_name_formats' => [

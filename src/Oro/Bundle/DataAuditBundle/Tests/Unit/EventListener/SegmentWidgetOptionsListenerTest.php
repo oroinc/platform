@@ -15,7 +15,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentWidgetOptionsListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 

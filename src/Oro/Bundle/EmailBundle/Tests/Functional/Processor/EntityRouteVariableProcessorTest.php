@@ -16,7 +16,7 @@ class EntityRouteVariableProcessorTest extends WebTestCase
     /** @var Item */
     private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
         $this->emailRenderer = self::getContainer()->get('oro_email.email_renderer');

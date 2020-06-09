@@ -21,7 +21,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected $attachmentProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -9,7 +9,7 @@ class CustomizeLoadedDataConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var CustomizeLoadedDataConfigExtra */
     private $extra;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extra = new CustomizeLoadedDataConfigExtra();
     }

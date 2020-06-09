@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -28,24 +29,28 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
     /** @var EnumSynchronizer */
     protected $enumSynchronizer;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var ExtendDbIdentifierNameGenerator */
+    protected $nameGenerator;
+
+    /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param ConfigManager       $configManager
+     * @param ConfigManager $configManager
      * @param TranslatorInterface $translator
-     * @param EnumSynchronizer    $enumSynchronizer
+     * @param EnumSynchronizer $enumSynchronizer
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        EnumSynchronizer $enumSynchronizer
+        EnumSynchronizer $enumSynchronizer,
+        ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->configManager    = $configManager;
-        $this->translator       = $translator;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
         $this->enumSynchronizer = $enumSynchronizer;
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -140,7 +145,8 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
                 ? ExtendHelper::buildEnumCode($enumName)
                 : ExtendHelper::generateEnumCode(
                     $configModel->getEntity()->getClassName(),
-                    $configModel->getFieldName()
+                    $configModel->getFieldName(),
+                    $this->nameGenerator->getMaxEnumCodeSize()
                 );
         }
 

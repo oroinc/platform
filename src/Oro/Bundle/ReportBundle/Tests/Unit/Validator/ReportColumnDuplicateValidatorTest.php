@@ -24,7 +24,7 @@ class ReportColumnDuplicateValidatorTest extends \PHPUnit\Framework\TestCase
      */
     protected $context;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->constraint = $this->getMockBuilder(Constraint::class)->getMock();
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)->getMock();

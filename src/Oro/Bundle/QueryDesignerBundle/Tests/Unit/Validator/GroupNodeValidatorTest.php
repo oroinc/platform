@@ -16,7 +16,7 @@ class GroupNodeValidatorTest extends \PHPUnit\Framework\TestCase
 
     protected $constraint;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->executionContext = $this->createMock(ExecutionContextInterface::class);
 

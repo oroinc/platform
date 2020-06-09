@@ -38,7 +38,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateListFinishMessageProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->operationManager = $this->createMock(AsyncOperationManager::class);
@@ -57,12 +57,12 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array       $body
-     * @param string|null $messageId
+     * @param array $body
+     * @param string $messageId
      *
      * @return MessageInterface
      */
-    private function getMessage(array $body, $messageId = null)
+    private function getMessage(array $body, string $messageId = '')
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -115,10 +115,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'Got invalid message.',
-                ['message' => $message]
-            );
+            ->with('Got invalid message.');
 
         $result = $this->processor->process($message, $this->getSession());
 

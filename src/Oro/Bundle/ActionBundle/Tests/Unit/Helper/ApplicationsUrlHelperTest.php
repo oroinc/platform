@@ -17,7 +17,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicationsUrlHelper */
     protected $instance;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->routerProvider = $this->getMockBuilder(RouteProviderInterface::class)
             ->disableOriginalConstructor()

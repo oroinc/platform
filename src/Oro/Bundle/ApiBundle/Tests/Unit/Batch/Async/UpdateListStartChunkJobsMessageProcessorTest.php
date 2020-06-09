@@ -34,7 +34,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
     /** @var UpdateListStartChunkJobsMessageProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
         $this->operationManager = $this->createMock(AsyncOperationManager::class);
@@ -50,12 +50,12 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
     }
 
     /**
-     * @param array       $body
-     * @param string|null $messageId
+     * @param array $body
+     * @param string $messageId
      *
      * @return MessageInterface
      */
-    private function getMessage(array $body, $messageId = null)
+    private function getMessage(array $body, string $messageId = '')
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -90,10 +90,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'Got invalid message.',
-                ['message' => $message]
-            );
+            ->with('Got invalid message.');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -118,10 +115,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
         $this->logger->expects(self::once())
             ->method('critical')
-            ->with(
-                'The root job does not exist.',
-                ['message' => $message]
-            );
+            ->with('The root job does not exist.');
 
         $result = $this->processor->process($message, $this->getSession());
 
@@ -380,7 +374,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             ->method('critical')
             ->with(
                 'The child job does not exist.',
-                ['message' => $message, 'jobId' => 10000]
+                ['jobId' => 10000]
             );
 
         $result = $this->processor->process($message, $this->getSession());

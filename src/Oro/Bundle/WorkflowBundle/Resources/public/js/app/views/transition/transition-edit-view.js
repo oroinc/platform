@@ -31,7 +31,7 @@ define(function(require) {
             step_from: null,
             button_example_template: '<button type="button" class="btn <%- button_color %>" ' +
                 'title="<%- button_title %>">' +
-                '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
+                '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"></i> <% } %>' +
                 '<%- button_label %></button>',
             allowed_button_styles: [
                 {

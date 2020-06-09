@@ -29,11 +29,9 @@ class NewAddressValidatorTest extends ConstraintValidatorTestCase
         return parent::createContext();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testWithInvalidConstraint()
     {
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate(new Address(), $this->createMock(Constraint::class));
     }
 

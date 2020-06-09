@@ -5,7 +5,6 @@ namespace Oro\Bundle\NotificationBundle;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,7 +20,7 @@ class OroNotificationBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new EventsCompilerPass());
 
         $container->addCompilerPass(
             AddTopicMetaPass::create()

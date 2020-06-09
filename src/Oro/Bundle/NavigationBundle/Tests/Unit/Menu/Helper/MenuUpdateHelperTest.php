@@ -29,7 +29,7 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);

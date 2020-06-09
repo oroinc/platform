@@ -26,7 +26,7 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $underlyingCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = $this->getMockForAbstractClass(
             'Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface'

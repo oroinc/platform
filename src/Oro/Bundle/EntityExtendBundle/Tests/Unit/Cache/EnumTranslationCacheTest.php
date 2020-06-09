@@ -20,7 +20,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     private $enumTranslationCache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
         $this->translator->expects($this->once())

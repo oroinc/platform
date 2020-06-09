@@ -19,7 +19,7 @@ class LoginAttemptsLogSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var LoginAttemptsLogSubscriber */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = $this->createMock(LoginAttemptsHandlerInterface::class);
         $this->subscriber = new LoginAttemptsLogSubscriber($this->handler);

@@ -2,51 +2,59 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
 use Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner;
 use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DefaultOwnerHelper|MockObject */
     protected $defaultOwnerHelper;
 
-    /**
-     * @var ActionInterface
-     */
+    /** @var ActionInterface */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
 
-        $this->defaultOwnerHelper = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper')
+        $this->defaultOwnerHelper = $this->getMockBuilder(DefaultOwnerHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->action = new PopulateIntegrationOwner($this->contextAccessor, $this->defaultOwnerHelper);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->action = new class($this->contextAccessor, $this->defaultOwnerHelper) extends PopulateIntegrationOwner {
+            public function xgetAttribute()
+            {
+                return $this->attribute;
+            }
+
+            public function xgetIntegration()
+            {
+                return $this->integration;
+            }
+        };
+
+        /** @var EventDispatcher|MockObject $dispatcher */
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @dataProvider invalidOptionsDataProvider
      * @param array $options
      */
     public function testInitializeExceptions(array $options)
     {
+        $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
     }
 
@@ -69,48 +77,43 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $integration = 'b';
 
         $options = ['attribute' => $attribute, 'integration' => $integration];
-        $this->assertSame($this->action, $this->action->initialize($options));
+        static::assertSame($this->action, $this->action->initialize($options));
 
-        $this->assertAttributeEquals($attribute, 'attribute', $this->action);
-        $this->assertAttributeEquals($integration, 'integration', $this->action);
+        static::assertEquals($attribute, $this->action->xgetAttribute());
+        static::assertEquals($integration, $this->action->xgetIntegration());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectEntity()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage(
+            'Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.'
+        );
+
         $context = new \stdClass();
         $context->attr = 'test';
-        $context->integration = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context->integration = $this->getMockBuilder(Channel::class)->disableOriginalConstructor()->getMock();
 
-        $this->defaultOwnerHelper->expects($this->never())
-            ->method($this->anything());
+        $this->defaultOwnerHelper->expects(static::never())->method(static::anything());
 
         $options = ['attribute' => new PropertyPath('attr'), 'integration' => new PropertyPath('integration')];
         $this->action->initialize($options);
         $this->action->execute($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Action "populate_channel_owner" expects Oro\Bundle\IntegrationBundle\Entity\Channel in parameter "integration", stdClass is given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectIntegration()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Action "populate_channel_owner" expects %s in parameter "integration", stdClass is given.',
+            Channel::class
+        ));
+
         $context = new \stdClass();
         $context->attr = new \stdClass();
         $context->integration = new \stdClass();
 
-        $this->defaultOwnerHelper->expects($this->never())
-            ->method($this->anything());
+        $this->defaultOwnerHelper->expects(static::never())->method(static::anything());
 
         $options = ['attribute' => new PropertyPath('attr'), 'integration' => new PropertyPath('integration')];
         $this->action->initialize($options);
@@ -121,11 +124,9 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
     {
         $context = new \stdClass();
         $context->attr = new \stdClass();
-        $context->integration = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context->integration = $this->getMockBuilder(Channel::class)->disableOriginalConstructor()->getMock();
 
-        $this->defaultOwnerHelper->expects($this->once())
+        $this->defaultOwnerHelper->expects(static::once())
             ->method('populateChannelOwner')
             ->with($context->attr, $context->integration);
 

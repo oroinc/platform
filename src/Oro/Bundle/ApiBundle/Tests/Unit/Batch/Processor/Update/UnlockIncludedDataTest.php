@@ -10,7 +10,7 @@ class UnlockIncludedDataTest extends BatchUpdateProcessorTestCase
     /** @var UnlockIncludedData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

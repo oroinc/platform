@@ -21,7 +21,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())

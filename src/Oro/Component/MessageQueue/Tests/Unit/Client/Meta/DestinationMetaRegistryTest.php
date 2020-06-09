@@ -7,22 +7,6 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 
 class DestinationMetaRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithDestinations()
-    {
-        $destinations = [
-            'aDestinationName' => [],
-            'anotherDestinationName' => []
-        ];
-
-        $registry = new DestinationMetaRegistry(
-            new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations,
-            'default'
-        );
-
-        $this->assertAttributeEquals($destinations, 'destinationsMeta', $registry);
-    }
-
     public function testThrowIfThereIsNotMetaForRequestedClientDestinationName()
     {
         $registry = new DestinationMetaRegistry(

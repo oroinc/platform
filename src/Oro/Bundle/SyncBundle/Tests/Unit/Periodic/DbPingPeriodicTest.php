@@ -19,7 +19,7 @@ class DbPingPeriodicTest extends \PHPUnit\Framework\TestCase
     /** @var DbPingPeriodic */
     private $dbPing;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->dbPing = new DbPingPeriodic($this->doctrine);

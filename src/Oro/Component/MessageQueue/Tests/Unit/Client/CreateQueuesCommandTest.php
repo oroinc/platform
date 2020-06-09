@@ -19,7 +19,7 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $driver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
         $this->driver = $this->createMock(DriverInterface::class);
@@ -51,7 +51,7 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        $this->assertContains('Creating queue: queue1', $tester->getDisplay());
-        $this->assertContains('Creating queue: queue2', $tester->getDisplay());
+        static::assertStringContainsString('Creating queue: queue1', $tester->getDisplay());
+        static::assertStringContainsString('Creating queue: queue2', $tester->getDisplay());
     }
 }

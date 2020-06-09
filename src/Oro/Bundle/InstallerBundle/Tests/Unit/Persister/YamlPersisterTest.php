@@ -14,7 +14,7 @@ class YamlPersisterTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     protected $temporaryDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->temporaryDir = $this->getTempDir('YamlPersisterTest');
     }

@@ -21,7 +21,7 @@ class WidgetCollectionTest extends \PHPUnit\Framework\TestCase
      */
     protected $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dashboard = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Entity\Dashboard')
             ->disableOriginalConstructor()

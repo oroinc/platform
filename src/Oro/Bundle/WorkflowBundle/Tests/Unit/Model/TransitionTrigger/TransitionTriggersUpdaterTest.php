@@ -32,7 +32,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
     /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
         $this->updateDecider = $this->createMock(TransitionTriggersUpdateDecider::class);

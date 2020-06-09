@@ -17,6 +17,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
  * Also filtering by several identifiers is supported.
  */
 class CompositeIdentifierFilter extends StandaloneFilter implements
+    FieldFilterInterface,
     RequestAwareFilterInterface,
     MetadataAwareFilterInterface
 {
@@ -78,7 +79,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         }
 
         if (null === $operator) {
-            $operator = self::EQ;
+            $operator = FilterOperator::EQ;
         }
         if (!\in_array($operator, $this->getSupportedOperators(), true)) {
             throw new \InvalidArgumentException(\sprintf(
@@ -90,7 +91,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         $entityIdTransformer = $this->getEntityIdTransformer();
         if (\is_array($value) && !ArrayUtil::isAssoc($value)) {
             // a list of identifiers
-            if (ComparisonFilter::NEQ === $operator) {
+            if (FilterOperator::NEQ === $operator) {
                 // expression: (field1 != value1 OR field2 != value2 OR ...) AND (...)
                 // this expression equals to NOT ((field1 = value1 AND field2 = value2 AND ...) OR (...)),
                 // but Criteria object does not support NOT expression
@@ -114,7 +115,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         } else {
             // single identifier
             $value = $entityIdTransformer->reverseTransform($value, $this->metadata);
-            if (ComparisonFilter::NEQ === $operator) {
+            if (FilterOperator::NEQ === $operator) {
                 // expression: field1 != value1 OR field2 != value2 OR ...
                 // this expression equals to NOT (field1 = value1 AND field2 = value2 AND ...),
                 // but Criteria object does not support NOT expression
@@ -127,7 +128,6 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
 
         return $expr;
     }
-
 
     /**
      * @param array $value

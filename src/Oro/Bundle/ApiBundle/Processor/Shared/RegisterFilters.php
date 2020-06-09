@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\CollectionAwareFilterInterface;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\ConfigAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\MetadataAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
@@ -19,8 +20,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 abstract class RegisterFilters implements ProcessorInterface
 {
     private const COLLECTION_ASSOCIATION_ADDITIONAL_OPERATORS = [
-        ComparisonFilter::CONTAINS,
-        ComparisonFilter::NOT_CONTAINS
+        FilterOperator::CONTAINS,
+        FilterOperator::NOT_CONTAINS
     ];
 
     /** @var FilterFactoryInterface */
@@ -62,7 +63,7 @@ abstract class RegisterFilters implements ProcessorInterface
             if ($filterConfig->isCollection()) {
                 if (!$filter instanceof CollectionAwareFilterInterface) {
                     throw new \LogicException(\sprintf(
-                        'The filter by "%s" does not support the "collection" option',
+                        'The filter by "%s" does not support the "collection" option.',
                         $propertyPath
                     ));
                 }
@@ -71,11 +72,22 @@ abstract class RegisterFilters implements ProcessorInterface
             if ($filter instanceof RequestAwareFilterInterface) {
                 $filter->setRequestType($context->getRequestType());
             }
+            if ($filter instanceof ConfigAwareFilterInterface) {
+                $config = $context->getConfig();
+                if (null === $config) {
+                    throw new \LogicException(\sprintf(
+                        'The config for class "%s" does not exist, but it required for the filter by "%s".',
+                        $context->getClassName(),
+                        $propertyPath
+                    ));
+                }
+                $filter->setConfig($config);
+            }
             if ($filter instanceof MetadataAwareFilterInterface) {
                 $metadata = $context->getMetadata();
                 if (null === $metadata) {
                     throw new \LogicException(\sprintf(
-                        'The metadata for class "%s" does not exist, but it required for the filter by "%s"',
+                        'The metadata for class "%s" does not exist, but it required for the filter by "%s".',
                         $context->getClassName(),
                         $propertyPath
                     ));

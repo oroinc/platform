@@ -39,7 +39,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new LocalizationType();
         $this->formType->setDataClass(static::DATA_CLASS);

@@ -31,7 +31,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
 
     protected $url;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 

@@ -21,7 +21,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorLocator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumer = $this->createMock(QueueConsumer::class);
         $this->processorLocator = $this->createMock(ContainerInterface::class);

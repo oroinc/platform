@@ -21,7 +21,7 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->entityConfigHelper = $this->createMock(EntityConfigHelper::class);

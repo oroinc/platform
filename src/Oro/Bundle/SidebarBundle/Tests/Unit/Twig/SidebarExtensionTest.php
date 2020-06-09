@@ -28,7 +28,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->widgetDefinitionProvider = $this->createMock(WidgetDefinitionProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);

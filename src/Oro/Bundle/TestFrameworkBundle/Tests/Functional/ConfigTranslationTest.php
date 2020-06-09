@@ -24,7 +24,7 @@ class ConfigTranslationTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->translator = self::getContainer()->get('translator');

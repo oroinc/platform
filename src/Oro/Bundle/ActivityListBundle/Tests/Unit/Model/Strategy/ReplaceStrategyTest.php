@@ -30,7 +30,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $activityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $activityListManager = 'Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager';
         $this->activityListManager = $this->getMockBuilder($activityListManager)

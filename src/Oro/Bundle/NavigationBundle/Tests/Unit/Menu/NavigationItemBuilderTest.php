@@ -25,7 +25,7 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|KnpItemInterface */
     private $menu;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);

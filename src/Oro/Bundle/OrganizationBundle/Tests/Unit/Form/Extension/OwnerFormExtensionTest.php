@@ -81,7 +81,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityOwnerAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

@@ -28,7 +28,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAliasResolver */
     private $entityAliasResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
         $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
@@ -72,45 +72,41 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage An alias for "Test\UnknownEntity" entity not found.
-     */
     public function testGetAliasForUnknownEntity()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('An alias for "Test\UnknownEntity" entity not found.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getAlias('Test\UnknownEntity');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage A plural alias for "Test\UnknownEntity" entity not found.
-     */
     public function testGetPluralAliasForUnknownEntity()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('A plural alias for "Test\UnknownEntity" entity not found.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getPluralAlias('Test\UnknownEntity');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage The alias "unknown" is not associated with any entity class.
-     */
     public function testGetClassByAliasForUnknownAlias()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('The alias "unknown" is not associated with any entity class.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getClassByAlias('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
-     * @expectedExceptionMessage The plural alias "unknown" is not associated with any entity class.
-     */
     public function testGetClassByPluralAliasForUnknownAlias()
     {
+        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectExceptionMessage('The plural alias "unknown" is not associated with any entity class.');
+
         $this->setLoadExpectations();
 
         $this->entityAliasResolver->getClassByPluralAlias('unknown');

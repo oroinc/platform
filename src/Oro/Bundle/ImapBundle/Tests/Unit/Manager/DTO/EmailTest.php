@@ -21,7 +21,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /** @var Email */
     private $email;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->message = $this->createMock(Message::class);
 
@@ -240,7 +240,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testXMessageId', $this->email->getXMessageId());
         $this->assertEquals('testXThreadId', $this->email->getXThreadId());
         $this->assertCount(2, $this->email->getMultiMessageId());
-        $this->assertInternalType('array', $this->email->getMultiMessageId());
+        $this->assertIsArray($this->email->getMultiMessageId());
 
         $this->message->expects($this->exactly(2))
             ->method('getFlags')

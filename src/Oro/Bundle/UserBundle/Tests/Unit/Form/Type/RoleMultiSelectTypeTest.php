@@ -24,7 +24,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
     /** @var RoleMultiSelectType */
     protected $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())

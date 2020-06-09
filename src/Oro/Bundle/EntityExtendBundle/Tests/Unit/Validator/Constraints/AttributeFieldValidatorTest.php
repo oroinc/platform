@@ -30,7 +30,7 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
      */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);

@@ -13,9 +13,14 @@ class TopicMetaRegistryTest extends \PHPUnit\Framework\TestCase
             'anotherTopicName' => []
         ];
 
-        $registry = new TopicMetaRegistry($topics);
+        $registry = new class($topics) extends TopicMetaRegistry {
+            public function xgetTopicsMeta(): array
+            {
+                return $this->topicsMeta;
+            }
+        };
 
-        $this->assertAttributeEquals($topics, 'topicsMeta', $registry);
+        static::assertEquals($topics, $registry->xgetTopicsMeta());
     }
 
     public function testThrowIfThereIsNotMetaForRequestedTopicName()

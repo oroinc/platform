@@ -20,7 +20,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
     /** @var CompleteItemErrorPaths */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -261,6 +261,31 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
 
         self::assertEquals('/data/100/attributes/name', $error1->getSource()->getPointer());
         self::assertEquals('/data/101/attributes/name', $error2->getSource()->getPointer());
+    }
+
+    public function testProcessWithBatchItemUnexpectedErrorInIncludedRoot()
+    {
+        $error1 = new Error();
+        $error1->setSource(new ErrorSource());
+        $error1->getSource()->setPointer('/included');
+
+        $item = $this->createMock(BatchUpdateItem::class);
+        $itemContext = $this->createMock(BatchUpdateItemContext::class);
+        $item->expects(self::once())
+            ->method('getContext')
+            ->willReturn($itemContext);
+        $itemContext->expects(self::once())
+            ->method('getErrors')
+            ->willReturn([$error1]);
+        $item->expects(self::once())
+            ->method('getIndex')
+            ->willReturn(0);
+
+        $this->context->setFile(new ChunkFile('test', 10, 100, 'data'));
+        $this->context->setBatchItems([$item]);
+        $this->processor->process($this->context);
+
+        self::assertEquals('/included', $error1->getSource()->getPointer());
     }
 
     public function testProcessWithBatchItemUnexpectedErrorInIncludedData()

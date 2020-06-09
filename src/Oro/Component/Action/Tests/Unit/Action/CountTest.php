@@ -15,7 +15,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /** @var Count */
     protected $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
@@ -24,30 +24,27 @@ class CountTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `value` is required.
-     */
     public function testInitializeArrayException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `value` is required.');
+
         $this->assertEquals($this->action, $this->action->initialize([]));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `attribute` is required.
-     */
     public function testInitializeAttributeException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `attribute` is required.');
+
         $this->assertEquals($this->action, $this->action->initialize(['value' => []]));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Parameter `attribute` must be a valid property definition.
-     */
     public function testInitializeAttributeWrongException()
     {
+        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter `attribute` must be a valid property definition.');
+
         $this->assertEquals($this->action, $this->action->initialize(['value' => [], 'attribute' => 'test']));
     }
 

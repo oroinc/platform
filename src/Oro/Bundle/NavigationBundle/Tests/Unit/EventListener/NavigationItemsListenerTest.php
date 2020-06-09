@@ -11,7 +11,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationItemsListener */
     protected $navigationListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
             ->disableOriginalConstructor()
@@ -56,7 +56,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
     public function onNavigationConfigureProvider()
     {
         $factory = $this->createMock('Knp\Menu\FactoryInterface');
-        
+
         return [
             [
                 new ConfigureMenuEvent(

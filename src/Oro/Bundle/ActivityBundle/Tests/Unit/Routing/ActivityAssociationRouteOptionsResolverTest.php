@@ -26,7 +26,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
     /** @var ActivityAssociationRouteOptionsResolver */
     protected $routeOptionsResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

@@ -17,44 +17,42 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TagManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TagManager|MockObject */
     private $tagManager;
 
-    /**
-     * @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TaggableHelper|MockObject */
     private $taggableHelper;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var CopyTaggingToNewEntity
-     */
+    /** @var CopyTaggingToNewEntity */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tagManager = $this->createMock(TagManager::class);
         $this->taggableHelper = $this->createMock(TaggableHelper::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->action = new CopyTaggingToNewEntity(
+        $this->action = new class(
             new ContextAccessor(),
             $this->tagManager,
             $this->taggableHelper,
             $this->doctrineHelper
-        );
+        ) extends CopyTaggingToNewEntity {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -70,12 +68,8 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
             'organization' => $this->createMock(PropertyPathInterface::class),
         ];
 
-        $this->assertInstanceOf(
-            ActionInterface::class,
-            $this->action->initialize($options)
-        );
-
-        static::assertAttributeEquals($options, 'options', $this->action);
+        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
     /**
@@ -169,20 +163,19 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 
         $em->expects(static::at(0))
             ->method('persist')
-            ->will(static::returnCallback(function (Tagging $tagging) use ($tag1, $destination) {
+            ->willReturnCallback(function (Tagging $tagging) use ($tag1, $destination) {
                 static::assertSame($tagging->getTag(), $tag1);
                 static::assertEquals($tagging->getEntityName(), ClassUtils::getClass($destination));
-            }));
+            });
 
         $em->expects(static::at(1))
             ->method('persist')
-            ->will(static::returnCallback(function (Tagging $tagging) use ($tag2, $destination) {
+            ->willReturnCallback(function (Tagging $tagging) use ($tag2, $destination) {
                 static::assertSame($tagging->getTag(), $tag2);
                 static::assertEquals($tagging->getEntityName(), ClassUtils::getClass($destination));
-            }));
+            });
 
-        $em->expects(static::once())
-            ->method('flush');
+        $em->expects(static::once())->method('flush');
 
         $this->action->initialize($options);
         $this->action->execute($data);
@@ -190,9 +183,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteMethodExceptionSource()
     {
-        $this->expectException(
-            \LogicException::class
-        );
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'Object in path "source" in "copy_tagging_to_new_entity" action should be taggable.'
         );
@@ -201,9 +192,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
             'source' => $this->createMock(Taggable::class),
         ];
 
-        $this->taggableHelper->expects(static::once())
-            ->method('isTaggable')
-            ->willReturn(false);
+        $this->taggableHelper->expects(static::once())->method('isTaggable')->willReturn(false);
 
         $data = new StubStorage($inputData);
         $options = [
@@ -218,9 +207,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteMethodExceptionDestination()
     {
-        $this->expectException(
-            \LogicException::class
-        );
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'Object in path "destination" in "copy_tagging_to_new_entity" action should be taggable.'
         );
@@ -230,13 +217,8 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
             'destination' => $this->createMock(Taggable::class),
         ];
 
-        $this->taggableHelper->expects(static::at(0))
-            ->method('isTaggable')
-            ->willReturn(true);
-
-        $this->taggableHelper->expects(static::at(1))
-            ->method('isTaggable')
-            ->willReturn(false);
+        $this->taggableHelper->expects(static::at(0))->method('isTaggable')->willReturn(true);
+        $this->taggableHelper->expects(static::at(1))->method('isTaggable')->willReturn(false);
 
         $data = new StubStorage($inputData);
         $options = [

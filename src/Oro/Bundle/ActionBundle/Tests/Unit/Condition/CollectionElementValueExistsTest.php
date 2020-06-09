@@ -11,7 +11,7 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionElementValueExists */
     protected $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->condition = new CollectionElementValueExists();
         $this->condition->setContextAccessor(new ContextAccessor());

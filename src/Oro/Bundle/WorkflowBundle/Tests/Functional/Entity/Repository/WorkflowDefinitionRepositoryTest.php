@@ -32,7 +32,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
     /** @var TestActivityScopeProvider */
     private $activityScopeProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
@@ -44,7 +44,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->activityScopeProvider->setCurrentTestActivity(null);
         $this->repository->invalidateCache();
@@ -119,26 +119,26 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $workflows = $this->getWorkflowNames($this->repository->findActive());
 
         $this->assertGreaterThanOrEqual(2, count($workflows));
-        $this->assertContains('test_active_flow1', $workflows);
-        $this->assertContains('test_active_flow2', $workflows);
+        $this->assertContainsEquals('test_active_flow1', $workflows);
+        $this->assertContainsEquals('test_active_flow2', $workflows);
     }
 
     public function testGetAllRelatedEntityClasses()
     {
         $result = $this->repository->getAllRelatedEntityClasses();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
-        $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertContains(Item::class, $result);
+        $this->assertContainsEquals(WorkflowAwareEntity::class, $result);
+        $this->assertContainsEquals(Item::class, $result);
 
         $result = $this->repository->getAllRelatedEntityClasses(true);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
-        $this->assertContains(WorkflowAwareEntity::class, $result);
-        $this->assertContains(Item::class, $result);
-        $this->assertNotContains(Item2::class, $result);
+        $this->assertContainsEquals(WorkflowAwareEntity::class, $result);
+        $this->assertContainsEquals(Item::class, $result);
+        $this->assertNotContainsEquals(Item2::class, $result);
     }
 
     public function testInvalidateCache()

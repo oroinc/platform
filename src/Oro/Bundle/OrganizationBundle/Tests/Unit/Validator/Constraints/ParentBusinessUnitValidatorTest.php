@@ -14,7 +14,7 @@ class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $ownerTree;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ownerTree = $this->createMock(OwnerTreeInterface::class);
         parent::setUp();

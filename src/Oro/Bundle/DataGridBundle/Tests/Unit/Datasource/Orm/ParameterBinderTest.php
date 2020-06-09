@@ -30,7 +30,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
      */
     protected $parameterBinder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->datagrid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
@@ -254,7 +254,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
             ->method('getDatasource')
             ->will($this->returnValue($datasource));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Datagrid datasource has unexpected type "' . get_class($datasource) . '", ' .
             '"Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource" is expected.'
@@ -263,14 +263,13 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         $this->parameterBinder->bindParameters($this->datagrid, ['foo']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".
-     */
-    // @codingStandardsIgnoreEnd
     public function testBindParametersFailsWithInvalidDatasource()
     {
+        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".'
+        );
+
         $datagridParameters = ['foo' => new \stdClass];
         $queryParameters = new ArrayCollection();
 
@@ -320,7 +319,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
             ->method('getParameters')
             ->will($this->returnValue(new ParameterBag()));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Cannot bind parameter to data source, expected bind parameter format is a string or array with ' .
             'required "name" key, actual array keys are "foo"'

@@ -4,8 +4,11 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Component\Action\Action\RequestEntity;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -13,51 +16,43 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
 {
     const PROPERTY_PATH_VALUE = 'property_path_value';
 
-    /**
-     * @var RequestEntity
-     */
+    /** @var RequestEntity */
     protected $action;
 
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
+    /** @var MockObject|ManagerRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
+        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->action = new RequestEntity($this->contextAccessor, $this->registry);
+        $this->action = new class($this->contextAccessor, $this->registry) extends RequestEntity {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->contextAccessor, $this->registry, $this->action);
     }
 
     /**
-     * @return PropertyPath
+     * @return PropertyPath|MockObject
      */
     protected function getPropertyPath()
     {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -67,7 +62,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->action->initialize($options);
@@ -75,70 +70,69 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
 
     public function initializeExceptionDataProvider()
     {
-        return array(
-            'no class name' => array(
-                'options' => array(
+        return [
+            'no class name' => [
+                'options' => [
                     'some' => 1,
-                ),
+                ],
                 'message' => 'Class name parameter is required'
-            ),
-            'no attribute' => array(
-                'options' => array(
+            ],
+            'no attribute' => [
+                'options' => [
                     'class' => 'stdClass',
-                ),
+                ],
                 'message' => 'Attribute name parameter is required'
-            ),
-            'invalid attribute' => array(
-                array(
+            ],
+            'invalid attribute' => [
+                [
                     'class' => 'stdClass',
                     'identifier' => 1,
                     'attribute' => 'string',
-                ),
+                ],
                 'message' => 'Attribute must be valid property definition.'
-            ),
-            'no identifier' => array(
-                'options' => array(
+            ],
+            'no identifier' => [
+                'options' => [
                     'class' => 'stdClass',
                     'attribute' => $this->getPropertyPath(),
-                ),
+                ],
                 'message' => 'One of parameters "identifier", "where" or "order_by" must be defined'
-            ),
-            'invalid where' => array(
-                'options' => array(
+            ],
+            'invalid where' => [
+                'options' => [
                     'class' => 'stdClass',
                     'attribute' => $this->getPropertyPath(),
                     'where' => 'scalar_data'
-                ),
+                ],
                 'message' => 'Parameter "where" must be array'
-            ),
-            'invalid order_by' => array(
-                'options' => array(
+            ],
+            'invalid order_by' => [
+                'options' => [
                     'class' => 'stdClass',
                     'attribute' => $this->getPropertyPath(),
                     'order_by' => 'scalar_data'
-                ),
+                ],
                 'message' => 'Parameter "order_by" must be array'
-            ),
-        );
+            ],
+        ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
-     */
     public function testExecuteNotManageableEntity()
     {
-        $options = array(
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage('Entity class "\stdClass" is not manageable.');
+
+        $options = [
             'class' => '\stdClass',
             'identifier' => 1,
             'attribute' => $this->getPropertyPath()
-        );
-        $context = new ItemStub(array());
+        ];
+        $context = new ItemStub([]);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(static::once())
             ->method('getManagerForClass')
             ->with('\stdClass')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -151,8 +145,8 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize(array $source, array $expected)
     {
-        $this->assertEquals($this->action, $this->action->initialize($source));
-        $this->assertAttributeEquals($expected, 'options', $this->action);
+        static::assertSame($this->action, $this->action->initialize($source));
+        static::assertEquals($expected, $this->action->xgetOptions());
     }
 
     /**
@@ -160,39 +154,39 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function initializeDataProvider()
     {
-        return array(
-            'entity identifier' => array(
-                'source' => array(
+        return [
+            'entity identifier' => [
+                'source' => [
                     'class' => 'stdClass',
                     'identifier' => 1,
                     'attribute' => $this->getPropertyPath(),
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'class' => 'stdClass',
                     'identifier' => 1,
                     'attribute' => $this->getPropertyPath(),
-                    'where' => array(),
-                    'order_by' => array(),
+                    'where' => [],
+                    'order_by' => [],
                     'case_insensitive' => false,
-                ),
-            ),
-            'where and order by' => array(
-                'source' => array(
+                ],
+            ],
+            'where and order by' => [
+                'source' => [
                     'class' => 'stdClass',
-                    'where' => array('name' => 'qwerty'),
-                    'order_by' => array('date' => 'asc'),
+                    'where' => ['name' => 'qwerty'],
+                    'order_by' => ['date' => 'asc'],
                     'attribute' => $this->getPropertyPath(),
                     'case_insensitive' => true,
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'class' => 'stdClass',
-                    'where' => array('name' => 'qwerty'),
-                    'order_by' => array('date' => 'asc'),
+                    'where' => ['name' => 'qwerty'],
+                    'order_by' => ['date' => 'asc'],
                     'attribute' => $this->getPropertyPath(),
                     'case_insensitive' => true,
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
@@ -240,49 +234,49 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function executeDataProvider()
     {
-        return array(
-            'scalar_identifier' => array(
-                'options' => array(
+        return [
+            'scalar_identifier' => [
+                'options' => [
                     'class' => '\stdClass',
                     'identifier' => 1,
                     'attribute' => new PropertyPath('entity_attribute'),
-                )
-            ),
-            'attribute_class' => array(
-                'options' => array(
+                ]
+            ],
+            'attribute_class' => [
+                'options' => [
                     'class' => new PropertyPath('class'),
                     'identifier' => 1,
                     'attribute' => new PropertyPath('entity_attribute'),
-                )
-            ),
-            'scalar_attribute_identifier' => array(
-                'options' => array(
+                ]
+            ],
+            'scalar_attribute_identifier' => [
+                'options' => [
                     'class' => '\stdClass',
                     'identifier' => new PropertyPath('id'),
                     'attribute' => new PropertyPath('entity_attribute'),
-                ),
-                'data' => array(
+                ],
+                'data' => [
                     'id' => 1
-                ),
-            ),
-            'scalar_case_insensitive_identifier' => array(
-                'options' => array(
+                ],
+            ],
+            'scalar_case_insensitive_identifier' => [
+                'options' => [
                     'class' => '\stdClass',
                     'identifier' => ' DATA ',
                     'attribute' => new PropertyPath('entity_attribute'),
                     'case_insensitive' => true,
-                )
-            ),
-            'array_identifier' => array(
-                'options' => array(
+                ]
+            ],
+            'array_identifier' => [
+                'options' => [
                     'class' => '\stdClass',
-                    'identifier' => array(
+                    'identifier' => [
                         'id'   => 1,
                         'name' => 'unique_key',
-                    ),
+                    ],
                     'attribute' => new PropertyPath('entity_attribute'),
-                )
-            ),
+                ]
+            ],
             'property_identifier' => [
                 'options' => [
                     'class' => '\stdClass',
@@ -296,21 +290,21 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            'array_attribute_identifier' => array(
-                'options' => array(
+            'array_attribute_identifier' => [
+                'options' => [
                     'class' => '\stdClass',
-                    'identifier' => array(
+                    'identifier' => [
                         'id'   => new PropertyPath('id_attribute'),
                         'name' => new PropertyPath('name_attribute'),
-                    ),
+                    ],
                     'attribute' => new PropertyPath('entity_attribute'),
-                ),
-                'data' => array(
+                ],
+                'data' => [
                     'id_attribute'   => 1,
                     'name_attribute' => 'unique_key',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -319,19 +313,19 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteWithWhereAndOrderBy($caseInsensitive)
     {
-        $options = array(
+        $options = [
             'class' => '\stdClass',
-            'where' => array('name' => ' Qwerty '),
+            'where' => ['name' => ' Qwerty '],
             'attribute' => new PropertyPath('entity'),
-            'order_by' => array('createdDate' => ' asc '),
+            'order_by' => ['createdDate' => ' asc '],
             'case_insensitive' => $caseInsensitive
-        );
+        ];
 
         $context = new ItemStub();
         $entity = new \stdClass();
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')->disableOriginalConstructor()
-            ->setMethods(array('getOneOrNullResult'))->getMockForAbstractClass();
+            ->setMethods(['getOneOrNullResult'])->getMockForAbstractClass();
         $query->expects($this->once())->method('getOneOrNullResult')->will($this->returnValue($entity));
 
         $expectedField = !empty($options['case_insensitive']) ? 'LOWER(e.name)' : 'e.name';
@@ -374,14 +368,14 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function executeWithConditionsDataProvider()
     {
-        return array(
-            'case sensitive' => array(
+        return [
+            'case sensitive' => [
                 'caseInsensitive' => false,
-            ),
-            'case insensitive' => array(
+            ],
+            'case insensitive' => [
                 'caseInsensitive' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**

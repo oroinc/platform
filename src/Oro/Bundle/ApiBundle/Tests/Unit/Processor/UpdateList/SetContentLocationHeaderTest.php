@@ -26,7 +26,7 @@ class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
     /** @var SetContentLocationHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

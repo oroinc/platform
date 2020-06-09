@@ -21,7 +21,7 @@ class FileManagerTest extends TestCase
     /** @var MockObject|FileSystem */
     private $filesystem;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->filesystem = $this->createMock(Filesystem::class);
         $this->fileManager = new FileManager(new FilesystemMap(['importexport' => $this->filesystem]));

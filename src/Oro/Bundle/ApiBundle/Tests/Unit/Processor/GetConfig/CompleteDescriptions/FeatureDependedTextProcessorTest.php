@@ -10,7 +10,7 @@ class FeatureDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureDependedTextProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects(self::any())

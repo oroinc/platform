@@ -13,7 +13,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->form->expects($this->any())

@@ -19,7 +19,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityEntityGeneratorExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

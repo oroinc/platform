@@ -18,13 +18,13 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityMaskBuilder */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->identity = $this->getIdentity(rand(0, 20));
         $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->builder, $this->identity);
     }

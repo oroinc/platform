@@ -29,7 +29,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
         $this->manager = $this->getMockBuilder(TranslationManager::class)->disableOriginalConstructor()->getMock();
@@ -42,7 +42,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->translator, $this->manager, $this->helper, $this->translationHelper);
     }

@@ -9,26 +9,24 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutRendererRegistry */
     protected $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRendererRegistry();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The layout renderer named "" was not found.
-     */
     public function testGetUndefinedDefaultRenderer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The layout renderer named "" was not found.');
+
         $this->registry->getRenderer();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The layout renderer named "undefined" was not found.
-     */
     public function testGetUndefinedRenderer()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectExceptionMessage('The layout renderer named "undefined" was not found.');
+
         $this->registry->getRenderer('undefined');
     }
 

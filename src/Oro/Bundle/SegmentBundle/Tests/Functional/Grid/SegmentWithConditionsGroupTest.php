@@ -24,7 +24,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
      */
     private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([
@@ -36,7 +36,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
             ->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->configManager
             ->set('oro_query_designer.conditions_group_merge_same_entity_conditions', $this->groupingEnabled);

@@ -31,7 +31,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $builder = new ProcessorBagConfigBuilder();
@@ -103,7 +103,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $this->addProcessor($builder, 'guid', DataType::GUID),
-                new Processor\NormalizeString()
+                new Processor\NormalizeGuid()
             ],
             [
                 $this->addProcessor($builder, 'entityClass', DataType::ENTITY_CLASS),
@@ -165,7 +165,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [Processor\NormalizeDecimal::REQUIREMENT, DataType::MONEY, [RequestType::REST]],
             [Processor\NormalizeNumber::REQUIREMENT, DataType::FLOAT, [RequestType::REST]],
             [Processor\NormalizeNumber::REQUIREMENT, DataType::PERCENT, [RequestType::REST]],
-            [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::GUID, [RequestType::REST]],
+            [Processor\NormalizeGuid::REQUIREMENT, DataType::GUID, [RequestType::REST]],
             [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
             [Processor\Rest\NormalizeDate::REQUIREMENT, DataType::DATE, [RequestType::REST]],
             [Processor\Rest\NormalizeTime::REQUIREMENT, DataType::TIME, [RequestType::REST]],
@@ -261,7 +261,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                $this->getArrayRequirement(Processor\NormalizeGuid::REQUIREMENT),
                 DataType::GUID,
                 [RequestType::REST]
             ],
@@ -366,7 +366,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                Processor\NormalizeGuid::REQUIREMENT,
                 DataType::GUID,
                 [RequestType::REST]
             ],
@@ -471,7 +471,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                $this->getArrayRequirement(Processor\NormalizeGuid::REQUIREMENT),
                 DataType::GUID,
                 [RequestType::REST]
             ],
@@ -923,8 +923,41 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST],
                 true
             ],
-            ['test', 'test', DataType::GUID, [RequestType::REST], true],
-            ['test', 'test', DataType::GUID, [RequestType::REST], false],
+            [
+                'EAC12975-D94D-4E96-88B1-101B99914DEF',
+                'EAC12975-D94D-4E96-88B1-101B99914DEF',
+                DataType::GUID,
+                [RequestType::REST],
+                true
+            ],
+            [
+                'EAC12975-D94D-4E96-88B1-101B99914DEF',
+                'EAC12975-D94D-4E96-88B1-101B99914DEF',
+                DataType::GUID,
+                [RequestType::REST],
+                false
+            ],
+            [
+                ['EAC12975-D94D-4E96-88B1-101B99914DEF', '7eab7435-44bb-493a-9bda-dea3fda3c0d9'],
+                ['EAC12975-D94D-4E96-88B1-101B99914DEF', '7eab7435-44bb-493a-9bda-dea3fda3c0d9'],
+                DataType::GUID,
+                [RequestType::REST],
+                true
+            ],
+            [
+                ['EAC12975-D94D-4E96-88B1-101B99914DEF', '7eab7435-44bb-493a-9bda-dea3fda3c0d9'],
+                ['EAC12975-D94D-4E96-88B1-101B99914DEF', '7eab7435-44bb-493a-9bda-dea3fda3c0d9'],
+                DataType::GUID,
+                [RequestType::REST],
+                false
+            ],
+            [
+                ['EAC12975-D94D-4E96-88B1-101B99914DEF', '7eab7435-44bb-493a-9bda-dea3fda3c0d9'],
+                'EAC12975-D94D-4E96-88B1-101B99914DEF,7eab7435-44bb-493a-9bda-dea3fda3c0d9',
+                DataType::GUID,
+                [RequestType::REST],
+                true
+            ],
             [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, [RequestType::REST], true],
             [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, [RequestType::REST], true],
             [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, [RequestType::REST], true],
@@ -1379,6 +1412,31 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 'Expected an array of times. Given "10:30:59,test"',
                 '10:30:59,test',
                 DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected GUID value. Given "test"',
+                'test',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0dh"',
+                '7eab7435-44bb-493a-9bda-dea3fda3c0dh',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0d91"',
+                '7eab7435-44bb-493a-9bda-dea3fda3c0d91',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of GUIDs. Given '
+                . '"EAC12975-D94D-4E96-88B1-101B99914DEF,7eab7435-44bb-493a-9bda-dea3fda3c0dh".',
+                'EAC12975-D94D-4E96-88B1-101B99914DEF,7eab7435-44bb-493a-9bda-dea3fda3c0dh',
+                DataType::GUID,
                 [RequestType::REST]
             ]
         ];

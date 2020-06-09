@@ -5,6 +5,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
@@ -37,7 +38,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     /** @var EntitySerializer */
     protected $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
@@ -68,8 +69,22 @@ abstract class EntitySerializerTestCase extends OrmTestCase
             ->method('isApplicableField')
             ->willReturn(true);
 
-        $this->container = $this->createMock(ContainerInterface::class);
         $queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
+        $queryHintResolver->expects($this->any())
+            ->method('resolveHints')
+            ->willReturnCallback(function (Query $query, array $hints = []) {
+                if (!empty($hints)) {
+                    foreach ($hints as $hint) {
+                        if (is_array($hint)) {
+                            $query->setHint($hint['name'], $hint['value']);
+                        } elseif (is_string($hint)) {
+                            $query->setHint($hint, true);
+                        }
+                    }
+                }
+            });
+
+        $this->container = $this->createMock(ContainerInterface::class);
         $doctrineHelper = new DoctrineHelper($doctrine);
         $dataAccessor = new EntityDataAccessor();
         $fieldAccessor = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);

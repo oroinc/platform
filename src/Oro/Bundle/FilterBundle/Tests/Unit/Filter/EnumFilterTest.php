@@ -3,117 +3,111 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EnumFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Test\FormInterface;
 
 class EnumFilterTest extends OrmTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormFactoryInterface|MockObject */
     protected $formFactory;
 
     /** @var EnumFilter */
     protected $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
-        /** @var DictionaryApiEntityManager|\PHPUnit\Framework\MockObject\MockObject $dictionaryApiEntityManager */
-        $dictionaryApiEntityManager =
-            $this->getMockBuilder('Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager')
+        /** @var DictionaryApiEntityManager|MockObject $dictionaryApiEntityManager */
+        $dictionaryApiEntityManager = $this->getMockBuilder(DictionaryApiEntityManager::class)
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->filter = new EnumFilter($this->formFactory, new FilterUtility(), $dictionaryApiEntityManager);
+        $this->filter = new class(
+            $this->formFactory,
+            new FilterUtility(),
+            $dictionaryApiEntityManager
+        ) extends EnumFilter {
+            public function xgetParams(): array
+            {
+                return $this->params;
+            }
+
+            public function xbuildComparisonExpr(
+                FilterDatasourceAdapterInterface $ds,
+                $comparisonType,
+                $fieldName,
+                $parameterName
+            ) {
+                return parent::buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
+            }
+        };
     }
 
     public function testInit()
     {
-        $params = [];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
-            [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => []
-            ],
-            'params',
-            $this->filter
+        $this->filter->init('test', []);
+
+        static::assertEquals(
+            [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithNullValue()
     {
-        $params = [
-            'null_value' => ':empty:'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
-            [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'null_value'                     => ':empty:',
-                'options'                        => []
-            ],
-            'params',
-            $this->filter
+        $this->filter->init('test', ['null_value' => ':empty:']);
+        static::assertEquals(
+            [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'null_value' => ':empty:', 'options' => []],
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithClass()
     {
-        $params = [
-            'class' => 'Test\EnumValue'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
-            [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => [
-                    'class' => 'Test\EnumValue'
-                ]
-            ],
-            'params',
-            $this->filter
+        $this->filter->init('test', ['class' => 'Test\EnumValue']);
+        static::assertEquals(
+            [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['class' => 'Test\EnumValue']],
+            $this->filter->xgetParams()
         );
     }
 
     public function testInitWithEnumCode()
     {
-        $params = [
-            'enum_code' => 'test_enum'
-        ];
-        $this->filter->init('test', $params);
-        $this->assertAttributeEquals(
+        $this->filter->init('test', ['enum_code' => 'test_enum']);
+        static::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'options'                        => [
+                'options' => [
                     'enum_code' => 'test_enum',
                     'class' => 'Extend\Entity\EV_Test_Enum'
                 ],
                 'class' => 'Extend\Entity\EV_Test_Enum'
             ],
-            'params',
-            $this->filter
+            $this->filter->xgetParams()
         );
     }
 
     public function testGetForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(EnumFilterType::class)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
-        $this->assertSame(
-            $form,
-            $this->filter->getForm()
-        );
+        static::assertSame($form, $this->filter->getForm());
     }
+
     /**
      * @dataProvider filterProvider
      *
@@ -127,26 +121,21 @@ class EnumFilterTest extends OrmTestCase
             ->select('o.id')
             ->from('Stub:TestOrder', 'o');
 
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName'])
+        /** @var OrmFilterDatasourceAdapter|MockObject $ds */
+        $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
+            ->onlyMethods([])
             ->setConstructorArgs([$qb])
             ->getMock();
 
         $fieldName     = 'o.testField';
         $parameterName = 'param1';
 
-        $reflection = new \ReflectionObject($this->filter);
-        $method     = $reflection->getMethod('buildComparisonExpr');
-        $method->setAccessible(true);
-        $expr = $method->invokeArgs($this->filter, [$ds, $filterType, $fieldName, $parameterName]);
+        $expr = $this->filter->xbuildComparisonExpr($ds, $filterType, $fieldName, $parameterName);
 
         $qb->where($expr);
         $result = $qb->getDQL();
 
-        $this->assertSame(
-            $expected,
-            $result
-        );
+        static::assertSame($expected, $result);
     }
 
     public function filterProvider()

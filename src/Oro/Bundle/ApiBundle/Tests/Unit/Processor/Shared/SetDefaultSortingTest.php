@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -20,7 +21,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     /** @var SetDefaultSorting */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,8 +55,12 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $config->setIdentifierFieldNames(['id']);
         $config->addField('id');
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -73,8 +78,12 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $config->setIdentifierFieldNames(['name']);
         $config->addField('name');
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('name');
+
         $this->context->setClassName(Category::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -86,6 +95,29 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
+    public function testProcessForEntityWithSingleIdentifierAndSorterIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id')->setExcluded(true);
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
     public function testProcessForEntityWithCompositeIdentifier()
     {
         $config = new EntityDefinitionConfig();
@@ -93,8 +125,13 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $config->addField('id');
         $config->addField('title');
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+        $configOfSorters->addField('title');
+
         $this->context->setClassName(CompositeKeyEntity::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -106,13 +143,42 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
+    public function testProcessForEntityWithCompositeIdentifierAndSorterForSomeIdentifierFieldsIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id', 'title']);
+        $config->addField('id');
+        $config->addField('title');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id')->setExcluded(true);
+        $configOfSorters->addField('title');
+
+        $this->context->setClassName(CompositeKeyEntity::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['title' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
     public function testProcessWhenNoIdentifierFieldInConfig()
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -130,8 +196,12 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $config->setIdentifierFieldNames(['id']);
         $config->setOrderBy(['name' => 'DESC']);
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -146,9 +216,11 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     public function testProcessForEntityWithoutIdentifier()
     {
         $config = new EntityDefinitionConfig();
+        $configOfSorters = new SortersConfig();
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -166,8 +238,12 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $config->setIdentifierFieldNames(['renamedId']);
         $config->addField('renamedId')->setPropertyPath('id');
 
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('renamedId')->setPropertyPath('id');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -176,6 +252,31 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
+    public function testProcessForEntityWithRenamedIdentifierFieldAndSorterForThisFieldIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['renamedId']);
+        $config->addField('renamedId')->setPropertyPath('id');
+
+        $configOfSorters = new SortersConfig();
+        $sorterConfig = $configOfSorters->addField('renamedId');
+        $sorterConfig->setPropertyPath('id');
+        $sorterConfig->setExcluded(true);
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertSame([], $sortFilter->getDefaultValue());
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 

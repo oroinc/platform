@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\ResponseExtension;
 use Symfony\Component\DomCrawler\Crawler;
@@ -19,7 +18,7 @@ class ControllersTest extends WebTestCase
     /** @var  Registry */
     protected $doctrine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -43,9 +42,9 @@ class ControllersTest extends WebTestCase
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent('oro.notification.event.entity_post_persist');
+        $eventName = 'oro.notification.event.entity_post_persist';
 
-        $this->assertFormSubmission($event, $crawler);
+        $this->assertFormSubmission($eventName, $crawler);
     }
 
     /**
@@ -72,9 +71,9 @@ class ControllersTest extends WebTestCase
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent('oro.notification.event.entity_post_update');
+        $eventName = 'oro.notification.event.entity_post_update';
 
-        $this->assertFormSubmission($event, $crawler);
+        $this->assertFormSubmission($eventName, $crawler);
     }
 
     /**
@@ -104,17 +103,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param $eventName
-     *
-     * @return null|object|Event
-     */
-    protected function getEvent($eventName)
-    {
-        return $this->doctrine->getRepository(Event::class)
-            ->findOneBy(['name' => $eventName]);
-    }
-
-    /**
      * @return null|object|EmailTemplate
      */
     protected function getTemplate()
@@ -125,16 +113,16 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param Event $event
+     * @param string $eventName
      * @param Crawler $crawler
      */
-    protected function assertFormSubmission(Event $event, Crawler $crawler)
+    protected function assertFormSubmission($eventName, Crawler $crawler)
     {
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $formValues = $form->getPhpValues();
         $formValues['emailnotification']['entityName'] = self::ENTITY_NAME;
-        $formValues['emailnotification']['event'] = $event->getId();
+        $formValues['emailnotification']['eventName'] = $eventName;
         $formValues['emailnotification']['template'] = $this->getTemplate()->getId();
         $formValues['emailnotification']['recipientList']['users'] = 1;
         $formValues['emailnotification']['recipientList']['groups'][0] = 1;
@@ -146,6 +134,6 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        $this->assertContains("Email notification rule saved", $html);
+        static::assertStringContainsString("Email notification rule saved", $html);
     }
 }

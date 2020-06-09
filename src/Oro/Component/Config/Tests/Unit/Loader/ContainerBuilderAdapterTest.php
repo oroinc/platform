@@ -14,7 +14,7 @@ class ContainerBuilderAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerBuilderAdapter */
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerBuilder::class);
         $this->adapter = new ContainerBuilderAdapter($this->container);

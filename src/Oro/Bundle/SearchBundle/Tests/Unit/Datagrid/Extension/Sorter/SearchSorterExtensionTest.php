@@ -17,7 +17,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -81,11 +81,9 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException
-     */
     public function testVisitDatasourceWithInvalidType()
     {
+        $this->expectException(\Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException::class);
         $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [

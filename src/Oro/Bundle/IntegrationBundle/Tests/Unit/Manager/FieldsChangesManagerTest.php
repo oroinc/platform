@@ -30,7 +30,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this
             ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')

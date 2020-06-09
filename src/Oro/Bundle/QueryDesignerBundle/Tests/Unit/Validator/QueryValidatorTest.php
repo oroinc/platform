@@ -42,7 +42,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);
         $this->gridBuilder = $this->createMock(Builder::class);
@@ -227,12 +227,11 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testBuilderIsMissing()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Builder is missing');
+
         $this->configurationProvider
             ->expects($this->once())
             ->method('getProviders')
@@ -241,12 +240,11 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate(new Segment(), $this->constraint);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testExistingEntityValidation()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Builder is missing');
+
         $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
@@ -265,12 +263,11 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate(new Segment(), $this->constraint);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testNewEntityValidation()
     {
+        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Builder is missing');
+
         $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(null);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);

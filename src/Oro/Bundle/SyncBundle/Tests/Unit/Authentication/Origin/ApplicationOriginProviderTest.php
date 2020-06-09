@@ -16,7 +16,7 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicationOriginProvider */
     private $applicationOriginProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->originExtractor = $this->createMock(OriginExtractor::class);

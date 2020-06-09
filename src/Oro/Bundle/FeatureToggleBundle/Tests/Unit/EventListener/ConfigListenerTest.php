@@ -33,7 +33,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $configListener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->featureConfigManager = $this->getMockBuilder(ConfigurationManager::class)

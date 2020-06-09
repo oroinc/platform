@@ -15,7 +15,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SystemVariablesProvider */
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

@@ -17,7 +17,7 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutItem */
     protected $item;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayoutBuilder = new RawLayoutBuilder();
         $this->context          = new LayoutContext();

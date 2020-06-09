@@ -15,7 +15,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ConstraintTextExtractor */
     private $constraintTextExtractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraintTextExtractor = new ConstraintTextExtractor();
     }
@@ -36,7 +36,9 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         return [
             [new Blank(), 400],
             [new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'test']), 501],
-            [new FieldAccessGranted(), 403]
+            [new FieldAccessGranted(), 403],
+            [new NamedValidationConstraint('some constraint'), 400],
+            [new NamedValidationConstraint('some constraint', 409), 409],
         ];
     }
 

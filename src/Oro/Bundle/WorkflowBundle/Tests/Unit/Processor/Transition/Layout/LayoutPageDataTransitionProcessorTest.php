@@ -22,7 +22,7 @@ class LayoutPageDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutPageDataTransitionProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->helper = $this->createMock(TransitionTranslationHelper::class);
 

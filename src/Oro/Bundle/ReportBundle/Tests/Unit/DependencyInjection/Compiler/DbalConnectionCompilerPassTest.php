@@ -56,14 +56,13 @@ class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($decoratorDef->isPublic());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "reports" DBAL connection specified for "oro_report.connection" is not configured.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWithReportDbalConnectionParameterButDbalConnectionWasNotConfigured()
     {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The "reports" DBAL connection specified for "oro_report.connection" is not configured.'
+        );
+
         $container = new ContainerBuilder();
         $container->register('oro_datagrid.orm.query_executor');
         $container->setParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME, 'reports');

@@ -15,7 +15,7 @@ use Oro\Bundle\UIBundle\Route\Router;
  */
 class AttributeFamilyControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
@@ -38,7 +38,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Product Family was successfully saved', $crawler->html());
+        static::assertStringContainsString('Product Family was successfully saved', $crawler->html());
     }
 
     public function testUpdate()
@@ -60,7 +60,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Successfully updated', $crawler->html());
+        static::assertStringContainsString('Successfully updated', $crawler->html());
     }
 
     /**
@@ -75,7 +75,7 @@ class AttributeFamilyControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertEquals(200, $result->getStatusCode());
-        $this->assertContains('Can not be deleted', $result->getContent());
+        static::assertStringContainsString('Can not be deleted', $result->getContent());
     }
 
     public function testDelete()
@@ -92,7 +92,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertEquals(200, $result->getStatusCode());
-        $this->assertContains('Successfully deleted', $result->getContent());
+        static::assertStringContainsString('Successfully deleted', $result->getContent());
 
         $lastAttributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 

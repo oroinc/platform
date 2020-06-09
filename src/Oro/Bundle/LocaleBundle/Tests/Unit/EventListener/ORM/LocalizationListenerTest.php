@@ -25,7 +25,7 @@ class LocalizationListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $localizationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = $this
             ->getMockBuilder(LocalizationFallbackStrategy::class)

@@ -16,7 +16,7 @@ class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainImagePlaceholderProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(ImagePlaceholderProviderInterface::class);
         $this->provider2 = $this->createMock(ImagePlaceholderProviderInterface::class);

@@ -15,7 +15,7 @@ class EmailRecipientsValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new EmailRecipients();
         $this->context = $this->createMock(ExecutionContextInterface::class);

@@ -16,7 +16,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $jobStatusChecker = new JobStatusChecker();
         $this->collectionCalculator = new CollectionCalculator();
@@ -26,7 +26,7 @@ class CollectionCalculatorTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->collectionCalculator);
     }

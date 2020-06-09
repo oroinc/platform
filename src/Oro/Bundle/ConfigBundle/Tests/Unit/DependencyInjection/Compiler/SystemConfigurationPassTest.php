@@ -18,7 +18,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new SystemConfigurationPass();
         $this->container = $this->createMock(ContainerBuilder::class);

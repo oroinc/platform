@@ -20,7 +20,7 @@ class HandleUnidirectionalAssociationsTest extends \PHPUnit\Framework\TestCase
     /** @var HandleUnidirectionalAssociations */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new CustomizeFormDataContext();
         $this->context->getRequestType()->add('test');

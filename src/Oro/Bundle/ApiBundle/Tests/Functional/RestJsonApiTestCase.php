@@ -21,7 +21,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
@@ -100,7 +100,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         );
 
         // make sure that REST API call does not start the session
-        static::assertSessionNotStarted($method, $uri, $server);
+        $this->assertSessionNotStarted($method, $uri, $server);
 
         return $this->client->getResponse();
     }

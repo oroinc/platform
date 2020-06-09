@@ -21,7 +21,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $associationBuilder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();

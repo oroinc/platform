@@ -36,7 +36,7 @@ class BlockViewCacheTest extends LayoutTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->blockView = new BlockView();
 

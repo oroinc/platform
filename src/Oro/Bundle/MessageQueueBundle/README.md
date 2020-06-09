@@ -22,6 +22,7 @@ OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatfor
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/security_context.md)
  - [Buffering Messages](Resources/doc/buffering_messages.md)
+ - [Filtering Messages](Resources/doc/filtering_messages.md)
  * [Delayed Messages](./Resources/doc/delayed_messages.md)
 
     * [Redelivery Process](./Resources/doc/delayed_messages.md#redelivery-process)
@@ -110,7 +111,7 @@ Register it as a container service and subscribe to the topic:
 
 ```yaml
 oro_channel.async.change_integration_status_processor:
-    class: 'FooMessageProcessor'
+    class: FooMessageProcessor
     tags:
         - { name: 'oro_message_queue.client.message_processor' }
 ```
@@ -236,19 +237,6 @@ To test that a message was sent in unit and functional tests, you can use `Messa
 - [Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension](./Test/Functional/MessageQueueExtension.php) for functional tests
 
 Also, in case if you need custom logic for manage sent messages, you can use [Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueAssertTrait](./Test/Unit/MessageQueueAssertTrait.php) or [Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait](./Test/Functional/MessageQueueAssertTrait.php) traits. 
-
-Before you start to use traits in functional tests, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
-
-```yaml
-# config/config_test.yml
-
-services:
-    oro_message_queue.test.message_collector:
-        class: Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
-        decorates: oro_message_queue.client.message_producer
-        arguments:
-            - '@oro_message_queue.test.message_collector.inner'
-```
 
 The following example shows how to test whether a message was sent.
 

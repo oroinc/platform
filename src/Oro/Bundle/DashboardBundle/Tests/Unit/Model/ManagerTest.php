@@ -48,7 +48,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected $tokenStorage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Factory')
             ->disableOriginalConstructor()

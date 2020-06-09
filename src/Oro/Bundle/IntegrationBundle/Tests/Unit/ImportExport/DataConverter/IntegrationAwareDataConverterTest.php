@@ -12,14 +12,14 @@ class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataConverter = $this->getMockForAbstractClass(
             'Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter'
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->dataConverter);
     }

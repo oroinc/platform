@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\HierarchyCollection;
 
 /**
@@ -12,7 +13,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var HierarchyCollection */
     protected $hierarchyCollection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->hierarchyCollection = new HierarchyCollection();
     }
@@ -44,12 +45,11 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('root', $this->hierarchyCollection->getRootId());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The root item does not exist.
-     */
     public function testGetRootIdForEmptyHierarchy()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The root item does not exist.');
+
         $this->hierarchyCollection->getRootId();
     }
 
@@ -103,32 +103,31 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "item1" item to "root" because "root" root item does not exist.
-     */
     public function testAddToFirstHierarchyLevelWithoutRoot()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot add "item1" item to "root" because "root" root item does not exist.');
+
         $this->hierarchyCollection->add(['root'], 'item1');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "item3" item to "root/item1/item2" because "root" root item does not exist.
-     */
     public function testAddWithoutRoot()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "item3" item to "root/item1/item2" because "root" root item does not exist.'
+        );
+
         $this->hierarchyCollection->add(['root', 'item1', 'item2'], 'item3');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "item3" item to "root/unknown/item2" because "root" item does not have "unknown" child.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddToUnknown()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "item3" item to "root/unknown/item2" because "root" item does not have "unknown" child.'
+        );
+
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
         $this->hierarchyCollection->add(['root'], 'item1');
@@ -138,12 +137,11 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root', 'unknown', 'item2'], 'item3');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "item1" item to "root" because such item already exists.
-     */
     public function testAddDuplicate()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot add "item1" item to "root" because such item already exists.');
+
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
         $this->hierarchyCollection->add(['root'], 'item1');
@@ -212,12 +210,13 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "item3" item to "root/header" because "unknown" sibling item does not exist.
-     */
     public function testAddWithUnknownSibling()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Cannot add "item3" item to "root/header" because "unknown" sibling item does not exist.'
+        );
+
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
         $this->hierarchyCollection->add(['root'], 'header');

@@ -46,7 +46,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ContextHelper */
     private $contextHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()

@@ -13,7 +13,7 @@ class ReminderRepositoryTest extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(

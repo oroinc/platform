@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Update email notification form when event name or workflow name is changed
+ */
 class EmailNotificationTypeExtension extends AbstractTypeExtension
 {
     /** @var EmailNotificationTypeListener */
@@ -48,7 +51,7 @@ class EmailNotificationTypeExtension extends AbstractTypeExtension
         $elements = array_filter(
             array_map(
                 function (FormView $view) {
-                    if (in_array($view->vars['name'], ['event', 'workflow_definition'], true)) {
+                    if (in_array($view->vars['name'], ['eventName', 'workflow_definition'], true)) {
                         return '#' . $view->vars['id'];
                     }
 

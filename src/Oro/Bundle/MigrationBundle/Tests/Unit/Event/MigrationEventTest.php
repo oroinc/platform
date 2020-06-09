@@ -13,7 +13,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
 
     protected $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()

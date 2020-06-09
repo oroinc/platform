@@ -29,7 +29,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class CompoundObjectTypeTest extends TypeTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->builder = new ApiFormBuilder('', null, $this->dispatcher, $this->factory);

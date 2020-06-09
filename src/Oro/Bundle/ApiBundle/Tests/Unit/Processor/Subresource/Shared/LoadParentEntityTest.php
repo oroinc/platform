@@ -26,7 +26,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
     /** @var LoadParentEntity */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -169,12 +169,11 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage No access to the parent entity.
-     */
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectExceptionMessage('No access to the parent entity.');
+
         $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();

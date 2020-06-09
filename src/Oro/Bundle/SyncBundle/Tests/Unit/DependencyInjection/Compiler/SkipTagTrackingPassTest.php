@@ -17,7 +17,7 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerBuilder::class);
 
@@ -38,7 +38,7 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
 
         $this->skipTagTrackingPass->process($this->container);
     }
-    
+
     public function testProcess()
     {
         $this->container

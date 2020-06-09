@@ -11,7 +11,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TagImportManager */
     protected $tagImportManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $tagStorage = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()

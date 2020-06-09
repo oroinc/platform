@@ -158,13 +158,13 @@ class HasMoreTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?, ?)',
             [
-                ['id_0' => 123, 'name_1' => 'user123', 'category_name_2' => null],
-                ['id_0' => 456, 'name_1' => 'user456', 'category_name_2' => null],
-                ['id_0' => 789, 'name_1' => 'user789', 'category_name_2' => null]
+                ['id_0' => 123, 'name_1' => 'user123'],
+                ['id_0' => 456, 'name_1' => 'user456'],
+                ['id_0' => 789, 'name_1' => 'user789']
             ],
             [1 => 123, 2 => 456, 3 => 789],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
@@ -293,13 +293,13 @@ class HasMoreTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?, ?)',
             [
-                ['id_0' => 123, 'name_1' => 'user123', 'category_name_2' => null],
-                ['id_0' => 456, 'name_1' => 'user456', 'category_name_2' => null],
-                ['id_0' => 789, 'name_1' => 'user789', 'category_name_2' => null]
+                ['id_0' => 123, 'name_1' => 'user123'],
+                ['id_0' => 456, 'name_1' => 'user456'],
+                ['id_0' => 789, 'name_1' => 'user789']
             ],
             [1 => 123, 2 => 456, 3 => 789],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
@@ -404,12 +404,12 @@ class HasMoreTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
             [
-                ['id_0' => 123, 'name_1' => 'user123', 'category_name_2' => null],
-                ['id_0' => 456, 'name_1' => 'user456', 'category_name_2' => null]
+                ['id_0' => 123, 'name_1' => 'user123'],
+                ['id_0' => 456, 'name_1' => 'user456']
             ],
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
@@ -511,12 +511,12 @@ class HasMoreTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT u0_.id AS id_0, u0_.name AS name_1, u0_.category_name AS category_name_2'
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
             [
-                ['id_0' => 123, 'name_1' => 'user123', 'category_name_2' => null],
-                ['id_0' => 456, 'name_1' => 'user456', 'category_name_2' => null]
+                ['id_0' => 123, 'name_1' => 'user123'],
+                ['id_0' => 456, 'name_1' => 'user456']
             ],
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]

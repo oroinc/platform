@@ -10,7 +10,7 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
     protected $widgetConfigs;
     protected $widgetItemsFormSubscriber;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
         $translator->expects($this->any())

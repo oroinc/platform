@@ -12,7 +12,7 @@ class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
     protected $providers = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chainProvider = new ChainExclusionProvider();
 

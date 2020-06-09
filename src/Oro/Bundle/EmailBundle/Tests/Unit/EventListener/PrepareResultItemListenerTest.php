@@ -23,7 +23,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|Item */
     protected $item;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()

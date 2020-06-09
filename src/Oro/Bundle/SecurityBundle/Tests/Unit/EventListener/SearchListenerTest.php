@@ -22,7 +22,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
 

@@ -15,7 +15,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadataFactory;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
 

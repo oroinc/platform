@@ -18,7 +18,7 @@ abstract class AbstractPassTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPass */
     protected $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
@@ -28,7 +28,7 @@ abstract class AbstractPassTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->compilerPass, $this->definitionBuilder, $this->container);
     }

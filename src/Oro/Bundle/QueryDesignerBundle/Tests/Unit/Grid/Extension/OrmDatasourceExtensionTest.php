@@ -41,7 +41,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);

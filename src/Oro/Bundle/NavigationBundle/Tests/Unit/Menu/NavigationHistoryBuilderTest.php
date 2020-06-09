@@ -30,7 +30,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
     private $menuManipulator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);

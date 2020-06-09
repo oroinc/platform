@@ -37,32 +37,29 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         return new ActionFactory($arguments['container'], $arguments['types']);
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage The action type must be defined
-     */
     public function testCreateNoType()
     {
+        $this->expectException(\RunTimeException::class);
+        $this->expectExceptionMessage('The action type must be defined');
+
         $factory = $this->buildActionFactory();
         $factory->create(null);
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage No attached service to action type named `unknown_type`
-     */
     public function testCreateIncorrectType()
     {
+        $this->expectException(\RunTimeException::class);
+        $this->expectExceptionMessage('No attached service to action type named `unknown_type`');
+
         $factory = $this->buildActionFactory();
         $factory->create('unknown_type');
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage The service `test_type_service` must implement `ActionInterface`
-     */
     public function testCreateIncorrectInterface()
     {
+        $this->expectException(\RunTimeException::class);
+        $this->expectExceptionMessage('The service `test_type_service` must implement `ActionInterface`');
+
         $factory = $this->buildActionFactory();
         $factory->create(self::TEST_TYPE);
     }

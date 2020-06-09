@@ -16,7 +16,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)
             ->disableOriginalConstructor()
@@ -27,7 +27,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->provider, $this->contextHelper);
     }

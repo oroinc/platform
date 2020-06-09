@@ -24,7 +24,7 @@ class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
      */
     protected $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->accessor = $this
             ->createMock('Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface');

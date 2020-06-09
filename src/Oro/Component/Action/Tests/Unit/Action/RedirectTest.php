@@ -3,44 +3,43 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\Redirect;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 class RedirectTest extends \PHPUnit\Framework\TestCase
 {
-    const REDIRECT_PATH = 'redirectUrl';
+    private const REDIRECT_PATH = 'redirectUrl';
 
-    /**
-     * @var Redirect
-     */
+    /** @var Redirect */
     protected $action;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface
-     */
+    /** @var MockObject|RouterInterface */
     protected $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
+        $this->router = $this->getMockBuilder(RouterInterface::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->router->expects($this->any())
-            ->method('generate')
-            ->will($this->returnCallback(array($this, 'generateTestUrl')));
+        $this->router->method('generate')->willReturnCallback([$this, 'generateTestUrl']);
 
-        $this->action = new Redirect(new ContextAccessor(), $this->router, self::REDIRECT_PATH);
+        $this->action = new class(new ContextAccessor(), $this->router, self::REDIRECT_PATH) extends Redirect {
+            public function xgetOptions(): array
+            {
+                return $this->options;
+            }
+        };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->router, $this->action);
     }
@@ -52,35 +51,32 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        static::assertEquals($options, $this->action->xgetOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            'route' => array(
-                'options' => array(
+        return [
+            'route' => [
+                'options' => [
                     'route' => 'test_route_name'
-                ),
+                ],
                 'expectedUrl' => $this->generateTestUrl('test_route_name'),
-            ),
-            'route with parameters' => array(
-                'options' => array(
+            ],
+            'route with parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
-                    'route_parameters' => array('id' => 1),
-                ),
-                'expectedUrl' => $this->generateTestUrl('test_route_name', array('id' => 1)),
-            ),
-            'plain url' => array(
-                'options' => array(
+                    'route_parameters' => ['id' => 1],
+                ],
+                'expectedUrl' => $this->generateTestUrl('test_route_name', ['id' => 1]),
+            ],
+            'plain url' => [
+                'options' => [
                     'url' => 'http://some.host/path'
-                ),
+                ],
                 'expectedUrl' => 'http://some.host/path'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -96,26 +92,23 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no name' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no name' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Either url or route parameter must be specified',
-            ),
-            'invalid route parameters' => array(
-                'options' => array(
+            ],
+            'invalid route parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
                     'route_parameters' => 'stringData',
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Route parameters must be an array',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -131,7 +124,7 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $urlProperty = self::REDIRECT_PATH;
-        $this->assertEquals($expectedUrl, $context->$urlProperty);
+        static::assertEquals($expectedUrl, $context->$urlProperty);
     }
 
     /**
@@ -139,11 +132,11 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
      * @param array $routeParameters
      * @return string
      */
-    public function generateTestUrl($routeName, array $routeParameters = array())
+    public function generateTestUrl($routeName, array $routeParameters = [])
     {
         $url = 'url:' . $routeName;
         if ($routeParameters) {
-            $url .= ':' . serialize($routeParameters);
+            $url .= ':' . \serialize($routeParameters);
         }
 
         return $url;

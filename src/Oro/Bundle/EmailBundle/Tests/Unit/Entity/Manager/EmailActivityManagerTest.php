@@ -25,7 +25,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 
     protected $emailActivityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()

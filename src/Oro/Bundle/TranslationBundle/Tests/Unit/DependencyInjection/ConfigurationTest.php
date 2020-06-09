@@ -11,7 +11,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var Configuration */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
     }

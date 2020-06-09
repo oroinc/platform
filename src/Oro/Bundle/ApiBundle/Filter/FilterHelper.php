@@ -91,7 +91,7 @@ class FilterHelper
         $filterValue = $this->getFilterValue($fieldName);
         if ($filterValue) {
             $result = $filterValue->getValue();
-            if (ComparisonFilter::NEQ === $filterValue->getOperator()) {
+            if (FilterOperator::NEQ === $filterValue->getOperator()) {
                 $result = !$result;
             }
         }
@@ -117,7 +117,7 @@ class FilterHelper
         $item = $this->filterMap[$fieldName];
         $filterValue = $item[0];
         if (null === $filterValue && $item[2] instanceof StandaloneFilterWithDefaultValue) {
-            $filterValue = new FilterValue($item[1], $item[2]->getDefaultValue(), StandaloneFilter::EQ);
+            $filterValue = new FilterValue($item[1], $item[2]->getDefaultValue(), FilterOperator::EQ);
             $this->filterMap[$fieldName][0] = $filterValue;
         }
 

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
@@ -16,7 +15,6 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
-use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Calculates the total number of records and sets it
@@ -86,18 +84,18 @@ class SetTotalCountHeader implements ProcessorInterface
      *
      * @return int
      */
-    private function executeTotalCountCallback($callback)
+    private function executeTotalCountCallback($callback): int
     {
         if (!\is_callable($callback)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'Expected callable for "totalCount", "%s" given.',
                 \is_object($callback) ? \get_class($callback) : gettype($callback)
             ));
         }
 
-        $totalCount = \call_user_func($callback);
+        $totalCount = $callback();
         if (!\is_int($totalCount)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'Expected integer as result of "totalCount" callback, "%s" given.',
                 \is_object($totalCount) ? \get_class($totalCount) : gettype($totalCount)
             ));
@@ -112,7 +110,7 @@ class SetTotalCountHeader implements ProcessorInterface
      *
      * @return int
      */
-    private function calculateTotalCount($query, EntityDefinitionConfig $config = null)
+    private function calculateTotalCount($query, ?EntityDefinitionConfig $config): int
     {
         if ($query instanceof QueryBuilder) {
             $countQuery = $this->countQueryBuilderOptimizer
@@ -122,89 +120,46 @@ class SetTotalCountHeader implements ProcessorInterface
                 ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof Query) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = QueryUtil::cloneQuery($query)
                 ->setMaxResults(null)
                 ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof SqlQueryBuilder) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = (clone $query)
                 ->setMaxResults(null)
                 ->setFirstResult(null)
                 ->getQuery();
         } elseif ($query instanceof SqlQuery) {
-            $countQuery = $this->cloneQuery($query)
+            $countQuery = (clone $query)
                 ->getQueryBuilder()
                 ->setMaxResults(null)
                 ->setFirstResult(null);
         } else {
-            throw new \RuntimeException(\sprintf(
-                'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
-                . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'
-                . ' or Oro\Bundle\EntityBundle\ORM\SqlQuery, "%s" given.',
+            throw new \RuntimeException(sprintf(
+                'Expected instance of %s, %s, %s or %s, "%s" given.',
+                QueryBuilder::class,
+                Query::class,
+                SqlQueryBuilder::class,
+                SqlQuery::class,
                 \is_object($query) ? \get_class($query) : gettype($query)
             ));
         }
 
-        return $this->executeCountQuery($countQuery);
-    }
-
-    /**
-     * @param $countQuery
-     *
-     * @return int
-     */
-    private function executeCountQuery($countQuery)
-    {
         if ($countQuery instanceof Query) {
-            $paginator = new Paginator($countQuery);
-            $paginator->setUseOutputWalkers(false);
-
-            // the result-set mapping is not relevant and should be rebuilt
-            // because the query will be changed by Doctrine\ORM\Tools\Pagination\Paginator
-            // unfortunately the reflection is the only way to clear the result-set mapping
-            $resultSetMappingProperty = ReflectionUtil::getProperty(
-                new \ReflectionClass($countQuery),
-                '_resultSetMapping'
-            );
-            if (null === $resultSetMappingProperty) {
-                throw new \LogicException(sprintf(
-                    'The "_resultSetMapping" property does not exist in %s.',
-                    get_class($countQuery)
-                ));
-            }
-            $resultSetMappingProperty->setAccessible(true);
-            $resultSetMappingProperty->setValue($countQuery, null);
-
-            return $paginator->count();
+            return QueryCountCalculator::calculateCountDistinct($countQuery);
         }
 
-        return QueryCountCalculator::calculateCount($countQuery, false);
+        return QueryCountCalculator::calculateCount($countQuery);
     }
 
     /**
      * @param Query                       $query
      * @param EntityDefinitionConfig|null $config
      */
-    private function resolveQuery(Query $query, EntityDefinitionConfig $config = null)
+    private function resolveQuery(Query $query, ?EntityDefinitionConfig $config): void
     {
         if (null !== $config) {
             $this->queryResolver->resolveQuery($query, $config);
         }
-    }
-
-    /**
-     * Makes full clone of the given query, including its parameters and hints
-     *
-     * @param object $query
-     *
-     * @return object
-     */
-    private function cloneQuery($query)
-    {
-        if ($query instanceof Query) {
-            return QueryUtil::cloneQuery($query);
-        }
-
-        return clone $query;
     }
 }

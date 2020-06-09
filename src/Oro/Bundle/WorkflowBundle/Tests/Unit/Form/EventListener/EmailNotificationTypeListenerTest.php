@@ -3,23 +3,23 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\EmailNotificationTypeListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType;
-use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub as EmailNotification;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationTypeListenerTest extends TestCase
 {
     use EntityTrait;
 
@@ -32,7 +32,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 
@@ -43,7 +43,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturnMap(
                 [
-                    ['event', $this->createMock(FormInterface::class)],
+                    ['eventName', $this->createMock(FormInterface::class)],
                     ['template', $this->createMock(FormInterface::class)]
                 ]
             );
@@ -101,7 +101,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
         yield 'with workflow event' => [
             'data' => $this->getEntity(
                 EmailNotification::class,
-                ['entityName' => \stdClass::class, 'event' => new Event(LoadWorkflowNotificationEvents::TRANSIT_EVENT)]
+                ['entityName' => \stdClass::class, 'eventName' => WorkflowEvents::NOTIFICATION_TRANSIT_EVENT]
             ),
             'expected' => $this->getEntity(EmailNotification::class, ['entityName' => \stdClass::class])
         ];
@@ -109,36 +109,33 @@ class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
         yield 'with not workflow event' => [
             'data' => $this->getEntity(
                 EmailNotification::class,
-                ['entityName' => \stdClass::class, 'event' => new Event('test')]
+                ['entityName' => \stdClass::class, 'eventName' => 'test']
             ),
             'expected' => $this->getEntity(
                 EmailNotification::class,
-                ['entityName' => \stdClass::class, 'event' => new Event('test')]
+                ['entityName' => \stdClass::class, 'eventName' => 'test']
             )
         ];
     }
 
     protected function assertEventFieldUpdated()
     {
-        /** @var Expr|\PHPUnit\Framework\MockObject\MockObject $expr */
-        $expr = $this->createMock(Expr::class);
-        $expr->expects($this->once())->method('neq')->with('c.name', ':event')->willReturnSelf();
-
-        /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $config */
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())->method('expr')->willReturn($expr);
-        $qb->expects($this->once())->method('andWhere')->with($expr)->willReturnSelf();
-        $qb->expects($this->once())
-            ->method('setParameter')
-            ->with('event', LoadWorkflowNotificationEvents::TRANSIT_EVENT);
-
+        $choices =['test_1', 'test2'];
         /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $config */
         $config = $this->createMock(FormConfigInterface::class);
-        $config->expects($this->once())->method('getOption')->with('query_builder')->willReturn($qb);
+        $config->expects($this->once())->method('getOption')->with('choices')->willReturn($choices);
+        $config->expects($this->once())->method('getOptions')->willReturn(['choices' => $choices]);
+
+        $formType = $this->createMock(FormTypeInterface::class);
+        $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
+        $resolvedFormType->expects($this->once())
+            ->method('getInnerType')
+            ->willReturn($formType);
+        $config->expects($this->once())->method('getType')->willReturn($resolvedFormType);
 
         /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $eventForm */
-        $eventForm = $this->form->get('event');
-        $eventForm->expects($this->once())->method('getConfig')->willReturn($config);
+        $eventForm = $this->form->get('eventName');
+        $eventForm->expects($this->any())->method('getConfig')->willReturn($config);
     }
 
     /**
@@ -154,7 +151,7 @@ class EmailNotificationTypeListenerTest extends \PHPUnit\Framework\TestCase
             EmailNotification::class,
             [
                 'entityName' => \stdClass::class,
-                'event' => new Event(LoadWorkflowNotificationEvents::TRANSIT_EVENT),
+                'eventName' => WorkflowEvents::NOTIFICATION_TRANSIT_EVENT,
                 'workflowDefinition' => $this->getEntity(WorkflowDefinition::class, ['name' => 'test_workflow'])
             ]
         );

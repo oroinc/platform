@@ -18,7 +18,7 @@ class MarkMassActionTest extends \PHPUnit\Framework\TestCase
     /** @var ActionConfiguration */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = ActionConfiguration::createNamed(
             'test',

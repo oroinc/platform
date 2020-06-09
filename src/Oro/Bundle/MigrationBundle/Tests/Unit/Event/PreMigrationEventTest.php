@@ -11,7 +11,7 @@ class PreMigrationEventTest extends \PHPUnit\Framework\TestCase
      */
     protected $preMigrationEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
