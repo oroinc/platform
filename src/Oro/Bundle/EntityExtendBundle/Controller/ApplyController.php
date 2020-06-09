@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Apply entity config controller.
+ * Updates the database and all related caches to reflect changes made in extended entities.
  *
  * @Route("/entity/extend")
  */
@@ -24,13 +24,20 @@ class ApplyController extends Controller
      */
     public function updateAction()
     {
-        /** @var EntityProcessor $entityProcessor */
-        $entityProcessor = $this->get('oro_entity_extend.extend.entity_processor');
+        /** @var EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler */
+        $entityExtendUpdateHandler = $this->get('oro_entity_extend.extend.update_handler');
 
-        if (!$entityProcessor->updateDatabase(true, true)) {
-            throw new HttpException(500, 'Update failed');
+        $result = $entityExtendUpdateHandler->update();
+        if ($result->isSuccessful()) {
+            return new JsonResponse();
         }
 
-        return new Response();
+        $responseData = [];
+        $failedMessage = $result->getFailedMessage();
+        if ($failedMessage) {
+            $responseData['message'] = $failedMessage;
+        }
+
+        return new JsonResponse($responseData, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

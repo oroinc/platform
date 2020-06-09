@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
@@ -395,13 +396,13 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             ->set('o.syncCodeUpdatedAt', ':updated')
             ->where('o.id = :id')
             ->setParameter('code', $syncCode)
-            ->setParameter('updated', $this->getCurrentUtcDateTime())
+            ->setParameter('updated', $this->getCurrentUtcDateTime(), Type::DATETIME)
             ->setParameter('id', $origin->getId());
 
         if ($synchronizedAt !== null) {
             $qb
                 ->set('o.synchronizedAt', ':synchronized')
-                ->setParameter('synchronized', $synchronizedAt);
+                ->setParameter('synchronized', $synchronizedAt, Type::DATETIME);
         }
 
         if ($syncCode === self::SYNC_CODE_IN_PROCESS || $syncCode === self::SYNC_CODE_IN_PROCESS_FORCE) {
@@ -477,9 +478,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             ->setParameter('inProcessForce', self::SYNC_CODE_IN_PROCESS_FORCE)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
             ->setParameter('isActive', true)
-            ->setParameter('now', $now)
-            ->setParameter('min', $min)
-            ->setParameter('border', $border)
+            ->setParameter('now', $now, Type::DATETIME)
+            ->setParameter('min', $min, Type::DATETIME)
+            ->setParameter('border', $border, Type::DATETIME)
             ->setParameter('timeShift', $timeShift)
             ->setMaxResults($maxConcurrentTasks + 1);
 
@@ -583,7 +584,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             ->where('o.syncCode = :inProcess AND o.syncCodeUpdatedAt <= :border')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('failure', self::SYNC_CODE_FAILURE)
-            ->setParameter('border', $border)
+            ->setParameter('border', $border, Type::DATETIME)
             ->getQuery();
 
         $affectedRows = $query->execute();

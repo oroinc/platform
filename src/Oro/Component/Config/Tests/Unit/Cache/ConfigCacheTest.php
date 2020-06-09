@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Tests\Unit\Cache;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
 use Oro\Component\Config\Cache\ConfigCache;
+use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Oro\Component\Testing\TempDirExtension;
 
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
@@ -89,6 +90,75 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $staleResource->setFresh(false);
 
         $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', [$staleResource]);
+
+        self::assertFalse($cache->isFresh());
+    }
+
+    public function testFreshResourceInDebugAndHasFreshDependencies()
+    {
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
+        $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
+        $dependency2 = $this->createMock(ConfigCacheStateInterface::class);
+
+        $dependency1->expects(self::once())
+            ->method('isCacheFresh')
+            ->with(self::isType('int'))
+            ->willReturn(true);
+        $dependency2->expects(self::once())
+            ->method('isCacheFresh')
+            ->with(self::isType('int'))
+            ->willReturn(true);
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->addDependency($dependency1);
+        $cache->addDependency($dependency2);
+        $cache->write('', [$freshResource]);
+
+        self::assertTrue($cache->isFresh());
+    }
+
+    public function testFreshResourceInDebugAndHasStaleDependencies()
+    {
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
+        $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
+        $dependency2 = $this->createMock(ConfigCacheStateInterface::class);
+
+        $dependency1->expects(self::once())
+            ->method('isCacheFresh')
+            ->with(self::isType('int'))
+            ->willReturn(false);
+        $dependency2->expects(self::never())
+            ->method('isCacheFresh');
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->addDependency($dependency1);
+        $cache->addDependency($dependency2);
+        $cache->write('', [$freshResource]);
+
+        self::assertFalse($cache->isFresh());
+    }
+
+    public function testStaleResourceInDebugAndHasDependencies()
+    {
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
+
+        $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
+        $dependency2 = $this->createMock(ConfigCacheStateInterface::class);
+
+        $dependency1->expects(self::never())
+            ->method('isCacheFresh');
+        $dependency2->expects(self::never())
+            ->method('isCacheFresh');
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->addDependency($dependency1);
+        $cache->addDependency($dependency2);
         $cache->write('', [$staleResource]);
 
         self::assertFalse($cache->isFresh());

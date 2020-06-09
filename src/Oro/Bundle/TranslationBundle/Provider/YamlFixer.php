@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+/**
+ * Fixes lines format of translation file
+ */
 class YamlFixer
 {
     /**
@@ -35,7 +38,7 @@ class YamlFixer
             }
 
             // check if it's starting multiline string
-            $isMultiLine = trim($line[1])[0] == '|';
+            $isMultiLine = (trim($line[1])[0] ?? '') === '|';
 
             $key = trim($key, '"\'');
             if (strpos($key, '"') !== false) {

@@ -74,10 +74,27 @@ services:
 
     oro_notification.manager:
         class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
+        public: true
         arguments:
             - !tagged_iterator notification.handler
             - '@oro_notification.cache'
             - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro.notification.event.entity_post_persist, method: process }
+            - { name: kernel.event_listener, event: oro.notification.event.entity_post_remove, method: process }
+            - { name: kernel.event_listener, event: oro.notification.event.entity_post_update, method: process }
+
+    oro_notification.manager.link:
+        tags:
+            - { name: oro_service_link, service: oro_notification.manager }
+
+    oro_notification.event_dispatcher_decorator:
+        class: Oro\Bundle\NotificationBundle\Event\NotificationEventDispatcher
+        public: true
+        decorates: 'event_dispatcher'
+        arguments:
+            - '@oro_notification.event_dispatcher_decorator.inner'
+            - '@oro_notification.manager.link'
 
     oro_notification.cache:
         parent: oro.cache.abstract

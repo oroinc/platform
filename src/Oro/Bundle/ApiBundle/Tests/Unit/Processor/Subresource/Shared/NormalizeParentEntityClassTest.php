@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
 {
@@ -97,13 +98,14 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
 
     public function testProcessForInvalidParentEntityType()
     {
-        $this->context->setParentClassName('test');
+        $parentEntityType = 'test';
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->with($parentEntityType, DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willThrowException(new EntityAliasNotFoundException($parentEntityType));
 
+        $this->context->setParentClassName($parentEntityType);
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getParentClassName());

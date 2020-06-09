@@ -12,7 +12,14 @@ class TimePicker extends Element
      */
     public function setValue($dateTime)
     {
-        $this->click();
+        $this->spin(
+            function () {
+                $this->click();
+
+                return true;
+            },
+            5
+        );
 
         $timeSelect = $this->getPage()->findVisible('css', '.ui-timepicker-wrapper');
         $time = $this->formatTime($dateTime);

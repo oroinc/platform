@@ -229,14 +229,6 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t success root jobs. id: "%s"', $job->getId()));
         }
 
-        if ($job->getStatus() !== Job::STATUS_RUNNING) {
-            throw new \LogicException(sprintf(
-                'Can success only running jobs. id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
-        }
-
         $job->setStatus(Job::STATUS_SUCCESS);
         $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
@@ -285,14 +277,6 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
         }
 
-        if ($job->getStatus() !== Job::STATUS_RUNNING) {
-            throw new \LogicException(sprintf(
-                'Can fail only running jobs. id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
-        }
-
         $job->setStatus(Job::STATUS_FAILED);
         $job->setStoppedAt(new \DateTime());
 
@@ -307,14 +291,6 @@ class JobProcessor
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
-        }
-
-        if ($job->getStatus() !== Job::STATUS_RUNNING) {
-            throw new \LogicException(sprintf(
-                'Can fail and redelivery only running jobs. id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
         }
 
         $job->setStatus(Job::STATUS_FAILED_REDELIVERED);

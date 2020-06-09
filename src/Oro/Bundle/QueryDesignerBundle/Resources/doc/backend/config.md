@@ -68,6 +68,7 @@ Aggregating functions configuration
 This section describes how you can configure which aggregating functions will be available in the query designer. By default the QueryDesigner bundle does not provide configuration for any aggregating function. The following example shows how aggregating functions for numeric data type can be added:
 ``` yaml
 query_designer:
+    aggregates:
         number:
             applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
             functions:

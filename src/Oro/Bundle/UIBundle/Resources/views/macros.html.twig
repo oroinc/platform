@@ -730,6 +730,9 @@
     {% if (parameters.ariaLabel is defined) %}
         aria-label="{{ parameters.ariaLabel }}"
     {% endif %}
+    {% if (parameters.ariaHaspopup is defined) %}
+        aria-haspopup="{{ parameters.ariaHaspopup ? 'true' : 'false' }}"
+    {% endif %}
     {%- if (parameters.visible is defined and not parameters.visible) -%}
         style="display: none"
     {%- endif -%}
@@ -798,7 +801,10 @@
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
     {% spaceless %}
-        <button {{- UIMacro.clientControlAttrs(parameters) -}}>
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}
+            {% if (parameters.title is defined) %}
+                title="{{ parameters.title }}"
+            {% endif %}>
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
@@ -1110,7 +1116,7 @@
     Separator between buttons
 #}
 {% macro buttonSeparator() %}
-    <div class="pull-left">
+    <div class="pull-left" aria-hidden="true">
         <div class="separator-btn"></div>
     </div>
 {% endmacro %}

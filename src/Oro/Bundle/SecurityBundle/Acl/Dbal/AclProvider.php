@@ -92,7 +92,7 @@ class AclProvider implements AclProviderInterface
     {
         [$sql, $params, $types] = $this->getFindChildrenSql($parentOid, $directChildrenOnly);
 
-        $children = array();
+        $children = [];
         foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
             $children[] = new ObjectIdentity($data['object_identifier'], $data['class_type']);
         }
@@ -103,9 +103,9 @@ class AclProvider implements AclProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function findAcl(ObjectIdentityInterface $oid, array $sids = array())
+    public function findAcl(ObjectIdentityInterface $oid, array $sids = [])
     {
-        return $this->findAcls(array($oid), $sids)->offsetGet($oid);
+        return $this->findAcls([$oid], $sids)->offsetGet($oid);
     }
 
     /**
@@ -114,11 +114,11 @@ class AclProvider implements AclProviderInterface
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function findAcls(array $oids, array $sids = array())
+    public function findAcls(array $oids, array $sids = [])
     {
         $result = new \SplObjectStorage();
-        $currentBatch = array();
-        $oidLookup = array();
+        $currentBatch = [];
+        $oidLookup = [];
         $sidKey = $this->getSidKey($sids);
 
         for ($i = 0, $c = count($oids); $i < $c; ++$i) {
@@ -218,7 +218,7 @@ class AclProvider implements AclProviderInterface
                     }
                 }
 
-                $currentBatch = array();
+                $currentBatch = [];
             }
         }
 
@@ -254,40 +254,23 @@ class AclProvider implements AclProviderInterface
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
 
-        $sql = <<<SELECTCLAUSE
-            SELECT
-                o.id as acl_id,
-                o.object_identifier,
-                o.parent_object_identity_id,
-                o.entries_inheriting,
-                c.class_type,
-                e.id as ace_id,
-                e.object_identity_id,
-                e.field_name,
-                e.ace_order,
-                e.mask,
-                e.granting,
-                e.granting_strategy,
-                e.audit_success,
-                e.audit_failure,
-                s.username,
-                s.identifier as security_identifier
-            FROM
-                {$this->options['oid_table_name']} o
-            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-            LEFT JOIN {$this->options['entry_table_name']} e ON (
-                e.class_id = o.class_id 
-                AND (e.object_identity_id = o.id 
-                OR {$this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id')})
-            )
-            LEFT JOIN {$this->options['sid_table_name']} s ON (
-                s.id = e.security_identity_id
-            )
-
-            WHERE o.id in (?)
-SELECTCLAUSE;
-
-        return [$sql, [$ancestorIds], [Connection::PARAM_INT_ARRAY]];
+        return [
+            sprintf(
+                'SELECT o.id as acl_id, o.object_identifier, o.parent_object_identity_id, o.entries_inheriting,'
+                . ' c.class_type, e.id as ace_id, e.object_identity_id, e.field_name, e.ace_order, e.mask,'
+                . ' e.granting, e.granting_strategy, e.audit_success, e.audit_failure, s.username,'
+                . ' s.identifier as security_identifier FROM %s o INNER JOIN %s c ON c.id = o.class_id'
+                . ' LEFT JOIN %s e ON e.class_id = o.class_id AND (e.object_identity_id = o.id OR %s)'
+                . ' LEFT JOIN %s s ON s.id = e.security_identity_id WHERE o.id in (?)',
+                $this->options['oid_table_name'],
+                $this->options['class_table_name'],
+                $this->options['entry_table_name'],
+                $this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id'),
+                $this->options['sid_table_name']
+            ),
+            [$ancestorIds],
+            [Connection::PARAM_INT_ARRAY]
+        ];
     }
 
     /**
@@ -300,16 +283,15 @@ SELECTCLAUSE;
         $parameters = [];
         $parametersTypes = [];
 
-        $sql = <<<SELECTCLAUSE
-            SELECT a.ancestor_id
-            FROM
-                {$this->options['oid_table_name']} o
-            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-            INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
-               WHERE (
-SELECTCLAUSE;
+        $sql = sprintf(
+            'SELECT a.ancestor_id FROM %s o INNER JOIN %s c ON c.id = o.class_id'
+            . ' INNER JOIN %s a ON a.object_identity_id = o.id WHERE ',
+            $this->options['oid_table_name'],
+            $this->options['class_table_name'],
+            $this->options['oid_ancestors_table_name']
+        );
 
-        $types = array();
+        $types = [];
         $count = count($batch);
         for ($i = 0; $i < $count; ++$i) {
             if (!isset($types[$batch[$i]->getType()])) {
@@ -325,7 +307,7 @@ SELECTCLAUSE;
         }
 
         if (1 === count($types)) {
-            $ids = array();
+            $ids = [];
             for ($i = 0; $i < $count; ++$i) {
                 $ids[] = (string) $batch[$i]->getIdentifier();
             }
@@ -347,8 +329,6 @@ SELECTCLAUSE;
             }
         }
 
-        $sql .= ')';
-
         return [$sql, $parameters, $parametersTypes];
     }
 
@@ -364,22 +344,21 @@ SELECTCLAUSE;
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
     {
         if (false === $directChildrenOnly) {
-            $query = <<<FINDCHILDREN
-                SELECT o.object_identifier, c.class_type
-                FROM
-                    {$this->options['oid_table_name']} o
-                INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-                INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
-                WHERE
-                    a.ancestor_id = ? AND a.object_identity_id != a.ancestor_id
-FINDCHILDREN;
+            $query = sprintf(
+                'SELECT o.object_identifier, c.class_type FROM %s o'
+                . ' INNER JOIN %s c ON c.id = o.class_id INNER JOIN %s a ON a.object_identity_id = o.id'
+                . ' WHERE a.ancestor_id = ? AND a.object_identity_id != a.ancestor_id',
+                $this->options['oid_table_name'],
+                $this->options['class_table_name'],
+                $this->options['oid_ancestors_table_name']
+            );
         } else {
-            $query = <<<FINDCHILDREN
-                SELECT o.object_identifier, c.class_type
-                FROM {$this->options['oid_table_name']} o
-                INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-                WHERE o.parent_object_identity_id = ?
-FINDCHILDREN;
+            $query = sprintf(
+                'SELECT o.object_identifier, c.class_type FROM %s o'
+                . ' INNER JOIN %s c ON c.id = o.class_id WHERE o.parent_object_identity_id = ?',
+                $this->options['oid_table_name'],
+                $this->options['class_table_name']
+            );
         }
 
         return [$query, [$this->retrieveObjectIdentityPrimaryKey($oid)], [ParameterType::INTEGER]];
@@ -395,16 +374,10 @@ FINDCHILDREN;
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
     {
-        $query = <<<QUERY
-            SELECT o.id
-            FROM %s o
-            INNER JOIN %s c ON c.id = o.class_id
-            WHERE o.object_identifier = ? AND c.class_type = ?
-QUERY;
-
         return [
             sprintf(
-                $query,
+                'SELECT o.id FROM %s o INNER JOIN %s c ON c.id = o.class_id'
+                . ' WHERE o.object_identifier = ? AND c.class_type = ?',
                 $this->options['oid_table_name'],
                 $this->options['class_table_name']
             ),
@@ -423,6 +396,7 @@ QUERY;
     final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
     {
         [$sql, $params, $types] = $this->getSelectObjectIdentityIdSql($oid);
+
         return $this->connection->executeQuery($sql, $params, $types)->fetchColumn();
     }
 
@@ -433,7 +407,7 @@ QUERY;
      */
     private function updateAceIdentityMap(AclInterface $acl)
     {
-        foreach (array('classAces', 'classFieldAces', 'objectAces', 'objectFieldAces') as $property) {
+        foreach (['classAces', 'classFieldAces', 'objectAces', 'objectFieldAces'] as $property) {
             $reflection = new \ReflectionProperty($acl, $property);
             $reflection->setAccessible(true);
             $value = $reflection->getValue($acl);
@@ -463,7 +437,7 @@ QUERY;
     {
         [$sql, $params, $types] = $this->getAncestorLookupSql($batch);
 
-        $ancestorIds = array();
+        $ancestorIds = [];
         foreach ($this->connection->executeQuery($sql, $params, $types)->fetchAll() as $data) {
             // FIXME: skip ancestors which are cached
             // Fix: Oracle returns keys in uppercase
@@ -547,14 +521,14 @@ QUERY;
     private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
     {
         $parentIdToFill = new \SplObjectStorage();
-        $acls = $aces = $emptyArray = array();
+        $acls = $aces = $emptyArray = [];
         $oidCache = $oidLookup;
         $result = new \SplObjectStorage();
         $permissionGrantingStrategy = $this->permissionGrantingStrategy;
         $sidKey = $this->getSidKey($sids);
 
         // we need these to set protected properties on hydrated objects
-        $aclReflection = new \ReflectionClass('Symfony\Component\Security\Acl\Domain\Acl');
+        $aclReflection = new \ReflectionClass(Acl::class);
         $aclClassAcesProperty = $aclReflection->getProperty('classAces');
         $aclClassAcesProperty->setAccessible(true);
         $aclClassFieldAcesProperty = $aclReflection->getProperty('classFieldAces');
@@ -643,7 +617,7 @@ QUERY;
             if (null !== $aceId) {
                 // have we already hydrated ACEs for this ACL?
                 if (!isset($aces[$aclId])) {
-                    $aces[$aclId] = array($emptyArray, $emptyArray, $emptyArray, $emptyArray);
+                    $aces[$aclId] = [$emptyArray, $emptyArray, $emptyArray, $emptyArray];
                 }
 
                 // has this ACE already been hydrated during a previous cycle, or
@@ -816,9 +790,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseSecurityIdentity(SecurityIdentityInterface $sid): array
     {

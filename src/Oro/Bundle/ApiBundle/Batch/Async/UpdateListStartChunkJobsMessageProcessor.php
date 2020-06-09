@@ -81,14 +81,14 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
             $body['version'],
             $body['rootJobId']
         )) {
-            $this->logger->critical('Got invalid message.', ['message' => $message]);
+            $this->logger->critical('Got invalid message.');
 
             return self::REJECT;
         }
 
         $rootJob = $this->jobStorage->findJobById($body['rootJobId']);
         if (null === $rootJob) {
-            $this->logger->critical('The root job does not exist.', ['message' => $message]);
+            $this->logger->critical('The root job does not exist.');
 
             return self::REJECT;
         }
@@ -108,7 +108,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
             if (null === $job) {
                 $this->logger->critical(
                     'The child job does not exist.',
-                    ['message' => $message, 'jobId' => $chunkFileToJobIdMap[$nextChunkFileIndex]]
+                    ['jobId' => $chunkFileToJobIdMap[$nextChunkFileIndex]]
                 );
 
                 return self::REJECT;

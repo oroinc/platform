@@ -68,6 +68,14 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $this->button->getLabel());
     }
 
+    public function testGetAriaLabel(): void
+    {
+        $label = 'test_label';
+        $this->definition->expects($this->once())->method('getDatagridOptions')->willReturn(['aria_label' => $label]);
+
+        $this->assertEquals($label, $this->button->getAriaLabel());
+    }
+
     public function testGetIcon()
     {
         $this->assertNull($this->button->getIcon());

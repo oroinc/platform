@@ -11,9 +11,7 @@ For example, if Operations are implemented in the above mentioned way, the butto
 ```YAML
 
     oro_action.provider.button.extension.operation:
-        class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
-        arguments: 
-            - #dependencies...
+        class: Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 } #<- register/inject extension via tag
 

@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
-use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -48,7 +47,6 @@ class EntityType extends AbstractType
         $includedEntities = $options['included_entities'];
         if ($metadata->isCollection()) {
             $builder
-                ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
                     new CollectionToArrayTransformer(
                         new EntityToIdTransformer(

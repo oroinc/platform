@@ -83,7 +83,7 @@ Add the service definition to `services.yml`:
 
 ```yaml
 acme_bundle.datagrid.datasource.array:
-    class: 'Acme\Bundle\AcmeBundle\Datagrid\Datasource\CustomDatasource'
+    class: Acme\Bundle\AcmeBundle\Datagrid\Datasource\CustomDatasource
     tags:
         - { name: oro_datagrid.datasource, type: acme_custom }
 ```

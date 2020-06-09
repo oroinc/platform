@@ -84,7 +84,7 @@ And register it in services.yml:
 
 ```yaml
     acme.form.guesser.extend_field:
-        class: %acme.form.guesser.extend_field.class%
+        class: Acme\Bundle\AcmeBundle\Form\Guesser\CustomTypeGuesser
         tags:
             - { name: form.type_guesser, priority: N }
 ```

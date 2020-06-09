@@ -281,6 +281,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('data')
                     ->prototype('variable')->end()
                 ->end()
+                ->scalarNode('aria_label')->end()
             ->end()
             ->validate()
                 ->always(function ($config) {

@@ -19,9 +19,9 @@ services:
     oro_search.search.engine:
         class: Oro\Bundle\SearchBundle\Engine\Orm
         arguments:
-            - @doctrine
-            - @oro_entity.doctrine_helper
-            - @oro_search.mapper
+            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_search.mapper'
         calls:
             - [setLogQueries, [%oro_search.log_queries%]]
 ```

@@ -4,10 +4,7 @@ namespace Oro\Bundle\ApiBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
-use Oro\Bundle\ApiBundle\Provider\CacheManager;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
-use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
@@ -164,46 +161,5 @@ class OroApiBundle extends Bundle
      */
     public function boot()
     {
-        // Warms up API caches here to detect misconfiguration (e.g. duplicated entity aliases) as early as possible
-        // to avoid ORM metadata exceptions like "The target entity Extend\Entity\... cannot be found in ...".
-        // Do it only if extended entity proxies are ready.
-        // Skip for "cache:clear" and "cache:warmup" commands to avoid premature warming up caches;
-        // in this case caches are warmed up by cache warmers
-        // Skip the following commands:
-        // * oro:install
-        // * oro:platform:update
-        // * oro:migration:load
-        // * oro:entity-config:update
-        // * oro:entity-config:cache:*
-        // * oro:entity-extend:update-config
-        // * oro:entity-extend:migration:update-config
-        // * oro:entity-extend:cache:*
-        // * doctrine:database:create
-        // to avoid "Class Extend\Entity\... does not exist" exceptions for case when custom entities are created
-        // via migrations and has some configuration in "Resources/config/oro/api.yml"
-        if ($this->kernel->isDebug()
-            && ExtendClassLoadingUtils::aliasesExist($this->kernel->getCacheDir())
-            && !CommandExecutor::isCurrentCommand('cache:clear')
-            && !CommandExecutor::isCurrentCommand('cache:warmup')
-            && !CommandExecutor::isCurrentCommand('oro:install')
-            && !CommandExecutor::isCurrentCommand('oro:platform:update')
-            && !CommandExecutor::isCurrentCommand('oro:migration:load')
-            && !CommandExecutor::isCurrentCommand('oro:entity-config:update')
-            && !CommandExecutor::isCurrentCommand('oro:entity-config:cache:', true)
-            && !CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')
-            && !CommandExecutor::isCurrentCommand('oro:entity-extend:migration:update-config')
-            && !CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
-            && !CommandExecutor::isCurrentCommand('doctrine:database:create')
-        ) {
-            $this->getCacheManager()->warmUpDirtyCaches();
-        }
-    }
-
-    /**
-     * @return CacheManager
-     */
-    private function getCacheManager()
-    {
-        return $this->kernel->getContainer()->get('oro_api.cache_manager');
     }
 }

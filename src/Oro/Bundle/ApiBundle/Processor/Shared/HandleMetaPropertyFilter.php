@@ -44,8 +44,9 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $requestType = $context->getRequestType();
         $filterName = $this->filterNamesRegistry
-            ->getFilterNames($context->getRequestType())
+            ->getFilterNames($requestType)
             ->getMetaPropertyFilterName();
 
         $filterValue = $context->getFilterValues()->get($filterName);
@@ -61,13 +62,23 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
-        $names = $this->valueNormalizer->normalizeValue(
-            $filterValue->getValue(),
-            DataType::STRING,
-            $context->getRequestType(),
-            true
-        );
-        if (empty($names)) {
+        try {
+            $names = $this->valueNormalizer->normalizeValue(
+                $filterValue->getValue(),
+                DataType::STRING,
+                $requestType,
+                true
+            );
+        } catch (\Exception $e) {
+            $context->addError(
+                $this->createInvalidFilterValueKeyError($filterValue->getSourceKey())
+                    ->setInnerException($e)
+            );
+
+            return;
+        }
+
+        if (!$names) {
             // meta properties were not requested
             return;
         }
@@ -85,7 +96,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
                 $configExtra->addMetaProperty($name, $allowedMetaProperties[$name]);
             } else {
                 $context->addError($this->createInvalidFilterValueKeyError(
-                    $filterName,
+                    $filterValue->getSourceKey(),
                     sprintf(
                         'The "%s" value is not allowed. Allowed values: %s',
                         $name,
@@ -97,12 +108,12 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     }
 
     /**
-     * @param string $filterKey
-     * @param string $detail
+     * @param string      $filterKey
+     * @param string|null $detail
      *
      * @return Error
      */
-    private function createInvalidFilterValueKeyError(string $filterKey, string $detail): Error
+    private function createInvalidFilterValueKeyError(string $filterKey, string $detail = null): Error
     {
         return Error::createValidationError(Constraint::FILTER, $detail)
             ->setSource(ErrorSource::createByParameter($filterKey));

@@ -268,8 +268,7 @@ datagrids:
 - declare own grid listener
 ```
 my_bundle.event_listener.my_grid_listener:
-        class: %my_grid_listener.class%
-        arguments: ~
+        class: 'Acme\DemoBundle\EventListener\MyGridListener'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.my-grid-name, method: onBuildBefore }
 ```

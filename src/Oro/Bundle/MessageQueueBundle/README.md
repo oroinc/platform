@@ -110,7 +110,7 @@ Register it as a container service and subscribe to the topic:
 
 ```yaml
 oro_channel.async.change_integration_status_processor:
-    class: 'FooMessageProcessor'
+    class: FooMessageProcessor
     tags:
         - { name: 'oro_message_queue.client.message_processor' }
 ```

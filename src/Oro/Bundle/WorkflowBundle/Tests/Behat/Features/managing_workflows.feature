@@ -49,7 +49,7 @@ Feature: Managing workflows
     Then I should see following actions for Test workflow in grid:
       | Edit |
     And I click "Activate" on row "Test workflow" in grid
-    And I click "Activate"
+    And I click "Activate" in modal window
     Then I should see "Workflow activated" flash message
     And I should not see following actions for Test workflow in grid:
       | Edit |

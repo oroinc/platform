@@ -13,7 +13,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider validItemsDataProvider
      * @param string $value
      */
-    public function testValidateValid($value)
+    public function testValidateValid($value): void
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext $context */
         $context = $this->getMockBuilder(ExecutionContext::class)
@@ -32,10 +32,11 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function validItemsDataProvider()
+    public function validItemsDataProvider(): array
     {
         return [
             'html' => ['<p>some content</p>'],
+            'image' => ['<p><img src="/"/></p>'],
             'text' => ['some content'],
         ];
     }
@@ -44,7 +45,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidItemsDataProvider
      * @param mixed $value
      */
-    public function testValidateInvalid($value)
+    public function testValidateInvalid($value): void
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext $context */
         $context = $this->getMockBuilder(ExecutionContext::class)
@@ -74,14 +75,16 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function invalidItemsDataProvider()
+    public function invalidItemsDataProvider(): array
     {
-        return array(
+        return [
             'empty string' => [''],
+            'one white-space' => [' '],
+            'few white-spaces' => ['     '],
             'false' => [false],
             'null' => [null],
             'empty html' => ['<p></p>'],
             'empty html with attr' => ['<p class="empty"></p>'],
-        );
+        ];
     }
 }
