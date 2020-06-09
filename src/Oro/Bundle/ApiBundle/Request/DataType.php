@@ -34,20 +34,39 @@ final class DataType
     public const ENTITY_CLASS     = 'entityClass';
     public const ORDER_BY         = 'orderBy';
 
-    private const NESTED_OBJECT                   = 'nestedObject';
-    private const NESTED_ASSOCIATION              = 'nestedAssociation';
-    private const EXTENDED_ASSOCIATION_PREFIX     = 'association';
-    private const EXTENDED_ASSOCIATION_MARKER     = 'association:';
-    private const ASSOCIATION_AS_FIELD_DATA_TYPES = ['array', 'object', 'nestedObject', 'objects', 'scalar'];
+    private const NESTED_OBJECT               = 'nestedObject';
+    private const NESTED_ASSOCIATION          = 'nestedAssociation';
+    private const EXTENDED_ASSOCIATION_PREFIX = 'association';
+    private const EXTENDED_ASSOCIATION_MARKER = 'association:';
+    private const ASSOCIATION_AS_FIELD_TYPES  = ['array', 'object', 'nestedObject', 'objects', 'strings', 'scalar'];
+    private const ARRAY_TYPES                 = ['array', 'objects', 'strings'];
+    private const ARRAY_SUFFIX                = '[]';
+
+    /**
+     * Checks whether the field represents an array.
+     *
+     * @param string|null $dataType
+     *
+     * @return bool
+     */
+    public static function isArray(?string $dataType): bool
+    {
+        return
+            $dataType
+            && (
+                \in_array($dataType, self::ARRAY_TYPES, true)
+                || false !== strpos($dataType, self::ARRAY_SUFFIX, -2)
+            );
+    }
 
     /**
      * Checks whether the field represents a nested object.
      *
-     * @param string $dataType
+     * @param string|null $dataType
      *
      * @return bool
      */
-    public static function isNestedObject($dataType)
+    public static function isNestedObject(?string $dataType): bool
     {
         return self::NESTED_OBJECT === $dataType;
     }
@@ -55,11 +74,11 @@ final class DataType
     /**
      * Checks whether the field represents a nested association.
      *
-     * @param string $dataType
+     * @param string|null $dataType
      *
      * @return bool
      */
-    public static function isNestedAssociation($dataType)
+    public static function isNestedAssociation(?string $dataType): bool
     {
         return self::NESTED_ASSOCIATION === $dataType;
     }
@@ -68,35 +87,42 @@ final class DataType
      * Checks whether an association should be represented as a field.
      * For JSON:API it means that it should be in "attributes" section instead of "relationships" section.
      * Usually, to increase readability, "scalar" and "object" data-types are used for "to-one" associations
-     * and "array" and "objects" data-types are used for "to-many" associations.
+     * and "array", "objects", "strings" or "data-type[]" data-types are used for "to-many" associations.
      * The "scalar" is usually used if a value of the field contains a scalar value.
-     * The "array" is usually used if a value of the field contains a list of scalar values.
+     * The "array" "scalar-data-type[]" (e.g. "scalar[]", "string[]", "integer[]", etc.) is usually used
+     * if a value of the field contains a list of scalar values.
      * The "object" is usually used if a value of the field contains several properties.
-     * The "objects" is usually used if a value of the field contains a list of items that have several properties.
+     * The "objects" or "object[]" is usually used if a value of the field contains a list of items
+     * that have several properties.
      * Also "nestedObject" data-type, that is used to group several fields in one object,
      * is classified as an association that should be represented as a field because the behaviour
      * of it is the same.
      *
-     * @param string $dataType
+     * @param string|null $dataType
      *
      * @return bool
      */
-    public static function isAssociationAsField($dataType)
+    public static function isAssociationAsField(?string $dataType): bool
     {
-        return \in_array($dataType, self::ASSOCIATION_AS_FIELD_DATA_TYPES, true);
+        return
+            $dataType
+            && (
+                \in_array($dataType, self::ASSOCIATION_AS_FIELD_TYPES, true)
+                || false !== strpos($dataType, self::ARRAY_SUFFIX, -2)
+            );
     }
 
     /**
      * Checks whether the given data-type represents an extended association.
      * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
-     * @param string $dataType
+     * @param string|null $dataType
      *
      * @return bool
      */
-    public static function isExtendedAssociation($dataType)
+    public static function isExtendedAssociation(?string $dataType): bool
     {
-        return 0 === \strpos($dataType, self::EXTENDED_ASSOCIATION_MARKER);
+        return $dataType && 0 === strncmp($dataType, self::EXTENDED_ASSOCIATION_MARKER, 12);
     }
 
     /**
@@ -109,13 +135,14 @@ final class DataType
      *
      * @throws \InvalidArgumentException if the given data-type does not represent an extended association
      */
-    public static function parseExtendedAssociation($dataType)
+    public static function parseExtendedAssociation(string $dataType): array
     {
-        list($prefix, $type, $kind) = \array_pad(\explode(':', $dataType, 3), 3, null);
-        if (self::EXTENDED_ASSOCIATION_PREFIX !== $prefix || empty($type) || '' === $kind) {
-            throw new \InvalidArgumentException(
-                \sprintf('Expected a string like "association:type[:kind]", "%s" given.', $dataType)
-            );
+        [$prefix, $type, $kind] = array_pad(explode(':', $dataType, 3), 3, null);
+        if (self::EXTENDED_ASSOCIATION_PREFIX !== $prefix || !$type || '' === $kind) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected a string like "association:type[:kind]", "%s" given.',
+                $dataType
+            ));
         }
 
         return [$type, $kind];
