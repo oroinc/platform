@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -13,11 +14,16 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('oro_security');
-        $rootNode = $treeBuilder->getRootNode();
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        SettingsBuilder::append(
+            $treeBuilder->getRootNode(),
+            [
+                'symfony_profiler_collection_of_voter_decisions' => [
+                    'value' => false
+                ],
+            ]
+        );
+
         return $treeBuilder;
     }
 }
