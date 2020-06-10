@@ -94,7 +94,7 @@
     {# Transaltions temporary disabled due to BAP-5355 #}
     {{ ui.link({
         'path': '#',
-        'id': 'transition-%s-%s'|format(workflow.name, transition.name),
+        'id': 'transition-%s-%s-%s'|format(workflow.name, transition.name, random()),
         'iCss': iCss,
         'title': title,
         'role': 'button',
