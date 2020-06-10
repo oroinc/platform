@@ -35,8 +35,11 @@ oro:
             totalPages: of %totalPages%
             totalRecords: "Total of %totalRecords% records"
             prev: Prev
+            prev.aria_label: "Previous page"
             next: Next
+            next.aria_label: "Next page"
             pageNumber: Page Number
+            input.aria_label: Current page number
         pagesize:
             label: View per page
             labelShort: Per page
