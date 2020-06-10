@@ -29,6 +29,7 @@ use Twig\TwigTest;
  *   - set_class_prefix_to_form
  *   - convert_value_to_string
  *   - highlight_string
+ *   - clone_form_view_with_unique_id
  *
  * Provides Twig filters for string manipulations:
  *   - block_text - normalizes and translates (if needed) labels in the given value.
@@ -129,6 +130,10 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
                 'highlight_string',
                 [$this, 'highlightString'],
                 ['is_safe' => ['html']]
+            ),
+            new TwigFunction(
+                'clone_form_view_with_unique_id',
+                [$this, 'cloneFormViewWithUniqueId']
             ),
         ];
     }
@@ -261,6 +266,26 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
         $highlightString = str_replace('&lt;?php&nbsp;', '', $highlightString);
 
         return $highlightString;
+    }
+
+    /**
+     * @param FormView $form
+     * @param string $uniqueId
+     * @param FormView|null $parent
+     * @return FormView
+     */
+    public function cloneFormViewWithUniqueId(FormView $form, string $uniqueId, FormView $parent = null): FormView
+    {
+        $newForm = new FormView($parent);
+        $newForm->vars = $form->vars;
+        $newForm->vars['id'] = sprintf('%s-%s', $form->vars['id'], $uniqueId);
+        $newForm->vars['form'] = $newForm;
+
+        foreach ($form->children as $name => $child) {
+            $newForm->children[$name] = $this->cloneFormViewWithUniqueId($child, $uniqueId, $newForm);
+        }
+
+        return $newForm;
     }
 
     /**

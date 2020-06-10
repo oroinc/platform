@@ -19,8 +19,13 @@ class OroSecurityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $this->processConfiguration($configuration, $configs);
+        $container->prependExtensionConfig(
+            $this->getAlias(),
+            array_intersect_key(
+                $this->processConfiguration(new Configuration(), $configs),
+                array_flip(['settings'])
+            )
+        );
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('layouts.yml');
@@ -30,6 +35,10 @@ class OroSecurityExtension extends Extension
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
+        }
+
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('services_debug.yml');
         }
     }
 }

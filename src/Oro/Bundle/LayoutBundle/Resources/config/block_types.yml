@@ -270,6 +270,14 @@ services:
         tags:
              - { name: layout.block_type, alias: form }
 
+    oro_layout.block_type.form_container:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{form: ~, instance_name: {default: ''}}]]
+            - [setName, ['form_container']]
+        tags:
+            - { name: layout.block_type, alias: form_container }
+
     oro_layout.block_type.form_start:
         parent: oro_layout.block_type.abstract_configurable
         calls:

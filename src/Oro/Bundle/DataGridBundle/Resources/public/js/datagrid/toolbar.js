@@ -21,7 +21,7 @@ define([
      */
     const Toolbar = Backbone.View.extend({
         /** @property */
-        template: '#template-datagrid-toolbar',
+        template: '.datagrid_templates[data-identifier="template-datagrid-toolbar"]',
 
         /** @property */
         pagination: PaginationInput,

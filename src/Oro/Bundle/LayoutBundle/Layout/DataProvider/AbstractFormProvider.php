@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Provides abstract form and form view for layout data provider.
+ */
 abstract class AbstractFormProvider
 {
     /** @var array */
