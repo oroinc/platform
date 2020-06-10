@@ -4,7 +4,7 @@ OroTagBundle enables tags for application entities and provides the ability for 
 
 With the bundle, admin users can enable or disable the tag feature for particular entities in the entity management UI.
 
-Developers can also configure tags for every entity in the entity [configuration metadata](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityConfigBundle).
+Developers can also configure tags for every entity in the entity [configuration metadata](https://github.com/oroinc/platform/tree/4.1/src/Oro/Bundle/EntityConfigBundle).
 
 ## Entity Configuration
 
