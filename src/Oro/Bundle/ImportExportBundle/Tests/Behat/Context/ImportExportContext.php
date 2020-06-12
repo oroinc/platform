@@ -521,6 +521,8 @@ class ImportExportContext extends OroFeatureContext implements
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);
+
+        $headers = array_unique(array_merge($headers, $table->getRow(0)));
         fputcsv($fp, $headers);
 
         foreach ($table as $row) {
