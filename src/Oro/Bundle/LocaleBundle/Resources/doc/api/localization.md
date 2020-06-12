@@ -85,8 +85,8 @@ Example:
     "relationships": {
       "localization": {
         "data": {
-        "type":"localizations",
-        "id":"1"
+          "type": "localizations",
+          "id": "1"
         }
       }
     }
@@ -119,8 +119,8 @@ Example:
     "relationships": {
       "localization": {
         "data": {
-        "type":"localizations",
-        "id":"1"
+          "type": "localizations",
+          "id": "1"
         }
       }
     }

@@ -26,18 +26,18 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"notes",
-      "attributes":{  
-         "message":"<p>test note message</p>"
+{
+   "data": {
+      "type": "notes",
+      "attributes": {
+         "message": "<p>test note message</p>"
       },
-      "relationships":{  
-         "activityTargets":{  
-            "data":[  
-               {  
-                  "type":"accounts",
-                  "id":"7"
+      "relationships": {
+         "activityTargets": {
+            "data": [
+               {
+                  "type": "accounts",
+                  "id": "7"
                }
             ]
          }
@@ -59,31 +59,31 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"notes",
-      "id":"2",
-      "attributes":{  
-         "message":"New message"
+{
+   "data": {
+      "type": "notes",
+      "id": "2",
+      "attributes": {
+         "message": "New message"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "activityTargets":{  
-            "data":[  
-               {  
-                  "type":"accounts",
-                  "id":"7"
+         "activityTargets": {
+            "data": [
+               {
+                  "type": "accounts",
+                  "id": "7"
                }
             ]
          }

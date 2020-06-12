@@ -143,7 +143,7 @@ can_do_something_specific:
     group_name: "Some Group"
     category: "SomeCategory"
     bindings:
-        - {  class: someClass, method: someMethod}
+        - { class: someClass, method: someMethod }
 ```
 
 In this case, when someMethod of someClass is called, can_do_something_specific premission will be checked.

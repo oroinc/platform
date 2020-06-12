@@ -2,6 +2,11 @@ This file includes only the most important items that should be addressed before
 
 Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes in the code that may affect the upgrade of some customizations.
 
+## FROM 4.1.0-rc to 4.1.0
+
+* The feature toggle for WEB API was implemented. After upgrade, the API feature will be disabled.
+To enable it please follow the documentation [Enabling an API Feature](https://doc.oroinc.com/api/enabling-api-feature/).
+
 ## FROM 3.0.0 to 3.1.0
 * `oro:assets:install` command was removed, use [`assets:install`] instead.
 * `oro:assetic:dump` command was removed, use [`oro:assets:build`](src/Oro/Bundle/AssetBundle/README.md) instead.

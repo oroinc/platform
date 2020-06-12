@@ -1,5 +1,8 @@
 api:
     entity_aliases:
+        Extend\Entity\EV_Auth_Status:
+            alias: userauthstatus
+            plural_alias: userauthstatuses
         Oro\Bundle\UserBundle\Api\Model\UserProfile:
             alias: userprofile
             plural_alias: userprofile

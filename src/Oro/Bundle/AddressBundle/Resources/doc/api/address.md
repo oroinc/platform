@@ -26,32 +26,32 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"addresses",
-      "attributes":{  
+{
+   "data": {
+      "type": "addresses",
+      "attributes": {
          "label": "Home",
-         "street":"1475 Harigun Drive",
-         "city":"Dallas",
-         "postalCode":"04759",
-         "organization":"Dallas Nugets",
-         "namePrefix":"Mr.",
-         "firstName":"Jerry",
-         "middleName":"August",
-         "lastName":"Coleman",
-         "nameSuffix":"d'"
+         "street": "1475 Harigun Drive",
+         "city": "Dallas",
+         "postalCode": "04759",
+         "organization": "Dallas Nugets",
+         "namePrefix": "Mr.",
+         "firstName": "Jerry",
+         "middleName": "August",
+         "lastName": "Coleman",
+         "nameSuffix": "d'"
       },
-      "relationships":{  
-         "country":{  
-            "data":{  
-               "type":"countries",
-               "id":"US"
+      "relationships": {
+         "country": {
+            "data": {
+               "type": "countries",
+               "id": "US"
             }
          },
-         "region":{  
-            "data":{  
-               "type":"regions",
-               "id":"US-NY"
+         "region": {
+            "data": {
+               "type": "regions",
+               "id": "US-NY"
             }
          }
       }
@@ -72,33 +72,33 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"addresses",
-      "id":"51",
-      "attributes":{  
-         "label":"Home",
-         "street":"1475 Harigun Drive",
-         "city":"Dallas",
-         "postalCode":"04759",
-         "organization":"Dallas Nugets",
-         "namePrefix":"Mr.",
-         "firstName":"Jerry",
-         "middleName":"August",
-         "lastName":"Coleman",
-         "nameSuffix":"d'"
+{
+   "data": {
+      "type": "addresses",
+      "id": "51",
+      "attributes": {
+         "label": "Home",
+         "street": "1475 Harigun Drive",
+         "city": "Dallas",
+         "postalCode": "04759",
+         "organization": "Dallas Nugets",
+         "namePrefix": "Mr.",
+         "firstName": "Jerry",
+         "middleName": "August",
+         "lastName": "Coleman",
+         "nameSuffix": "d'"
       },
-      "relationships":{  
-         "country":{  
-            "data":{  
-               "type":"countries",
-               "id":"US"
+      "relationships": {
+         "country": {
+            "data": {
+               "type": "countries",
+               "id": "US"
             }
          },
-         "region":{  
-            "data":{  
-               "type":"regions",
-               "id":"US-NY"
+         "region": {
+            "data": {
+               "type": "regions",
+               "id": "US-NY"
             }
          }
       }

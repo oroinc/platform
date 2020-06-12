@@ -11,6 +11,9 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
+/**
+ * Normalize/denormalize FieldConfigModel instances.
+ */
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     const TYPE_BOOLEAN = 'boolean';
@@ -198,7 +201,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             }
             $enum = ['id' => null, 'priority' => null];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
-                $enum[$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield], $type);
+                $enum[$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield] ?? null, $type);
             }
 
             $enum['is_default'] = !$default && !empty($enum['is_default']);

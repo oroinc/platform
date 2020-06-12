@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\AbstractEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides human-readable names in English for enum entities.
+ */
 class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implements EntityClassNameProviderInterface
 {
     /** @var array [enumCode => [class name, field name], ...] */
@@ -51,7 +53,7 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
             return null;
         }
 
-        list($className, $fieldName) = $enumCodesMap[$enumCode];
+        [$className, $fieldName] = $enumCodesMap[$enumCode];
 
         return $this->getFieldName($className, $fieldName, $isPlural);
     }
@@ -71,11 +73,6 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
                     || $entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)
                     || !ExtendHelper::isEntityAccessible($entityConfig)
                 ) {
-                    continue;
-                }
-                // skip dictionaries
-                $groups = $this->configManager->getEntityConfig('grouping', $className)->get('groups');
-                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
                     continue;
                 }
 
