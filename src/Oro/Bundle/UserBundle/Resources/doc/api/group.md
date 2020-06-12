@@ -26,23 +26,23 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"usergroups",
-      "attributes":{  
-         "name":"HQ Administrators"
+{
+   "data": {
+      "type": "usergroups",
+      "attributes": {
+         "name": "HQ Administrators"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -63,24 +63,24 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"usergroups",
-      "id":"10",
-      "attributes":{  
-         "name":"HQ Administrators"
+{
+   "data": {
+      "type": "usergroups",
+      "id": "10",
+      "attributes": {
+         "name": "HQ Administrators"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }

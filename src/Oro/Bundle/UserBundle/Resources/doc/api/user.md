@@ -26,27 +26,27 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"users",
-      "attributes":{  
-         "username":"testapiuser",
-         "email":"testuser@oroinc.com",
-         "firstName":"Bob",
-         "lastName":"Fedeson",
+{
+   "data": {
+      "type": "users",
+      "attributes": {
+         "username": "testapiuser",
+         "email": "testuser@oroinc.com",
+         "firstName": "Bob",
+         "lastName": "Fedeson",
          "password": "Password000!"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"businessunits",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "businessunits",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -67,51 +67,51 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"users",
-      "id":"54",
-      "attributes":{  
-         "phone":"455-78-54",
-         "title":"administrator",
-         "password_expires_at":"2017-01-01T00:00:00Z",
-         "middleName":"Karl",
-         "birthday":"1964-07-05",
-         "enabled":true
+{
+   "data": {
+      "type": "users",
+      "id": "54",
+      "attributes": {
+         "phone": "455-78-54",
+         "title": "administrator",
+         "password_expires_at": "2017-01-01T00:00:00Z",
+         "middleName": "Karl",
+         "birthday": "1964-07-05",
+         "enabled": true
       },
-      "relationships":{  
-         "businessUnits":{  
-            "data":[  
-               {  
-                  "type":"businessunits",
-                  "id":"1"
+      "relationships": {
+         "businessUnits": {
+            "data": [
+               {
+                  "type": "businessunits",
+                  "id": "1"
                }
             ]
          },
-         "roles":{  
-            "data":[  
-               {  
-                  "type":"userroles",
-                  "id":"3"
+         "roles": {
+            "data": [
+               {
+                  "type": "userroles",
+                  "id": "3"
                }
             ]
          },
-         "organizations":{  
-            "data":[  
-               {  
-                  "type":"organizations",
-                  "id":"1"
+         "organizations": {
+            "data": [
+               {
+                  "type": "organizations",
+                  "id": "1"
                },
-               {  
-                  "type":"organizations",
-                  "id":"2"
+               {
+                  "type": "organizations",
+                  "id": "2"
                }
             ]
          },
-         "auth_status":{  
-            "data":{  
-               "type":"authstatuses",
-               "id":"active"
+         "auth_status": {
+            "data": {
+               "type": "userauthstatuses",
+               "id": "active"
             }
          }
       }
@@ -593,7 +593,7 @@ Example:
 ```JSON
 {
   "data": {
-    "type": "authstatuses",
+    "type": "userauthstatuses",
     "id": "active"
   }
 }
