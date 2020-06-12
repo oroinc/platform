@@ -45,5 +45,5 @@ data:
             data: null
         auth_status:
             data:
-                type: authstatuses
+                type: userauthstatuses
                 id: active

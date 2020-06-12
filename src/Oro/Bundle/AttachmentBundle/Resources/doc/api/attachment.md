@@ -26,35 +26,35 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"attachments",
-      "attributes":{  
-         "comment":"Account's background"
+{
+   "data": {
+      "type": "attachments",
+      "attributes": {
+         "comment": "Account's background"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "file":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "file": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"accounts",
-               "id":"1"
+         "target": {
+            "data": {
+               "type": "accounts",
+               "id": "1"
             }
          }
       }
@@ -75,36 +75,36 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"attachments",
-      "id":"3",
-      "attributes":{  
-         "comment":"Account's background"
+{
+   "data": {
+      "type": "attachments",
+      "id": "3",
+      "attributes": {
+         "comment": "Account's background"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "file":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "file": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"accounts",
-               "id":"1"
+         "target": {
+            "data": {
+               "type": "accounts",
+               "id": "1"
             }
          }
       }

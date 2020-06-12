@@ -26,35 +26,35 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"comments",
-      "attributes":{  
-         "message":"<p>test contact</p>"
+{
+   "data": {
+      "type": "comments",
+      "attributes": {
+         "message": "<p>test contact</p>"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "attachment":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "attachment": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"emails",
-               "id":"123"
+         "target": {
+            "data": {
+               "type": "emails",
+               "id": "123"
             }
          }
       }
@@ -75,36 +75,36 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"comments",
-      "id":"11",
-      "attributes":{  
-         "message":"<p>test contact</p>"
+{
+   "data": {
+      "type": "comments",
+      "id": "11",
+      "attributes": {
+         "message": "<p>test contact</p>"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "attachment":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "attachment": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"emails",
-               "id":"123"
+         "target": {
+            "data": {
+               "type": "emails",
+               "id": "123"
             }
          }
       }

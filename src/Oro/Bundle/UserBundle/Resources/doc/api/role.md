@@ -26,19 +26,19 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"userroles",
-      "attributes":{  
-         "extend_description":"A guest role",
-         "role":"IS_AUTHENTICATED_AT_FIRST",
-         "label":"Guest"
+{
+   "data": {
+      "type": "userroles",
+      "attributes": {
+         "extend_description": "A guest role",
+         "role": "IS_AUTHENTICATED_AT_FIRST",
+         "label": "Guest"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
@@ -59,20 +59,20 @@ The updated record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"userroles",
-      "id":"10",
-      "attributes":{  
-         "extend_description":"A guest role new",
-         "role":"IS_AUTHENTICATED_AT_FIRST",
-         "label":"Guest"
+{
+   "data": {
+      "type": "userroles",
+      "id": "10",
+      "attributes": {
+         "extend_description": "A guest role new",
+         "role": "IS_AUTHENTICATED_AT_FIRST",
+         "label": "Guest"
       },
-      "relationships":{  
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+      "relationships": {
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          }
       }
