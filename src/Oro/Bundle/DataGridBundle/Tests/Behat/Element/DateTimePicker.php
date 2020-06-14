@@ -9,26 +9,51 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class DateTimePicker extends Element
 {
     /**
-     * @param \DateTime $dateTime
+     * @param string|\DateTime $value
      */
-    public function setValue($dateTime)
+    public function setValue($value)
     {
+        $dateTime = $this->getDateTime($value);
+
         $this->open();
-        $this->getYearPicker()->selectOption($dateTime->format('Y'));
+        if (null === $dateTime) {
+            $this->setDatePickerValue($value);
+        } else {
+            $this->getYearPicker()->selectOption($dateTime->format('Y'));
+            $monthPicker = $this->getMonthPicker();
+            $month = $dateTime->format('M');
+            try {
+                $monthPicker->selectOption($month);
+            } catch (ElementNotFoundException $e) {
+                $monthPicker->selectOption(strtolower($month));
+            }
+            $this->getCalendarDate($dateTime->format('j'))->click();
+            if ($this->getElements('TimePicker')) {
+                $this->getTimePicker()->setValue($dateTime);
+            }
+        }
+    }
 
-        $monthPicker = $this->getMonthPicker();
-        $month = $dateTime->format('M');
-        try {
-            $monthPicker->selectOption($month);
-        } catch (ElementNotFoundException $e) {
-            $monthPicker->selectOption(strtolower($month));
+    /**
+     * @param string|\DateTime $value
+     *
+     * @return \DateTime|null
+     */
+    protected function getDateTime($value)
+    {
+        if ($value instanceof \DateTime) {
+            return $value;
         }
 
-        $this->getCalendarDate($dateTime->format('j'))->click();
-
-        if ($this->getElements('TimePicker')) {
-            $this->getTimePicker()->setValue($dateTime);
+        if (0 !== strncmp($value, 'today', 5) && 0 !== strncmp($value, 'now', 3)) {
+            try {
+                return new \DateTime($value);
+            } catch (\Exception $e) {
+                // ignore parsing errors
+            }
         }
+
+        return null;
     }
 
     protected function open()
@@ -135,5 +160,19 @@ class DateTimePicker extends Element
         }
 
         return false;
+    }
+
+    /**
+     * @param string $value
+     */
+    protected function setDatePickerValue($value)
+    {
+        $this->closeCalendarWidget();
+        $this->getDatePicker()->setValue($value);
+    }
+
+    protected function closeCalendarWidget()
+    {
+        $this->find('css', '.dropdown-menu-calendar')->click();
     }
 }
