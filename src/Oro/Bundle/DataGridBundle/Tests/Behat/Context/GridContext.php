@@ -1069,10 +1069,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             self::fail(sprintf('Date time filter "%s" not found', $filterName));
         }
 
-        $filterItem->setStartTime(new \DateTime($start));
+        $filterItem->setStartTime($start);
 
         if (null !== $end) {
-            $filterItem->setEndTime(new \DateTime($end));
+            $filterItem->setEndTime($end);
         }
 
         $filterItem->submit();
