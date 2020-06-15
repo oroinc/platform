@@ -58,14 +58,12 @@ abstract class AbstractPagerExtension extends AbstractExtension
 
             $exist = array_filter(
                 $pageSizeItems,
-                function ($item) use ($currentPageSize) {
-                    if (is_array($item) && isset($item['size'])) {
+                static function ($item) use ($currentPageSize) {
+                    if (isset($item['size'])) {
                         return $currentPageSize == $item['size'];
-                    } elseif (is_numeric($item)) {
-                        return $currentPageSize == $item;
                     }
 
-                    return false;
+                    return is_numeric($item) ? $currentPageSize == $item : false;
                 }
             );
 
