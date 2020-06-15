@@ -60,11 +60,11 @@
 }
 
 .fallback-item {
-    &:not(:first-child) {
+    &:not(.tab-pane):not(:first-child) {
         border-top: $fallback-item-border;
     }
 
-    &:last-child {
+    &:not(.tab-pane):last-child {
         border-bottom: $fallback-item-border;
     }
 

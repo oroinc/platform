@@ -5,18 +5,18 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 class GridFilterDateTimeItem extends AbstractGridFilterItem
 {
     /**
-     * @param \DateTime $dateTime
+     * @param string|\DateTime $dateTime
      */
-    public function setStartTime(\DateTime $dateTime)
+    public function setStartTime($dateTime)
     {
         $dateTimePicker = $this->createDateTimePicker('div.filter-start-date');
         $dateTimePicker->setValue($dateTime);
     }
 
     /**
-     * @param \DateTime $dateTime
+     * @param string|\DateTime $dateTime
      */
-    public function setEndTime(\DateTime $dateTime)
+    public function setEndTime($dateTime)
     {
         $dateTimePicker = $this->createDateTimePicker('div.filter-end-date');
         $dateTimePicker->setValue($dateTime);
