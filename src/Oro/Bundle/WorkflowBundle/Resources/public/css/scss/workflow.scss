@@ -364,4 +364,18 @@ table.grid {
 
 .transitions-list-short li {
     list-style: none;
+
+    a, i, span {
+        &:not(:first-child) {
+            margin-left: 8px;
+        }
+    }
+
+    .action {
+        color: $primary-700;
+
+        &:hover {
+            color: $primary-500;
+        }
+    }
 }
