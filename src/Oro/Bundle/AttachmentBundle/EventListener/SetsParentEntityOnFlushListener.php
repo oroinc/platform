@@ -88,6 +88,8 @@ class SetsParentEntityOnFlushListener
                 }
             );
         }
+
+        $this->onFlushCollections($event);
     }
 
     /**
@@ -105,6 +107,9 @@ class SetsParentEntityOnFlushListener
 
             $entityClass = ClassUtils::getRealClass($entity);
             $entityId = $this->getEntityId($entityManager, $entity);
+            if (!$entityId) {
+                continue;
+            }
 
             /* @var $fieldConfigs Config[] */
             $fieldConfigs = $this->configManager->getConfigs('extend', $entityClass);
@@ -114,18 +119,15 @@ class SetsParentEntityOnFlushListener
                 if (!FieldConfigHelper::isMultiField($fieldConfigId)) {
                     continue;
                 }
+
                 $fieldName = $fieldConfigId->getFieldName();
-
-                $value = $this->propertyAccessor->getValue($entity, $fieldName);
-
-                if ($value !== $collection) {
+                if ($this->propertyAccessor->getValue($entity, $fieldName) !== $collection) {
                     continue;
                 }
 
                 foreach ($collection as $fileItem) {
                     /* @var $fileItem FileItem */
                     $file = $fileItem->getFile();
-
                     if ($file->getId()) {
                         continue;
                     }
@@ -154,8 +156,7 @@ class SetsParentEntityOnFlushListener
         }
 
         foreach ($classMetadata->getAssociationMappings() as $mapping) {
-            // Skips field if it does not target to File entity.
-            if (!$mapping['isOwningSide'] || $mapping['targetEntity'] !== File::class || $entity instanceof FileItem) {
+            if ($entity instanceof FileItem || !$this->isMetadataAcceptable($mapping)) {
                 continue;
             }
 
@@ -176,6 +177,16 @@ class SetsParentEntityOnFlushListener
 
             $callback($entity, $mapping['fieldName'], $fileEntities);
         }
+    }
+
+    /**
+     * @param array $mapping
+     * @return bool
+     */
+    private function isMetadataAcceptable(array $mapping): bool
+    {
+        return ($mapping['isOwningSide'] && $mapping['targetEntity'] === File::class) ||
+            (!$mapping['isOwningSide'] && $mapping['targetEntity'] === FileItem::class);
     }
 
     /**
@@ -250,7 +261,12 @@ class SetsParentEntityOnFlushListener
 
         if ($associationType & ClassMetadata::TO_MANY) {
             // Field value is Collection of File entities.
-            $value = $value->toArray();
+            $value = array_map(
+                static function ($obj) {
+                    return $obj instanceof FileItem ? $obj->getFile() : $obj;
+                },
+                $value->toArray()
+            );
         } else {
             $value = $value ? [$value] : [];
         }
