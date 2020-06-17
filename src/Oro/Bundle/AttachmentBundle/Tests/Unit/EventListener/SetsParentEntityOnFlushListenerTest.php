@@ -63,6 +63,11 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
+        $unitOfWork
+            ->expects(self::once())
+            ->method('getScheduledCollectionUpdates')
+            ->willReturn([]);
+
         $this->listener->onFlush($eventOnFlush);
     }
 
@@ -116,12 +121,32 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                         'type' => ClassMetadata::MANY_TO_ONE,
                     ],
                 ],
-                [['isOwningSide' => false]]
+                [
+                    [
+                        'isOwningSide' => true,
+                        'targetEntity' => File::class,
+                        'fieldName' => 'file',
+                        'type' => ClassMetadata::MANY_TO_ONE,
+                    ],
+                ],
+                [
+                    [
+                        'isOwningSide' => false,
+                        'targetEntity' => FileItem::class,
+                        'fieldName' => $fieldNameToMany = 'files',
+                        'type' => ClassMetadata::ONE_TO_MANY,
+                    ],
+                ]
             );
 
         $unitOfWork
             ->expects(self::exactly(2))
             ->method('recomputeSingleEntityChangeSet');
+
+        $unitOfWork
+            ->expects(self::once())
+            ->method('getScheduledCollectionUpdates')
+            ->willReturn([]);
 
         $this->listener->onFlush($eventOnFlush);
 
@@ -155,7 +180,11 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->listener->onFlushCollections($eventOnFlush);
+        $unitOfWork
+            ->method('getScheduledEntityUpdates')
+            ->willReturn([]);
+
+        $this->listener->onFlush($eventOnFlush);
     }
 
     public function testOnFlushCollections(): void
@@ -212,16 +241,18 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $unitOfWork
-            ->expects(self::at(1))
+            ->expects(self::exactly(2))
             ->method('recomputeSingleEntityChangeSet')
-            ->with($classMetadata, $file1);
+            ->withConsecutive(
+                [$classMetadata, $file1],
+                [$classMetadata, $file2]
+            );
 
         $unitOfWork
-            ->expects(self::at(2))
-            ->method('recomputeSingleEntityChangeSet')
-            ->with($classMetadata, $file2);
+            ->method('getScheduledEntityUpdates')
+            ->willReturn([]);
 
-        $this->listener->onFlushCollections($eventOnFlush);
+        $this->listener->onFlush($eventOnFlush);
 
         $this->assertEquals(TestEntity1::class, $file1->getParentEntityClass());
         $this->assertEquals(1, $file1->getParentEntityId());
@@ -236,8 +267,11 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
     {
         $fileToInsert = (new File())->setFilename('sample-filename');
         $fileToInsert2 = (new File())->setFilename('sample-filename2');
+        $fileToInsert3 = (new File())->setFilename('sample-filename3');
 
-        $entityToInsert = $this->createEntity($id = 1, $fileToInsert, [$fileToInsert2]);
+        $fileItem = (new FileItem())->setFile($fileToInsert3);
+
+        $entityToInsert = $this->createEntity($id = 1, $fileToInsert, [$fileToInsert2], [$fileItem]);
 
         $eventPrePersist = $this->mockLifecycleEvent($entityToInsert);
         [$entityManager] = $this->mockEntityManager($eventPrePersist);
@@ -266,6 +300,12 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                     'fieldName' => $fieldNameToMany = 'files',
                     'type' => ClassMetadata::ONE_TO_MANY,
                 ],
+                [
+                    'isOwningSide' => false,
+                    'targetEntity' => FileItem::class,
+                    'fieldName' => $fieldNameImages = 'images',
+                    'type' => ClassMetadata::ONE_TO_MANY,
+                ],
             ]);
 
         $this->listener->prePersist($eventPrePersist);
@@ -283,11 +323,11 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id']);
 
         $unitOfWork
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(3))
             ->method('scheduleExtraUpdate');
 
         $unitOfWork
-            ->expects(self::exactly(2))
+            ->expects(self::exactly(3))
             ->method('recomputeSingleEntityChangeSet');
 
         $this->listener->postPersist($eventPostPersist);
@@ -299,6 +339,10 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($id, $fileToInsert2->getParentEntityId());
         self::assertEquals(get_class($entityToInsert), $fileToInsert2->getParentEntityClass());
         self::assertEquals($fieldNameToMany, $fileToInsert2->getParentEntityFieldName());
+
+        self::assertEquals($id, $fileToInsert3->getParentEntityId());
+        self::assertEquals(get_class($entityToInsert), $fileToInsert3->getParentEntityClass());
+        self::assertEquals($fieldNameImages, $fileToInsert3->getParentEntityFieldName());
 
         // Checks that persist and flush will not be called again.
         $this->listener->postPersist($eventPostPersist);
@@ -490,11 +534,12 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
      * @param int $id
      * @param File|null $file
      * @param array $files
+     * @param array $images
      *
      * @return object
      */
-    private function createEntity(int $id, ?File $file, array $files)
+    private function createEntity(int $id, ?File $file, array $files, array $images = [])
     {
-        return new ParentEntity($id, $file, $files);
+        return new ParentEntity($id, $file, $files, $images);
     }
 }
