@@ -67,7 +67,7 @@
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " grid-toolbar"
     }) %}
-    <script type="text/html" id="template-datagrid-toolbar">
+    <script type="text/html" class="datagrid_templates" data-identifier="template-datagrid-toolbar">
         <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
     </script>
 {% endblock %}

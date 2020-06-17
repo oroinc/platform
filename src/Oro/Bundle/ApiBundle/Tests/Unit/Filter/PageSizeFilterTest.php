@@ -11,7 +11,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {
-        $filter = new PageSizeFilter(DataType::INTEGER);
+        $filter = new PageSizeFilter(DataType::UNSIGNED_INTEGER);
         $criteria = new Criteria();
 
         $filter->apply($criteria);
@@ -21,7 +21,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWithFilter()
     {
-        $filter = new PageSizeFilter(DataType::INTEGER);
+        $filter = new PageSizeFilter(DataType::UNSIGNED_INTEGER);
         $filterValue = new FilterValue('path', 10, null);
         $criteria = new Criteria();
 

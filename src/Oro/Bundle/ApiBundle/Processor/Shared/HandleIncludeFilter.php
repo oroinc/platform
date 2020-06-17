@@ -4,7 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -45,8 +48,9 @@ class HandleIncludeFilter implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         $filterName = $this->filterNamesRegistry
-            ->getFilterNames($context->getRequestType())
+            ->getFilterNames($requestType)
             ->getIncludeFilterName();
         if (!$filterName) {
             // the "include" filter is not supported
@@ -59,13 +63,24 @@ class HandleIncludeFilter implements ProcessorInterface
             return;
         }
 
-        $includes = $this->valueNormalizer->normalizeValue(
-            $filterValue->getValue(),
-            DataType::STRING,
-            $context->getRequestType(),
-            true
-        );
-        if (empty($includes)) {
+        try {
+            $includes = $this->valueNormalizer->normalizeValue(
+                $filterValue->getValue(),
+                DataType::STRING,
+                $requestType,
+                true
+            );
+        } catch (\Exception $e) {
+            $context->addError(
+                Error::createValidationError(Constraint::FILTER)
+                    ->setInnerException($e)
+                    ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+            );
+
+            return;
+        }
+
+        if (!$includes) {
             // expanding of related entities was not requested
             return;
         }

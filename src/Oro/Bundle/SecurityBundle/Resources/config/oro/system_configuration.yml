@@ -1,0 +1,33 @@
+system_configuration:
+    groups:
+        development_settings:
+            title: oro.security.system_configuration.groups.development_settings.title
+            icon:  'fa-wrench'
+
+        development_symfony_profiler_settings:
+            title: oro.security.system_configuration.groups.development_layout_symfony_profiler.title
+
+    fields:
+        oro_security.symfony_profiler_collection_of_voter_decisions:
+            data_type: boolean
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+            search_type: choice
+            options:
+                label: oro.security.system_configuration.fields.symfony_profiler_collection_of_voter_decisions.label
+                choices:
+                    oro.security.system_configuration.fields.symfony_profiler_collection_of_voter_decisions.choices.no: 0
+                    oro.security.system_configuration.fields.symfony_profiler_collection_of_voter_decisions.choices.yes: 1
+            priority: 10
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            development_settings:
+                                children:
+                                    development_symfony_profiler_settings:
+                                        children:
+                                            - oro_security.symfony_profiler_collection_of_voter_decisions
+

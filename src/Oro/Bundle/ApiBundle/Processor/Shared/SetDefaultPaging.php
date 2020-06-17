@@ -93,7 +93,7 @@ class SetDefaultPaging implements ProcessorInterface
             $filters->add(
                 $filterName,
                 new PageSizeFilter(
-                    DataType::INTEGER,
+                    DataType::UNSIGNED_INTEGER,
                     'The number of items per page.',
                     $pageSize ?? $this->getDefaultPageSize()
                 ),

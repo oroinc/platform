@@ -201,6 +201,34 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         self::assertFalse(isset($data['data']['included']));
     }
 
+    public function testFieldsFilterWithEndingComma()
+    {
+        $response = $this->cget(['entity' => 'users'], ['fields[users]' => 'phone,title,'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given "phone,title,".',
+                'source' => ['parameter' => 'fields[users]']
+            ],
+            $response
+        );
+    }
+
+    public function testIncludeFilterWithEndingComma()
+    {
+        $response = $this->cget(['entity' => 'users'], ['include' => 'owner,organization,'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given "owner,organization,".',
+                'source' => ['parameter' => 'include']
+            ],
+            $response
+        );
+    }
+
     public function testIncludeFilterWithWrongFieldName()
     {
         $params = [
