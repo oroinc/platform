@@ -68,6 +68,7 @@ define([
         },
 
         renderAllItems: function() {
+            this.$el.trigger('content:remove');
             const result = Body.__super__.renderAllItems.call(this);
             mediator.trigger('layout:adjustHeight');
             return result;
