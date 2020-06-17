@@ -79,7 +79,6 @@ const TogglePaginationView = BaseView.extend({
             return;
         }
         this.togglePagination();
-        this.grid.collection.fetch({reset: true});
     },
 
     togglePagination: function() {
