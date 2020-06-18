@@ -756,7 +756,7 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 #### UIBundle
 * Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](./src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
 #### SecurityBundle
-* Removed `oro_security.acl_helper.process_select.after` event, create [Access Rule](./src/Oro/Bundle/SecurityBundle/Resources/doc/access-rules.md) instead.
+* Removed `oro_security.acl_helper.process_select.after` event, create [Access Rule](https://doc.oroinc.com/backend/security/access-rules) instead.
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage` and `Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder` classes because now ACL restrictions applies with Access Rules by `Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker`.
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
 #### DatagridBundle
@@ -1542,7 +1542,7 @@ oro_acme.my_entity.discriminator_map_listener:
 #### LayoutBundle
 * Added alias `layout` for `oro_layout.layout_manager` service to make it more convenient to access it from container
 #### UserBundle
-* Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/configurable-permissions.md))
+* Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](https://doc.oroinc.com/backend/security/configurable-permissions)
 ### Changed
 #### ActionBundle
 * The service `oro_action.twig.extension.operation` was marked as `private`
