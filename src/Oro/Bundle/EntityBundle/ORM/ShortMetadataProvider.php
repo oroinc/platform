@@ -8,24 +8,26 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 /**
- * Provides short form of metadata that can be used to check whether a manageable entity
- * is a final entity or a mapped superclass.
+ * Provides a brief information about manageable entities that can be used to check the following
+ * with minimal performance impact:
+ * * whether a manageable entity is a final entity or a mapped superclass
+ * * whether a manageable entity has at least one association
  * @see \Oro\Bundle\EntityBundle\ORM\ShortClassMetadata
  */
 class ShortMetadataProvider
 {
     private const ALL_SHORT_METADATA_CACHE_KEY = 'oro_entity.all_short_metadata';
 
-    /** @var array */
+    /** @var ShortClassMetadata[]|null */
     private $metadataCache;
 
     /**
-     * Gets short form of metadata for all entities registered in a given entity manager.
+     * Gets a brief information about manageable entities registered in a given entity manager.
      *
      * @param ObjectManager $manager        The entity manager
      * @param bool          $throwException Whether to throw exception in case if metadata cannot be retrieved
      *
-     * @return ShortClassMetadata[]
+     * @return ShortClassMetadata[] A brief information about manageable entities sorted by entity names
      */
     public function getAllShortMetadata(ObjectManager $manager, $throwException = true)
     {
@@ -72,12 +74,16 @@ class ShortMetadataProvider
 
         $result = [];
         foreach ($allMetadata as $metadata) {
-            $shortMetadata = new ShortClassMetadata($metadata->getName());
-            if ($metadata instanceof ClassMetadata && $metadata->isMappedSuperclass) {
-                $shortMetadata->isMappedSuperclass = true;
+            $entityClass = $metadata->getName();
+            $shortMetadata = new ShortClassMetadata($entityClass);
+            if ($metadata instanceof ClassMetadata) {
+                $shortMetadata->isMappedSuperclass = $metadata->isMappedSuperclass;
+                $shortMetadata->hasAssociations = count($metadata->getAssociationMappings()) > 0;
             }
-            $result[] = $shortMetadata;
+            $result[$entityClass] = $shortMetadata;
         }
+        ksort($result);
+        $result = array_values($result);
 
         return $result;
     }
