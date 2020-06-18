@@ -331,14 +331,14 @@ class DoctrineHelper implements ResetInterface
     }
 
     /**
-     * Gets short form of metadata for all entities registered in a given entity manager.
-     * Use this method if you need only FQCN of entities and "mapped superclass" flag.
+     * Gets a brief information about manageable entities registered in a given entity manager.
+     * Use this method if you need only FQCN of entities, "mapped superclass" or "has associations" flags.
      * Using of this method instead of getAllMetadata() gives significant performance gain.
      *
      * @param ObjectManager $manager        The entity manager
      * @param bool          $throwException Whether to throw exception in case if metadata cannot be retrieved
      *
-     * @return ShortClassMetadata[]
+     * @return ShortClassMetadata[] A brief information about manageable entities sorted by entity names
      */
     public function getAllShortMetadata(ObjectManager $manager, $throwException = true)
     {
