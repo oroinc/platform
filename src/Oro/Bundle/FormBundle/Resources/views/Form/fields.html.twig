@@ -566,6 +566,7 @@
              existingEntitySelector: '.existing-entity',
              existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
              editable: form.vars.editable|default(false),
+             disabled_edit_form: form.vars.disabled_edit_form|default(false),
              editRoute: form.vars.edit_route|default(null)
          }|json_encode }}">
         <div class="existing-entity">

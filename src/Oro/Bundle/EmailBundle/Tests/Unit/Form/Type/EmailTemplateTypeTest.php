@@ -69,6 +69,9 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
         $configProvider = $this->createMock(ConfigProvider::class);
         /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
         /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
