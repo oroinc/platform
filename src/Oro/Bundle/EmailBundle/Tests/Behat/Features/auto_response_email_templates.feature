@@ -1,5 +1,6 @@
 @regression
 @ticket-BB-19178
+@ticket-BB-19252
 @fixture-OroEmailBundle:templates.yml
 @fixture-OroEmailBundle:autoresponse-templates.yml
 
@@ -24,3 +25,47 @@ Feature: Auto response email templates
       | not_system_email_3 |
       | system_email       |
       | non_entity_related |
+
+  Scenario: Check Autoresponse Rule creation with existing template
+    When I fill "Add Autoresponse Rule Form" with:
+      | Name              | Rule 1                |
+      | Response Template | email_entity_template |
+    And I click "Add"
+    Then I should see following "Autoresponse Rules Grid" grid:
+      | Name   |
+      | Rule 1 |
+
+  Scenario: Check Autoresponse Rule Default Subject validation
+    When I click "Add Rule"
+    And I fill "Add Autoresponse Rule Form" with:
+      | Name | Rule invalid |
+    And I click "Add"
+    Then I should see "Add Autoresponse Rule Form" validation errors:
+      | Default Subject | This value should not be blank. |
+    And I close ui dialog
+
+  Scenario: Check Autoresponse Rule English Subject validation
+    When I click "Add Rule"
+    And I fill "Add Autoresponse Rule Form" with:
+      | Name            | Rule invalid |
+      | Default Subject | Test subject |
+    And I click "English"
+    And I fill "Add Autoresponse Rule Form" with:
+      | English Subject Fallback | false |
+      | English Subject          |       |
+    And I click "Add"
+    And I click "English"
+    Then I should see "Add Autoresponse Rule Form" validation errors:
+      | English Subject | This value should not be blank. |
+    And I close ui dialog
+
+  Scenario: Check Autoresponse Rule creation with existing template
+    When I click "Add Rule"
+    And I fill "Add Autoresponse Rule Form" with:
+      | Name            | Rule 2       |
+      | Default Subject | Test subject |
+    And I click "Add"
+    Then I should see following "Autoresponse Rules Grid" grid:
+      | Name   |
+      | Rule 1 |
+      | Rule 2 |

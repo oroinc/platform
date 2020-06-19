@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,6 +15,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type to Choose existing entity or Create new one within single page.
+ */
 class OroEntityCreateOrSelectChoiceType extends AbstractType
 {
     const NAME = 'oro_entity_create_or_select_choice';
@@ -45,8 +49,10 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             function (FormEvent $event) use ($options) {
                 $data = $event->getData();
                 $mode = !empty($data['mode']) ? $data['mode'] : $options['mode'];
-                if (!in_array($mode, $this->validationEnabledModes)) {
-                    $this->disableNewEntityValidation($event->getForm(), $options);
+
+                $isEntityPreviewForm = !empty($data['existing_entity']) && $options['disabled_edit_form'];
+                if ($isEntityPreviewForm || !in_array($mode, $this->validationEnabledModes, true)) {
+                    $this->disableNewEntityValidation($event->getForm());
                 }
             }
         );
@@ -98,11 +104,17 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
             'edit_route' => null,
             'editable' => false,
+            /**
+             * flag was added to add the ability to preview existing entity data within edit forms without a need
+             * to leave a page. In this case when cascade operations are not configured edits will be not persisted
+             * which will confuse user. So we show form in disabled state.
+             */
+            'disabled_edit_form' => false
         ]);
 
         $resolver->setNormalizer(
             'editable',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if (!$options['edit_route']) {
                     return false;
                 }
@@ -145,19 +157,10 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
 
     /**
      * @param FormInterface $form
-     * @param array $options
      */
-    protected function disableNewEntityValidation(FormInterface $form, array $options)
+    protected function disableNewEntityValidation(FormInterface $form)
     {
-        $form->remove('new_entity');
-        $form->add(
-            'new_entity',
-            $options['create_entity_form_type'],
-            array_merge(
-                $this->getNewEntityFormOptions($options),
-                ['validation_groups' => false]
-            )
-        );
+        FormUtils::replaceField($form, 'new_entity', ['validation_groups' => false]);
     }
 
     /**
@@ -166,6 +169,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['editable'] = $options['editable'];
+        $view->vars['disabled_edit_form'] = $options['disabled_edit_form'];
         $view->vars['edit_route'] = $options['edit_route'];
     }
 }
