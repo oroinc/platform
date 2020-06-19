@@ -28,7 +28,7 @@ Oro\Bundle\EmailBundle\Form\Model\Email:
         bcc:
             - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
         subject:
-            - NotBlank:     ~
+            - NotBlank: ~
         contexts:
             - Valid:
                 traverse: false
@@ -46,3 +46,18 @@ Oro\Bundle\EmailBundle\Entity\Mailbox:
             - NotBlank: ~
             - Email: ~
 
+Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation:
+    constraints:
+        - Oro\Bundle\EmailBundle\Validator\Constraints\NotEmptyEmailTemplateTranslationSubject: ~
+    properties:
+        subject:
+            - Length:
+                max: 255
+
+Oro\Bundle\EmailBundle\Entity\AutoResponseRule:
+    properties:
+        name:
+            - NotBlank: ~
+        template:
+            - Valid: ~
+            - NotBlank: ~

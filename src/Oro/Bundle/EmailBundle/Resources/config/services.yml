@@ -447,6 +447,11 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_email.validator.mailbox_origin }
 
+    oro_email.validator.not_empty_email_template_translation_subject:
+        class: Oro\Bundle\EmailBundle\Validator\NotEmptyEmailTemplateTranslationSubjectValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_email.not_empty_email_template_translation_subject }
+
     oro_email.datagrid_query_factory:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
         arguments:
