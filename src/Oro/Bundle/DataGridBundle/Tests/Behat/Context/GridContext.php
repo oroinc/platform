@@ -247,11 +247,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->waitForAjax();
         $grid = $this->getGrid($gridName);
+        $hiddenRowsCount = 0;
 
         foreach ($table as $index => $row) {
-            $rowNumber = $index + 1;
+            $rowNumber = $index + $hiddenRowsCount + 1;
             foreach ($row as $columnTitle => $value) {
-                $cellValue = $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle);
+                $gridRow = $grid->getRowByNumber($rowNumber);
+
+                if (!$gridRow->isVisible()) {
+                    $hiddenRowsCount = $hiddenRowsCount + 1 ;
+                    $rowNumber = $rowNumber + 1;
+                    continue;
+                }
+
+                $cellValue = $gridRow->getCellValue($columnTitle);
                 if ($cellValue instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
