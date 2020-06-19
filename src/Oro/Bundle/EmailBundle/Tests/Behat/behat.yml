@@ -22,10 +22,45 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
+          Status:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[active]"]'
+          Name:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[name]"]'
           Response Template:
             type: 'css'
             locator: '[name="oro_email_autoresponserule[template][existing_entity]"]'
             element: Select2Entity
+          Type:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][type]"]'
+          Default Subject:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][default][subject]"]'
+          Default Content:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][default][content]"]'
+          English Subject:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][subject]"]'
+          English Subject Fallback:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][subjectFallback]"]'
+          English Content:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][content]"]'
+          English Content Fallback:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][contentFallback]"]'
+          Save Response as Email Template:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][visible]"]'
+
+    Autoresponse Rules Grid:
+      selector: '[id^="grid-email-auto-response-rules"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
     Email Form:
       selector: "form[id^='oro_email_email']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

@@ -15,8 +15,10 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validation;
 
 class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
 {
@@ -35,6 +37,9 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
     {
         /** @var TranslatorInterface $translator */
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
 
         /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
@@ -65,6 +70,7 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
                 ],
                 []
             ),
+            new ValidatorExtension(Validation::createValidator()),
         ];
     }
 
