@@ -248,9 +248,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->waitForAjax();
         $grid = $this->getGrid($gridName);
+        $hiddenRowsCount = 0;
 
         foreach ($table as $index => $row) {
-            $rowNumber = $index + 1;
+            $rowNumber = $index + $hiddenRowsCount + 1;
             foreach ($row as $columnTitle => $value) {
                 [$value, $cellValue, $columnTitle] = $this->normalizeValueByMetadata(
                     $value,
