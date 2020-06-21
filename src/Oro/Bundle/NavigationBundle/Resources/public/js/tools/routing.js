@@ -26,6 +26,11 @@ define(function(require) {
 
             _.each(route.tokens, function(token) {
                 if ('variable' === token[0]) {
+                    // do not add "_format" placeholder to the pattern because it is optional with default value,
+                    // as result the format is not added to generated route URL
+                    if ('_format' === token[3]) {
+                        return;
+                    }
                     // JS does not support Possessive Quantifiers
                     pattern = '(' + token[2].replace('++', '+').replace(/\//g, '\\$&') + ')' + pattern;
                 }

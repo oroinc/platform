@@ -1,13 +1,6 @@
 {% extends "OroApiBundle:ApiDoc:layout.html.twig" %}
 
 {% block content %}
-    <div id="summary">
-        <ul>
-            {% for section, sections in resources  %}
-                <li><a href="#section-{{ section }}">{{ section }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
     {% for section, sections in resources  %}
         {% if section != '_others' %}
             <li class="section{{ defaultSectionsOpened? ' active':'' }}">
