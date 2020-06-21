@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -36,6 +37,48 @@ class SecurityContext implements SecurityContextInterface
     public function hasSecurityToken(): bool
     {
         return null !== $this->tokenStorage->getToken();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizations(): array
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
+            return [];
+        }
+
+        $user = $token->getUser();
+        if (!$user instanceof AbstractUser) {
+            return [];
+        }
+
+        $result = [];
+        $organizations = $user->getOrganizations(true);
+        foreach ($organizations as $organization) {
+            $result[(string)$organization->getId()] = $organization->getName();
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganization(): ?string
+    {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
+            return null;
+        }
+
+        $organization = $token->getOrganization();
+        if (null === $organization) {
+            return null;
+        }
+
+        return (string)$organization->getId();
     }
 
     /**
@@ -85,7 +128,7 @@ class SecurityContext implements SecurityContextInterface
             }
         }
 
-        return $apiKeyKeys->first()->getApiKey();
+        return null;
     }
 
     /**
@@ -116,6 +159,14 @@ class SecurityContext implements SecurityContextInterface
         return $request->isSecure()
             ? 'https-' . CsrfRequestManager::CSRF_TOKEN_ID
             : CsrfRequestManager::CSRF_TOKEN_ID;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSwitchOrganizationRoute(): ?string
+    {
+        return 'oro_security_switch_organization';
     }
 
     /**

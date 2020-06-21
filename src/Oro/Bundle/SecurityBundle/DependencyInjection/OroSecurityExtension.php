@@ -7,13 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * Container extension for OroSecurityBundle
- */
 class OroSecurityExtension extends Extension
 {
-    const ACLS_CONFIG_ROOT_NODE = 'acls';
-
     /**
      * {@inheritDoc}
      */
@@ -32,6 +27,7 @@ class OroSecurityExtension extends Extension
         $loader->load('ownership.yml');
         $loader->load('services.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
