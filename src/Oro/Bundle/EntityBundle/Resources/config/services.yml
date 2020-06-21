@@ -321,14 +321,10 @@ services:
             - '@oro_entity.entity_alias_cache'
             - '@logger'
         calls:
-            - [ setConfigCacheState, [ '@oro_entity.entity_alias_config_cache_state' ] ]
+            - [ setConfigCacheState, [ '@oro_entity.entity_configuration.provider' ] ]
 
     Oro\Bundle\EntityBundle\ORM\EntityAliasResolver:
         alias: oro_entity.entity_alias_resolver
-
-    oro_entity.entity_alias_config_cache_state:
-        alias: oro_entity.entity_configuration.provider
-        public: false
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract.without_memory_cache
