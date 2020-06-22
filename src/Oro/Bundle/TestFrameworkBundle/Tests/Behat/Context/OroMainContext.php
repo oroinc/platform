@@ -2031,6 +2031,33 @@ JS;
         ));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Check that some JS Tree node not belongs to another one node
+     * Example: Then I should not see "By Brand" belongs to "New Arrivals" in tree
+     *
+     * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
+     * @param string $nodeTitle
+     * @param string $anotherNodeTitle
+     */
+    //@codingStandardsIgnoreEnd
+    public function iNotSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
+    {
+        $page = $this->getSession()->getPage();
+        $resultElement = $page->find(
+            'xpath',
+            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
+            . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
+            . '/a[contains(., "' . $anotherNodeTitle . '")]'
+        );
+
+        self::assertTrue(is_null($resultElement), sprintf(
+            'Node "%s" belong to "%s" in tree.',
+            $nodeTitle,
+            $anotherNodeTitle
+        ));
+    }
+
     /**
      * @Then /^Page title equals to "(?P<pageTitle>[\w\W\s\-]+)"$/
      *

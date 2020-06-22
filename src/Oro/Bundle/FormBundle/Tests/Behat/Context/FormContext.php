@@ -543,6 +543,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $optionsValue);
             }
+        } elseif ($element instanceof Select) {
+            /** @var NodeElement[] $options */
+            $options = $element->findAll('css', 'option');
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $optionsValue);
+            }
         } else {
             $this->assertSelectContainsOptions($field, $optionLabels);
         }
@@ -579,6 +590,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         } elseif ($element instanceof Select2Entities) {
             $element->focus();
             $options = $element->getSearchResults();
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $optionsValue);
+            }
+        } elseif ($element instanceof Select) {
+            /** @var NodeElement[] $options */
+            $options = $element->findAll('css', 'option');
             $optionsValue = [];
             /** @var Element $element */
             foreach ($options as $element) {
