@@ -83,9 +83,12 @@
         return '';
     };
     $(function() {
-        var userName = {{ userName|json_encode|raw }},
+        var organizations = {{ organizations|json_encode|raw }},
+            organization = {{ organization|json_encode|raw }},
+            userName = {{ userName|json_encode|raw }},
             apiKey = {{ apiKey|json_encode|raw }},
             apiKeyGenerationHint = {{ apiKeyGenerationHint|default('')|json_encode|raw }},
+            switchOrganizationUrl = {{ switchOrganizationRoute ? path(switchOrganizationRoute)|json_encode|raw : 'null' }},
             loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
             logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
             sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
@@ -256,20 +259,60 @@
             $('#header').css('background-color', '#f7fe2e');
         }
 
+        var accountInfo = '', switchOrganizationAllowed = false;
+
         /**
-         * Add loggin and logout links
+         * Add organization selector
          */
-        var accountInfo = '';
+        if (switchOrganizationUrl && Object.keys(organizations).length > 1) {
+            accountInfo += 'organization: <select id="organization">';
+            for (var org in organizations) {
+                accountInfo += '<option value="' + escapeHtmlAttribute(org)
+                    + '"' + (org == organization ? ' selected=""' : '') + '>'
+                    + $('<div/>').text(organizations[org]).html() + '</option>';
+            }
+            accountInfo += '</select><span id="organization_loading" style="display: none;">Loading...</span>';
+            switchOrganizationAllowed = true;
+        } else if (organization && (organizations[organization] || false)) {
+            accountInfo += 'organization: ' + organizations[organization];
+        }
+
+        /**
+         * Add login and logout links
+         */
         if (userName) {
-            accountInfo = '<em>signed in as: ' + userName + '</em>';
+            accountInfo += '<em>signed in as: ' + userName + '</em>';
             if (logoutUrl) {
                 accountInfo += '<a href="' + logoutUrl + '?_api_view=' + apiType + '">sign out</a>'
             }
         } else if (loginUrl) {
-            accountInfo = '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
+            accountInfo += '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
         }
+
         if (accountInfo) {
             $('#sandbox_configuration').append('<span class="account-info">' + accountInfo + '</span>');
+            if (switchOrganizationAllowed) {
+                $('#organization').on('change', function() {
+                    var $organizationSelector = $(this),
+                        $organizationLoader = $('#organization_loading');
+                    $organizationSelector.hide();
+                    $organizationLoader.show();
+                    $.ajax({
+                        url: switchOrganizationUrl + '/' + this.value + '.json',
+                        type: 'GET',
+                        headers: { 'X-CSRF-Header': getCookieValue({{ csrfCookieName|json_encode|raw }}) },
+                        success: function() {
+                            window.location.reload();
+                        },
+                        error: function() {
+                            $organizationSelector.val(organization);
+                            $organizationLoader.hide();
+                            $organizationSelector.show();
+                            alert('Failed to switch the organization.');
+                        }
+                    });
+                });
+            }
         }
 
         /**
@@ -475,13 +518,7 @@
             /**
              * Update "Curl Command Line" section
              */
-            displayCurl(
-                options.type,
-                decodeURIComponent(options.url),
-                options.headers,
-                options.data,
-                $('.curl-command', $result)
-            );
+            displayCurl(options.type, options.url, options.headers, options.data, $('.curl-command', $result));
         });
 
         /**

@@ -424,9 +424,12 @@
                 var displayCurl = function(method, url, headers, data, result_container) {
                     var escapeShell = function(param) {
                         param = "" + param;
-                        return '"' + param.replace(/(["\s'$`\\])/g,'\\$1') + '"';
+                        return '"' + param.replace(/(["$`\\])/g,'\\$1') + '"';
                     };
 
+                    if (url.startsWith('/')) {
+                        url = '{{ app.request.schemeAndHttpHost|default('') }}' + url;
+                    }
                     url = getFinalUrl(method, url, data);
 
                     var command = "curl";
@@ -445,7 +448,7 @@
                         }
                     }
 
-                    command += " " + url;
+                    command += " " + escapeShell(url);
 
                     result_container.text(command);
                 };

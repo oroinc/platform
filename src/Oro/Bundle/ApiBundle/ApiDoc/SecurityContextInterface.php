@@ -15,6 +15,20 @@ interface SecurityContextInterface
     public function hasSecurityToken(): bool;
 
     /**
+     * Gets all available organizations for the currently logger in user.
+     *
+     * @return array [organization identifier => organization name, ...]
+     */
+    public function getOrganizations(): array;
+
+    /**
+     * Gets the identifier of the organization for the currently logger in user.
+     *
+     * @return string|null
+     */
+    public function getOrganization(): ?string;
+
+    /**
      * Gets the name of the currently logger in user.
      *
      * @return string|null
@@ -41,6 +55,13 @@ interface SecurityContextInterface
      * @return string|null
      */
     public function getCsrfCookieName(): ?string;
+
+    /**
+     * Gets the route name to the switch organization.
+     *
+     * @return string|null
+     */
+    public function getSwitchOrganizationRoute(): ?string;
 
     /**
      * Gets the route name to the sign in form.
