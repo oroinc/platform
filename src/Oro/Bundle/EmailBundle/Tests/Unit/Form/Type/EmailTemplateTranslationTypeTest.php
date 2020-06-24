@@ -13,8 +13,10 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validation;
 
 class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
 {
@@ -33,6 +35,9 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
     {
         /** @var TranslatorInterface $translator */
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
 
         /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
@@ -63,6 +68,7 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
                 ],
                 []
             ),
+            new ValidatorExtension(Validation::createValidator()),
         ];
     }
 
@@ -112,7 +118,7 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
         $this->assertFalse($form->has('contentFallback'));
     }
 
-    public function testSubmit(): void
+    public function testSubmitValid(): void
     {
         /** @var Localization $localization */
         $localization = $this->getEntity(Localization::class, ['id' => 42]);
@@ -143,6 +149,99 @@ class EmailTemplateTranslationTypeTest extends FormIntegrationTestCase
             (new EmailTemplateTranslation())
                 ->setLocalization($localization)
                 ->setSubject('Test subject')
+                ->setSubjectFallback(true)
+                ->setContent('Test content')
+                ->setContentFallback(true),
+            $form->getData()
+        );
+    }
+
+    public function testSubmitEmptySubjectDefaultLocalization(): void
+    {
+        $form = $this->factory->create(EmailTemplateTranslationType::class);
+
+        $data = (new EmailTemplateTranslation())
+            ->setSubject('Old subject')
+            ->setSubjectFallback(false)
+            ->setContent('Old content')
+            ->setContentFallback(false);
+
+        $form->setData($data);
+
+        $submittedData = [
+            'subject' => '',
+            'content' => 'Test content'
+        ];
+
+        $form->submit($submittedData);
+
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('subject')->isValid());
+    }
+
+    public function testSubmitEmptySubjectNonDefaultLocalization(): void
+    {
+        /** @var Localization $localization */
+        $localization = $this->getEntity(Localization::class, ['id' => 42]);
+        $form = $this->factory->create(EmailTemplateTranslationType::class, null, [
+            'localization' => $localization,
+        ]);
+
+        $data = (new EmailTemplateTranslation())
+            ->setLocalization($localization)
+            ->setSubject('Old subject')
+            ->setSubjectFallback(false)
+            ->setContent('Old content')
+            ->setContentFallback(false);
+
+        $form->setData($data);
+
+        $submittedData = [
+            'subject' => '',
+            'subjectFallback' => '0',
+            'content' => 'Test content',
+            'contentFallback' => '1',
+        ];
+
+        $form->submit($submittedData);
+
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('subject')->isValid());
+    }
+
+    public function testSubmitEmptySubjectNonDefaultLocalizationFallbackEnabled(): void
+    {
+        /** @var Localization $localization */
+        $localization = $this->getEntity(Localization::class, ['id' => 42]);
+        $form = $this->factory->create(EmailTemplateTranslationType::class, null, [
+            'localization' => $localization,
+        ]);
+
+        $data = (new EmailTemplateTranslation())
+            ->setLocalization($localization)
+            ->setSubject('Old subject')
+            ->setSubjectFallback(false)
+            ->setContent('Old content')
+            ->setContentFallback(false);
+
+        $form->setData($data);
+
+        $submittedData = [
+            'subject' => '',
+            'subjectFallback' => '1',
+            'content' => 'Test content',
+            'contentFallback' => '1',
+        ];
+
+        $form->submit($submittedData);
+
+        $this->assertTrue($form->isValid());
+        $this->assertTrue($form->get('subject')->isValid());
+
+        $this->assertEquals(
+            (new EmailTemplateTranslation())
+                ->setLocalization($localization)
+                ->setSubject('')
                 ->setSubjectFallback(true)
                 ->setContent('Test content')
                 ->setContentFallback(true),

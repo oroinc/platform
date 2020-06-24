@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Form\AbstractType;
@@ -10,10 +11,13 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Form type for EmailTemplateTranslation entity
@@ -66,18 +70,7 @@ class EmailTemplateTranslationType extends AbstractType
             ]);
 
         if ($options['localization']) {
-            $fallbackLabel = $options['localization']->getParentLocalization()
-                ? $this->translator->trans(
-                    'oro.email.emailtemplatetranslation.form.use_parent_localization',
-                    [
-                        '%name%' => $options['localization']->getParentLocalization()->getTitle(
-                            $this->localizationManager->getDefaultLocalization()
-                        ),
-                    ]
-                )
-                : $this->translator->trans(
-                    'oro.email.emailtemplatetranslation.form.use_default_localization'
-                );
+            $fallbackLabel = $this->getFallbackLabel($options['localization']);
 
             $builder
                 ->add('subjectFallback', CheckboxType::class, [
@@ -92,33 +85,20 @@ class EmailTemplateTranslationType extends AbstractType
                 ]);
         }
 
-        $builder->addViewTransformer(
-            new CallbackTransformer(
-                static function ($data) use ($options) {
-                    // Create localized template for localization
-                    if (!$data) {
-                        $data = new EmailTemplateTranslation();
-                        $data->setLocalization($options['localization']);
-                    }
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($options) {
+            $form = $event->getForm();
+            $data = $event->getData();
 
-                    return $data;
-                },
-                static function ($data) {
-                    // Clear empty input
-                    if ($data instanceof EmailTemplateTranslation) {
-                        if (!trim($data->getSubject())) {
-                            $data->setSubject(null);
-                        }
+            $notNullRequired = true;
+            if ($form->has('subjectFallback')) {
+                $notNullRequired = empty($data['subjectFallback']);
+            }
 
-                        if (preg_match(self::EMPTY_REGEX, trim($data->getContent()))) {
-                            $data->setContent(null);
-                        }
-                    }
-
-                    return $data;
-                }
-            )
-        );
+            if ($notNullRequired) {
+                FormUtils::replaceField($form, 'subject', ['constraints' => [new NotBlank()]]);
+            }
+        });
+        $builder->addViewTransformer($this->getViewTransformer($options));
     }
 
     /**
@@ -131,13 +111,15 @@ class EmailTemplateTranslationType extends AbstractType
         $view->vars['localization_parent_id'] = null;
 
         if (isset($options['localization'])) {
-            $view->vars['localization_id'] = $options['localization']->getId();
-            $view->vars['localization_title'] = $options['localization']->getTitle(
+            /** @var Localization $localization */
+            $localization = $options['localization'];
+            $view->vars['localization_id'] = $localization->getId();
+            $view->vars['localization_title'] = $localization->getTitle(
                 $this->localizationManager->getDefaultLocalization()
             );
 
-            if ($options['localization']->getParentLocalization()) {
-                $view->vars['localization_parent_id'] = $options['localization']->getParentLocalization()->getId();
+            if ($localization->getParentLocalization()) {
+                $view->vars['localization_parent_id'] = $localization->getParentLocalization()->getId();
             }
         }
     }
@@ -167,5 +149,62 @@ class EmailTemplateTranslationType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'oro_email_emailtemplate_localization';
+    }
+
+    /**
+     * @param Localization $localization
+     * @return string
+     */
+    private function getFallbackLabel(Localization $localization): string
+    {
+        if ($localization->getParentLocalization()) {
+            $fallbackLabel = $this->translator->trans(
+                'oro.email.emailtemplatetranslation.form.use_parent_localization',
+                [
+                    '%name%' => $localization->getParentLocalization()->getTitle(
+                        $this->localizationManager->getDefaultLocalization()
+                    ),
+                ]
+            );
+        } else {
+            $fallbackLabel = $this->translator->trans(
+                'oro.email.emailtemplatetranslation.form.use_default_localization'
+            );
+        }
+
+        return $fallbackLabel;
+    }
+
+    /**
+     * @param array $options
+     * @return CallbackTransformer
+     */
+    private function getViewTransformer(array $options): CallbackTransformer
+    {
+        return new CallbackTransformer(
+            static function ($data) use ($options) {
+                // Create localized template for localization
+                if (!$data) {
+                    $data = new EmailTemplateTranslation();
+                    $data->setLocalization($options['localization']);
+                }
+
+                return $data;
+            },
+            static function ($data) {
+                // Clear empty input
+                if ($data instanceof EmailTemplateTranslation) {
+                    if (!trim($data->getSubject())) {
+                        $data->setSubject(null);
+                    }
+
+                    if (preg_match(self::EMPTY_REGEX, trim($data->getContent()))) {
+                        $data->setContent(null);
+                    }
+                }
+
+                return $data;
+            }
+        );
     }
 }

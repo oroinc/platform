@@ -8,7 +8,7 @@ Feature: Actions applicability in grid
     And I go to System/Emails/Templates
     When I filter Template Name as is equal to "user_change_password"
     Then I should see following actions for user_change_password in grid:
-      | Edit |
+      | Edit  |
       | Clone |
     But I should not see following actions for user_change_password in grid:
       | Delete |
@@ -17,8 +17,8 @@ Feature: Actions applicability in grid
     Given I go to System/Emails/Templates
     When I filter Template Name as is equal to "quote_email_link"
     Then I should see following actions for quote_email_link in grid:
-      | Edit |
-      | Clone |
+      | Edit   |
+      | Clone  |
       | Delete |
 
   Scenario: Sales Rep should not see actions for system email templates
@@ -26,16 +26,16 @@ Feature: Actions applicability in grid
     And I go to System/Emails/Templates
     When I filter Template Name as is equal to "user_change_password"
     Then I should not see following actions for user_change_password in grid:
-      | Edit |
-      | Clone |
+      | Edit   |
+      | Clone  |
       | Delete |
 
   Scenario: Sales Rep should not see actions for administrator's email templates
     Given I go to System/Emails/Templates
     When I filter Template Name as is equal to "quote_email_link"
     Then I should not see following actions for quote_email_link in grid:
-      | Edit |
-      | Clone |
+      | Edit   |
+      | Clone  |
       | Delete |
 
   Scenario: Sales Rep should see actions for created email template
@@ -43,10 +43,11 @@ Feature: Actions applicability in grid
     And I click "Create Email Template"
     When I fill form with:
       | Template Name | new_template |
+      | Subject       | new subject  |
     And I save and close form
     And I go to System/Emails/Templates
     And I filter Template Name as is equal to "new_template"
     Then I should see following actions for new_template in grid:
-      | Edit |
-      | Clone |
+      | Edit   |
+      | Clone  |
       | Delete |

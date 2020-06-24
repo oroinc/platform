@@ -34,9 +34,11 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $metadata2->isMappedSuperclass = true;
         $metadata3 = $this->createMock(ClassMetadataInterface::class);
         $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
+        $metadata11 = new ClassMetadata('Test\Entity11');
 
         $expectedResult = [
             new ShortClassMetadata('Test\Entity1'),
+            new ShortClassMetadata('Test\Entity11'),
             new ShortClassMetadata('Test\Entity2', true),
             new ShortClassMetadata('Test\Entity3'),
         ];
@@ -56,7 +58,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->with('oro_entity.all_short_metadata', $expectedResult);
         $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
-            ->willReturn([$metadata1, $metadata2, $metadata3]);
+            ->willReturn([$metadata1, $metadata2, $metadata3, $metadata11]);
 
         $provider = new ShortMetadataProvider();
 
@@ -68,6 +70,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 new ShortClassMetadata('Test\Entity1'),
+                new ShortClassMetadata('Test\Entity11'),
                 new ShortClassMetadata('Test\Entity2', true),
                 new ShortClassMetadata('Test\Entity3'),
             ],
@@ -129,9 +132,11 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $metadata2->isMappedSuperclass = true;
         $metadata3 = $this->createMock(ClassMetadataInterface::class);
         $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
+        $metadata11 = new ClassMetadata('Test\Entity11');
 
         $expectedResult = [
             new ShortClassMetadata('Test\Entity1'),
+            new ShortClassMetadata('Test\Entity11'),
             new ShortClassMetadata('Test\Entity2', true),
             new ShortClassMetadata('Test\Entity3'),
         ];
@@ -144,16 +149,12 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
         $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
-            ->willReturn([$metadata1, $metadata2, $metadata3]);
+            ->willReturn([$metadata1, $metadata2, $metadata3, $metadata11]);
 
         $provider = new ShortMetadataProvider();
 
         $this->assertEquals(
-            [
-                new ShortClassMetadata('Test\Entity1'),
-                new ShortClassMetadata('Test\Entity2', true),
-                new ShortClassMetadata('Test\Entity3'),
-            ],
+            $expectedResult,
             $provider->getAllShortMetadata($manager)
         );
         // test that the result is cached locally

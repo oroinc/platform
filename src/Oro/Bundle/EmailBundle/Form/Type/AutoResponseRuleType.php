@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -11,6 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for AutoResponseRule entity
+ */
 class AutoResponseRuleType extends AbstractQueryDesignerType
 {
     const NAME = 'oro_email_autoresponserule';
@@ -46,10 +51,11 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
             ])
             ->add('template', OroEntityCreateOrSelectChoiceType::class, [
                 'label' => 'oro.email.autoresponserule.template.label',
-                'class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
+                'class' => EmailTemplate::class,
                 'create_entity_form_type' => AutoResponseTemplateType::class,
                 'select_entity_form_type' => AutoResponseTemplateChoiceType::class,
                 'editable' => true,
+                'disabled_edit_form' => true,
                 'edit_route' => 'oro_email_autoresponserule_edittemplate',
             ])
             // this field represents selected entity in query builder entity selector
@@ -69,7 +75,7 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
         parent::configureOptions($resolver);
 
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\EmailBundle\Entity\AutoResponseRule',
+            'data_class' => AutoResponseRule::class,
             'query_type' => 'string',
         ]);
     }
