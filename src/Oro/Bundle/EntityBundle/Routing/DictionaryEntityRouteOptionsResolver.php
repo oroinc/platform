@@ -10,6 +10,9 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Adds all dictionaries entities to REST API.
+ */
 class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     const ROUTE_GROUP = 'dictionary_entity';
@@ -28,6 +31,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /** @var array */
     private $supportedEntities;
 
+    /** @var string[] */
+    private $exclusions = [];
+
     /**
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param EntityAliasResolver              $entityAliasResolver
@@ -41,6 +47,16 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
         $this->dictionaryProvider = $dictionaryProvider;
         $this->entityAliasResolver = $entityAliasResolver;
         $this->logger = $logger;
+    }
+
+    /**
+     * Adds an entity to the exclusion list. Such entities is skipped by this route options resolver.
+     *
+     * @param string $entityClass
+     */
+    public function addExclusion(string $entityClass): void
+    {
+        $this->exclusions[] = $entityClass;
     }
 
     /**
@@ -73,6 +89,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
             $this->supportedEntities = [];
             foreach ($entities as $className) {
+                if (\in_array($className, $this->exclusions, true)) {
+                    continue;
+                }
                 try {
                     $this->supportedEntities[] = $this->entityAliasResolver->getPluralAlias($className);
                 } catch (EntityAliasNotFoundException $e) {
