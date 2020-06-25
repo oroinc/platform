@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -21,8 +24,8 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
     /** @var JobRunner */
     private $jobRunner;
 
-    /** @var JobStorage */
-    private $jobStorage;
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var AsyncOperationManager */
     private $operationManager;
@@ -38,20 +41,20 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
 
     /**
      * @param JobRunner                  $jobRunner
-     * @param JobStorage                 $jobStorage
+     * @param DoctrineHelper             $doctrineHelper
      * @param AsyncOperationManager      $operationManager
      * @param UpdateListProcessingHelper $processingHelper
      * @param LoggerInterface            $logger
      */
     public function __construct(
         JobRunner $jobRunner,
-        JobStorage $jobStorage,
+        DoctrineHelper $doctrineHelper,
         AsyncOperationManager $operationManager,
         UpdateListProcessingHelper $processingHelper,
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
-        $this->jobStorage = $jobStorage;
+        $this->doctrineHelper = $doctrineHelper;
         $this->operationManager = $operationManager;
         $this->processingHelper = $processingHelper;
         $this->logger = $logger;
@@ -95,7 +98,7 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
             return self::REJECT;
         }
 
-        $rootJob = $this->jobStorage->findJobById($body['rootJobId']);
+        $rootJob = $this->getJobRepository()->findJobById((int)$body['rootJobId']);
         if (null === $rootJob) {
             $this->logger->critical('The root job does not exist.');
 
@@ -138,5 +141,13 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
         }
 
         return self::ACK;
+    }
+
+    /**
+     * @return JobRepository|EntityRepository
+     */
+    private function getJobRepository(): JobRepository
+    {
+        return $this->doctrineHelper->getEntityRepository(Job::class);
     }
 }

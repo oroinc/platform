@@ -4,17 +4,18 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculatorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var JobStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobStorage;
+    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
 
     /** @var RootJobStatusCalculatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $rootJobStatusCalculator;
@@ -30,20 +31,32 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
         $this->rootJobStatusCalculator = $this->createMock(RootJobStatusCalculator::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $entityClass = Job::class;
+        $manager = $this->createMock(ManagerRegistry::class);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->willReturn($this->jobRepository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($manager);
 
         $this->processor = new CalculateRootJobStatusProcessor(
-            $this->jobStorage,
             $this->rootJobStatusCalculator,
+            $doctrine,
+            $entityClass,
             $this->logger
         );
     }
 
     public function testProcessWithInvalidMessage(): void
     {
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->never())
             ->method('findJobById');
 
@@ -67,7 +80,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessJobNotFound(): void
     {
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(47)
@@ -96,7 +109,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setId(47);
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(47)

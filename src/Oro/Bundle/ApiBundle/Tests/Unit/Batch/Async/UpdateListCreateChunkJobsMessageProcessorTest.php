@@ -6,10 +6,12 @@ use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Batch\Async\Topics;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -22,8 +24,8 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
     /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
     private $jobRunner;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRepository */
+    private $jobRepository;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
     private $operationManager;
@@ -40,14 +42,19 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepository::class);
         $this->operationManager = $this->createMock(AsyncOperationManager::class);
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(JobEntity::class)
+            ->willReturn($this->jobRepository);
 
         $this->processor = new UpdateListCreateChunkJobsMessageProcessor(
             $this->jobRunner,
-            $this->jobStorage,
+            $doctrineHelper,
             $this->operationManager,
             $this->processingHelper,
             $this->logger
@@ -114,7 +121,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             'chunkJobNameTemplate' => 'oro:batch_api:123:chunk:%s'
         ]);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->with($rootJobId)
             ->willReturn(null);
@@ -147,7 +154,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->with($rootJobId)
             ->willReturn($rootJob);
@@ -210,7 +217,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->with($rootJobId)
             ->willReturn($rootJob);
@@ -270,7 +277,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->with($rootJobId)
             ->willReturn($rootJob);

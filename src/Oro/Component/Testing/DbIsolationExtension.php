@@ -37,6 +37,11 @@ trait DbIsolationExtension
         $registry = $this->getClientInstance()->getContainer()->get('doctrine');
         foreach ($registry->getManagers() as $name => $em) {
             if ($em instanceof EntityManagerInterface) {
+                $objectId = spl_object_id($em->getConnection());
+                if (array_key_exists($objectId, self::$dbIsolationConnections)) {
+                    continue;
+                }
+
                 $em->clear();
                 $connection = $em->getConnection();
                 if ($connection->getNestTransactionsWithSavepoints() !== $nestTransactionsWithSavepoints) {
@@ -44,7 +49,7 @@ trait DbIsolationExtension
                 }
                 $connection->beginTransaction();
 
-                self::$dbIsolationConnections[$name.uniqid('connection', true)] = $connection;
+                self::$dbIsolationConnections[$objectId] = $connection;
             }
         }
     }

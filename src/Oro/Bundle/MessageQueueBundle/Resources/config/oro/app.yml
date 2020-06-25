@@ -1,3 +1,13 @@
+doctrine:
+    orm:
+        entity_managers:
+            message_queue:
+                connection: default
+                mappings:
+                    OroMessageQueueBundle:
+                        mapping: true
+                        is_bundle: true
+
 oro_message_queue:
     persistent_services:
         - 'kernel'

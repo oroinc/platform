@@ -2,12 +2,13 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobMessageProcessor;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\Job\Topics;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -15,7 +16,47 @@ use Psr\Log\LoggerInterface;
 
 class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldReturnSubscribedTopicNames()
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $producer;
+
+    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var DependentJobMessageProcessor */
+    private $processor;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->producer = $this->createMock(MessageProducerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
+        $entityClass = Job::class;
+        $manager = $this->createMock(ManagerRegistry::class);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->willReturn($this->jobRepository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($manager);
+
+        $this->processor = new DependentJobMessageProcessor(
+            $this->producer,
+            $doctrine,
+            $entityClass,
+            $this->logger
+        );
+    }
+
+    public function testShouldReturnSubscribedTopicNames(): void
     {
         $this->assertEquals(
             [Topics::ROOT_JOB_STOPPED],
@@ -23,120 +64,88 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldLogCriticalAndRejectMessageIfJobIdIsNotSet()
+    public function testShouldLogCriticalAndRejectMessageIfJobIdIsNotSet(): void
     {
-        $jobStorage = $this->createJobStorageMock();
-
-        $producer = $this->createMessageProducerMock();
-
-        $logger = $this->createLoggerMock();
-        $logger
+        $this->logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['key' => 'value']));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogCriticalAndRejectMessageIfJobEntityWasNotFound()
+    public function testShouldLogCriticalAndRejectMessageIfJobEntityWasNotFound(): void
     {
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
-            ->with(12345)
-        ;
+            ->with(12345);
 
-        $producer = $this->createMessageProducerMock();
-
-        $logger = $this->createLoggerMock();
-        $logger
+        $this->logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Job was not found. id: "12345"')
-        ;
+            ->with('Job was not found. id: "12345"');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogCriticalAndRejectMessageIfJobIsNotRoot()
+    public function testShouldLogCriticalAndRejectMessageIfJobIsNotRoot(): void
     {
         $job = new Job();
         $job->setRootJob(new Job());
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
-        $producer = $this->createMessageProducerMock();
-
-        $logger = $this->createLoggerMock();
-        $logger
+        $this->logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Expected root job but got child. id: "12345"')
-        ;
+            ->with('Expected root job but got child. id: "12345"');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldDoNothingIfDependentJobsAreMissing()
+    public function testShouldDoNothingIfDependentJobsAreMissing(): void
     {
         $job = new Job();
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
-        $producer = $this->createMessageProducerMock();
-        $producer
+        $this->producer
             ->expects($this->never())
-            ->method('send')
-        ;
-
-        $logger = $this->createLoggerMock();
+            ->method('send');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldLogCriticalAndRejectMessageIfDependentJobTopicIsMissing()
+    public function testShouldLogCriticalAndRejectMessageIfDependentJobTopicIsMissing(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -146,38 +155,30 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
-        $producer = $this->createMessageProducerMock();
-        $producer
+        $this->producer
             ->expects($this->never())
-            ->method('send')
-        ;
+            ->method('send');
 
-        $logger = $this->createLoggerMock();
-        $logger
+        $this->logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"')
-        ;
+            ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogCriticalAndRejectMessageIfDependentJobMessageIsMissing()
+    public function testShouldLogCriticalAndRejectMessageIfDependentJobMessageIsMissing(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -189,39 +190,31 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
-        $producer = $this->createMessageProducerMock();
-        $producer
+        $this->producer
             ->expects($this->never())
-            ->method('send')
-        ;
+            ->method('send');
 
-        $logger = $this->createLoggerMock();
-        $logger
+        $this->logger
             ->expects($this->once())
             ->method('critical')
             ->with('Got invalid dependent job data. '.
-             'job: "123", dependentJob: "{"topic":"topic-name"}"')
-        ;
+             'job: "123", dependentJob: "{"topic":"topic-name"}"');
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldPublishDependentMessage()
+    public function testShouldPublishDependentMessage(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -234,33 +227,26 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
+        /** @var Message $expectedMessage */
         $expectedMessage = null;
-        $producer = $this->createMessageProducerMock();
-        $producer
+        $this->producer
             ->expects($this->once())
             ->method('send')
             ->with('topic-name', $this->isInstanceOf(Message::class))
-            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+            ->willReturnCallback(static function ($topic, Message $message) use (&$expectedMessage) {
                 $expectedMessage = $message;
-            }))
-        ;
-
-        $logger = $this->createLoggerMock();
+            });
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
@@ -268,7 +254,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($expectedMessage->getPriority());
     }
 
-    public function testShouldPublishDependentMessageWithPriority()
+    public function testShouldPublishDependentMessageWithPriority(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -282,33 +268,26 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job))
-        ;
+            ->willReturn($job);
 
+        /** @var Message $expectedMessage */
         $expectedMessage = null;
-        $producer = $this->createMessageProducerMock();
-        $producer
+        $this->producer
             ->expects($this->once())
             ->method('send')
             ->with('topic-name', $this->isInstanceOf(Message::class))
-            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+            ->willReturnCallback(static function ($topic, Message $message) use (&$expectedMessage) {
                 $expectedMessage = $message;
-            }))
-        ;
-
-        $logger = $this->createLoggerMock();
+            });
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
@@ -316,7 +295,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('priority', $expectedMessage->getPriority());
     }
 
-    public function testShouldPublishDependentMessageWithAdditionalProperties()
+    public function testShouldPublishDependentMessageWithAdditionalProperties(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -327,29 +306,24 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ]);
         $job->setProperties(['key' => 'value']);
 
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
-            ->will($this->returnValue($job));
+            ->willReturn($job);
 
+        /** @var Message $expectedMessage */
         $expectedMessage = null;
-        $producer = $this->createMessageProducerMock();
-        $producer->expects($this->once())
+        $this->producer->expects($this->once())
             ->method('send')
             ->with('topic-name', $this->isInstanceOf(Message::class))
-            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+            ->willReturnCallback(static function ($topic, Message $message) use (&$expectedMessage) {
                 $expectedMessage = $message;
-            }));
-
-        $logger = $this->createLoggerMock();
+            });
 
         $message = new TransportMessage();
         $message->setBody(json_encode(['jobId' => 12345]));
 
-        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
@@ -363,29 +337,5 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private function createSessionMock()
     {
         return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    private function createJobStorageMock()
-    {
-        return $this->createMock(JobStorage::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }
