@@ -34,7 +34,7 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
             ->with($this->isInstanceOf(\stdClass::class), $scope = 'sample_scope')
             ->willReturn('sample_key');
 
-        $this->assertEquals(sha1($expectedCacheKey), $this->generator->generate($arguments));
+        $this->assertEquals($expectedCacheKey, $this->generator->generate($arguments));
     }
 
     /**
@@ -45,25 +45,25 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
         return [
             'number' => [
                 'arguments' => 10,
-                'expectedCacheKey' => '10',
+                'expectedCacheKey' => sha1('10'),
             ],
             'string' => [
                 'arguments' => 'sample_argument',
-                'expectedCacheKey' => 'sample_argument',
+                'expectedCacheKey' => sha1('sample_argument'),
             ],
             'boolean' => [
                 'arguments' => false,
-                'expectedCacheKey' => false,
+                'expectedCacheKey' => sha1(false),
             ],
             'object' => [
                 'arguments' => ['sample_scope' => new \stdClass()],
-                'expectedCacheKey' => 'sample_key',
+                'expectedCacheKey' => sha1('sample_key'),
             ],
             'object with scope in array' => [
                 'arguments' => [
                     ['sample_scope' => [new \stdClass()]],
                 ],
-                'expectedCacheKey' => 'sample_key',
+                'expectedCacheKey' => sha1('sample_key'),
             ],
             'mix of different types' => [
                 'arguments' => [
@@ -73,7 +73,7 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
                     'sample_string',
                     3,
                 ],
-                'expectedCacheKey' => 'sample_key|sample_key|1|sample_string|3',
+                'expectedCacheKey' => sha1('sample_key|sample_key|1|sample_string|3'),
             ],
         ];
     }
