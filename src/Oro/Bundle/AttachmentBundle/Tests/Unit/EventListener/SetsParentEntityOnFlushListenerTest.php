@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -51,11 +52,27 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn([new \stdClass()]);
 
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(true);
+        $metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(File::class)
+            ->willReturn($classMetadata);
+
+        $entityManager
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+
         $entityManager
             ->method('getClassMetadata')
-            ->willReturn($classMetadata = $this->createMock(ClassMetadata::class));
+            ->willReturn($classMetadata);
 
         $classMetadata
+            ->expects($this->once())
             ->method('getIdentifier')
             ->willReturn(['id', 'name']);
 
@@ -87,16 +104,28 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $unitOfWork
             ->method('getScheduledEntityUpdates')
             ->willReturn([$entityToUpdate, $entityWithoutFileToUpdate, $entityWithoutFileField]);
-
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(true);
+        $metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(File::class)
+            ->willReturn($classMetadata);
+        $entityManager
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
         $entityManager
             ->method('getClassMetadata')
-            ->willReturn($classMetadata = $this->createMock(ClassMetadata::class));
-
+            ->willReturn($classMetadata);
         $classMetadata
+            ->expects($this->exactly(6))
             ->method('getIdentifier')
             ->willReturn(['id']);
-
         $classMetadata
+            ->expects($this->exactly(3))
             ->method('getAssociationMappings')
             ->willReturnOnConsecutiveCalls(
                 [
@@ -138,11 +167,9 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ]
             );
-
         $unitOfWork
             ->expects(self::exactly(2))
             ->method('recomputeSingleEntityChangeSet');
-
         $unitOfWork
             ->expects(self::once())
             ->method('getScheduledCollectionUpdates')
@@ -153,11 +180,9 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($id, $fileToInsert->getParentEntityId());
         self::assertEquals(get_class($entityToUpdate), $fileToInsert->getParentEntityClass());
         self::assertEquals($fieldName, $fileToInsert->getParentEntityFieldName());
-
         self::assertEquals($id, $fileToInsert2->getParentEntityId());
         self::assertEquals(get_class($entityToUpdate), $fileToInsert2->getParentEntityClass());
         self::assertEquals($fieldNameToMany, $fileToInsert2->getParentEntityFieldName());
-
         self::assertEquals($parentEntityClass, $fileNotForUpdate->getParentEntityClass());
     }
 
@@ -166,6 +191,22 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $eventOnFlush = $this->createMock(OnFlushEventArgs::class);
 
         [$entityManager, $unitOfWork] = $this->mockEntityManager($eventOnFlush);
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(true);
+        $metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(File::class)
+            ->willReturn($classMetadata);
+
+        $entityManager
+            ->expects(self::once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
 
         $unitOfWork
             ->expects(self::once())
@@ -192,6 +233,22 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $eventOnFlush = $this->createMock(OnFlushEventArgs::class);
 
         [$entityManager, $unitOfWork] = $this->mockEntityManager($eventOnFlush);
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(true);
+        $metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with(File::class)
+            ->willReturn($classMetadata);
+
+        $entityManager
+            ->expects(self::once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
 
         $file1 = new File();
         $items1 = new ArrayCollection([

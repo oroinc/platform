@@ -42,6 +42,12 @@ class DoctrineEventListener
      */
     public function preFlush(PreFlushEventArgs $event)
     {
+        $em = $event->getEntityManager();
+        $metadataFactory = $em->getMetadataFactory();
+        if (!$metadataFactory->hasMetadataFor(Scope::class)) {
+            return;
+        }
+
         if (!$this->scheduledForInsertScopes->isEmpty()) {
             $em = $event->getEntityManager();
             $scopes = $this->scheduledForInsertScopes->getAll();
@@ -57,6 +63,12 @@ class DoctrineEventListener
      */
     public function onFlush(OnFlushEventArgs $event)
     {
+        $em = $event->getEntityManager();
+        $metadataFactory = $em->getMetadataFactory();
+        if (!$metadataFactory->hasMetadataFor(Scope::class)) {
+            return;
+        }
+
         if ($this->needToResetScopeCache) {
             // do nothing as we are already known that the cache should be reset
             return;

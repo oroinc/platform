@@ -49,14 +49,6 @@ class RootJobStatusExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onCancel(Job $job)
-    {
-        $this->calculateJobStatusMessage($job);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function onError(Job $job)
     {
         $this->calculateJobStatusMessage($job);

@@ -855,7 +855,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.job.storage'
+            - '@oro_message_queue.job.manager'
             - '@oro_message_queue.job.dependent_job_service'
             - '@oro_api.batch.file_splitter_registry'
             - '@oro_api.batch.chunk_file_classifier_registry'
@@ -876,7 +876,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.job.storage'
+            - '@oro_entity.doctrine_helper'
             - '@oro_api.batch.async.operation_manager'
             - '@oro_api.batch.async.update_list_processing_helper'
             - '@logger'
@@ -887,7 +887,7 @@ services:
     oro_api.batch.async.update_list.start_chunk_jobs:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListStartChunkJobsMessageProcessor
         arguments:
-            - '@oro_message_queue.job.storage'
+            - '@oro_entity.doctrine_helper'
             - '@oro_api.batch.async.operation_manager'
             - '@oro_api.batch.async.update_list_processing_helper'
             - '@logger'
@@ -926,8 +926,10 @@ services:
 
     oro_api.batch.job_event_listener:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\MessageQueueBundle\Entity\Job, event: preFlush }
+            - { name: kernel.event_listener, event: oro_message_queue.before_save_job, method: onBeforeSaveJob }
 
     oro_api.batch.retry_helper:
         class: Oro\Bundle\ApiBundle\Batch\RetryHelper

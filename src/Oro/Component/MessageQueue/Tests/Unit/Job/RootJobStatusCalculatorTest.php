@@ -7,15 +7,15 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var JobStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobStorage;
+    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobManager;
 
     /** @var JobStatusChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $jobStatusChecker;
@@ -34,13 +34,13 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->jobStatusChecker = $this->createMock(JobStatusChecker::class);
         $this->statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
 
         $this->rootJobStatusCalculator = new RootJobStatusCalculator(
-            $this->jobStorage,
+            $this->jobManager,
             $this->jobStatusChecker,
             $this->statusCalculatorResolver,
             $this->messageProducer
@@ -64,9 +64,9 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
             ->with($expectedJob)
             ->willReturn(true);
 
-        $this->jobStorage
+        $this->jobManager
             ->expects($this->never())
-            ->method('saveJob');
+            ->method('saveJobWithLock');
 
         $this->statusCalculatorResolver
             ->expects($this->never())
@@ -105,10 +105,10 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
                 true
             );
 
-        $this->jobStorage
+        $this->jobManager
             ->expects($this->once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $expectedJob, $callback) {
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static function (Job $expectedJob, $callback) {
                 $callback($expectedJob);
             });
 
@@ -154,10 +154,10 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
                 false
             );
 
-        $this->jobStorage
+        $this->jobManager
             ->expects($this->once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $expectedJob, $callback) {
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static function (Job $expectedJob, $callback) {
                 $callback($expectedJob);
             });
 
@@ -218,10 +218,10 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
                 true
             );
 
-        $this->jobStorage
+        $this->jobManager
             ->expects($this->once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $expectedJob, $callback) {
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static function (Job $expectedJob, $callback) {
                 $callback($expectedJob);
             });
 

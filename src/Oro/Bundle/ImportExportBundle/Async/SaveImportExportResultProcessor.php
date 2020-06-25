@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -36,9 +38,9 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     protected $userManager;
 
     /**
-     * @var JobStorage
+     * @var DoctrineHelper
      */
-    protected $jobStorage;
+    protected $doctrineHelper;
 
     /**
      * @var LoggerInterface
@@ -48,18 +50,18 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     /**
      * @param ImportExportResultManager $importExportResultManager
      * @param UserManager $userManager
-     * @param JobStorage $jobStorage
+     * @param DoctrineHelper $doctrineHelper
      * @param LoggerInterface $logger
      */
     public function __construct(
         ImportExportResultManager $importExportResultManager,
         UserManager $userManager,
-        JobStorage $jobStorage,
+        DoctrineHelper $doctrineHelper,
         LoggerInterface $logger
     ) {
         $this->importExportResultManager = $importExportResultManager;
         $this->userManager = $userManager;
-        $this->jobStorage = $jobStorage;
+        $this->doctrineHelper = $doctrineHelper;
         $this->logger = $logger;
     }
 
@@ -91,7 +93,7 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
             return self::REJECT;
         }
 
-        $job = $this->jobStorage->findJobById($options['jobId']);
+        $job = $this->getJobRepository()->findJobById((int)$options['jobId']);
         $job = $job->isRoot() ? $job : $job->getRootJob();
 
         try {
@@ -172,5 +174,13 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     public static function getSubscribedTopics(): array
     {
         return [Topics::SAVE_IMPORT_EXPORT_RESULT];
+    }
+
+    /**
+     * @return JobRepository
+     */
+    private function getJobRepository(): JobRepository
+    {
+        return $this->doctrineHelper->getEntityRepository(JobEntity::class);
     }
 }

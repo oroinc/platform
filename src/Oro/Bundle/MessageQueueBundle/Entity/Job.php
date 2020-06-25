@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -7,12 +8,13 @@ use Doctrine\ORM\Mapping\Index;
 use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
- * @ORM\Entity
+* Message Queue Job entity class.
+ *
+ * @ORM\Entity(repositoryClass="Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository")
  * @ORM\Table(
  *     name="oro_message_queue_job",
  *     indexes={
- *          @Index(name="owner_id_idx", columns={"owner_id"}),
- *          @Index(name="oro_message_queue_job_idx", columns={"root_job_id", "name", "status", "interrupted"})
+ *          @Index(name="idx_status", columns={"status"})
  *     }
  * )
  */

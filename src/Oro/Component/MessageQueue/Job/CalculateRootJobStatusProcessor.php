@@ -2,12 +2,14 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Calculate root job status asynchronously.
@@ -17,34 +19,40 @@ use Psr\Log\LoggerInterface;
  */
 class CalculateRootJobStatusProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var JobStorage */
-    private $jobStorage;
-
     /** @var RootJobStatusCalculatorInterface */
     private $rootJobStatusCalculator;
+
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    /** @var string */
+    private $entityClass;
 
     /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param JobStorage $jobStorage
      * @param RootJobStatusCalculatorInterface $calculateRootJobStatusCase
+     * @param ManagerRegistry $doctrine
+     * @param string $entityClass
      * @param LoggerInterface $logger
      */
     public function __construct(
-        JobStorage $jobStorage,
         RootJobStatusCalculatorInterface $calculateRootJobStatusCase,
+        ManagerRegistry $doctrine,
+        string $entityClass,
         LoggerInterface $logger
     ) {
-        $this->jobStorage = $jobStorage;
         $this->rootJobStatusCalculator = $calculateRootJobStatusCase;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
         $this->logger = $logger;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = JSON::decode($message->getBody());
 
@@ -54,7 +62,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
             return self::REJECT;
         }
 
-        $job = $this->jobStorage->findJobById($data['jobId']);
+        $job = $this->getJobRepository()->findJobById((int)$data['jobId']);
         if (!$job) {
             $this->logger->critical(sprintf('Job was not found. id: "%s"', $data['jobId']));
 
@@ -69,8 +77,16 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [Topics::CALCULATE_ROOT_JOB_STATUS];
+    }
+
+    /**
+     * @return JobRepositoryInterface|ObjectRepository
+     */
+    private function getJobRepository(): JobRepositoryInterface
+    {
+        return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 }

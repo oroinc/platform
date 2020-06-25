@@ -558,7 +558,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.log.handler.resend_job',
             // job.yml
             'oro_message_queue.job.configuration_provider',
-            'oro_message_queue.job.storage',
             'oro_message_queue.job.unique_job_handler',
             'oro_message_queue.job.processor',
             'oro_message_queue.job.runner',

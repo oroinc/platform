@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -39,9 +43,14 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     private $logger;
 
     /**
-     * @var JobStorage
+     * @var DoctrineHelper
      */
-    private $jobStorage;
+    private $doctrineHelper;
+
+    /**
+     * @var JobManagerInterface
+     */
+    private $jobManager;
 
     /**
      * @var ImportExportResultSummarizer
@@ -62,7 +71,8 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      * @param ExportHandler $exportHandler
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
-     * @param JobStorage $jobStorage
+     * @param DoctrineHelper $doctrineHelper
+     * @param JobManagerInterface $jobManager
      * @param ImportExportResultSummarizer $importExportResultSummarizer
      * @param NotificationSettings $notificationSettings
      */
@@ -70,14 +80,16 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         ExportHandler $exportHandler,
         MessageProducerInterface $producer,
         LoggerInterface $logger,
-        JobStorage $jobStorage,
+        DoctrineHelper $doctrineHelper,
+        JobManagerInterface $jobManager,
         ImportExportResultSummarizer $importExportResultSummarizer,
         NotificationSettings $notificationSettings
     ) {
         $this->exportHandler = $exportHandler;
         $this->producer = $producer;
         $this->logger = $logger;
-        $this->jobStorage = $jobStorage;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->jobManager = $jobManager;
         $this->importExportResultSummarizer = $importExportResultSummarizer;
         $this->notificationSettings = $notificationSettings;
     }
@@ -100,7 +112,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             $this->logger->critical('Invalid message');
         }
 
-        if (! ($job = $this->jobStorage->findJobById($body['jobId']))) {
+        if (!($job = $this->getJobRepository()->findJobById((int)$body['jobId']))) {
             $this->logger->critical('Job not found');
 
             return self::REJECT;
@@ -132,7 +144,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
         if ($fileName !== null) {
             $job->setData(array_merge($job->getData(), ['file' => $fileName]));
-            $this->jobStorage->saveJob($job);
+            $this->jobManager->saveJob($job);
 
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
@@ -188,5 +200,13 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         );
 
         $this->logger->info('Sent notification email.');
+    }
+
+    /**
+     * @return JobRepository|EntityRepository
+     */
+    private function getJobRepository(): JobRepository
+    {
+        return $this->doctrineHelper->getEntityRepository(Job::class);
     }
 }

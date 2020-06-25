@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\SaveImportExportResultProcessor;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -20,8 +22,8 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var SaveImportExportResultProcessor */
     private $saveExportResultProcessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRepository */
+    private $jobRepository;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ImportExportResultManager */
     private $importExportResultManager;
@@ -34,15 +36,20 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepository::class);
         $this->userManager = $this->createMock(UserManager::class);
         $this->importExportResultManager = $this->createMock(ImportExportResultManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(JobEntity::class)
+            ->willReturn($this->jobRepository);
 
         $this->saveExportResultProcessor = new SaveImportExportResultProcessor(
             $this->importExportResultManager,
             $this->userManager,
-            $this->jobStorage,
+            $doctrineHelper,
             $this->logger
         );
     }
@@ -81,7 +88,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('saveResult')
             ->with(1, ProcessorRegistry::TYPE_EXPORT, 'Acme', null, null);
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('findJobById')
             ->willReturn($job);
@@ -119,7 +126,7 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('saveResult');
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->never())
             ->method('findJobById')
             ->willReturn($job);
