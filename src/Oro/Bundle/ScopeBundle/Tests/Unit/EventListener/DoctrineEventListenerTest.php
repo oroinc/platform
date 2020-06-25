@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub as Entity;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -21,6 +22,9 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeCache;
 
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
     /** @var DoctrineEventListener */
     private $listener;
 
@@ -29,13 +33,21 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scheduledForInsertScopes = $this->createMock(ScopeCollection::class);
         $this->scopeCache = $this->createMock(CacheProvider::class);
 
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory->expects($this->any())
+            ->method('hasMetadataFor')
+            ->with(Scope::class)
+            ->willReturn(true);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->em->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+
         $this->listener = new DoctrineEventListener($this->scheduledForInsertScopes, $this->scopeCache);
     }
 
     public function testPreFlushForEmptyScheduledForInsertScopes()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-
         $this->scheduledForInsertScopes->expects($this->once())
             ->method('isEmpty')
             ->willReturn(true);
@@ -43,15 +55,14 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getAll');
         $this->scheduledForInsertScopes->expects($this->never())
             ->method('clear');
-        $em->expects($this->never())
+        $this->em->expects($this->never())
             ->method('persist');
 
-        $this->listener->preFlush(new PreFlushEventArgs($em));
+        $this->listener->preFlush(new PreFlushEventArgs($this->em));
     }
 
     public function testPreFlushForNotEmptyScheduledForInsertScopes()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $scope1 = new Scope();
         $scope2 = new Scope();
 
@@ -63,16 +74,14 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$scope1, $scope2]);
         $this->scheduledForInsertScopes->expects($this->once())
             ->method('clear');
-        $em->expects($this->exactly(2))
-            ->method('persist');
-        $em->expects($this->at(0))
+        $this->em->expects($this->exactly(2))
             ->method('persist')
-            ->with($this->identicalTo($scope1));
-        $em->expects($this->at(1))
-            ->method('persist')
-            ->with($this->identicalTo($scope2));
+            ->withConsecutive(
+                [$scope1],
+                [$scope2]
+            );
 
-        $this->listener->preFlush(new PreFlushEventArgs($em));
+        $this->listener->preFlush(new PreFlushEventArgs($this->em));
     }
 
     public function testOnClear()
@@ -85,11 +94,10 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testFlushWhenNoChangesRequireResetScopeCache()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -102,7 +110,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityDeletions')
             ->willReturn([new Entity()]);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(Scope::class)
             ->willReturn($scopeMetadata);
@@ -117,16 +125,15 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scopeCache->expects($this->never())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
     }
 
     public function testNeedToResetScopeCacheFlag()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -136,18 +143,17 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scopeCache->expects($this->once())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
         $this->listener->postFlush();
     }
 
     public function testFlushWhenScopeEntityCreatedThatRequireResetScopeCache()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -158,23 +164,22 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $uow->expects($this->never())
             ->method('getScheduledEntityDeletions');
 
-        $em->expects($this->never())
+        $this->em->expects($this->never())
             ->method('getClassMetadata')
             ->with(Scope::class);
 
         $this->scopeCache->expects($this->once())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
     }
 
     public function testFlushWhenScopeEntityUpdatedThatRequireResetScopeCache()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -186,24 +191,23 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $uow->expects($this->never())
             ->method('getScheduledEntityDeletions');
 
-        $em->expects($this->never())
+        $this->em->expects($this->never())
             ->method('getClassMetadata')
             ->with(Scope::class);
 
         $this->scopeCache->expects($this->once())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
     }
 
     public function testFlushWhenScopeEntityDeletedThatRequireResetScopeCache()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -216,7 +220,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityDeletions')
             ->willReturn([new Scope()]);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(Scope::class)
             ->willReturn($scopeMetadata);
@@ -231,17 +235,16 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scopeCache->expects($this->once())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
     }
 
     public function testFlushWhenScopeAssociationTargetEntityDeletedThatRequireResetScopeCache()
     {
-        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
         $uow->expects($this->once())
@@ -254,7 +257,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityDeletions')
             ->willReturn([new Entity()]);
 
-        $em->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(Scope::class)
             ->willReturn($scopeMetadata);
@@ -269,7 +272,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scopeCache->expects($this->once())
             ->method('deleteAll');
 
-        $this->listener->onFlush(new OnFlushEventArgs($em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
     }
 }

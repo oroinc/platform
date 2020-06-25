@@ -22,8 +22,8 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -38,8 +38,8 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     /** @var JobRunner */
     private $jobRunner;
 
-    /** @var JobStorage */
-    private $jobStorage;
+    /** @var JobManagerInterface */
+    private $jobManager;
 
     /** @var DependentJobService */
     private $dependentJob;
@@ -82,7 +82,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
 
     /**
      * @param JobRunner                   $jobRunner
-     * @param JobStorage                  $jobStorage
+     * @param JobManagerInterface         $jobManager
      * @param DependentJobService         $dependentJob
      * @param FileSplitterRegistry        $splitterRegistry
      * @param ChunkFileClassifierRegistry $chunkFileClassifierRegistry
@@ -100,7 +100,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function __construct(
         JobRunner $jobRunner,
-        JobStorage $jobStorage,
+        JobManagerInterface $jobManager,
         DependentJobService $dependentJob,
         FileSplitterRegistry $splitterRegistry,
         ChunkFileClassifierRegistry $chunkFileClassifierRegistry,
@@ -115,7 +115,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
-        $this->jobStorage = $jobStorage;
+        $this->jobManager = $jobManager;
         $this->dependentJob = $dependentJob;
         $this->splitterRegistry = $splitterRegistry;
         $this->chunkFileClassifierRegistry = $chunkFileClassifierRegistry;
@@ -422,7 +422,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $data = $rootJob->getData();
         $data['api_operation_id'] = $operationId;
         $rootJob->setData($data);
-        $this->jobStorage->saveJob($rootJob);
+        $this->jobManager->saveJob($rootJob);
     }
 
     /**

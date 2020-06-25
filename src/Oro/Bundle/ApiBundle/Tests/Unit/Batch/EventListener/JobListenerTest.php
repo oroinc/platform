@@ -3,15 +3,19 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Batch\EventListener\JobListener;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 
 class JobListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctineHelper;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     private $em;
 
@@ -24,12 +28,18 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
+        $this->doctineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctineHelper
+            ->expects(self::any())
+            ->method('getEntityManager')
+            ->with(AsyncOperation::class)
+            ->willReturn($this->em);
         $this->uow = $this->createMock(UnitOfWork::class);
         $this->em->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->listener = new JobListener();
+        $this->listener = new JobListener($this->doctineHelper);
     }
 
     public function testForNotRootJob()
@@ -41,7 +51,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::never())
             ->method('find');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
     public function testForNewRootJob()
@@ -51,7 +61,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::never())
             ->method('find');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
     public function testForRootJobNotLinkedToAsyncOperation()
@@ -62,7 +72,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::never())
             ->method('find');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
     public function testForRootJobLinkedToNotExistingAsyncOperation()
@@ -76,7 +86,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->with(AsyncOperation::class, 1)
             ->willReturn(null);
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
     public function testForRootJobLinkedToAsyncOperationButNoChanges()
@@ -99,7 +109,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateProgress()
@@ -134,7 +144,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(0.1, $operation->getProgress()); // 10%
     }
@@ -172,7 +182,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(0, $operation->getProgress());
     }
@@ -204,7 +214,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(0.5, $operation->getProgress());
     }
@@ -235,7 +245,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(0.1, $operation->getProgress());
     }
@@ -264,7 +274,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(123, $operation->getJobId());
     }
@@ -301,7 +311,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_SUCCESS, $operation->getStatus());
         self::assertSame(1, $operation->getProgress());
@@ -359,7 +369,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_SUCCESS, $operation->getStatus());
         self::assertSame(1, $operation->getProgress());
@@ -419,7 +429,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_FAILED, $operation->getStatus());
         self::assertSame(0.5, $operation->getProgress());
@@ -467,7 +477,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_FAILED, $operation->getStatus());
         self::assertSame(0.5, $operation->getProgress());
@@ -511,7 +521,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_CANCELLED, $operation->getStatus());
         self::assertSame(0.5, $operation->getProgress());
@@ -537,7 +547,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_RUNNING, $operation->getStatus());
     }
@@ -562,7 +572,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects(self::never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->listener->preFlush($job, new PreFlushEventArgs($this->em));
+        $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
 
         self::assertSame(AsyncOperation::STATUS_RUNNING, $operation->getStatus());
     }

@@ -18,8 +18,11 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
+use Oro\Component\MessageQueue\Event\AfterSaveJobEvent;
+use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 use Oro\Component\MessageQueue\Job\Topics;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -62,5 +65,10 @@ class OroMessageQueueBundle extends Bundle
             ->add(Topics::CALCULATE_ROOT_JOB_STATUS, 'Calculate root job status')
             ->add(Topics::ROOT_JOB_STOPPED, 'Root job stopped');
         $container->addCompilerPass($addTopicPass);
+
+        $container->addCompilerPass(new AddEventAliasesPass([
+            BeforeSaveJobEvent::class => BeforeSaveJobEvent::EVENT_ALIAS,
+            AfterSaveJobEvent::class => AfterSaveJobEvent::EVENT_ALIAS,
+        ]));
     }
 }

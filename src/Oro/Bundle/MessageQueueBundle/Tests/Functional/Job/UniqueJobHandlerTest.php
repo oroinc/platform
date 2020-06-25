@@ -24,12 +24,15 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->loadFixtures([LoadJobData::class]);
     }
 
+    /**
+     * @return Connection
+     */
     private function getConnection(): ?Connection
     {
         return $this->getContainer()->get('doctrine')->getManager()->getConnection();
     }
 
-    public function testShouldThrowIfDuplicateJobOwnerIdAndName()
+    public function testShouldThrowIfDuplicateJobOwnerIdAndName(): void
     {
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
@@ -44,7 +47,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobOwnerId()
+    public function testShouldThrowIfDuplicateJobOwnerId(): void
     {
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
@@ -59,7 +62,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobName()
+    public function testShouldThrowIfDuplicateJobName(): void
     {
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
@@ -74,7 +77,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobOwnerIdWithPreSelect()
+    public function testShouldThrowIfDuplicateJobOwnerIdWithPreSelect(): void
     {
         $this->uniqueJobHandler->setPreSelectSupport(true);
 
@@ -91,7 +94,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobNameWithPreSelect()
+    public function testShouldThrowIfDuplicateJobNameWithPreSelect(): void
     {
         $this->uniqueJobHandler->setPreSelectSupport(true);
 
@@ -108,7 +111,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsert()
+    public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsert(): void
     {
         $this->uniqueJobHandler->setUpsertSupport(true);
 
@@ -125,7 +128,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobNameUsingUpsert()
+    public function testShouldThrowIfDuplicateJobNameUsingUpsert(): void
     {
         $this->uniqueJobHandler->setUpsertSupport(true);
 
@@ -142,7 +145,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsertAndPreSelect()
+    public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsertAndPreSelect(): void
     {
         $this->uniqueJobHandler->setUpsertSupport(true);
         $this->uniqueJobHandler->setPreSelectSupport(true);
@@ -160,7 +163,7 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldThrowIfDuplicateJobNameUsingUpsertAndPreSelect()
+    public function testShouldThrowIfDuplicateJobNameUsingUpsertAndPreSelect(): void
     {
         $this->uniqueJobHandler->setUpsertSupport(true);
         $this->uniqueJobHandler->setPreSelectSupport(true);
@@ -178,10 +181,18 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->uniqueJobHandler->insert($this->getConnection(), $job);
     }
 
-    public function testShouldRemoveWhenFinished()
+    public function testShouldRemoveWhenFinished(): void
     {
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $this->uniqueJobHandler->delete($this->getConnection(), $existingJob);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDataFixturesExecutorEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 }

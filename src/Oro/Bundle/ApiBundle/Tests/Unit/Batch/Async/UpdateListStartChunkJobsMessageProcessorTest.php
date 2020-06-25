@@ -7,9 +7,11 @@ use Oro\Bundle\ApiBundle\Batch\Async\Topics;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListStartChunkJobsMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -19,8 +21,8 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 {
     private const BATCH_SIZE = 3000;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRepository */
+    private $jobRepository;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
     private $operationManager;
@@ -36,13 +38,18 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
     protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepository::class);
         $this->operationManager = $this->createMock(AsyncOperationManager::class);
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(JobEntity::class)
+            ->willReturn($this->jobRepository);
 
         $this->processor = new UpdateListStartChunkJobsMessageProcessor(
-            $this->jobStorage,
+            $doctrineHelper,
             $this->operationManager,
             $this->processingHelper,
             $this->logger
@@ -108,7 +115,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             'rootJobId'   => $rootJobId
         ]);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->with($rootJobId)
             ->willReturn(null);
@@ -145,7 +152,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             $chunkFileToJobIdMap[$i] = $i + 10000;
         }
 
-        $this->jobStorage->expects(self::exactly(self::BATCH_SIZE + 1))
+        $this->jobRepository->expects(self::exactly(self::BATCH_SIZE + 1))
             ->method('findJobById')
             ->willReturnCallback(function (int $jobId) use ($rootJobId, $rootJob) {
                 if ($jobId === $rootJobId) {
@@ -210,7 +217,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             $chunkFileToJobIdMap[$i] = $i + 10000;
         }
 
-        $this->jobStorage->expects(self::exactly(self::BATCH_SIZE + 1))
+        $this->jobRepository->expects(self::exactly(self::BATCH_SIZE + 1))
             ->method('findJobById')
             ->willReturnCallback(function (int $jobId) use ($rootJobId, $rootJob) {
                 if ($jobId === $rootJobId) {
@@ -276,7 +283,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             $chunkFileToJobIdMap[$i] = $i + 10000;
         }
 
-        $this->jobStorage->expects(self::exactly(2))
+        $this->jobRepository->expects(self::exactly(2))
             ->method('findJobById')
             ->willReturnCallback(function (int $jobId) use ($rootJobId, $rootJob) {
                 if ($jobId === $rootJobId) {
@@ -322,8 +329,6 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
         $operationId = 123;
         $rootJobId = 100;
         $chunkIndexCount = self::BATCH_SIZE + 1000;
-        $nextChunkFileIndex = self::BATCH_SIZE;
-        $aggregateTime = 200;
         $body = [
             'operationId' => $operationId,
             'entityClass' => 'Test\Entity',
@@ -340,7 +345,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             $chunkFileToJobIdMap[$i] = $i + 10000;
         }
 
-        $this->jobStorage->expects(self::exactly(2))
+        $this->jobRepository->expects(self::exactly(2))
             ->method('findJobById')
             ->willReturnCallback(function (int $jobId) use ($rootJobId, $rootJob) {
                 if ($jobId === $rootJobId) {
