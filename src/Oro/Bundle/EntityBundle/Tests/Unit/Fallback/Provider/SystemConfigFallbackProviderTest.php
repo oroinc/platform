@@ -43,10 +43,6 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFallbackHolderEntityThrowsExceptionIfNoConfigFound()
     {
-        $this->getMemoryCacheProvider()
-            ->expects($this->never())
-            ->method('get');
-
         $this->expectException(FallbackFieldConfigurationMissingException::class);
         $entityConfig = $this->getEntityConfiguration();
         $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST][SystemConfigFallbackProvider::FALLBACK_ID] = [];
