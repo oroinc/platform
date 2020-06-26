@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -115,7 +115,7 @@ trait WorkflowQueryTrait
         $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityClass);
         list($entityIdentifier) = $metadata->getIdentifierFieldNames();
 
-        if ($metadata->getTypeOfField($entityIdentifier) === Type::INTEGER) {
+        if ($metadata->getTypeOfField($entityIdentifier) === Types::INTEGER) {
             $condition = '%s.%s = CAST(%s.entityId as int) AND %s.entityClass = \'%s\'';
         } else {
             $condition = 'CAST(%s.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'';

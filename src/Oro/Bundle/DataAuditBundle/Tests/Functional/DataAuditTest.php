@@ -139,18 +139,17 @@ class DataAuditTest extends WebTestCase
 
         $em = $this->saveOwnerAndClearMessages($owner);
 
-        $resource = fopen(__FILE__, 'rb');
-        if (false === $resource) {
-            $this->fail('Unable to open resource');
-        }
-        $owner->setBinaryProperty($resource);
+        $value = base_convert(unpack('H*', 'Test')[1], 16, 2);
+        $owner->setBinaryProperty($value);
         $em->flush();
 
         $this->processMessages();
         $this->assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertInternalType('resource', $owner->getBinaryProperty());
+
+        $storedValue = $owner->getBinaryProperty();
+        $this->assertEquals('Test', pack('H*', base_convert($storedValue, 2, 16)));
     }
 
     public function testBlob()

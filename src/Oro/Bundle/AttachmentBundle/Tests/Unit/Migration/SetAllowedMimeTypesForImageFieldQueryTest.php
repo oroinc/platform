@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\AttachmentBundle\Migration\SetAllowedMimeTypesForImageFieldQuery;
 use Psr\Log\LoggerInterface;
 
@@ -79,7 +79,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
             ]);
         $this->connection->expects(static::once())
             ->method('convertToPHPValue')
-            ->with('data persisted serialized', Type::TARRAY)
+            ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
                 'attachment' => [
                     'mimetypes' => [
@@ -110,7 +110,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
 
         $this->connection->expects(static::once())
             ->method('convertToPHPValue')
-            ->with('data persisted serialized', Type::TARRAY)
+            ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
                 'attachment' => [
                     'width' => 100
@@ -125,7 +125,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
                     'mimetypes' => 'testType1
 testType2'
                 ]
-            ], Type::TARRAY)
+            ], Types::ARRAY)
             ->willReturn('data serialized to persist');
         $this->updateAttachmentOptionQuery->setConnection($this->connection);
         self::assertEquals(
@@ -151,7 +151,7 @@ testType2'
             ]);
         $this->connection->expects(static::once())
             ->method('convertToPHPValue')
-            ->with('data persisted serialized', Type::TARRAY)
+            ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
                 'attachment' => [
                     'width' => 100
@@ -166,7 +166,7 @@ testType2'
                     'mimetypes' => 'testType1
 testType2'
                 ]
-            ], Type::TARRAY)
+            ], Types::ARRAY)
             ->willReturn('data serialized to persist');
         $statement = $this->createMock(Statement::class);
         $this->connection->expects(static::once())

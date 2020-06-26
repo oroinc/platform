@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -12,6 +12,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Set locale by request to DistributionBundle Translator.
+ */
 class LocaleListener implements EventSubscriberInterface
 {
     const DEFAULT_LANGUAGE = 'en';
@@ -89,7 +92,7 @@ class LocaleListener implements EventSubscriberInterface
                 'SELECT text_value FROM oro_config_value WHERE name = :name AND section = :section',
                 ['name' => 'language', 'section' => 'oro_locale'],
                 0,
-                ['name' => Type::STRING, 'section' => Type::STRING]
+                ['name' => Types::STRING, 'section' => Types::STRING]
             );
     }
 

@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Remove config of a given entity.
+ */
 class RemoveTableQuery extends ParametrizedMigrationQuery
 {
     /** @var string  */
@@ -26,7 +29,7 @@ class RemoveTableQuery extends ParametrizedMigrationQuery
     {
         $sql = 'SELECT id FROM oro_entity_config WHERE class_name = ? LIMIT 1';
 
-        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass], [Type::STRING]);
+        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass], [Types::STRING]);
         if ($fieldRow) {
             $this->executeQuery($logger, 'DELETE FROM oro_entity_config_field WHERE entity_id = ?', [$fieldRow['id']]);
             $this->executeQuery($logger, 'DELETE FROM oro_entity_config WHERE id = ?', [$fieldRow['id']]);

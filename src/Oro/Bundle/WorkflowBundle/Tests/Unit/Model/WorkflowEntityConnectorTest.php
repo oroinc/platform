@@ -6,6 +6,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
@@ -137,15 +138,15 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
     public function typeSupportingProvider()
     {
         return [
-            [Type::BIGINT, true],
-            [Type::DECIMAL, true],
-            [Type::INTEGER, true],
-            [Type::SMALLINT, true],
-            [Type::STRING, true],
-            [Type::TEXT, false],
-            [Type::BINARY, false],
+            [Types::BIGINT, true],
+            [Types::DECIMAL, true],
+            [Types::INTEGER, true],
+            [Types::SMALLINT, true],
+            [Types::STRING, true],
+            [Types::TEXT, false],
+            [Types::BINARY, false],
             ['other', false],
-            'type object to string conversion' => [Type::getType(Type::SMALLINT), true]
+            'type object to string conversion' => [Type::getType(Types::SMALLINT), true]
         ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Doctrine DBAL implementation of MQ Message Producer.
+ */
 class DbalMessageProducer implements MessageProducerInterface
 {
     /**
@@ -73,12 +76,12 @@ class DbalMessageProducer implements MessageProducerInterface
 
         try {
             $this->connection->getDBALConnection()->insert($this->connection->getTableName(), $dbalMessage, [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'delayed_until' => Type::INTEGER,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'delayed_until' => Types::INTEGER,
             ]);
         } catch (\Exception $e) {
             throw new Exception('The transport fails to send the message due to some internal error.', null, $e);

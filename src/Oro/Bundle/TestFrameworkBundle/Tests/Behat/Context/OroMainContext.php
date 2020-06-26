@@ -1851,9 +1851,7 @@ JS;
     public function iConfirmSchemaUpdate()
     {
         try {
-            $this->pressButton('Update schema');
-            $this->assertPageContainsText('Schema update confirmation');
-            $this->pressButton('Yes, Proceed');
+            $this->iClickUpdateSchema();
             $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
         } catch (\Exception $e) {
             throw $e;
@@ -2506,8 +2504,9 @@ JS;
 
             $page->clickLink('Update schema');
             $this->waitForAjax();
+            $this->assertPageContainsText('Schema update confirmation');
             $page->clickLink('Yes, Proceed');
-            $this->waitForAjax();
+            $this->waitForAjax(720000); // Wait for max 12 minutes because DB update process timeout set to 10 minutes
         } catch (\Exception $e) {
             throw $e;
         }

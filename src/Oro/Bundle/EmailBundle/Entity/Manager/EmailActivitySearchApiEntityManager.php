@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -15,6 +15,9 @@ use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
+/**
+ * The API manager to find entities associated with the email activity.
+ */
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
     /** @var EntityNameResolver  */
@@ -103,7 +106,7 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
      * Returns a query builder that contains entities from the search result in which titles replaced with
      * text representation of appropriate entities.
      *
-     * @todo: This functionality should be removed in the BAP-8995.
+     * Note! This functionality will be removed in the BAP-8995.
      *
      * @param SearchResult $searchResult
      *
@@ -116,7 +119,7 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 
         $qb = new UnionQueryBuilder($em);
         $qb
-            ->addSelect('id', 'id', Type::INTEGER)
+            ->addSelect('id', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($this->getAssociatedEntitiesFilters($searchResult) as $entityClass => $ids) {

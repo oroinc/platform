@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
+/**
+ * Doctrine ORM repository for Translation entity.
+ */
 class TranslationRepository extends EntityRepository
 {
     /**
@@ -54,9 +57,9 @@ class TranslationRepository extends EntityRepository
                     $queryBuilder->expr()->eq('k.domain', ':domain')
                 )
             )
-            ->setParameter('code', $locale, Type::STRING)
-            ->setParameter('key', $key, Type::STRING)
-            ->setParameter('domain', $domain, Type::STRING)
+            ->setParameter('code', $locale, Types::STRING)
+            ->setParameter('key', $key, Types::STRING)
+            ->setParameter('domain', $domain, Types::STRING)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -110,7 +113,7 @@ class TranslationRepository extends EntityRepository
                 )
             )
             ->setParameter('code', $languageCode)
-            ->setParameter('domain', $domain, Type::STRING)
+            ->setParameter('domain', $domain, Types::STRING)
             ->setParameter('scope', Translation::SCOPE_SYSTEM);
 
         return $qb->getQuery()->getArrayResult();

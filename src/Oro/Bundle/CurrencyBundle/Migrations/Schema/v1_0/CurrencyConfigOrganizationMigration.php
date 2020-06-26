@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -35,10 +35,10 @@ class CurrencyConfigOrganizationMigration implements Migration
                     'search_section'    => 'oro_locale'
                 ],
                 [
-                    'currency_name'     => Type::STRING,
-                    'section'           => Type::STRING,
-                    'search_name'       => Type::STRING,
-                    'search_section'    => Type::STRING
+                    'currency_name'     => Types::STRING,
+                    'section'           => Types::STRING,
+                    'search_name'       => Types::STRING,
+                    'search_section'    => Types::STRING
                 ]
             )
         );

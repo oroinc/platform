@@ -45,7 +45,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             ->method('executeQuery')
             ->with(
                 'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
-                . 'COLLATE utf8_unicode_ci ENGINE = InnoDB'
+                . 'COLLATE `utf8_unicode_ci` ENGINE = InnoDB'
             );
         $this->connection->expects($this->at(5))
             ->method('executeQuery')
@@ -59,7 +59,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
                 '> ' . get_class($migration11),
                 'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
-                . 'COLLATE utf8_unicode_ci ENGINE = InnoDB',
+                . 'COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
                 'ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL',
             ],
             $messages
@@ -86,7 +86,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
                 '> ' . get_class($migration11),
                 'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
-                . 'COLLATE utf8_unicode_ci ENGINE = InnoDB',
+                . 'COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
                 'ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL',
             ],
             $messages

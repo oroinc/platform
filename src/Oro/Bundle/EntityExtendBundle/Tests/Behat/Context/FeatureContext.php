@@ -71,10 +71,14 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
 
         $columnsArray = [];
         foreach ($columns as $column) {
-            $columnsArray[] = $column->getName();
+            $columnsArray[] = strtolower($column->getName());
         }
-        $cond === 'is' ?
-            self::assertContains($field, $columnsArray) :
-                self::assertNotContains($field, $columnsArray);
+
+        $field = strtolower($field);
+        if ($cond === 'is') {
+            self::assertContains($field, $columnsArray);
+        } else {
+            self::assertNotContains($field, $columnsArray);
+        }
     }
 }

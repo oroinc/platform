@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
@@ -53,7 +53,7 @@ class InsertFromSelectQueryExecutorTest extends WebTestCase
             ->innerJoin('u.groups', 'g')
             ->where('u.createdAt <= :datetime')
             ->andWhere('g = :group')
-            ->setParameter('datetime', new \DateTime(), Type::DATETIME)
+            ->setParameter('datetime', new \DateTime(), Types::DATETIME_MUTABLE)
             ->setParameter('group', $group)
         ;
 

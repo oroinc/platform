@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
@@ -993,7 +993,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
         $columnTypeName = $targetColumn->getType()->getName();
-        if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT], true)) {
+        if (!in_array($columnTypeName, [Types::INTEGER, Types::STRING, Types::SMALLINT, Types::BIGINT], true)) {
             throw new SchemaException(
                 sprintf(
                     'The type of relation column "%s::%s" must be an integer or string. "%s" type is not supported.',
@@ -1004,7 +1004,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             );
         }
 
-        if ($columnTypeName === Type::STRING && $targetColumn->getLength() !== null) {
+        if ($columnTypeName === Types::STRING && $targetColumn->getLength() !== null) {
             $options['length'] = $targetColumn->getLength();
         }
 

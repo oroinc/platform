@@ -13,6 +13,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapServicesFactory;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
+use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadOriginData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
@@ -46,24 +47,19 @@ class EmailSyncCommandTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->imapConnectorFactory = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->serviceFactory = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServicesFactory')
+        $this->imapConnectorFactory = $this->createMock(ImapConnectorFactory::class);
+        $this->serviceFactory = $this->getMockBuilder(ImapServicesFactory::class)
             ->setMethods(['createImapServices', 'getDefaultImapStorage'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->imapServices = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServices')
+        $this->imapServices = $this->getMockBuilder(ImapServices::class)
             ->disableOriginalConstructor()
             ->setMethods(['getStorage', 'getSearchStringManager'])
             ->getMock();
 
         $this->imap = new TestImap([]);
 
-        $this->searchStringManager = $this
-            ->getMockBuilder('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->searchStringManager = $this->createMock(SearchStringManagerInterface::class);
 
         $this->imapServices->expects($this->any())
             ->method('getStorage')
@@ -116,7 +112,11 @@ class EmailSyncCommandTest extends WebTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * @dataProvider commandImapSyncProvider
+     * @param string $id
      * @param array $params
      * @param array $data
      * @param int $assertCount
@@ -125,6 +125,7 @@ class EmailSyncCommandTest extends WebTestCase
      * @param string $expectedEmailDataDbType
      */
     public function testImapSync(
+        $id,
         array $params,
         $data,
         $assertCount,
@@ -132,7 +133,10 @@ class EmailSyncCommandTest extends WebTestCase
         $expectedEmailData,
         $expectedEmailDataDbType
     ) {
-        $this->loadFixtures(['Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadOriginData']);
+        if (!$this->isDbTypeIsValid($expectedEmailDataDbType)) {
+            $this->markTestSkipped(sprintf('%s might be checked only with %s', $id, $expectedEmailDataDbType));
+        }
+        $this->loadFixtures([LoadOriginData::class]);
 
         $this->protocol->expects($this->any())
             ->method('fetch')
@@ -156,7 +160,7 @@ class EmailSyncCommandTest extends WebTestCase
 
         $this->assertEquals($assertCount, count($list));
 
-        if ($expectedEmailData && $this->isDbTypeIsValid($expectedEmailDataDbType)) {
+        if ($expectedEmailData) {
             /** @var Email $email */
             $email = $list[0];
             $propertyAccessor = new PropertyAccessor();
@@ -188,12 +192,13 @@ class EmailSyncCommandTest extends WebTestCase
         $apiData = $this->getRequestsData($path);
 
         foreach ($apiData as $data) {
-            $expectedEmailDataDbType = isset($data['expectedEmailDataDbType']) ? $data['expectedEmailDataDbType'] : '';
+            $expectedEmailDataDbType = $data['expectedEmailDataDbType'] ?? '';
             $results[$data['id']] = [
-                'params'            => $data['params'],
-                'data'              => $data['data'],
-                'assertCount'       => $data['total'],
-                'expectedContent'   => $data['log_info'],
+                'id' => $data['id'],
+                'params' => $data['params'],
+                'data' => $data['data'],
+                'assertCount' => $data['total'],
+                'expectedContent' => $data['log_info'],
                 'expectedEmailData' => $data['expectedEmailData'],
                 'expectedEmailDataDbType' => $expectedEmailDataDbType
             ];
@@ -213,7 +218,7 @@ class EmailSyncCommandTest extends WebTestCase
             return true;
         }
 
-        $platform  = $this->getContainer()->get('doctrine')->getConnection()->getDatabasePlatform()->getName();
+        $platform = $this->getContainer()->get('doctrine')->getConnection()->getDatabasePlatform()->getName();
 
         return $expectedEmailDataDbType === $platform;
     }

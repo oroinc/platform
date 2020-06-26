@@ -3,7 +3,7 @@
 namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -1028,7 +1028,7 @@ class EntitySerializer
      */
     protected function getTypedEntityId($value, $type)
     {
-        if (Type::INTEGER === $type || Type::SMALLINT === $type) {
+        if (Types::INTEGER === $type || Types::SMALLINT === $type) {
             $value = (int)$value;
         }
 

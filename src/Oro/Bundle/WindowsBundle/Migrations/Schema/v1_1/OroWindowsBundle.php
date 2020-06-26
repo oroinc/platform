@@ -6,6 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -32,7 +33,7 @@ class OroWindowsBundle implements Migration, DatabasePlatformAwareInterface
                 'ALTER TABLE oro_windows_state ALTER COLUMN data TYPE JSON USING data::JSON'
             );
         } else {
-            $column->setType(Type::getType(Type::JSON_ARRAY));
+            $column->setType(Type::getType(Types::JSON_ARRAY));
         }
 
         $column->setOptions(['comment' => '(DC2Type:json_array)']);

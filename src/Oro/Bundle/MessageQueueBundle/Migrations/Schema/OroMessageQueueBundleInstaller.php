@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -126,14 +126,14 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             new ParametrizedSqlMigrationQuery(
                 'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
                 ['id' => 'cache', 'updated_at' => null],
-                ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
+                ['id' => Types::STRING, 'updated_at' => Types::DATETIME_MUTABLE]
             )
         );
         $queries->addPostQuery(
             new ParametrizedSqlMigrationQuery(
                 'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
                 ['id' => 'consumers', 'updated_at' => new \DateTime('2000-01-01')],
-                ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
+                ['id' => Types::STRING, 'updated_at' => Types::DATETIME_MUTABLE]
             )
         );
     }

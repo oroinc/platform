@@ -11,7 +11,7 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 use Oro\Bundle\SearchBundle\Migration\MysqlVersionCheckTrait;
 use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -19,12 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class OroSearchBundleInstaller implements Installation, ContainerAwareInterface, DatabasePlatformAwareInterface
 {
+    use ContainerAwareTrait;
     use MysqlVersionCheckTrait;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
 
     /**
      * @var AbstractPlatform
@@ -37,14 +33,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
     public function getMigrationVersion()
     {
         return 'v1_8';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 
     /**

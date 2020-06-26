@@ -31,10 +31,11 @@ Feature: Create Report with Dictionary field
     And I save and close form
     Then I should see "Report saved" flash message
     And number of records should be 2
+    And I sort grid by "Tag"
     And I should see following grid:
       | Opportunity name | Close reason | Tag  |
-      | Opportunity 1    | Cancelled    | tag2 |
       | Opportunity 1    | Cancelled    | tag1 |
+      | Opportunity 1    | Cancelled    | tag2 |
 
   Scenario: Created report with Dictionary field and "is empty tags" filter
     Given I go to Reports & Segments / Manage Custom Reports

@@ -15,6 +15,8 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
+ * Doctrine ORM Entity WorkflowDefinition.
+ *
  * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
@@ -93,7 +95,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var boolean
      *
-     * @ORM\Column(name="system", type="boolean")
+     * @ORM\Column(name="`system`", type="boolean")
      */
     protected $system = false;
 

@@ -2,12 +2,12 @@ namespace Test;
 
 class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    protected $field_2;
+    protected $field_2 = true;
     protected $field1;
 
     public function setField2($value)
     {
-        $this->field_2 = $value; return $this;
+        $this->field_2 = (bool)$value; return $this;
     }
 
     public function setField1($value)

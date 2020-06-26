@@ -237,7 +237,16 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             'boolean',
             [
                 'is_extend' => true,
-                'default'   => true
+                'default'   => true,
+                'nullable'  => false
+            ]
+        );
+        $this->configProvider->addFieldConfig(
+            'SomeClass',
+            'field2',
+            'integer',
+            [
+                'is_extend' => true
             ]
         );
 
@@ -255,7 +264,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                         'entity'    => \stdClass::class,
                         'type'      => 'Extend',
                         'property'  => [
-                            'field1' => []
+                            'field1' => [],
+                            'field2' => [],
                         ],
                         'relation'  => [],
                         'default'   => [],
@@ -267,11 +277,20 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                                     'field1' => [
                                         'column'    => 'field1',
                                         'type'      => 'boolean',
-                                        'nullable'  => true,
+                                        'nullable'  => false,
                                         'length'    => null,
                                         'precision' => null,
                                         'scale'     => null,
                                         'default'   => true,
+                                    ],
+                                    'field2' => [
+                                        'column'    => 'field2',
+                                        'type'      => 'integer',
+                                        'nullable'  => true,
+                                        'length'    => null,
+                                        'precision' => null,
+                                        'scale'     => null,
+                                        'default'   => null,
                                     ]
                                 ]
                             ]

@@ -5,10 +5,13 @@ namespace Oro\Bundle\DistributionBundle\Translation;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+/**
+ * Dbal implementation of translation loader.
+ */
 class DbalTranslationLoader implements LoaderInterface
 {
     /** @var ManagerRegistry */
@@ -61,9 +64,9 @@ class DbalTranslationLoader implements LoaderInterface
                     $qb->expr()->eq('k.domain', ':domain')
                 )
             )
-            ->setParameter('code', $locale, Type::STRING)
-            ->setParameter('scope', 0, Type::INTEGER)
-            ->setParameter('domain', $domain, Type::STRING);
+            ->setParameter('code', $locale, Types::STRING)
+            ->setParameter('scope', 0, Types::INTEGER)
+            ->setParameter('domain', $domain, Types::STRING);
 
         return $qb->execute()->fetchAll();
     }

@@ -1,5 +1,7 @@
 @ticket-BB-14685
 @fixture-OroUserBundle:user.yml
+#Run on PostgreSQL only because of different implementation of Case Sensitive search on MySQL
+@postgresql
 
 Feature: User Case Insensitive Email Addresses
   In order to avoid possible user mistakes

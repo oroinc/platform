@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 {
-    const NEW_OWNER_LABEL       = 'oro.custom_entity.owner.label';
+    const NEW_OWNER_LABEL = 'oro.custom_entity.owner.label';
     const NEW_OWNER_DESCRIPTION = 'oro.custom_entity.owner.description';
 
     /**
@@ -34,16 +34,16 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool            $dryRun
+     * @param bool $dryRun
      */
     protected function migrateConfigs(LoggerInterface $logger, $dryRun = false)
     {
-        $query  = 'SELECT cf.id, c.class_name, cf.data'
+        $query = 'SELECT cf.id, c.class_name, cf.data'
             . ' FROM oro_entity_config c'
             . ' INNER JOIN oro_entity_config_field cf ON cf.entity_id = c.id'
             . ' WHERE cf.field_name = :field';
         $params = ['field' => 'owner'];
-        $types  = ['field' => Type::STRING];
+        $types = ['field' => Types::STRING];
 
         $this->logQuery($logger, $query, $params, $types);
 
@@ -57,7 +57,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
             }
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
             if (isset($data['entity']['label']) && $data['entity']['label'] === 'Owner') {
-                $data['entity']['label']       = self::NEW_OWNER_LABEL;
+                $data['entity']['label'] = self::NEW_OWNER_LABEL;
                 $data['entity']['description'] = self::NEW_OWNER_DESCRIPTION;
 
                 $id = $row['id'];
@@ -65,13 +65,18 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
                 $updateQueries[] = [
                     'UPDATE oro_entity_config_field SET data = :data, mode = :mode WHERE id = :id',
                     ['id' => $id, 'mode' => ConfigModel::MODE_DEFAULT, 'data' => $data],
-                    ['id' => Type::INTEGER, 'mode' => Type::STRING, 'data' => Type::TARRAY]
+                    ['id' => Types::INTEGER, 'mode' => Types::STRING, 'data' => Types::ARRAY]
                 ];
                 $updateQueries[] = [
                     'UPDATE oro_entity_config_index_value SET value = :value'
                     . ' WHERE field_id = :id AND scope = :scope AND code = :code',
                     ['id' => $id, 'scope' => 'entity', 'code' => 'label', 'value' => self::NEW_OWNER_LABEL],
-                    ['id' => Type::INTEGER, 'scope' => Type::STRING, 'code' => Type::STRING, 'value' => Type::STRING]
+                    [
+                        'id' => Types::INTEGER,
+                        'scope' => Types::STRING,
+                        'code' => Types::STRING,
+                        'value' => Types::STRING
+                    ]
                 ];
             }
         }
