@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_31;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -70,7 +70,7 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
                 'id' => $ruleId,
             ],
             [
-                Type::TEXT,
+                Types::TEXT,
             ]
         );
     }

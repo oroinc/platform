@@ -437,6 +437,43 @@ define(function(require) {
 
                 return paths.length ? '/' + paths.join('/') : null;
             }
+        },
+
+        /**
+         * Gets unique CSS selector for DOM element.
+         *
+         * @param {HTMLElement} element
+         * @param {boolean} [clearPath=true]
+         * @returns {string}
+         */
+        getElementCSSPath: function(element, clearPath = true) {
+            const buildPath = (el, path = []) => {
+                if (el && el.nodeType === Node.ELEMENT_NODE) {
+                    let part = el.nodeName.toLowerCase();
+
+                    if (el.className) {
+                        part += `.${el.className.trim().split(' ')[0]}`;
+                    }
+
+                    if (el.nodeName !== 'HTML') {
+                        part += `:nth-child(${$(el).index() + 1})`;
+                    }
+
+                    return buildPath(el.parentNode, path.concat([part]));
+                } else {
+                    const preparedPath = path.reverse().join(' > ');
+
+                    if (clearPath) {
+                        const regExp = /(\.js-focus-visible|\.focus-visible|\.hide|\.show)/;
+
+                        return preparedPath.replace(new RegExp(regExp, 'g'), '');
+                    }
+
+                    return preparedPath;
+                }
+            };
+
+            return buildPath(element);
         }
     });
 

@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manage extend table/column options.
+ */
 class ExtendOptionsManager
 {
     const ENTITY_CLASS_OPTION = '_entity_class';
@@ -115,7 +118,7 @@ class ExtendOptionsManager
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
 
-        return isset($this->options[$objectKey]);
+        return isset($this->getExtendOptions()[$objectKey]);
     }
 
     /**
@@ -127,7 +130,7 @@ class ExtendOptionsManager
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
 
-        return $this->options[$objectKey] ?? [];
+        return $this->getExtendOptions()[$objectKey] ?? [];
     }
 
     /**
@@ -165,6 +168,8 @@ class ExtendOptionsManager
      */
     public function getExtendOptions()
     {
+        $this->filterOptions();
+
         return $this->options;
     }
 
@@ -278,5 +283,24 @@ class ExtendOptionsManager
                 sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
             );
         }
+    }
+
+    protected function filterOptions(): void
+    {
+        $this->options = array_filter($this->options, static function ($options, $key) {
+            // Filter only columns with only extend options set
+            if (empty($options['extend'])
+                || strpos($key, '!') === false
+                || count(array_diff(array_keys($options), ['extend', '_type'])) > 0
+            ) {
+                return true;
+            }
+
+            // Check for options set not only by ExtendColumn
+            $extendColumnKeys = ['nullable', 'length', 'precision', 'scale', 'default'];
+            $diff = array_diff(array_keys($options['extend']), $extendColumnKeys);
+
+            return !empty($diff);
+        }, ARRAY_FILTER_USE_BOTH);
     }
 }

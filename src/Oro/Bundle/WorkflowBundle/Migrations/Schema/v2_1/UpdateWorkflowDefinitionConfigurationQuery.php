@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_1;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -189,7 +190,7 @@ class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQu
         $rows = $this->connection->fetchAll($sql);
 
         foreach ($rows as $key => $row) {
-            $type = Type::getType(Type::TARRAY);
+            $type = Type::getType(Types::ARRAY);
             $platform = $this->connection->getDatabasePlatform();
             $data = $type->convertToPHPValue($row['configuration'], $platform);
             $dataChanged = false;

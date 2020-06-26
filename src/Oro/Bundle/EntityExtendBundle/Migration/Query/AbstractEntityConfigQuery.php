@@ -3,10 +3,13 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Query;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract class which simplifies updating entity config values in batches.
+ */
 abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -84,7 +87,7 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
     protected function updateEntityConfigData(array $entityData, $id, LoggerInterface $logger = null)
     {
         $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
-        $parameters = [$this->connection->convertToDatabaseValue($entityData, Type::TARRAY), $id];
+        $parameters = [$this->connection->convertToDatabaseValue($entityData, Types::ARRAY), $id];
 
         if ($logger) {
             $this->logQuery($logger, $query, $parameters);

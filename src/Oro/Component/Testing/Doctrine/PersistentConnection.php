@@ -1,9 +1,11 @@
 <?php
+
 namespace Oro\Component\Testing\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\TransactionIsolationLevel;
 
 /**
  * Connection wrapper sharing the same db handle across multiple requests
@@ -37,8 +39,8 @@ class PersistentConnection extends Connection
 
             $this->setPersistentConnection($this->_conn);
 
-            if ($this->getTransactionIsolation() !== Connection::TRANSACTION_READ_COMMITTED) {
-                $this->setTransactionIsolation(Connection::TRANSACTION_READ_COMMITTED);
+            if ($this->getTransactionIsolation() !== TransactionIsolationLevel::READ_COMMITTED) {
+                $this->setTransactionIsolation(TransactionIsolationLevel::READ_COMMITTED);
             }
 
             if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
@@ -91,6 +93,7 @@ class PersistentConnection extends Connection
     public function isTransactionActive()
     {
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
+
         return parent::isTransactionActive();
     }
 
@@ -101,7 +104,7 @@ class PersistentConnection extends Connection
     {
         static $rp = null;
         if (false == $rp) {
-            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', '_transactionNestingLevel');
+            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', 'transactionNestingLevel');
             $rp->setAccessible(true);
         }
 
@@ -116,7 +119,7 @@ class PersistentConnection extends Connection
     private function wrapTransactionNestingLevel($method)
     {
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
-        call_user_func(array('parent', $method));
+        parent::$method();
         $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
     }
 
@@ -127,7 +130,7 @@ class PersistentConnection extends Connection
     {
         static $rp = null;
         if (false == $rp) {
-            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', '_isConnected');
+            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', 'isConnected');
             $rp->setAccessible(true);
         }
 
@@ -142,6 +145,7 @@ class PersistentConnection extends Connection
         if (isset(static::$persistentTransactionNestingLevels[$this->getConnectionId()])) {
             return static::$persistentTransactionNestingLevels[$this->getConnectionId()];
         }
+
         return 0;
     }
 
@@ -177,9 +181,6 @@ class PersistentConnection extends Connection
         return static::$persistentConnections[$this->getConnectionId()];
     }
 
-    /**
-     * @return DriverConnection
-     */
     protected function unsetPersistentConnection()
     {
         unset(static::$persistentConnections[$this->getConnectionId()]);

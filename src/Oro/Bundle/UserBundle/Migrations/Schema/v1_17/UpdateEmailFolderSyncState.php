@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_17;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -33,7 +33,7 @@ class UpdateEmailFolderSyncState implements Migration
                     );
                 ',
                     ['sync' => true, 'name_old' => 'imapemailorigin', 'name_new' => 'useremailorigin'],
-                    ['sync' => Type::BOOLEAN, 'name_old' => Type::STRING, 'name_new' => Type::STRING]
+                    ['sync' => Types::BOOLEAN, 'name_old' => Types::STRING, 'name_new' => Types::STRING]
                 )
             );
         }

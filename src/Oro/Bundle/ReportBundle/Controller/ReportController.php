@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Controller;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
 use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
@@ -266,7 +266,7 @@ class ReportController extends AbstractController
 
         /** @var DateHelper $dateTimeHelper */
         $dateTimeHelper = $this->get(DateHelper::class);
-        $dateTypes      = [Type::DATETIME, Type::DATE, Type::DATETIMETZ];
+        $dateTypes      = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
 
         if (in_array($labelFieldType, $dateTypes)) {
             $data  = $datagrid->getData()->offsetGet('data');

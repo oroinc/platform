@@ -2,32 +2,36 @@
 
 namespace Oro\Component\MessageQueue\StatusCalculator;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 
+/**
+ * Calculate root job status and root job progress with DB queries.
+ */
 class QueryCalculator extends AbstractStatusCalculator
 {
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var array
-     */
+    /** @var string */
+    private $entityClass;
+
+    /** @var array */
     private $childJobStatusCounts = [];
 
-    /**
-     * @var Job
-     */
+    /** @var Job */
     private $rootJob;
 
     /**
-     * @param JobStorage $jobStorage
+     * @param ManagerRegistry $doctrine
+     * @param string $entityClass
      */
-    public function __construct(JobStorage $jobStorage)
+    public function __construct(ManagerRegistry $doctrine, string $entityClass)
     {
-        $this->jobStorage = $jobStorage;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
     }
 
     /**
@@ -36,7 +40,7 @@ class QueryCalculator extends AbstractStatusCalculator
     public function init(Job $rootJob)
     {
         $this->rootJob = $rootJob;
-        $this->childJobStatusCounts = $this->jobStorage->getChildStatusesWithJobCountByRootJob($rootJob);
+        $this->childJobStatusCounts = $this->getJobRepository()->getChildStatusesWithJobCountByRootJob($rootJob);
     }
 
     /**
@@ -79,7 +83,7 @@ class QueryCalculator extends AbstractStatusCalculator
         foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
             $internalStatus = $this->convertJobStatusToInternalStatus($jobStatus);
             if (false === $internalStatus) {
-                $childJobIds = $this->jobStorage->getChildJobIdsByRootJobAndStatus($this->rootJob, $jobStatus);
+                $childJobIds = $this->getJobRepository()->getChildJobIdsByRootJobAndStatus($this->rootJob, $jobStatus);
                 throw new \LogicException(sprintf(
                     'Got unsupported job status: ids: "%s" status: "%s"',
                     implode(', ', $childJobIds),
@@ -91,5 +95,13 @@ class QueryCalculator extends AbstractStatusCalculator
         }
 
         return $internalJobStatusCountList;
+    }
+
+    /**
+     * @return JobRepositoryInterface|ObjectRepository
+     */
+    private function getJobRepository(): JobRepositoryInterface
+    {
+        return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 }

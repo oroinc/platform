@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_4;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -27,7 +28,7 @@ class FixOptionSetQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query, $params);
         $fields = $this->connection->fetchAll($query, $params);
 
-        $type = Type::getType(Type::TARRAY);
+        $type = Type::getType(Types::ARRAY);
         $platform = $this->connection->getDatabasePlatform();
 
         foreach ($fields as $field) {

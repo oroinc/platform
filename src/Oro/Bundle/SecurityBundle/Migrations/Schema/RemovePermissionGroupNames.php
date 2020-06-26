@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -85,7 +85,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
     {
         $sql = 'SELECT id, group_names FROM oro_security_permission WHERE name IN (:permission_name)';
         $params = ['permission_name' => $this->permissions];
-        $types = ['permission_name' => Type::SIMPLE_ARRAY];
+        $types = ['permission_name' => Types::SIMPLE_ARRAY];
 
         $this->logQuery($logger, $sql, $params, $types);
 
@@ -94,7 +94,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
         foreach ($rows as $row) {
             $result[] = [
                 'id' => $row['id'],
-                'group_names' => $this->connection->convertToPHPValue($row['group_names'], Type::TARRAY)
+                'group_names' => $this->connection->convertToPHPValue($row['group_names'], Types::ARRAY)
             ];
         }
 
@@ -112,7 +112,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
         foreach ($rows as $row) {
             $sql = 'UPDATE oro_security_permission SET group_names = :group_names WHERE id = :id';
             $params = ['group_names' => $row['group_names'], 'id' => $row['id']];
-            $types = ['group_names' => Type::TARRAY, 'id' => Type::INTEGER];
+            $types = ['group_names' => Types::ARRAY, 'id' => Types::INTEGER];
             $this->logQuery($logger, $sql, $params, $types);
 
             if (!$dryRun) {

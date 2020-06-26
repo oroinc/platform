@@ -3,7 +3,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
@@ -46,12 +46,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
         $dbalConnection->expects($this->once())
             ->method('insert')
             ->with('oro_message_queue', $expectedMessage, [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'delayed_until' => Type::INTEGER,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'delayed_until' => Types::INTEGER,
             ]);
 
         $this->connection
@@ -76,12 +76,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
         $dbalConnection->expects($this->once())
             ->method('insert')
             ->with('oro_message_queue', $this->arrayHasKey('delayed_until'), [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'delayed_until' => Type::INTEGER,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'delayed_until' => Types::INTEGER,
             ]);
 
         $this->connection
@@ -112,12 +112,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
                 'priority' => 0,
                 'queue' => 'queue name',
             ], [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'delayed_until' => Type::INTEGER,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'delayed_until' => Types::INTEGER,
             ])
             ->willThrowException(new \Exception());
 

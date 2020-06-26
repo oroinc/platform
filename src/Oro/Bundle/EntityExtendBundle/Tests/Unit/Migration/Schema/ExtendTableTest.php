@@ -76,9 +76,9 @@ class ExtendTableTest extends TestCase
         static::assertEquals('N/A', $column->getDefault());
     }
 
-    private function setExpectations($name, string $extend, $expected): void
+    public function testAddColumnWithSameExtendNullable()
     {
-        $type = Type::getType($name);
+        $type = Type::getType('string');
 
         $this->extendOptionsManager->expects(static::exactly(2))
             ->method('setColumnOptions')
@@ -95,7 +95,46 @@ class ExtendTableTest extends TestCase
                     self::TABLE_NAME,
                     self::COLUMN_NAME,
                     [
+                        'extend' => ['nullable' => false],
+                        '_type' => $type->getName()
+                    ]
+                ]
+            );
+
+        $options = ['notnull' => true, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
+        $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
+        static::assertInstanceOf(ExtendColumn::class, $column);
+        static::assertTrue($column->getNotnull());
+    }
+
+    private function setExpectations($name, string $extend, $expected): void
+    {
+        $type = Type::getType($name);
+
+        $this->extendOptionsManager->expects(static::exactly(3))
+            ->method('setColumnOptions')
+            ->withConsecutive(
+                [
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    [
+                        'extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true],
+                        '_type' => $type->getName()
+                    ]
+                ],
+                [
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    [
                         'extend' => [$extend => $expected],
+                        '_type' => $type->getName()
+                    ]
+                ],
+                [
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    [
+                        'extend' => ['nullable' => true],
                         '_type' => $type->getName()
                     ]
                 ]

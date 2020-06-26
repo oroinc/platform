@@ -2,6 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -11,33 +13,45 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Process list of jobs that should be started after when root job was finished (all child jobs is processed).
+ */
 class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var JobStorage */
-    private $jobStorage;
-
     /** @var MessageProducerInterface */
     private $producer;
+
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    /** @var string */
+    private $entityClass;
 
     /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param JobStorage               $jobStorage
      * @param MessageProducerInterface $producer
-     * @param LoggerInterface          $logger
+     * @param ManagerRegistry $doctrine
+     * @param string $entityClass
+     * @param LoggerInterface $logger
      */
-    public function __construct(JobStorage $jobStorage, MessageProducerInterface $producer, LoggerInterface $logger)
-    {
-        $this->jobStorage = $jobStorage;
+    public function __construct(
+        MessageProducerInterface $producer,
+        ManagerRegistry $doctrine,
+        string $entityClass,
+        LoggerInterface $logger
+    ) {
         $this->producer = $producer;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
         $this->logger = $logger;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = JSON::decode($message->getBody());
         if (!isset($data['jobId'])) {
@@ -46,7 +60,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
             return self::REJECT;
         }
 
-        $job = $this->jobStorage->findJobById($data['jobId']);
+        $job = $this->getJobRepository()->findJobById((int)$data['jobId']);
         if (null === $job) {
             $this->logger->critical(sprintf('Job was not found. id: "%s"', $data['jobId']));
 
@@ -76,18 +90,18 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [Topics::ROOT_JOB_STOPPED];
     }
 
     /**
      * @param array $dependentJobs
-     * @param Job   $job
+     * @param Job $job
      *
      * @return bool
      */
-    private function validateDependentJobs(array $dependentJobs, Job $job)
+    private function validateDependentJobs(array $dependentJobs, Job $job): bool
     {
         $result = true;
         foreach ($dependentJobs as $dependentJob) {
@@ -107,9 +121,9 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
 
     /**
      * @param array $dependentJobs
-     * @param Job   $job
+     * @param Job $job
      */
-    private function processDependentJobs(array $dependentJobs, Job $job)
+    private function processDependentJobs(array $dependentJobs, Job $job): void
     {
         foreach ($dependentJobs as $dependentJob) {
             $jobMessage = new Message();
@@ -124,5 +138,13 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
 
             $this->producer->send($dependentJob['topic'], $jobMessage);
         }
+    }
+
+    /**
+     * @return JobRepositoryInterface|ObjectRepository
+     */
+    private function getJobRepository(): JobRepositoryInterface
+    {
+        return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 }

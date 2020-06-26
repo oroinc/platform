@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_11;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -190,7 +191,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
         $rows = $this->connection->fetchAll($sql);
 
         foreach ($rows as $key => $row) {
-            $type = Type::getType(Type::TARRAY);
+            $type = Type::getType(Types::ARRAY);
             $platform = $this->connection->getDatabasePlatform();
             $data = $type->convertToPHPValue($row['data'], $platform);
 

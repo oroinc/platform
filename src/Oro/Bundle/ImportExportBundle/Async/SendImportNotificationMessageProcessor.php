@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -23,11 +25,6 @@ use Psr\Log\LoggerInterface;
  */
 class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
-
     /**
      * @var MessageProducerInterface
      */
@@ -61,7 +58,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     /**
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
-     * @param JobStorage $jobStorage
      * @param ImportExportResultSummarizer $importJobSummaryResultService
      * @param NotificationSettings $notificationSettings
      * @param ManagerRegistry $doctrine
@@ -69,14 +65,12 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,
-        JobStorage $jobStorage,
         ImportExportResultSummarizer $importJobSummaryResultService,
         NotificationSettings $notificationSettings,
         ManagerRegistry $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;
-        $this->jobStorage = $jobStorage;
         $this->importJobSummaryResultService = $importJobSummaryResultService;
         $this->notificationSettings = $notificationSettings;
         $this->doctrine = $doctrine;
@@ -95,7 +89,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
-        if (! ($job = $this->jobStorage->findJobById($body['rootImportJobId']))) {
+        if (! ($job = $this->getJobRepository()->findJobById((int)$body['rootImportJobId']))) {
             $this->logger->critical('Job not found');
 
             return self::REJECT;
@@ -167,5 +161,13 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     public static function getSubscribedTopics()
     {
         return [Topics::SEND_IMPORT_NOTIFICATION];
+    }
+
+    /**
+     * @return JobRepository|EntityRepository
+     */
+    private function getJobRepository(): JobRepository
+    {
+        return $this->doctrine->getManagerForClass(Job::class)->getRepository(Job::class);
     }
 }

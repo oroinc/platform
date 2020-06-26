@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\PostExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -37,9 +40,14 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private $importExportResultSummarizer;
 
     /**
-     * @var JobStorage|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|JobRepository
      */
-    private $jobStorage;
+    private $jobRepository;
+
+    /**
+     * @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $jobManager;
 
     /**
      * @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject
@@ -62,15 +70,22 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->exportHandler = $this->createMock(ExportHandler::class);
         $this->messageProducer = $this->createMock(MessageProducer::class);
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepository::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->importExportResultSummarizer = $this->createMock(ImportExportResultSummarizer::class);
         $this->notificationSettings = $this->createMock(NotificationSettings::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(JobEntity::class)
+            ->willReturn($this->jobRepository);
 
         $this->postExportMessageProcessor = new PostExportMessageProcessor(
             $this->exportHandler,
             $this->messageProducer,
             $this->logger,
-            $this->jobStorage,
+            $doctrineHelper,
+            $this->jobManager,
             $this->importExportResultSummarizer,
             $this->notificationSettings
         );
@@ -101,7 +116,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $childJob->setRootJob($job);
         $job->setChildJobs([$childJob]);
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects(self::once())
             ->method('findJobById')
             ->willReturn($childJob);
@@ -163,7 +178,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $childJob->setRootJob($job);
         $job->setChildJobs([$childJob]);
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects(self::once())
             ->method('findJobById')
             ->willReturn($childJob);
@@ -233,7 +248,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn(['file' => 'file.csv']);
 
-        $this->jobStorage
+        $this->jobRepository
             ->expects(self::once())
             ->method('findJobById')
             ->willReturn($job);

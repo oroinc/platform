@@ -2,37 +2,46 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * JobProcessor is a main class responsible for processing jobs, shifting it's responsibilities to other classes
  * is quite difficult and would make it less readable.
- *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JobProcessor
 {
     /** @var JobConfigurationProviderInterface */
     private $jobConfigurationProvider;
 
-    /** @var JobStorage */
-    private $jobStorage;
+    /** @var JobManagerInterface */
+    private $jobManager;
+
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    /** @var string */
+    private $entityClass;
 
     /**
-     * @param JobStorage $jobStorage
+     * @param JobManagerInterface $jobManager
+     * @param ManagerRegistry $doctrine
+     * @param string $entityClass
      */
-    public function __construct(JobStorage $jobStorage)
+    public function __construct(JobManagerInterface $jobManager, ManagerRegistry $doctrine, string $entityClass)
     {
-        $this->jobStorage = $jobStorage;
+        $this->jobManager = $jobManager;
+        $this->doctrine = $doctrine;
+        $this->entityClass = $entityClass;
     }
 
     /**
      * @param JobConfigurationProviderInterface $jobConfigurationProvider
-     * @return $this
+     * @return self
      */
-    public function setJobConfigurationProvider(JobConfigurationProviderInterface $jobConfigurationProvider)
+    public function setJobConfigurationProvider(JobConfigurationProviderInterface $jobConfigurationProvider): self
     {
         $this->jobConfigurationProvider = $jobConfigurationProvider;
 
@@ -42,7 +51,7 @@ class JobProcessor
     /**
      * @return JobConfigurationProviderInterface
      */
-    public function getJobConfigurationProvider()
+    public function getJobConfigurationProvider(): JobConfigurationProviderInterface
     {
         if (!$this->jobConfigurationProvider) {
             return new NullJobConfigurationProvider();
@@ -51,51 +60,51 @@ class JobProcessor
     }
 
     /**
-     * @param string $id
+     * @param int $id
      *
-     * @return Job
+     * @return Job|null
      */
-    public function findJobById($id)
+    public function findJobById(int $id): ?Job
     {
-        return $this->jobStorage->findJobById($id);
+        return $this->getJobRepository()->findJobById($id);
     }
 
     /**
      * Finds root non interrupted job by name and given statuses.
      *
      * @param string $jobName
-     * @param array  $statuses
+     * @param array $statuses
      *
      * @return Job|null
      */
-    public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
+    public function findRootJobByJobNameAndStatuses(string $jobName, array $statuses): ?Job
     {
-        return $this->jobStorage->findRootJobByJobNameAndStatuses($jobName, $statuses);
+        return $this->getJobRepository()->findRootJobByJobNameAndStatuses($jobName, $statuses);
     }
 
     /**
      * @param string $ownerId
      * @param string $jobName
-     * @param bool   $unique
+     * @param bool $unique
      *
      * @return Job|null
      */
-    public function findOrCreateRootJob($ownerId, $jobName, $unique = false)
+    public function findOrCreateRootJob(string $ownerId, string $jobName, bool $unique = false): ?Job
     {
-        if (! $ownerId) {
+        if (!$ownerId) {
             throw new \LogicException('OwnerId must not be empty');
         }
 
-        if (! $jobName) {
+        if (!$jobName) {
             throw new \LogicException('Job name must not be empty');
         }
 
-        $job = $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+        $job = $this->getJobRepository()->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
         if ($job) {
             return $job;
         }
 
-        $job = $this->jobStorage->createJob();
+        $job = $this->getJobRepository()->createJob();
         $job->setOwnerId($ownerId);
         $job->setStatus(Job::STATUS_NEW);
         $job->setName($jobName);
@@ -109,89 +118,31 @@ class JobProcessor
     }
 
     /**
-     * @param Job $job
-     * @return null|Job
-     */
-    private function saveJobAndStaleDuplicateIfQualifies($job)
-    {
-        try {
-            $this->jobStorage->saveJob($job);
-            return $job;
-        } catch (DuplicateJobException $e) {
-            $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), $this->getActiveJobStatuses());
-            if ($currentRootJob && $this->isJobStale($currentRootJob)) {
-                $this->staleRootJobAndChildren($currentRootJob);
-                return $this->saveJobAndStaleDuplicateIfQualifies($job);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param Job $job
-     * @return bool
-     */
-    private function isJobStale(Job $job)
-    {
-        if ($job->getStatus() === Job::STATUS_STALE) {
-            return true;
-        }
-
-        if ($this->hasNotStartedChild($job)) {
-            return false;
-        }
-
-        $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
-        if ($timeBeforeStale !== null && $timeBeforeStale != -1) {
-            return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale. ' seconds');
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Job $job
-     *
-     * @return bool
-     */
-    private function hasNotStartedChild(Job $job)
-    {
-        foreach ($job->getChildJobs() as $childJob) {
-            if (Job::STATUS_NEW === $childJob->getStatus()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @param string $jobName
      * @param Job $rootJob
      *
      * @return Job
      */
-    public function findOrCreateChildJob($jobName, Job $rootJob)
+    public function findOrCreateChildJob(string $jobName, Job $rootJob): ?Job
     {
-        if (! $jobName) {
+        if (!$jobName) {
             throw new \LogicException('Job name must not be empty');
         }
 
-        $rootJob = $this->jobStorage->findJobById($rootJob->getId());
-        $job = $this->jobStorage->findChildJobByName($jobName, $rootJob);
+        $job = $this->getJobRepository()->findChildJobByName($jobName, $rootJob);
 
         if ($job) {
             return $job;
         }
 
-        $job = $this->jobStorage->createJob();
+        $job = $this->getJobRepository()->createJob();
         $job->setStatus(Job::STATUS_NEW);
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
         $rootJob->addChildJob($job);
         $job->setJobProgress(0);
-        $this->jobStorage->saveJob($job);
+        $this->jobManager->saveJob($job);
 
         return $job;
     }
@@ -199,13 +150,13 @@ class JobProcessor
     /**
      * @param Job $job
      */
-    public function startChildJob(Job $job)
+    public function startChildJob(Job $job): void
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t start root jobs. id: "%s"', $job->getId()));
         }
 
-        if (! in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
+        if (!in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
             throw new \LogicException(sprintf(
                 'Can start only new jobs: id: "%s", status: "%s"',
                 $job->getId(),
@@ -216,14 +167,13 @@ class JobProcessor
         $job->setStatus(Job::STATUS_RUNNING);
         $job->setStartedAt(new \DateTime());
 
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
      * @param Job $job
      */
-    public function successChildJob(Job $job)
+    public function successChildJob(Job $job): void
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t success root jobs. id: "%s"', $job->getId()));
@@ -232,46 +182,13 @@ class JobProcessor
         $job->setStatus(Job::STATUS_SUCCESS);
         $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
      * @param Job $job
      */
-    private function updateJobLastActiveAtAndSave(Job $job)
-    {
-        $job->setLastActiveAt(new \DateTime());
-        $this->jobStorage->saveJob($job);
-    }
-    
-    /**
-     * @param Job $rootJob
-     */
-    private function staleRootJobAndChildren(Job $rootJob)
-    {
-        if (!$rootJob->isRoot()) {
-            throw new \LogicException(sprintf('Can\'t stale child jobs. id: "%s"', $rootJob->getId()));
-        }
-
-        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) {
-            $rootJob->setStatus(Job::STATUS_STALE);
-            $rootJob->setStoppedAt(new \DateTime());
-
-            foreach ($rootJob->getChildJobs() as $childJob) {
-                if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
-                    $childJob->setStatus(Job::STATUS_STALE);
-                    $childJob->setStoppedAt(new \DateTime());
-                    $this->jobStorage->saveJob($childJob);
-                }
-            }
-        });
-    }
-
-    /**
-     * @param Job $job
-     */
-    public function failChildJob(Job $job)
+    public function failChildJob(Job $job): void
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
@@ -280,91 +197,26 @@ class JobProcessor
         $job->setStatus(Job::STATUS_FAILED);
         $job->setStoppedAt(new \DateTime());
 
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
      * @param Job $job
      */
-    public function failAndRedeliveryChildJob(Job $job)
+    public function failAndRedeliveryChildJob(Job $job): void
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
         }
 
         $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
      * @param Job $job
      */
-    public function cancelChildJob(Job $job)
-    {
-        if ($job->isRoot()) {
-            throw new \LogicException(sprintf('Can\'t cancel root jobs. id: "%s"', $job->getId()));
-        }
-
-        if (! in_array($job->getStatus(), $this->getActiveJobStatuses(), true)) {
-            throw new \LogicException(sprintf(
-                'Can cancel only new or running jobs. id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
-        }
-
-        $job->setStatus(Job::STATUS_CANCELLED);
-        $job->setStoppedAt($stoppedAt = new \DateTime());
-
-        if (! $job->getStartedAt()) {
-            $job->setStartedAt($stoppedAt);
-        }
-
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
-    }
-
-    /**
-     * @param Job $job
-     */
-    public function cancelAllActiveChildJobs(Job $job)
-    {
-        if (!$job->isRoot() || !$job->getChildJobs()) {
-            return;
-        }
-
-        foreach ($job->getChildJobs() as $childJob) {
-            if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
-                $this->cancelChildJob($childJob);
-            }
-        }
-    }
-
-    /**
-     * Cancels running for all child jobs that are not in run status.
-     *
-     * @param Job $job
-     */
-    public function cancelAllNotStartedChildJobs(Job $job)
-    {
-        if (!$job->isRoot() || !$job->getChildJobs()) {
-            return;
-        }
-
-        foreach ($job->getChildJobs() as $childJob) {
-            if (in_array($childJob->getStatus(), $this->getNotStartedJobStatuses(), true)) {
-                $this->cancelChildJob($childJob);
-            }
-        }
-    }
-
-    /**
-     * @param Job  $job
-     * @param bool $force
-     */
-    public function interruptRootJob(Job $job, $force = false)
+    public function interruptRootJob(Job $job): void
     {
         if (!$job->isRoot()) {
             throw new \LogicException(sprintf('Can interrupt only root jobs. id: "%s"', $job->getId()));
@@ -374,37 +226,21 @@ class JobProcessor
             return;
         }
 
-        $this->jobStorage->saveJob($job, function (Job $job) use ($force) {
+        $this->jobManager->saveJobWithLock($job, function (Job $job) {
             if ($job->isInterrupted()) {
                 return;
             }
 
+            $stoppedAt = new \DateTime();
             $job->setInterrupted(true);
+            $job->setStoppedAt($stoppedAt);
+            $job->setLastActiveAt($stoppedAt);
+            $job->setStatus(Job::STATUS_CANCELLED);
 
-            if ($force) {
-                $this->cancelAllActiveChildJobs($job);
-                $job->setStoppedAt(new \DateTime());
-            } else {
-                // we should mark all child jobs as canceled to speed-up the terminate process
-                $this->cancelAllNotStartedChildJobs($job);
-            }
+            // Cancel only jobs that should be processed, to make in order to save history for already processed jobs.
+            $this->jobManager->setCancelledStatusForChildJobs($job, [Job::STATUS_NEW], $stoppedAt, $stoppedAt);
+            $this->jobManager->setCancelledStatusForChildJobs($job, [Job::STATUS_FAILED_REDELIVERED], $stoppedAt);
         });
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getNotStartedJobStatuses()
-    {
-        return [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED];
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getActiveJobStatuses()
-    {
-        return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     }
 
     /**
@@ -415,7 +251,7 @@ class JobProcessor
      *
      * @return Job|null
      */
-    public function findNotStaleRootJobyJobNameAndStatuses($jobName, array $statuses)
+    public function findNotStaleRootJobyJobNameAndStatuses(string $jobName, array $statuses): ?Job
     {
         $currentRootJob = $this->findRootJobByJobNameAndStatuses($jobName, $statuses);
         if ($currentRootJob) {
@@ -427,5 +263,111 @@ class JobProcessor
         }
 
         return null;
+    }
+
+    /**
+     * @param Job $rootJob
+     */
+    private function staleRootJobAndChildren(Job $rootJob): void
+    {
+        if (!$rootJob->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t stale child jobs. id: "%s"', $rootJob->getId()));
+        }
+
+        $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
+            $rootJob->setStatus(Job::STATUS_STALE);
+            $rootJob->setStoppedAt(new \DateTime());
+
+            foreach ($rootJob->getChildJobs() as $childJob) {
+                if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
+                    $childJob->setStatus(Job::STATUS_STALE);
+                    $childJob->setStoppedAt(new \DateTime());
+                    $this->jobManager->saveJob($childJob);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param Job $job
+     * @return Job|null
+     */
+    private function saveJobAndStaleDuplicateIfQualifies(Job $job): ?Job
+    {
+        try {
+            $this->jobManager->saveJob($job);
+
+            return $job;
+        } catch (DuplicateJobException $e) {
+            $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), $this->getActiveJobStatuses());
+            if ($currentRootJob && $this->isJobStale($currentRootJob)) {
+                $this->staleRootJobAndChildren($currentRootJob);
+
+                return $this->saveJobAndStaleDuplicateIfQualifies($job);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param Job $job
+     * @return bool
+     */
+    private function isJobStale(Job $job): bool
+    {
+        if ($job->getStatus() === Job::STATUS_STALE) {
+            return true;
+        }
+
+        if ($this->hasNotStartedChild($job)) {
+            return false;
+        }
+
+        $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
+        if ($timeBeforeStale !== null && $timeBeforeStale !== -1) {
+            return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale. ' seconds');
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function hasNotStartedChild(Job $job): bool
+    {
+        foreach ($job->getChildJobs() as $childJob) {
+            if (Job::STATUS_NEW === $childJob->getStatus()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getNotStartedJobStatuses(): array
+    {
+        return [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getActiveJobStatuses(): array
+    {
+        return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
+    }
+
+    /**
+     * @return JobRepositoryInterface|ObjectRepository
+     */
+    private function getJobRepository(): JobRepositoryInterface
+    {
+        return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 }

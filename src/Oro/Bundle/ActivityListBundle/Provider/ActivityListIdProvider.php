@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
@@ -186,7 +186,7 @@ class ActivityListIdProvider
                     $qb->andWhere($qb->expr()->lt($orderByPath, ':offsetDate'));
                 }
             }
-            $qb->setParameter('offsetDate', $offsetDate, Type::DATETIME);
+            $qb->setParameter('offsetDate', $offsetDate, Types::DATETIME_MUTABLE);
             $rows = $this->loadListDataIds(
                 $qb,
                 $entityClass,

@@ -33,7 +33,11 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         ]);
 
         $queries->addQuery(new SplitGroupsToIndividualFieldsQuery());
-        $queries->addPostQuery(sprintf('ALTER TABLE %s DROP COLUMN %s', self::TABLE_NAME, 'groups'));
+        $queries->addPostQuery(sprintf(
+            'ALTER TABLE %s DROP COLUMN %s',
+            self::TABLE_NAME,
+            $this->platform->quoteSingleIdentifier('groups')
+        ));
     }
 
     /**

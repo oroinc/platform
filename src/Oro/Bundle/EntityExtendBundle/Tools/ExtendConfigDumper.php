@@ -349,7 +349,7 @@ class ExtendConfigDumper
                 $doctrine[$entityName]['fields'][$fieldName] = [
                     'column'    => $columnName,
                     'type'      => $fieldType,
-                    'nullable'  => true,
+                    'nullable'  => $fieldConfig->get('nullable', false, true),
                     'length'    => $fieldConfig->get('length'),
                     'precision' => $fieldConfig->get('precision'),
                     'scale'     => $fieldConfig->get('scale'),

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
@@ -79,11 +79,15 @@ class DateTimeRangeFilterTest extends OrmTestCase
         $ds->expects($this->exactly(2))
             ->method('setParameter')
             ->withConsecutive(
-                ['date1', new \DateTime('2018-01-20T10:00:00', new \DateTimeZone('Europe/Kiev')), Type::DATETIME],
+                [
+                    'date1',
+                    new \DateTime('2018-01-20T10:00:00', new \DateTimeZone('Europe/Kiev')),
+                    Types::DATETIME_MUTABLE
+                ],
                 [
                     'date2',
                     new \DateTimeImmutable('2020-01-20T10:00:00', new \DateTimeZone('Europe/Kiev')),
-                    Type::DATETIME_IMMUTABLE
+                    Types::DATETIME_IMMUTABLE
                 ]
             );
         $ds->expects($this->any())

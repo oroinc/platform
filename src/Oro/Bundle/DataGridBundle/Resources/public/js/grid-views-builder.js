@@ -41,6 +41,10 @@ define(function(require, exports, module) {
                 GridViewsView: config.GridViewsView,
                 buildViews: function(grid) {
                     const gridViews = gridViewsBuilder.build.call(this, grid.collection);
+
+                    if (gridViews !== void 0) {
+                        grid.$grid.attr({'aria-labelledby': gridViews.uniqueId});
+                    }
                     deferred.resolve(gridViews);
                 }
             };
@@ -125,6 +129,7 @@ define(function(require, exports, module) {
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
             options.gridViewsOptions = this.gridViewsOptions;
+            options.uniqueId = _.uniqueId(`grid-title-${options.gridName}`);
 
             return _.omit(options, ['views']);
         },

@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -79,14 +79,14 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     {
         $table = $schema->createTable('oro_session');
         if ($this->platform instanceof MySqlPlatform) {
-            $table->addColumn('id', Type::BINARY, ['length' => 128]);
-            $table->addColumn('sess_data', Type::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
+            $table->addColumn('id', Types::BINARY, ['length' => 128]);
+            $table->addColumn('sess_data', Types::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
         } else {
-            $table->addColumn('id', Type::STRING, ['length' => 128]);
-            $table->addColumn('sess_data', Type::BLOB, []);
+            $table->addColumn('id', Types::STRING, ['length' => 128]);
+            $table->addColumn('sess_data', Types::BLOB, []);
         }
-        $table->addColumn('sess_time', Type::INTEGER, []);
-        $table->addColumn('sess_lifetime', Type::INTEGER, []);
+        $table->addColumn('sess_time', Types::INTEGER, []);
+        $table->addColumn('sess_lifetime', Types::INTEGER, []);
         $table->setPrimaryKey(['id']);
     }
 }

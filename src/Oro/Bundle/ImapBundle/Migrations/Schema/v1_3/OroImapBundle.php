@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -20,7 +20,7 @@ class OroImapBundle implements Migration
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_email_origin SET name = :new_name WHERE name = :old_name',
                 ['new_name' => 'useremailorigin', 'old_name' => 'imapemailorigin'],
-                ['new_name' => Type::STRING, 'old_name' => Type::STRING]
+                ['new_name' => Types::STRING, 'old_name' => Types::STRING]
             )
         );
 
