@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -18,7 +18,7 @@ class AutoResponseRuleRepository extends EntityRepository
         $rules = $this->createQueryBuilder('r')
             ->andWhere('r.mailbox IS NULL')
             ->andWhere('r.createdAt < :until')
-            ->setParameter('until', new \DateTime('-1 day'), Type::DATETIME)
+            ->setParameter('until', new \DateTime('-1 day'), Types::DATETIME_MUTABLE)
             ->getQuery()
             ->getResult();
 

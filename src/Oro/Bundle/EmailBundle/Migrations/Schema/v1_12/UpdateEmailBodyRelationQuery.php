@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_12;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -36,19 +36,13 @@ class UpdateEmailBodyRelationQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $dbDriver = $this->connection->getDriver()->getName();
-        switch ($dbDriver) {
-            case DatabaseDriverInterface::DRIVER_POSTGRESQL:
-                $query = 'UPDATE oro_email AS e SET email_body_id = b.id
-                    FROM oro_email_body AS b WHERE e.id = b.email_id';
-
-                break;
-            case DatabaseDriverInterface::DRIVER_MYSQL:
-            default:
-                $query = 'UPDATE oro_email e LEFT JOIN oro_email_body b
-                    ON e.id = b.email_id SET e.email_body_id = b.id';
-
-                break;
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof PostgreSqlPlatform) {
+            $query = 'UPDATE oro_email AS e SET email_body_id = b.id
+                FROM oro_email_body AS b WHERE e.id = b.email_id';
+        } else {
+            $query = 'UPDATE oro_email e LEFT JOIN oro_email_body b
+                ON e.id = b.email_id SET e.email_body_id = b.id';
         }
 
         $this->logQuery($logger, $query);

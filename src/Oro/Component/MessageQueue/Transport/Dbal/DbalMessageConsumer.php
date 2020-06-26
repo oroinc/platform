@@ -7,7 +7,7 @@ use Doctrine\DBAL\Driver\DriverException;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -172,12 +172,12 @@ class DbalMessageConsumer implements MessageConsumerInterface
             ];
 
             $affectedRows = $this->dbal->insert($this->connection->getTableName(), $dbalMessage, [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'redelivered' => Type::BOOLEAN,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'redelivered' => Types::BOOLEAN,
             ]);
 
             if (1 !== $affectedRows) {

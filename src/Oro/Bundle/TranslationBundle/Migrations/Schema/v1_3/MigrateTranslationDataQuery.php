@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -43,7 +43,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
                 'INSERT INTO oro_language (code, created_at, updated_at, enabled) ' .
                     'VALUES(:code, now(), now(), :enabled);',
                 ['code' => $languageCode, 'enabled' => true],
-                ['code' => Type::STRING, 'enabled' => Type::BOOLEAN],
+                ['code' => Types::STRING, 'enabled' => Types::BOOLEAN],
             ];
         }
 
@@ -84,7 +84,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
             $queries[] = [
                 'DELETE FROM oro_translation WHERE id = :id;',
                 ['id' => $id],
-                ['id' => Type::INTEGER],
+                ['id' => Types::INTEGER],
             ];
         }
 

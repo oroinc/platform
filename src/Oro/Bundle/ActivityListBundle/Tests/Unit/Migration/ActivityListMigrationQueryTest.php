@@ -125,7 +125,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             'CREATE TABLE oro_rel_c3990ba6784dd132527c89 (activitylist_id INT NOT NULL, test_id INT NOT NULL, '
             . 'INDEX IDX_53682E3596EB1108 (activitylist_id), INDEX IDX_53682E351E5D0459 (test_id), '
-            . 'PRIMARY KEY(activitylist_id, test_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci '
+            . 'PRIMARY KEY(activitylist_id, test_id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` '
             . 'ENGINE = InnoDB',
             $log[0]
         );

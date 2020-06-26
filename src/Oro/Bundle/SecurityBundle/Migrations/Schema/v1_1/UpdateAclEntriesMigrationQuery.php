@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
@@ -106,7 +106,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
     {
         $query = $this->getSqlForSelectByObjectIdentifier();
         $params = ['oid' => EntityAclExtension::NAME];
-        $types  = ['field' => Type::STRING];
+        $types  = ['field' => Types::STRING];
 
         $this->logQuery($logger, $query, $params, $types);
 
@@ -167,7 +167,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
                 $this->addSql(
                     $query,
                     ['mask' => $ace['mask'], 'id' => $ace['id']],
-                    ['mask' => Type::INTEGER, 'id' => Type::INTEGER]
+                    ['mask' => Types::INTEGER, 'id' => Types::INTEGER]
                 );
             }
         }
@@ -186,16 +186,16 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
                     $query,
                     $ace,
                     [
-                        'class_id' => Type::INTEGER,
-                        'object_identity_id' => Type::STRING,
-                        'field_name' => Type::STRING,
-                        'ace_order' => Type::INTEGER,
-                        'security_identity_id' => Type::INTEGER,
-                        'mask' => Type::INTEGER,
-                        'granting' => Type::BOOLEAN,
-                        'granting_strategy' => Type::STRING,
-                        'audit_success' => Type::BOOLEAN,
-                        'audit_failure' => Type::BOOLEAN
+                        'class_id' => Types::INTEGER,
+                        'object_identity_id' => Types::STRING,
+                        'field_name' => Types::STRING,
+                        'ace_order' => Types::INTEGER,
+                        'security_identity_id' => Types::INTEGER,
+                        'mask' => Types::INTEGER,
+                        'granting' => Types::BOOLEAN,
+                        'granting_strategy' => Types::STRING,
+                        'audit_success' => Types::BOOLEAN,
+                        'audit_failure' => Types::BOOLEAN
                     ]
                 );
             }

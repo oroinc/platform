@@ -7,7 +7,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
  */
 interface MessageQueueProcessorInterface
 {
-    const TIMEOUT = 300;
+    const TIMEOUT = 900;
 
     /**
      * @return void

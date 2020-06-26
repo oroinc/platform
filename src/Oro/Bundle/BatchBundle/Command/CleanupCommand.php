@@ -4,7 +4,7 @@ namespace Oro\Bundle\BatchBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -186,7 +186,7 @@ class CleanupCommand extends Command implements CronCommandInterface
                 'statuses',
                 [BatchStatus::STARTING, BatchStatus::STARTED]
             )
-            ->setParameter('endTime', $endTime, Type::DATETIME);
+            ->setParameter('endTime', $endTime, Types::DATETIME_MUTABLE);
     }
 
     /**

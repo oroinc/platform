@@ -3,7 +3,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL\Extension;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
@@ -74,7 +74,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
                     'consumerIds' => ['consumer-id-1', 'consumer-id-2'],
                 ],
                 [
-                    'isRedelivered' => Type::BOOLEAN,
+                    'isRedelivered' => Types::BOOLEAN,
                     'consumerIds' => Connection::PARAM_STR_ARRAY,
                 ]
             )

@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Statement;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
@@ -120,7 +120,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
         $sqlParams = [1, 2];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -143,7 +143,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             . ' FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?)'
             . ' AS count_query';
         $sqlParams = [1, 2];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -165,7 +165,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $expectedSql = 'SELECT DISTINCT count(DISTINCT e0_.a) AS sclr_0'
             . ' FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
         $sqlParams = [3, 3];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -188,7 +188,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             . ' FROM (SELECT DISTINCT e0_.a AS a_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?)'
             . ' AS count_query';
         $sqlParams = [3, 3];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -209,7 +209,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
         $sqlParams = [4, 3];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -232,7 +232,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             . ' FROM (SELECT e0_.a AS a_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?)'
             . ' AS count_query';
         $sqlParams = [4, 3];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -253,7 +253,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         );
         $expectedSql = 'SELECT count(DISTINCT e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
         $sqlParams = [1, 2];
-        $types = [Type::INTEGER, Type::INTEGER];
+        $types = [Types::INTEGER, Types::INTEGER];
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -285,7 +285,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ?';
         $sqlParams = [1];
-        $types = [Type::INTEGER];
+        $types = [Types::INTEGER];
 
         $expectedSourceSql = 'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ WHERE e0_.a = ?';
         $expectedEntity1 = new Entity();

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -105,7 +105,7 @@ class MoveEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
         foreach ($rows as $row) {
             $id = $row['id'];
 
-            $data = (array) $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            $data = (array) $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             if (!isset($data[$this->fromScope][$this->fromCode])) {
                 continue;
             }
@@ -113,7 +113,7 @@ class MoveEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
             $data[$this->toScope][$this->toCode] = $data[$this->fromScope][$this->fromCode];
             unset($data[$this->fromScope][$this->fromCode]);
 
-            $params = [$this->connection->convertToDatabaseValue($data, Type::TARRAY), $id];
+            $params = [$this->connection->convertToDatabaseValue($data, Types::ARRAY), $id];
 
             $this->logQuery($logger, $sql, $params);
 

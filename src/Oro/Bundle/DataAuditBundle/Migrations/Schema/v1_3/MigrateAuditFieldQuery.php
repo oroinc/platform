@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
@@ -65,7 +66,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         $data = $row['data'];
 
         try {
-            $data = Type::getType(Type::TARRAY)
+            $data = Type::getType(Types::ARRAY)
                 ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
         } catch (ConversionException $ex) {
         }

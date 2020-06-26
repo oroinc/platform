@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
@@ -61,7 +62,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function processRow(array $row)
     {
-        $data = Type::getType(Type::TARRAY)
+        $data = Type::getType(Types::ARRAY)
             ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
 
         if (!isset($data['extend']['state']) || $data['extend']['state'] !== 'New') {
@@ -96,7 +97,7 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 
         $data['extend']['pending_changes'] = $pendingChanges;
 
-        $this->connection->update('oro_entity_config', ['data' => $data], ['id' => $row['id']], [Type::TARRAY]);
+        $this->connection->update('oro_entity_config', ['data' => $data], ['id' => $row['id']], [Types::ARRAY]);
     }
 
     /**

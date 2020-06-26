@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
@@ -131,7 +131,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                     [
                         'name' => 'entity_name',
                         'path' => 'entityName',
-                        'type' => Type::STRING
+                        'type' => Types::STRING
                     ]
                 ],
                 'datagridParameters' => [
@@ -141,7 +141,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
                     $this->createQueryParameter('entity_id', 1),
-                    $this->createQueryParameter('entity_name', 'test', Type::STRING),
+                    $this->createQueryParameter('entity_name', 'test', Types::STRING),
                 ]
             ],
             'default value' => [

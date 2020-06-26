@@ -3,7 +3,7 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -52,12 +52,12 @@ class DbalMessageProducer implements MessageProducerInterface
             /** @var Connection $dbalConnection */
             $dbalConnection = $this->connection->getDBALConnection();
             $dbalConnection->insert($this->connection->getTableName(), $dbalMessage, [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'delayed_until' => Type::INTEGER,
+                'body' => Types::TEXT,
+                'headers' => Types::TEXT,
+                'properties' => Types::TEXT,
+                'priority' => Types::SMALLINT,
+                'queue' => Types::STRING,
+                'delayed_until' => Types::INTEGER,
             ]);
         } catch (\Exception $e) {
             throw new RuntimeException(

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -107,7 +107,7 @@ SQL;
         $isColumnExists = $connection->executeQuery(
             $isColumnExistsQuery,
             ['tableName' => $tableName, 'fieldName' => $fieldName],
-            ['tableName' => Type::STRING, 'fieldName' => Type::STRING]
+            ['tableName' => Types::STRING, 'fieldName' => Types::STRING]
         )
         ->fetchColumn();
 

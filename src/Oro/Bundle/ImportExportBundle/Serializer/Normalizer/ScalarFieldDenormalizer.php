@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\DBAL\Types\MoneyType;
 use Oro\DBAL\Types\PercentType;
 
@@ -40,11 +40,11 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
 
     /** @var array */
     private $convertTypeMappings = [
-        Type::SMALLINT => self::SCALAR_TYPE_INTEGER,
-        Type::INTEGER => self::SCALAR_TYPE_INTEGER,
-        Type::BIGINT => self::SCALAR_TYPE_INTEGER,
-        Type::FLOAT => self::SCALAR_TYPE_FLOAT,
-        Type::DECIMAL => self::SCALAR_TYPE_FLOAT,
+        Types::SMALLINT => self::SCALAR_TYPE_INTEGER,
+        Types::INTEGER => self::SCALAR_TYPE_INTEGER,
+        Types::BIGINT => self::SCALAR_TYPE_INTEGER,
+        Types::FLOAT => self::SCALAR_TYPE_FLOAT,
+        Types::DECIMAL => self::SCALAR_TYPE_FLOAT,
         MoneyType::TYPE => self::SCALAR_TYPE_FLOAT,
         PercentType::TYPE => self::SCALAR_TYPE_FLOAT
     ];

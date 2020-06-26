@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToManyRelationQuery;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -96,7 +96,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
         $relationKey = 'manyToMany|Extend\Entity\TestEntity1|Extend\Entity\TestEntity2|uniM2MTargets';
 
         $entityRow = $this->getEntityRow($entityClass);
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
         unset(
             $entityData['extend']['relation'][$relationKey],
             $entityData['extend']['schema']['relation'][$entityField],
@@ -121,7 +121,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
                 '[1] = ' . $fieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Types::ARRAY),
                 '[2] = ' . $entityClass,
             ],
             $this->logger->getMessages()
@@ -136,7 +136,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
         $relationKey = 'manyToMany|Extend\Entity\TestEntity1|Extend\Entity\TestEntity2|biM2MTargets';
 
         $entityRow = $this->getEntityRow($entityClass);
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
         unset(
             $entityData['extend']['relation'][$relationKey],
             $entityData['extend']['schema']['relation'][$entityField],
@@ -146,7 +146,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
 
         $targetEntityClass = \Extend\Entity\TestEntity2::class;
         $targetEntityRow = $this->getEntityRow($targetEntityClass);
-        $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Type::TARRAY);
+        $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Types::ARRAY);
         unset(
             $targetEntityData['extend']['relation'][$relationKey],
             $targetEntityData['extend']['schema']['relation'][$targetEntityField],
@@ -172,14 +172,14 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
                 '[1] = ' . $fieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($entityData, Types::ARRAY),
                 '[2] = ' . $entityClass,
                 'DELETE FROM oro_entity_config_field WHERE id = ?',
                 'Parameters:',
                 '[1] = ' . $targetFieldRow['id'],
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',
                 'Parameters:',
-                '[1] = ' . $this->connection->convertToDatabaseValue($targetEntityData, Type::TARRAY),
+                '[1] = ' . $this->connection->convertToDatabaseValue($targetEntityData, Types::ARRAY),
                 '[2] = ' . $targetEntityClass
             ],
             $this->logger->getMessages()

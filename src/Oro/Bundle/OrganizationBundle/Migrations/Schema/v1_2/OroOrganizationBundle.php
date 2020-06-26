@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -86,7 +86,7 @@ class OroOrganizationBundle implements Migration
                     ],
                     [
                         'field_names' => Connection::PARAM_STR_ARRAY,
-                        'class_name'  => Type::STRING
+                        'class_name'  => Types::STRING
                     ]
                 )
             );
@@ -103,7 +103,7 @@ class OroOrganizationBundle implements Migration
                     ],
                     [
                         'field_names' => Connection::PARAM_STR_ARRAY,
-                        'class_name'  => Type::STRING
+                        'class_name'  => Types::STRING
                     ]
                 )
             );

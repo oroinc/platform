@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -84,11 +84,11 @@ class UpdateNotificationRuleWorkflowTransitionQuery extends ParametrizedMigratio
                   workflow_transition_name = :transitionName and 
                   template_id = :templateId';
         $types = [
-            'templateId' => Type::INTEGER,
-            'newTransitionName' => Type::STRING,
-            'entityName' => Type::STRING,
-            'workflowDefinitionName' => Type::STRING,
-            'transitionName' => Type::STRING,
+            'templateId' => Types::INTEGER,
+            'newTransitionName' => Types::STRING,
+            'entityName' => Types::STRING,
+            'workflowDefinitionName' => Types::STRING,
+            'transitionName' => Types::STRING,
         ];
 
         $params = [
