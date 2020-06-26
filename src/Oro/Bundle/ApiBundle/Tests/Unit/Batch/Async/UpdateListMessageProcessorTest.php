@@ -25,6 +25,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -47,8 +48,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
     private $jobRunner;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface */
+    private $jobManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DependentJobService */
     private $dependentJob;
@@ -86,7 +87,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->dependentJob = $this->createMock(DependentJobService::class);
         $this->splitterRegistry = $this->createMock(FileSplitterRegistry::class);
         $this->chunkFileClassifierRegistry = $this->createMock(ChunkFileClassifierRegistry::class);
@@ -107,9 +108,12 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 );
             });
 
+        /** @var JobStorage $jobStorage */
+        $jobStorage = $this->createMock(JobStorage::class);
+
         $this->processor = new UpdateListMessageProcessor(
             $this->jobRunner,
-            $this->jobStorage,
+            $jobStorage,
             $this->dependentJob,
             $this->splitterRegistry,
             $this->chunkFileClassifierRegistry,
@@ -123,6 +127,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             new FileNameProvider(),
             $this->logger
         );
+        $this->processor->setJobManager($this->jobManager);
     }
 
     /**
@@ -284,7 +289,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private function expectSaveJob(int $operationId, array $jobData)
     {
-        $this->jobStorage->expects(self::once())
+        $this->jobManager->expects(self::once())
             ->method('saveJob')
             ->willReturnCallback(function (Job $job) use ($operationId, $jobData) {
                 self::assertEquals(array_merge($jobData, ['api_operation_id' => $operationId]), $job->getData());
@@ -1088,7 +1093,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->jobRunner->expects(self::never())
             ->method('runUnique');
-        $this->jobStorage->expects(self::never())
+        $this->jobManager->expects(self::never())
             ->method('saveJob');
         $this->fileManager->expects(self::never())
             ->method('writeToStorage');

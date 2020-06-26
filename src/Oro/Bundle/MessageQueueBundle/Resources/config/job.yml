@@ -13,6 +13,13 @@ services:
             - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
             - '@oro_message_queue.job.unique_job_handler'
 
+    oro_message_queue.job.manager:
+        class: 'Oro\Bundle\MessageQueueBundle\Job\JobManager'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_message_queue.job.unique_job_handler'
+            - '@event_dispatcher'
+
     oro_message_queue.job.unique_job_handler:
         class: 'Oro\Component\MessageQueue\Job\UniqueJobHandler'
         arguments:
@@ -23,9 +30,9 @@ services:
         public: true
         arguments:
             - '@oro_message_queue.job.storage'
-            - '@oro_message_queue.client.message_producer'
         calls:
             - ['setJobConfigurationProvider', ['@oro_message_queue.job.configuration_provider']]
+            - ['setJobManager', ['@oro_message_queue.job.manager']]
 
     oro_message_queue.job.runner:
         class: 'Oro\Component\MessageQueue\Job\JobRunner'
@@ -48,6 +55,8 @@ services:
             - '@oro_message_queue.checker.job_status_checker'
             - '@oro_message_queue.status_calculator.status_calculator_resolver'
             - '@oro_message_queue.client.message_producer'
+        calls:
+            - [ 'setJobManager', ['@oro_message_queue.job.manager'] ]
 
     oro_message_queue.checker.job_status_checker:
         class: 'Oro\Component\MessageQueue\Checker\JobStatusChecker'
@@ -102,6 +111,8 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.job.storage'
+        calls:
+            - [ 'setJobManager', ['@oro_message_queue.job.manager'] ]
 
     oro_message_queue.job.grid.root_job_action_configuration:
         class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'
@@ -114,6 +125,8 @@ services:
             - '@security.token_storage'
             - '@oro_security.token_serializer'
             - '@oro_message_queue.job.storage'
+        calls:
+            - [ 'setJobManager', ['@oro_message_queue.job.manager'] ]
         tags:
             - { name: oro_message_queue.job.extension }
 

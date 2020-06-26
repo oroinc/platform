@@ -22,6 +22,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -40,6 +41,9 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
 
     /** @var JobStorage */
     private $jobStorage;
+
+    /** @var JobManagerInterface */
+    private $jobManager;
 
     /** @var DependentJobService */
     private $dependentJob;
@@ -128,6 +132,14 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->processingHelper = $processingHelper;
         $this->fileNameProvider = $fileNameProvider;
         $this->logger = $logger;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -422,7 +434,11 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $data = $rootJob->getData();
         $data['api_operation_id'] = $operationId;
         $rootJob->setData($data);
-        $this->jobStorage->saveJob($rootJob);
+        if ($this->jobManager) {
+            $this->jobManager->saveJob($rootJob);
+        } else {
+            $this->jobStorage->saveJob($rootJob);
+        }
     }
 
     /**

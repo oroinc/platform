@@ -872,6 +872,8 @@ services:
             - '@oro_api.batch.async.update_list_processing_helper'
             - '@oro_api.batch.file_name_provider'
             - '@logger'
+        calls:
+            - [ 'setJobManager', ['@oro_message_queue.job.manager'] ]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: api }
@@ -930,8 +932,10 @@ services:
 
     oro_api.batch.job_event_listener:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
+        calls:
+            - [ 'setDoctrineHelper', ['@oro_entity.doctrine_helper'] ]
         tags:
-            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\MessageQueueBundle\Entity\Job, event: preFlush }
+            - { name: kernel.event_listener, event: oro_message_queue.before_save_job, method: onBeforeSaveJob }
 
     oro_api.batch.retry_helper:
         class: Oro\Bundle\ApiBundle\Batch\RetryHelper

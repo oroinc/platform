@@ -12,7 +12,6 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\Routing\Router;
@@ -197,6 +196,8 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         array $resultOfImportJob2,
         array $notificationExpectedMessage
     ) {
+        $jobHandler = self::getContainer()->get('oro_message_queue.job.manager');
+
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:oro_test.add_or_replace:test_import_message'
@@ -206,7 +207,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             $rootJob
         );
         $childJob1->setData($resultOfImportJob1);
-        $this->getJobStorage()->saveJob($childJob1);
+        $jobHandler->saveJob($childJob1);
 
         $childJob2 = $this->getJobProcessor()->findOrCreateChildJob(
             'oro:import:oro_test.add_or_replace:test_import_message:chunk.2',
@@ -270,14 +271,6 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
     private function getConfigManager()
     {
         return $this->getContainer()->get('oro_config.user');
-    }
-
-    /**
-     * @return JobStorage
-     */
-    private function getJobStorage()
-    {
-        return $this->getContainer()->get('oro_message_queue.job.storage');
     }
 
     /**

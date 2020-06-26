@@ -46,12 +46,12 @@ class JobRunner
         if (!$rootJob) {
             return null;
         }
+
         $this->throwIfJobIsStale($rootJob);
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
 
-        if ($rootJob->isInterrupted()) {
-            $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
+        if ($childJob->getStatus() === Job::STATUS_CANCELLED) {
             $this->jobExtension->onCancel($childJob);
 
             return null;
@@ -115,13 +115,13 @@ class JobRunner
     public function runDelayed($jobId, \Closure $runCallback)
     {
         $job = $this->jobProcessor->findJobById($jobId);
-        if (! $job) {
+        if (!$job) {
             throw JobNotFoundException::create($jobId);
         }
+
         $this->throwIfJobIsStale($job);
 
-        if ($job->getRootJob()->isInterrupted()) {
-            $this->jobProcessor->cancelAllActiveChildJobs($job->getRootJob());
+        if ($job->getStatus() === Job::STATUS_CANCELLED) {
             $this->jobExtension->onCancel($job);
 
             return null;

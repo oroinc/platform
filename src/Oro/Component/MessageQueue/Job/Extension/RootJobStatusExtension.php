@@ -51,7 +51,6 @@ class RootJobStatusExtension extends AbstractExtension
      */
     public function onCancel(Job $job)
     {
-        $this->calculateJobStatusMessage($job);
     }
 
     /**

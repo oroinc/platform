@@ -55,7 +55,7 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         $processorResult = $processor->process($message, $this->createSessionMock());
 
         /** @var ImportExportResult $resultJob */
-        $rootJobResult = $importExportResultManager->findOneBy(['jobId' => $rootJob]);
+        $rootJobResult = $importExportResultManager->findOneBy(['jobId' => $rootJob->getId()]);
 
         self::assertEquals(ExportMessageProcessor::ACK, $processorResult);
         self::assertAttributeEquals($rootJob->getId(), 'jobId', $rootJobResult);

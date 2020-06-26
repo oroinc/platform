@@ -2,14 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Jobs database layer, load and save jobs responsibility
@@ -22,9 +17,6 @@ class JobStorage
     /** @var string */
     private $entityClass;
 
-    /** @var UniqueJobHandler */
-    private $uniqueJobHandler;
-
     /**
      * @param ManagerRegistry  $doctrine
      * @param string           $entityClass
@@ -34,7 +26,6 @@ class JobStorage
     {
         $this->doctrine = $doctrine;
         $this->entityClass = $entityClass;
-        $this->uniqueJobHandler = $uniqueJobHandler;
     }
 
     /**
@@ -44,13 +35,13 @@ class JobStorage
      */
     public function findJobById($id)
     {
-        return $this->createJobQueryBuilder('job')
-            ->addSelect('rootJob')
+        $qb = $this->createJobQueryBuilder('job');
+        $qb->addSelect('rootJob')
             ->leftJoin('job.rootJob', 'rootJob')
-            ->where('job = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->where($qb->expr()->eq('job', ':id'))
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -61,13 +52,14 @@ class JobStorage
      */
     public function findRootJobByOwnerIdAndJobName($ownerId, $jobName)
     {
-        return $this->createJobQueryBuilder('job')
-            ->where('job.ownerId = :ownerId AND job.name = :jobName')
-            ->andWhere('job.rootJob is NULL')
+        $qb = $this->createJobQueryBuilder('job');
+        $qb->where($qb->expr()->isNull('job.rootJob'))
+            ->andWhere($qb->expr()->eq('job.name', ':jobName'))
+            ->andWhere($qb->expr()->eq('job.ownerId', ':ownerId'))
             ->setParameter('ownerId', $ownerId)
-            ->setParameter('jobName', $jobName)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('jobName', $jobName);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -80,14 +72,17 @@ class JobStorage
      */
     public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
     {
-        return $this->createJobQueryBuilder('job')
-            ->where('job.rootJob is NULL and job.name = :jobName and job.status in (:statuses)')
-            ->andWhere('job.interrupted != true')
+        $qb = $this->createJobQueryBuilder('job');
+        $qb->where($qb->expr()->isNull('job.rootJob'))
+            ->andWhere($qb->expr()->eq('job.name', ':jobName'))
+            ->andWhere($qb->expr()->in('job.status', ':statuses'))
+            ->andWhere($qb->expr()->neq('job.interrupted', ':interrupted'))
             ->setParameter('jobName', $jobName)
             ->setParameter('statuses', $statuses)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('interrupted', true)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -98,26 +93,28 @@ class JobStorage
      */
     public function findChildJobByName($name, Job $rootJob)
     {
-        return $this->createJobQueryBuilder('job')
-            ->addSelect('rootJob')
+        $qb = $this->createJobQueryBuilder('job');
+        $qb->addSelect('rootJob')
             ->leftJoin('job.rootJob', 'rootJob')
-            ->where('rootJob = :rootJob AND job.name = :name')
+            ->where($qb->expr()->eq('job.rootJob', ':rootJob'))
+            ->andWhere($qb->expr()->eq('job.name', ':name'))
             ->setParameter('rootJob', $rootJob)
-            ->setParameter('name', $name)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('name', $name);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
      * @param Job $rootJob
      *
-     * @return []
+     * @return array
      */
     public function getChildStatusesWithJobCountByRootJob(Job $rootJob)
     {
-        $rawChildStatusesWithJobCount = $this->createJobQueryBuilder('job')
+        $qb = $this->createJobQueryBuilder('job');
+        $rawChildStatusesWithJobCount = $qb
             ->select('COUNT(job.id) AS childCount', 'job.status')
-            ->where('job.rootJob = :rootJob')
+            ->where($qb->expr()->eq('job.rootJob', ':rootJob'))
             ->groupBy('job.status')
             ->setParameter('rootJob', $rootJob)
             ->getQuery()
@@ -148,18 +145,14 @@ class JobStorage
             ->select('job.id')
             ->where(
                 $qb->expr()->andX(
-                    'job.rootJob = :rootJob',
-                    'job.status = :status'
+                    $qb->expr()->eq('job.rootJob', ':rootJob'),
+                    $qb->expr()->eq('job.status', ':status')
                 )
             )
-            ->setParameters(
-                new ArrayCollection(
-                    [
-                        new Parameter('rootJob', $rootJob),
-                        new Parameter('status', $status),
-                    ]
-                )
-            )
+            ->setParameters([
+                'rootJob' => $rootJob,
+                'status' => $status,
+            ])
             ->getQuery()
             ->getScalarResult();
 
@@ -181,7 +174,10 @@ class JobStorage
      */
     public function createJobQueryBuilder($alias)
     {
-        return $this->getEntityManager()
+        /** @var EntityManager $em */
+        $em = $this->doctrine->getManagerForClass($this->entityClass);
+
+        return $em
             ->createQueryBuilder()
             ->select($alias)
             ->from($this->entityClass, $alias);
@@ -190,114 +186,9 @@ class JobStorage
     /**
      * @param Job           $job
      * @param \Closure|null $lockCallback
-     *
-     * @throws DuplicateJobException
      */
     public function saveJob(Job $job, \Closure $lockCallback = null)
     {
-        if (!$job instanceof $this->entityClass) {
-            throw new \InvalidArgumentException(sprintf(
-                'Expected job instance of "%s", given "%s".',
-                $this->entityClass,
-                get_class($job)
-            ));
-        }
-
-        if ($lockCallback) {
-            if (!$job->getId()) {
-                throw new \LogicException('Is not possible to create new job with lock, only update is allowed');
-            }
-
-            $em = $this->getEntityManager(true);
-            $em->getConnection()->transactional(function (Connection $connection) use ($em, $job, $lockCallback) {
-                /** @var Job $job */
-                $job = $em->find($this->entityClass, $job->getId(), LockMode::PESSIMISTIC_WRITE);
-
-                $lockCallback($job);
-                $em->flush($job);
-
-                if ($job->getStoppedAt()) {
-                    $this->uniqueJobHandler->delete($connection, $job);
-                }
-            });
-        } else {
-            if (!$job->getId() && $job->isRoot()) {
-                // Dbal transaction is used here because Doctrine closes EntityManger any time
-                // exception occurs but UniqueConstraintViolationException is expected here
-                // and we should keep EntityManager in open state.
-                $em = $this->getEntityManager(true);
-                $em->getConnection()->transactional(
-                    function (Connection $connection) use ($job, $em) {
-                        $this->uniqueJobHandler->insert($connection, $job);
-                        $this->flushJob($em, $job);
-                    }
-                );
-            } else {
-                $this->flushJob($this->getEntityManager(true), $job);
-            }
-        }
-    }
-
-    /**
-     * @param EntityManager $em
-     * @param Job           $job
-     */
-    private function flushJob(EntityManager $em, Job $job)
-    {
-        if (!$job->getId()) {
-            $em->persist($job);
-        } elseif (UnitOfWork::STATE_DETACHED === $em->getUnitOfWork()->getEntityState($job)) {
-            $job = $em->merge($job);
-        }
-
-        $em->flush($job);
-    }
-
-    /**
-     * @param bool $force Set TRUE if you need to get the open entity manager
-     *                    even if the current entity manager is closed
-     *
-     * @return EntityManager
-     */
-    private function getEntityManager($force = false)
-    {
-        /** @var EntityManager $em */
-        $em = $this->doctrine->getManagerForClass($this->entityClass);
-        if ($force) {
-            if (!$em->isOpen()) {
-                $this->resetEntityManager();
-                $em = $this->doctrine->getManagerForClass($this->entityClass);
-            } else {
-                /**
-                 * ensure that the transaction is fully rolled back
-                 * in case if a nested transaction is rolled back but the entity manager is not closed
-                 * this may happen if the EntityManager::rollback() method is called
-                 * without the call of EntityManager::close() method
-                 * @link http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/transactions-and-concurrency.html#exception-handling
-                 */
-                $connection = $em->getConnection();
-                if ($connection->getTransactionNestingLevel() > 0 && $connection->isRollbackOnly()) {
-                    while ($connection->getTransactionNestingLevel() > 0) {
-                        $connection->rollBack();
-                    }
-                }
-            }
-        }
-
-        return $em;
-    }
-
-    /**
-     * Replaces the closed entity manager with new instance of entity manager.
-     */
-    private function resetEntityManager()
-    {
-        $managers = $this->doctrine->getManagers();
-        foreach ($managers as $name => $manager) {
-            if (!$manager->getMetadataFactory()->isTransient($this->entityClass)) {
-                $this->doctrine->resetManager($name);
-                break;
-            }
-        }
+        // use JobManagerInterface::saveJob or JobManagerInterface::saveJobWithLock instead
     }
 }

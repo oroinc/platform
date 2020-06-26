@@ -1,19 +1,34 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
 class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    /** @var JobManagerInterface */
+    private $jobManager;
+
+    /** @var DependentJobService */
+    private $dependentJobService;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
-        new DependentJobService($this->createJobStorageMock());
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
+        /** @var JobStorage $jobStorage */
+        $jobStorage = $this->createMock(JobStorage::class);
+        $this->dependentJobService = new DependentJobService($jobStorage);
+        $this->dependentJobService->setJobManager($this->jobManager);
     }
 
-    public function testShouldThrowIfJobIsNotRootJob()
+    public function testSaveDependentJobLogicException(): void
     {
         $job = new Job();
         $job->setId(12345);
@@ -21,35 +36,29 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
 
         $context = new DependentJobContext($job);
 
-        $service = new DependentJobService($this->createJobStorageMock());
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Only root jobs allowed but got child. jobId: "12345"');
-        $service->saveDependentJob($context);
+        $this->dependentJobService->saveDependentJob($context);
     }
 
-    public function testShouldSaveDependentJobs()
+    public function testSaveDependentJob(): void
     {
         $job = new Job();
         $job->setId(12345);
 
-        $storage = $this->createJobStorageMock();
-        $storage
+        $this->jobManager
             ->expects($this->once())
-            ->method('saveJob')
-            ->will($this->returnCallback(function (Job $job, $callback) {
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static function (Job $job, $callback) {
                 $callback($job);
 
                 return true;
-            }))
-        ;
+            });
 
         $context = new DependentJobContext($job);
         $context->addDependentJob('job-topic', 'job-message', 'job-priority');
 
-        $service = new DependentJobService($storage);
-
-        $service->saveDependentJob($context);
+        $this->dependentJobService->saveDependentJob($context);
 
         $expectedDependentJobs = [
             'dependentJobs' => [
@@ -62,14 +71,5 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertEquals($expectedDependentJobs, $job->getData());
-    }
-
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    private function createJobStorageMock()
-    {
-        return $this->createMock(JobStorage::class);
     }
 }

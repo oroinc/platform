@@ -11,6 +11,7 @@ use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -42,6 +43,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      * @var JobStorage
      */
     private $jobStorage;
+
+    /**
+     * @var JobManagerInterface
+     */
+    private $jobManager;
 
     /**
      * @var ImportExportResultSummarizer
@@ -80,6 +86,14 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->jobStorage = $jobStorage;
         $this->importExportResultSummarizer = $importExportResultSummarizer;
         $this->notificationSettings = $notificationSettings;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -132,7 +146,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
         if ($fileName !== null) {
             $job->setData(array_merge($job->getData(), ['file' => $fileName]));
-            $this->jobStorage->saveJob($job);
+            if ($this->jobManager) {
+                $this->jobManager->saveJob($job);
+            } else {
+                $this->jobStorage->saveJob($job);
+            }
 
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 

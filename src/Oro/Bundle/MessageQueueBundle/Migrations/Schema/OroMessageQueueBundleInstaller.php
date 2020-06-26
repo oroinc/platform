@@ -21,7 +21,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_8_1';
     }
 
     /**
@@ -87,7 +87,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $table->addColumn('started_at', 'datetime', ['notnull' => false]);
         $table->addColumn('last_active_at', 'datetime', ['notnull' => false]);
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
-        $table->addIndex(['owner_id'], "owner_id_idx");
         $table->setPrimaryKey(['id']);
         $table->addColumn('data', 'json_array', [
             'notnull' => false,
@@ -100,7 +99,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-        $table->addIndex(['root_job_id', 'name', 'status', 'interrupted'], 'oro_message_queue_job_idx');
+        $table->addIndex(['status'], 'idx_status');
     }
 
     /**

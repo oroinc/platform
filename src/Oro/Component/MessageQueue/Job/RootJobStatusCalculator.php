@@ -14,8 +14,8 @@ use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
  */
 class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
 {
-    /** @var JobStorage */
-    private $jobStorage;
+    /** @var JobManagerInterface */
+    private $jobManager;
 
     /** @var JobStatusChecker */
     private $jobStatusChecker;
@@ -38,10 +38,17 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         StatusCalculatorResolver $statusCalculatorResolver,
         MessageProducerInterface $messageProducer
     ) {
-        $this->jobStorage = $jobStorage;
         $this->jobStatusChecker = $jobStatusChecker;
         $this->statusCalculatorResolver = $statusCalculatorResolver;
         $this->messageProducer = $messageProducer;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -55,7 +62,7 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
             return;
         }
 
-        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) {
+        $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
             if (!$this->jobStatusChecker->isJobStopped($rootJob)) {
                 $this->updateRootJob($rootJob);
             }

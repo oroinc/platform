@@ -20,12 +20,23 @@ class JobProcessor
     /** @var JobStorage */
     private $jobStorage;
 
+    /** @var JobManagerInterface */
+    private $jobManager;
+
     /**
      * @param JobStorage $jobStorage
      */
     public function __construct(JobStorage $jobStorage)
     {
         $this->jobStorage = $jobStorage;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -115,12 +126,14 @@ class JobProcessor
     private function saveJobAndStaleDuplicateIfQualifies($job)
     {
         try {
-            $this->jobStorage->saveJob($job);
+            $this->jobManager->saveJob($job);
+
             return $job;
         } catch (DuplicateJobException $e) {
             $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), $this->getActiveJobStatuses());
             if ($currentRootJob && $this->isJobStale($currentRootJob)) {
                 $this->staleRootJobAndChildren($currentRootJob);
+
                 return $this->saveJobAndStaleDuplicateIfQualifies($job);
             }
         }
@@ -173,11 +186,10 @@ class JobProcessor
      */
     public function findOrCreateChildJob($jobName, Job $rootJob)
     {
-        if (! $jobName) {
+        if (!$jobName) {
             throw new \LogicException('Job name must not be empty');
         }
 
-        $rootJob = $this->jobStorage->findJobById($rootJob->getId());
         $job = $this->jobStorage->findChildJobByName($jobName, $rootJob);
 
         if ($job) {
@@ -191,7 +203,7 @@ class JobProcessor
         $job->setRootJob($rootJob);
         $rootJob->addChildJob($job);
         $job->setJobProgress(0);
-        $this->jobStorage->saveJob($job);
+        $this->jobManager->saveJob($job);
 
         return $job;
     }
@@ -205,7 +217,7 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t start root jobs. id: "%s"', $job->getId()));
         }
 
-        if (! in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
+        if (!in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
             throw new \LogicException(sprintf(
                 'Can start only new jobs: id: "%s", status: "%s"',
                 $job->getId(),
@@ -216,8 +228,7 @@ class JobProcessor
         $job->setStatus(Job::STATUS_RUNNING);
         $job->setStartedAt(new \DateTime());
 
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
@@ -232,19 +243,9 @@ class JobProcessor
         $job->setStatus(Job::STATUS_SUCCESS);
         $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
-    /**
-     * @param Job $job
-     */
-    private function updateJobLastActiveAtAndSave(Job $job)
-    {
-        $job->setLastActiveAt(new \DateTime());
-        $this->jobStorage->saveJob($job);
-    }
-    
     /**
      * @param Job $rootJob
      */
@@ -254,7 +255,7 @@ class JobProcessor
             throw new \LogicException(sprintf('Can\'t stale child jobs. id: "%s"', $rootJob->getId()));
         }
 
-        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) {
+        $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
             $rootJob->setStatus(Job::STATUS_STALE);
             $rootJob->setStoppedAt(new \DateTime());
 
@@ -262,7 +263,7 @@ class JobProcessor
                 if (in_array($childJob->getStatus(), $this->getActiveJobStatuses(), true)) {
                     $childJob->setStatus(Job::STATUS_STALE);
                     $childJob->setStoppedAt(new \DateTime());
-                    $this->jobStorage->saveJob($childJob);
+                    $this->jobManager->saveJob($childJob);
                 }
             }
         });
@@ -280,8 +281,7 @@ class JobProcessor
         $job->setStatus(Job::STATUS_FAILED);
         $job->setStoppedAt(new \DateTime());
 
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
@@ -294,8 +294,7 @@ class JobProcessor
         }
 
         $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
-        $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
+        $this->jobManager->saveJob($job);
     }
 
     /**
@@ -323,7 +322,6 @@ class JobProcessor
         }
 
         $this->jobStorage->saveJob($job);
-        $this->updateJobLastActiveAtAndSave($job->getRootJob());
     }
 
     /**
@@ -343,8 +341,6 @@ class JobProcessor
     }
 
     /**
-     * Cancels running for all child jobs that are not in run status.
-     *
      * @param Job $job
      */
     public function cancelAllNotStartedChildJobs(Job $job)
@@ -361,7 +357,7 @@ class JobProcessor
     }
 
     /**
-     * @param Job  $job
+     * @param Job $job
      * @param bool $force
      */
     public function interruptRootJob(Job $job, $force = false)
@@ -374,20 +370,20 @@ class JobProcessor
             return;
         }
 
-        $this->jobStorage->saveJob($job, function (Job $job) use ($force) {
+        $this->jobManager->saveJobWithLock($job, function (Job $job) {
             if ($job->isInterrupted()) {
                 return;
             }
 
+            $stoppedAt = new \DateTime();
             $job->setInterrupted(true);
+            $job->setStoppedAt($stoppedAt);
+            $job->setLastActiveAt($stoppedAt);
+            $job->setStatus(Job::STATUS_CANCELLED);
 
-            if ($force) {
-                $this->cancelAllActiveChildJobs($job);
-                $job->setStoppedAt(new \DateTime());
-            } else {
-                // we should mark all child jobs as canceled to speed-up the terminate process
-                $this->cancelAllNotStartedChildJobs($job);
-            }
+            // Cancel only jobs that should be processed, to make in order to save history for already processed jobs.
+            $this->jobManager->setCancelledStatusForChildJobs($job, [Job::STATUS_NEW], $stoppedAt, $stoppedAt);
+            $this->jobManager->setCancelledStatusForChildJobs($job, [Job::STATUS_FAILED_REDELIVERED], $stoppedAt);
         });
     }
 

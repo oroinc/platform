@@ -16,10 +16,10 @@ use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
     /** @var * MessageProducerInterface */
-    protected $messageProcessor;
+    private $messageProcessor;
 
     /** @var QueueConsumer */
-    protected $consumer;
+    private $consumer;
 
     /**
      * {@inheritdoc}
@@ -38,7 +38,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
         $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
     }
 
-    public function testMessageProcessionUpdatesRootJobAfterException()
+    public function testMessageProcessionUpdatesRootJobAfterException(): void
     {
         $uniqueJobName = UniqueMessageProcessor::TEST_JOB_NAME;
         $dependentJobName = DependentMessageProcessor::TEST_JOB_NAME;
@@ -64,11 +64,18 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
     }
 
     /**
-     * @param $classManager
+     * {@inheritdoc}
+     */
+    protected function getDataFixturesExecutorEntityManager()
+    {
+        return $this->getEntityManager();
+    }
+
+    /**
      * @return EntityManager
      */
-    private function getEntityManager($classManager = Job::class)
+    private function getEntityManager(): EntityManager
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($classManager);
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 }
