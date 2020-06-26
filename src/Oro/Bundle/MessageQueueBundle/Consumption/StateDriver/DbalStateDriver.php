@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\StateDriver;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
 use Psr\Log\LoggerInterface;
 
@@ -103,7 +103,7 @@ class DbalStateDriver implements StateDriverInterface
         $this->getConnection()->executeUpdate(
             $querySQL,
             ['updatedAt' => $date, 'id' => $this->key, 'dateWithGap' => $dateWithGap],
-            ['updatedAt' => Type::DATETIME, 'id' => Type::STRING, 'dateWithGap' => Type::DATETIME]
+            ['updatedAt' => Types::DATETIME_MUTABLE, 'id' => Types::STRING, 'dateWithGap' => Types::DATETIME_MUTABLE]
         );
     }
 

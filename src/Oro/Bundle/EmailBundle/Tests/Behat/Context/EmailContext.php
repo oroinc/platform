@@ -17,6 +17,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailContext extends OroFeatureContext implements KernelAwareContext
 {
@@ -59,8 +60,10 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $pattern = $this->getPattern($text);
         $found = false;
 
+        $messages = $this->getSentMessages($mailer);
+
         /** @var \Swift_Mime_SimpleMessage $message */
-        foreach ($mailer->getSentMessages() as $message) {
+        foreach ($messages as $message) {
             $data = array_map(
                 function ($field) use ($message) {
                     return $this->getMessageData($message, $field);
@@ -78,7 +81,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             $found,
             sprintf(
                 'Sent emails bodies don\'t contain expected text. The following messages has been sent: %s',
-                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+                print_r($this->getSentMessagesData($messages), true)
             )
         );
     }
@@ -112,7 +115,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
 
-        $sentMessages = $mailer->getSentMessages();
+        $sentMessages = $this->getSentMessages($mailer);
 
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
@@ -138,7 +141,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             $found,
             sprintf(
                 'Sent emails bodies don\'t contain expected data. The following messages has been sent: %s',
-                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+                print_r($this->getSentMessagesData($sentMessages), true)
             )
         );
     }
@@ -191,7 +194,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
 
-        $sentMessages = $mailer->getSentMessages();
+        $sentMessages = $this->getSentMessages($mailer);
 
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
@@ -217,7 +220,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             $found,
             sprintf(
                 'Sent emails contains extra data. The following messages has been sent: %s',
-                print_r($this->getSentMessagesData($mailer->getSentMessages()), true)
+                print_r($this->getSentMessagesData($sentMessages), true)
             )
         );
     }
@@ -236,7 +239,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $found = null;
 
         /** @var \Swift_Mime_Message $message */
-        foreach ($mailer->getSentMessages() as $message) {
+        foreach ($this->getSentMessages($mailer) as $message) {
             $body = $message->getBody();
 
             if (!preg_match($pattern, $body, $matches)) {
@@ -267,6 +270,10 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
+     * Example: And the downloaded file from email contains at least the following data:
+     *          | SKU   | Related SKUs {{ "type": "array", "separator": ";" }} |
+     *          | PSKU2 | PSKU5;PSKU4;PSKU3;PSKU1                              |
+     *
      * @Given /^the downloaded file from email contains at least the following data:$/
      *
      * @param TableNode $expectedEntities
@@ -282,11 +289,18 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                 | \SplFileObject::DROP_NEW_LINE);
 
             $headers = $exportedFile->current();
-            $expectedHeaders = $expectedEntities->getRow(0);
+            [$expectedHeaders, $metadata] = $this->getExpectedHeadersWithMetadata($expectedEntities->getRow(0));
 
             foreach ($exportedFile as $line => $data) {
-                $entityDataFromCsv = array_combine($headers, array_values($data));
-                $expectedEntityData = array_combine($expectedHeaders, array_values($expectedEntities->getRow($line)));
+                // Skip the first (header) line
+                if ($line === 0) {
+                    continue;
+                }
+                $entityDataFromCsv = $this->normalizeData(array_combine($headers, array_values($data)), $metadata);
+                $expectedEntityData = $this->normalizeData(
+                    array_combine($expectedHeaders, array_values($expectedEntities->getRow($line))),
+                    $metadata
+                );
 
                 // Ensure that at least expected data is present.
                 foreach ($expectedEntityData as $property => $value) {
@@ -335,7 +349,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $found = false;
 
         /** @var \Swift_Mime_SimpleMessage $message */
-        foreach ($mailer->getSentMessages() as $message) {
+        foreach ($this->getSentMessages($mailer) as $message) {
             if ($searchText !== $this->getMessageData($message, $searchField)) {
                 continue;
             }
@@ -369,7 +383,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         }
 
         /** @var \Swift_Mime_SimpleMessage $message */
-        foreach ($mailer->getSentMessages() as $message) {
+        foreach ($this->getSentMessages($mailer) as $message) {
             if ($searchText === $this->getMessageData($message, $searchField)) {
                 self::fail(sprintf('Email with %s \"%s\" was not expected to be sent', $searchField, $searchText));
             }
@@ -393,7 +407,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         $found = null;
         /** @var \Swift_Mime_Message $message */
-        foreach ($mailer->getSentMessages() as $message) {
+        foreach ($this->getSentMessages($mailer) as $message) {
             $found = (bool) preg_match(
                 '/\D{2,3}\s\d{1,2},\s\d{4} at \d{1,2}:\d{2}\s(AM|PM)/',
                 $message->getBody(),
@@ -527,7 +541,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         $url = $this->spin(function () use ($mailer, $pattern) {
             $matches = [];
             /** @var \Swift_Mime_SimpleMessage $message */
-            foreach ($mailer->getSentMessages() as $message) {
+            foreach ($this->getSentMessages($mailer) as $message) {
                 $text = utf8_decode(html_entity_decode($message->getBody()));
                 // replace non-breaking spaces with plain spaces to be able to search
                 $text = str_replace(chr(160), chr(32), $text);
@@ -568,5 +582,62 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         // Doctrine is caching email templates and after change template data not perform that changes in behat thread
         $doctrine->resetManager();
+    }
+
+    /**
+     * @param array $expectedHeaders
+     * @return array
+     */
+    private function getExpectedHeadersWithMetadata(array $expectedHeaders)
+    {
+        $metadata = [];
+        foreach ($expectedHeaders as &$header) {
+            if (($metadataPos = strpos($header, '{{')) > 0) {
+                $headerMetadata = substr($header, $metadataPos);
+                $headerMetadata = trim(str_replace(['{{', '}}'], ['{', '}'], $headerMetadata));
+                $headerMetadata = json_decode($headerMetadata, true);
+                $header = trim(substr($header, 0, $metadataPos));
+                $metadata[$header] = $headerMetadata;
+            }
+        }
+        unset($header);
+
+        return [$expectedHeaders, $metadata];
+    }
+
+    /**
+     * @param array $data
+     * @param array $metadata
+     * @return array
+     */
+    private function normalizeData(array $data, array $metadata): array
+    {
+        foreach ($metadata as $header => $metadataRow) {
+            if (array_key_exists($header, $data)) {
+                $cellValue = $data[$header];
+
+                if ($metadataRow && array_key_exists('type', $metadataRow) && $metadataRow['type'] === 'array') {
+                    $separator = $metadataRow['separator'] ?? ',';
+                    $cellValue = explode($separator, $cellValue);
+                    $cellValue = array_map('trim', $cellValue);
+                    sort($cellValue);
+
+                    $data[$header] = $cellValue;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param DirectMailerDecorator $mailer
+     * @return array
+     */
+    private function getSentMessages(DirectMailerDecorator $mailer): array
+    {
+        return $this->spin(static function () use ($mailer) {
+            return $mailer->getSentMessages() ?: null;
+        }, 30) ?? [];
     }
 }

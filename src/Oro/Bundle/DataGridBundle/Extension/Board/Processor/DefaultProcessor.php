@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -104,7 +104,7 @@ class DefaultProcessor implements BoardProcessorInterface
             $idExpr = sprintf('%s.%s', $rootAlias, $idKeyField);
 
             $unionQb = new UnionQueryBuilder($em, true, 'ids');
-            $unionQb->addSelect('id', 'id', Type::INTEGER);
+            $unionQb->addSelect('id', 'id', Types::INTEGER);
             foreach ($boardData['board_options'] as $optionIds) {
                 /** @var QueryBuilder $queryClone */
                 $qbClone = clone $qb;

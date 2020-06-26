@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -213,8 +213,8 @@ class AssociationManager
         $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationOwnerClass)
-            ->addSelect('id', 'ownerId', Type::INTEGER)
-            ->addSelect('entityId', 'id', Type::INTEGER)
+            ->addSelect('id', 'ownerId', Types::INTEGER)
+            ->addSelect('entityId', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($associationTargets as $entityClass => $fieldName) {
@@ -340,7 +340,7 @@ class AssociationManager
         $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationTargetClass)
-            ->addSelect('entityId', 'id', Type::INTEGER)
+            ->addSelect('entityId', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($associationTargetClass);

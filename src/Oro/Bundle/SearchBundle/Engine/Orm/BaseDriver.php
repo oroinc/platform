@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
@@ -881,25 +881,25 @@ abstract class BaseDriver implements DBALPersisterInterface
         if (!$this->writeableItemTypes) {
             $this->writeableItemTypes = [
                 'insert' => [
-                    Type::STRING,
-                    Type::STRING,
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::DECIMAL,
-                    Type::BOOLEAN,
-                    Type::DATETIME,
-                    Type::DATETIME,
+                    Types::STRING,
+                    Types::STRING,
+                    Types::INTEGER,
+                    Types::STRING,
+                    Types::DECIMAL,
+                    Types::BOOLEAN,
+                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_MUTABLE,
                 ],
                 'update' => [
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::STRING,
-                    Type::INTEGER,
-                    Type::STRING,
-                    Type::DECIMAL,
-                    Type::BOOLEAN,
-                    Type::DATETIME,
-                    Type::DATETIME,
+                    Types::INTEGER,
+                    Types::STRING,
+                    Types::STRING,
+                    Types::INTEGER,
+                    Types::STRING,
+                    Types::DECIMAL,
+                    Types::BOOLEAN,
+                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_MUTABLE,
                 ],
             ];
         }
@@ -949,10 +949,10 @@ abstract class BaseDriver implements DBALPersisterInterface
             $this->indexUpdateData[$table] = [
                 'data'  => [],
                 'types' => [
-                    Type::INTEGER,
-                    Type::STRING,
+                    Types::INTEGER,
+                    Types::STRING,
                     $type,
-                    Type::INTEGER,
+                    Types::INTEGER,
                 ],
             ];
             $this->indexInsertData[$table] = [
@@ -985,9 +985,9 @@ abstract class BaseDriver implements DBALPersisterInterface
 
                 array_push(
                     $this->indexInsertData[$table]['types'],
-                    Type::STRING,
+                    Types::STRING,
                     $type,
-                    Type::INTEGER
+                    Types::INTEGER
                 );
             }
         }

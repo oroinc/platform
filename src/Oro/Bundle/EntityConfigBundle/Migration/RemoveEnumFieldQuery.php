@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Remove outdated enum field data.
+ */
 class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
 {
     /** @var string  */
@@ -63,7 +66,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     {
         $enumClass = null;
 
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         // delete field data
         $this->executeQuery($logger, 'DELETE FROM oro_entity_config_field WHERE id = ?', [$id]);
@@ -96,7 +99,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
      */
     protected function updateEntityData(LoggerInterface $logger, $enumClass, $data)
     {
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         $extendKey = sprintf('manyToOne|%s|%s|%s', $this->entityClass, $enumClass, $this->enumField);
         if (isset($data['extend']['relation'][$extendKey])) {
@@ -106,7 +109,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
             unset($data['extend']['schema']['relation'][$this->enumField]);
         }
 
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+        $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
         $this->executeQuery(
             $logger,

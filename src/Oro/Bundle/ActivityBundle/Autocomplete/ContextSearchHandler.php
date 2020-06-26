@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
@@ -281,7 +281,7 @@ class ContextSearchHandler implements ConverterInterface
 
         $qb = new UnionQueryBuilder($em);
         $qb
-            ->addSelect('id', 'id', Type::INTEGER)
+            ->addSelect('id', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($groupedTargets as $entityClass => $ids) {

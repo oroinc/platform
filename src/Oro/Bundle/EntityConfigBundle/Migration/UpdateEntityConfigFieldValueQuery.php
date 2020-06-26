@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Set option for entity field in a given scope.
+ */
 class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -104,11 +107,11 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
         if ($row) {
             $data = $row['data'];
             $id   = $row['id'];
-            $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+            $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
             if ($this->isDoUpdate($data)) {
                 $data[$this->scope][$this->code] = $this->value;
-                $data                            = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+                $data                            = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
                 // update field itself
                 $sql        = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
                 $parameters = [$data, $id];

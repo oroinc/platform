@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -26,8 +26,8 @@ class ImportExportResultRepository extends EntityRepository
                 )
             )
             ->setParameter('expired', true)
-            ->setParameter('from', $from, Type::DATETIME)
-            ->setParameter('to', $to, Type::DATETIME);
+            ->setParameter('from', $from, Types::DATETIME_MUTABLE)
+            ->setParameter('to', $to, Types::DATETIME_MUTABLE);
 
         $qb->getQuery()->execute();
     }

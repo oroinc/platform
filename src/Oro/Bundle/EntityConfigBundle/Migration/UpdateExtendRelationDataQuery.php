@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -74,13 +74,13 @@ class UpdateExtendRelationDataQuery extends ParametrizedMigrationQuery
     {
         $sql = 'SELECT id, data FROM oro_entity_config WHERE class_name = :className LIMIT 1';
         $parameters = ['className' => $this->className];
-        $types = ['className' => Type::STRING];
+        $types = ['className' => Types::STRING];
 
         $this->logQuery($logger, $sql, $parameters);
 
         $row = $this->connection->fetchAssoc($sql, $parameters, $types);
         $id = $row['id'];
-        $data = isset($row['data']) ? $this->connection->convertToPHPValue($row['data'], Type::TARRAY) : [];
+        $data = isset($row['data']) ? $this->connection->convertToPHPValue($row['data'], Types::ARRAY) : [];
 
         if (!isset($data['extend']['relation'][$this->relationName])) {
             $logger->error(sprintf(
@@ -92,7 +92,7 @@ class UpdateExtendRelationDataQuery extends ParametrizedMigrationQuery
         }
 
         $data['extend']['relation'][$this->relationName][$this->option] = $this->value;
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+        $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [$data, $id];

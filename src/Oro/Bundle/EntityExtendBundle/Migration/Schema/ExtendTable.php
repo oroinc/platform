@@ -77,7 +77,7 @@ class ExtendTable extends TableWithNameGenerator
             if (!isset($oroOptions['extend']['is_extend'])) {
                 $oroOptions['extend']['is_extend'] = true;
             }
-            $options['notnull'] = false;
+            $options['notnull'] = $options['notnull'] ?? false;
         }
 
         $column = parent::addColumn($columnName, $typeName, $options);

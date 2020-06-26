@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
@@ -26,7 +26,7 @@ class SetValue implements Migration, OrderedMigrationInterface
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_audit SET type = :type',
                 ['type' => 'audit'],
-                ['type' => Type::STRING]
+                ['type' => Types::STRING]
             )
         );
     }

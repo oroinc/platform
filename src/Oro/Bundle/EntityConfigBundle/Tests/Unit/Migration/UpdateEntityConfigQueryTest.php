@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigQuery;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
@@ -126,7 +126,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         $this->initializeQuery($key, $value);
         $this->connection->expects($this->at(1))
             ->method('convertToPHPValue')
-            ->with('data persisted payload serialized', Type::TARRAY)
+            ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn([
                 'extend' => [
                     'relation' => [] //no relation defined in persisted entity config
@@ -168,7 +168,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->connection->expects($this->at(1))
             ->method('convertToPHPValue')
-            ->with('data persisted payload serialized', Type::TARRAY)
+            ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn(
                 [
                     'extend' => [
@@ -188,7 +188,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                Type::TARRAY
+                Types::ARRAY
             )->willReturn('data serialized payload to persist');
 
         $statement = $this->createMock(Statement::class);

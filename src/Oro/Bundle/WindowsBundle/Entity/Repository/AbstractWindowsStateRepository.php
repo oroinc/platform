@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\WindowsBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Abstract implementation of ORM entity repository for WindowsState entities.
+ */
 abstract class AbstractWindowsStateRepository extends EntityRepository
 {
     /**
@@ -53,10 +56,11 @@ abstract class AbstractWindowsStateRepository extends EntityRepository
                     $qb->expr()->eq('w.id', ':id')
                 )
             )
-            ->setParameter('data', $connection->convertToDatabaseValue($data, Type::JSON_ARRAY))
+            ->setParameter('data', $connection->convertToDatabaseValue($data, Types::JSON_ARRAY))
             ->setParameter(
                 'updatedAt',
-                $connection->convertToDatabaseValue(new \DateTime('now', new \DateTimeZone('UTC')), Type::DATETIME)
+                $connection
+                    ->convertToDatabaseValue(new \DateTime('now', new \DateTimeZone('UTC')), Types::DATETIME_MUTABLE)
             )
             ->setParameter('id', $windowId)
             ->setParameter('user', $user)

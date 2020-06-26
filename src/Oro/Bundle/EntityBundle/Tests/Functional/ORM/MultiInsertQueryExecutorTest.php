@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -62,7 +62,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
             ->innerJoin('u.groups', 'g')
             ->where('u.createdAt <= :datetime')
             ->andWhere('g = :group')
-            ->setParameter('datetime', new \DateTime(), Type::DATETIME)
+            ->setParameter('datetime', new \DateTime(), Types::DATETIME_MUTABLE)
             ->setParameter('group', $group)
         ;
 

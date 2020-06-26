@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 
@@ -21,7 +21,7 @@ class CalendarDateRepository extends EntityRepository
         if ($date) {
             $qb
                 ->where($qb->expr()->eq('CAST(d.date as date)', 'CAST(:date as date)'))
-                ->setParameter('date', $date, Type::DATETIME);
+                ->setParameter('date', $date, Types::DATETIME_MUTABLE);
         }
 
         return $qb->getQuery()->getOneOrNullResult();

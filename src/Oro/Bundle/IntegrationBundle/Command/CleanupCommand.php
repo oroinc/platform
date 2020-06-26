@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -198,10 +198,10 @@ class CleanupCommand extends Command implements CronCommandInterface
                     $expr->notIn('status.id', ':excludes')
                 )
             );
-        $queryBuilder->setParameter('statusCompleted', Status::STATUS_COMPLETED, Type::STRING);
-        $queryBuilder->setParameter('statusFailed', Status::STATUS_FAILED, Type::STRING);
-        $queryBuilder->setParameter('completedInterval', $completedInterval, Type::DATETIME);
-        $queryBuilder->setParameter('failedInterval', $failedInterval, Type::DATETIME);
+        $queryBuilder->setParameter('statusCompleted', Status::STATUS_COMPLETED, Types::STRING);
+        $queryBuilder->setParameter('statusFailed', Status::STATUS_FAILED, Types::STRING);
+        $queryBuilder->setParameter('completedInterval', $completedInterval, Types::DATETIME_MUTABLE);
+        $queryBuilder->setParameter('failedInterval', $failedInterval, Types::DATETIME_MUTABLE);
         $queryBuilder->setParameter('excludes', $excludes);
 
         return $queryBuilder;

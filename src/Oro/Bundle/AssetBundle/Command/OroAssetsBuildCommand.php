@@ -231,7 +231,7 @@ DESCRIPTION
         $output->writeln('<info>Building assets.</info>');
         $this->buildAssets($input, $output);
         if (!$input->getOption('hot') && !$input->getOption('watch')) {
-            $io->success('All assets were successfully build.');
+            $io->success('All assets were successfully built.');
         }
     }
 

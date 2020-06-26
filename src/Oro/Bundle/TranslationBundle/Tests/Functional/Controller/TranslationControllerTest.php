@@ -43,9 +43,20 @@ class TranslationControllerTest extends WebTestCase
             ->findAvailableDomains();
 
         // Assert Domain filter choices
+        $gridElement = $crawler->filter('[data-page-component-name="oro-translation-translations-grid"]');
+        $gridComponentOptions = json_decode($gridElement->attr('data-page-component-options'), JSON_OBJECT_AS_ARRAY);
+        $this->assertArrayHasKey('metadata', $gridComponentOptions);
+        $this->assertArrayHasKey('filters', $gridComponentOptions['metadata']);
+        $this->assertIsArray($gridComponentOptions['metadata']['filters']);
+        $domainFilter = null;
+        foreach ($gridComponentOptions['metadata']['filters'] as $filter) {
+            if ($filter['name'] === 'domain') {
+                $domainFilter = $filter;
+                break;
+            }
+        }
         foreach ($domains as $domain) {
-            $json = sprintf('{"label":"%s","value":"%s"}', $domain, $domain);
-            static::assertStringContainsString($json, $crawler->html(), 'JSON not found in page content');
+            self::assertContains(['label' => $domain, 'value' => $domain], $domainFilter['choices']);
         }
 
         $language = $this->registry->getRepository(Language::class)->findOneBy(['code' => LoadLanguages::LANGUAGE1]);

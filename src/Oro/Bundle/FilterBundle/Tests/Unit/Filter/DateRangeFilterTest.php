@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
@@ -80,7 +80,7 @@ class DateRangeFilterTest extends OrmTestCase
             });
         $ds->expects(self::once())
             ->method('setParameter')
-            ->with('date1', new \DateTime('2018-01-20T00:00:00', new \DateTimeZone('UTC')), Type::DATE);
+            ->with('date1', new \DateTime('2018-01-20T00:00:00', new \DateTimeZone('UTC')), Types::DATE_MUTABLE);
         $ds->expects(self::any())
             ->method('expr')
             ->willReturn($expr);

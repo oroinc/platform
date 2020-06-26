@@ -3,11 +3,14 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Set specific row value in oro_entity_config_index_value table.
+ */
 class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**
@@ -124,11 +127,11 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $data = $this->connection->fetchColumn($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         if ($this->isDoUpdate($data)) {
             $data[$this->scope][$this->code] = $this->value;
-            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
             $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
             $parameters = [$data, $this->entityName];
