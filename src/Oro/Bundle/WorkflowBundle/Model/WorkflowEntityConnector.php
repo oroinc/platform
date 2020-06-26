@@ -7,8 +7,13 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
+/**
+ * Provide information about entity applicability for workflow.
+ * Only entities with single identifiers of (big|small)int, decimal and string are supported.
+ */
 class WorkflowEntityConnector
 {
     const WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX = 'workflow_applicable_entity:';
@@ -18,11 +23,11 @@ class WorkflowEntityConnector
 
     /** @var array */
     protected $supportedIdentifierTypes = [
-        Type::BIGINT,
-        Type::DECIMAL,
-        Type::INTEGER,
-        Type::SMALLINT,
-        Type::STRING
+        Types::BIGINT,
+        Types::DECIMAL,
+        Types::INTEGER,
+        Types::SMALLINT,
+        Types::STRING
     ];
 
     /**

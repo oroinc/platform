@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
@@ -127,7 +128,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     protected function getDefaultOptions()
     {
         if (!$this->defaultColumn) {
-            $this->defaultColumn = new Column('_template_', Type::getType(Type::STRING));
+            $this->defaultColumn = new Column('_template_', Type::getType(Types::STRING));
         }
         if (!$this->defaultColumnOptions) {
             foreach ($this->optionNames as $optionName) {

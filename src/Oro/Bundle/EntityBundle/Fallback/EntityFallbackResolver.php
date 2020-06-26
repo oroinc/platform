@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Fallback;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -474,7 +474,7 @@ class EntityFallbackResolver
         $qb->select('1')
             ->innerJoin(QueryBuilderUtil::getField('e', $objectFieldName), 'fallbackValue')
             ->where($qb->expr()->eq('fallbackValue.scalarValue', ':value'))
-            ->setParameter('value', $value, Type::STRING)
+            ->setParameter('value', $value, Types::STRING)
             ->setMaxResults(1);
 
         return (bool)$qb->getQuery()->getResult();

@@ -3,10 +3,17 @@
 namespace Oro\Bundle\ConfigBundle\Migration;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Rename keys within array_value of oro_config_value.
+ *
+ * Example:
+ * new RenameConfigArrayKeyQuery('oro_warehouse', 'enabled_warehouses', 'priority', 'sort_order')
+ */
 class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -69,7 +76,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $selectQuery = 'SELECT id, array_value FROM oro_config_value WHERE name = :name AND section = :section';
-        $selectQueryTypes = ['name' => Type::STRING, 'section' => Type::STRING];
+        $selectQueryTypes = ['name' => Types::STRING, 'section' => Types::STRING];
         $selectQueryParameters = ['name' => $this->configValueName, 'section' => $this->configValueSection];
 
         $this->logQuery($logger, $selectQuery, $selectQueryParameters, $selectQueryTypes);
@@ -78,7 +85,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
         }
 
         $updateQuery = 'UPDATE oro_config_value SET array_value = :array_value WHERE id = :id';
-        $updateQueryTypes = ['array_value' => TYPE::TARRAY, 'id' => TYPE::INTEGER];
+        $updateQueryTypes = ['array_value' => Types::ARRAY, 'id' => Types::INTEGER];
 
         $selectStatement = $this->connection->prepare($selectQuery);
         $selectStatement->execute($selectQueryParameters);
@@ -119,7 +126,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
      */
     protected function deserialize($serializedValue)
     {
-        $arrayType = Type::getType(Type::TARRAY);
+        $arrayType = Type::getType(Types::ARRAY);
         $platform = $this->connection->getDatabasePlatform();
 
         return $arrayType->convertToPHPValue($serializedValue, $platform);

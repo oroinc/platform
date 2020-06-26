@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -97,7 +97,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('message', 'text', []);
         $table->addColumn('date', 'datetime', []);
-        $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        $table->addColumn('data', Types::JSON_ARRAY, ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
         $table->addIndex(['date'], 'oro_intch_date_idx', []);

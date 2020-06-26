@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -93,7 +93,7 @@ class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
             ->setMaxResults(1)
             ->getSQL();
         $params = ['role' => User::ROLE_ADMINISTRATOR];
-        $types = ['role' => Type::STRING];
+        $types = ['role' => Types::STRING];
 
         $this->logQuery($logger, $sql, $params, $types);
 

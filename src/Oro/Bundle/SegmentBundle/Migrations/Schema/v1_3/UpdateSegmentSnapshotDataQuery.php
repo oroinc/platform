@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_3;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -41,7 +41,7 @@ UPDATE oro_segment_snapshot set integer_entity_id = CAST(entity_id as %s) WHERE 
 SQL;
         $type = 'UNSIGNED';
         $function = 'REGEXP';
-        if ($this->connection->getDriver()->getName() === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
             $function = '~';
             $type = 'int';
         }

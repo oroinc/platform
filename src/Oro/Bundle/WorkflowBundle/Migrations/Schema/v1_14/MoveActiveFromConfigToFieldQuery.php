@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -50,7 +50,7 @@ class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
                     $queries[] = [
                         'UPDATE oro_workflow_definition SET active = :is_active WHERE name = :workflow_name',
                         ['is_active' => true, 'workflow_name' => $workflowName],
-                        ['is_active' => Type::BOOLEAN, 'workflow_name' => Type::STRING]
+                        ['is_active' => Types::BOOLEAN, 'workflow_name' => Types::STRING]
                     ];
                 }
 
@@ -58,7 +58,7 @@ class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
                 $queries[] = [
                     'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                     ['data' => $data, 'id' => $row['id']],
-                    ['data' => Type::TARRAY, 'id' => Type::INTEGER]
+                    ['data' => Types::ARRAY, 'id' => Types::INTEGER]
                 ];
             }
         }

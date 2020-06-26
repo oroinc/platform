@@ -11,17 +11,9 @@ Feature: User Case Insensitive Usernames
       | Admin | first_session  |
       | User  | second_session |
 
-  Scenario: Check unsuccessful login with username in another case
+  Scenario: Check successful login with original username
     Given I proceed as the User
     And I am on Login page
-    And I fill "Login Form" with:
-      | Username | CHARLIE |
-      | Password | charlie |
-    When I click "Log in"
-    Then I should see "Your login was unsuccessful. Please check your e-mail address and password before trying again. If you have forgotten your password, follow \"Forgot your password?\" link."
-
-  Scenario: Check successful login with original username
-    Given I am on Login page
     And I fill form with:
       | Username | charlie |
       | Password | charlie |

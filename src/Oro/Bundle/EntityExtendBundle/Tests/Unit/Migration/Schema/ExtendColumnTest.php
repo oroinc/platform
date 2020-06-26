@@ -110,8 +110,21 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
                 'extend' => ['default' => true],
                 ExtendOptionsManager::TYPE_OPTION => 'string'
             ]);
-        static::assertEquals(null, $this->column->getDefault());
+        static::assertNull($this->column->getDefault());
         $this->column->setDefault(true);
-        static::assertEquals(true, $this->column->getDefault());
+        static::assertTrue($this->column->getDefault());
+    }
+
+    public function testSetNotNull()
+    {
+        $this->extendOptionsManager->expects(static::once())
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => ['nullable' => true],
+                ExtendOptionsManager::TYPE_OPTION => 'string'
+            ]);
+        static::assertTrue($this->column->getNotnull());
+        $this->column->setNotnull(false);
+        static::assertFalse($this->column->getNotnull());
     }
 }

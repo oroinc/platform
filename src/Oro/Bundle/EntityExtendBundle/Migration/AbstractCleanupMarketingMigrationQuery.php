@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract implementation of entity config removal for given entities.
+ */
 abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -161,7 +164,7 @@ abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrat
             $this->connection->executeUpdate(
                 $query,
                 $parameters,
-                ['className' => Type::STRING]
+                ['className' => Types::STRING]
             );
         }
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_8;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -59,7 +60,7 @@ class RemoveInvalidFieldConfigQuery implements MigrationQuery, ConnectionAwareIn
      */
     protected function processRow(array $row)
     {
-        $convertedData = Type::getType(Type::TARRAY)
+        $convertedData = Type::getType(Types::ARRAY)
             ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
         if (!isset($convertedData['extend']['pending_changes'])) {
             return;
@@ -70,7 +71,7 @@ class RemoveInvalidFieldConfigQuery implements MigrationQuery, ConnectionAwareIn
             'oro_entity_config_field',
             ['data' => $convertedData],
             ['id' => $row['id']],
-            [Type::TARRAY]
+            [Types::ARRAY]
         );
     }
 

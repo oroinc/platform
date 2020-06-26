@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_5;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -34,8 +34,7 @@ class UpdateDateActivityListQuery extends ParametrizedMigrationQuery
      */
     protected function migrateActivityDates(LoggerInterface $logger, $dryRun = false)
     {
-        $dbDriver = $this->connection->getDriver()->getName();
-        if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
             $query  = <<<DQL
 UPDATE oro_activity_list
 SET created_at = e.sent, updated_at = e.sent

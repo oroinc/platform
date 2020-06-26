@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
@@ -90,12 +90,12 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
                 'priority' => 2,
             ],
             [
-                'body' => Type::JSON_ARRAY,
-                'headers' => Type::JSON_ARRAY,
-                'properties' => Type::JSON_ARRAY,
-                'redelivered' => Type::BOOLEAN,
-                'queue' => Type::TEXT,
-                'priority' => Type::SMALLINT,
+                'body' => Types::JSON_ARRAY,
+                'headers' => Types::JSON_ARRAY,
+                'properties' => Types::JSON_ARRAY,
+                'redelivered' => Types::BOOLEAN,
+                'queue' => Types::TEXT,
+                'priority' => Types::SMALLINT,
             ]
         );
     }

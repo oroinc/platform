@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Migrate Activity list filter definition to new format.
+ */
 class MigrateActivityListFilterQuery extends ParametrizedSqlMigrationQuery
 {
     /** @var string */
@@ -35,7 +38,7 @@ class MigrateActivityListFilterQuery extends ParametrizedSqlMigrationQuery
             $definition = $report['definition'];
             $needUpdate = false;
             if ($definition) {
-                $definition = $this->connection->convertToPHPValue($definition, Type::JSON_ARRAY);
+                $definition = $this->connection->convertToPHPValue($definition, Types::JSON_ARRAY);
                 if (!empty($definition['filters'])) {
                     $updated = $this->processFilters($definition['filters'], $needUpdate);
                     if ($needUpdate) {
@@ -54,8 +57,8 @@ class MigrateActivityListFilterQuery extends ParametrizedSqlMigrationQuery
                     'definition' => $definitionToUpdate
                 ],
                 [
-                    'id' => Type::INTEGER,
-                    'definition' => Type::JSON_ARRAY
+                    'id' => Types::INTEGER,
+                    'definition' => Types::JSON_ARRAY
                 ]
             );
         }

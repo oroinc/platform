@@ -406,6 +406,11 @@ entity_config:
                     options:
                         auditable:          false
 
+                nullable:
+                    options:
+                        auditable:          false
+                        default_value:      true
+
     enum:
         entity:
             items:

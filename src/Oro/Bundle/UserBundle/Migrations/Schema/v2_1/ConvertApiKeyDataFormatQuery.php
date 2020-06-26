@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v2_1;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Psr\Log\LoggerInterface;
@@ -42,8 +42,8 @@ class ConvertApiKeyDataFormatQuery extends ParametrizedSqlMigrationQuery
                     'api_key' => $this->crypter->encryptData($key['api_key'])
                 ],
                 [
-                    'id'      => Type::INTEGER,
-                    'api_key' => Type::STRING
+                    'id'      => Types::INTEGER,
+                    'api_key' => Types::STRING
                 ]
             );
         }

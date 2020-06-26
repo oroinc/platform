@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener\ORM;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
+/**
+ * Force IDENTITY strategy for PostgreSQL sequence generators.
+ */
 class GeneratedValueStrategyListener
 {
     /**
@@ -51,7 +54,7 @@ class GeneratedValueStrategyListener
         $fieldName    = $classMetadata->getSingleIdentifierFieldName();
         $fieldMapping = $classMetadata->getFieldMapping($fieldName);
 
-        $generator = ($fieldName && $fieldMapping['type'] === Type::BIGINT)
+        $generator = ($fieldName && $fieldMapping['type'] === Types::BIGINT)
             ? new BigIntegerIdentityGenerator($sequenceName)
             : new IdentityGenerator($sequenceName);
 

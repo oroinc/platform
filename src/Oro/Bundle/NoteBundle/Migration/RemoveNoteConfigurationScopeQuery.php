@@ -3,11 +3,14 @@
 namespace Oro\Bundle\NoteBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Remove outdated entity configuration data with scope name "note".
+ */
 class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
     /**
@@ -21,12 +24,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info(
-            sprintf(
-                'Remove outdated entity configuration data with scope name "%s".',
-                'note'
-            )
-        );
+        $logger->info('Remove outdated entity configuration data with scope name "note".');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
@@ -53,7 +51,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
         $entityConfigs = array_map(function ($entityConfig) {
             $entityConfig['data'] = empty($entityConfig['data'])
                 ? []
-                : $this->connection->convertToPHPValue($entityConfig['data'], Type::TARRAY);
+                : $this->connection->convertToPHPValue($entityConfig['data'], Types::ARRAY);
 
             return $entityConfig;
         }, $entityConfigs);
@@ -62,7 +60,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
             unset($entityConfig['data']['note']);
             $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
             $parameters = [
-                $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
+                $this->connection->convertToDatabaseValue($entityConfig['data'], Types::ARRAY),
                 $entityConfig['id']
             ];
 
