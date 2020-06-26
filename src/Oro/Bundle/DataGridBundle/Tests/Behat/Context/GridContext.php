@@ -24,6 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
@@ -237,8 +238,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Example: And I should see following grid:
-     *            | First name | Last name | Primary Email     | Enabled | Status |
-     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *   | First name | Last name | Primary Email     | Enabled | Status {{ "type": "array", "separator": ";" }} |
+     *   | John       | Doe       | admin@example.com | Enabled | Active; Reviewed                               |
      *
      * @Then /^(?:|I )should see following grid:$/
      * @Then /^(?:|I )should see following "(?P<gridName>[^"]+)" grid:$/
@@ -252,24 +253,56 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table as $index => $row) {
             $rowNumber = $index + $hiddenRowsCount + 1;
             foreach ($row as $columnTitle => $value) {
-                $gridRow = $grid->getRowByNumber($rowNumber);
+                [$value, $cellValue, $columnTitle] = $this->normalizeValueByMetadata(
+                    $value,
+                    $grid,
+                    $rowNumber,
+                    $columnTitle
+                );
 
-                if (!$gridRow->isVisible()) {
+                if (!$grid->getRowByNumber($rowNumber)->isVisible()) {
                     $hiddenRowsCount = $hiddenRowsCount + 1 ;
                     $rowNumber = $rowNumber + 1;
                     continue;
                 }
 
-                $cellValue = $gridRow->getCellValue($columnTitle);
-                if ($cellValue instanceof \DateTime) {
-                    $value = new \DateTime($value);
-                }
                 self::assertEquals(
                     $value,
                     $cellValue,
                     sprintf('Unexpected value at %d row "%s" column in grid', $rowNumber, $columnTitle)
                 );
             }
+        }
+    }
+
+    /**
+     * Example: And I should see following grid containing rows:
+     *   | First name | Last name | Primary Email     | Enabled |
+     *   | John       | Doe       | admin@example.com | Enabled |
+     *
+     * @Then /^(?:|I )should see following grid containing rows:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>[^"]+)" grid containing rows:$/
+     */
+    public function iShouldSeeFollowingGridWithRowsInAnyOrder(TableNode $table, $gridName = null)
+    {
+        $this->waitForAjax();
+        $grid = $this->getGrid($gridName);
+
+        $expected = [];
+        foreach ($table as $row) {
+            $expected[] = $row;
+        }
+
+        $headers = [];
+        if ($expected) {
+            $headers = array_keys(reset($expected));
+        }
+        $actualRows = array_map(function (GridRow $row) use ($headers) {
+            return array_combine($headers, $row->getCellValues($headers));
+        }, $grid->getRows());
+
+        foreach ($expected as $expectedRow) {
+            self::assertContains($expectedRow, $actualRows);
         }
     }
 
@@ -1212,7 +1245,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )should see filter hints in "(?P<gridName>[^"]+)" frontend grid:$/
      *
      * @param TableNode $table
-     * @param string    $gridName
+     * @param string $gridName
      */
     public function shouldSeeFrontendGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
     {
@@ -1246,7 +1279,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )should see filter hints in "(?P<gridName>[^"]+)" grid:$/
      *
      * @param TableNode $table
-     * @param string    $gridName
+     * @param string $gridName
      */
     public function shouldSeeGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
     {
@@ -2282,7 +2315,7 @@ TEXT;
     private function getGridColumnManager($grid)
     {
         /** @var $colunmManager GridColumnManager $colunmManager */
-        $colunmManager =  $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        $colunmManager = $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
         $colunmManager->setGrid($grid);
 
         return $colunmManager;
@@ -2318,11 +2351,39 @@ TEXT;
 
         $expectedRows = $expectedTableNode->getRows();
         $headers = array_shift($expectedRows);
-        $rows = $table->getRows();
+        $actualRows = array_map(function (TableRow $row) use ($headers) {
+            return $row->getCellValues($headers);
+        }, $table->getRows());
 
-        foreach ($expectedRows as $rowKey => $expectedRow) {
-            self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
+        foreach ($expectedRows as $expectedRow) {
+            self::assertContains($expectedRow, $actualRows);
         }
+    }
+
+    /**
+     * Example: I should see next rows in "Discounts" table in the exact order
+     *   | Description | Discount |
+     *   | Amount 1     | -$2.00   |
+     *   | Amount 2     | -$5.00   |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table in the exact order$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeExactlyNextRowsInTable(TableNode $expectedTableNode, $elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $expectedRows = $expectedTableNode->getRows();
+        $headers = array_shift($expectedRows);
+        $actualRows = array_map(function (TableRow $row) use ($headers) {
+            return $row->getCellValues($headers);
+        }, $table->getRows());
+
+        self::assertEquals(array_values($expectedRows), array_values($actualRows));
     }
 
     /**
@@ -2412,5 +2473,40 @@ TEXT;
                 sprintf('There is no such sorting option: "%s"', $expectedRow[0])
             );
         }
+    }
+
+    /**
+     * @param string $value
+     * @param Table $grid
+     * @param int $rowNumber
+     * @param string $columnTitle
+     * @return array
+     */
+    private function normalizeValueByMetadata($value, Table $grid, $rowNumber, $columnTitle): array
+    {
+        $metadata = null;
+        if (($metadataPos = strpos($columnTitle, '{{')) > 0) {
+            $metadata = substr($columnTitle, $metadataPos);
+            $metadata = trim(str_replace(['{{', '}}'], ['{', '}'], $metadata));
+            $metadata = json_decode($metadata, true);
+            $columnTitle = trim(substr($columnTitle, 0, $metadataPos));
+        }
+
+        $cellValue = $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle);
+        if ($metadata && array_key_exists('type', $metadata) && $metadata['type'] === 'array') {
+            $separator = $metadata['separator'] ?? ',';
+            $value = explode($separator, $value);
+            $cellValue = explode($separator, $cellValue);
+            $value = array_map('trim', $value);
+            $cellValue = array_map('trim', $cellValue);
+            sort($value);
+            sort($cellValue);
+        }
+
+        if ($cellValue instanceof \DateTime) {
+            $value = new \DateTime($value);
+        }
+
+        return [$value, $cellValue, $columnTitle];
     }
 }

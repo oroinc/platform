@@ -119,6 +119,13 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
                 'initial' => null,
                 'expected' => true
             ],
+            'notnull' => [
+                'name' => '_notnull',
+                'method' => 'setNotnull',
+                'options' => ['extend' => ['nullable' => false], ExtendOptionsManager::TYPE_OPTION => 'string'],
+                'initial' => true,
+                'expected' => true
+            ],
         ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Dbal\Extension;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
@@ -44,7 +44,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
             'redelivered' => false,
             'queue' => 'queue',
             'priority' => 1,
-        ], ['redelivered' => Type::BOOLEAN]);
+        ], ['redelivered' => Types::BOOLEAN]);
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
 
         $consumer = $this->createMessageConsumerMock();

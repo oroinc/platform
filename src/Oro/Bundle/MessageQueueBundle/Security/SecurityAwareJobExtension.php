@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Security;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\Extension\AbstractExtension;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -20,13 +21,13 @@ class SecurityAwareJobExtension extends AbstractExtension
     /** @var TokenSerializerInterface */
     private $tokenSerializer;
 
-    /** @var JobStorage */
-    private $jobStorage;
+    /** @var JobManagerInterface */
+    private $jobManager;
 
     /**
-     * @param TokenStorageInterface    $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
      * @param TokenSerializerInterface $tokenSerializer
-     * @param JobStorage               $jobStorage
+     * @param JobStorage $jobStorage
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
@@ -35,7 +36,14 @@ class SecurityAwareJobExtension extends AbstractExtension
     ) {
         $this->tokenStorage = $tokenStorage;
         $this->tokenSerializer = $tokenSerializer;
-        $this->jobStorage = $jobStorage;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -60,7 +68,7 @@ class SecurityAwareJobExtension extends AbstractExtension
         if (null !== $serializedToken) {
             $jobProperties[SecurityAwareDriver::PARAMETER_SECURITY_TOKEN] = $serializedToken;
             $job->setProperties($jobProperties);
-            $this->jobStorage->saveJob($job);
+            $this->jobManager->saveJob($job);
         }
     }
 }

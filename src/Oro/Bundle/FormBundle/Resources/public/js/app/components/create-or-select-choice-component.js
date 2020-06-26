@@ -4,7 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
-    const mediator = require('oroui/js/mediator');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     const routing = require('routing');
     const tinyMCE = require('tinymce/tinymce');
 
@@ -29,6 +29,7 @@ define(function(require) {
         $existingEntityInput: null,
         $dialog: null,
         editable: false,
+        disabledEditForm: false,
 
         /**
          * @inheritDoc
@@ -42,6 +43,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.editable = (options.editable === true);
+            this.disabledEditForm = (options.disabled_edit_form === true);
             if (this.editable) {
                 this.requiredOptions.push('editRoute');
             }
@@ -166,6 +168,21 @@ define(function(require) {
                     $el.change();
                 }
             });
+
+            if (this.disabledEditForm) {
+                this.$newEntity.find(':input').each(function() {
+                    const $input = $(this);
+                    const editor = tinyMCE.get($input.attr('id'));
+
+                    if (editor && !$input.data('saved-disabled')) {
+                        editor.setMode('design');
+                        $(editor.editorContainer).removeClass('disabled');
+                        $(editor.editorContainer).children('.disabled-overlay').remove();
+                    }
+
+                    $input.prop('disabled', $input.data('saved-disabled'));
+                });
+            }
         },
 
         /**
@@ -218,6 +235,22 @@ define(function(require) {
                     }
                 }
             }, this));
+
+            if (this.disabledEditForm) {
+                this.$newEntity.find(':input').each(function() {
+                    const $input = $(this);
+                    const editor = tinyMCE.get($input.attr('id'));
+
+                    $input.data('saved-disabled', $input.prop('disabled'));
+                    $input.prop('disabled', true);
+
+                    if (editor && !$input.data('saved-disabled')) {
+                        editor.setMode('readonly');
+                        $(editor.editorContainer).addClass('disabled');
+                        $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
+                    }
+                });
+            }
         },
 
         /**
@@ -236,10 +269,59 @@ define(function(require) {
          */
         _setLoading: function(enabled) {
             if (enabled) {
-                mediator.execute('showLoading');
+                this._showLoadingMask();
             } else {
-                mediator.execute('hideLoading');
+                this._hideLoadingMask();
             }
+        },
+
+        /**
+         * @private
+         */
+        _showLoadingMask: function() {
+            this._ensureLoadingMaskLoaded();
+
+            if (!this.loadingMask.isShown()) {
+                this.loadingMask.show();
+            }
+        },
+
+        /**
+         * @private
+         */
+        _hideLoadingMask: function() {
+            this._ensureLoadingMaskLoaded();
+
+            if (this.loadingMask.isShown()) {
+                this.loadingMask.hide();
+            }
+        },
+
+        /**
+         * @private
+         */
+        _ensureLoadingMaskLoaded: function() {
+            if (!this.loadingMask) {
+                this.loadingMask = new LoadingMaskView({container: this.$newEntity});
+            }
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.loadingMask) {
+                this.loadingMask.dispose();
+                delete this.loadingMask;
+            }
+
+            this.$existingEntity.off('change', _.bind(this._onEntityChange, this));
+            this.$existingEntity.off('change', _.bind(this._retrieveEntityData, this));
+            this.$existingEntity.off('change', _.bind(this._cleanEntityData, this));
+            this.$mode.off('change', _.bind(this._updateNewEntityVisibility, this));
+
+            CreateOrSelectChoiceComponent.__super__.dispose.call(this);
         }
     });
 

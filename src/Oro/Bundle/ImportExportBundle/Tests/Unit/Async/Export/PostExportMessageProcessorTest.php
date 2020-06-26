@@ -12,6 +12,7 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -42,6 +43,11 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private $jobStorage;
 
     /**
+     * @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $jobManager;
+
+    /**
      * @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $messageProducer;
@@ -63,6 +69,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler = $this->createMock(ExportHandler::class);
         $this->messageProducer = $this->createMock(MessageProducer::class);
         $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->importExportResultSummarizer = $this->createMock(ImportExportResultSummarizer::class);
         $this->notificationSettings = $this->createMock(NotificationSettings::class);
 
@@ -74,6 +81,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->importExportResultSummarizer,
             $this->notificationSettings
         );
+        $this->postExportMessageProcessor->setJobManager($this->jobManager);
     }
 
     public function testProcessExceptionsAreHandledDuringMerge()

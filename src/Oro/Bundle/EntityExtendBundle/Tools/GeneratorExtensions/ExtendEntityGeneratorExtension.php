@@ -13,6 +13,7 @@ use Symfony\Component\Inflector\Inflector as SymfonyIflector;
 /**
  * The main extension of the entity generator. This extension is responsible for generate extend entity skeleton
  * and all extend fields and relations.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
 {
@@ -115,7 +116,16 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
                 }
             }
 
-            $class->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'));
+            $property = PhpProperty::create($fieldName)->setVisibility('protected');
+            $entity = $schema['entity'] ?? null;
+            $default = null;
+            if ($entity) {
+                $default = $schema['doctrine'][$entity]['fields'][$fieldName]['default'] ?? null;
+            }
+            if ($default !== null) {
+                $property->setDefaultValue($default);
+            }
+            $class->setProperty($property);
             $isPrivate = is_array($config) && isset($config['private']) && $config['private'];
             if (!$isPrivate) {
                 $class
@@ -172,6 +182,16 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function getSetterBody($fieldName, array $schema)
     {
         if (!isset($schema['addremove'][$fieldName])) {
+            $type = null;
+            $default = null;
+            $entity = $schema['entity'] ?? null;
+            if ($entity) {
+                $type = $schema['doctrine'][$entity]['fields'][$fieldName]['type'] ?? null;
+                $default = $schema['doctrine'][$schema['entity']]['fields'][$fieldName]['default'] ?? null;
+            }
+            if ($type === 'boolean' && $default !== null) {
+                return '$this->' . $fieldName . ' = (bool)$value; return $this;';
+            }
             return '$this->' . $fieldName . ' = $value; return $this;';
         } else {
             $relationFieldName = $schema['addremove'][$fieldName]['self'];

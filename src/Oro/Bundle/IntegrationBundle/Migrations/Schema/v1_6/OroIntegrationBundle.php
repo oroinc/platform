@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension;
 use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -34,21 +34,21 @@ class OroIntegrationBundle implements Migration, ChangeTypeExtensionAwareInterfa
             $queries,
             'oro_integration_channel',
             'id',
-            Type::INTEGER
+            Types::INTEGER
         );
         $this->changeTypeExtension->changePrimaryKeyType(
             $schema,
             $queries,
             'oro_integration_channel_status',
             'id',
-            Type::INTEGER
+            Types::INTEGER
         );
         $this->changeTypeExtension->changePrimaryKeyType(
             $schema,
             $queries,
             'oro_integration_transport',
             'id',
-            Type::INTEGER
+            Types::INTEGER
         );
     }
 }

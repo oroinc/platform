@@ -475,13 +475,7 @@
             /**
              * Update "Curl Command Line" section
              */
-            displayCurl(
-                options.type,
-                decodeURIComponent(options.url),
-                options.headers,
-                options.data,
-                $('.curl-command', $result)
-            );
+            displayCurl(options.type, options.url, options.headers, options.data, $('.curl-command', $result));
         });
 
         /**

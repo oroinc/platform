@@ -12,7 +12,6 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
-use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
@@ -369,7 +368,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     ): void {
         $this->getEntityManager()->clear();
         $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
-        $rootJob = $this->getEntityManager()->find(JobEntity::class, $operation->getJobId());
+        $rootJob = $this->getJob($operation->getJobId());
         self::assertEquals($status, $rootJob->getStatus(), 'Root job status');
         self::assertEquals($progress, $rootJob->getJobProgress(), 'Root job progress');
         self::assertArrayContains(['api_operation_id' => $operationId], $rootJob->getData(), 'Root job data');

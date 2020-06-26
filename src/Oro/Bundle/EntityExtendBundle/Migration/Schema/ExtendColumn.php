@@ -8,7 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
 
 /**
- * Adds handling of extended options to the Comumn class that is used in migrations.
+ * Adds handling of extended options to the Column class that is used in migrations.
  */
 class ExtendColumn extends Column
 {
@@ -61,6 +61,20 @@ class ExtendColumn extends Column
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return ExtendColumn
+     */
+    public function setNotnull($notnull)
+    {
+        if ($this->constructed) {
+            $this->setOptions([OroOptions::KEY => ['extend' => ['nullable' => !$notnull]]]);
+        }
+
+        return parent::setNotnull($notnull);
     }
 
     /**

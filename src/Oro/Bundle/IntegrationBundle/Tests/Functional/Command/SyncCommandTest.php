@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\IntegrationBundle\Async\Topics;
@@ -28,7 +29,7 @@ class SyncCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:cron:integration:sync', ['--help']);
 
-        $this->assertContains("Usage: oro:cron:integration:sync [options]", $result);
+        static::assertStringContainsString('Usage: oro:cron:integration:sync [options]', $result);
     }
 
     public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()
@@ -90,6 +91,7 @@ class SyncCommandTest extends WebTestCase
 
         /** @var JobStorage $jobStorage */
         $jobStorage = $this->getContainer()->get('oro_message_queue.job.storage');
+        $jobHandler = $this->getContainer()->get('oro_message_queue.job.manager');
         $data = [
             'name' => 'oro_integration:sync_integration:'.$integration->getId(),
             'owner_id' => 'owner-id-1',
@@ -99,7 +101,7 @@ class SyncCommandTest extends WebTestCase
         ];
         /** @var Job $entity */
         $entity = $this->getEntity(Job::class, $data);
-        $jobStorage->saveJob($entity);
+        $jobHandler->saveJob($entity);
 
         $this->assertNull($jobStorage->findRootJobByJobNameAndStatuses(
             'oro_integration:sync_integration:'.$integration->getId(),

@@ -44,6 +44,8 @@ services:
             - '@oro_message_queue.job.storage'
             - '@oro_importexport.async.import_export_result_summarizer'
             - '@oro_notification.model.notification_settings'
+        calls:
+            - [ 'setJobManager', ['@oro_message_queue.job.manager'] ]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

@@ -242,7 +242,8 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
                                 'extend'   => [
                                     'is_extend' => true,
                                     'owner' => ExtendScope::OWNER_CUSTOM,
-                                    'length' => 100
+                                    'length' => 100,
+                                    'nullable' => true
                                 ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ]
@@ -280,7 +281,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         $sql = $schema->toSql(new MySqlPlatform());
         foreach ($sql as &$el) {
             $el = str_replace(
-                ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB',
+                ' DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
                 '',
                 $el
             );

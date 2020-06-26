@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
+/**
+ * MQ Extension for redelivering orphan messages.
+ */
 class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 {
     /**
@@ -149,7 +152,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
                 'consumerIds' => $orphanConsumerIds,
             ],
             [
-                'isRedelivered' => Type::BOOLEAN,
+                'isRedelivered' => Types::BOOLEAN,
                 'consumerIds' => Connection::PARAM_STR_ARRAY,
             ]
         );

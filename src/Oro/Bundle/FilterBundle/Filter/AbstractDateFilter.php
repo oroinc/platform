@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -113,11 +113,11 @@ abstract class AbstractDateFilter extends AbstractFilter
     protected function guessParameterValueType($key, $value): ?string
     {
         if ($value instanceof \DateTime) {
-            return Type::DATETIME;
+            return Types::DATETIME_MUTABLE;
         }
 
         if ($value instanceof \DateTimeImmutable) {
-            return Type::DATETIME_IMMUTABLE;
+            return Types::DATETIME_IMMUTABLE;
         }
 
         return null;

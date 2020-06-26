@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -134,7 +134,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
         $row = $this->connection->fetchAssoc($sql, [$this->entityClass]);
         if ($row) {
-            $data = $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             if (isset($data['extend']['schema']['property'][$this->entityField])) {
                 unset($data['extend']['schema']['property'][$this->entityField]);
             }
@@ -150,7 +150,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
                 unset($data['extend']['index'][$this->entityField]);
             }
 
-            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
             $this->executeQuery(
                 $logger,
                 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?',

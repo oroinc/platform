@@ -127,7 +127,7 @@ class AutoResponseTemplateType extends AbstractType
 
             $proposedName = $template->getSubject();
             while ($this->templateExists($proposedName)) {
-                $proposedName .= rand(0, 10);
+                $proposedName .= random_int(0, 10000);
             }
 
             $template->setName($proposedName);
@@ -142,7 +142,7 @@ class AutoResponseTemplateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
+            'data_class' => EmailTemplate::class,
         ]);
     }
 
@@ -187,7 +187,7 @@ class AutoResponseTemplateType extends AbstractType
      */
     protected function getEmailTemplateRepository()
     {
-        return $this->registry->getRepository('OroEmailBundle:EmailTemplate');
+        return $this->registry->getRepository(EmailTemplate::class);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener\ORM;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
@@ -123,8 +123,8 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
     public function identityGeneratorProvider()
     {
         return [
-            ['id', 'id_field_seq', Type::INTEGER, new IdentityGenerator('id_field_seq')],
-            ['id', 'id_field_seq', Type::BIGINT, new BigIntegerIdentityGenerator('id_field_seq')],
+            ['id', 'id_field_seq', Types::INTEGER, new IdentityGenerator('id_field_seq')],
+            ['id', 'id_field_seq', Types::BIGINT, new BigIntegerIdentityGenerator('id_field_seq')],
         ];
     }
 }

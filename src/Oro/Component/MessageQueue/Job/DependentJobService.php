@@ -1,19 +1,28 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
+/**
+ * Save list of jobs that should be started after when root job was finished (all child jobs is processed).
+ */
 class DependentJobService
 {
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
+    /** @var JobManagerInterface */
+    private $jobManager;
 
     /**
-     * @param JobStorage|null $jobStorage
+     * @param JobStorage $jobStorage
      */
     public function __construct(JobStorage $jobStorage)
     {
-        $this->jobStorage = $jobStorage;
+    }
+
+    /**
+     * @param JobManagerInterface $jobManager
+     */
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
     }
 
     /**
@@ -38,7 +47,7 @@ class DependentJobService
             ));
         }
 
-        $this->jobStorage->saveJob($context->getJob(), function (Job $job) use ($context) {
+        $this->jobManager->saveJobWithLock($context->getJob(), static function (Job $job) use ($context) {
             $data = $job->getData();
             $data['dependentJobs'] = $context->getDependentJobs();
 

@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener\ORM;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
+/**
+ * Remove where restriction for a given index for MySQL platform.
+ */
 class PartialIndexListener
 {
     /**
@@ -33,8 +36,8 @@ class PartialIndexListener
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        $driverName = $event->getEntityManager()->getConnection()->getDriver()->getName();
-        if ($driverName !== DatabaseDriverInterface::DRIVER_MYSQL) {
+        $platform = $event->getEntityManager()->getConnection()->getDatabasePlatform();
+        if (!$platform instanceof MySqlPlatform) {
             return;
         }
 

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_14_2;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -91,7 +91,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
     protected function unsetDeletedFlag(array $fields, LoggerInterface $logger, $dryRun = false)
     {
         $query = 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id';
-        $types = ['data' => Type::TARRAY, 'id' => Type::INTEGER];
+        $types = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
 
         foreach ($fields as $field) {
             $data = $field['data'];
@@ -118,7 +118,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
 
         $result = [];
         foreach ($this->connection->fetchAll($sql) as $field) {
-            $data = $this->connection->convertToPHPValue($field['data'], Type::TARRAY);
+            $data = $this->connection->convertToPHPValue($field['data'], Types::ARRAY);
             $field['data'] = $data;
             $result[] = $field;
         }

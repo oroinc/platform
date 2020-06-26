@@ -5,6 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -44,7 +45,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('isCommentedDoctrineType')
             ->will($this->returnValue(false));
 
-        $column = new Column('string_column', Type::getType(Type::STRING));
+        $column = new Column('string_column', Type::getType(Types::STRING));
         $column->setLength(255);
         $result = $this->extension->getColumnOptions($column);
         $this->assertCount(1, $result);
@@ -58,7 +59,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('isCommentedDoctrineType')
             ->will($this->returnValue(true));
 
-        $column = new Column('string_column', Type::getType(Type::INTEGER));
+        $column = new Column('string_column', Type::getType(Types::INTEGER));
         $column->setNotnull(false);
         $column->setAutoincrement(true);
         $column->setUnsigned(true);

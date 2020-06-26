@@ -698,7 +698,7 @@ class ImportExportContext extends OroFeatureContext implements
         $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
 
         $importSubmitButton->press();
-        $this->waitForAjax();
+        $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
     }
 
     /**
@@ -712,7 +712,7 @@ class ImportExportContext extends OroFeatureContext implements
         $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
 
         $importSubmitButton->press();
-        $this->waitForAjax();
+        $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
 
         $flashMessage = 'Validation started successfully. You will receive an email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);

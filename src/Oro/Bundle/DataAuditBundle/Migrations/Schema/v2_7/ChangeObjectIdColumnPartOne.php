@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v2_7;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -28,7 +29,7 @@ class ChangeObjectIdColumnPartOne implements Migration, OrderedMigrationInterfac
             $table->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
         } else {
             $table->getColumn('object_id')
-                ->setType(Type::getType(Type::STRING))
+                ->setType(Type::getType(Types::STRING))
                 ->setOptions(['notnull' => false, 'length' => 255]);
         }
     }

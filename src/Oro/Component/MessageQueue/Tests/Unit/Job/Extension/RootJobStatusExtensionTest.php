@@ -56,17 +56,6 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPostRunUnique($job, '');
     }
 
-    public function testOnCancel(): void
-    {
-        $job = new Job();
-        $this->rootJobStatusCalculator
-            ->expects($this->once())
-            ->method('calculate')
-            ->with($job);
-
-        $this->extension->onCancel($job);
-    }
-
     public function testOnError(): void
     {
         $job = new Job();

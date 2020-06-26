@@ -114,4 +114,36 @@ class ExtendTableTest extends TestCase
             ],
         ];
     }
+
+    public function testAddColumnNotNull()
+    {
+        $type = Type::getType('string');
+        $options = ['notnull' => true];
+        $options[OroOptions::KEY]['extend'] = ['owner' => ExtendScope::OWNER_CUSTOM];
+
+        $this->extendOptionsManager->expects($this->at(0))
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
+                ],
+                '_type' => $type->getName()
+            ]);
+
+        $this->extendOptionsManager->expects($this->at(1))
+            ->method('setColumnOptions')
+            ->with(self::TABLE_NAME, self::COLUMN_NAME, [
+                'extend' => [
+                    'nullable' => false
+                ],
+                '_type' => $type->getName()
+            ]);
+
+        /** @var ExtendColumn $column */
+        $column = $this->table->addColumn(self::COLUMN_NAME, $type->getName(), $options);
+        $this->assertInstanceOf(ExtendColumn::class, $column);
+
+        $this->assertTrue($column->getNotnull());
+    }
 }

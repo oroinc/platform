@@ -3,7 +3,7 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
@@ -113,11 +113,11 @@ class UnionQueryBuilderTest extends OrmTestCase
     {
         $qb = new UnionQueryBuilder($this->em);
         self::assertSame($qb, $qb->addSelect('column1', 'alias1'));
-        self::assertSame($qb, $qb->addSelect('column2', 'alias2', Type::INTEGER));
+        self::assertSame($qb, $qb->addSelect('column2', 'alias2', Types::INTEGER));
         self::assertSame(
             [
-                ['column1', 'alias1', Type::STRING],
-                ['column2', 'alias2', Type::INTEGER]
+                ['column1', 'alias1', Types::STRING],
+                ['column2', 'alias2', Types::INTEGER]
             ],
             $qb->getSelect()
         );
@@ -178,7 +178,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryBuilderForOnlyOneSubQuery()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -196,7 +196,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryBuilderForSeveralSubQuery()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -221,7 +221,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQuery()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -246,7 +246,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryForUnionInsteadOfUnionAll()
     {
         $qb = new UnionQueryBuilder($this->em, false);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -271,7 +271,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryWhenSubQueryColumnDoesNotEqualToResultColumn()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('subId', 'resultId', Type::INTEGER);
+        $qb->addSelect('subId', 'resultId', Types::INTEGER);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -296,7 +296,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryWithOrderBy()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
         $qb->addOrderBy($qb->getAlias() . '.id', 'DESC');
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
@@ -323,7 +323,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryWithOffset()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
         $qb->setFirstResult(100);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
@@ -350,7 +350,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testGetQueryWithLimit()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
         $qb->setMaxResults(100);
 
         $subQb1 = $this->em->getRepository(Entity\Group::class)
@@ -377,7 +377,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testSubQueryWithParameters()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -397,7 +397,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     public function testSubQueryWithSortingAndPaging()
     {
         $qb = new UnionQueryBuilder($this->em);
-        $qb->addSelect('id', 'id', Type::INTEGER);
+        $qb->addSelect('id', 'id', Types::INTEGER);
 
         $subQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')

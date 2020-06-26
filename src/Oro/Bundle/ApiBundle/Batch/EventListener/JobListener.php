@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Batch\EventListener;
 
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 
 /**
  * Synchronizes an asynchronous operation with the related MQ job.
@@ -21,12 +23,33 @@ class JobListener
     private const CREATE_COUNT   = 'createCount';
     private const UPDATE_COUNT   = 'updateCount';
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
     /**
-     * @param Job               $job
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper): void
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param Job $job
      * @param PreFlushEventArgs $event
      */
     public function preFlush(Job $job, PreFlushEventArgs $event): void
     {
+        $this->onBeforeSaveJob(new BeforeSaveJobEvent($job));
+    }
+
+    /**
+     * @param BeforeSaveJobEvent $event
+     */
+    public function onBeforeSaveJob(BeforeSaveJobEvent $event): void
+    {
+        /** @var Job $job */
+        $job = $event->getJob();
         if (!$this->isRootJobUpdate($job)) {
             return;
         }
@@ -36,12 +59,13 @@ class JobListener
             return;
         }
 
-        $em = $event->getEntityManager();
+        $em = $this->doctrineHelper->getEntityManager(AsyncOperation::class);
         $operation = $em->find(AsyncOperation::class, $data[self::OPERATION_ID]);
         if (null !== $operation && $this->updateOperation($operation, $job)) {
             $uow = $em->getUnitOfWork();
             $uow->clearEntityChangeSet(spl_object_hash($operation));
             $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(AsyncOperation::class), $operation);
+            $uow->commit($operation);
         }
     }
 

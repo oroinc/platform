@@ -110,7 +110,16 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'property'  => ['field1' => 'field1', 'field_2' => 'field_2'],
             'relation'  => [],
             'default'   => [],
-            'addremove' => []
+            'addremove' => [],
+            'entity' => 'CustomEntity',
+            'doctrine' => [
+                'CustomEntity' => [
+                    'fields' => [
+                        'field1' => [],
+                        'field_2' => ['default' => true, 'type' => 'boolean']
+                    ]
+                ]
+            ]
         ];
         $this->assertGeneration('properties.txt', $schema);
     }

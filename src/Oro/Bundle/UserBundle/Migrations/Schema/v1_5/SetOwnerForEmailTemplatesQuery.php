@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_5;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
@@ -18,7 +18,7 @@ class SetOwnerForEmailTemplatesQuery extends ParametrizedSqlMigrationQuery
             ->update('oro_email_template')
             ->set('user_owner_id', '(' . $this->getAdminUserQuery() . ')');
 
-        $this->addSql($qb->getSQL(), ['role' => User::ROLE_ADMINISTRATOR], ['role' => Type::STRING]);
+        $this->addSql($qb->getSQL(), ['role' => User::ROLE_ADMINISTRATOR], ['role' => Types::STRING]);
 
         parent::processQueries($logger, $dryRun);
     }

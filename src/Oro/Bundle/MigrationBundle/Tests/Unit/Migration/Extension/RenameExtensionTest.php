@@ -12,6 +12,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -51,7 +52,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
 
-        $table = new Table('old_table', [new Column('id', Type::getType(Type::INTEGER))]);
+        $table = new Table('old_table', [new Column('id', Type::getType(Types::INTEGER))]);
         $table->setPrimaryKey(['id']);
 
         $sequence = new Sequence($platform->getIdentitySequenceName('old_table', 'id'));

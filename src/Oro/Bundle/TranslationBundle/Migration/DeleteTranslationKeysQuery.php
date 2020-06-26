@@ -4,10 +4,13 @@ namespace Oro\Bundle\TranslationBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Remove unused translation keys.
+ */
 class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
@@ -59,7 +62,7 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
 
         $types  = [
             'translation_keys' => Connection::PARAM_STR_ARRAY,
-            'domain' => Type::STRING,
+            'domain' => Types::STRING,
         ];
 
         $sql = sprintf(

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener\ORM;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EventListener\ORM\PartialIndexListener;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,21 +29,13 @@ class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->event = $this
-            ->getMockBuilder('Doctrine\ORM\Event\LoadClassMetadataEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $this->metadata = $this->createMock(ClassMetadataInfo::class);
     }
 
     public function testPlatformNotMatch()
     {
-        $manager = $this->getManagerMock('db_driver');
+        $manager = $this->getManagerMock(SqlitePlatform::class);
         $this->event->method('getEntityManager')->willReturn($manager);
         $this->event
             ->expects($this->never())
@@ -55,7 +47,7 @@ class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPlatformMatch()
     {
-        $manager = $this->getManagerMock(DatabaseDriverInterface::DRIVER_MYSQL);
+        $manager = $this->getManagerMock(MySqlPlatform::class);
         $this->event->method('getEntityManager')->willReturn($manager);
 
         $classMetadataInfo = $this->getClassMetadataInfoMock('table', 'index');
@@ -71,16 +63,15 @@ class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $driverName
+     * @param string $platformClass
      *
      * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getManagerMock($driverName)
+    private function getManagerMock($platformClass)
     {
         $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(Driver::class);
-        $driver->method('getName')->willReturn($driverName);
-        $connection->method('getDriver')->willReturn($driver);
+        $platform = $this->createMock($platformClass);
+        $connection->method('getDatabasePlatform')->willReturn($platform);
         $manager = $this->createMock(EntityManager::class);
         $manager->method('getConnection')->willReturn($connection);
 

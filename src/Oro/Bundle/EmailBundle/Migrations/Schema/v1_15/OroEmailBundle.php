@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_15;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
@@ -68,7 +68,7 @@ class OroEmailBundle implements Migration
             new ParametrizedSqlMigrationQuery(
                 sprintf($sql, "'" . InternalEmailOrigin::MAILBOX_NAME . "'"),
                 ['name' => 'internalemailorigin'],
-                ['name' => Type::STRING]
+                ['name' => Types::STRING]
             )
         );
 
@@ -76,12 +76,12 @@ class OroEmailBundle implements Migration
             $queries->addQuery(new ParametrizedSqlMigrationQuery(
                 sprintf($sql, 'imap_user'),
                 ['name' => 'imapemailorigin'],
-                ['name' => Type::STRING]
+                ['name' => Types::STRING]
             ));
             $queries->addQuery(new ParametrizedSqlMigrationQuery(
                 sprintf($sql, 'imap_user'),
                 ['name' => 'useremailorigin'],
-                ['name' => Type::STRING]
+                ['name' => Types::STRING]
             ));
         }
 
@@ -89,7 +89,7 @@ class OroEmailBundle implements Migration
             $queries->addQuery(new ParametrizedSqlMigrationQuery(
                 sprintf($sql, 'ews_user_email'),
                 ['name' => 'ewsemailorigin'],
-                ['name' => Type::STRING]
+                ['name' => Types::STRING]
             ));
         }
     }

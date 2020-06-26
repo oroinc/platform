@@ -330,6 +330,21 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * Removes all cached message catalogs.
+     */
+    public function clearCache()
+    {
+        $this->applyCurrentStrategy();
+        $locales = array_unique($this->getFallbackLocales());
+        foreach ($locales as $locale) {
+            $catalogueFile = $this->getCatalogueCachePath($locale);
+            if (is_file($catalogueFile)) {
+                unlink($catalogueFile);
+            }
+        }
+    }
+
+    /**
      * Rebuilds all cached message catalogs, w/o any delay at clients side
      */
     public function rebuildCache()

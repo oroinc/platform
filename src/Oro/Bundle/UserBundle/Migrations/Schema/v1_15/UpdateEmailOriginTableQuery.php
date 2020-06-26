@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_15;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -36,25 +36,21 @@ class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $dbDriver = $this->connection->getDriver()->getName();
-        switch ($dbDriver) {
-            case DatabaseDriverInterface::DRIVER_POSTGRESQL:
-                $query = <<<SQL
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof PostgreSqlPlatform) {
+            $query = <<<SQL
 UPDATE oro_email_origin AS eo SET owner_id = ueo.user_id
   FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id;
 UPDATE oro_email_origin AS eo SET organization_id = u.organization_id
   FROM oro_user AS u WHERE u.id = eo.owner_id;
 SQL;
-                break;
-            case DatabaseDriverInterface::DRIVER_MYSQL:
-            default:
-                $query = <<<SQL
+        } else {
+            $query = <<<SQL
 UPDATE oro_email_origin eo SET eo.owner_id =
   (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id);
 UPDATE oro_email_origin eo SET eo.organization_id =
   (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id);
 SQL;
-                break;
         }
 
         $this->logQuery($logger, $query);

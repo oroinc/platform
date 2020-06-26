@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_8;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -66,7 +67,7 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
      */
     protected function processRow(array $row)
     {
-        $convertedData = Type::getType(Type::TARRAY)
+        $convertedData = Type::getType(Types::ARRAY)
             ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
 
         $requiresUpdate = false;
@@ -87,7 +88,7 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
             'oro_entity_config',
             ['data' => $convertedData],
             ['id' => $row['id']],
-            [Type::TARRAY]
+            [Types::ARRAY]
         );
     }
 
