@@ -131,7 +131,7 @@ define(function(require) {
                 throw new TypeError('"viewsCollection" is required');
             }
 
-            _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances']));
+            _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances', 'uniqueId']));
 
             this.template = this.getTemplateFunction();
             this.titleTemplate = this.getTemplateFunction('titleTemplate');
@@ -390,6 +390,8 @@ define(function(require) {
             }, this));
 
             confirm.open();
+
+            return confirm;
         },
 
         /**
@@ -508,13 +510,13 @@ define(function(require) {
          */
         getViewChoices: function() {
             const showIcons = _.uniq(this.viewsCollection.pluck('icon')).length > 1;
-            const choices = this.viewsCollection.map(function(model) {
+            const choices = this.viewsCollection.map(function(model, iteratee) {
                 return {
                     label: model.getLabel(),
                     icon: showIcons ? model.get('icon') : false,
                     value: model.get('name')
                 };
-            });
+            }, this);
 
             const defaultItem = _.findWhere(choices, {value: this.DEFAULT_GRID_VIEW_ID});
             if (defaultItem.label === this.DEFAULT_GRID_VIEW_ID) {
@@ -658,6 +660,7 @@ define(function(require) {
          */
         renderTitle: function() {
             return this.titleTemplate({
+                uniqueId: this.uniqueId,
                 title: this._getCurrentViewLabel(),
                 hasCaret: true,
                 navbar: Boolean(this.title)
@@ -669,6 +672,7 @@ define(function(require) {
          */
         renderPlainTitle: function() {
             return this.titleTemplate({
+                uniqueId: this.uniqueId,
                 title: this.title || '',
                 hasCaret: false,
                 navbar: Boolean(this.title)
