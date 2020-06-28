@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CacheConfigurationPass implements CompilerPassInterface
 {
-    /** this cache should be used to caching data private for each node in a web farm */
-    public const FILE_CACHE_SERVICE = 'oro.file_cache.abstract';
     /** this cache should be used to caching data which need to be shared between nodes in a web farm */
     public const DATA_CACHE_SERVICE = 'oro.cache.abstract';
     /** the same as "oro.cache.abstract" but without additional in-memory caching */
@@ -33,21 +31,8 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $this->ensureAbstractFileCacheExists($container);
         $this->ensureAbstractDataCacheExists($container);
         $this->configureDataCacheManagerAndStaticConfigCache($container);
-    }
-
-    /**
-     * Makes sure abstract service for file cache exists
-     *
-     * @param ContainerBuilder $container
-     */
-    private function ensureAbstractFileCacheExists(ContainerBuilder $container)
-    {
-        $cacheProvider = $this->getCacheProvider($container, static::FILE_CACHE_SERVICE);
-
-        $container->setDefinition(self::FILE_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProvider));
     }
 
     /**
@@ -55,11 +40,11 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    private function ensureAbstractDataCacheExists(ContainerBuilder $container)
+    private function ensureAbstractDataCacheExists(ContainerBuilder $container): void
     {
         $cacheProvider = $this->getCacheProvider($container, static::DATA_CACHE_SERVICE);
 
-        $container->setDefinition(self::DATA_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProvider));
+        $container->setDefinition(self::DATA_CACHE_SERVICE, self::getMemoryCacheChain($cacheProvider));
         $container->setDefinition(self::DATA_CACHE_NO_MEMORY_SERVICE, $cacheProvider);
     }
 
@@ -68,10 +53,9 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    private function configureDataCacheManagerAndStaticConfigCache(ContainerBuilder $container)
+    private function configureDataCacheManagerAndStaticConfigCache(ContainerBuilder $container): void
     {
         $parentServices = [
-            self::FILE_CACHE_SERVICE,
             self::DATA_CACHE_SERVICE,
             self::DATA_CACHE_NO_MEMORY_SERVICE
         ];
@@ -81,7 +65,7 @@ class CacheConfigurationPass implements CompilerPassInterface
             if (!$def instanceof ChildDefinition || $def->isAbstract()) {
                 continue;
             }
-            if (in_array($def->getParent(), $parentServices, true)) {
+            if (\in_array($def->getParent(), $parentServices, true)) {
                 $managerDef->addMethodCall(
                     'registerCacheProvider',
                     [new Reference($serviceId)]
@@ -96,7 +80,7 @@ class CacheConfigurationPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param string           $providerServiceId
      */
-    private function registerStaticConfigWarmer(ContainerBuilder $container, $providerServiceId)
+    private function registerStaticConfigWarmer(ContainerBuilder $container, string $providerServiceId): void
     {
         $warmerServiceId = $providerServiceId . '.warmer';
         if (!$container->hasDefinition($warmerServiceId)) {
@@ -114,17 +98,15 @@ class CacheConfigurationPass implements CompilerPassInterface
      * @param string           $cacheDefinitionId
      *
      * @return Definition
-     *
-     * @throws \InvalidArgumentException
      */
-    private function getCacheProvider(ContainerBuilder $container, $cacheDefinitionId)
+    private function getCacheProvider(ContainerBuilder $container, string $cacheDefinitionId): Definition
     {
         if ($container->hasDefinition($cacheDefinitionId)) {
             $cacheDefinition = $container->getDefinition($cacheDefinitionId);
             if (null === $cacheDefinition->getClass() && $cacheDefinition->isAbstract()) {
                 return $cacheDefinition;
             }
-            if (!in_array(CacheProvider::class, class_parents($cacheDefinition->getClass()), true)) {
+            if (!\in_array(CacheProvider::class, class_parents($cacheDefinition->getClass()), true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Cache providers for `%s` should extend doctrine CacheProvider::class. `%s` given',
                     $cacheDefinitionId,
@@ -132,24 +114,20 @@ class CacheConfigurationPass implements CompilerPassInterface
                 ));
             }
         } else {
-            $cacheDefinition = $this->getFilesystemCache($cacheDefinitionId);
+            $cacheDefinition = $this->getFilesystemCache();
         }
 
         return $cacheDefinition;
     }
 
     /**
-     * @param string $cacheDefinitionId
-     *
      * @return Definition
      */
-    private function getFilesystemCache($cacheDefinitionId)
+    private function getFilesystemCache(): Definition
     {
-        $path = $cacheDefinitionId === static::FILE_CACHE_SERVICE ? 'oro' : 'oro_data';
-
         $cacheDefinition = new Definition(
             FilesystemCache::class,
-            [sprintf('%%kernel.cache_dir%%/%s', $path)]
+            ['%kernel.cache_dir%/oro_data']
         );
         $cacheDefinition->setAbstract(true);
 
@@ -161,7 +139,7 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @return Definition
      */
-    public static function getMemoryCacheChain(Definition $cacheProvider)
+    public static function getMemoryCacheChain(Definition $cacheProvider): Definition
     {
         $definition = new Definition(MemoryCacheChain::class, [$cacheProvider]);
         $definition->setAbstract(true);
