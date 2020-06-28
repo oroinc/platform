@@ -9,6 +9,11 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
 
+### Removed
+
+#### CacheBundle
+* The service "oro.file_cache.abstract" was removed because it is not used anywhere.
+
 ## 4.2.0-alpha.2 (2020-05-29)
 [Show detailed list of changes](incompatibilities-4-2-alpha-2.md)
 
