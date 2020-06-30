@@ -1,9 +1,9 @@
-{% macro renderDynamicFields(entity, entity_class) %}
+{% macro renderDynamicFields(entity, entity_class = null, ignoredFields = {}) %}
     {% import _self as entityConfigMacros %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
-        {% for fieldName, item in dynamicFields %}
+        {% for fieldName, item in dynamicFields if fieldName not in ignoredFields %}
             {% if feature_resource_enabled(fieldName, 'field_configs') %}
                 {{ ui.renderHtmlProperty(
                     item.label|trans,
