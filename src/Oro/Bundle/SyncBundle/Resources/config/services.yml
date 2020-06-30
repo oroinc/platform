@@ -29,7 +29,6 @@ services:
 
     oro_sync.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -58,52 +57,18 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
-    oro_sync.authentication.origin.origin_provider_chain:
-        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
-        public: false
+    oro_sync.authentication.origin_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\ChainOriginProvider
         arguments:
             - !tagged_iterator oro_sync.origin_provider
 
-    oro_sync.authentication.origin.application_origin_provider:
+    oro_sync.authentication.application_origin_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider
-        public: false
         arguments:
             - '@oro_config.global'
-            - '@oro_sync.authentication.origin.extractor'
+            - '@oro_sync.authentication.origin_extractor'
         tags:
             - { name: oro_sync.origin_provider }
 
-    oro_sync.authentication.origin.origin_registry_decorator:
-        decorates: gos_web_socket.origins.registry
-        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryDecorator
-        public: false
-        arguments:
-            - '@oro_sync.authentication.origin.origin_registry_decorator.inner'
-            - '@oro_sync.authentication.origin.origin_provider_chain'
-
-    oro_sync.authentication.origin.extractor:
+    oro_sync.authentication.origin_extractor:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
-        public: false
-
-    oro_sync.gos_pubsub_router.php_file.cache:
-        decorates: gos_pubsub_router.php_file.cache
-        decoration_priority: 20
-        class: Symfony\Component\Cache\DoctrineProvider
-        arguments:
-            - !service
-                class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
-                arguments:
-                    - 'pubsub_router'
-                    - 0
-                    - '%kernel.cache_dir%/oro_data'
-                    - true
-        calls:
-            - [setNamespace, ['pubsub_router']]
-
-    oro_sync.gos_pubsub_router.php_file.cache.decorator:
-        decorates: gos_pubsub_router.php_file.cache
-        decoration_priority: 10
-        class: Oro\Bundle\SyncBundle\Cache\PubSubRouterCacheDecorator
-        arguments:
-            - '@oro_sync.gos_pubsub_router.php_file.cache.decorator.inner'
-            - '%kernel.debug%'

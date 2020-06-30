@@ -46,5 +46,5 @@ In case when your template extends base template, but content depends on some ad
 Backend implementation
 ----------------------
 
-For doctrine entities tag generation are covered in onFlush event listener. For each entity modified into UnitOfWork `TagGeneratorChain#generate` method will be invoked.
+For doctrine entities tag generation are covered in onFlush event listener. For each entity modified into UnitOfWork `ChainTagGenerator#generate` method will be invoked.
 To add your own generator into chain you should develop a class that implements `TagGeneratorInterface` and register it as service with `oro_sync.tag_generator` tag.

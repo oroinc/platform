@@ -17,7 +17,7 @@ services:
             - { name: doctrine.event_listener, event: postFlush, connection: default }
 
     oro_sync.content.tag_generator:
-        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
+        class: Oro\Bundle\SyncBundle\Content\ChainTagGenerator
         public: true
         arguments:
             - !tagged_iterator oro_sync.tag_generator
@@ -39,7 +39,7 @@ services:
             - { name: oro_sync.tag_generator }
 
     oro_sync.content.data_update_topic_sender:
-        class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
+        class: Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender
         public: true
         arguments:
             - '@oro_sync.websocket_client'
