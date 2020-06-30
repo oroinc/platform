@@ -3,6 +3,24 @@ oro_behat_extension:
     TaxonomyForm:
       selector: 'form[name="oro_tag_taxonomy_form"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+    Edit Tags Button:
+      selector:
+        locator: '//label[text()="Tags"]/following::div[@class="inline-editable-wrapper"]//button'
+        type: xpath
+
+    View Page Tags Form:
+      selector:
+        locator: '//form[contains(@class,"tags-select-editor")]'
+        type: xpath
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Tags:
+            type: xpath
+            locator: '//input[@type="text"]'
+            element: Select2Entities
+
   suites:
     OroTagBundle:
       contexts:

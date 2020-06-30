@@ -6,7 +6,7 @@ namespace Oro\Bundle\SyncBundle\Content;
  * Delegates the generation of tags to child generators.
  * Child generators should be responsible for cache calls for the same data.
  */
-class TagGeneratorChain implements TagGeneratorInterface
+class ChainTagGenerator implements TagGeneratorInterface
 {
     /** @var iterable|TagGeneratorInterface[] */
     private $generators;
