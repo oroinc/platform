@@ -5,7 +5,7 @@ namespace Oro\Bundle\SyncBundle\Authentication\Origin;
 /**
  * Collects origins from all child providers.
  */
-class OriginProviderChain implements OriginProviderInterface
+class ChainOriginProvider implements OriginProviderInterface
 {
     /** @var iterable|OriginProviderInterface[] */
     private $providers;
