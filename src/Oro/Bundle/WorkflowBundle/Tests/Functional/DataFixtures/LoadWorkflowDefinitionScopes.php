@@ -36,8 +36,8 @@ class LoadWorkflowDefinitionScopes extends AbstractFixture implements DependentF
             $manager,
             LoadWorkflowDefinitions::WITH_GROUPS2,
             [
-                $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_1),
-                $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_3)
+                $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_3),
+                $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_4)
             ]
         );
 

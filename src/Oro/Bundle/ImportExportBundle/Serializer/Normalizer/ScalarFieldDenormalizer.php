@@ -177,7 +177,7 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
 
         $originalValueAsFloat = (float)$data;
         /** Check that variable is not float and not overflow */
-        if ($originalValueAsFloat == $data) {
+        if (is_finite($originalValueAsFloat) && $originalValueAsFloat == $data) {
             return $originalValueAsFloat;
         }
 
