@@ -62,6 +62,9 @@
             }]
         }]
     %}
+
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
+
     {% set data =
         {
         'formErrors': form_errors(form)? form_errors(form) : null,

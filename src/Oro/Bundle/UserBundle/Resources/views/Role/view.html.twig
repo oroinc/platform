@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {"%role%": entity.label }}) %}
 
@@ -55,6 +56,8 @@
             {{ UI.renderProperty('oro.user.role.organization.label'|trans, entity.organization) }}
         {% endif %}
         {{ UI.renderSwitchableHtmlProperty('oro.user.role.extend_description.label'|trans, entity.extendDescription) }}
+        {% set ignoredFields = ['organization', 'extend_description'] %}
+        {{ entityConfig.renderDynamicFields(entity, entity_class, ignoredFields) }}
     {% endset %}
 
     {% set rolePermissionsGrid %}
