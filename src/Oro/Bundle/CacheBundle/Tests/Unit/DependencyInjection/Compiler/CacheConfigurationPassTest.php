@@ -25,16 +25,6 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler = new CacheConfigurationPass();
         $compiler->process($container);
 
-        $fileCacheDef = new Definition(
-            MemoryCacheChain::class,
-            [$this->getFilesystemCache('%kernel.cache_dir%/oro')]
-        );
-        $fileCacheDef->setAbstract(true);
-        $this->assertEquals(
-            $fileCacheDef,
-            $container->getDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE)
-        );
-
         $dataCacheDef = new Definition(
             MemoryCacheChain::class,
             [$this->getFilesystemCache('%kernel.cache_dir%/oro_data')]
@@ -48,21 +38,15 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testExistingCacheDefinitionsShouldNotBeChanged()
     {
-        $fileCacheDef = new Definition(ArrayCache::class);
         $dataCacheDef = new Definition(ArrayCache::class);
 
         $container = new ContainerBuilder();
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
         $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
 
         $compiler = new CacheConfigurationPass();
         $compiler->process($container);
 
-        $this->assertEquals(
-            (new Definition(MemoryCacheChain::class, [$fileCacheDef]))->setAbstract(true),
-            $container->getDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE)
-        );
         $this->assertEquals(
             (new Definition(MemoryCacheChain::class, [$dataCacheDef]))->setAbstract(true),
             $container->getDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE)
@@ -71,12 +55,10 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testExceptionIsThrownWhenInvalidCacheProviderGiven()
     {
-        $fileCacheDef = new Definition(Cache::class);
         $dataCacheDef = new Definition(Cache::class);
 
         $container = new ContainerBuilder();
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
         $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
 
         $compiler = new CacheConfigurationPass();
@@ -131,18 +113,13 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
     public function testDataCacheManagerConfiguration()
     {
         $dataCacheManagerDef = new Definition(OroDataCacheManager::class);
-        $fileCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
-        $abstractFileCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
-        $abstractFileCacheDef->setAbstract(true);
         $dataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
-        $abstractDataCacheDef = new ChildDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE);
+        $abstractDataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
         $abstractDataCacheDef->setAbstract(true);
         $otherCacheDef = new ChildDefinition('some_abstract_cache');
 
         $container = new ContainerBuilder();
         $container->setDefinition(CacheConfigurationPass::MANAGER_SERVICE_KEY, $dataCacheManagerDef);
-        $container->setDefinition('file_cache', $fileCacheDef);
-        $container->setDefinition('abstract_file_cache', $abstractFileCacheDef);
         $container->setDefinition('data_cache', $dataCacheDef);
         $container->setDefinition('abstract_data_cache', $abstractDataCacheDef);
         $container->setDefinition('other_cache', $otherCacheDef);
@@ -151,7 +128,6 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
 
         $expectedDataCacheManagerDef = new Definition(OroDataCacheManager::class);
-        $expectedDataCacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('file_cache')]);
         $expectedDataCacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('data_cache')]);
         $this->assertEquals(
             $expectedDataCacheManagerDef,

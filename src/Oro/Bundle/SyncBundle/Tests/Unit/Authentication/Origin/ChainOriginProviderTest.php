@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Origin;
 
-use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain;
+use Oro\Bundle\SyncBundle\Authentication\Origin\ChainOriginProvider;
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface;
 
-class OriginProviderChainTest extends \PHPUnit\Framework\TestCase
+class ChainOriginProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOriginsWhenNoChildProviders()
     {
-        $originProviderChain = new OriginProviderChain([]);
-        self::assertSame([], $originProviderChain->getOrigins());
+        $chainOriginProvider = new ChainOriginProvider([]);
+        self::assertSame([], $chainOriginProvider->getOrigins());
     }
 
     public function testGetOrigins()
@@ -24,10 +24,10 @@ class OriginProviderChainTest extends \PHPUnit\Framework\TestCase
             ->method('getOrigins')
             ->willReturn(['sampleOrigin2', 'sampleOrigin3']);
 
-        $originProviderChain = new OriginProviderChain([$originProvider1, $originProvider2]);
+        $chainOriginProvider = new ChainOriginProvider([$originProvider1, $originProvider2]);
         self::assertEquals(
             ['sampleOrigin1', 'sampleOrigin2', 'sampleOrigin3'],
-            $originProviderChain->getOrigins()
+            $chainOriginProvider->getOrigins()
         );
     }
 }

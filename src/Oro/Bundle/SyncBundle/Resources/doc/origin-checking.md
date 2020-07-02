@@ -11,17 +11,15 @@ The list of allowed origins is not directly configurable via UI. By default, it 
 How to Customize
 ----------------
 
-Origins are collected by `oro_sync.authentication.origin.origin_provider_chain` which in its turn calls origins
-providers. In order to add custom origin, you should create a provider implementing
+In order to add custom origins, you should create a provider implementing
  `Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface` and declare it as a service with tag `oro_sync.origin_provider`, e.g.
 
 ``` yaml
-    oro_sync.authentication.origin.application_origin_provider:
+    oro_sync.authentication.application_origin_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider
-        public: false
         arguments:
             - '@oro_config.global'
-            - '@oro_sync.authentication.origin.extractor'
+            - '@oro_sync.authentication.origin_extractor'
         tags:
             - { name: oro_sync.origin_provider }
 ```

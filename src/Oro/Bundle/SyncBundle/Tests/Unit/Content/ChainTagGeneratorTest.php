@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
-use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
+use Oro\Bundle\SyncBundle\Content\ChainTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\SimpleGeneratorStub;
 
-class TagGeneratorChainTest extends \PHPUnit\Framework\TestCase
+class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider generateDataProvider
      */
-    public function testGenerate(TagGeneratorChain $generator, $data, $includeCollection, $expectedTags)
+    public function testGenerate(ChainTagGenerator $generator, $data, $includeCollection, $expectedTags)
     {
         $result = $generator->generate($data, $includeCollection);
         $this->assertSame($expectedTags, $result);
@@ -23,31 +23,31 @@ class TagGeneratorChainTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'Expect one tag from one generator w/o collection'            => [
-                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
+                new ChainTagGenerator([new SimpleGeneratorStub('s')]),
                 'testString',
                 false,
                 ['testString_s']
             ],
             'Expect two tags from one generator with collection'          => [
-                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
+                new ChainTagGenerator([new SimpleGeneratorStub('s')]),
                 'testString',
                 true,
                 ['testString_s', 'testString_s_type_collection']
             ],
             'Expect no tags, not supported type, but should return array' => [
-                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
+                new ChainTagGenerator([new SimpleGeneratorStub('s')]),
                 ['someArray'],
                 true,
                 []
             ],
             'Expected filtration by unique tags'                          => [
-                new TagGeneratorChain([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('s')]),
+                new ChainTagGenerator([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('s')]),
                 'testString',
                 false,
                 ['testString_s']
             ],
             'Expected merge tags from different generators'               => [
-                new TagGeneratorChain([
+                new ChainTagGenerator([
                     new SimpleGeneratorStub('s'),
                     new SimpleGeneratorStub('e'),
                     new SimpleGeneratorStub('s')
@@ -68,7 +68,7 @@ class TagGeneratorChainTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupports(array $generators, $data, $result)
     {
-        $chain = new TagGeneratorChain($generators);
+        $chain = new ChainTagGenerator($generators);
         $this->assertEquals($result, $chain->supports($data));
     }
 
