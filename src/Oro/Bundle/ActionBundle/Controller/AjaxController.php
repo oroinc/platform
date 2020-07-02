@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -128,7 +129,11 @@ class AjaxController extends AbstractController
     {
         $this->get(SessionInterface::class)->getFlashBag()->add('error', $message);
 
-        return $this->redirect($this->generateUrl($routeName));
+        try {
+            return $this->redirect($this->generateUrl($routeName));
+        } catch (MissingMandatoryParametersException $e) {
+            throw $this->createNotFoundException($message);
+        }
     }
 
     /**
