@@ -10,6 +10,8 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository;
 use Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManagerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\WebsiteBundle\Entity\Website;
 use Oro\Bundle\WebsiteBundle\Manager\WebsiteManager;
 use Oro\Bundle\WebsiteBundle\Provider\WebsiteProviderInterface;
@@ -17,8 +19,10 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Response;
 
-class AttachmentImageContext extends AttachmentContext implements KernelAwareContext
+class AttachmentImageContext extends AttachmentContext implements KernelAwareContext, OroPageObjectAware
 {
+    use PageObjectDictionary;
+
     /** @var ManagerRegistry */
     private $doctrine;
 
@@ -251,5 +255,40 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
                 $this->assertFileDoesNotExist($path);
             }
         }
+    }
+
+    /**
+     * Checks if image is successfully loaded and displayed on page
+     *
+     * @Then /^image "(?P<attachmentName>[^"]+)" is loaded$/
+     * Example: Then "Product 1 Grid Image" is loaded
+     *
+     * @param string $imgElementName
+     */
+    public function assertImageIsLoaded(string $imgElementName): void
+    {
+        $imgElement = $this->elementFactory->createElement($imgElementName);
+        $imgElementXpath = $imgElement->getXpath();
+        $imageIsLoadedScript = <<<JS
+        (function () {
+            var image = document.evaluate(
+                '$imgElementXpath',
+                document,
+                null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE,
+                null
+                ).singleNodeValue;
+            
+            if (!image) {
+                return false;
+            }
+            
+            return image.complete && typeof image.naturalWidth !== "undefined" && image.naturalWidth !== 0;
+        })();
+JS;
+
+        $result = $this->getDriver()->evaluateScript($imageIsLoadedScript);
+
+        $this->assertTrue($result, sprintf('Image %s is not loaded', $imgElementName));
     }
 }
