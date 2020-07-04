@@ -104,7 +104,6 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             if ($this->isDependentObject($includedData[$index], $primaryObjectKey)) {
                 unset($toCheck[$objectKey]);
                 $checked[$objectKey] = $index;
-                break;
             }
         }
     }
