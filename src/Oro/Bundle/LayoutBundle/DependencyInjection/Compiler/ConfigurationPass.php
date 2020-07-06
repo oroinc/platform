@@ -214,15 +214,17 @@ class ConfigurationPass implements CompilerPassInterface
     private function getDataProviders(ContainerBuilder $container)
     {
         $dataProviders = [];
-        foreach ($container->findTaggedServiceIds(self::DATA_PROVIDER_TAG_NAME) as $serviceId => $tag) {
-            if (empty($tag[0]['alias'])) {
-                throw new InvalidConfigurationException(
-                    sprintf('Tag attribute "alias" is required for "%s" service.', $serviceId)
-                );
-            }
+        foreach ($container->findTaggedServiceIds(self::DATA_PROVIDER_TAG_NAME) as $serviceId => $tags) {
+            foreach ($tags as $tag) {
+                if (empty($tag['alias'])) {
+                    throw new InvalidConfigurationException(
+                        sprintf('Tag attribute "alias" is required for "%s" service.', $serviceId)
+                    );
+                }
 
-            $alias = $tag[0]['alias'];
-            $dataProviders[$alias] = $serviceId;
+                $alias = $tag['alias'];
+                $dataProviders[$alias] = $serviceId;
+            }
 
             $this->addServiceToServiceLocator($serviceId);
         }
