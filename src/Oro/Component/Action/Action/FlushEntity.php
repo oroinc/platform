@@ -71,6 +71,10 @@ class FlushEntity extends AbstractAction
     {
         $entity = $this->getEntity($context);
 
+        if ($entity === null) {
+            return;
+        }
+
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass(ClassUtils::getClass($entity));
         $entityManager->beginTransaction();
