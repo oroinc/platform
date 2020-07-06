@@ -480,8 +480,7 @@ abstract class AbstractScopeManager
     {
         if (is_object($identifier)) {
             $identifier = $this->getScopeIdFromEntity($identifier);
-        }
-        if (null === $identifier) {
+        } elseif (null === $identifier) {
             $identifier = $this->getScopeId();
         }
 
