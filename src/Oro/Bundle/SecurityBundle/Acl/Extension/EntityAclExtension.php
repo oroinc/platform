@@ -516,14 +516,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $identity = $this->getIdentityForPermission($permission);
 
         if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $maskBuilder = $this->getEntityMaskBuilder($identity);
-
-            return
-                $maskBuilder->getMaskForGroup('SYSTEM')
-                | $maskBuilder->getMaskForGroup('GLOBAL')
-                | $maskBuilder->getMaskForGroup('DEEP')
-                | $maskBuilder->getMaskForGroup('LOCAL')
-                | $maskBuilder->getMaskForGroup('BASIC');
+            return $this->getValidMasksForRoot($identity);
         }
 
         $metadata = $this->getMetadata($object);
@@ -731,5 +724,30 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $this->accessLevelForMask[$mask] = $result;
 
         return $result;
+    }
+
+    /**
+     * @param int $identity
+     *
+     * @return int
+     */
+    private function getValidMasksForRoot(int $identity): int
+    {
+        $maskBuilder = $this->getEntityMaskBuilder($identity);
+        $maxAccessLevel = $this->metadataProvider->getMaxAccessLevel(
+            AccessLevel::SYSTEM_LEVEL,
+            ObjectIdentityFactory::ROOT_IDENTITY_TYPE
+        );
+
+        return $maxAccessLevel === AccessLevel::SYSTEM_LEVEL
+            ? $maskBuilder->getMaskForGroup('SYSTEM')
+                | $maskBuilder->getMaskForGroup('GLOBAL')
+                | $maskBuilder->getMaskForGroup('DEEP')
+                | $maskBuilder->getMaskForGroup('LOCAL')
+                | $maskBuilder->getMaskForGroup('BASIC')
+            : $maskBuilder->getMaskForGroup('GLOBAL')
+                | $maskBuilder->getMaskForGroup('DEEP')
+                | $maskBuilder->getMaskForGroup('LOCAL')
+                | $maskBuilder->getMaskForGroup('BASIC');
     }
 }
