@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\RootOwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension\Stub\DomainObjectStub;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadata;
@@ -321,5 +325,117 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
                 $securityToken
             )
         );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithSystemAccessLevelProvider
+     *
+     * @param int $mask
+     */
+    public function testValidateMaskForRootWithSystemAccessLevel($mask)
+    {
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::SYSTEM_LEVEL);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn(new RootOwnershipMetadata());
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelProvider
+     *
+     * @param int $mask
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevel($mask)
+    {
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn(new RootOwnershipMetadata());
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider
+     *
+     * @param int $mask
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevelAndInvalidMasks($mask, $expectedException)
+    {
+        $this->expectException(InvalidAclMaskException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Invalid ACL mask "%s" for ObjectIdentity(workflow, (root)).',
+                $expectedException
+            )
+        );
+
+        $this->metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+
+        $this->extension->validateMask(
+            $mask,
+            new ObjectIdentity('workflow', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function validateMaskForRootWithSystemAccessLevelProvider()
+    {
+        return [
+            [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
+            [1 << 1 /* MASK_PERFORM_TRANSITIONS_BASIC */],
+            [1 << 2 /* MASK_VIEW_WORKFLOW_LOCAL */],
+            [1 << 3 /* MASK_PERFORM_TRANSITIONS_LOCAL */],
+            [1 << 4 /* MASK_VIEW_WORKFLOW_DEEP */],
+            [1 << 5 /* MASK_PERFORM_TRANSITIONS_DEEP */],
+            [1 << 6 /* MASK_VIEW_WORKFLOW_GLOBAL */],
+            [1 << 7 /* MASK_PERFORM_TRANSITIONS_GLOBAL */],
+            [1 << 8 /* MASK_VIEW_WORKFLOW_SYSTEM */],
+            [1 << 9 /* MASK_PERFORM_TRANSITIONS_SYSTEM */]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function validateMaskForRootWithoutSystemAccessLevelProvider()
+    {
+        return [
+            [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
+            [1 << 1 /* MASK_PERFORM_TRANSITIONS_BASIC */],
+            [1 << 2 /* MASK_VIEW_WORKFLOW_LOCAL */],
+            [1 << 3 /* MASK_PERFORM_TRANSITIONS_LOCAL */],
+            [1 << 4 /* MASK_VIEW_WORKFLOW_DEEP */],
+            [1 << 5 /* MASK_PERFORM_TRANSITIONS_DEEP */],
+            [1 << 6 /* MASK_VIEW_WORKFLOW_GLOBAL */],
+            [1 << 7 /* MASK_PERFORM_TRANSITIONS_GLOBAL */],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider()
+    {
+        return [
+            [1 << 8 /* MASK_VIEW_WORKFLOW_SYSTEM */, '(PV) system:.V global:.. deep:.. local:.. basic:..'],
+            [1 << 9 /* MASK_PERFORM_TRANSITIONS_SYSTEM */, '(PV) system:P. global:.. deep:.. local:.. basic:..']
+        ];
     }
 }
