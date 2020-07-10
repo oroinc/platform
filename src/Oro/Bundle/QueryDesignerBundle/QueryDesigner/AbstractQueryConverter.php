@@ -1333,7 +1333,11 @@ abstract class AbstractQueryConverter
                     }
                     $joinType     = $mapItem['type'];
                     $join         = $query['join'][$joinType][$mapItem['key']];
-                    $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($join['join'], $mainEntityJoinId);
+                    $parentJoinId = $this->getParentJoinIdForVirtualColumn(
+                        $joinMap,
+                        $join['join'],
+                        $mainEntityJoinId
+                    );
                     if (null !== $parentJoinId) {
                         $alias    = $join['alias'];
                         $joinId   = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
@@ -1348,7 +1352,8 @@ abstract class AbstractQueryConverter
                         if (!isset($mapItem['processed'])) {
                             $joinType     = $mapItem['type'];
                             $join         = $query['join'][$joinType][$mapItem['key']];
-                            $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
+                            $parentJoinId = $this->getParentJoinIdForVirtualColumn(
+                                $joinMap,
                                 $join['join'],
                                 $mainEntityJoinId
                             );
@@ -1374,6 +1379,32 @@ abstract class AbstractQueryConverter
                         ['processed' => true, 'joinId' => $joinId]
                     );
                     unset($joinMap[$alias]);
+
+                    /**
+                     * It is required to update parentAliases in the map with the new alias,
+                     * because there could be a case when one of the joins use another one and in this case
+                     * second join alias will start to be invalid after replacement.
+                     *
+                     * Example of such virtual field con figuration:
+                     * select:
+                     *     expr:         defaultContactEmails.email
+                     *     return_type:  string
+                     * join:
+                     *     left:
+                     *         - { join: entity.defaultContact, alias: defaultContact }
+                     *         - {
+                     *             join: defaultContact.emails,
+                     *             alias: defaultContactEmails,
+                     *             conditionType: 'WITH',
+                     *             condition: 'defaultContactEmails.primary = true'
+                     *           }
+                     * Example of $joinMap value for this configuration of the virtual field above:
+                     *      [
+                     *          '__tmp1__' => ['['type'=> left, 'key' => 0, 'parentAlias' => t1],
+                     *          '__tmp2__' => ['['type'=> left, 'key' => 1, 'parentAlias' => __tmp1__],
+                     *      ]
+                     */
+                    $joinMap = $this->replaceParentAliasInJoinMapItems($joinMap, $alias, $newAlias);
                 }
             }
         }
@@ -1400,6 +1431,36 @@ abstract class AbstractQueryConverter
         }
 
         return $foundAlias;
+    }
+
+    /**
+     * Method added to avoid problem with backward compatibility and will be removed in the next release.
+     * Instead signature of the method:
+     * @see \Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter::getParentJoinIdForVirtualColumnJoin
+     * will be changed to fix a bug: $joinMap parameter was not passed to the function but it is used in it to get
+     * correct parent join id from the already processed joins
+     *
+     * @param array  $joinMap
+     * @param string $joinExpr
+     * @param string $mainEntityJoinId
+     *
+     * @return string|null
+     */
+    private function getParentJoinIdForVirtualColumn($joinMap, $joinExpr, $mainEntityJoinId)
+    {
+        $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin($joinExpr, $mainEntityJoinId);
+        if (!$parentJoinId) {
+            $parts = explode('.', $joinExpr, 2);
+
+            $parentAlias = count($parts) === 2
+                ? $parts[0]
+                : null;
+            if (isset($joinMap[$parentAlias]['processed'])) {
+                $parentJoinId = $joinMap[$parentAlias]['joinId'];
+            }
+        }
+
+        return $parentJoinId;
     }
 
     /**
@@ -1492,6 +1553,24 @@ abstract class AbstractQueryConverter
             unset($joins);
         }
         $query['select']['expr'] = QueryUtils::replaceTableAliasesInSelectExpr($query['select']['expr'], $aliases);
+    }
+
+    /**
+     * Actualize parent alias
+     *
+     * @param array  $joinMap
+     * @param string $from
+     * @param string $to
+     */
+    private function replaceParentAliasInJoinMapItems(array $joinMap, string $from, string $to): array
+    {
+        foreach ($joinMap as &$mapItem) {
+            if (isset($mapItem['parentAlias']) && $mapItem['parentAlias'] === $from) {
+                $mapItem['parentAlias'] = $to;
+            }
+        }
+
+        return $joinMap;
     }
 
     /**
