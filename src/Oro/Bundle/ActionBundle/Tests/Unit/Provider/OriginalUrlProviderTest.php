@@ -45,6 +45,11 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('example.com', $this->urlProvider->getOriginalUrl());
     }
 
+    public function testGetOriginalUrlReturnNullIfRequestIsNotDefined()
+    {
+        $this->assertNull($this->urlProvider->getOriginalUrl());
+    }
+
     public function testGetOriginalUrlWhenDatagridIsSet()
     {
         $datagridName = 'quotes-grid';

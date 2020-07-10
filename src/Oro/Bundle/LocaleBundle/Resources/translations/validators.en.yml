@@ -7,3 +7,5 @@ oro.locale:
     validators:
         is_not_enabled: "Localization '%localization%' cannot be used as Default, because not enabled"
         unknown_localization: 'Localization "#%localization_id%" not found'
+        not_blank_default_localized_value:
+            error_message: 'Default localized value is blank'
