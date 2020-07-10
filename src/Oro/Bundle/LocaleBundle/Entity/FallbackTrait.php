@@ -14,7 +14,7 @@ trait FallbackTrait
      * @param Collection|LocalizedFallbackValue[] $values
      * @param Localization|null                   $localization
      *
-     * @return LocalizedFallbackValue
+     * @return LocalizedFallbackValue|null
      */
     protected function getFallbackValue(Collection $values, Localization $localization = null)
     {
@@ -24,7 +24,7 @@ trait FallbackTrait
     /**
      * @param Collection|LocalizedFallbackValue[] $values
      *
-     * @return LocalizedFallbackValue
+     * @return LocalizedFallbackValue|null
      */
     protected function getDefaultFallbackValue(Collection $values)
     {
@@ -58,7 +58,7 @@ trait FallbackTrait
      * @param Collection|LocalizedFallbackValue[] $values
      * @param Localization                        $localization
      *
-     * @return LocalizedFallbackValue
+     * @return LocalizedFallbackValue|null
      *
      * @throws \LogicException
      */
