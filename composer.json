@@ -62,7 +62,7 @@
         "akeneo/batch-bundle": "0.4.11",
         "nesbot/carbon": "1.29.*",
         "monolog/monolog": "1.23.*",
-        "ocramius/proxy-manager": "2.1.1",
+        "ocramius/proxy-manager": "2.2.*",
         "knplabs/knp-gaufrette-bundle": "0.5.2",
         "oro/doctrine-extensions": "1.2.*",
         "tinymce/tinymce": "4.6.*",
