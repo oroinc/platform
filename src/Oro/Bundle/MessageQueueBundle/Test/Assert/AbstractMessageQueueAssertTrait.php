@@ -151,6 +151,14 @@ trait AbstractMessageQueueAssertTrait
     }
 
     /**
+     * Clears messages in queue.
+     */
+    protected static function clearMessageCollector()
+    {
+        return self::getMessageCollector()->clearMessageCollector();
+    }
+
+    /**
      * Gets a message sent to a specific topic.
      *
      * @param string $topic
