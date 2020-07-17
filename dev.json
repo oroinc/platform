@@ -72,7 +72,7 @@
         "piwik/device-detector": "3.10.*",
         "symfony/polyfill-php70":"1.*",
         "box/spout": "2.7.*",
-        "robloach/component-installer": "0.2.*",
+        "oomphinc/composer-installers-extender": "1.1.*",
         "jms/cg": "1.2.*",
         "oro/redis-config": "4.2.x-dev",
         "brick/math": "0.8.*",
