@@ -73,13 +73,14 @@ class IterableResultFactory implements IterableResultFactoryInterface
                     ? $qb->expr()->in($identifierField, ':values')
                     : $qb->expr()->notIn($identifierField, ':values');
             $qb->andWhere($valueWhereCondition);
-            $qb->addGroupBy($identifierField);
             $qb->setParameter('values', $selectedItems->getValues());
         }
 
         if ($objectIdentifier) {
             $qb->addSelect($objectIdentifier);
         }
+
+        $qb->addGroupBy($identifierField);
 
         if (!$gridConfiguration->isDatasourceSkipAclApply()) {
             $qb = $this->aclHelper->apply($qb);
