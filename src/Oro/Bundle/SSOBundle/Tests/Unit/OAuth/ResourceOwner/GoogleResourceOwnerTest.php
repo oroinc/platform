@@ -6,6 +6,8 @@ use Http\Client\Common\HttpMethodsClient;
 use HWI\Bundle\OAuthBundle\OAuth\RequestDataStorageInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class GoogleResourceOwnerTest extends \PHPUnit\Framework\TestCase
@@ -20,7 +22,10 @@ class GoogleResourceOwnerTest extends \PHPUnit\Framework\TestCase
     {
         $this->cm = $this->createMock(ConfigManager::class);
 
-        $httpClient = $this->createMock(HttpMethodsClient::class);
+        $httpClient = new HttpMethodsClient(
+            $this->createMock(ClientInterface::class),
+            $this->createMock(RequestFactoryInterface::class)
+        );
         $httpUtils = $this->createMock(HttpUtils::class);
         $options = [
             'client_id' => 'changeMe',

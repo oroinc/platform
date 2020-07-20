@@ -1,5 +1,4 @@
 parameters:
-    hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
     hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
 
 services:
