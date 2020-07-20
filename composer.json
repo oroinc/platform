@@ -67,7 +67,7 @@
         "tinymce/tinymce": "4.6.*",
         "ezyang/htmlpurifier": "4.12.*",
         "xemlock/htmlpurifier-html5": "0.1.10",
-        "hwi/oauth-bundle": "0.6.*",
+        "hwi/oauth-bundle": "1.1.*",
         "kriswallsmith/buzz": "1.0.*",
         "piwik/device-detector": "3.10.*",
         "symfony/polyfill-php70":"1.*",

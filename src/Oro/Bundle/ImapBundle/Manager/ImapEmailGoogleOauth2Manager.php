@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use Http\Client\Common\HttpMethodsClient;
+use Http\Client\Common\HttpMethodsClientInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -23,7 +23,7 @@ class ImapEmailGoogleOauth2Manager
     const RETRY_TIMES = 3;
     const RESOURCE_OWNER_GOOGLE = 'google';
 
-    /** @var HttpMethodsClient */
+    /** @var HttpMethodsClientInterface */
     protected $httpClient;
 
     /** @var ResourceOwnerMap */
@@ -36,13 +36,13 @@ class ImapEmailGoogleOauth2Manager
     private $doctrine;
 
     /**
-     * @param HttpMethodsClient $httpClient
+     * @param HttpMethodsClientInterface $httpClient
      * @param ResourceOwnerMap $resourceOwnerMap
      * @param ConfigManager $configManager
      * @param ManagerRegistry $doctrine
      */
     public function __construct(
-        HttpMethodsClient $httpClient,
+        HttpMethodsClientInterface $httpClient,
         ResourceOwnerMap $resourceOwnerMap,
         ConfigManager $configManager,
         ManagerRegistry $doctrine
