@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SSOBundle\Security\OAuthProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -28,6 +29,7 @@ class HwiConfigurationPass implements CompilerPassInterface
 
         if ($container->hasDefinition('hwi_oauth.authentication.provider.oauth')) {
             $container->getDefinition('hwi_oauth.authentication.provider.oauth')
+                ->setClass(OAuthProvider::class)
                 ->addMethodCall('setTokenFactory', [new Reference('oro_sso.token.factory.oauth')])
                 ->addMethodCall(
                     'setOrganizationGuesser',
