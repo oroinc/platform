@@ -100,14 +100,19 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTestedNoGitTarget(): void
     {
-        $this->featureRepository->expects($this->never())
-            ->method('findBy');
+        $expected = new FeatureStatistic();
+        $expected->setPath('/relative/path/to/file');
+
+        $this->featureRepository->expects($this->once())
+            ->method('findBy')
+            ->with(['build_id' => self::BUILD_ID, 'git_target' => null, 'git_branch' => self::GIT_BRANCH])
+            ->willReturn([$expected]);
 
         $this->criteria->set('target_branch', null);
 
         $manager = new FeatureStatisticManager($this->featureRepository, $this->featurePathLocator, $this->criteria);
 
-        $this->assertEquals([], $manager->getTested());
+        $this->assertEquals(['/relative/path/to/file'], $manager->getTested());
     }
 
     public function testSaveStatistics(): void

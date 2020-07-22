@@ -60,16 +60,16 @@ class FeatureStatisticManager
     public function getTested(): array
     {
         $buildId = $this->getBuildId();
-        $gitTarget = $this->getGitTarget();
+        $gitBranch = $this->getGitBranch();
 
-        if (!$buildId || !$gitTarget) {
+        if (!$buildId) {
             return [];
         }
 
-        $criteria = ['build_id' => $buildId, 'git_target' => $gitTarget, 'git_branch' => $this->getGitBranch()];
+        $criteria = ['build_id' => $buildId, 'git_target' => $this->getGitTarget(), 'git_branch' => $gitBranch];
 
         return array_map(
-            function (FeatureStatistic $statistic) {
+            static function (FeatureStatistic $statistic) {
                 return $statistic->getPath();
             },
             $this->featureRepository->findBy($criteria)
