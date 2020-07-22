@@ -39,8 +39,6 @@ class WidgetControllerTest extends WebTestCase
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
-        $this->em->persist($this->widget);
-        $this->em->flush($this->widget);
     }
 
     public function testPut()
@@ -127,17 +125,19 @@ class WidgetControllerTest extends WebTestCase
     }
 
     /**
-     * @param array $widgets
+     * @param array $widgetsData
      * @param array $expectedPositions
      *
      * @dataProvider widgetsProvider
      */
-    public function testPositions($widgets, $expectedPositions)
+    public function testPositions($widgetsData, $expectedPositions)
     {
-        foreach ($widgets as $widget) {
-            $this->em->persist($widget);
+        foreach ($widgetsData as $widgetData) {
+            $widgets[] = $this->createWidget(
+                $widgetData['name'],
+                $widgetData['layoutPosition']
+            );
         }
-        $this->em->flush();
 
         $dashboard = null;
         $data      = ['layoutPositions' => []];
@@ -184,8 +184,8 @@ class WidgetControllerTest extends WebTestCase
         return [
             'multiple' => [
                 'widgets'           => [
-                    $this->createWidget(),
-                    $this->createWidget('quick_launchpad', [2, 2]),
+                    ['name' => 'quick_launchpad', 'layoutPosition' => [1, 1]],
+                    ['name' => 'quick_launchpad', 'layoutPosition' => [2, 2]],
                 ],
                 'expectedPositions' => [
                     [10, 10],
@@ -194,7 +194,7 @@ class WidgetControllerTest extends WebTestCase
             ],
             'single'   => [
                 'widgets'           => [
-                    $this->createWidget()
+                    ['name' => 'quick_launchpad', 'layoutPosition' => [1, 1]],
                 ],
                 'expectedPositions' => [
                     [10, 10]
@@ -220,6 +220,9 @@ class WidgetControllerTest extends WebTestCase
             ->setDashboard($dashboard);
 
         $dashboard->addWidget($widget);
+
+        $this->em->persist($widget);
+        $this->em->flush();
 
         return $widget;
     }
