@@ -2,7 +2,7 @@ parameters:
     oro_logger.detailed_logs_default_level: error
 services:
     oro_logger.cache:
-        parent: doctrine_cache.abstract.array
+        class: Doctrine\Common\Cache\ArrayCache
         public: true
         lazy: true
         calls:
