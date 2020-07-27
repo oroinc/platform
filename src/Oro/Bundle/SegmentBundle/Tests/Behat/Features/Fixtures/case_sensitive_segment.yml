@@ -1,0 +1,8 @@
+Oro\Bundle\SegmentBundle\Entity\Segment:
+    segment:
+        name: 'NEW segment'
+        type: '@segment_dynamic_type'
+        entity: 'Oro\Bundle\UserBundle\Entity\User'
+        definition: ''
+        organization: '@organization'
+        owner: '@business_unit'
