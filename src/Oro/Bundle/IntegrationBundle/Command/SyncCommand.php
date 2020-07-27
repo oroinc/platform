@@ -2,6 +2,7 @@
 namespace Oro\Bundle\IntegrationBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
@@ -74,7 +75,9 @@ class SyncCommand extends Command implements CronCommandInterface
             ->select('COUNT(c.id)')
             ->where('c.transport is NOT NULL')
             ->andWhere('c.enabled = :isEnabled')
-            ->setParameter('isEnabled', true);
+            ->andWhere('c.connectors <> :emptyConnectors')
+            ->setParameter('isEnabled', true, Types::BOOLEAN)
+            ->setParameter('emptyConnectors', [], Types::ARRAY);
 
         $count = $qb->getQuery()->getSingleScalarResult();
 
@@ -113,6 +116,7 @@ class SyncCommand extends Command implements CronCommandInterface
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('Started integration sync scheduling');
         $connector = $input->getOption('connector');
         $integrationId = $input->getOption('integration');
         $connectorParameters = $this->getConnectorParameters($input);
@@ -156,6 +160,7 @@ class SyncCommand extends Command implements CronCommandInterface
 
             $this->syncScheduler->schedule($integration->getId(), $connector, $connectorParameters);
         }
+        $output->writeln('Integration sync scheduling complete');
     }
 
     /**
