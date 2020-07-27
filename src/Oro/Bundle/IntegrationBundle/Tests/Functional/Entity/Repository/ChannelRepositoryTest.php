@@ -29,7 +29,7 @@ class ChannelRepositoryTest extends WebTestCase
 
     public function testRepositoryIsRegistered()
     {
-        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository', $this->repository);
+        $this->assertInstanceOf(ChannelRepository::class, $this->repository);
     }
 
     public function testGetLastStatusForConnectorWorks()
@@ -105,6 +105,36 @@ class ChannelRepositoryTest extends WebTestCase
         static::assertContains(
             $expectedIntegration,
             $this->repository->findByTypeAndExclude('bar', [$excludedIntegration])
+        );
+    }
+
+    public function testGetConfiguredChannelsForSync()
+    {
+        $channels = $this->repository->getConfiguredChannelsForSync(null, false);
+        $this->assertCount(3, $channels);
+
+        $channelNames = array_map(static function (Channel $channel) {
+            return $channel->getName();
+        }, $channels);
+
+        $this->assertEqualsCanonicalizing(
+            ['Foo Integration', 'Bar Integration', 'Extended Bar Integration'],
+            $channelNames
+        );
+    }
+
+    public function testGetConfiguredChannelsForSyncByType()
+    {
+        $channels = $this->repository->getConfiguredChannelsForSync('no_connectors');
+        $this->assertCount(1, $channels);
+
+        $channelNames = array_map(static function (Channel $channel) {
+            return $channel->getName();
+        }, $channels);
+
+        $this->assertEqualsCanonicalizing(
+            ['No connectors Integration'],
+            $channelNames
         );
     }
 }
