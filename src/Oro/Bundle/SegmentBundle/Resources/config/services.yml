@@ -29,7 +29,7 @@ services:
             - ['setLogger', ['@?logger']]
 
     oro_segment.segment_manager.cache:
-        parent: doctrine_cache.abstract.array
+        class: Doctrine\Common\Cache\ArrayCache
         calls:
             - [ setNamespace, [ 'oro_segment_manager' ] ]
 

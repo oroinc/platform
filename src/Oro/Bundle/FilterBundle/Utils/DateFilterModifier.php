@@ -349,9 +349,14 @@ class DateFilterModifier
     protected function getValueMapValuesClosure()
     {
         return function ($data) {
-            // html5 format for intl
-            return $data instanceof \DateTime ? $data->format('Y-m-d H:i') :
-                (is_numeric($data) ? sprintf('2015-%\'.02d-01 00:00', $data) : $data);
+            if ($data instanceof \DateTime) {
+                return (clone $data)->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:00\Z');
+            }
+            if (is_numeric($data)) {
+                return sprintf('2015-%02d-01 00:00:00\Z', $data);
+            }
+
+            return $data;
         };
     }
 }

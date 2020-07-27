@@ -55,7 +55,7 @@ class SegmentManagerTest extends WebTestCase
         ], $this->manager->getSegmentTypeChoices());
     }
 
-    public function testGetSegmentByEntityName()
+    public function testGetSegmentByEntityNameAndCheckOrder()
     {
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
@@ -101,6 +101,48 @@ class SegmentManagerTest extends WebTestCase
             ],
             $this->manager->getSegmentByEntityName(WorkflowAwareEntity::class, null)
         );
+    }
+
+    /**
+     * @dataProvider caseSensitiveTermDataProvider
+     *
+     * @param string $segmentName
+     */
+    public function testGetSegmentByEntityNameWithCaseSensitiveTerm(string $segmentName): void
+    {
+        /** @var Segment $dynamicSegment */
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $this->assertEquals(
+            [
+                'results' => [
+                    [
+                        'id' => 'segment_' . $segment->getId(),
+                        'text' => $segment->getName(),
+                        'type' => 'segment',
+                    ],
+                ],
+                'more' => false
+            ],
+            $this->manager->getSegmentByEntityName(WorkflowAwareEntity::class, $segmentName)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function caseSensitiveTermDataProvider(): array
+    {
+        return [
+            'Default name' => [
+                'Segment name' => 'Dynamic Segment with Filter',
+            ],
+            'Upped name' => [
+                'Segment name' => 'dynamic segment with filter',
+            ],
+            'Lower name' => [
+                'Segment name' => 'DYNAMIC SEGMENT WITH FILTER',
+            ],
+        ];
     }
 
     public function testFindById()

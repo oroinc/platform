@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub;
 
+use Closure;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
@@ -21,7 +22,7 @@ class OroEntityManagerStub extends OroEntityManager implements LazyLoadingInterf
     /**
      * {@inheritdoc}
      */
-    public function getProxyInitializer()
+    public function getProxyInitializer() : ?Closure
     {
         return $this->proxyInitializer;
     }

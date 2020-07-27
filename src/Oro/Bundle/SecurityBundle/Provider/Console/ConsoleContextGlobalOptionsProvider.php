@@ -51,7 +51,9 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
                 self::OPTION_ORGANIZATION,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'ID or name of the organization that should be used as current organization'
+                'ID or name of the organization that should be used as current organization. '
+                    . 'If user have an access only to one organization, it will be used as current one.'
+                    . 'If user have an access to some organizations, the current organization must be specified.'
             )
         ];
 
@@ -121,11 +123,21 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
      */
     private function setOrganization($organization, OrganizationAwareTokenInterface $token): void
     {
+        $user = $token->getUser();
+        $organizationEntity = null;
         if (!$organization) {
-            return;
+            $userOrganizations = $user->getOrganizations(true);
+            if (1 === $userOrganizations->count()) {
+                $organizationEntity = $userOrganizations->first();
+            } else {
+                throw new \InvalidArgumentException('The --current-organization parameter is not specified.');
+            }
         }
 
-        $organizationEntity = $this->loadOrganization($organization);
+        if (null === $organizationEntity) {
+            $organizationEntity = $this->loadOrganization($organization);
+        }
+
         if (null === $organizationEntity) {
             throw new \InvalidArgumentException(sprintf(
                 'Can\'t find organization with identifier %s',

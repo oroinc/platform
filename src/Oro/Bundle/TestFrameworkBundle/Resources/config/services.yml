@@ -108,7 +108,7 @@ services:
         factory: ['@oro_test.alice_fixture_loader', getReferenceRepository]
 
     oro_config.cache:
-        parent: doctrine_cache.abstract.array
+        class: Doctrine\Common\Cache\ArrayCache
         public: true
         calls:
             - [setNamespace, [ 'oro_config' ] ]

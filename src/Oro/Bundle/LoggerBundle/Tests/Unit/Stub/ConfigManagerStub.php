@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Stub;
 
+use Closure;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
@@ -20,7 +21,7 @@ class ConfigManagerStub extends ConfigManager implements LazyLoadingInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyInitializer()
+    public function getProxyInitializer() : ?Closure
     {
     }
 
