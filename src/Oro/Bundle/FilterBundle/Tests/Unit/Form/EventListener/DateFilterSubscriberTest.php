@@ -96,7 +96,12 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         return [
             'should process date value'                                           => [
                 ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
-                ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 00:00']],
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'value' => [
+                        'start' => $this->getUtcDate('2001-01-01')
+                    ]
+                ],
                 ['start' => 'start subform']
             ],
             'should process day of week'                                          => [
@@ -205,5 +210,17 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
+    }
+
+    /**
+     * @param string $dateTime
+     *
+     * @return string
+     */
+    private function getUtcDate(string $dateTime): string
+    {
+        return (new \DateTime($dateTime, new \DateTimeZone(self::TIMEZONE)))
+                ->setTimezone(new \DateTimeZone('UTC'))
+                ->format('Y-m-d H:i:00\Z');
     }
 }
