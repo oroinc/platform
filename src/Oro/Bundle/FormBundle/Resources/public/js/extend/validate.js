@@ -288,7 +288,7 @@ define(function(require, exports, module) {
                         const text = [];
 
                         $label.each(function() {
-                            text.push($(this).text());
+                            text.push(_.escape($(this).text()));
                         });
                         this.showLabel(element, text.join('<br>'));
                         $label.remove();
