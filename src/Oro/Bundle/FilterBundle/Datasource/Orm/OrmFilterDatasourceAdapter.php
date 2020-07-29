@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
@@ -13,6 +14,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
  */
 class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
+    private const GENERATED_PARAMETERS_PREFIX = '_gpnp'; // Generated Parameter Name Prefix
+
     /**
      * @var QueryBuilder
      */
@@ -27,6 +30,11 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      * @var OrmExpressionBuilder
      */
     private $expressionBuilder;
+
+    /**
+     * @var array
+     */
+    private $parameterNames = [];
 
     /**
      * @param QueryBuilder $qb
@@ -117,7 +125,37 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function generateParameterName($filterName)
     {
-        return preg_replace('#[^a-z0-9]#i', '', $filterName) . mt_rand();
+        if (!array_key_exists($filterName, $this->parameterNames)) {
+            $this->parameterNames[$filterName] = 0;
+        }
+
+        $usedParameterNames = [];
+        /** @var Parameter $parameter */
+        foreach ($this->qb->getParameters() as $parameter) {
+            $usedParameterNames[$parameter->getName()] = true;
+        }
+
+        return $this->generateUniqueParameterName($filterName, $usedParameterNames);
+    }
+
+    /**
+     * Get parameter name unique for the query.
+     *
+     * @param string $filterName
+     * @param array $usedParameterNames
+     * @return string
+     */
+    private function generateUniqueParameterName($filterName, array $usedParameterNames)
+    {
+        $parameterName = self::GENERATED_PARAMETERS_PREFIX
+            . preg_replace('#[^a-z0-9]#i', '', $filterName)
+            . ++$this->parameterNames[$filterName];
+
+        if (!empty($usedParameterNames[$parameterName])) {
+            return $this->generateUniqueParameterName($filterName, $usedParameterNames);
+        }
+
+        return $parameterName;
     }
 
     /**
