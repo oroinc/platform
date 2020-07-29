@@ -19,7 +19,11 @@ The current file describes significant changes in the code that may affect the u
 ### SyncBundle
 * Removed long-unused the `orosync/js/content/grid-builder` component from the layout updates.
 
-## 4.2.0-alpha.3
+## 4.2.0-beta (2020-09-28)
+[Show detailed list of changes](incompatibilities-4-2-beta.md)
+
+## 4.2.0-alpha.3 (2020-07-30)
+[Show detailed list of changes](incompatibilities-4-2-alpha-3.md)
 
 ### Changed
 
