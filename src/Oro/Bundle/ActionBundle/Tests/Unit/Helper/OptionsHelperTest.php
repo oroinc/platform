@@ -44,11 +44,6 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->formProvider = self::createMock(FormProvider::class);
         $this->htmlTagHelper = self::createMock(HtmlTagHelper::class);
-        $this->htmlTagHelper->expects(self::any())
-            ->method('escape')
-            ->willReturnCallback(function ($value) {
-                return $value . '_escaped';
-            });
 
         $this->helper = new OptionsHelper(
             $this->router,
@@ -116,7 +111,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => '[trans]custom title[value1_escaped][/trans]',
+                            'title' => '[trans]custom title[value1][/trans]',
                             'dialogOptions' => [],
                         ],
                         'dialogUrl' => 'generated-url',
@@ -149,7 +144,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                         'message' => [
                             'title' => 'title1',
-                            'content' => '[trans]message1[value1_escaped][/trans]',
+                            'content' => '[trans]message1[value1][/trans]',
                             'message_parameters' => ['param1' => 'value1']
                         ],
                     ],
@@ -203,7 +198,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                             'okText' => 'okText1',
                             'message' => 'message1',
                             'message_parameters' => [
-                                'username' => 'username_escaped'
+                                'username' => 'username'
                             ],
                         ],
                     ],
