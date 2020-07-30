@@ -146,6 +146,8 @@ define(function(require, exports, module) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
 
+            this.listenTo(this.model, 'change:action_configuration', this.onActionConfigChange);
+
             this.subviews.push(...this.actions);
         },
 
@@ -183,7 +185,7 @@ define(function(require, exports, module) {
             _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
-                    result.push(this.createAction(action, config[name] || {}));
+                    result.push(this.createAction(action, {...(config[name] || {}), name}));
                 }
             }, this);
 
@@ -211,12 +213,53 @@ define(function(require, exports, module) {
          * @protected
          */
         createLaunchers: function() {
-            return _.map(this.actions, function(action) {
-                return action.createLauncher({
+            return this.actions.map(action => {
+                return action.launcherInstance || action.createLauncher({
                     launcherMode: this.launcherMode,
                     allowDefaultAriaLabel: this.allowDefaultAriaLabel
                 });
-            }, this);
+            });
+        },
+
+        /**
+         * Handles `action_configuration` attributes change and updates actions list accordingly
+         */
+        onActionConfigChange: function() {
+            const config = this.model.get('action_configuration') || {};
+
+            // update existing actions
+            this.actions.forEach(action => {
+                const isEnabled = config[action.configuration.name];
+                if (isEnabled !== void 0 && isEnabled !== action.launcherInstance.enabled) {
+                    action.launcherInstance[isEnabled ? 'enable' : 'disable']();
+                }
+            });
+
+            // create newly enabled actions
+            Object.entries(config).forEach(([name, isEnabled]) => {
+                if (!isEnabled) {
+                    return; // action is not enabled -- no need for a check if it exists
+                }
+                let action = this.actions.find(action => action.configuration.name === name);
+                const Action = this.column.get('actions')[name];
+                if (!action && Action) {
+                    action = this.createAction(Action, {...(config[name] || {}), name});
+                    action.createLauncher({
+                        launcherMode: this.launcherMode,
+                        allowDefaultAriaLabel: this.allowDefaultAriaLabel
+                    });
+                    this.actions.push(action);
+                }
+            });
+
+            // re-sort actions to preserve order of declaration and sort by order value afterwards, if it's defined
+            const actions = Object.keys(this.column.get('actions'))
+                .map(name => this.actions.find(action => action.configuration.name === name));
+            this.actions.length = 0;
+            this.actions.push(..._.sortBy(_.compact(actions), 'order'));
+
+            this.isLauncherListFilled = false;
+            this.fillLauncherList();
         },
 
         /**
@@ -267,10 +310,13 @@ define(function(require, exports, module) {
             if (!this.isLauncherListFilled) {
                 this.isLauncherListFilled = true;
 
-                const launcherList = this.createLaunchers();
+                let launcherList = this.createLaunchers();
+                launcherList.forEach(launcher => launcher.$el.detach());
+                launcherList = launcherList.filter(launcher => launcher.enabled);
 
                 const launchers = this.getLaunchersByIcons(launcherList);
                 const $listsContainer = this.$(this.launchersContainerSelector);
+                $listsContainer.empty();
 
                 if (this.showCloseButton && launcherList.length >= this.actionsHideCount) {
                     $listsContainer.append(this.closeButtonTemplate());
