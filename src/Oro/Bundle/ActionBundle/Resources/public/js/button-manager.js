@@ -288,7 +288,9 @@ define(function(require) {
             let options = {};
 
             if (!_.isEmpty(this.options.confirmation)) {
-                const placeholders = this.options.confirmation.message_parameters || {};
+                const placeholders = _.mapObject(this.options.confirmation.message_parameters || {}, function(item) {
+                    return _.isString(item) ? _.escape(item) : item;
+                });
 
                 options = _.defaults(_.omit(this.options.confirmation, 'component', 'message'), {
                     title: (this.options.confirmation.title || this.messages.confirm_title),
