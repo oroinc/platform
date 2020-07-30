@@ -40,6 +40,8 @@ define(function(require) {
         events: {
             mouseenter: 'onMouseEnter',
             mouseleave: 'onMouseLeave',
+            focusin: 'onFocusin',
+            focusout: 'onFocusout',
             click: 'onClick'
         },
 
@@ -143,6 +145,11 @@ define(function(require) {
                 this.$el.addClass('align-' + this.column.get('align'));
             }
 
+            if (this.isLabelAbbreviated) {
+                this.$('[data-grid-header-cell-label]').attr('aria-label', this.column.get('label'));
+                this.$('[data-grid-header-cell-text]').attr('aria-hidden', true);
+            }
+
             return this;
         },
 
@@ -192,8 +199,47 @@ define(function(require) {
          *
          * @param {Event} e
          */
-        onMouseEnter: function(e) {
-            if (!this.isLabelAbbreviated) {
+        onMouseEnter(e) {
+            this.isHovered = true;
+            this.showHint();
+        },
+
+        /**
+         * Mouse Leave from column name to hide hint
+         *
+         * @param {Event} e
+         */
+        onMouseLeave(e) {
+            delete this.isHovered;
+            if (!this.isFocused) {
+                this.hideHint();
+            }
+        },
+
+        /**
+         * Focusin on column name to show hint if label has been abbreviated
+         *
+         * @param {Event} e
+         */
+        onFocusin(e) {
+            this.isFocused = true;
+            this.showHint();
+        },
+
+        /**
+         * Focus from column name to hide hint
+         *
+         * @param {Event} e
+         */
+        onFocusout(e) {
+            delete this.isFocused;
+            if (!this.isHovered) {
+                this.hideHint();
+            }
+        },
+
+        showHint() {
+            if (!this.isLabelAbbreviated || this.hintTimeout || this.subview('hint')) {
                 return;
             }
 
@@ -215,13 +261,9 @@ define(function(require) {
             }.bind(this), 300);
         },
 
-        /**
-         * Mouse Leave from column name to hide hint
-         *
-         * @param {Event} e
-         */
-        onMouseLeave: function(e) {
+        hideHint() {
             clearTimeout(this.hintTimeout);
+            delete this.hintTimeout;
             if (this.subview('hint')) {
                 this.removeSubview('hint');
             }
