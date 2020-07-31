@@ -170,7 +170,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
 
             // delete nonce from cache because user have another api keys
             if (!$isSecretValid && $secretsCount !== $currentIteration) {
-                $this->nonceCache->delete($nonce);
+                $this->nonceCache->delete($this->getNonceCacheKey($nonce));
             }
 
             if ($isSecretValid) {
@@ -226,11 +226,12 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
             throw new CredentialsExpiredException('Token has expired.');
         }
 
-        if ($this->nonceCache->has($nonce)) {
+        $nonceCacheKey = $this->getNonceCacheKey($nonce);
+        if ($this->nonceCache->has($nonceCacheKey)) {
             throw new NonceExpiredException('Previously used nonce detected.');
         }
 
-        $this->nonceCache->set($nonce, strtotime($this->getCurrentTime()), $this->lifetime);
+        $this->nonceCache->set($nonceCacheKey, strtotime($this->getCurrentTime()), $this->lifetime);
 
         $expected = $this->encoder->encodePassword(sprintf('%s%s%s', base64_decode($nonce), $created, $secret), $salt);
 
@@ -263,5 +264,19 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
     private function isFormattedCorrectly($created): bool
     {
         return (bool)preg_match($this->dateFormat, $created);
+    }
+
+    /**
+     * @param string $nonce
+     * @return string
+     */
+    private function getNonceCacheKey(string $nonce): string
+    {
+        $key = preg_replace('/[^a-zA-Z0-9_.]/', '_', $nonce);
+        if (strlen($key) > 64) {
+            $key = md5($key);
+        }
+
+        return $key;
     }
 }

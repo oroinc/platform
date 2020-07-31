@@ -134,7 +134,7 @@ class CommandsTest extends WebTestCase
     {
         $nonceCache = $this->getNonceCache(self::FIREWALL_NAME);
 
-        $this->assertTrue($nonceCache->has($this->getNonce($header[4][1])));
+        $this->assertTrue($nonceCache->has($this->getNonceCacheKey($this->getNonce($header[4][1]))));
 
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
@@ -154,7 +154,7 @@ class CommandsTest extends WebTestCase
             '--firewall' => self::FIREWALL_NAME,
         ]);
 
-        $this->assertFalse($nonceCache->has($this->getNonce($header[4][1])));
+        $this->assertFalse($nonceCache->has($this->getNonceCacheKey($this->getNonce($header[4][1]))));
         $this->assertContains('Deleted nonce cache', $commandTester->getDisplay());
 
         return $header;
@@ -183,5 +183,19 @@ class CommandsTest extends WebTestCase
         preg_match('/Nonce="([^"]+)"/', $wsseHeader, $matches);
 
         return $matches[1] ?? null;
+    }
+
+    /**
+     * @param string $nonce
+     * @return string
+     */
+    private function getNonceCacheKey(string $nonce): string
+    {
+        $key = preg_replace('/[^a-zA-Z0-9_.]/', '_', $nonce);
+        if (strlen($key) > 64) {
+            $key = md5($key);
+        }
+
+        return $key;
     }
 }
