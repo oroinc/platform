@@ -55,6 +55,13 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      * @var string|null
      *
      * @ORM\Column(name="uuid", type="guid", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $uuid;
 
@@ -448,8 +455,13 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
             $this->id = null;
         }
 
-        // Resets uuid for clonned object, will be created on prePersist
+        // Resets uuid for cloned object, will be created on prePersist
         $this->uuid = null;
+
+        // Resets parent entity info for cloned object, must be set by corresponding listeners.
+        $this->parentEntityClass = null;
+        $this->parentEntityFieldName = null;
+        $this->parentEntityId = null;
     }
 
     /**

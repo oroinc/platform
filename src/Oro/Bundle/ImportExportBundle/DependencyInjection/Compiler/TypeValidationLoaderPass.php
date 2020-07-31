@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Adds validation loader for import-export identity entity fields.
  */
-class IdentityValidationLoaderPass implements CompilerPassInterface
+class TypeValidationLoaderPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
@@ -19,7 +19,7 @@ class IdentityValidationLoaderPass implements CompilerPassInterface
         $container->getDefinition('validator.builder')
             ->addMethodCall(
                 'addLoader',
-                [new Reference('oro_importexport.validator.identity_validation_loader')]
+                [new Reference('oro_importexport.validator.type_validation_loader')]
             );
     }
 }

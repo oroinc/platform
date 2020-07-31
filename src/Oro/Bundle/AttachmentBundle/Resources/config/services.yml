@@ -12,6 +12,8 @@ parameters:
 
     oro_attachment.provider.resized_image_path.skip_prefix:      'media/cache'
 
+    oro_attachment.import_files_dir: '%kernel.project_dir%/var/import_export/files/'
+
 services:
     oro_attachment.manager:
         public: true
@@ -181,6 +183,7 @@ services:
             - [setFileManager, ['@oro_attachment.file_manager']]
             - [setValidator, ['@oro_attachment.validator.file_config_validator']]
             - [setLogger, ['@logger']]
+            - [setFilesDir, ['%oro_attachment.import_files_dir%']]
         tags:
             - { name: oro_importexport.normalizer}
 
@@ -530,3 +533,35 @@ services:
                 liip_imagine.filter.configuration: '@liip_imagine.filter.configuration'
                 oro_attachment.manager.image_removal_manager: '@oro_attachment.manager.image_removal_manager'
         tags: ['container.service_locator']
+
+    oro_attachment.importexport.event_listener.file_headers:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileHeadersListener
+        tags:
+            - { name: kernel.event_listener, event: oro.import_export.after_load_entity_rules_and_backend_headers, method: afterLoadEntityRulesAndBackendHeaders }
+
+    oro_attachment.import_export.file_import_strategy_helper:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper
+        arguments:
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.validator.multiple_file_config_validator'
+            - '@translator'
+
+    oro_attachment.import_export.event_listener.file_strategy:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
+            - '@security.authorization_checker'
+            - '@translator'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_before, method: onProcessBefore }
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 50 }
+            - { name: monolog.logger, channel: oro_attachment }

@@ -11,6 +11,7 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -107,10 +108,20 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->fileManager->createFileEntity($path);
         $this->assertEquals('test.txt', $result->getOriginalFilename());
-        $this->assertEquals(
-            file_get_contents($path),
-            file_get_contents($result->getFile()->getPathname())
-        );
+        $this->assertFileEquals($path, $result->getFile()->getPathname());
+    }
+
+    public function testSetFileFromPath(): void
+    {
+        $path = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $this->protocolValidator->expects($this->never())
+            ->method('isSupportedProtocol');
+
+        $file = $this->createFileEntity();
+        $this->fileManager->setFileFromPath($file, $path);
+        $this->assertEquals('test.txt', $file->getOriginalFilename());
+        $this->assertFileEquals($path, $file->getFile()->getPathname());
     }
 
     /**
@@ -125,16 +136,33 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->createFileEntity($path);
     }
 
-    public function fileWithoutProtocolDataProvider()
+    /**
+     * @return array
+     */
+    public function fileWithoutProtocolDataProvider(): array
     {
         return [
-            [true, ''],
-            [true, ' '],
-            [true, '/file.txt'],
-            [true, '\\server\file.txt'],
-            [true, 'C:\file.txt'],
-            [true, 'c:/file.txt']
+            [''],
+            [' '],
+            ['/file.txt'],
+            ['\\server\file.txt'],
+            ['C:\file.txt'],
+            ['c:/file.txt']
         ];
+    }
+
+    /**
+     * @dataProvider fileWithoutProtocolDataProvider
+     *
+     * @param string $path
+     */
+    public function testSetFileFromPathWhenProtocolIsNotSpecified(string $path): void
+    {
+        $this->expectException(\Symfony\Component\Filesystem\Exception\FileNotFoundException::class);
+        $this->protocolValidator->expects($this->never())
+            ->method('isSupportedProtocol');
+
+        $this->fileManager->setFileFromPath($this->createFileEntity(), $path);
     }
 
     /**
@@ -161,6 +189,23 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider supportedFileProtocolDataProvider
+     *
+     * @param string $path
+     * @param string $expectedProtocol
+     */
+    public function testSetFileFromPathWhenProtocolIsSupported(string $path, string $expectedProtocol): void
+    {
+        $this->expectException(\Symfony\Component\Filesystem\Exception\FileNotFoundException::class);
+        $this->protocolValidator->expects($this->once())
+            ->method('isSupportedProtocol')
+            ->with($expectedProtocol)
+            ->willReturn(true);
+
+        $this->fileManager->setFileFromPath($this->createFileEntity(), $path);
+    }
+
+    /**
      * @dataProvider notSupportedFileProtocolDataProvider
      */
     public function testCreateFileEntityWhenProtocolIsNotSupported($path, $expectedProtocol)
@@ -181,6 +226,23 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ['Phar://test.phar/file.txt', 'phar'],
             [' PHAR://test.phar/file.txt ', 'phar']
         ];
+    }
+
+    /**
+     * @dataProvider notSupportedFileProtocolDataProvider
+     *
+     * @param string $path
+     * @param string $expectedProtocol
+     */
+    public function testSetFileFromPathWhenProtocolIsNotSupported(string $path, string $expectedProtocol): void
+    {
+        $this->expectException(\Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException::class);
+        $this->protocolValidator->expects($this->once())
+            ->method('isSupportedProtocol')
+            ->with($expectedProtocol)
+            ->willReturn(false);
+
+        $this->fileManager->setFileFromPath($this->createFileEntity(), $path);
     }
 
     public function testCreateFileEntityForNotExistingFile()
@@ -239,6 +301,63 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fileEntity->getOriginalFilename(), $clonedFileEntity->getOriginalFilename());
         $this->assertNull($clonedFileEntity->getFilename());
         $this->assertNull($clonedFileEntity->getFile());
+    }
+
+    public function testGetFileFromFileEntity(): void
+    {
+        $fileEntity = $this->createFileEntity();
+
+        $file = $this->createMock(\Gaufrette\File::class);
+        $fileContent = 'test';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileEntity->getFilename())
+            ->willReturn(true);
+        $this->filesystem->expects($this->once())
+            ->method('get')
+            ->with($fileEntity->getFilename())
+            ->willReturn($file);
+        $file->expects($this->once())
+            ->method('getContent')
+            ->willReturn($fileContent);
+
+        $symfonyFile = $this->fileManager->getFileFromFileEntity($fileEntity, false);
+
+        $this->assertNotNull($symfonyFile);
+        $this->assertEquals(
+            $fileContent,
+            file_get_contents($symfonyFile->getRealPath())
+        );
+    }
+
+    public function testGetFileFromFileEntityWhenFileDoesNotExist(): void
+    {
+        $fileEntity = $this->createFileEntity();
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileEntity->getFilename())
+            ->willReturn(false);
+        $this->filesystem->expects($this->never())
+            ->method('get');
+
+        $this->assertNull($this->fileManager->getFileFromFileEntity($fileEntity, false));
+    }
+
+    public function testGetFileFromFileEntityWhenFileDoesNotExistAndException(): void
+    {
+        $fileEntity = $this->createFileEntity();
+
+        $this->filesystem->expects($this->never())
+            ->method('has');
+        $this->filesystem->expects($this->once())
+            ->method('get')
+            ->willThrowException(new FileNotFoundException());
+
+        $this->expectException(FileNotFoundException::class);
+
+        $this->assertNull($this->fileManager->getFileFromFileEntity($fileEntity, true));
     }
 
     public function testPreUploadDeleteFile()
