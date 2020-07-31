@@ -5,12 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
-use Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader;
+use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -244,6 +246,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /**
      * @param object $entity
      * @param array|null $itemData
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function updateRelations($entity, array $itemData = null)
     {
@@ -350,7 +354,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     {
         // validate entity
         $validationErrors = $this->strategyHelper->validateEntity($entity, null, [
-            IdentityValidationLoader::IMPORT_IDENTITY_FIELDS_VALIDATION_GROUP
+            TypeValidationLoader::IMPORT_FIELD_TYPE_VALIDATION_GROUP
         ]);
 
         if ($validationErrors) {
@@ -511,7 +515,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             return [];
         }
 
-        if (!$this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->doctrineHelper->getEntityManager($entityName);
+        $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
+        // Association type should be one-to-one so context with inverse field name can lead to a single result.
+        // Otherwise - if allowing one-to-many and trying to call ::findExistingEntity() with such context it will
+        // always return the first item in the collection.
+        if ($association['type'] !== ClassMetadata::ONE_TO_ONE) {
             return [];
         }
 

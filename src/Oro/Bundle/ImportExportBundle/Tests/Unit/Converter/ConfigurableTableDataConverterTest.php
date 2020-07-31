@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -236,6 +237,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
      */
     protected $localeSettings;
 
+    /**
+     * @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $attributeConfigHelper;
+
     protected function setUp()
     {
         $configProvider = $this->createMock(ConfigProvider::class);
@@ -253,12 +259,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 
         $this->relationCalculator = $this->createMock(RelationCalculator::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->attributeConfigHelper = $this->createMock(AttributeConfigHelper::class);
 
         $this->converter = new ConfigurableTableDataConverter(
             $this->fieldHelper,
             $this->relationCalculator,
             $this->localeSettings
         );
+        $this->converter->setAttributeConfigHelper($this->attributeConfigHelper);
     }
 
     /**
@@ -592,6 +600,10 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldHeaderWithRelation()
     {
+        $this->attributeConfigHelper->expects($this->any())
+            ->method('isFieldAttribute')
+            ->willReturn(true);
+
         $fieldName = 'name';
         $this->prepareFieldHelper();
         $this->prepareRelationCalculator();
@@ -600,6 +612,9 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 
         $relationFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'fullScalar');
         $this->assertEquals($relationFieldValue, 'Full Scalar Entity Name');
+
+        $fieldName = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'innerRelation.name');
+        $this->assertEquals('Inner Relation Name', $fieldName);
     }
 
     /**

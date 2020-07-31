@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -34,8 +35,19 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var AttributeConfigHelper|null */
+    protected $attributeConfigHelper;
+
     /** @var bool */
     protected $translateUsingLocale = true;
+
+    /**
+     * @param AttributeConfigHelper|null $attributeConfigHelper
+     */
+    public function setAttributeConfigHelper(?AttributeConfigHelper $attributeConfigHelper): void
+    {
+        $this->attributeConfigHelper = $attributeConfigHelper;
+    }
 
     /**
      * {@inheritDoc}

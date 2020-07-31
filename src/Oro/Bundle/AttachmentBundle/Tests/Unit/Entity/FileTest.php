@@ -92,4 +92,27 @@ class FileTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1, $this->entity->getId());
         $this->assertSame('test-uuid', $this->entity->getUuid());
     }
+
+    public function testClone(): void
+    {
+        /** @var File $file */
+        $file = $this->getEntity(
+            File::class,
+            [
+                'id' => 1,
+                'uuid' => 'sample-uuid',
+                'parentEntityClass' => \stdClass::class,
+                'parentEntityFieldName' => 'sampleField',
+                'parentEntityId' => 1,
+            ]
+        );
+
+        $clonedFile = clone $file;
+
+        $this->assertNull($clonedFile->getId());
+        $this->assertNull($clonedFile->getUuid());
+        $this->assertNull($clonedFile->getParentEntityClass());
+        $this->assertNull($clonedFile->getParentEntityFieldName());
+        $this->assertNull($clonedFile->getParentEntityId());
+    }
 }

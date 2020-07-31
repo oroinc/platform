@@ -4,14 +4,21 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\EventListener\FileDigitalAssetChangedListener;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
+use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\FileStub;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
     private $fileReflector;
 
@@ -43,12 +50,31 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->prePersist($this->file, $this->eventArgs);
     }
 
+    public function testPrePersistWhenNewDigitalAsset(): void
+    {
+        $this->file
+            ->expects($this->once())
+            ->method('getDigitalAsset')
+            ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
+
+        $this->fileReflector
+            ->expects($this->never())
+            ->method('reflectFromDigitalAsset');
+
+        $this->listener->prePersist($this->file, $this->eventArgs);
+    }
+
     public function testPrePersist(): void
     {
         $this->file
             ->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
+
+        $digitalAsset
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn(1);
 
         $this->fileReflector
             ->expects($this->once())
@@ -126,11 +152,101 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getDigitalAsset')
             ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
 
+        $digitalAsset
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn(1);
+
         $this->fileReflector
             ->expects($this->once())
             ->method('reflectFromDigitalAsset')
             ->with($this->file, $digitalAsset);
 
         $this->listener->preUpdate($this->file, $this->eventArgs);
+    }
+
+    public function testFlushWhenNoMetadata(): void
+    {
+        $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager = $this->createMock(EntityManager::class));
+
+        $entityManager
+            ->expects($this->once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory = $this->createMock(ClassMetadataFactory::class));
+
+        $metadataFactory
+            ->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(false);
+
+        $this->fileReflector
+            ->expects($this->never())
+            ->method('reflectFromDigitalAsset');
+
+        $this->listener->onFlush($onFlushEventArgs);
+    }
+
+    public function testFlush(): void
+    {
+        $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager = $this->createMock(EntityManager::class));
+
+        $entityManager
+            ->expects($this->once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory = $this->createMock(ClassMetadataFactory::class));
+
+        $metadataFactory
+            ->expects($this->once())
+            ->method('hasMetadataFor')
+            ->with(File::class)
+            ->willReturn(true);
+
+        $entityManager
+            ->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(File::class)
+            ->willReturn($metadata = $this->createMock(ClassMetadata::class));
+
+        $entityManager
+            ->expects($this->once())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
+
+        /** @var DigitalAsset $digitalAssetWithId */
+        $digitalAssetWithId = $this->getEntity(DigitalAsset::class, ['id' => 1]);
+        $expectedDigitalAsset = new DigitalAsset();
+        $expectedFile = (new FileStub())->setDigitalAsset($expectedDigitalAsset);
+        $scheduledInsertions = [
+            new \stdClass(),
+            new FileStub(),
+            (new FileStub())->setDigitalAsset($digitalAssetWithId),
+            $expectedFile,
+        ];
+
+        $unitOfWork
+            ->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->willReturn($scheduledInsertions);
+
+        $this->fileReflector
+            ->expects($this->once())
+            ->method('reflectFromDigitalAsset')
+            ->with($expectedFile, $expectedDigitalAsset);
+
+        $unitOfWork
+            ->expects($this->once())
+            ->method('recomputeSingleEntityChangeSet')
+            ->with($metadata, $expectedFile);
+
+        $this->listener->onFlush($onFlushEventArgs);
     }
 }

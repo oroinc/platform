@@ -2580,4 +2580,15 @@ JS;
         $this->assertTrue($element->isValid());
         $this->assertNotContains($value, $element->getAttribute($attribute));
     }
+
+    /**
+     * Checks, that page contains text matching specified regexp
+     * Example: Then I should see text matching regexp "Batman, the vigilante"
+     *
+     * @Then /^(?:|I )should see text matching regexp (?P<pattern>(?:[^"]|\\")*)$/
+     */
+    public function assertPageMatchesRegexp(string $pattern): void
+    {
+        $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
+    }
 }

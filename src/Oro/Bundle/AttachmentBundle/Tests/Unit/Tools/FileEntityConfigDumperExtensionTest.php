@@ -273,6 +273,13 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 ['extend', TestEntity3::class, false, [$filesFieldConfig]],
             ]));
 
+        $this->configManager->expects(self::exactly(2))
+            ->method('getFieldConfig')
+            ->will($this->returnValueMap([
+                ['importexport', TestEntity2::class, 'imagesFieldName', $imagesFieldConfig],
+                ['importexport', TestEntity3::class, 'filesFieldName', $filesFieldConfig],
+            ]));
+
         $this->configManager->expects(self::exactly(8))
             ->method('getEntityConfig')
             ->will($this->returnValueMap([
@@ -341,6 +348,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                     'refresh',
                 ],
                 'orphanRemoval' => true,
+                'full' => true,
             ],
             $imagesFieldConfig->all()
         );
@@ -393,6 +401,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                     'refresh',
                 ],
                 'orphanRemoval' => true,
+                'full' => true,
             ],
             $filesFieldConfig->all()
         );
