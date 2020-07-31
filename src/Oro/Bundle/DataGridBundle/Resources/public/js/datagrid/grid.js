@@ -748,13 +748,13 @@ define(function(require) {
                     order: 700
                 });
                 this.on('appearanceChanged', function(key, options) {
-                    const item = _.findWhere(action.launcherInstanse.items,
+                    const item = _.findWhere(action.launcherInstance.items,
                         {key: options.type, id: options.id || 'by_type'});
                     if (!item) {
                         throw new Error('Could not find corresponding launcher item');
                     }
-                    action.launcherInstanse.selectedItem = item;
-                    action.launcherInstanse.render();
+                    action.launcherInstance.selectedItem = item;
+                    action.launcherInstance.render();
                 });
                 actions.push(action);
             }

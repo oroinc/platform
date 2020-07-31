@@ -161,7 +161,7 @@ define(function(require) {
             }
             _.defaults(options, this.launcherOptions);
             const launcher = new (this.launcher)(options);
-            this.launcherInstanse = launcher;
+            this.launcherInstance = launcher;
             // schedule dispose
             this.subviews.push(launcher);
             return launcher;
