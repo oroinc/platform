@@ -2606,4 +2606,15 @@ JS;
             sprintf('Element %s does not go after %s', $element1Name, $element2Name)
         );
     }
+
+    /**
+     * Checks, that page contains text matching specified regexp
+     * Example: Then I should see text matching regexp "Batman, the vigilante"
+     *
+     * @Then /^(?:|I )should see text matching regexp (?P<pattern>(?:[^"]|\\")*)$/
+     */
+    public function assertPageMatchesRegexp(string $pattern): void
+    {
+        $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
+    }
 }

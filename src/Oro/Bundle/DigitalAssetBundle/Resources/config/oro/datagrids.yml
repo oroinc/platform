@@ -63,7 +63,7 @@ datagrids:
                 title:
                     data_name: title
                 originalFilename:
-                    data_name: digitalAsset.originalFilename
+                    data_name: file.originalFilename
                 fileSize:
                     data_name: file.fileSize
                 mimeType:

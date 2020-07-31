@@ -17,6 +17,7 @@ use Oro\Bundle\WebsiteBundle\Manager\WebsiteManager;
 use Oro\Bundle\WebsiteBundle\Provider\WebsiteProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
 class AttachmentImageContext extends AttachmentContext implements KernelAwareContext, OroPageObjectAware
@@ -43,6 +44,12 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
 
     /** @var array[] */
     private $imagePaths;
+
+    /** @var int[] */
+    private $filesCount;
+
+    /** @var string[] */
+    private $rememberedFilenames;
 
     /**
      * @param WebsiteProviderInterface $websiteProvider
@@ -290,5 +297,123 @@ JS;
         $result = $this->getDriver()->evaluateScript($imageIsLoadedScript);
 
         $this->assertTrue($result, sprintf('Image %s is not loaded', $imgElementName));
+    }
+
+    /**
+     * @Given /^(?:|I )remember number of files in attachment directory$/
+     * @Given /^(?:|I )remember number of files with extension "(?P<extension>[^"]+)" in attachment directory$/
+     *
+     * @param string $extension
+     */
+    public function rememberNumberOfAttachmentFiles(string $extension = ''): void
+    {
+        $this->filesCount[$extension] = $this->countFilesInAttachmentDir($extension);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @Then /^number of files in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
+     * @Then /^number of files with extension "(?P<extension>[^"]+)" in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
+     *
+     * @param string $operator
+     * @param int $count
+     * @param string $extension
+     */
+    //@codingStandardsIgnoreEnd
+    public function numberOfAttachmentFilesIsChangedBy(string $operator, int $count, string $extension = ''): void
+    {
+        $currentCount = $this->countFilesInAttachmentDir($extension);
+        $rememberedCount = $this->filesCount[$extension] ?? 0;
+
+        if ($operator === 'less') {
+            $this->assertEquals(
+                $rememberedCount - $currentCount,
+                $count,
+                sprintf(
+                    'Current number of files %d is not less by %d than remembered %d',
+                    $currentCount,
+                    $count,
+                    $rememberedCount
+                )
+            );
+        }
+
+        if ($operator === 'more') {
+            $this->assertEquals(
+                $count,
+                $currentCount - $rememberedCount,
+                sprintf(
+                    'Current number of files %d is not more by %d than remembered %d',
+                    $currentCount,
+                    $count,
+                    $rememberedCount
+                )
+            );
+        }
+    }
+
+    /**
+     * @param string $extension
+     *
+     * @return int
+     */
+    private function countFilesInAttachmentDir(string $extension = ''): int
+    {
+        $projectDir = $this->getContainer()->getParameter('kernel.project_dir');
+        $attachmentDir = $this->getContainer()->getParameter('oro_attachment.filesystem_dir.attachments');
+        $filesIterator = Finder::create()
+            ->in($projectDir . '/var/' . $attachmentDir)
+            ->files();
+
+        if ($extension) {
+            $filesIterator->name(sprintf('*.%s', ltrim($extension, '.')));
+        }
+
+        return iterator_count($filesIterator);
+    }
+
+    /**
+     * Example: I remember filename of the file "product1"
+     *
+     * @Given /^I remember filename of the file "(?P<name>[^"]*)"$/
+     * @param string $name
+     */
+    public function iRememberFilenameOfFile(string $name): void
+    {
+        $link = $this->getSession()
+            ->getPage()
+            ->find(
+                'xpath',
+                sprintf('//a[contains(@data-filename, "%s")]', $name)
+            );
+
+        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
+
+        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+
+        $this->rememberedFilenames[$name] = $matches['filename'];
+    }
+
+    /**
+     * Example: Then filename of the file "product1" is not as remembered
+     *
+     * @Then /^filename of the file "(?P<name>[^"]*)" is not as remembered$/
+     * @param string $name
+     */
+    public function filenameOfFileIsNotAsRemembered(string $name): void
+    {
+        $link = $this->getSession()
+            ->getPage()
+            ->find(
+                'xpath',
+                sprintf('//a[contains(@data-filename, "%s")]', $name)
+            );
+
+        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
+
+        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+
+        $this->assertArrayHasKey($name, $this->rememberedFilenames);
+        $this->assertNotEquals($this->rememberedFilenames[$name], $matches['filename']);
     }
 }
