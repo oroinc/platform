@@ -52,6 +52,7 @@ services:
         tags:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
 
     oro_digital_asset.form.transformer.digital_asset_to_id:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer
@@ -86,3 +87,17 @@ services:
             - '@oro_digital_asset.listener.file_delete_listener.inner'
         tags:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preRemove }
+
+    oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_event_listener:
+        class: Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyEventListener
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_entity.doctrine_helper'
+            - '@translator'
+        tags:
+            # Listener priority should be lower than onProcessAfter in oro_attachment.import_export.file_strategy_event_listener
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 40 }
+            - { name: doctrine.event_listener, event: preFlush, connection: 'default' }

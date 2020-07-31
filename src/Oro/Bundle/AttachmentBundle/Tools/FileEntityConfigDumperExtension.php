@@ -63,7 +63,7 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
             $extendFieldConfigId->getClassName(),
             $extendFieldConfigId->getFieldName()
         );
-        $importFieldConfig->set('process_as_scalar', true);
+        $importFieldConfig->set('process_as_scalar', false);
         $this->configManager->persist($importFieldConfig);
 
         $this->createRelation($extendFieldConfig);
@@ -92,6 +92,14 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
             ['persist', 'remove']
         );
         $extendFieldConfig->set('cascade', array_unique($cascade));
+
+        $importFieldConfig = $this->configManager->getFieldConfig(
+            'importexport',
+            $extendFieldConfigId->getClassName(),
+            $extendFieldConfigId->getFieldName()
+        );
+        $importFieldConfig->set('full', true);
+        $this->configManager->persist($importFieldConfig);
 
         $this->createRelation($extendFieldConfig);
     }

@@ -145,13 +145,13 @@ services:
         arguments:
             - '@doctrine'
 
-    oro_importexport.validator.identity_validation_loader:
-        class: Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader
-        public: false
+    oro_importexport.validator.type_validation_loader:
+        class: Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader
         arguments:
             - '@oro_entity_config.provider.extend'
             - '@oro_entity_config.provider.importexport'
             - '@oro_entity.doctrine_helper'
+            - '@oro_entity.helper.field_helper'
         calls:
             -
                 - addConstraints
@@ -161,7 +161,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?\d+$/'
                               message: "This value should contain only valid integer."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -170,7 +170,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?\d+$/'
                               message: "This value should contain only valid integer."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -179,7 +179,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?\d+$/'
                               message: "This value should contain only valid integer."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -188,7 +188,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
                               message: "This value should contain only valid float."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -197,7 +197,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
                               message: "This value should contain only valid decimal."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -206,7 +206,7 @@ services:
                         - Regex:
                               pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
                               message: "This value should contain only valid decimal."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
             -
                 - addConstraints
                 -
@@ -215,4 +215,60 @@ services:
                         - Regex:
                               pattern: '/^[+-]?((\d+\.?\d*)|(\.\d+))*$/'
                               message: "This value should contain only valid float."
-                              groups: ['import_identity']
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - manyToOne
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - manyToMany
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - 'ref-many'
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - oneToMany
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - file
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - image
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - multiFile
+                    -
+                        - Valid:
+                              groups: ['import_field_type']
+            -
+                - addConstraints
+                -
+                    - multiImage
+                    -
+                        - Valid:
+                              groups: ['import_field_type']

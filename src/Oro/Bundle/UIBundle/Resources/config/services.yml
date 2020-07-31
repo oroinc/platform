@@ -359,3 +359,11 @@ services:
         class: Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider
         arguments:
             - '@router'
+
+    oro_ui.consumption_extension.request_context:
+        class: Oro\Bundle\UIBundle\Consumption\Extension\ConsumptionExtension
+        arguments:
+            - '@router.request_context'
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_message_queue.consumption.extension }

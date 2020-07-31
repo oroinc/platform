@@ -9,10 +9,11 @@ use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * The normalizer for attached files.
@@ -30,6 +31,9 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 
     /** @var LoggerInterface */
     protected $logger;
+
+    /** @var string|null */
+    private $filesDir;
 
     /**
      * @param AttachmentManager $manager
@@ -64,6 +68,14 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     }
 
     /**
+     * @param string|null $filesDir
+     */
+    public function setFilesDir(?string $filesDir): void
+    {
+        $this->filesDir = rtrim($filesDir, DIRECTORY_SEPARATOR);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
@@ -84,57 +96,67 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $result = null;
-        $entity = $this->createFileEntity($data);
-        if ($entity) {
-            $violations = $this->validator->validate(
-                $entity->getFile(),
-                $context['entityName'],
-                $context['fieldName']
-            );
-            if ($violations->count()) {
-                /** @var ConstraintViolationInterface $violation */
-                foreach ($violations as $violation) {
-                    $this->logger->error(sprintf(
-                        '%s. File: %s. Original File: %s.',
-                        $violation->getMessage(),
-                        $entity->getFile()->getPath(),
-                        $data
-                    ));
-                }
-            } else {
-                $result = $entity;
-            }
-        }
-
-        return $result;
+        return $this->createFileEntity($data['uri'] ?? '', $data['uuid'] ?? '');
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param File $object
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        return $this->attachmentManager->getFileUrl(
-            $object,
-            FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        $fileUrl = null;
+        // It is impossible to generate URL for a file without ID.
+        if ($object->getId()) {
+            $fileUrl = $this->attachmentManager->getFileUrl(
+                $object,
+                FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+
+        return [
+            'uuid' => $object->getUuid(),
+            'uri' => $fileUrl,
+        ];
     }
 
     /**
-     * @param string $path
+     * Creates file entity with non-fetched file that can be fetched later during import.
      *
-     * @return File|null
+     * @param string $uri
+     * @param string $uuid
+     *
+     * @return File
      */
-    private function createFileEntity($path)
+    private function createFileEntity(string $uri, string $uuid): File
     {
-        try {
-            return $this->fileManager->createFileEntity($path);
-        } catch (IOException $e) {
-            $this->logger->error($e->getMessage());
+        $file = new File();
+        $file->setUuid($uuid ?: UUIDGenerator::v4());
+        if ($uri) {
+            // Sets SymfonyFile without checking path as anyway the file must not be uploaded in normalizer, so it
+            // should pass through any file.
+            $file->setFile(new SymfonyFile($this->denormalizeFileUri($uri), false));
         }
 
-        return null;
+        return $file;
+    }
+
+    /**
+     * If the provided uri is relative path, then makes it absolute by prepending files directory path.
+     *
+     * @param string $uri
+     *
+     * @return string
+     */
+    private function denormalizeFileUri(string $uri): string
+    {
+        $filesystem = new SymfonyFileSystem();
+        if (!$filesystem->isAbsolutePath($uri)) {
+            $uri = sprintf('%s%s%s', $this->filesDir, DIRECTORY_SEPARATOR, ltrim($uri, DIRECTORY_SEPARATOR));
+        }
+
+        return $uri;
     }
 }
