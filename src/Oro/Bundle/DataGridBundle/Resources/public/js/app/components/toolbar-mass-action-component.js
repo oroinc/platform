@@ -56,7 +56,7 @@ define(function(require) {
                 return;
             }
 
-            action.launcherInstanse.$el.trigger('tohide.bs.dropdown');
+            action.launcherInstance.$el.trigger('tohide.bs.dropdown');
         },
 
         /**
