@@ -13,6 +13,7 @@ use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
+use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,6 +39,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /** @var RelatedEntityStateHelper */
     protected $relatedEntityStateHelper;
+
+    /** @var EntityOwnershipAssociationsSetter */
+    protected $entityOwnershipAssociationsSetter;
 
     /** @var array */
     protected $cachedEntities = [];
@@ -73,6 +77,14 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->newEntitiesHelper = $newEntitiesHelper;
         $this->doctrineHelper = $doctrineHelper;
         $this->relatedEntityStateHelper = $relatedEntityStateHelper;
+    }
+
+    /**
+     * @param EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter
+     */
+    public function setOwnershipSetter(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter): void
+    {
+        $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
     }
 
     /**
@@ -154,7 +166,14 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             $this->cachedEntities[$oid] = $entity;
         }
 
-        return $this->importEntityFields($entity, $existingEntity, $isFullData, $entityIsRelation, $itemData);
+        $entity = $this->importEntityFields($entity, $existingEntity, $isFullData, $entityIsRelation, $itemData);
+
+        // try to set the owner data if it absent in import data
+        if (null !== $entity) {
+            $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($entity);
+        }
+
+        return $entity;
     }
 
     /**

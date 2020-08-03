@@ -272,3 +272,13 @@ services:
                     -
                         - Valid:
                               groups: ['import_field_type']
+
+    oro_importexport.event_listener.process_after.empty_owner:
+        class: Oro\Bundle\ImportExportBundle\EventListener\ValidateOwnerListener
+        arguments:
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@property_accessor'
+            - '@oro_user.importexport.data_converter'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
