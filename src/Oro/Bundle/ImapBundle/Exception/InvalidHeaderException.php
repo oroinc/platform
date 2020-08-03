@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Exception;
 
-use Zend\Mail\Header\HeaderName;
+use Laminas\Mail\Header\HeaderName;
 
 /**
  * Exception that throws in case if was detected wrong message header.

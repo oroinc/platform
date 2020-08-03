@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Laminas\Mail\Storage\Folder as BaseFolder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Zend\Mail\Storage\Folder as BaseFolder;
 
+/**
+ * Imap mail folder.
+ */
 class Folder extends BaseFolder
 {
     const FLAG_SENT   = 'Sent';
@@ -77,6 +80,7 @@ class Folder extends BaseFolder
                 if (false === strpos($item, '\\')) {
                     $item = '\\' . $item;
                 }
+
                 return $item;
             },
             $flags
@@ -115,7 +119,7 @@ class Folder extends BaseFolder
     public function addFlag($flag)
     {
         if ($this->flags === null) {
-            $this->flags = array();
+            $this->flags = [];
         }
         if (!(strpos($flag, '\\') === 0)) {
             $flag = '\\' . $flag;
