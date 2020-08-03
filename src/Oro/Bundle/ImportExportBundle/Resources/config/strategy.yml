@@ -43,6 +43,8 @@ services:
             - '@oro_importexport.strategy.new_entities_helper'
             - '@oro_entity.doctrine_helper'
             - '@oro_importexport.field.related_entity_state_helper'
+        calls:
+            - [setOwnershipSetter, ['@oro_organization.entity_ownership_associations_setter']]
 
     oro_importexport.strategy.new_entities_helper:
         class: Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper
