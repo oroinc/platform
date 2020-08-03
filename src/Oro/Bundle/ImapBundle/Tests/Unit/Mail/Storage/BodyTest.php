@@ -4,10 +4,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BodyTest extends \PHPUnit\Framework\TestCase
+class BodyTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $part;
 
     /** @var Body */
@@ -15,7 +17,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
+        $this->part = $this->getMockBuilder('Laminas\Mail\Storage\Part')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -24,7 +26,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHeaders()
     {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()->getMock();
         $headers->expects($this->any())->method('has')
             ->will(
@@ -48,7 +50,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHeader()
     {
-        $header = $this->getMockBuilder('Zend\Mail\Headers')
+        $header = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()->getMock();
         $header->expects($this->any())->method('has')
             ->will(
@@ -110,10 +112,10 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->part->expects($this->any())->method('isMultipart')
             ->will($this->returnValue(true));
 
-        $part1 = $this->getMockBuilder('Zend\Mail\Storage\Part')
+        $part1 = $this->getMockBuilder('Laminas\Mail\Storage\Part')
             ->disableOriginalConstructor()
             ->getMock();
-        $part2 = $this->getMockBuilder('Zend\Mail\Storage\Part')
+        $part2 = $this->getMockBuilder('Laminas\Mail\Storage\Part')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -141,7 +143,12 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockIterator(\PHPUnit\Framework\MockObject\MockObject $obj, $iterationResult1, $iterationResult2)
+    /**
+     * @param MockObject                               $obj
+     * @param                                          $iterationResult1
+     * @param                                          $iterationResult2
+     */
+    private function mockIterator(MockObject $obj, $iterationResult1, $iterationResult2)
     {
         $obj->expects($this->exactly(3))
             ->method('current')
@@ -154,14 +161,21 @@ class BodyTest extends \PHPUnit\Framework\TestCase
             ->will($this->onConsecutiveCalls(true, true, true));
     }
 
+    /**
+     * @param MockObject $obj
+     * @param            $contentValue
+     * @param            $contentType
+     * @param            $contentTransferEncoding
+     * @param            $contentEncoding
+     */
     private function preparePartMock(
-        \PHPUnit\Framework\MockObject\MockObject $obj,
+        MockObject $obj,
         $contentValue,
         $contentType,
         $contentTransferEncoding,
         $contentEncoding
     ) {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()->getMock();
 
         $headers->expects($this->any())->method('has')
@@ -179,13 +193,13 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $obj->expects($this->once())->method('getContent')
             ->will($this->returnValue($contentValue));
 
-        $contentTypeHeader = $this->createMock('Zend\Mail\Header\ContentType');
+        $contentTypeHeader = $this->createMock('Laminas\Mail\Header\ContentType');
         $contentTypeHeader->expects($this->any())->method('getType')
             ->will($this->returnValue($contentType));
         $contentTypeHeader->expects($this->any())->method('getParameter')
             ->will($this->returnValue($contentEncoding));
 
-        $contentEncodingHeader = $this->createMock('Zend\Mail\Header\HeaderInterface');
+        $contentEncodingHeader = $this->createMock('Laminas\Mail\Header\HeaderInterface');
         $contentEncodingHeader->expects($this->any())->method('getFieldValue')
             ->will($this->returnValue($contentTransferEncoding));
 

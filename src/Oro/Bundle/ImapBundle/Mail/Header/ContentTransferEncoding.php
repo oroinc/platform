@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\ContentTransferEncoding}
+ * This file is a copy of {@see Laminas\Mail\Header\ContentTransferEncoding}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use Zend\Mail\Header\ContentTransferEncoding as BaseContentTransferEncoding;
-use Zend\Mail\Header\Exception\InvalidArgumentException;
+use Laminas\Mail\Header\ContentTransferEncoding as BaseContentTransferEncoding;
+use Laminas\Mail\Header\Exception\InvalidArgumentException;
 
 /**
  * Content transfer header that adds support of additional encoding types

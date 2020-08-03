@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\GenericHeader}
+ * This file is a copy of {@see Laminas\Mail\Header\GenericHeader}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\Header\Exception;
-use \Zend\Mail\Header\GenericHeader as BaseGenericHeader;
+use Laminas\Mail\Header\Exception;
+use Laminas\Mail\Header\GenericHeader as BaseGenericHeader;
 
 /**
  * Common header that uses overridden HeaderWrap during parsing
@@ -22,7 +22,7 @@ class GenericHeader extends BaseGenericHeader
      */
     public static function fromString($headerLine)
     {
-        list($name, $value) = self::splitHeaderLine($headerLine);
+        [$name, $value] = self::splitHeaderLine($headerLine);
         $value = HeaderWrap::mimeDecodeValue($value);
         $header = new static($name, $value);
 

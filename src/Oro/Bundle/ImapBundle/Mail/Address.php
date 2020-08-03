@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Address}
+ * This file is a copy of {@see Laminas\Mail\Address}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail;
 
-use \Zend\Mail\Address as BaseAddress;
-use \Zend\Mail\Header\Exception;
+use Laminas\Mail\Address as BaseAddress;
+use Laminas\Mail\Header\Exception;
 
 /**
  * Overridden zend-mail address that avoid validation exception in case of invalid email address.

@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage\Exception;
 
-class InvalidBodyFormatException extends \Zend\Mail\Storage\Exception\RuntimeException
+use Laminas\Mail\Storage\Exception\RuntimeException;
+
+/**
+ * An exception that is thrown when an email body is empty.
+ */
+class InvalidBodyFormatException extends RuntimeException
 {
 }

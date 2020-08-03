@@ -1,16 +1,17 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Headers}
+ * This file is a copy of {@see Laminas\Mail\Headers}
  *
  * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail;
 
-use \Zend\Mail\Exception\RuntimeException;
-use \Zend\Mail\Header\HeaderInterface;
-use \Zend\Mail\Headers as BaseHeaders;
+use Exception;
+use Laminas\Mail\Exception\RuntimeException;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Headers as BaseHeaders;
 use Oro\Bundle\ImapBundle\Exception\InvalidHeaderException;
 use Oro\Bundle\ImapBundle\Exception\InvalidHeadersException;
 use Oro\Bundle\ImapBundle\Mail\Header\GenericHeader;
@@ -51,12 +52,14 @@ class Headers extends BaseHeaders
                     break;
                 } else {
                     // Line does not match header format!
-                    throw new RuntimeException(sprintf(
-                        'Line "%s"does not match header format!',
-                        $line
-                    ));
+                    throw new RuntimeException(
+                        sprintf(
+                            'Line "%s"does not match header format!',
+                            $line
+                        )
+                    );
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // avoid throwing an exception and collect it to be able to continue to parse headers.
                 $exceptions[] = new InvalidHeaderException($currentLine, $e);
                 $currentLine = trim($line);
@@ -67,7 +70,7 @@ class Headers extends BaseHeaders
             if ($currentLine) {
                 $headers->addHeaderLine($currentLine);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exceptions[] = new InvalidHeaderException($currentLine, $e);
         }
 
@@ -123,7 +126,7 @@ class Headers extends BaseHeaders
      */
     public function loadHeader($headerLine)
     {
-        list($name, ) = GenericHeader::splitHeaderLine($headerLine);
+        [$name,] = GenericHeader::splitHeaderLine($headerLine);
         /** @var HeaderInterface $class */
         $class = $this->getPluginClassLoader()->load($name) ?: GenericHeader::class;
         return $class::fromString($headerLine);

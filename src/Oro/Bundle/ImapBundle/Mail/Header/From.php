@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\From}
+ * This file is a copy of {@see Laminas\Mail\Header\From}
  *
  * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\Header\Exception;
-use \Zend\Mail\Header\From as BaseFrom;
+use Laminas\Mail\Header\Exception;
+use Laminas\Mail\Header\From as BaseFrom;
 use Oro\Bundle\ImapBundle\Mail\AddressList;
 use Oro\Bundle\ImapBundle\Mail\Headers;
 
@@ -22,12 +22,12 @@ class From extends BaseFrom
     /**
      * {@inheritdoc}
      *
-     * This method is a copy of {@see Zend\Mail\Header\From::fromString}
+     * This method is a copy of {@see \Laminas\Mail\Header\From::fromString}
      * It is needed to override static call of `GenericHeader::splitHeaderLine`
      */
     public static function fromString($headerLine)
     {
-        list($fieldName, $fieldValue) = GenericHeader::splitHeaderLine($headerLine);
+        [$fieldName, $fieldValue] = GenericHeader::splitHeaderLine($headerLine);
         if (strtolower($fieldName) !== static::$type) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Invalid header line for "%s" string',
@@ -78,7 +78,7 @@ class From extends BaseFrom
     /**
      * {@inheritdoc}
      *
-     * This method is a copy of {@see Zend\Mail\Header\From::getAddressList}
+     * This method is a copy of {@see \Laminas\Mail\Header\From::getAddressList}
      * It is needed to override `new AddressList()`
      */
     public function getAddressList()

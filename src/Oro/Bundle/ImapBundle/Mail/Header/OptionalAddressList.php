@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\AddressList;
+use Laminas\Mail\AddressList;
 
 /**
  * The email address list that ignores empty address.

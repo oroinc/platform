@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager\DTO;
 
-use Zend\Mail\Header\ContentType;
+use Laminas\Mail\Header\ContentType;
 
 /**
  * Represents IMAP email body.

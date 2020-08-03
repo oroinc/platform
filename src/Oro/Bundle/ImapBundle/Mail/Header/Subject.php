@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\Subject}
+ * This file is a copy of {@see Laminas\Mail\Header\Subject}
  *
  * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\Header\Exception;
-use \Zend\Mail\Header\Subject as BaseSubject;
+use Laminas\Mail\Header\Exception;
+use Laminas\Mail\Header\Subject as BaseSubject;
 
 /**
  * Subject header that uses overridden GenericHeader during value parsing.
@@ -19,12 +19,12 @@ class Subject extends BaseSubject
     /**
      * {@inheritdoc}
      *
-     * This method is a copy of {@see Zend\Mail\Header\Subject::fromString}.
+     * This method is a copy of {@see \Laminas\Mail\Header\Subject::fromString}.
      * It is needed to override static call of `GenericHeader::splitHeaderLine`.
      */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
         $value = HeaderWrap::mimeDecodeValue($value);
 
         // check to ensure proper header type for this factory

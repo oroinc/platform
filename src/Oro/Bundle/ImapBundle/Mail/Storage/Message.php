@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use \Zend\Mail\Header\ContentType;
-use \Zend\Mail\Header\HeaderInterface;
-use \Zend\Mail\Storage\AbstractStorage;
-use \Zend\Mail\Storage\Exception\InvalidArgumentException;
-use \Zend\Mail\Storage\Exception\RuntimeException;
-use \Zend\Mail\Storage\Part;
-use \Zend\Mime\Mime as BaseMime;
-use \Zend\Stdlib\ErrorHandler;
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Storage\AbstractStorage;
+use Laminas\Mail\Storage\Exception\InvalidArgumentException;
+use Laminas\Mail\Storage\Exception\RuntimeException;
+use Laminas\Mail\Storage\Part;
+use Laminas\Mime\Mime as BaseMime;
+use Laminas\Stdlib\ErrorHandler;
 use Oro\Bundle\ImapBundle\Exception\InvalidHeadersException;
 use Oro\Bundle\ImapBundle\Exception\InvalidMessageHeadersException;
 use Oro\Bundle\ImapBundle\Mail\Headers;
@@ -20,7 +20,7 @@ use Oro\Bundle\ImapBundle\Mime\Decode;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Message extends \Zend\Mail\Storage\Message
+class Message extends \Laminas\Mail\Storage\Message
 {
     /**
      * {@inheritdoc}
@@ -67,7 +67,7 @@ class Message extends \Zend\Mail\Storage\Message
      * Gets the message attachments
      *
      * @return Body
-     * @throws \Zend\Mail\Storage\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function getBody()
     {
@@ -130,7 +130,7 @@ class Message extends \Zend\Mail\Storage\Message
      *
      * @param Part $part The message part
      *
-     * @return \Zend\Mail\Header\ContentType|null
+     * @return ContentType|null
      */
     protected function getPartContentType($part)
     {
@@ -298,7 +298,7 @@ class Message extends \Zend\Mail\Storage\Message
         }
         $counter = 1;
         foreach ($parts as $part) {
-            $this->parts[$counter++] = new static(array('headers' => $part['header'], 'content' => $part['body']));
+            $this->parts[$counter++] = new static(['headers' => $part['header'], 'content' => $part['body']]);
         }
     }
 

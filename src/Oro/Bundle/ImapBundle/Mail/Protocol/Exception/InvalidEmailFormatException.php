@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol\Exception;
 
-class InvalidEmailFormatException extends \Zend\Mail\Storage\Exception\RuntimeException
+use Laminas\Mail\Storage\Exception\RuntimeException;
+
+/**
+ * An exception that is thrown when an email format is invalid.
+ */
+class InvalidEmailFormatException extends RuntimeException
 {
 }

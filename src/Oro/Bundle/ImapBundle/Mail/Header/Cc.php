@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\Cc}
+ * This file is a copy of {@see \Laminas\Mail\Header\Cc}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
-use \Zend\Mail\Header\Cc as BaseHeader;
+use Laminas\Mail\Header\Cc as BaseHeader;
 
 /**
  * Cc header that uses overridden OptionalAddressList as the storage of address list.
