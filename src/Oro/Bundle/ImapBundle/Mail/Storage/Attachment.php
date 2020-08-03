@@ -71,10 +71,7 @@ class Attachment
             $encoding = 'ASCII';
         }
 
-        // Extract name from quoted text.
-        // zend mail library bug (incorrect header decode).
-        // Laminas\Mail\Headers line 82 ($currentLine .= ' ' . trim($line);)
-        // Fixed in zend-mail 2.4
+        // Extract name from quoted text. {@see \Oro\Bundle\ImapBundle\Mail\Headers::fromString}
         if (preg_match('"([^\\"]+)"', $value, $result)) {
             $value = $result[0];
         }

@@ -7,7 +7,7 @@ use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 
 /**
- * - adds PEEK capability to Zend Imap Protocol
+ * - adds PEEK capability to Laminas Imap Protocol
  * - fixes the parsing of double quotes in labels
  */
 class Imap extends \Laminas\Mail\Protocol\Imap
