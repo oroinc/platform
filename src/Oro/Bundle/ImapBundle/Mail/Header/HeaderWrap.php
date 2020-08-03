@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\HeaderWrap}
+ * This file is a copy of {@see Laminas\Mail\Header\HeaderWrap}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
+use Laminas\Mail\Header\HeaderWrap as BaseHeaderWrap;
 use Oro\Bundle\ImapBundle\Mail\Headers;
-use Zend\Mail\Header\HeaderWrap as BaseHeaderWrap;
 
 /**
  * Utility class that can be used to decode header values.

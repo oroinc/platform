@@ -1,15 +1,15 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\ContentType}
+ * This file is a copy of {@see Laminas\Mail\Header\ContentType}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\Header\ContentType as BaseContentType;
-use \Zend\Mail\Header\Exception\InvalidArgumentException;
+use Laminas\Mail\Header\ContentType as BaseContentType;
+use Laminas\Mail\Header\Exception\InvalidArgumentException;
 use Oro\Bundle\ImapBundle\Mail\Headers;
 
 /**
@@ -26,7 +26,7 @@ class ContentType extends BaseContentType
     public static function fromString($headerLine)
     {
         $headerLine = iconv_mime_decode($headerLine, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
-        list($name, $value) = explode(': ', $headerLine, 2);
+        [$name, $value] = explode(': ', $headerLine, 2);
 
         // check to ensure proper header type for this factory
         if (self::getHeaders()->normalizeFieldName($name) !== 'contenttype') {
@@ -43,7 +43,7 @@ class ContentType extends BaseContentType
         if (count($values)) {
             foreach ($values as $keyValuePair) {
                 if ($keyValuePair && strpos($keyValuePair, '=') !== false) {
-                    list($key, $value) = explode('=', $keyValuePair, 2);
+                    [$key, $value] = explode('=', $keyValuePair, 2);
                     $value = trim($value, "'\" \t\n\r\0\x0B");
                     $header->addParameter($key, $value);
                 }

@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
+use Laminas\Mail\Storage\Exception as BaseException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
-use Zend\Mail\Storage\Exception as BaseException;
 
 /**
  * - adds PEEK capability to Zend Imap Protocol
  * - fixes the parsing of double quotes in labels
  */
-class Imap extends \Zend\Mail\Protocol\Imap
+class Imap extends \Laminas\Mail\Protocol\Imap
 {
     /**
      * {@inheritdoc}
@@ -35,9 +35,9 @@ class Imap extends \Zend\Mail\Protocol\Imap
         $item = str_replace('.PEEK', '', $items[0]);
 
         $tag = null;  // define $tag variable before first use
-        $this->sendRequest('FETCH', array($set, $itemList), $tag);
+        $this->sendRequest('FETCH', [$set, $itemList], $tag);
 
-        $result = array();
+        $result = [];
         $tokens = null; // define $tokens variable before first use
         while (!$this->readLine($tokens, $tag)) {
             // ignore other responses
@@ -65,7 +65,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
                     }
                 }
             } else {
-                $data = array();
+                $data = [];
                 while (key($tokens[2]) !== null) {
                     $data[current($tokens[2])] = next($tokens[2]);
                     next($tokens[2]);
@@ -76,6 +76,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
                 // we still need to read all liness
                 while (!$this->readLine($tokens, $tag)) {
                 }
+
                 return $data;
             }
             $result[$tokens[0]] = $data;
@@ -103,6 +104,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
     }
 
     // @codingStandardsIgnoreStart
+
     /**
      * {@inheritdoc}
      */

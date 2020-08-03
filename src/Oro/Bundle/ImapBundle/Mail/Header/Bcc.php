@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is a copy of {@see Zend\Mail\Header\Bcc}
+ * This file is a copy of {@see Laminas\Mail\Header\Bcc}
  *
  * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
 
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
-use \Zend\Mail\Header\Bcc as BaseHeader;
+use Laminas\Mail\Header\Bcc as BaseHeader;
 
 /**
  * Bcc header that uses overridden OptionalAddressList as the storage of address list.
