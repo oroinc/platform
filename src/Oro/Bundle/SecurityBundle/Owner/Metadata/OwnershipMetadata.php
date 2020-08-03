@@ -30,7 +30,7 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     protected $organizationColumnName;
 
     /**
-     * @param int    $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
+     * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
      * @param string $ownerFieldName
      * @param string $ownerColumnName
      * @param string $organizationFieldName
