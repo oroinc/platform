@@ -410,6 +410,10 @@ define([
          * @protected
          */
         _parseResponseOptions: function(resp) {
+            if (this.options.parseResponseOptions) {
+                return this.options.parseResponseOptions(resp);
+            }
+
             if (_.has(resp, 'options')) {
                 return resp.options;
             }
