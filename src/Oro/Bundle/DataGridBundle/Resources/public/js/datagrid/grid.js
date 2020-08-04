@@ -901,14 +901,13 @@ define(function(require) {
          * @private
          */
         _listenToCollectionEvents: function() {
-            this.listenTo(this.collection, 'request', function(model, xhr) {
-                this._beforeRequest();
-                const self = this;
+            this.listenTo(this.collection, 'request', function(model, xhr, options = {}) {
+                this._beforeRequest(options);
                 const always = xhr.always;
-                xhr.always = function(...args) {
-                    always.apply(this, args);
-                    if (!self.disposed) {
-                        self._afterRequest(this);
+                xhr.always = (...args) => {
+                    always.apply(xhr, args);
+                    if (!this.disposed) {
+                        this._afterRequest(xhr, options);
                     }
                 };
             });
@@ -1059,7 +1058,7 @@ define(function(require) {
             this.renderLoadingMask();
 
             this.delegateEvents();
-            this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
+            this.listenTo(this.collection, 'reset remove', this.renderNoDataBlock);
 
             this._deferredRender();
             this.initLayout({
@@ -1237,9 +1236,14 @@ define(function(require) {
          *
          * @private
          */
-        _beforeRequest: function() {
+        _beforeRequest: function(options) {
+            const {toggleLoading = true} = options;
             this.requestsCount += 1;
-            this.showLoading();
+
+            if (toggleLoading) {
+                this.showLoading();
+            }
+            this.lockToolBar();
         },
 
         /**
@@ -1247,15 +1251,20 @@ define(function(require) {
          *
          * @private
          */
-        _afterRequest: function(jqXHR) {
+        _afterRequest: function(jqXHR, options) {
             const json = jqXHR.responseJSON || {};
+            const {toggleLoading = true} = options;
+
             if (json.metadata) {
                 this._processLoadedMetadata(json.metadata);
             }
 
             this.requestsCount -= 1;
             if (this.requestsCount === 0) {
-                this.hideLoading();
+                if (toggleLoading) {
+                    this.hideLoading();
+                }
+                this.unlockToolBar();
                 /**
                  * Backbone event. Fired when data for grid has been successfully rendered.
                  * @event grid_load:complete
@@ -1278,19 +1287,31 @@ define(function(require) {
         },
 
         /**
-         * Show loading mask and disable toolbar
+         * Show loading mask
          */
         showLoading: function() {
             this.loadingMask.show();
+        },
+
+        /**
+         * Disable toolbar
+         */
+        lockToolBar: function() {
             this.callToolbar('disable');
             this.trigger('disable');
         },
 
         /**
-         * Hide loading mask and enable toolbar
+         * Hide loading mask
          */
         hideLoading: function() {
             this.loadingMask.hide();
+        },
+
+        /**
+         * Enable toolbar
+         */
+        unlockToolBar: function() {
             this.callToolbar('enable');
             this.trigger('enable');
         },
@@ -1310,11 +1331,23 @@ define(function(require) {
          *
          * @private
          */
-        _onRemove: function(model, reset) {
+        _onRemove: function(model, collection, options = {}) {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
-            if (reset !== false) {
-                this.collection.fetch({reset: true});
+            if (collection) {
+                const fetchKeys = ['mode', 'parse', 'reset', 'wait', 'uniqueOnly',
+                    'add', 'remove', 'merge', 'toggleLoading'];
+                let fetchOptions = {
+                    reset: true
+                };
+                let params = _.pick(collection.options, fetchKeys);
+
+                if (collection.options.parseResponseOptions) {
+                    params = _.extend( params, _.pick(collection.options.parseResponseOptions(), fetchKeys));
+                }
+
+                fetchOptions = _.extend(fetchOptions, params, _.pick(options, fetchKeys));
+                this.collection.fetch(fetchOptions);
             }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
