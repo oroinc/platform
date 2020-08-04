@@ -106,6 +106,10 @@ define(function(require) {
         /** @property {orodatagrid.datagrid.column.ActionColumn} */
         actionsColumn: ActionColumn,
 
+        selectRowCell: SelectRowCell,
+
+        selectAllHeaderCell: SelectAllHeaderCell,
+
         /** @property true when no one column configured to be shown in th grid */
         noColumnsFlag: false,
 
@@ -644,8 +648,8 @@ define(function(require) {
                 sortable: false,
                 editable: false,
                 manageable: false,
-                cell: SelectRowCell,
-                headerCell: SelectAllHeaderCell,
+                cell: this.selectRowCell,
+                headerCell: this.selectAllHeaderCell,
                 order: -Infinity
             });
             return column;
