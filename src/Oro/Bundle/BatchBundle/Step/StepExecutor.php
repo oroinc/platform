@@ -9,6 +9,9 @@ use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
+/**
+ * Executor for the import/export step
+ */
 class StepExecutor
 {
     /**
@@ -255,11 +258,15 @@ class StepExecutor
             $warningName = $element instanceof AbstractConfigurableStepElement
                 ? $element->getName()
                 : get_class($element);
-            $item = $e instanceof InvalidItemException
-                ? $e->getItem()
-                : null;
 
-            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $e->getMessageParameters(), $item);
+            $item = null;
+            $reasonParameters = [];
+            if ($e instanceof InvalidItemException) {
+                $item = $e->getItem();
+                $reasonParameters = $e->getMessageParameters();
+            }
+
+            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $reasonParameters, $item);
         }
     }
 }
