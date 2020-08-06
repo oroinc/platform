@@ -21,6 +21,16 @@ final class Events
      * @var string
      */
     // @codingStandardsIgnoreStart
-    const preClose = 'preClose';
+    public const preClose = 'preClose';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * The preClear event occurs when the EntityManager#clear() operation is invoked,
+     * before onClear event, i.e. before the actual clearing.
+     *
+     * @var string
+     */
+    // @codingStandardsIgnoreStart
+    public const preClear = 'preClear';
     // @codingStandardsIgnoreEnd
 }
