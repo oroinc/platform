@@ -9,7 +9,23 @@ oro_form:
                 - 'data'
                 - 'tel'
 
+            allowed_iframe_domains:
+                - 'youtube.com/embed/'
+                - 'youtube-nocookie.com/embed/'
+                - 'player.vimeo.com/video/'
             allowed_html_elements:
+                iframe:
+                    attributes:
+                        - allowfullscreen
+                        - frameborder
+                        - height
+                        - marginheight
+                        - marginwidth
+                        - name
+                        - scrolling
+                        - src
+                        - width
+                        - allow
                 table:
                     attributes:
                         - cellspacing
