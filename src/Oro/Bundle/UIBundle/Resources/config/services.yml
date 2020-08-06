@@ -245,6 +245,8 @@ services:
             - ['setAttribute', ['video', 'controls', 'Bool']]
             - ['setAttribute', ['video', 'loop', 'Bool']]
             - ['setAttribute', ['video', 'poster', 'URI']]
+            # iframe
+            - ['setAttribute', ['iframe', 'allow', 'Text']]
             # Set Custom Elements
             - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]
