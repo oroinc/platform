@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     const EnumValuesView = BaseView.extend({
         /**

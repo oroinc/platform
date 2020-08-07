@@ -21,6 +21,7 @@ const prepareModulesMap = require('./plugin/map/prepare-modules-map');
 const resolve = require('enhanced-resolve');
 const webpackMerge = require('webpack-merge');
 const babelConfig = require('./../babel.config.js');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 class ConfigBuilder {
     constructor() {
@@ -156,11 +157,6 @@ class ConfigBuilder {
                                 priority: 10,
                                 reuseExistingChunk: true
                             },
-                            vendors: {
-                                test: /[\/\\]node_modules[\/\\]/,
-                                name: 'vendors',
-                                priority: -10
-                            },
                             tinymce: {
                                 test: /tinymce/,
                                 name: 'tinymce.min',
@@ -254,6 +250,10 @@ class ConfigBuilder {
                     })
                 ]
             };
+
+            if (env.analyze) {
+                webpackConfig.plugins.push(new BundleAnalyzerPlugin());
+            }
 
             if (!env.skipJS && !env.skipBabel) {
                 let happyPackOptions = {
@@ -433,7 +433,6 @@ class ConfigBuilder {
     _getJsEntryPoints(theme) {
         return {
             'app': [
-                'whatwg-fetch',
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]

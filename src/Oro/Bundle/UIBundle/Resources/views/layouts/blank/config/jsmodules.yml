@@ -16,11 +16,10 @@ aliases:
     controllers/page-controller$: oroui/js/app/controllers/page-controller
     cryptojs/core$: npmassets/crypto-js/core
     cryptojs/sha256$: npmassets/crypto-js/sha256
-    css-vars-ponyfill$: npmassets/css-vars-ponyfill/dist/css-vars-ponyfill
     datepair$: npmassets/datepair.js/dist/datepair
     extend-popper$: oroui/js/extend/popper
     jquery$: npmassets/jquery/dist/jquery
-    jquery-ui$: oroui/js/jquery-ui
+    jquery-ui: npmassets/jquery-ui/ui
     jquery.cookie$: npmassets/jquery.cookie/jquery.cookie
     jquery.form$: npmassets/jquery-form/src/jquery.form
     jquery.mousewheel$: npmassets/jquery-mousewheel/jquery.mousewheel
@@ -38,6 +37,7 @@ aliases:
     scriptjs$: npmassets/scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: npmassets/underscore/underscore
+    whatwg-fetch$: npmassets/whatwg-fetch/fetch
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
@@ -47,7 +47,7 @@ app-modules:
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/layout-module
     - oroui/js/app/modules/messenger-module
-    - oroui/js/app/modules/styled-scroll-bar-module
+#    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs
@@ -62,7 +62,6 @@ configs:
     oroui/js/app/views/tab-collection-view: {}
     oroui/js/app/views/tab-item-view: {}
     oroui/js/component-shortcuts-manager: {}
-    oroui/js/css-variables-manager: {}
     oroui/js/error: {}
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}
     oroui/js/extend/scriptjs: {}
@@ -72,6 +71,8 @@ configs:
     oroui/js/tools/scroll-helper: {}
     oroui/js/viewport-manager: {}
 dynamic-imports:
+    polyfills:
+        - whatwg-fetch
     oroui:
         - controllers/page-controller
         - oro/block-widget
@@ -108,7 +109,6 @@ dynamic-imports:
         - oroui/js/standard-confirmation
         - oroui/js/tools
         - oroui/js/tools/api-accessor
-        - oroui/js/tools/manage-focus
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
 map:
@@ -119,7 +119,9 @@ map:
         chaplin: oroui/js/extend/chaplin
         dropdown.js: bootstrap-dropdown
         jquery: oroui/js/extend/jquery
-        jquery-ui: oroui/js/jquery-ui-datepicker-l10n
+        jquery-ui/widgets/datepicker: oroui/js/extend/jquery-ui/widgets/datepicker
+        jquery-ui/widgets/dialog: oroui/js/extend/jquery-ui/widgets/dialog
+        jquery-ui/widgets/sortable: oroui/js/extend/jquery-ui/widgets/sortable
         jquery.multiselect: oroui/js/extend/jquery.multiselect
         jquery.multiselect.filter: oroui/js/extend/jquery.multiselect-filter
         jquery.select2: oroui/js/extend/select2
@@ -150,8 +152,12 @@ map:
         chaplin: chaplin
     oroui/js/extend/jquery:
         jquery: jquery
-    oroui/js/extend/jquery-ui:
-        jquery-ui: jquery-ui
+    oroui/js/extend/jquery-ui/widgets/datepicker:
+        jquery-ui/widgets/datepicker: jquery-ui/widgets/datepicker
+    oroui/js/extend/jquery-ui/widgets/dialog:
+        jquery-ui/widgets/dialog: jquery-ui/widgets/dialog
+    oroui/js/extend/jquery-ui/widgets/sortable:
+        jquery-ui/widgets/sortable: jquery-ui/widgets/sortable
     oroui/js/extend/jquery.multiselect:
         jquery.multiselect: jquery.multiselect
     oroui/js/extend/jquery.multiselect-filter:
@@ -169,7 +175,7 @@ map:
     oroui/js/jquery-timepicker-l10n:
         jquery.timepicker: jquery.timepicker
     oroui/js/jquery-ui-datepicker-l10n:
-        jquery-ui: oroui/js/extend/jquery-ui
+        jquery-ui/widgets/datepicker: jquery-ui/widgets/datepicker
     oroui/js/mediator:
         chaplin: chaplin
     oroui/js/select2-l10n:

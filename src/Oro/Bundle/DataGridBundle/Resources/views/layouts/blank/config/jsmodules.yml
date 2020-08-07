@@ -86,6 +86,10 @@ dynamic-imports:
         - orodatagrid/js/app/components/grid-sidebar-component
         - orodatagrid/js/app/components/multi-grid-component
         - orodatagrid/js/app/plugins/grid-component/board-appearance-plugin
+        - orodatagrid/js/app/plugins/grid/datagrid-settings-plugin
+        - orodatagrid/js/app/plugins/grid/floating-header-plugin
+        - orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin
+        - orodatagrid/js/app/plugins/grid/fullscreen-plugin
         - orodatagrid/js/app/plugins/grid/inline-editing-plugin
         - orodatagrid/js/app/transitions/update-main-property-transition
         - orodatagrid/js/app/views/board/board-view
@@ -102,6 +106,8 @@ dynamic-imports:
         - orodatagrid/js/inline-editing/default-editors
         - orodatagrid/js/row-select-for-widget/builder
         - orodatagrid/js/totals-builder
+    orodatagrid-scroll-plugin:
+        - orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin
 map:
     "*":
         orodatagrid/templates/datagrid/grid.html: orodatagrid/blank/templates/datagrid/grid.html

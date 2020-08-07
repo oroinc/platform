@@ -1,13 +1,20 @@
-const _ = require('underscore');
 const modules = require('dynamic-imports');
+
+function pick(object, keys) {
+    return keys.reduce((obj, key) => {
+        if (object && object.hasOwnProperty(key)) {
+            obj[key] = object[key];
+        }
+        return obj;
+    }, {});
+}
 
 function loadModule(name, ...values) {
     if (!modules[name]) {
         throw new Error(`Module "${name}" is not found in the list of modules used for dynamic-imports`);
     }
-    return modules[name]().then(function(module) {
-        return values.length === 0 ? module.default : _.pick(module, values);
-    });
+    return modules[name]().then(module =>
+        values.length === 0 ? module.default : pick(module, values));
 }
 
 /**
@@ -24,31 +31,27 @@ function loadModule(name, ...values) {
 module.exports = function loadModules(modules, callback, context) {
     let requirements;
     let processModules;
-    const isModulesArray = _.isArray(modules);
+    const isModulesArray = Array.isArray(modules);
 
-    if (_.isObject(modules) && !isModulesArray) {
-        // if modules is an object of {formal_name: module_name}
-        requirements = _.values(modules);
-        processModules = function(loadedModules) {
-            // maps loaded modules into original object
-            _.each(modules, _.partial(function(map, value, key) {
-                modules[key] = map[value];
-            }, _.object(requirements, loadedModules)));
-            return modules;
-        };
+    if (isModulesArray) {
+        requirements = modules;
+        processModules = loadedModules => loadedModules;
+    } else if (typeof modules === 'string') {
+        requirements = [modules];
+        processModules = loadedModules => loadedModules[0];
     } else {
-        requirements = isModulesArray ? modules : [modules];
-        processModules = function(loadedModules) {
-            return isModulesArray ? loadedModules : loadedModules[0];
+        // if modules is an object of {formalName: moduleName}
+        requirements = Object.values(modules);
+        processModules = loadedModules => {
+            // maps loaded modules into original object
+            Object.keys(modules)
+                .forEach((formalName, index) => modules[formalName] = loadedModules[index]);
+            return modules;
         };
     }
 
-    const promises = requirements.map(function(moduleName) {
-        return loadModule(moduleName);
-    });
-
-    return Promise.all(promises)
-        .then(function(modules) {
+    return Promise.all(requirements.map(moduleName => loadModule(moduleName)))
+        .then(modules => {
             modules = processModules(modules);
             if (callback) {
                 callback[isModulesArray ? 'apply': 'call'](context || null, modules);
