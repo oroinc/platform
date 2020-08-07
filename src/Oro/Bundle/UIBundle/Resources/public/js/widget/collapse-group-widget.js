@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    require('jquery-ui');
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
+    require('jquery-ui/widget');
 
     $.widget('oroui.collapseGroupWidget', {
         options: {

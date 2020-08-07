@@ -255,6 +255,8 @@ define(function(require, exports, module) {
                 }.bind(this)
             });
 
+            $.validator._loadMethod();
+
             original.init.call(this);
 
             this.bindInitialErrors();
@@ -539,15 +541,29 @@ define(function(require, exports, module) {
     });
 
     /**
-     * Loader for custom validation methods
+     * Registers modules to load with custom validation methods
      *
-     * @param {string|Array.<string>} module name of AMD module or list of modules
+     * @param {string|Array.<string>} module name or list of modules to load
      */
     $.validator.loadMethod = function(module) {
-        loadModules($.makeArray(module), function(...modules) {
-            _.each(modules, function(args) {
-                $.validator.addMethod(...args);
-            });
+        const {_methodsToLoad: modules = []} = $.validator;
+        modules.push(...$.makeArray(module));
+        $.validator._methodsToLoad = modules;
+    };
+
+    /**
+     * Loads registered for custom validation methods
+     */
+    $.validator._loadMethod = function() {
+        const {_methodsToLoad: modules = []} = $.validator;
+        $.validator._methodsToLoad = []; // flush collected modules
+        loadModules(modules, (...methods) => {
+            methods.forEach(method => $.validator.addMethod(...method));
+
+            if ($.validator._methodsToLoad.length) {
+                // there are new methods were added to load
+                $.validator._loadMethod();
+            }
         });
     };
 

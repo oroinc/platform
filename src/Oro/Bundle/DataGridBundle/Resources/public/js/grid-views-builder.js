@@ -28,6 +28,16 @@ define(function(require, exports, module) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
+            if (
+                !options.enableViews ||
+                $.isEmptyObject(options.metadata.gridViews) ||
+                !options.metadata.gridViews.permissions.VIEW ||
+                !options.metadata.filters
+            ) {
+                deferred.resolve();
+                return;
+            }
+
             const self = {
                 metadata: _.defaults(options.metadata, {
                     gridViews: {},
@@ -94,24 +104,23 @@ define(function(require, exports, module) {
             let $gridViews;
             const GridViewsView = this.GridViewsView;
             const options = gridViewsBuilder.combineGridViewsOptions.call(this);
-            if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
-                const gridViewsOptions = _.extend({collection: collection}, options);
+            const gridViewsOptions = _.extend({collection: collection}, options);
 
-                if (this.showInNavbar) {
-                    $gridViews = $(gridGridViewsSelector);
-                    gridViewsOptions.title = $gridViews.text();
+            if (this.showInNavbar) {
+                $gridViews = $(gridGridViewsSelector);
+                gridViewsOptions.title = $gridViews.text();
 
-                    gridViews = new GridViewsView(gridViewsOptions);
-                    $gridViews.html(gridViews.render().$el);
-                } else if (this.showInCustomElement) {
-                    gridViews = new GridViewsView(gridViewsOptions);
-                    $gridViews = $(this.showInCustomElement);
-                    $gridViews.html(gridViews.render().$el);
-                } else {
-                    gridViews = new GridViewsView(gridViewsOptions);
-                    this.$gridEl.prepend(gridViews.render().$el);
-                }
+                gridViews = new GridViewsView(gridViewsOptions);
+                $gridViews.html(gridViews.render().$el);
+            } else if (this.showInCustomElement) {
+                gridViews = new GridViewsView(gridViewsOptions);
+                $gridViews = $(this.showInCustomElement);
+                $gridViews.html(gridViews.render().$el);
+            } else {
+                gridViews = new GridViewsView(gridViewsOptions);
+                this.$gridEl.prepend(gridViews.render().$el);
             }
+
             return gridViews;
         },
 

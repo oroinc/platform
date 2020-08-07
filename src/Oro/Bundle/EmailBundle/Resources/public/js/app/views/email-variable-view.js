@@ -8,7 +8,6 @@ define(function(require) {
     const mediator = require('oroui/js/mediator');
     const BaseView = require('oroui/js/app/views/base/view');
     const tinyMCE = require('tinymce/tinymce');
-    require('jquery-ui');
 
     /**
      * @export  oroemail/js/app/views/email-variable-view

@@ -9,10 +9,16 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
 
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
+
 ### Removed
 
 #### CacheBundle
 * The service "oro.file_cache.abstract" was removed because it is not used anywhere.
+
+#### UIBundle
+* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
 ## 4.2.0-alpha.2 (2020-05-29)
 [Show detailed list of changes](incompatibilities-4-2-alpha-2.md)

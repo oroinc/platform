@@ -139,7 +139,6 @@
             "bean": "1.0.6",
             "jquery-validation": "1.16.0",
             "backgrid": "0.3.7",
-            "backgrid-paginator": "0.3.8",
             "numeral": "2.0.6",
             "jquery-form": "4.2.1",
             "fuse.js": "3.2.*",
@@ -155,7 +154,6 @@
             "asap": "2.0.6",
             "slick-carousel": "1.6.0",
             "xregexp": "3.2.*",
-            "css-vars-ponyfill": "^2.0",
             "scriptjs": "2.5.9",
             "focus-visible": "5.0.2",
             "@oroinc/jquery-ajax-queue": "0.0.1",
@@ -163,7 +161,8 @@
             "@oroinc/select2": "3.4.1",
             "@oroinc/autobahnjs": "0.8.0",
             "@oroinc/backbone.pageable": "1.2.3",
-            "@oroinc/jquery.nicescroll": "3.6.6"
+            "@oroinc/jquery.nicescroll": "3.6.6",
+            "whatwg-fetch": "3.1.*"
         },
         "symfony": {
             "require": "4.4.*"

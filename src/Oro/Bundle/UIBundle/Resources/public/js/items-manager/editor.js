@@ -1,8 +1,8 @@
-define([
-    'jquery',
-    'jquery-ui'
-], function($) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    require('jquery-ui/widget');
 
     function setValue($elem, value) {
         $elem.inputWidget('val', value);

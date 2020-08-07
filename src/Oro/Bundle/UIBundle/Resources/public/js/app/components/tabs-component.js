@@ -56,6 +56,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         constructor: function TabsComponent(options) {
+            this.updateStateOfHiddenTabs = this.updateStateOfHiddenTabs.bind(this);
             TabsComponent.__super__.constructor.call(this, options);
         },
 
@@ -137,7 +138,7 @@ define(function(require, exports, module) {
                 }.bind(this));
             }.bind(this));
 
-            $(document).on('shown.bs.collapse', this.updateStateOfHiddenTabs.bind(this));
+            $(document).on('shown.bs.collapse', this.updateStateOfHiddenTabs);
         },
 
         updateStateOfHiddenTabs: function() {

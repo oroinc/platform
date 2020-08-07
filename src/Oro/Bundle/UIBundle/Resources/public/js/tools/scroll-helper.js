@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     const tools = require('oroui/js/tools');
     const mediator = require('oroui/js/mediator');
     let config = require('module-config').default(module.id);
-    require('jquery-ui');
+    require('jquery-ui/position');
 
     config = _.extend({
         scrollableContainerSelector: 'html'

@@ -11,7 +11,7 @@ define(function(require) {
     const ConditionItemView = require('oroquerydesigner/js/app/views/condition-builder/condition-item-view');
     const ConditionOperatorView = require('oroquerydesigner/js/app/views/condition-builder/condition-operator-view');
     const ConditionsGroupView = require('oroquerydesigner/js/app/views/condition-builder/conditions-group-view');
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     /**
      * @typedef {ConditionBuilderView|ConditionItemView|ConditionsGroupView|ConditionOperatorView} ConditionView
