@@ -1,31 +1,39 @@
-define(function(require, exports, module) {
-    'use strict';
+// This app module enable the device-switcher in case when url has the device-emulate param
+// For example: http://localhost/?device-emulate=true
 
-    // This app module enable the device-switcher in case when url has the device-emulate param
-    // For example: http://localhost/?device-emulate=true
+import loadModules from 'oroui/js/app/services/load-modules';
+import tools from 'oroui/js/tools';
+import moduleConfig from 'module-config';
 
-    const $ = require('jquery');
-    const DeviceSwitcherView = require('oroviewswitcher/js/app/views/device-switcher-view');
-    const innerPageModelService = require('oroviewswitcher/js/app/services/inner-page-model-service');
-    const tools = require('oroui/js/tools');
-    const config = require('module-config').default(module.id);
-    const pageModel = innerPageModelService.getModel();
+const params = tools.unpackFromQueryString(location.search);
+let promise = null;
 
-    pageModel.set({
-        needHelp: null,
-        personalDemoUrl: null
-    });
+if (params['device-emulate'] && !window.frameElement) {
+    document.body.innerHTML = '';
 
-    const params = tools.unpackFromQueryString(location.search);
+    const config = moduleConfig(module.id);
+    promise = loadModules([
+        'oroviewswitcher/js/app/views/device-switcher-view',
+        'oroviewswitcher/js/app/services/inner-page-model-service'
+    ]).then(([DeviceSwitcherView, innerPageModelService]) => {
+        const pageModel = innerPageModelService.getModel();
 
-    if (params['device-emulate'] && !window.frameElement) {
-        document.body.innerHTML = '';
+        pageModel.set({
+            needHelp: null,
+            personalDemoUrl: null
+        });
+
+        const elem = document.createElement('div');
+        elem.classList.add('demo-page');
+        document.querySelector('body').appendChild(elem);
 
         new DeviceSwitcherView({
-            _sourceElement: $('<div class="demo-page" />').appendTo('body'),
+            _sourceElement: [elem],
             pageModel: pageModel,
-            switcherStyle: config.stylePath || '/css/themes/oro/view-switcher.css',
+            switcherStyle: config.stylePath || '/layout-build/view-switcher/css/view-switcher.css',
             updateUrlDeviceFragment: false
         });
-    }
-});
+    });
+}
+
+export default promise;

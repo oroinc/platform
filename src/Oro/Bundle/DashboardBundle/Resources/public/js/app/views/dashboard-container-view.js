@@ -13,7 +13,7 @@ define(function(require) {
     const ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
     const WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
     const contentManager = require('orosync/js/content-manager');
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     const DashboardContainerView = BaseView.extend({
         /**

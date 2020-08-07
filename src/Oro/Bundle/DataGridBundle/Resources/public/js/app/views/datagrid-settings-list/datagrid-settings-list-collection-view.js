@@ -10,7 +10,7 @@ define(function(require, exports, module) {
     const DatagridSettingsListItemView =
         require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-item-view');
     let config = require('module-config').default(module.id);
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     config = _.extend({
         fallbackSelector: '.no-data'

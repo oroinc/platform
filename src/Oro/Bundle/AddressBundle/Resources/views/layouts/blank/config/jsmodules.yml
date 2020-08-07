@@ -5,7 +5,8 @@ app-modules:
 configs:
     oroaddress/js/region/view: {}
 dynamic-imports:
-    oroaddress:
+    orouser:
         - oroaddress/js/mapservice/googlemaps
         - oroaddress/js/region/view
+    oroform-validate:
         - oroaddress/js/validator/name-or-organization

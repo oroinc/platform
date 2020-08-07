@@ -1,5 +1,11 @@
-define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _, mediator) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    require('jquery-ui/widget');
+    require('jquery-ui/widgets/sortable');
 
     /**
      * Item container widget

@@ -1,6 +1,16 @@
 Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that should be addressed before attempting to upgrade or during the upgrade of a vanilla Oro application.
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
+## 4.1.7
+### Changed
+
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
+
+### Removed
+
+#### UIBundle
+* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
 ## 4.1.1 (2020-02-25)
 [Show detailed list of changes](incompatibilities-4-1-1.md)

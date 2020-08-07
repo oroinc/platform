@@ -10,4 +10,5 @@ dynamic-imports:
         - oroquerydesigner/js/app/views/function-choice-view
         - oroquerydesigner/js/dictionary-filter-initialized
         - oroquerydesigner/js/enum-filter-initialized
+    oroform-validate:
         - oroquerydesigner/js/validator/not-blank-filters

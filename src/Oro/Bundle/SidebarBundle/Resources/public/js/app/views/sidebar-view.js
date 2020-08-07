@@ -11,7 +11,7 @@ define(function(require) {
     const WidgetSetupModalView = require('orosidebar/js/app/views/widget-setup-modal-view');
     const ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
     const constants = require('orosidebar/js/sidebar-constants');
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     const SidebarView = BaseCollectionView.extend({
         optionNames: BaseView.prototype.optionNames.concat([

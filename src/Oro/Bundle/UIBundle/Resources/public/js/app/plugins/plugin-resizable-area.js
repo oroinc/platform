@@ -5,7 +5,7 @@ define(function(require) {
     const BasePlugin = require('oroui/js/app/plugins/base/plugin');
     const _ = require('underscore');
     const $ = require('jquery');
-    require('jquery-ui');
+    require('jquery-ui/widgets/resizable');
 
     const ResizableArea = BasePlugin.extend({
         /**
