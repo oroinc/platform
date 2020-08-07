@@ -5,6 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
     const template = require('tpl-loader!orodatagrid/templates/inline-editing/error-holder.html');
+    require('jquery-ui/position');
 
     /* The same like `getBoundingClientRect` but takes in account all child nodes, i.e. calculates real occupied rect
      *  for case when a child goes beyond its parent
@@ -27,8 +28,6 @@ define(function(require) {
         rect.height = rect.bottom - rect.top;
         return rect;
     }
-
-    require('jquery-ui');
 
     const InlineEditorErrorHolderView = BaseView.extend({
         keepElement: true,

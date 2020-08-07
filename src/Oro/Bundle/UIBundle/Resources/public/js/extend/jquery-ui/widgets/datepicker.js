@@ -1,7 +1,9 @@
 import $ from 'jquery';
-import 'jquery-ui';
+import 'jquery-ui/widgets/datepicker';
+import 'oroui/js/jquery-ui-datepicker-l10n';
 import moment from 'moment';
 import manageFocus from 'oroui/js/tools/manage-focus';
+import mask from 'oroui/js/dropdown-mask';
 
 const original = {
     _connectDatepicker: $.datepicker.constructor.prototype._connectDatepicker,
@@ -17,6 +19,27 @@ const original = {
 
 const dropdownClassName = 'ui-datepicker-dialog-is-below';
 const dropupClassName = 'ui-datepicker-dialog-is-above';
+
+$(document)
+    .off('select2-open.dropdown.data-api')
+    .on('select2-open.dropdown.data-api', function() {
+        if ($.datepicker._curInst && $.datepicker._datepickerShowing && !($.datepicker._inDialog && $.blockUI)) {
+            $.datepicker._hideDatepicker();
+        }
+    });
+
+$(document)
+    .on('datepicker:dialogShow', function(e) {
+        const $input = $(e.target);
+        const zIndex = $.datepicker._getInst(e.target).dpDiv.css('zIndex');
+        mask.show(zIndex - 1)
+            .onhide(function() {
+                $input.datepicker('hide');
+            });
+    })
+    .on('datepicker:dialogHide', function(e) {
+        mask.hide();
+    });
 
 /**
  * Combines space-separated line of events with widget's namespace

@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'moment',
-    'orolocale/js/formatter/datetime'
-], function(_, moment, datetimeFormatter) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const moment = require('moment');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
 
     function DateValueHelper(dayFormats) {
         dayFormats = dayFormats || [datetimeFormatter.getDayFormat()];

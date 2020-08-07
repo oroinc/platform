@@ -1,7 +1,7 @@
 app-modules:
     - orosync/js/app/modules/content-manager-module
 dynamic-imports:
-    orosync:
+    commons:
         - orosync/js/content-manager
         - orosync/js/content/grid-builder
         - orosync/js/sync
