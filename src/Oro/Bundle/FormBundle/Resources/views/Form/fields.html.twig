@@ -64,6 +64,37 @@
     {% endspaceless %}
 {% endblock form_stylesheet %}
 
+{% block form_row_collection %}
+    {% spaceless %}
+        {% from 'OroUIBundle::macros.html.twig' import collection_prototype  %}
+        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}{% if group_attr.class is defined %} {{ group_attr.class }}{% endif %}"{% if group_attr is defined %}{{ block('group_attributes') }}{% endif %}>
+            {% if hint|default() and hint_position|default() == 'above' %}
+                <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+            {% endif %}
+            {% if label is not same as(false) %}
+                <div class="control-label wrap">
+                    {{ form_label(form, '' , { label_attr: label_attr}) }}
+                </div>
+            {% endif %}
+            <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
+                <div class="row-oro">
+                    <div class="oro-item-collection collection-fields-list" data-prototype="{{ collection_prototype(form)|escape }}">
+                        {% for child in form.children %}{{ collection_prototype(child) }}{% endfor %}
+                    </div>
+                    {% if allow_add %}<a class="btn add-list-item" href="#" role="button">{{ add_label|trans({}, translation_domain) }}</a>{% endif %}
+                </div>
+                {% if hint|default() and hint_position|default() == 'after_input' %}
+                    <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+                {% endif %}
+                {{- form_errors(form) -}}
+            </div>
+            {% if hint|default() and hint_position|default() == 'below' %}
+                <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+            {% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock form_row_collection %}
+
 {% block oro_ticker_symbol_widget %}
     <script type="text/javascript">
         loadModules(['jquery', 'bootstrap'],

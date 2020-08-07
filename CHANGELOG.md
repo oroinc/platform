@@ -21,6 +21,10 @@ The current file describes significant changes in the code that may affect the u
 * The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic. 
 
 #### UIBundle
+* The `collectionField` TWIG macros was removed. Use the `form_row_collection` TWIG function instead.
+  Before: `UI.collectionField(form.emails, 'oro.user.emails.label'|trans)`.
+  After: `form_row_collection(form.emails)`.
+  To change "add" button label use the `add_label` form option.
 * Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
 ## 4.2.0-alpha.2 (2020-05-29)

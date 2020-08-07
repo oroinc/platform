@@ -4,6 +4,8 @@ namespace Oro\Bundle\FormBundle\Twig;
 
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\Twig\Node\RenderBlockNode;
+use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
@@ -18,6 +20,7 @@ use Twig\TwigFunction;
  *   - oro_form_js_validation
  *   - form_javascript
  *   - form_stylesheet
+ *   - form_row_collection
  */
 class FormExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
@@ -86,10 +89,12 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
             new TwigFunction(
                 'form_stylesheet',
                 null,
-                [
-                    'is_safe' => ['html'],
-                    'node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode',
-                ]
+                ['is_safe' => ['html'], 'node_class' => SearchAndRenderBlockNode::class]
+            ),
+            new TwigFunction(
+                'form_row_collection',
+                null,
+                ['is_safe' => ['html'], 'node_class' => RenderBlockNode::class]
             )
         ];
     }

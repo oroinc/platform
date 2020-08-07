@@ -130,6 +130,7 @@ class UserType extends AbstractType
                 CollectionType::class,
                 [
                     'label'          => 'oro.user.emails.label',
+                    'add_label'      => 'oro.user.emails.add',
                     'entry_type'     => EmailType::class,
                     'allow_add'      => true,
                     'allow_delete'   => true,
