@@ -1240,7 +1240,7 @@ define(function(require) {
          *
          * @private
          */
-        _beforeRequest: function(options) {
+        _beforeRequest: function(options = {}) {
             const {toggleLoading = true} = options;
             this.requestsCount += 1;
 
@@ -1255,7 +1255,7 @@ define(function(require) {
          *
          * @private
          */
-        _afterRequest: function(jqXHR, options) {
+        _afterRequest: function(jqXHR, options = {}) {
             const json = jqXHR.responseJSON || {};
             const {toggleLoading = true} = options;
 

@@ -28,6 +28,7 @@ styles:
         - 'bundles/oroui/blank/scss/variables/loading-bar-config.scss'
         - 'bundles/oroui/blank/scss/variables/line-clamp-config.scss'
         - 'bundles/oroui/blank/scss/reset.scss'
+        - 'bundles/oroui/blank/scss/components/loading-bar-lines.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
     output: 'css/styles.css'
 
