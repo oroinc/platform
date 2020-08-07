@@ -17,6 +17,9 @@ The current file describes significant changes in the code that may affect the u
 #### CacheBundle
 * The service "oro.file_cache.abstract" was removed because it is not used anywhere.
 
+#### ImportExportBundle
+* The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic. 
+
 #### UIBundle
 * Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
