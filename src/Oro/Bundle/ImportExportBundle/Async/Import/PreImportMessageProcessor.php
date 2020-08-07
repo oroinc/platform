@@ -172,16 +172,13 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     protected function processJob(string $parentMessageId, array $body, array $files)
     {
-        $uniqueJobSlug = $body['userId'];
-        if (isset($body['options']['unique_job_slug'])) {
-            $uniqueJobSlug = $body['options']['unique_job_slug'];
-        }
         $jobName = sprintf(
-            'oro:%s:%s:%s:%s',
+            'oro:%s:%s:%s:%s:%d',
             $body['process'],
             $body['processorAlias'],
             $body['jobName'],
-            $uniqueJobSlug
+            $body['userId'],
+            random_int(1, PHP_INT_MAX)
         );
 
         $result = $this->jobRunner->runUnique(

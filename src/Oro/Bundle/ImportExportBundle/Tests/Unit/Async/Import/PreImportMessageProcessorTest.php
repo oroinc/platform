@@ -290,8 +290,11 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(1, 'oro:import:test:test:0')
-            ->willReturn(true);
+            ->willReturnCallback(function ($jobId, $name) {
+                self::assertEquals(1, $jobId);
+                self::assertMatchesRegularExpression('/^oro:import:test:test:1:\d*/', $name);
+                return true;
+            });
         $this->fileManager
             ->expects($this->once())
             ->method('writeToTmpLocalStorage')
@@ -454,24 +457,25 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(1, 'oro:import:processor_test:test_import:1')
-            ->willreturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+            ->willReturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                self::assertEquals(1, $jobId);
+                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*/', $name);
                 return $callback($jobRunner, $childJob);
             });
 
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
-            ->with('oro:import:processor_test:test_import:1:chunk.1')
-            ->willreturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*:chunk.1/', $jobId);
                 return $callback($jobRunner, $childJob1);
             });
 
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
-            ->with('oro:import:processor_test:test_import:1:chunk.2')
-            ->willreturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*:chunk.2/', $jobId);
                 return $callback($jobRunner, $childJob2);
             });
 
