@@ -44,17 +44,10 @@
 {% endblock breadcrumbs %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set data = [] %}
     {% for child in form %}
         {% if child.children %}
-            {% set tooltip = null %}
-            {% if child.vars.tooltip is defined %}
-                {% set tooltip = child.vars.tooltip %}
-            {% endif %}
-            {% set data = data|merge([
-                UI.collectionField(child, child.vars.label, 'Add'|trans, tooltip)
-            ]) %}
+            {% set data = data|merge([form_row_collection(child)]) %}
         {% else %}
             {% set data = data|merge([form_row(child)]) %}
         {% endif %}

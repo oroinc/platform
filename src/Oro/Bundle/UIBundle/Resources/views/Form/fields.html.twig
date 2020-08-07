@@ -2,7 +2,7 @@
 
 {% block form_row %}
     {% spaceless %}
-        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
+        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}{% if group_attr.class is defined %} {{ group_attr.class }}{% endif %}"{% if group_attr is defined %}{{ block('group_attributes') }}{% endif %}>
             {% if hint|default() and hint_position|default() == 'above' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
@@ -25,14 +25,19 @@
     {% endspaceless %}
 {% endblock form_row %}
 
+{% block group_attributes %}
+    {%- for n, v in group_attr %}
+        {%- if v is same as(true) %} {{ n }}="{{ n }}"
+        {%- elseif n is not same as('class') and v is not same as(false) %} {{ n }}="{{ v }}"
+        {%- endif %}
+    {%- endfor -%}
+{% endblock group_attributes %}
+
 {% block hint_attributes %}
-    {{- " " -}}
-    {%- for attrname, attrvalue in hint_attr -%}
-        {%- if attrvalue is same as(true) -%}
-            {{- attrname }}="{{ attrname }}"
-        {%- elseif attrvalue is not same as(false) -%}
-            {{- attrname }}="{{ attrvalue }}"
-        {%- endif -%}
+    {%- for n, v in hint_attr %}
+        {%- if v is same as(true) %} {{ n }}="{{ n }}"
+        {%- elseif v is not same as(false) %} {{ n }}="{{ v }}"
+        {%- endif %}
     {%- endfor -%}
 {% endblock hint_attributes %}
 
