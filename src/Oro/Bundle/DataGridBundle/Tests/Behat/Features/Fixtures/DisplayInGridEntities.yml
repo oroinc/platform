@@ -2,7 +2,7 @@ Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm:
   embedded_form_entity:
     title: 'New Embedded Form'
     css: ''
-    formType: 'Oro\Bridge\ContactUs\Form\Type\ContactRequestType'
+    formType: 'Oro\Bundle\ContactUsBundle\Form\Type\ContactRequestType'
     successMessage: ''
     owner: '@organization'
 
