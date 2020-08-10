@@ -58,8 +58,8 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 
         $args = [
             // isset is used instead of empty as $data['id'] could be "0"
-            'id' => !isset($data['id']) ? null : $data['id'],
-            'name' => empty($data['name']) ? '' : $data['name'],
+            'id' => $data['id'] ?? null,
+            'name' => $data['name'] ?? '',
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
             'default' => !empty($data['default'])
         ];

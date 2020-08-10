@@ -220,7 +220,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $sourceEntityId,
         &$map
     ) {
-        list($old, $new) = $sourceChange;
+        [$old, $new] = $sourceChange;
 
         $new = $this->extractValue($new, 'inserted');
         foreach ($new['inserted'] as $insert) {
@@ -335,9 +335,9 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $sourceEntityId,
         &$map
     ) {
-        list($old, $new) = $sourceChange;
+        [$old, $new] = $sourceChange;
 
-        if (!empty($old['entity_id'])) {
+        if (isset($old['entity_id']) && $this->notEmpty($old['entity_id'])) {
             $entityId = $old['entity_id'];
 
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
@@ -350,7 +350,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
         }
 
-        if (!empty($new['entity_id'])) {
+        if (isset($new['entity_id']) && $this->notEmpty($new['entity_id'])) {
             $entityId = $new['entity_id'];
 
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
@@ -467,7 +467,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     private function addChangeSetToMap(array &$map, $entityClass, $entityId, $fieldName, array $change)
     {
-        if (empty($entityClass) || empty($entityId)) {
+        if (empty($entityClass) || !$this->notEmpty($entityId)) {
             throw new \LogicException('Entity class either entity id cannot be empty');
         }
 
@@ -475,9 +475,10 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             throw new \LogicException('Field name cannot be empty');
         }
 
-        $map[$entityClass.$entityId]['entity_class'] = $entityClass;
-        $map[$entityClass.$entityId]['entity_id'] = $entityId;
-        $map[$entityClass.$entityId]['change_set'][$fieldName] = $change;
+        $key = $entityClass . $entityId;
+        $map[$key]['entity_class'] = $entityClass;
+        $map[$key]['entity_id'] = $entityId;
+        $map[$key]['change_set'][$fieldName] = $change;
     }
 
     /**
@@ -490,25 +491,24 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     private function getChangeSetFromMap(array &$map, $entityClass, $entityId, $fieldName = null)
     {
-        if (empty($entityClass) || empty($entityId)) {
+        if (empty($entityClass) || !$this->notEmpty($entityId)) {
             throw new \LogicException('Entity class either entity id cannot be empty');
         }
 
+        $key = $entityClass . $entityId;
         if (!$fieldName) {
-            return $map[$entityClass.$entityId]['change_set'] ?? [];
+            return $map[$key]['change_set'] ?? [];
         }
 
-        if (false == isset($map[$entityClass.$entityId])) {
-            $map[$entityClass.$entityId] = [
+        if (!isset($map[$key])) {
+            $map[$key] = [
                 'entity_class' => $entityClass,
                 'entity_id' => $entityId,
                 'change_set' => [],
             ];
         }
 
-        return isset($map[$entityClass.$entityId]['change_set'][$fieldName]) ?
-            $map[$entityClass.$entityId]['change_set'][$fieldName] :
-            [null, null];
+        return $map[$key]['change_set'][$fieldName] ?? [null, null];
     }
 
     /**
@@ -576,5 +576,17 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     public static function getSubscribedTopics()
     {
         return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED];
+    }
+
+    /**
+     * @param mixed $val
+     * @return bool
+     */
+    private function notEmpty($val): bool
+    {
+        return $val !== null
+            && $val !== false
+            && $val !== []
+            && $val !== '';
     }
 }
