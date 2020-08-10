@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
-use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider;
 use Oro\Component\Layout\LayoutContext;
