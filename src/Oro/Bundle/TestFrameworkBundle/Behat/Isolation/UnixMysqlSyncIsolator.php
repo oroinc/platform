@@ -136,7 +136,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     protected function makeDump()
     {
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysqldump -h %s -P %s -u %s %s > %s',
+            'MYSQL_PWD="%s" mysqldump -h %s -P %s -u %s %s > %s',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,
@@ -150,7 +150,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     protected function restoreDbFromDump()
     {
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -h %s -P %s -u %s %s < %s',
+            'MYSQL_PWD="%s" mysql -h %s -P %s -u %s %s < %s',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,
@@ -176,7 +176,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
         }
 
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "create database %s;" -h %s -P %s -u %s',
+            'MYSQL_PWD="%s" mysql -e "create database %s;" -h %s -P %s -u %s',
             $this->dbPass,
             $this->dbTempName,
             $this->dbHost,
@@ -192,7 +192,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
         }
 
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "create database %s;" -h %s -P %s -u %s',
+            'MYSQL_PWD="%s" mysql -e "create database %s;" -h %s -P %s -u %s',
             $this->dbPass,
             $this->dbName,
             $this->dbHost,
@@ -207,7 +207,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     protected function renameTempDb()
     {
         $this->restoreDbFromDumpProcess = $this->runProcess(sprintf(
-            'MYSQL_PWD=%s && for table in `mysql -h %s -P %s -u %s -s -N -e "use %s;show tables from %4$s;"`; '.
+            'MYSQL_PWD="%s" && for table in `mysql -h %s -P %s -u %s -s -N -e "use %s;show tables from %4$s;"`; '.
             'do mysql -h %2$s -u %3$s -s -N -e "use %4$s;rename table %4$s.$table to %5$s.$table;"; done;',
             $this->dbPass,
             $this->dbHost,
@@ -225,7 +225,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
         }
 
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -P %s -u %s',
+            'MYSQL_PWD="%s" mysql -e "drop database %s;" -h %s -P %s -u %s',
             $this->dbPass,
             $this->dbName,
             $this->dbHost,
@@ -237,7 +237,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     protected function dropTempDb()
     {
         $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -P %s -u %s',
+            'MYSQL_PWD="%s" mysql -e "drop database %s;" -h %s -P %s -u %s',
             $this->dbPass,
             $this->dbTempName,
             $this->dbHost,
@@ -272,7 +272,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     private function isDbExists($dbName)
     {
         $process = $this->runProcess(sprintf(
-            'MYSQL_PWD=%s mysql -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA '.
+            'MYSQL_PWD="%s" mysql -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA '.
             'WHERE SCHEMA_NAME = \'%s\'" -h %s -P %s -u %s',
             $this->dbPass,
             $dbName,
