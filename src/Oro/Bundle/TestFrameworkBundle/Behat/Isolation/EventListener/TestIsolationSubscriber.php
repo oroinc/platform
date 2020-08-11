@@ -6,8 +6,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
-use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
-use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
+use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
@@ -23,6 +22,9 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * Event subscriber to register test isolators
+ */
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
     use SkipIsolatorsTrait;
@@ -62,12 +64,12 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BeforeExerciseCompleted::BEFORE => ['beforeExercise', 100],
+            ExerciseCompleted::BEFORE => ['beforeExercise', 100],
             BeforeFeatureTested::BEFORE => ['beforeFeature', 100],
             BeforeScenarioTested::BEFORE => ['beforeScenario', 100],
             AfterScenarioTested::AFTER => ['afterScenario', -100],
             AfterFeatureTested::AFTER => ['afterFeature', -100],
-            AfterExerciseCompleted::AFTER => ['afterExercise', -100],
+            ExerciseCompleted::AFTER => ['afterExercise', -100],
         ];
     }
 
@@ -195,7 +197,10 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function afterExercise()
+    /**
+     * @param ExerciseCompleted $event
+     */
+    public function afterExercise(ExerciseCompleted $event)
     {
         if ($this->skip) {
             return;
