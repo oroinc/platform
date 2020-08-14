@@ -26,6 +26,7 @@
         "nyholm/psr7": "1.2.*",
         "symfony/symfony": "4.4.2",
         "symfony/security-acl": "~3.0.0",
+        "symfony/polyfill-intl-idn": "1.17.*",
         "symfony/acl-bundle": "1.0.*",
         "twig/twig": "2.12.*",
         "doctrine/orm": "2.6.4",

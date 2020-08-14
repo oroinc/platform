@@ -27,6 +27,7 @@
         "symfony/symfony": "4.4.2",
         "symfony/security-acl": "~3.0.0",
         "symfony/acl-bundle": "1.0.*",
+        "symfony/polyfill-intl-idn": "1.17.*",
         "twig/twig": "2.12.*",
         "doctrine/orm": "2.6.4",
         "doctrine/doctrine-bundle": "1.9.*",
