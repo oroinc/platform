@@ -33,7 +33,7 @@ trait CommandTestingTrait
                     __METHOD__
                 ));
             }
-            $app = new Application(static::$kernel);
+            $app = new Application(static::$kernel ?? static::bootKernel());
             $command = $app->find($command);
         }
         $commandTester = new CommandTester($command);
