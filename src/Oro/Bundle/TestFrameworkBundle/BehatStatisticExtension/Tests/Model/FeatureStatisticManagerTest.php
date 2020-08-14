@@ -14,6 +14,8 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
     private const BUILD_ID = '12345';
     private const GIT_TARGET = 'master';
     private const GIT_BRANCH = 'ticket/PL-0000';
+    private const STAGE_NAME = 'TestEnv_42';
+    private const JOB_NAME = 'dev_weekly/PR-28584';
 
     /** @var StatisticRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $featureRepository;
@@ -36,6 +38,8 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
                 'build_id' => self::BUILD_ID,
                 'target_branch' => self::GIT_TARGET,
                 'branch_name' => self::GIT_BRANCH,
+                'stage_name' => self::STAGE_NAME,
+                'job_name' => self::JOB_NAME,
             ]
         );
 
@@ -64,7 +68,9 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
             ->setDuration(142)
             ->setGitBranch(self::GIT_BRANCH)
             ->setGitTarget(self::GIT_TARGET)
-            ->setBuildId(self::BUILD_ID);
+            ->setBuildId(self::BUILD_ID)
+            ->setStageName(self::STAGE_NAME)
+            ->setJobName(self::JOB_NAME);
 
         $this->featureRepository->expects($this->once())
             ->method('add')
@@ -80,7 +86,15 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->featureRepository->expects($this->once())
             ->method('findBy')
-            ->with(['build_id' => self::BUILD_ID, 'git_target' => self::GIT_TARGET, 'git_branch' => self::GIT_BRANCH])
+            ->with(
+                [
+                    'build_id' => self::BUILD_ID,
+                    'git_target' => self::GIT_TARGET,
+                    'git_branch' => self::GIT_BRANCH,
+                    'stage_name' => self::STAGE_NAME,
+                    'job_name' => self::JOB_NAME,
+                ]
+            )
             ->willReturn([$expected]);
 
         $this->assertEquals(['/relative/path/to/file'], $this->manager->getTested());
@@ -105,7 +119,15 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->featureRepository->expects($this->once())
             ->method('findBy')
-            ->with(['build_id' => self::BUILD_ID, 'git_target' => null, 'git_branch' => self::GIT_BRANCH])
+            ->with(
+                [
+                    'build_id' => self::BUILD_ID,
+                    'git_target' => null,
+                    'git_branch' => self::GIT_BRANCH,
+                    'stage_name' => self::STAGE_NAME,
+                    'job_name' => self::JOB_NAME,
+                ]
+            )
             ->willReturn([$expected]);
 
         $this->criteria->set('target_branch', null);
@@ -129,7 +151,8 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
             ->method('removeOldStatistics')
             ->with(2592000);
 
-        $this->criteria->set('branch_name', null);
+        $this->criteria->set('target_branch', null);
+        $this->criteria->set('branch_name', 'master');
 
         $manager = new FeatureStatisticManager($this->featureRepository, $this->featurePathLocator, $this->criteria);
         $manager->cleanOldStatistics();
