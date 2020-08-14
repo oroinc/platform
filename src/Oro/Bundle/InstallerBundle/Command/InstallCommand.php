@@ -22,6 +22,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Process\Process;
@@ -147,14 +148,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $this->validate($input);
         }
 
+        if ($this->isInstalled()) {
+            $this->alreadyInstalledMessageShow($input, $output);
+
+            return 1;
+        }
+
         $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
-
-        if ($this->isInstalled()) {
-            $this->alreadyInstalledMessageShow($output);
-
-            return 0;
-        }
 
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
@@ -198,26 +199,22 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      */
-    private function alreadyInstalledMessageShow(OutputInterface $output): void
+    private function alreadyInstalledMessageShow(InputInterface $input, OutputInterface $output): void
     {
-        $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
-        $output->writeln(
-            'To proceed with install: '
-        );
-        $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
-        $output->writeln(' - remove caches in var/cache folder manually');
-        $output->writeln(' - drop database manually or reinstall over existing database.');
-        $output->writeln(
-            'To reinstall over existing database - run command with <info>--drop-database</info> option:'
-        );
-        $output->writeln(sprintf('    <info>%s --drop-database</info>', $this->getName()));
-        $output->writeln(
-            '<comment>ATTENTION</comment>: All data will be lost. ' .
-            'Database backup is highly recommended before executing this command.'
-        );
-        $output->writeln('');
+        $io = new SymfonyStyle($input, $output);
+        $io->error('An Oro application is already installed.');
+        $io->text('To proceed with the installation:');
+        $io->listing([
+            'set <info>installed: false</info> in <info>config/parameters.yml</info>,',
+            'remove caches in <info>var/cache</info> folder manually,',
+            'drop the database manually or reinstall with the <info>--drop-database</info> option.',
+        ]);
+        $io->warning([
+            'All data will be lost. Database backup is highly recommended!'
+        ]);
     }
 
     /**
@@ -647,15 +644,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    protected function isInstalled()
+    protected function isInstalled(): bool
     {
-        $isInstalled = $this->getContainer()->hasParameter('installed')
+        return $this->getContainer()->hasParameter('installed')
             && $this->getContainer()->getParameter('installed');
-
-        return $isInstalled;
     }
 
     /**
