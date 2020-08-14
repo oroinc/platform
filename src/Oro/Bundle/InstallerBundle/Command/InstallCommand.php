@@ -183,6 +183,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             if (!$skipAssets) {
                 $buildAssetsProcessExitCode = $this->getBuildAssetsProcessExitCode($output);
             }
+            // cache clear must be done after assets build process finished,
+            // otherwise, it could lead to unpredictable errors
+            $this->clearCache($commandExecutor, $input);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
@@ -583,17 +586,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
+        // set installed flag in DI container
         $this->updateInstalledFlag(date('c'));
-
-        // clear the cache and set installed flag in DI container
-        $cacheClearOptions = ['--process-isolation' => true];
-        if ($commandExecutor->getDefaultOption('no-debug')) {
-            $cacheClearOptions['--no-debug'] = true;
-        }
-        if ($input->getOption('env')) {
-            $cacheClearOptions['--env'] = $input->getOption('env');
-        }
-        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         if (!$skipAssets) {
             /**
@@ -622,6 +616,22 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $params                        = $this->yamlPersister->parse();
         $params['system']['installed'] = $installed;
         $this->yamlPersister->dump($params);
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     * @param InputInterface  $input
+     */
+    protected function clearCache(CommandExecutor $commandExecutor, InputInterface $input): void
+    {
+        $cacheClearOptions = ['--process-isolation' => true];
+        if ($commandExecutor->getDefaultOption('no-debug')) {
+            $cacheClearOptions['--no-debug'] = true;
+        }
+        if ($input->getOption('env')) {
+            $cacheClearOptions['--env'] = $input->getOption('env');
+        }
+        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
     }
 
     /**
@@ -840,6 +850,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $command[] = sprintf('--env=%s', $input->getOption('env'));
         }
 
+        if ($input->hasOption('timeout')) {
+            $command[] = sprintf('--timeout=%d', $input->getOption('timeout'));
+        }
+
         $this->assetsCommandProcess = new Process(
             $command,
             realpath($this->getContainer()->getParameter('kernel.project_dir'))
@@ -866,6 +880,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $output->writeln('Assets has been installed successfully');
             $output->writeln($this->assetsCommandProcess->getOutput());
         } else {
+            $output->writeln($this->assetsCommandProcess->getOutput());
             $output->writeln('Assets has not been installed! Please run "php bin/console oro:assets:install".');
             $output->writeln('Error during install assets:');
             $output->writeln($this->assetsCommandProcess->getErrorOutput());
