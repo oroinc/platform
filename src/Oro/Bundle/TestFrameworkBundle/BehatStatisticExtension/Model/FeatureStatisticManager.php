@@ -49,7 +49,9 @@ class FeatureStatisticManager
             ->setDuration($time)
             ->setGitBranch($this->getGitBranch())
             ->setGitTarget($this->getGitTarget())
-            ->setBuildId($this->getBuildId());
+            ->setBuildId($this->getBuildId())
+            ->setStageName($this->getStageName())
+            ->setJobName($this->getJobName());
 
         $this->featureRepository->add($stat);
     }
@@ -61,12 +63,20 @@ class FeatureStatisticManager
     {
         $buildId = $this->getBuildId();
         $gitBranch = $this->getGitBranch();
+        $stageName = $this->getStageName();
+        $jobName = $this->getJobName();
 
-        if (!$buildId) {
+        if (!$buildId || !$stageName || !$jobName) {
             return [];
         }
 
-        $criteria = ['build_id' => $buildId, 'git_target' => $this->getGitTarget(), 'git_branch' => $gitBranch];
+        $criteria = [
+            'build_id' => $buildId,
+            'git_target' => $this->getGitTarget(),
+            'git_branch' => $gitBranch,
+            'stage_name' => $stageName,
+            'job_name' => $jobName,
+        ];
 
         return array_map(
             static function (FeatureStatistic $statistic) {
@@ -83,7 +93,7 @@ class FeatureStatisticManager
 
     public function cleanOldStatistics()
     {
-        if ($this->getGitTarget() === 'master' && $this->getGitBranch() === null) {
+        if ($this->getGitTarget() === null && $this->getGitBranch() === 'master') {
             $this->featureRepository->removeOldStatistics($this->getStatisticsLifetime());
         }
     }
@@ -94,6 +104,22 @@ class FeatureStatisticManager
     private function getBuildId(): ?string
     {
         return $this->criteria->get('build_id');
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getStageName(): ?string
+    {
+        return $this->criteria->get('stage_name');
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getJobName(): ?string
+    {
+        return $this->criteria->get('job_name');
     }
 
     /**
