@@ -20,7 +20,7 @@
             {% if config.show_on_widget and config.value is not null%}
                 {% if config.value is iterable %}
                     {% for key,value in config.value %}
-                <div class="widget-config-data"><stong>{{ key|trans }}</stong>: {{ value }}</div>
+                <div class="widget-config-data"><strong>{{ key|trans }}</strong>: {{ value }}</div>
                     {% endfor %}
                 {% else %}
                     {% if config.options is defined and config.options.label is defined %}
@@ -39,7 +39,7 @@
                     {% if value is null %}
                         {% set value = config.value %}
                     {% endif %}
-                    <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ value }}</div>
+                    <div class="widget-config-data"><strong>{{ label|trans }}</strong>: {{ value }}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}
