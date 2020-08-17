@@ -2617,4 +2617,34 @@ JS;
     {
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
     }
+
+    /**
+     * Checks, that all resources of a given type are versioned
+     * Example: I should be sure that all "json" are versioned
+     *
+     * @Then /^(?:|I )should be sure that all "(?P<format>(?:[^"]|\\")+)" assets are versioned$/
+     */
+    public function assertVersionedContent(string $format)
+    {
+        $content = $this->getSession()->getPage()->getContent();
+        $matches = [];
+        $versionedMatches = [];
+        preg_match_all('/(\w+\.' . $format . ')/i', $content, $matches);
+        preg_match_all('/(\w+\.' . $format . ')\?\w*version=\w+/i', $content, $versionedMatches);
+
+        $this->assertArrayHasKey(0, $matches);
+        $this->assertArrayHasKey(1, $matches);
+        $this->assertArrayHasKey(0, $versionedMatches);
+        $this->assertArrayHasKey(1, $versionedMatches);
+
+        $this->assertCount(
+            count($matches[0]),
+            $versionedMatches[0],
+            sprintf(
+                'Not all %s assets are versioned: %s',
+                $format,
+                implode(', ', array_diff($matches[1], $versionedMatches[1]))
+            )
+        );
+    }
 }
