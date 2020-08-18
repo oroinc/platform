@@ -193,6 +193,10 @@
             }
         }
 
+        .close-dialog {
+            margin-#{$end}: 0;
+        }
+
         .ui-dialog-titlebar-close:before {
             content: $dialog-titlebar-close-icon;
         }

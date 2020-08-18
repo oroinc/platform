@@ -77,7 +77,7 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $close = $this->find('css', '.close');
+        $close = $this->find('css', '[data-role="close"]');
         $close->click();
     }
 
