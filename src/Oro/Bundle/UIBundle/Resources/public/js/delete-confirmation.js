@@ -4,6 +4,15 @@ define(function(require) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const ModalView = require('oroui/js/modal');
+    let config = require('module-config').default(module.id);
+
+    config = Object.assign({}, {
+        className: 'modal oro-modal-danger',
+        okText: __('Yes, Delete'),
+        title: __('Delete Confirmation'),
+        cancelText: __('Cancel'),
+        okButtonClass: 'btn btn-danger'
+    }, config);
 
     /**
      * Delete confirmation dialog
@@ -14,18 +23,18 @@ define(function(require) {
      */
     const DeleteConfirmationView = ModalView.extend({
         /** @property {String} */
-        className: 'modal oro-modal-danger',
+        className: config.className,
 
         /** @property {String} */
-        okText: __('Yes, Delete'),
+        okText: config.okText,
 
         /** @property {String} */
-        title: __('Delete Confirmation'),
+        title: config.title,
 
         /** @property {String} */
-        cancelText: __('Cancel'),
+        cancelText: config.cancelText,
 
-        okButtonClass: 'btn btn-danger',
+        okButtonClass: config.okButtonClass,
 
         /**
          * @inheritDoc

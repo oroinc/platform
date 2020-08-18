@@ -33,7 +33,7 @@ define(function(require) {
             'click [data-role="datagrid-settings-select-all"]': 'onSelectAll',
             'click [data-role="datagrid-settings-unselect-all"]': 'onUnselectAll',
             'click [data-role="datagrid-settings-reset"]': 'reset',
-            'click .close': 'closeDropdown'
+            'click [data-role="close"]': 'closeDropdown'
         },
 
         /**

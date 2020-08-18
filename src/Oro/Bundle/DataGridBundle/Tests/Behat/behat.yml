@@ -109,7 +109,7 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager
 
     GridSettingsManagerClose:
-      selector: 'div.datagrid-settings > .dropdown-menu .close'
+      selector: 'div.datagrid-settings > .dropdown-menu [data-role="close"]'
 
     GridColumnManagerTabTitle:
       selector: 'div.datagrid-settings__wrapper .nav-link:contains("Grid")'
@@ -238,7 +238,7 @@ oro_behat_extension:
         locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Last Name")]'
 
     Close Fullscreen Popup:
-      selector: '.fullscreen-popup__close'
+      selector: '.fullscreen-popup .close-dialog'
 
   suites:
     OroDataGridBundle:
