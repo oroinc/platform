@@ -370,8 +370,14 @@ services:
         class: Oro\Bundle\UserBundle\Security\UserChecker
         arguments:
             - '@security.token_storage'
-            - '@session.flash_bag'
+
+    oro_user.event_listener.password_change_exception_listener:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordChangeExceptionListener
+        arguments:
+            - '@session'
             - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 255 }
 
     oro_user.role.datagrid_helper:
         class: Oro\Bundle\UserBundle\Datagrid\RoleGridHelper

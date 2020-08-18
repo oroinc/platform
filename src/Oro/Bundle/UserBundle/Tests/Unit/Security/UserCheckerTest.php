@@ -6,10 +6,8 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserCheckerTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,20 +17,11 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenStorage;
 
-    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $flashBag;
-
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->flashBag = $this->createMock(FlashBagInterface::class);
-        $translator = $this->createMock(TranslatorInterface::class);
 
-        $translator->expects($this->any())
-            ->method('trans')
-            ->willReturnArgument(0);
-
-        $this->userChecker = new UserChecker($this->tokenStorage, $this->flashBag, $translator);
+        $this->userChecker = new UserChecker($this->tokenStorage);
     }
 
     /**
@@ -50,10 +39,6 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($token);
 
         if ($exceptionThrown) {
-            $this->flashBag->expects($this->once())
-                ->method('add')
-                ->with('error', 'oro.user.security.password_changed.message');
-
             $this->expectException(\Oro\Bundle\UserBundle\Exception\PasswordChangedException::class);
             $this->expectExceptionMessage('Invalid password.');
         }
