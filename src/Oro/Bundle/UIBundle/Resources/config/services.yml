@@ -362,6 +362,13 @@ services:
         arguments:
             - '@router'
 
+    oro_ui.session.flash_bag:
+        class: Oro\Bundle\UIBundle\Model\FlashBag
+        decorates: session.flash_bag
+        lazy: true
+        arguments:
+            - '@session'
+
     oro_ui.consumption_extension.request_context:
         class: Oro\Bundle\UIBundle\Consumption\Extension\ConsumptionExtension
         arguments:
