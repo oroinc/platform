@@ -4,6 +4,9 @@ The current file describes significant changes in the code that may affect the u
 ## 4.1.7
 ### Changed
 
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
+
 #### UIBundle
 * Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
 

@@ -9,13 +9,16 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
+/**
+ * Limits the amount of items can be deleted at once.
+ */
 class MassDeleteLimiter
 {
     const NO_LIMIT                 = 1;
     const LIMIT_ACCESS             = 2;
     const LIMIT_MAX_RECORDS        = 3;
     const LIMIT_ACCESS_MAX_RECORDS = 4;
-    const MAX_DELETE_RECORDS       = 5000;
+    const MAX_DELETE_RECORDS       = 100;
 
     /** @var AclHelper */
     protected $aclHelper;
