@@ -6,6 +6,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
+
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
 
