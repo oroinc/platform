@@ -10,7 +10,8 @@ define(function(require) {
 
     const LayoutSubtreeView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
-            'keepAttrs', 'useHiddenElement'
+            'keepAttrs', 'useHiddenElement', 'onLoadingCssClass',
+            'loadingMask', 'disableControls'
         ]),
 
         options: {
@@ -29,6 +30,10 @@ define(function(require) {
         useHiddenElement: false,
 
         keepAttrs: [],
+
+        onLoadingCssClass: '',
+
+        disableControls: false,
 
         /** @property */
         events: {
@@ -98,6 +103,14 @@ define(function(require) {
         },
 
         _showLoading: function() {
+            if (this.onLoadingCssClass) {
+                this.$el.addClass(this.onLoadingCssClass);
+            }
+
+            if (this.disableControls) {
+                this.setDisableControls();
+            }
+
             if (!this.options.showLoading) {
                 return;
             }
@@ -112,6 +125,9 @@ define(function(require) {
         },
 
         _hideLoading: function() {
+            if (this.onLoadingCssClass) {
+                this.$el.removeClass(this.onLoadingCssClass);
+            }
             if (!this.options.showLoading) {
                 return;
             }
@@ -161,6 +177,18 @@ define(function(require) {
 
         _getInputs: function() {
             return this.$el.find('input, textarea, select').filter('[name!=""]');
+        },
+
+        setDisableControls() {
+            this.$el.find(':tabbable').each((i, element) => {
+                if (!_.isUndefined(element.value)) {
+                    $(element).attr('disabled', 'disabled')
+                } else {
+                    $(element)
+                        .attr('aria-disabled', 'true')
+                        .addClass('disabled');
+                }
+            });
         },
 
         contentInitialized: function() {
