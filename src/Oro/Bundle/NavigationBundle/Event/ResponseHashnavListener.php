@@ -5,6 +5,9 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Updates response headers and check if full redirect is required when using hash navigation.
+ */
 class ResponseHashnavListener
 {
     const HASH_NAVIGATION_HEADER = 'x-oro-hash-navigation';
@@ -43,6 +46,7 @@ class ResponseHashnavListener
      * Checking request and response and decide whether we need a redirect
      *
      * @param FilterResponseEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onResponse(FilterResponseEvent $event)
     {

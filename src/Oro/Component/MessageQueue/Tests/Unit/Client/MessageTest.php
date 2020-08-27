@@ -3,6 +3,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\Message;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MessageTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithoutAnyArguments()
@@ -20,9 +23,9 @@ class MessageTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowGetPreviouslySetBody()
     {
         $message = new Message();
-        
+
         self::assertSame($message, $message->setBody('theBody'));
-        
+
         self::assertSame('theBody', $message->getBody());
     }
 

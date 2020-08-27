@@ -8,6 +8,9 @@ use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Resource\FileResource;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

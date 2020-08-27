@@ -7,6 +7,10 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */

@@ -254,6 +254,7 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
      * @param bool   $withMultiValue
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getApplicableRelations($object, $withMultiValue = false)
     {

@@ -100,6 +100,7 @@ class CacheManager
 
     /**
      * Warms up all dirty API caches and clears all affected API documentation caches.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function warmUpDirtyCaches()
     {

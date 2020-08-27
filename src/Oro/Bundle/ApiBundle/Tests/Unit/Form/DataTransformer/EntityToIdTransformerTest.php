@@ -14,6 +14,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityToIdTransformerTest extends OrmRelatedTestCase
 {
     /**

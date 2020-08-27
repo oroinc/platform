@@ -97,6 +97,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
      * @param string $value
      *
      * @return \DateTimeInterface
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function reverseTransformValue(string $value): \DateTimeInterface
     {

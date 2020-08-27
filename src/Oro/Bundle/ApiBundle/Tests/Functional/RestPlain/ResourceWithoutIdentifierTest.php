@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutI
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
 {
     public function testGet()

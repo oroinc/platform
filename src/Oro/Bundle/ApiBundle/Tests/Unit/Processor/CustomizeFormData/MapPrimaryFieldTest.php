@@ -37,6 +37,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MapPrimaryFieldTest extends TypeTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */

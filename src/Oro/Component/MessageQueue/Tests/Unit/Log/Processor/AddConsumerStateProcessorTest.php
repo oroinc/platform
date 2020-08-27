@@ -13,6 +13,9 @@ use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\ExtensionProxy;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** Simple test message */

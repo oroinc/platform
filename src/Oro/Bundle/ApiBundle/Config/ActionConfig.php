@@ -29,6 +29,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function toArray()
     {

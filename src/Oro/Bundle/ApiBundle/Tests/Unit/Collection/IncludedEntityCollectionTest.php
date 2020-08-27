@@ -6,6 +6,10 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IncludedEntityCollection */

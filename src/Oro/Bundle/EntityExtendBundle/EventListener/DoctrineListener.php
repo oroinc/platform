@@ -16,6 +16,9 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
 use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Enriches discriminator mapping and field defaults in class metadata, ensures multi-enums are properly flushed.
+ */
 class DoctrineListener
 {
     const ANNOTATION_DISCRIMINATOR_VALUE = 'Oro\\Bundle\\EntityExtendBundle\\Annotation\\ORM\\DiscriminatorValue';
@@ -93,6 +96,7 @@ class DoctrineListener
      * @param EntityManager $em
      *
      * @throws MappingException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processDiscriminatorValues(ClassMetadata $class, EntityManager $em)
     {

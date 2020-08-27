@@ -40,6 +40,7 @@ class ConfigScopeType extends AbstractType
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

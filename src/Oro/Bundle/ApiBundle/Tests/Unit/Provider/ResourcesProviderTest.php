@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 {

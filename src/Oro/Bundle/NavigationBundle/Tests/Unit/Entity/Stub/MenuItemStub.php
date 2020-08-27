@@ -8,6 +8,7 @@ use Knp\Menu\ItemInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class MenuItemStub implements ItemInterface
 {

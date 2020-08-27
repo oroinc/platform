@@ -10,6 +10,8 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 /**
  * JobProcessor is a main class responsible for processing jobs, shifting it's responsibilities to other classes
  * is quite difficult and would make it less readable.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class JobProcessor
 {

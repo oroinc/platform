@@ -26,6 +26,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;

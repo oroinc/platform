@@ -110,6 +110,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param array $expected
      * @param array $actual
      * @param array $path
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function matchIndexedArray(array $expected, array $actual, array $path)
     {

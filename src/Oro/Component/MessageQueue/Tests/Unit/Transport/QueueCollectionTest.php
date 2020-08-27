@@ -5,6 +5,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueueCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var QueueCollection */

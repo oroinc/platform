@@ -16,6 +16,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OperationTest extends \PHPUnit\Framework\TestCase
 {

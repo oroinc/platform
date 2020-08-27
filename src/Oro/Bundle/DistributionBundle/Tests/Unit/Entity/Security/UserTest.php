@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DistributionBundle\Entity\Security\User;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UserTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;

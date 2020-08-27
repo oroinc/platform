@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\BatchUpdateContext;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BatchUpdateContext */

@@ -4,6 +4,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetArrayValueWhenConfigDoesNotContainsKey()

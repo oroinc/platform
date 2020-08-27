@@ -13,6 +13,7 @@ class FieldsTransformer
     /**
      * @param AbstractAuditField[] $fields
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getData(array $fields): array
     {

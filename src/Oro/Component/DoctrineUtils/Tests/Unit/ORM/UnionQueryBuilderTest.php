@@ -10,6 +10,10 @@ use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UnionQueryBuilderTest extends OrmTestCase
 {
     /** @var EntityManager */

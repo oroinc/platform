@@ -20,6 +20,9 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridActionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */

@@ -9,6 +9,9 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TestEmailSynchronizer */

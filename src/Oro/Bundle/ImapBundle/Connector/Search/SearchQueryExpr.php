@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Connector\Search;
 
 /**
  * Represents the search query expression
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAccess
 {

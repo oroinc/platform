@@ -4,6 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityReferenceTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldCreateNullReference()

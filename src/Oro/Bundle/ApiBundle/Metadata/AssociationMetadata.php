@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AssociationMetadata extends PropertyMetadata
 {
@@ -74,6 +75,7 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function toArray()
     {

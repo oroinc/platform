@@ -211,6 +211,7 @@ class ExtendConfigDumper
 
     /**
      * Makes sure that extended entity configs are ready to be processing by other config related commands
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function checkConfig()
     {
@@ -303,6 +304,7 @@ class ExtendConfigDumper
      * @param array           $doctrine
      * @param \ReflectionClass|null $reflectionEntityClass
      * @throws \ReflectionException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function checkFieldSchema(
         $entityName,

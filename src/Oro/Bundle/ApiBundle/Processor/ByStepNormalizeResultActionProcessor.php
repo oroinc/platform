@@ -37,6 +37,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function executeProcessors(ComponentContextInterface $context)
     {

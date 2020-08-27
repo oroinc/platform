@@ -59,6 +59,7 @@ class LocalizedValueRenderListener
 
     /**
      * @param ValueRenderEvent $fieldValueEvent
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function beforeValueRender(ValueRenderEvent $fieldValueEvent)
     {

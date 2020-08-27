@@ -98,6 +98,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadConfiguration(): array
     {

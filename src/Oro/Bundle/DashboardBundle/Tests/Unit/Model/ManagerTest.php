@@ -6,6 +6,10 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**

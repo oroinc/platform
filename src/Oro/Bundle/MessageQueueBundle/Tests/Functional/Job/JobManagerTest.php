@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\Job\DuplicateJobException;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class JobManagerTest extends WebTestCase
 {

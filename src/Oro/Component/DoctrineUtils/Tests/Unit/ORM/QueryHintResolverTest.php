@@ -9,6 +9,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**

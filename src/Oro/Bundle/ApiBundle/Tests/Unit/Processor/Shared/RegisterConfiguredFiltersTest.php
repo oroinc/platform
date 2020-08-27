@@ -15,6 +15,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */

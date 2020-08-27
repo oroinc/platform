@@ -7,6 +7,9 @@ use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 {
     /**

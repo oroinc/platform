@@ -18,6 +18,8 @@ use Psr\Log\NullLogger;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class QueueConsumerTest extends \PHPUnit\Framework\TestCase
 {

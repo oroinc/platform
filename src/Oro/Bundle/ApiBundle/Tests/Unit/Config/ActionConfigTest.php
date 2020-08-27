@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActionConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()

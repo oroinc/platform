@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';

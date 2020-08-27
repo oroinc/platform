@@ -4,6 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TestContext implements ContextInterface
 {
     /**

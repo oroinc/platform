@@ -9,6 +9,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */

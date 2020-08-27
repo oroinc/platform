@@ -10,6 +10,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
+ * This class is responsible for checking known email addresses.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, LoggerAwareInterface
@@ -71,6 +73,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneKnownEmailAddress($_)
     {
@@ -109,6 +112,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneUserEmailAddress($userId, $_)
     {
@@ -172,6 +176,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneMailboxEmailAddress($mailboxId, $_)
     {

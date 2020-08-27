@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependenci
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
 {
     /** @var ValidateIncludedDataDependencies */

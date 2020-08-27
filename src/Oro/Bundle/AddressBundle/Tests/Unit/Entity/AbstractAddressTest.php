@@ -9,6 +9,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 {

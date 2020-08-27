@@ -290,6 +290,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      * @param array $header
      * @param string $direction
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertHeader(array $header, $direction)
     {

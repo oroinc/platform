@@ -37,6 +37,7 @@ class CompleteAssociationHelper
      * @param string                      $version
      * @param RequestType                 $requestType
      * @param ConfigExtraInterface[]      $extras
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function completeAssociation(
         EntityDefinitionFieldConfig $field,

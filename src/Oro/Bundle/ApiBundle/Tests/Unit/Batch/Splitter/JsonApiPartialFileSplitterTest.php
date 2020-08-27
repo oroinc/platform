@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class JsonApiPartialFileSplitterTest extends FileSplitterTestCase
 {

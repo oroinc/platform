@@ -135,6 +135,7 @@ class ActivityListIdProvider
      * @param int          $pageSize
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize)
     {

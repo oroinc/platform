@@ -124,6 +124,7 @@ class ApiConfiguration implements ConfigurationInterface
      * @param array $config
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function postProcessConfig(array $config): array
     {

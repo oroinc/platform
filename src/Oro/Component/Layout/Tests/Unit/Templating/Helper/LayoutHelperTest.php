@@ -8,6 +8,9 @@ use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 use Oro\Component\Layout\Templating\TextHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */

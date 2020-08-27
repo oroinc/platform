@@ -140,6 +140,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
      * @param string $targetObjectKey
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isDependentObject(array $object, $targetObjectKey)
     {

@@ -116,6 +116,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
     {

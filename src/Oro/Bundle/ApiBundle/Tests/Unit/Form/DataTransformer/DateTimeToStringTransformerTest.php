@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransformWithNullValue()

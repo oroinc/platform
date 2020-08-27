@@ -53,6 +53,7 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onProcessAfter(StrategyEvent $event)
     {

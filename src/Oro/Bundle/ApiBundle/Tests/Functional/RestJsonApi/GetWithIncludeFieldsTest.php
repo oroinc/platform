@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 {
     public function testIncludeFilterWhenItIsNotSupportedForApiResource()

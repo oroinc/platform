@@ -9,6 +9,9 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\LayoutRegistry;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRegistry */

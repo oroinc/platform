@@ -136,6 +136,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
 
     /**
      * @param array $newData
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function merge(array $newData): void
     {
@@ -172,6 +173,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
 
     /**
      * @param string $fileContent
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseDocumentation(string $fileContent): void
     {
@@ -235,6 +237,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      * @param \DOMDocument              $doc
      * @param \DOMNode                  $node
      * @param MarkdownApiDocParserState $state
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state): void
     {

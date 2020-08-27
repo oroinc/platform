@@ -9,6 +9,7 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 
 /**
  * This class contains unit tests related to ALIASES
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTestCase
 {

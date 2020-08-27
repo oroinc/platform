@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
+/**
+ * Generic choice filter.
+ */
 class ChoiceFilter extends AbstractFilter
 {
     /**
@@ -113,6 +116,7 @@ class ChoiceFilter extends AbstractFilter
      * @param mixed $data
      *
      * @return array|bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseData($data)
     {

@@ -5,6 +5,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntity;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityDataAccessor */

@@ -7,6 +7,9 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**

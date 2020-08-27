@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ObjectMetadataFactoryTest extends LoaderTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
