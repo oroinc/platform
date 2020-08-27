@@ -69,14 +69,9 @@
                 <div class="alert alert-info import-notice" role="alert">
                     <b>{{ 'oro.importexport.import.importance'|trans }}</b>:
                     {{ 'oro.importexport.import.columns_notice'|trans }}
-                    {% if config.importAdditionalNotices is defined %}
-                        {% for importAdditionalNotice in config.importAdditionalNotices %}
-                            <div>
-                                {{ importAdditionalNotice|nl2br }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
                 </div>
+
+                {% placeholder import_validate_export_messages with { alias: alias, config: config, options: options } %}
 
                 <div class="form-container">
                     {{ form_start(form, {
