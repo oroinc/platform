@@ -12,6 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity as TestEntity;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_SCOPE = 'testScope';

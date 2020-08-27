@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\AliasCollection;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AliasCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AliasCollection */

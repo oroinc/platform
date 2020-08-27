@@ -6,6 +6,9 @@ use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RestApiTest extends WebTestCase
 {
     /**

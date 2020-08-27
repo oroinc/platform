@@ -110,6 +110,7 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
      *
      * @throws \Symfony\Component\Validator\Exception\InvalidArgumentException
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getTabs($menuName, $options = [])
     {

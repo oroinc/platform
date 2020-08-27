@@ -16,6 +16,9 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FlushDataTest extends BatchUpdateProcessorTestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';

@@ -47,7 +47,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -209,6 +209,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
      * Validate owner
      *
      * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function postSubmit(FormEvent $event)
     {

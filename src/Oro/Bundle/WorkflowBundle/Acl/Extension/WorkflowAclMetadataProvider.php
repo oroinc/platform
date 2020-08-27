@@ -92,6 +92,7 @@ class WorkflowAclMetadataProvider
      * @param array $workflowConfig
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadWorkflowTransitions(array $workflowConfig)
     {

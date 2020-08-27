@@ -7,6 +7,9 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

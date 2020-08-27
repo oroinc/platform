@@ -13,6 +13,10 @@ use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Symfony\Component\Filesystem\Exception\IOException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_FILE_SYSTEM_NAME = 'testFileSystem';

@@ -243,6 +243,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      * @param array $processors
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeGetConfigProcessors(array $processors): array
     {

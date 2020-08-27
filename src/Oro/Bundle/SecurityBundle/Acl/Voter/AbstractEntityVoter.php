@@ -119,6 +119,7 @@ abstract class AbstractEntityVoter implements VoterInterface
      * @param int    $identifier
      * @param array  $attributes
      * @return int
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getPermission($class, $identifier, array $attributes)
     {

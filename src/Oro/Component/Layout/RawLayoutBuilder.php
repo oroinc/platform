@@ -12,6 +12,7 @@ namespace Oro\Component\Layout;
  *  - only existing alias can be removed
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RawLayoutBuilder implements RawLayoutBuilderInterface
 {

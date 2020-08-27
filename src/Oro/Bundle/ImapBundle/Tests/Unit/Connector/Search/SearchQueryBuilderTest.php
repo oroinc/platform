@@ -8,6 +8,9 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprOperator;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryValueBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**

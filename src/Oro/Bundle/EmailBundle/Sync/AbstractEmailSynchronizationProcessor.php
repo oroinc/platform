@@ -19,6 +19,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
+ * Base implementation for synchronizers of emails for the given email origin.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
@@ -88,6 +90,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param OrganizationInterface $organization
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isApplicableEmail(EmailHeader $email, $folderType, $user = null, $organization = null)
     {
@@ -121,7 +124,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      *
      * @return bool
      * @throws \Doctrine\ORM\NonUniqueResultException
-     * todo CRM-2480 temporary solution for determination of emails` organization
      */
     protected function checkOrganization(EmailHeader $email, $folderType, $organization)
     {

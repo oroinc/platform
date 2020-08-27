@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ValidateEntityFallbackTest extends TypeTestCase
 {
     /** @var CustomizeFormDataContext */

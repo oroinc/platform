@@ -97,6 +97,7 @@ class CompleteFilters extends CompleteSection
      * @param FilterFieldConfig      $filter
      * @param ClassMetadata          $metadata
      * @param EntityDefinitionConfig $definition
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completePreConfiguredFilter(
         string $fieldName,

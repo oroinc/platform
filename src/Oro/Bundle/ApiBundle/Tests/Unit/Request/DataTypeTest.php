@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DataTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**

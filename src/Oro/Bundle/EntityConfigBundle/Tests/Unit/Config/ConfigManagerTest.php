@@ -30,6 +30,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {

@@ -17,6 +17,8 @@ use Symfony\Component\Debug\BufferingLogger;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {

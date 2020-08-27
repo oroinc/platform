@@ -5,6 +5,11 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
+/**
+ * Legacy REST API model.
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ */
 class EmailApi
 {
     /** @var EmailEntity|null */

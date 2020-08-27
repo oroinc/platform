@@ -73,6 +73,7 @@ class ContentProcessor
      * @param PartInterface $part The message part where the content is stored
      *
      * @return Content
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function extractContent(PartInterface $part)
     {

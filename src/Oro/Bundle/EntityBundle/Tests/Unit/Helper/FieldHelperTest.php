@@ -11,6 +11,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

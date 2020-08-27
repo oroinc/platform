@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
     /** @var EnumChoiceType */

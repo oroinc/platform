@@ -19,6 +19,9 @@ use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportExportControllerTest extends WebTestCase
 {
     use MessageQueueExtension;

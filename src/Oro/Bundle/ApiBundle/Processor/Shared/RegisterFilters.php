@@ -43,6 +43,7 @@ abstract class RegisterFilters implements ProcessorInterface
      * @return StandaloneFilter|null
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function createFilter(FilterFieldConfig $filterConfig, $propertyPath, Context $context)
     {

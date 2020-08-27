@@ -159,6 +159,7 @@ abstract class SoapController extends SoapGetController implements
      *
      * @param mixed $value
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertValueToArray($value)
     {

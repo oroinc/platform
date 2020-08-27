@@ -21,6 +21,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Provides a set of steps to test navigation related functionality.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware,

@@ -17,6 +17,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * Creates / finds scopes and scope criteria.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ScopeManager implements ResetInterface
 {
@@ -349,6 +350,7 @@ class ScopeManager implements ResetInterface
      * @param ScopeCriteriaProviderInterface $provider
      *
      * @return mixed
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getCriteriaValueFromContext($context, ScopeCriteriaProviderInterface $provider)
     {

@@ -19,6 +19,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */

@@ -81,6 +81,7 @@ class NumberFilter extends AbstractFilter
      * @param string $fieldName
      * @param string $parameterName
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,

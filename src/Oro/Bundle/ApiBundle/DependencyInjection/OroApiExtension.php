@@ -116,6 +116,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepend(ContainerBuilder $container)
     {

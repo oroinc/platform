@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
 {

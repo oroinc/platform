@@ -42,6 +42,7 @@ class Headers extends BaseHeaders
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function fromString($string, $EOL = self::EOL)
     {

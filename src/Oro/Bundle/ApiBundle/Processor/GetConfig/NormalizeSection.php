@@ -52,6 +52,7 @@ abstract class NormalizeSection implements ProcessorInterface
     /**
      * @param EntityConfigInterface  $section
      * @param EntityDefinitionConfig $definition
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function removeExcludedFieldsAndUpdatePropertyPath(
         EntityConfigInterface $section,
@@ -128,6 +129,7 @@ abstract class NormalizeSection implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $fieldPrefix
      * @param string                 $pathPrefix
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function collectNested(
         EntityConfigInterface $section,

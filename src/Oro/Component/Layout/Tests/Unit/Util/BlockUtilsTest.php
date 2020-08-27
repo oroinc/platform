@@ -6,6 +6,9 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BlockUtilsTest extends \PHPUnit\Framework\TestCase
 {
     public function testRegisterPlugin()

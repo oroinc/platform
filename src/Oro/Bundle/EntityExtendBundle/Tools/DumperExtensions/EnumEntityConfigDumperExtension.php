@@ -69,6 +69,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preUpdate()
     {
@@ -154,6 +155,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     /**
      * {@inheritdoc}
      * @throws \ReflectionException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function postUpdate()
     {

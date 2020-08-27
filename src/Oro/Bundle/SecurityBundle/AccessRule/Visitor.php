@@ -108,6 +108,7 @@ abstract class Visitor
      * @return mixed
      *
      * @throws \RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function dispatch(ExpressionInterface $expr)
     {

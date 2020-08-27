@@ -125,6 +125,7 @@ class ArrayUtil
      * @return array|null
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive)
     {

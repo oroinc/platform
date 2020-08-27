@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\Testing\ClassExtensionTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChainExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;

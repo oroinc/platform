@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Query\Criteria;
 use Doctrine\Common\Collections\Criteria as BaseCriteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * Criteria for filtering search results.
+ */
 class Criteria extends BaseCriteria
 {
     /** @var ExpressionBuilder */
@@ -56,6 +59,7 @@ class Criteria extends BaseCriteria
      * @param string $operator
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function getSearchOperatorByComparisonOperator($operator)
     {

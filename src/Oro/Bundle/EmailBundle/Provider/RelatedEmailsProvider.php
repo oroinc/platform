@@ -64,6 +64,7 @@ class RelatedEmailsProvider
      * @param Organization|null $organization
      *
      * @return Recipient[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
     {

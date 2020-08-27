@@ -7,6 +7,9 @@ use Gos\Bundle\PubSubRouterBundle\Router\RouteCollection;
 use Oro\Bundle\SyncBundle\Cache\PubSubRouterCache;
 use Oro\Component\Testing\TempDirExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PubSubRouterCacheTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

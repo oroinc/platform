@@ -12,6 +12,9 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\NotDisabledApplicableChecker;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**

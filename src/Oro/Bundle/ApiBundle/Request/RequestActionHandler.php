@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The base class for handling API actions.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class RequestActionHandler
 {

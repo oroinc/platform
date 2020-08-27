@@ -95,6 +95,7 @@ class JsonPartialFileParser extends Parser
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function parse(): void
     {

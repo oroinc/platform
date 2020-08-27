@@ -43,6 +43,7 @@ class ObjectMetadataLoader
      * @param string                 $targetAction
      *
      * @return EntityMetadata
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function loadObjectMetadata(
         $entityClass,

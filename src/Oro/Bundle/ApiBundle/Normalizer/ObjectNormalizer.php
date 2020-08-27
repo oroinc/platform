@@ -187,6 +187,7 @@ class ObjectNormalizer
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeObjectByConfig(
         $object,

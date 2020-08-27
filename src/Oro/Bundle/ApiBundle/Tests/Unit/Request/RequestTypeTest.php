@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RequestTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmptyForEmptyRequestType()

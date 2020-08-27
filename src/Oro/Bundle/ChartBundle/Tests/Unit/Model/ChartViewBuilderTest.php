@@ -17,6 +17,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Twig\Environment;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const TEMPLATE = 'template.twig.html';

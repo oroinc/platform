@@ -25,6 +25,8 @@ use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {

@@ -12,6 +12,8 @@ use Symfony\Component\Templating\EngineInterface;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class HtmlFormatter extends AbstractFormatter
 {

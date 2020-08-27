@@ -7,6 +7,9 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Container as DependencyInjectionContainer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MigrationContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ParameterBagInterface|\PHPUnit\Framework\MockObject\MockObject */

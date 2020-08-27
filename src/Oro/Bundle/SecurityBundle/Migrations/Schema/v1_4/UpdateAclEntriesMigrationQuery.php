@@ -375,6 +375,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
      * @param string          $orderBy
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadAces(
         LoggerInterface $logger,

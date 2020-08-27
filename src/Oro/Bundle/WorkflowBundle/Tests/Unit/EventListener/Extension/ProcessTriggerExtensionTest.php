@@ -18,6 +18,9 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
     use MessageQueueExtension;

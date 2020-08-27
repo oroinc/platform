@@ -10,6 +10,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */

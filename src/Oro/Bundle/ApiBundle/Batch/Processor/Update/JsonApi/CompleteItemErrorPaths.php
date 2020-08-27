@@ -28,6 +28,7 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeItemErrorPath(
         Error $error,

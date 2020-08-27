@@ -18,6 +18,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */

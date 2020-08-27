@@ -4,6 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Translation;
 
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
+/**
+ * Iterates overs all workflow elements (the label of the workflow itself, attribute labels,
+ * transition field labels, etc.) requiring translation.
+ */
 class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTranslationFieldsIterator
 {
     /** @var string */
@@ -24,6 +28,7 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getIterator()
     {

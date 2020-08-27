@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Provides a set of utility methods to simplify working with chunk files related to a batch operation.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UpdateListProcessingHelper
 {
