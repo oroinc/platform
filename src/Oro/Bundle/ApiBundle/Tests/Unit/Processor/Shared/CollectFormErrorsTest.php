@@ -19,6 +19,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CollectFormErrorsTest extends FormProcessorTestCase
 {
     /** @var ErrorCompleterRegistry */

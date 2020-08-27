@@ -10,6 +10,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Find an entity based on specified lookup conditions.
+ */
 class RequestEntity extends AbstractAction
 {
     /** @var array */
@@ -70,6 +73,7 @@ class RequestEntity extends AbstractAction
      * @param array $options
      * @return array
      * @throws InvalidParameterException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateConditionOptions(array $options)
     {

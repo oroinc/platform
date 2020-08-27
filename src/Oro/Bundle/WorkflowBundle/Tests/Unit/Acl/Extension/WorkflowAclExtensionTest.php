@@ -24,6 +24,10 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const PATTERN_ALL_OFF = '(PV) system:.. global:.. deep:.. local:.. basic:..';

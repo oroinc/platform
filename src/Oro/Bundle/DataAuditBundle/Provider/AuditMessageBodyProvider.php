@@ -36,6 +36,7 @@ class AuditMessageBodyProvider
      * @param array $collectionUpdates
      * @param TokenInterface|null $securityToken
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepareMessageBody(
         array $insertions,

@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

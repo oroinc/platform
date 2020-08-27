@@ -7,10 +7,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Checks that the address collections has addresses with different types only.
+ */
 class UniqueAddressTypesValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function validate($value, Constraint $constraint)
     {

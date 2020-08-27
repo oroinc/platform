@@ -91,6 +91,7 @@ class AddIncludedData implements ProcessorInterface
      *
      * @return array|null [included item index => included item, ...]
      *                    or NULL if at least one included item exists in $usedIncludedItems
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadIncludedItems(
         array $relationships,

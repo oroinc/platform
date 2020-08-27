@@ -5,6 +5,9 @@ use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\JsonSerializableClass;
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\SimpleClass;
 use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JSONTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldDecodeString()

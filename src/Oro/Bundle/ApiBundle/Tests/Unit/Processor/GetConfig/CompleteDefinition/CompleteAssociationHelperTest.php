@@ -15,6 +15,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */

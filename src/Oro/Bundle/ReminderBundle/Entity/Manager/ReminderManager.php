@@ -33,6 +33,7 @@ class ReminderManager
      * Save reminders
      *
      * @param RemindableInterface $entity
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function saveReminders(RemindableInterface $entity)
     {

@@ -148,6 +148,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function postProcessActionConfig(array $config): array
     {

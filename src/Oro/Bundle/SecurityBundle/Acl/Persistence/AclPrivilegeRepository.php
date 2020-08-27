@@ -166,6 +166,7 @@ class AclPrivilegeRepository
      * @throws \RuntimeException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function savePrivileges(SID $sid, ArrayCollection $privileges)
     {
@@ -818,6 +819,7 @@ class AclPrivilegeRepository
      * @param EntryInterface[]      $aces
      * @param AclExtensionInterface $extension
      * @param bool                  $itIsRootAcl
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addAcesPermissions(
         AclPrivilege $privilege,

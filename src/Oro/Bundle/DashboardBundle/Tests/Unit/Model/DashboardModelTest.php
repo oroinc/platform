@@ -8,6 +8,7 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DashboardModelTest extends \PHPUnit\Framework\TestCase
 {

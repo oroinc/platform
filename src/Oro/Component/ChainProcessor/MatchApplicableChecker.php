@@ -33,6 +33,7 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isApplicable(ContextInterface $context, array $processorAttributes)
     {

@@ -11,6 +11,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AclManagerTest extends \PHPUnit\Framework\TestCase
 {

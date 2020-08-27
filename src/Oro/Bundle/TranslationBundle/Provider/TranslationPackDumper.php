@@ -252,6 +252,7 @@ class TranslationPackDumper implements LoggerAwareInterface
      *
      * @throws \Exception if key is not translated
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateMessage($key, $message)
     {

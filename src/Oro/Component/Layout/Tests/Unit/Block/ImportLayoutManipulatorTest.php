@@ -6,6 +6,10 @@ use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     /**

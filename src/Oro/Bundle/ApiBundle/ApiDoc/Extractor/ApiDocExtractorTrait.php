@@ -98,6 +98,7 @@ trait ApiDocExtractorTrait
      * @param string[] $excludeSections
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doExtractAnnotations(array $routes, $view, array $excludeSections)
     {

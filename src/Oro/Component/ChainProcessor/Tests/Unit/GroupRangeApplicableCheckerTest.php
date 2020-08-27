@@ -7,6 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
     public function testGroupRangeApplicableCheckerWithoutFirstAndLastGroups()

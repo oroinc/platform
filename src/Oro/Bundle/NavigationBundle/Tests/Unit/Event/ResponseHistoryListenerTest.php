@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */

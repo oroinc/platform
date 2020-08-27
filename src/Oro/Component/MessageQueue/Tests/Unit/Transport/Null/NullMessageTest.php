@@ -5,6 +5,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\Testing\ClassExtensionTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NullMessageTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;

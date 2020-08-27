@@ -7,6 +7,7 @@ use Gaufrette\StreamMode;
 
 /**
  * Gaufrette stream that allow to read from resource
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ReadonlyResourceStream implements Stream
 {

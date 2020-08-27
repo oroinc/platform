@@ -10,6 +10,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */

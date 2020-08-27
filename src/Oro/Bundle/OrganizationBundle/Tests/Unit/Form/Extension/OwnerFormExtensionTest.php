@@ -32,6 +32,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;

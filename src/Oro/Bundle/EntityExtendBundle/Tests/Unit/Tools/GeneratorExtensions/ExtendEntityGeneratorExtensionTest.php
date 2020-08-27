@@ -6,6 +6,9 @@ use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendEntityGeneratorExtension */

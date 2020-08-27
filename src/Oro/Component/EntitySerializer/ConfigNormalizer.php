@@ -27,6 +27,7 @@ class ConfigNormalizer
      * @param array $config
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function preNormalizeConfig(array $config)
     {
@@ -74,6 +75,7 @@ class ConfigNormalizer
      * @param array $config
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doNormalizeConfig(array $config)
     {

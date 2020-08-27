@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\MigrationBundle\Tools;
 
+/**
+ * Provides methods to generate column/table/index names for extend entities.
+ */
 class DbIdentifierNameGenerator
 {
     /**
@@ -74,6 +77,7 @@ class DbIdentifierNameGenerator
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function generateIdentifierName(
         $tableNames,

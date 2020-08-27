@@ -4,6 +4,9 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+/**
+ * Provides a set of methods to get information about fields.
+ */
 class FieldAccessor
 {
     /** @internal Uses for caching the built list of fields */
@@ -44,6 +47,7 @@ class FieldAccessor
      * @param EntityConfig $config
      *
      * @return string[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFields($entityClass, EntityConfig $config)
     {
@@ -72,7 +76,7 @@ class FieldAccessor
                         $result[] = $field;
                     }
                 } elseif ($this->isApplicableField($entityClass, $property)) {
-                    // @todo: ignore not configured relations to avoid infinite loop
+                    // ignore not configured relations to avoid infinite loop
                     // it is a temporary fix until the identifier field will not be used by default for them
                     if (!$entityMetadata->isAssociation($field)) {
                         $result[] = $field;
@@ -98,6 +102,7 @@ class FieldAccessor
      * @param bool         $withAssociations
      *
      * @return string[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
     {

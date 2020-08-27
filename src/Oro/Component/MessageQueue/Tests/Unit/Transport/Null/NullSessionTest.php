@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Transport\Null\NullTopic;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NullSessionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
@@ -55,7 +58,7 @@ class NullSessionTest extends \PHPUnit\Framework\TestCase
         $session = new NullSession();
 
         $queue = $session->createQueue('aName');
-        
+
         $this->assertInstanceOf(NullQueue::class, $queue);
     }
 

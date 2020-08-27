@@ -21,6 +21,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BuildFormBuilderTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */

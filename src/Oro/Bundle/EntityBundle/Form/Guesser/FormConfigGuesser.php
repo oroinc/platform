@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+/**
+ * Guesses form info for config fields.
+ */
 class FormConfigGuesser extends AbstractFormGuesser
 {
     /** @var ConfigProvider */
@@ -28,6 +31,7 @@ class FormConfigGuesser extends AbstractFormGuesser
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function guessType($class, $property)
     {

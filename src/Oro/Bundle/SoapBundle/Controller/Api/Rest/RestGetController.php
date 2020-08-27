@@ -164,6 +164,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * @param  array $resultFields If not empty, result item will contain only given fields.
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getPreparedItem($entity, $resultFields = [])
     {

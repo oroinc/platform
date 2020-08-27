@@ -49,6 +49,7 @@ class ConfigProvider implements ResetInterface
      * @param ConfigExtraInterface[] $extras      Requests for configuration data
      *
      * @return Config
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getConfig(
         string $className,

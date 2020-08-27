@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {

@@ -14,6 +14,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doNormalizeConfig(array $config)
     {
@@ -70,6 +71,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
     /**
      * @param array    $config
      * @param string[] $dependsOnPropertyPath
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processDependentField(array &$config, array $dependsOnPropertyPath)
     {

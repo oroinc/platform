@@ -8,6 +8,9 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfigurat
 use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SortersStateProviderTest extends AbstractStateProviderTest
 {
     /** @var SortersStateProvider */

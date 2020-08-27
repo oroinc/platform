@@ -6,6 +6,7 @@ namespace Oro\Component\EntitySerializer;
  * Represents the configuration of an entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityConfig
 {
@@ -372,6 +373,7 @@ class EntityConfig
      *
      * @param string $name  The name of the hint
      * @param mixed  $value The value of the hint
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function removeHint($name, $value = null)
     {

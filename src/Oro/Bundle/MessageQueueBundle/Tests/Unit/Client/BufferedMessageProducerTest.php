@@ -5,6 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */

@@ -10,6 +10,10 @@ use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\ConfigCache as SymfonyConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

@@ -11,6 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 {

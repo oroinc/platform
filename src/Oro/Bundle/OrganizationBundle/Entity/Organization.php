@@ -35,6 +35,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Organization extends ExtendOrganization implements
     OrganizationInterface,

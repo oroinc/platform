@@ -92,6 +92,7 @@ class JsonFileSplitterListener implements ListenerInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function endObject(): void
     {

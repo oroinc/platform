@@ -13,6 +13,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This listener determines the default grid view and editability and deletability of grid views on GridViewsLoadEvent
+ */
 class GridViewsLoadListener
 {
     /** @var ManagerRegistry */
@@ -67,6 +70,7 @@ class GridViewsLoadListener
 
     /**
      * @param GridViewsLoadEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onViewsLoad(GridViewsLoadEvent $event)
     {

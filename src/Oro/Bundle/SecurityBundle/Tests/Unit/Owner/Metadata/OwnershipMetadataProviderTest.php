@@ -15,6 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {

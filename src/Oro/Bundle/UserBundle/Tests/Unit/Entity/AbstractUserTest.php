@@ -10,6 +10,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractUserTest extends \PHPUnit\Framework\TestCase
 {
     /**

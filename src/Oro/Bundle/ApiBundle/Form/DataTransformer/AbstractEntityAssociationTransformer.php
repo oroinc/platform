@@ -50,6 +50,7 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function reverseTransform($value)
     {

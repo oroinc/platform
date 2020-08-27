@@ -6,6 +6,7 @@ namespace Oro\Component\Layout;
  * Represents the raw layout configuration and provides methods to modify these data
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RawLayout
 {
@@ -139,6 +140,7 @@ class RawLayout
      * @throws Exception\LogicException if the layout item cannot be added by other reasons
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function add(
         $id,

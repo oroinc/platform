@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraint;
  * @method EntityDefinitionFieldConfig[] getFields()
  * @method EntityDefinitionFieldConfig|null getField($fieldName)
  *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

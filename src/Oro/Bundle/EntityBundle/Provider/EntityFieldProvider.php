@@ -346,6 +346,7 @@ class EntityFieldProvider
      * @param string $className
      * @param bool   $applyExclusions
      * @param bool   $translate
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addVirtualFields(array &$result, $className, $applyExclusions, $translate)
     {

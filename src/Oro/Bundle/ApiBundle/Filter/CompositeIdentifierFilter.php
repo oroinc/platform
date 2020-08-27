@@ -70,6 +70,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
      * @param mixed       $value
      *
      * @return Expression
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function buildExpression(?string $operator, $value): Expression
     {

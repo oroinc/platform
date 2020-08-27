@@ -6,6 +6,9 @@ use JsonStreamingParser\Exception\ParsingException;
 use Oro\Bundle\ApiBundle\Batch\Splitter\JsonFileSplitter;
 use Oro\Bundle\GaufretteBundle\FileManager;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JsonApiFileSplitterTest extends FileSplitterTestCase
 {
     public function testChunkSize()

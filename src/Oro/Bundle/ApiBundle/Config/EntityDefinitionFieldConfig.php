@@ -376,6 +376,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      * Removes a validation constraint from the form options by its class.
      *
      * @param string $constraintClass
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function removeFormConstraint($constraintClass)
     {

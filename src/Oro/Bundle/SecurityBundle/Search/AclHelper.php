@@ -142,6 +142,7 @@ class AclHelper
      * @param array $condition
      * @param ExpressionBuilder $expressionBuilder
      * @return Expression|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getExpressionByCondition(
         string $className,

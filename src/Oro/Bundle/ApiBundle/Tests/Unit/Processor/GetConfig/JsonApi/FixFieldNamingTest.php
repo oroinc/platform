@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\JsonApi;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\FixFieldNaming;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FixFieldNamingTest extends ConfigProcessorTestCase
 {
     /** @var FixFieldNaming */

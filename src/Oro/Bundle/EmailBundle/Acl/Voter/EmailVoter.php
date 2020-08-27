@@ -72,6 +72,7 @@ class EmailVoter implements VoterInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {

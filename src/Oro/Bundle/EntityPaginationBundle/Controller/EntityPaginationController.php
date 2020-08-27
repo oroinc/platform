@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Handles navigation to previous/next entities in the entity paginator.
+ */
 class EntityPaginationController extends Controller
 {
     /**
@@ -68,6 +71,7 @@ class EntityPaginationController extends Controller
      * @param string $routeName
      * @param string $navigation
      * @return JsonResponse
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getLink($entityName, $scope, $routeName, $navigation)
     {

@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
+/**
+ * Processes YAML configuration for datagrid's ORM source.
+ */
 class YamlProcessor implements ConfigProcessorInterface
 {
     /** @var ManagerRegistry */
@@ -22,6 +25,7 @@ class YamlProcessor implements ConfigProcessorInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function processQuery(array $config)
     {

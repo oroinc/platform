@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpandedAssociationExtractor */

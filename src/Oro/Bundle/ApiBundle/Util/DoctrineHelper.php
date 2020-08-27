@@ -134,6 +134,7 @@ class DoctrineHelper extends BaseHelper
      * @param ClassMetadata $metadata
      *
      * @return array [field name => field data-type, ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getIndexedFields(ClassMetadata $metadata)
     {

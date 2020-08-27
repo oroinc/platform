@@ -207,6 +207,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
      * @param CustomizeLoadedDataContext $context
      *
      * @return EntityDefinitionFieldConfig[] [association name => EntityDefinitionFieldConfig, ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function collectAssociationsToExpand(
         EntityDefinitionConfig $config,
@@ -339,6 +340,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
      * @param EntityDefinitionFieldConfig[] $associations [association name => EntityDefinitionFieldConfig, ...]
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadExpandedEntitiesForAssociations(
         array $data,

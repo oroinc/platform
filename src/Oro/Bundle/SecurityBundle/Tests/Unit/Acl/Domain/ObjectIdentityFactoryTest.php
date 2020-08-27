@@ -10,6 +10,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntityIm
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectIdentityFactory */

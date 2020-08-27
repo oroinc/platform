@@ -14,6 +14,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 abstract class AbstractQueryConverter
 {
@@ -1311,6 +1312,7 @@ abstract class AbstractQueryConverter
      * @param string $mainEntityJoinId
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function registerVirtualColumnQueryAliases($query, $mainEntityJoinId)
     {

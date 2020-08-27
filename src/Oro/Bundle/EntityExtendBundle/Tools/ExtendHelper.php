@@ -11,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 /**
  * Provides utility static methods to work with extended entities.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendHelper
 {

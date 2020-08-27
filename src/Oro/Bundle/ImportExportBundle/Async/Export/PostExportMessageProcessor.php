@@ -98,6 +98,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {

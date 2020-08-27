@@ -378,6 +378,7 @@ class DbalConfigurationLoader
      * @param string $connectionName
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function getDbalConnectionKey(array $doctrineConfig, string $connectionName): ?string
     {

@@ -70,6 +70,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -132,6 +133,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      * collect this fields to add validation error.
      *
      * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event)
     {

@@ -4,6 +4,10 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\Job;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JobTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldConstructWithNullId()

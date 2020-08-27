@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
  * A collection of FilterInterface.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 {

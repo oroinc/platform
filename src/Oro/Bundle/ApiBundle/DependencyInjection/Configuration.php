@@ -283,6 +283,7 @@ class Configuration implements ConfigurationInterface
      * @param array $underlyingView
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function mergeViews(array $view, array $underlyingView): array
     {

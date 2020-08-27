@@ -234,6 +234,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string|null            $associationPath
      *
      * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function collectIdentifiers(
         array &$entityIdMap,
@@ -295,6 +296,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string|null            $associationPath
      *
      * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function collectIdentifiersForCompositeId(
         array &$entityIdMap,
@@ -367,6 +369,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string|null                   $associationPath
      *
      * @return array [data item key => [entity key, association map], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function collectIdentifiersForAssociations(
         array &$entityIdMap,

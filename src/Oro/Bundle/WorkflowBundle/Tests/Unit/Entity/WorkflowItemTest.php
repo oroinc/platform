@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 {

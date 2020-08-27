@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents the configuration of all fields that can be used to sort data.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SortersConfig implements EntityConfigInterface
 {

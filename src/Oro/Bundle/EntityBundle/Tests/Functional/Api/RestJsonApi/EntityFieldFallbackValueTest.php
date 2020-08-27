@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\Api\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityFieldFallbackValueTest extends RestJsonApiTestCase
 {
     protected function setUp()

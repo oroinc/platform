@@ -7,6 +7,8 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\RequestDataValidator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {

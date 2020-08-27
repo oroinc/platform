@@ -9,6 +9,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TransitionButtonTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */

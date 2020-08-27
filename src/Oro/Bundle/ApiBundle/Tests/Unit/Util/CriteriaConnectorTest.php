@@ -20,6 +20,10 @@ use Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker;
 use Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CriteriaConnectorTest extends OrmRelatedTestCase
 {
     private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';

@@ -30,6 +30,7 @@ class EmbedFormController extends Controller
      * @param EmbeddedForm $formEntity
      * @param Request $request
      * @return Response
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {

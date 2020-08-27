@@ -77,6 +77,7 @@ class TargetConfigExtraBuilder
      * @param string                 $associationName
      *
      * @return ConfigExtraInterface[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function buildParentConfigExtras(
         array $configExtras,

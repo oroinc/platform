@@ -6,6 +6,7 @@ use Brick\Math\BigDecimal as BrickBigDecimal;
 
 /**
  * Immutable, arbitrary-precision signed decimal numbers.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class BigDecimal extends BigNumber
 {
