@@ -8,6 +8,8 @@ styles:
         - 'bundles/oroform/blank/scss/variables/label-config.scss'
         - 'bundles/oroform/blank/scss/variables/form-row-config.scss'
         - 'bundles/oroform/blank/scss/variables/focus-visible-config.scss'
+        - 'bundles/oroform/blank/scss/variables/floating-validation-message-config.scss'
 
         - 'bundles/oroform/blank/scss/styles.scss'
         - 'bundles/oroform/blank/scss/components/focus-visible.scss'
+        - 'bundles/oroform/blank/scss/components/floating-validation-message.scss'
