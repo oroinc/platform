@@ -4,12 +4,13 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
-use Gos\Bundle\WebSocketBundle\Client\Driver\DriverInterface;
+use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
+use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
+use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientEventListener as GosClientEventListener;
 use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
+use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Guzzle\Http\Message\Response;
 use Oro\Bundle\SyncBundle\EventListener\ClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
@@ -32,31 +33,30 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ClientStorage */
     private $clientStorage;
 
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $storageDriver;
-
     /** @var ClientEventListener */
     private $clientEventListener;
 
     /** @var GosClientEventListener|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClientEventListener;
 
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $decoratedListenerLogger;
+
     /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
-
-    /** @var ClientEvent */
-    private $clientEvent;
 
     protected function setUp(): void
     {
         $this->websocketAuthenticationProvider = $this->createMock(WebsocketAuthenticationProviderInterface::class);
 
-        // We cannot properly mock ClientStorageInterface because of static method getStorageId().
-        $this->clientStorage = new ClientStorage(100, $this->createMock(LoggerInterface::class));
-        $this->storageDriver = $this->createMock(DriverInterface::class);
-        $this->clientStorage->setStorageDriver($this->storageDriver);
+        $this->clientStorage = $this->createMock(ClientStorageInterface::class);
 
-        $this->decoratedClientEventListener = $this->createMock(GosClientEventListener::class);
+        $this->decoratedListenerLogger = $this->createMock(LoggerInterface::class);
+        $this->decoratedClientEventListener = new GosClientEventListener(
+            $this->clientStorage,
+            $this->websocketAuthenticationProvider
+        );
+        $this->decoratedClientEventListener->setLogger($this->decoratedListenerLogger);
 
         $this->clientEventListener = new ClientEventListener(
             $this->decoratedClientEventListener,
@@ -67,7 +67,6 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->setUpLoggerMock($this->clientEventListener);
 
         $this->connection = $this->createConnection();
-        $this->clientEvent = new ClientEvent($this->connection, ClientEvent::CONNECTED);
     }
 
     public function testOnClientConnectAuthenticationFailed(): void
@@ -80,7 +79,8 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(BadCredentialsException::class);
 
-        $this->clientEventListener->onClientConnect($this->clientEvent);
+        $event = new ClientConnectedEvent($this->connection);
+        $this->clientEventListener->onClientConnect($event);
 
         self::assertNull($this->connection->WAMP->clientStorageId);
     }
@@ -94,18 +94,19 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
             ->with($this->connection)
             ->willReturn($token);
 
-        $this->storageDriver
+        $this->clientStorage
             ->expects(self::once())
-            ->method('save')
-            ->willThrowException(new \Exception());
+            ->method('addClient')
+            ->willThrowException(new StorageException());
 
         $this->assertLoggerErrorMethodCalled();
 
         $this->expectException(StorageException::class);
 
-        $this->clientEventListener->onClientConnect($this->clientEvent);
+        $event = new ClientConnectedEvent($this->connection);
+        $this->clientEventListener->onClientConnect($event);
 
-        self::assertNull($this->connection->WAMP->clientStorageId);
+        self::assertNull($this->connection->WAMP->username);
     }
 
     public function testOnClientConnectAnonymous(): void
@@ -123,9 +124,9 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoggerInfoMethodCalled();
 
-        $this->clientEventListener->onClientConnect($this->clientEvent);
+        $event = new ClientConnectedEvent($this->connection);
+        $this->clientEventListener->onClientConnect($event);
 
-        self::assertEquals(self::CONNECTION_RESOURCE_ID, $this->connection->WAMP->clientStorageId);
         self::assertNull($this->connection->WAMP->username);
     }
 
@@ -141,37 +142,41 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoggerInfoMethodCalled();
 
-        $this->clientEventListener->onClientConnect($this->clientEvent);
+        $event = new ClientConnectedEvent($this->connection);
+        $this->clientEventListener->onClientConnect($event);
 
-        self::assertEquals(self::CONNECTION_RESOURCE_ID, $this->connection->WAMP->clientStorageId);
         self::assertEquals($user, $this->connection->WAMP->username);
     }
 
     public function testOnClientDisconnect(): void
     {
-        $this->decoratedClientEventListener
-            ->expects(self::once())
-            ->method('onClientDisconnect')
-            ->with($this->clientEvent);
+        $disconnectEvent = new ClientDisconnectedEvent($this->connection);
 
-        $this->clientEventListener->onClientDisconnect($this->clientEvent);
+        $this->clientStorage->expects(self::once())
+            ->method('hasClient')
+            ->willReturn(true);
+        $this->decoratedListenerLogger
+            ->expects(self::once())
+            ->method('info');
+
+        $this->clientEventListener->onClientDisconnect($disconnectEvent);
     }
 
     public function testOnClientRejected(): void
     {
         $clientRejectedEvent = new ClientRejectedEvent('sampleOrigin');
 
-        $this->decoratedClientEventListener
+        $this->decoratedListenerLogger
             ->expects(self::once())
-            ->method('onClientRejected')
-            ->with($clientRejectedEvent);
+            ->method('warning')
+            ->with('Client rejected, bad origin');
 
         $this->clientEventListener->onClientRejected($clientRejectedEvent);
     }
 
     public function testOnClientErrorGeneralException(): void
     {
-        $clientErrorEvent = new ClientErrorEvent($this->connection, ClientEvent::ERROR);
+        $clientErrorEvent = new ClientErrorEvent($this->connection);
         $clientErrorEvent->setException(new \Exception());
 
         $this->assertLoggerErrorMethodCalled();
@@ -181,18 +186,18 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnClientErrorBadCredentialsException(): void
     {
-        $clientErrorEvent = new ClientErrorEvent($this->connection, ClientEvent::ERROR);
+        $clientErrorEvent = new ClientErrorEvent($this->connection);
         $clientErrorEvent->setException(new BadCredentialsException());
 
-        $this->decoratedClientEventListener
+        $this->decoratedListenerLogger
             ->expects(self::never())
-            ->method('onClientError');
+            ->method('error');
 
         $closingResponse = new Response(403);
         $this->connection
             ->expects(self::once())
             ->method('send')
-            ->with((string) $closingResponse);
+            ->with((string)$closingResponse);
         $this->connection
             ->expects(self::once())
             ->method('close');
@@ -210,7 +215,7 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
     private function createConnection(): ConnectionInterface
     {
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WAMP = (object) ['sessionId' => '12345', 'prefixes' => []];
+        $connection->WAMP = (object)['sessionId' => '12345', 'prefixes' => []];
         $connection->remoteAddress = 'localhost';
         $connection->resourceId = self::CONNECTION_RESOURCE_ID;
 

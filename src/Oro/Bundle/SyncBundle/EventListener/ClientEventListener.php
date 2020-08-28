@@ -5,10 +5,11 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
+use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientEventListener as GosClientEventListener;
 use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
+use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Guzzle\Http\Message\Response;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Psr\Log\LoggerAwareInterface;
@@ -58,7 +59,6 @@ class ClientEventListener implements LoggerAwareInterface
     public function onClientConnect(ClientEvent $event)
     {
         $connection = $event->getConnection();
-        $connection->WAMP->clientStorageId = null;
         $connection->WAMP->username = null;
 
         $token = $this->websocketAuthenticationProvider->authenticate($connection);
@@ -71,7 +71,7 @@ class ClientEventListener implements LoggerAwareInterface
 
         try {
             $storageId = $this->clientStorage->getStorageId($connection);
-            $this->clientStorage->addClient($storageId, $token->getUser());
+            $this->clientStorage->addClient($storageId, $token);
         } catch (StorageException $exception) {
             $this->logger->error(
                 'Failed to add user to client storage for {username} with ticket {ticketId}',
@@ -80,8 +80,6 @@ class ClientEventListener implements LoggerAwareInterface
 
             throw $exception;
         }
-
-        $connection->WAMP->clientStorageId = $storageId;
 
         // Save username in WAMP connection to be able to restore user in ClientManipulator in case of
         // ClientStorage TTL expiration.
@@ -93,9 +91,9 @@ class ClientEventListener implements LoggerAwareInterface
     }
 
     /**
-     * @param ClientEvent $event
+     * @param ClientDisconnectedEvent $event
      */
-    public function onClientDisconnect(ClientEvent $event)
+    public function onClientDisconnect(ClientDisconnectedEvent $event)
     {
         $this->decoratedClientEventListener->onClientDisconnect($event);
     }
@@ -105,7 +103,7 @@ class ClientEventListener implements LoggerAwareInterface
      */
     public function onClientError(ClientErrorEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $connection = $event->getConnection();
 
         $loggerContext = [
