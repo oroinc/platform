@@ -272,6 +272,7 @@ class Indexer
      * Apply special behavior of class inheritance processing
      *
      * @param Query $query
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyModesBehavior(Query $query)
     {

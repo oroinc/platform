@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */

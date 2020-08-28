@@ -428,6 +428,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * @param bool   $allowEndsWithField
      *
      * @return QueryBuilder
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function createSubqueryByPath(
         string $path,

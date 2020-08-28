@@ -146,8 +146,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->wampClient
             ->expects(self::once())
             ->method('publish')
-            ->with($topicUri, $payload, $exclude, $eligible)
-            ->willReturn(true);
+            ->with($topicUri, json_encode($payload), $exclude, $eligible);
 
         self::assertTrue($this->websocketClient->publish($topicUri, $payload, $exclude, $eligible));
     }
@@ -180,8 +179,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->wampClient
             ->expects(self::once())
             ->method('prefix')
-            ->with($prefix, $uri)
-            ->willReturn(true);
+            ->with($prefix, $uri);
 
         self::assertTrue($this->websocketClient->prefix($prefix, $uri));
     }
@@ -202,8 +200,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->wampClient
             ->expects(self::once())
             ->method('call')
-            ->with($procUri, $arguments)
-            ->willReturn(true);
+            ->with($procUri, $arguments);
 
         self::assertTrue($this->websocketClient->call($procUri, $arguments));
     }
@@ -224,8 +221,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->wampClient
             ->expects(self::once())
             ->method('event')
-            ->with($topicUri, $payload)
-            ->willReturn(true);
+            ->with($topicUri, json_encode($payload));
 
         self::assertTrue($this->websocketClient->event($topicUri, $payload));
     }

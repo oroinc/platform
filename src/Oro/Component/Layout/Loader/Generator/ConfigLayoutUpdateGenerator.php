@@ -79,6 +79,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      *
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validate(GeneratorData $data)
     {

@@ -143,6 +143,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
      * @return bool
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function processJob(
         JobRunner $jobRunner,

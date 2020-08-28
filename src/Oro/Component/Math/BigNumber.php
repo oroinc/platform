@@ -9,6 +9,9 @@ use Brick\Math\BigRational as BrickBigRational;
 
 /**
  * Common interface for arbitrary-precision rational numbers.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class BigNumber implements \Serializable, \JsonSerializable
 {

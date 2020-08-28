@@ -305,6 +305,7 @@ class FieldsDescriptionHelper
      * @param string|null                 $fieldDescriptionReplacement
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getDescriptionOfField(
         EntityDefinitionFieldConfig $field,

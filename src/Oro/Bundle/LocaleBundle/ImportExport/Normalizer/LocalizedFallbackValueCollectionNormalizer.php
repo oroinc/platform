@@ -61,7 +61,10 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         return $result;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!is_array($data)) {

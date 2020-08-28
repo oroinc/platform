@@ -30,6 +30,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase

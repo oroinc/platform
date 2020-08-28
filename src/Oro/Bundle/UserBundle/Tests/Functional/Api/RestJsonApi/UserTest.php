@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UserTest extends RestJsonApiTestCase
 {

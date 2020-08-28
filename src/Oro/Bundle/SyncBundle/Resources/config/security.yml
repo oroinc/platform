@@ -18,14 +18,14 @@ services:
             - '@oro_sync.security.ticket_authentication_provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
 
-    # Decorates gos_web_socket.client_event.listener to disable onClientConnect event handling.
+    # Decorates gos_web_socket.event_listener.client to disable onClientConnect event handling.
     oro_sync.event_listener.client:
         class: Oro\Bundle\SyncBundle\EventListener\ClientEventListener
-        decorates: gos_web_socket.client_event.listener
+        decorates: gos_web_socket.event_listener.client
         arguments:
             - '@oro_sync.event_listener.client.inner'
             - '@oro_sync.authentication.websocket_authentication_by_ticket_provider'
-            - '@gos_web_socket.client_storage'
+            - '@gos_web_socket.client.storage'
         calls:
             - [ setLogger, [ '@logger' ] ]
         tags:
@@ -46,7 +46,9 @@ services:
 
     oro_sync.authentication.ticket_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider
-        public: true
         arguments:
             - '@oro_sync.authentication.ticket_digest_generator'
             - '%secret%'
+
+    Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider:
+        alias: oro_sync.authentication.ticket_provider

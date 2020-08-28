@@ -104,6 +104,7 @@ class DateFilterModifier
      * @param array $data
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function modifyDateForEqualType(array $data)
     {
@@ -185,6 +186,7 @@ class DateFilterModifier
      * @param array $data
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function modifyDateForBetweenType(array $data)
     {

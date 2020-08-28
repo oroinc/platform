@@ -5,6 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeBuilderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OwnerTreeBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */

@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 /**
  * Manages dashboards.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Manager
 {

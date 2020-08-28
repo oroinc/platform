@@ -9,6 +9,9 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ItemTest extends \PHPUnit\Framework\TestCase
 {
     /**

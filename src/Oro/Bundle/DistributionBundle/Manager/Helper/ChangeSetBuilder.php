@@ -3,6 +3,10 @@ namespace Oro\Bundle\DistributionBundle\Manager\Helper;
 
 use Composer\Package\PackageInterface;
 
+/**
+ * Compares the lists of currently installed and previously installed packages to detect newly installed,
+ * updated and uninstalled ones.
+ */
 class ChangeSetBuilder
 {
     /**
@@ -10,6 +14,7 @@ class ChangeSetBuilder
      * @param PackageInterface[] $currentlyInstalled
      *
      * @return array - [$installed, $updated, $uninstalled]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function build(array $previousInstalled, array $currentlyInstalled)
     {

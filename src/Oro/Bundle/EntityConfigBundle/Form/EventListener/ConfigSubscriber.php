@@ -92,6 +92,7 @@ class ConfigSubscriber implements EventSubscriberInterface
      * @param ConfigModel $configModel
      * @param array $data
      * @param bool $flush
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function updateConfigs(ConfigModel $configModel, array $data, $flush)
     {

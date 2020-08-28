@@ -63,6 +63,7 @@ class MigrateNoteAssociations20
 
     /**
      * @return array [current class name => old class name, ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadTargetEntities()
     {

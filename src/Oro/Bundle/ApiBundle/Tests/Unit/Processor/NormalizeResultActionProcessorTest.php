@@ -26,6 +26,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {

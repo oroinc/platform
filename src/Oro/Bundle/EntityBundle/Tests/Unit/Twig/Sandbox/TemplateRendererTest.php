@@ -22,6 +22,7 @@ use Twig\TemplateWrapper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TemplateRendererTest extends \PHPUnit\Framework\TestCase
 {

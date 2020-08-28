@@ -17,6 +17,9 @@ use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\FilterBagStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
     protected const DATAGRID_NAME = 'sampleDatagridName';

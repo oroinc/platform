@@ -80,6 +80,7 @@ class DbIdentifierNameGenerator
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function generateIdentifierName(
         $tableNames,

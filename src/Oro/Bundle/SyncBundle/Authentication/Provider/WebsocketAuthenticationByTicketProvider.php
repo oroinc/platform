@@ -7,6 +7,7 @@ use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
@@ -42,7 +43,7 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
      *
      * @throws BadCredentialsException
      */
-    public function authenticate(ConnectionInterface $connection)
+    public function authenticate(ConnectionInterface $connection): TokenInterface
     {
         $ticket = $this->getTicketFromConnection($connection);
         $token = $this->createTokenFromTicket($ticket);

@@ -19,7 +19,8 @@
         color: $notifications-success-text-color;
     }
 
-    &--warning {
+    &--warning,
+    &--warn {
         background-color: $notifications-warning-color;
         color: $notifications-warning-text-color;
 

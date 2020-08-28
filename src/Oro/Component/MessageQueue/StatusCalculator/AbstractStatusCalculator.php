@@ -5,6 +5,9 @@ namespace Oro\Component\MessageQueue\StatusCalculator;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Job\Job;
 
+/**
+ * Based implementation for job status calculators.
+ */
 abstract class AbstractStatusCalculator
 {
     /**
@@ -113,6 +116,7 @@ abstract class AbstractStatusCalculator
      * @param array $childrenInternalJobStatusCounts
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getRootJobStatus(array $childrenInternalJobStatusCounts)
     {

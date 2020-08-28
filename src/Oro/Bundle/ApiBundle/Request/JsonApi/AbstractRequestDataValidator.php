@@ -153,6 +153,7 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
      * @param string $pointer
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateRelationships(array $data, string $pointer): bool
     {

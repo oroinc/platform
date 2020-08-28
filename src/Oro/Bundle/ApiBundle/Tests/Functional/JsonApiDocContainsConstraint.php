@@ -27,6 +27,7 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function matches($other): bool
     {

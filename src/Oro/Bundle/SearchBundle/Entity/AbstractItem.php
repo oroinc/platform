@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
  *
  * @ORM\MappedSuperclass
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractItem
 {
@@ -421,6 +422,7 @@ abstract class AbstractItem
      * @param Collection $fields
      * @param ItemFieldInterface $newRecord
      * @param string $type
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function saveData($objectData, Collection $fields, ItemFieldInterface $newRecord, $type)
     {

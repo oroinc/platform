@@ -22,6 +22,7 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  * Tests ValueNormalizer and normalization processors for all supported simple types
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {

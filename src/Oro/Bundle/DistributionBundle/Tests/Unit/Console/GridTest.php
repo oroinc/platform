@@ -3,6 +3,9 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Console;
 
 use Oro\Bundle\DistributionBundle\Console\Grid;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GridTest extends \PHPUnit\Framework\TestCase
 {
     /**

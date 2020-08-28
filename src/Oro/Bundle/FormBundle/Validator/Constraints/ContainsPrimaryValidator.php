@@ -8,8 +8,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Checks that a collection of items has exactly one item marked as primary.
+ */
 class ContainsPrimaryValidator extends ConstraintValidator
 {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function validate($value, Constraint $constraint)
     {
         if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {

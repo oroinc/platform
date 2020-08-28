@@ -10,6 +10,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
+ * Processes changes in entity configs.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendConfigProcessor
@@ -176,6 +178,7 @@ class ExtendConfigProcessor
      * @param string $fieldName
      * @param array  $configs
      * @param bool   $isExtendEntity
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
     {

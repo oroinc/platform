@@ -17,6 +17,9 @@ use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Util\JSON;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DbalSessionInterface|MockObject */

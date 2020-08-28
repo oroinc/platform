@@ -118,6 +118,7 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixEntityLabels(array $entityConfigs, LoggerInterface $logger, $dryRun = false)
     {

@@ -15,6 +15,9 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowLabel;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */

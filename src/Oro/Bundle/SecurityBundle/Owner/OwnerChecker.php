@@ -78,6 +78,7 @@ class OwnerChecker
      * @param object $entity
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isOwnerCanBeSet($entity)
     {

@@ -89,6 +89,7 @@ class CollectFormErrors implements ProcessorInterface
 
     /**
      * @param FormContext $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function collectIncludedFormErrors(FormContext $context): void
     {
@@ -182,6 +183,7 @@ class CollectFormErrors implements ProcessorInterface
     /**
      * @param array       $foundErrors [[parent form, error], ...]
      * @param FormContext $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixErrorPaths(array $foundErrors, FormContext $context): void
     {

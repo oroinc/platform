@@ -186,6 +186,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
      * @throws RuntimeException
      * @throws InvalidArgumentException
      * @throws \Laminas\Mail\Protocol\Exception\RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFolders($rootFolder = null)
     {

@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testDateResult()

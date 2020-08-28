@@ -9,6 +9,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
+/**
+ * Can be used in placeholders to determine applicability of activity to certain entity (e.g. whether this entity has
+ * any applicable activities).
+ * It also serves as a listener on oro.ui.grouping_chain_widget.before event.
+ */
 class PlaceholderFilter
 {
     /** @var ActivityListChainProvider */
@@ -51,6 +56,7 @@ class PlaceholderFilter
      * @param int|null    $pageType
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isApplicable($entity = null, $pageType = null)
     {

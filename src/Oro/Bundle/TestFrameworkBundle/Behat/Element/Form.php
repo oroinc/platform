@@ -268,6 +268,7 @@ class Form extends Element
      * @param bool $failOnError
      * @return NodeElement|null
      * @throws ElementNotFoundException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function findFieldByLabel($locator, $failOnError = true)
     {

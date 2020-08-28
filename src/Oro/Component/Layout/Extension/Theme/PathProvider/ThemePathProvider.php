@@ -7,6 +7,9 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
+/**
+ * Determines theme path based on context data.
+ */
 class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 {
     /** @var ThemeManager */
@@ -33,6 +36,7 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getPaths(array $existingPaths)
     {

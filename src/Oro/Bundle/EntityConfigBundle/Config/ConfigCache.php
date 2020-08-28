@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
  * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ConfigCache
 {

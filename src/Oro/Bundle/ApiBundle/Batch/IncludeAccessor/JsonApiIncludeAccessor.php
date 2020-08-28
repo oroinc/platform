@@ -78,6 +78,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getRelationships(array $item): array
     {
@@ -129,6 +130,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function updateRelationships(array &$item, callable $callback): void
     {

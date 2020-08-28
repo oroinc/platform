@@ -21,6 +21,9 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const PATTERN_ALL_OFF = '(P) system:. global:. deep:. local:. basic:.';

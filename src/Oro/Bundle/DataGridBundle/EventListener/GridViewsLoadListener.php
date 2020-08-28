@@ -110,6 +110,7 @@ class GridViewsLoadListener
      * @param AbstractUser $user
      * @param GridViewsLoadEvent $event
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getGridViews(AbstractUser $user, GridViewsLoadEvent $event): array
     {

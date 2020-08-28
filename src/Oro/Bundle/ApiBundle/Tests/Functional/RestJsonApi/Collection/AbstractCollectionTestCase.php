@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractCollectionTestCase extends RestJsonApiTestCase
 {
     /**

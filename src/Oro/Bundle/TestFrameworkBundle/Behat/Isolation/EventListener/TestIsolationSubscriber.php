@@ -73,6 +73,9 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function beforeExercise()
     {
         if ($this->skip) {

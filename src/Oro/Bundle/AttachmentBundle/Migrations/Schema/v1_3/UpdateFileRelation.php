@@ -32,6 +32,7 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
