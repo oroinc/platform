@@ -182,7 +182,7 @@ define(function(require) {
         setDisableControls() {
             this.$el.find(':tabbable').each((i, element) => {
                 if (!_.isUndefined(element.value)) {
-                    $(element).attr('disabled', 'disabled')
+                    $(element).attr('disabled', 'disabled');
                 } else {
                     $(element)
                         .attr('aria-disabled', 'true')
