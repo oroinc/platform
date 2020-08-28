@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
+use Gos\Bundle\PubSubRouterBundle\Router\Route;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,9 +40,12 @@ class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
             ->with($event, ['data1'], ['data2']);
 
         /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject $wampRequest */
-        $wampRequest = $this->createMock(WampRequest::class);
-        $wampRequest->expects(self::never())
-            ->method(self::anything());
+        $wampRequest = new WampRequest(
+            'route',
+            $this->createMock(Route::class),
+            $this->createMock(ParameterBag::class),
+            'matched'
+        );
 
         $this->broadcast->onPublish($connection, $topic, $wampRequest, $event, ['data1'], ['data2']);
     }

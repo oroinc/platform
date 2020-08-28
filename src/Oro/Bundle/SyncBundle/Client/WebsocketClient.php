@@ -86,7 +86,7 @@ class WebsocketClient implements WebsocketClientInterface
         $this->validatePayload($payload);
         $this->ensureClientConnected();
 
-        $this->getWampClient()->publish($topicUri, $payload, $exclude, $eligible);
+        $this->getWampClient()->publish($topicUri, json_encode($payload), $exclude, $eligible);
 
         return true;
     }
@@ -131,7 +131,7 @@ class WebsocketClient implements WebsocketClientInterface
         $this->validatePayload($payload);
         $this->ensureClientConnected();
 
-        $this->getWampClient()->event($topicUri, $payload);
+        $this->getWampClient()->event($topicUri, json_encode($payload));
 
         return true;
     }

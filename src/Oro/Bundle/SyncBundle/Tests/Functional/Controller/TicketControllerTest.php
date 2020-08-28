@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Functional\Controller;
 
-use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
+use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -26,14 +26,14 @@ class TicketControllerTest extends WebTestCase
 
         $connection = $this->prepareConnection($response['ticket']);
 
-        $event = new ClientEvent($connection, ClientEvent::CONNECTED);
+        $event = new ClientConnectedEvent($connection);
         self::getContainer()
             ->get('event_dispatcher')
             ->dispatch('gos_web_socket.client_connected', $event);
 
         $user = self::getContainer()
-            ->get('gos_web_socket.websocket.client_manipulator')
-            ->getClient($connection);
+            ->get('gos_web_socket.client.manipulator')
+            ->getUser($connection);
 
         self::assertInstanceOf(UserInterface::class, $user);
         self::assertSame('admin', $user->getUsername());

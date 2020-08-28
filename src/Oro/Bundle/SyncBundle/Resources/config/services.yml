@@ -70,5 +70,17 @@ services:
         tags:
             - { name: oro_sync.origin_provider }
 
+    oro_sync.authentication.origin_registry.factory:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryFactory
+        arguments:
+            - '@oro_sync.authentication.origin_provider'
+
+    oro_sync.loader.yaml:
+        class:  Oro\Bundle\SyncBundle\Loader\YamlFileLoader
+        public: false
+        parent: gos_pubsub_router.loader.yaml
+        tags:
+            - { name: gos_pubsub_router.routing.loader }
+
     oro_sync.authentication.origin_extractor:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
