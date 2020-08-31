@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -76,17 +77,43 @@ class IterableResultFactory implements IterableResultFactoryInterface
             $qb->setParameter('values', $selectedItems->getValues());
         }
 
+        if (!$this->isIdentifierFieldPresent($qb, $identifierField)) {
+            $qb->addSelect($identifierField);
+            $qb->addGroupBy($identifierField);
+        }
+
         if ($objectIdentifier) {
             $qb->addSelect($objectIdentifier);
         }
-
-        $qb->addGroupBy($identifierField);
 
         if (!$gridConfiguration->isDatasourceSkipAclApply()) {
             $qb = $this->aclHelper->apply($qb);
         }
 
         return $this->getIterableResult($qb);
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $identifierField
+     * @return bool
+     */
+    private function isIdentifierFieldPresent(QueryBuilder $queryBuilder, string $identifierField): bool
+    {
+        $identifierFieldFound = false;
+        /** @var Expr\Select[] $selectDqlParts */
+        $selectDqlParts = $queryBuilder->getDQLPart('select');
+        $as = ' as ';
+        foreach ($selectDqlParts as $selectDqlPart) {
+            foreach ($selectDqlPart->getParts() as $part) {
+                if (in_array($identifierField, explode($as, str_ireplace($as, $as, $part)), true)) {
+                    $identifierFieldFound = true;
+                    break;
+                }
+            }
+        }
+
+        return $identifierFieldFound;
     }
 
     /**

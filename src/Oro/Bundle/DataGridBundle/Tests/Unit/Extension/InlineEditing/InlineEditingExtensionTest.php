@@ -143,6 +143,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
                 'enable' => true,
                 'entity_name' => $entityName,
                 'behaviour' => 'enable_all',
+                'mobile_enabled' => false,
                 'save_api_accessor' => [
                     'route' => 'oro_api_patch_entity_data',
                     'http_method' => 'PATCH',
