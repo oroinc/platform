@@ -1058,9 +1058,8 @@ define([
          * @returns {string}
          * @protected
          */
-        _encodeStateData: function(state) {
-            let stateData = {urlParams: this.urlParams};
-            stateData = _.extend(stateData, state);
+        _encodeStateData: function(state= {}) {
+            const stateData = {...state, urlParams: {...this.urlParams, ...state.parameters}};
             this._packStateData(stateData);
             return PageableCollection.encodeStateData(stateData);
         },
