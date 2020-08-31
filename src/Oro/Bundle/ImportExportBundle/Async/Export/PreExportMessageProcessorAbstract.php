@@ -105,6 +105,14 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     }
 
     /**
+     * @return int
+     */
+    protected function getBatchSize(): int
+    {
+        return $this->batchSize;
+    }
+
+    /**
      * @param string $jobUniqueName
      * @param array $body
      *
@@ -167,7 +175,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      */
     protected function splitOnBatch(array $ids)
     {
-        return array_chunk($ids, $this->batchSize);
+        return array_chunk($ids, $this->getBatchSize());
     }
 
     /**
