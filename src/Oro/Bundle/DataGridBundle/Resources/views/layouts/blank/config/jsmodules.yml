@@ -49,6 +49,7 @@ configs:
     orodatagrid/js/grid-views-builder: {}
 dynamic-imports:
     orodatagrid:
+        - orodatagrid/js/app/views/toggle-group-view
         - oro/datagrid/action/abstract-action
         - oro/datagrid/action/ajax-action
         - oro/datagrid/action/ajaxdelete-action
