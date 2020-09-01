@@ -31,6 +31,10 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
+    private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
+
+    private const DEFAULT_IDENTITY_FIELDS = ['id'];
+
     /**
      * @var ExtendOptionsManager
      */
@@ -149,6 +153,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                  public flag is allowed or not. More details can be found
      *                                  in entity_config.yml
      * @param array         $options
+     * @param array         $identityFields
      *
      * @return Table A table that is used to store enum values
      *
@@ -162,13 +167,28 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $isMultiple = false,
         $isPublic = false,
         $immutable = false,
-        array $options = []
+        array $options = [],
+        array $identityFields = self::DEFAULT_IDENTITY_FIELDS
     ) {
         if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'The enum code "%s" must contain only lower alphabetical symbols, numbers and underscore.',
                     $enumCode
+                )
+            );
+        }
+
+        if (empty($identityFields)) {
+            throw new \InvalidArgumentException('At least one identify field is required.');
+        }
+
+        if ($invalidIdentifyFields = array_diff($identityFields, self::ALLOWED_IDENTITY_FIELDS)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'The identification fields can only be: %s. Current invalid fields: %s.',
+                    implode(', ', self::ALLOWED_IDENTITY_FIELDS),
+                    implode(', ', $invalidIdentifyFields)
                 )
             );
         }
@@ -218,7 +238,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true,
+                        'identity' => in_array('id', $identityFields, true),
                     ],
                 ]
             ]
@@ -235,6 +255,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     ],
                     'datagrid' => [
                         'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    ],
+                    'importexport' => [
+                        'identity' => in_array('name', $identityFields, true),
                     ],
                 ],
             ]
@@ -291,6 +314,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                       public flag is allowed or not. More details can be found
      *                                       in entity_config.yml
      * @param array         $options
+     * @param array         $identityFields
      *
      * @return Table A table that is used to store enum values
      */
@@ -301,7 +325,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $enumCode,
         $isMultiple = false,
         $immutable = false,
-        array $options = []
+        array $options = [],
+        array $identityFields = self::DEFAULT_IDENTITY_FIELDS
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $selfTable     = $this->getTable($table, $schema);
@@ -309,7 +334,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable, [], $identityFields);
         } else {
             $enumTable = $this->getTable($enumTableName, $schema);
         }
