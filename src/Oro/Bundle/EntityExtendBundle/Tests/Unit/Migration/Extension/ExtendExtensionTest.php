@@ -308,9 +308,14 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider createEnumWithIdentityDataProvider
+     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @param array $identityFields
+     * @param array $expected
      */
-    public function testCreateEnum()
+    public function testCreateEnum($identityFields = [], $expected = [])
     {
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -333,7 +338,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $extension->createEnum($schema, 'test_status');
+        $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
 
         $this->assertSchemaSql(
             $schema,
@@ -376,7 +381,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'label' => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
-                                'importexport' => ['identity' => true],
+                                'importexport' => ['identity' => $expected['id']],
                                 'extend' => ['length' => 32, 'nullable' => false],
                             ],
                             'type' => 'string'
@@ -388,6 +393,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
                                 'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                                'importexport' => ['identity' => $expected['name']],
                                 'extend' => ['length' => 255],
                             ],
                             'type' => 'string'
@@ -416,6 +422,69 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
             ]
         );
+    }
+
+
+    /**
+     * @return array[]
+     */
+    public function createEnumWithIdentityDataProvider(): array
+    {
+        return [
+            '`id` is identity field' => [
+                'identityFields' => ['id'],
+                'expected' => ['id' => true, 'name' => false]
+            ],
+            '`name` is identity field' => [
+                'identityFields' => ['name'],
+                'expected' => ['id' => false, 'name' => true]
+            ],
+            '`id` and `name` are identity field' => [
+                'identityFields' => ['id', 'name'],
+                'expected' => ['id' => true, 'name' => true]
+            ],
+        ];
+    }
+
+    /**
+     * @param string $exception
+     * @param string $exceptionMessage
+     * @param array $identityFields
+     *
+     * @dataProvider createEnumWithInvalidIdentityFieldDataProvider
+     */
+    public function testCreateEnumWithInvalidIdentityField(
+        string $exception,
+        string $exceptionMessage,
+        array $identityFields = []
+    ): void {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
+        $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function createEnumWithInvalidIdentityFieldDataProvider(): array
+    {
+        return [
+            'with not allowed identify fields' => [
+                'exception' => \InvalidArgumentException::class,
+                'exceptionMessage' =>
+                    'The identification fields can only be: id, name. '.
+                    'Current invalid fields: priority, is_default.',
+                'identityFields' => ['id', 'name', 'priority', 'is_default']
+            ],
+            'with empty identify fields' => [
+                'exception' => \InvalidArgumentException::class,
+                'exceptionMessage' => 'At least one identify field is required',
+                'identityFields' => []
+            ]
+        ];
     }
 
     /**
@@ -523,6 +592,9 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                                 ],
                                 'extend' => [
                                     'length' => 255,
+                                ],
+                                'importexport' => [
+                                    'identity' => false,
                                 ],
                             ],
                             'type' => 'string',
