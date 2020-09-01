@@ -90,6 +90,14 @@
 }
 
 @include breakpoint('print') {
+    html {
+        background: $print-page-background;
+    }
+
+    .body {
+        margin: $print-page-offset;
+    }
+
     thead {
         display: table-header-group;
     }
@@ -113,5 +121,9 @@
     img {
         max-width: 100% !important;
         page-break-inside: avoid
+    }
+
+    @page {
+        margin: 10mm;
     }
 }
