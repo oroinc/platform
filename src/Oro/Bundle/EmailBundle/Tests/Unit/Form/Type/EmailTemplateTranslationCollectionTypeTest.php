@@ -17,8 +17,8 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
 {
@@ -54,6 +54,7 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
             ->willReturn(['br', 'a']);
 
         $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
+        $htmlTagHelper->setTranslator($this->translator);
 
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);

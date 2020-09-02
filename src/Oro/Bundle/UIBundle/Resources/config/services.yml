@@ -143,6 +143,7 @@ services:
             - '@oro_form.provider.html_tag_provider'
             - '%kernel.cache_dir%/oro_data'
         calls:
+            - ['setTranslator', ['@translator']]
             # Additional div attributes
             - ['setAttribute', ['div', 'role', 'Text']]
             - ['setAttribute', ['div', 'aria-label', 'Text']]
