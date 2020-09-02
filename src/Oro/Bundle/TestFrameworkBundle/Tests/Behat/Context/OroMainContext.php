@@ -539,10 +539,11 @@ class OroMainContext extends MinkContext implements
     /**
      * Example: Then I should see only "At least one of the fields First name, Last name must be defined." error message
      *
-     * @Then /^(?:|I should )see only "(?P<title>[^"]+)" error message$/
+     * @Then /^(?:|I should )see only "(?P<title>([^"]|\\")+)" error message$/
      */
     public function iShouldSeeStrictErrorMessage($title)
     {
+        $title = $this->fixStepArgument($title);
         $errorElement = $this->spin(function (MinkContext $context) {
             return $context->getSession()->getPage()->find('css', '.alert-error');
         });

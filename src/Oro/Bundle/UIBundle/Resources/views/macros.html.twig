@@ -1247,7 +1247,7 @@
                     <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    {{ data.formErrors|raw }}
+                    {{ data.formErrors|raw|nl2br }}
                 </div>
             </div>
         {% endif %}
