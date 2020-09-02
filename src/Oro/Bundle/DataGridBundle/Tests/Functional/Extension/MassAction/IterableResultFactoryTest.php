@@ -131,7 +131,7 @@ class IterableResultFactoryTest extends WebTestCase
         );
 
         $ids = array_map(
-            static function (string $name) {
+            function (string $name) {
                 return $this->getReference($name)->getId();
             },
             [
