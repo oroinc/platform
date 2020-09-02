@@ -3,9 +3,11 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -20,13 +22,17 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagProvider;
 
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $translator;
+
     /** @var string */
     private $cachePath;
 
     protected function setUp(): void
     {
         $this->cachePath = $this->getTempDir('cache_test_data');
-        $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
 
         $this->helper->setAttribute('img', 'usemap', 'CDATA');
@@ -112,13 +118,45 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider errorCollectorDataProvider
+     * @dataProvider errorCollectorWithoutErrorsDataProvider
      *
      * @param string $htmlValue
      * @param array $allowedElements
      * @param array $expectedResult
      */
-    public function testGetLastErrorCollector($htmlValue, array $allowedElements, array $expectedResult): void
+    public function testGetLastErrorCollectorWithoutErrors(
+        $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
+        $this->assertLastErrorCollector($htmlValue, $allowedElements, $expectedResult);
+    }
+
+    /**
+     * @dataProvider errorCollectorWithErrorsDataProvider
+     *
+     * @param string $htmlValue
+     * @param array $allowedElements
+     * @param array $expectedResult
+     */
+    public function testGetLastErrorCollectorWithErrors($htmlValue, array $allowedElements, array $expectedResult): void
+    {
+        $this->translator->expects($this->at(18))
+            ->method('trans')
+            ->with($this->stringContains('oro.htmlpurifier.messages'))
+            ->willReturn('Unrecognized $CurrentToken.Serialized tag removed');
+
+        $this->helper->setTranslator($this->translator);
+
+        $this->assertLastErrorCollector($htmlValue, $allowedElements, $expectedResult);
+    }
+
+    /**
+     * @param string $htmlValue
+     * @param array $allowedElements
+     * @param array $expectedResult
+     */
+    public function assertLastErrorCollector($htmlValue, array $allowedElements, array $expectedResult): void
     {
         $this->htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
@@ -146,7 +184,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function errorCollectorDataProvider(): array
+    public function errorCollectorWithoutErrorsDataProvider(): array
     {
         return [
             'without errors' => [
@@ -154,6 +192,15 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 'allowedElements' => ['div', 'h1'],
                 'expectedResult' => []
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function errorCollectorWithErrorsDataProvider(): array
+    {
+        return [
             'with errors' => [
                 'htmlValue' => '<div><h1>Hello World!</h1></div>',
                 'allowedElements' => ['div'],
@@ -456,5 +503,23 @@ HTML;
                 'expected' => 'double stripped'
             ]
         ];
+    }
+
+    public function testSanitizeWithTranslator(): void
+    {
+        $htmlValue = '<div><h1>Hello World!</h1></div>';
+        $expectedResult = [
+            new Error('Unrecognized <h1> tag removed', '<h1>Hello World!</h1></di'),
+            new Error('Unrecognized </h1> tag removed', '</h1></div>'),
+        ];
+
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['div']);
+
+        $this->helper->sanitize($htmlValue);
+
+        $this->assertNotNull($this->helper->getLastErrorCollector());
+        $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
     }
 }
