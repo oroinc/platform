@@ -13,6 +13,7 @@ oro_form:
                 - 'youtube.com/embed/'
                 - 'youtube-nocookie.com/embed/'
                 - 'player.vimeo.com/video/'
+                - 'maps.google.com/maps'
             allowed_html_elements:
                 iframe:
                     attributes:
