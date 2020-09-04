@@ -50,7 +50,13 @@ define(function(require, exports, module) {
             this.syncAriaExpanded();
 
             if (Dropdown._isShowing) {
-                manageFocus.focusTabbable($(this._menu));
+                let focusTabbable = null;
+
+                if (_.isMobile()) {
+                    focusTabbable = $(this._menu).find(':tabbable:not("input")').eq(0);
+                }
+
+                manageFocus.focusTabbable($(this._menu), focusTabbable);
                 this.bindKeepFocusInside();
             } else {
                 this.unbindKeepFocusInside();
