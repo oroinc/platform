@@ -4,6 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RestUsersTest extends WebTestCase
 {
     protected function setUp(): void

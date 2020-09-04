@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
+use Laminas\Mail\Header\ContentType;
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
@@ -11,7 +12,6 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
-use Zend\Mail\Header\ContentType;
 
 class EmailTest extends \PHPUnit\Framework\TestCase
 {

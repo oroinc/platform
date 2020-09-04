@@ -49,7 +49,9 @@ class FeatureStatisticManager
             ->setDuration($time)
             ->setGitBranch($this->getGitBranch())
             ->setGitTarget($this->getGitTarget())
-            ->setBuildId($this->getBuildId());
+            ->setBuildId($this->getBuildId())
+            ->setStageName($this->getStageName())
+            ->setJobName($this->getJobName());
 
         $this->featureRepository->add($stat);
     }
@@ -60,16 +62,24 @@ class FeatureStatisticManager
     public function getTested(): array
     {
         $buildId = $this->getBuildId();
-        $gitTarget = $this->getGitTarget();
+        $gitBranch = $this->getGitBranch();
+        $stageName = $this->getStageName();
+        $jobName = $this->getJobName();
 
-        if (!$buildId || !$gitTarget) {
+        if (!$buildId || !$stageName || !$jobName) {
             return [];
         }
 
-        $criteria = ['build_id' => $buildId, 'git_target' => $gitTarget, 'git_branch' => $this->getGitBranch()];
+        $criteria = [
+            'build_id' => $buildId,
+            'git_target' => $this->getGitTarget(),
+            'git_branch' => $gitBranch,
+            'stage_name' => $stageName,
+            'job_name' => $jobName,
+        ];
 
         return array_map(
-            function (FeatureStatistic $statistic) {
+            static function (FeatureStatistic $statistic) {
                 return $statistic->getPath();
             },
             $this->featureRepository->findBy($criteria)
@@ -83,7 +93,7 @@ class FeatureStatisticManager
 
     public function cleanOldStatistics()
     {
-        if ($this->getGitTarget() === 'master' && $this->getGitBranch() === null) {
+        if ($this->getGitTarget() === null && $this->getGitBranch() === 'master') {
             $this->featureRepository->removeOldStatistics($this->getStatisticsLifetime());
         }
     }
@@ -94,6 +104,22 @@ class FeatureStatisticManager
     private function getBuildId(): ?string
     {
         return $this->criteria->get('build_id');
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getStageName(): ?string
+    {
+        return $this->criteria->get('stage_name');
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getJobName(): ?string
+    {
+        return $this->criteria->get('job_name');
     }
 
     /**

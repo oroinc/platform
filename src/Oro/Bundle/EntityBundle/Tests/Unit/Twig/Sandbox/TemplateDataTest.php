@@ -6,6 +6,10 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityDataAccessor;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariableComputer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TemplateDataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityVariableComputer|\PHPUnit\Framework\MockObject\MockObject */

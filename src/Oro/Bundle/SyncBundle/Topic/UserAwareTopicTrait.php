@@ -7,6 +7,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
+/**
+ * Trait for topic handlers which work with current user.
+ */
 trait UserAwareTopicTrait
 {
     /** @var ClientManipulatorInterface */
@@ -42,7 +45,7 @@ trait UserAwareTopicTrait
             return false;
         }
 
-        $user = $this->clientManipulator->getClient($connection);
+        $user = $this->clientManipulator->getUser($connection);
 
         return $user instanceof User && $user->getId() === $userId;
     }

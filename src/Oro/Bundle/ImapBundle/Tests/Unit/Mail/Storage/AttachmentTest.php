@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
+use Laminas\Mail\Header\GenericHeader;
+use Laminas\Mail\Headers;
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
-use Zend\Mail\Header\GenericHeader;
-use Zend\Mail\Headers;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
-class AttachmentTest extends \PHPUnit\Framework\TestCase
+class AttachmentTest extends TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $part;
@@ -18,7 +20,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
+        $this->part = $this->getMockBuilder('Laminas\Mail\Storage\Part')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -27,7 +29,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHeaders()
     {
-        $headers = new \stdClass();
+        $headers = new stdClass();
 
         $this->part
             ->expects($this->once())
@@ -41,7 +43,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHeader()
     {
-        $header = new \stdClass();
+        $header = new stdClass();
 
         $this->part
             ->expects($this->once())
@@ -60,7 +62,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $testEncoding = 'SomeEncoding';
 
         // Content-Disposition header
-        $contentDispositionHeader = $this->getMockBuilder('Zend\Mail\Header\GenericHeader')
+        $contentDispositionHeader = $this->getMockBuilder('Laminas\Mail\Header\GenericHeader')
             ->disableOriginalConstructor()
             ->getMock();
         $contentDispositionHeader->expects($this->once())
@@ -71,7 +73,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($testEncoding));
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()
             ->getMock();
         $headers->expects($this->once())
@@ -101,7 +103,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $testEncoding = 'SomeEncoding';
 
         // Content-Disposition header
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
+        $contentTypeHeader = $this->getMockBuilder('Laminas\Mail\Header\ContentType')
             ->disableOriginalConstructor()
             ->getMock();
         $contentTypeHeader->expects($this->once())
@@ -113,7 +115,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($testEncoding));
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()
             ->getMock();
         $headers->expects($this->any())
@@ -145,6 +147,12 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getContentProvider
+     * @param $contentTransferEncoding
+     * @param $contentType
+     * @param $contentCharset
+     * @param $contentValue
+     * @param $expected
+     * @param $decodedValue
      */
     public function testGetContent(
         $contentTransferEncoding,
@@ -155,7 +163,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $decodedValue
     ) {
         // Content-Type header
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
+        $contentTypeHeader = $this->getMockBuilder('Laminas\Mail\Header\ContentType')
             ->disableOriginalConstructor()
             ->getMock();
         if ($contentType !== null) {
@@ -169,7 +177,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         }
 
         // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
             ->disableOriginalConstructor()
             ->getMock();
         $headers->expects($this->any())

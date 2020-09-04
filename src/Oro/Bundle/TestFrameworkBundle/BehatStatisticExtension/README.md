@@ -19,6 +19,8 @@ default: &default
                 target_branch: CHANGE_TARGET
                 build_id: BUILD_ID
                 single_branch_name: BRANCH_NAME
+                stage_name: STAGE_NAME
+                job_name: JOB_NAME
                 any_var: ANY_ENV_VAR # this could be used in AvgTimeProvider
             count_build_limit: 10
 ```
@@ -26,8 +28,8 @@ default: &default
 To see all existing configuration connections abilities, follow Doctrine Dbal documentation -
 http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html
 
-```CHANGE_BRANCH```, ```CHANGE_TARGET```, ```BRANCH_NAME``` and ```BUILD_ID```
-is required environment variables names for build in providers.
+```CHANGE_BRANCH```, ```CHANGE_TARGET```, ```BRANCH_NAME```, ```BUILD_ID```, ```STAGE_NAME``` and ```JOB_NAME```
+are required environment variables names for build in providers.
 However any AvgTimeProviders could be used, see ```AvgTimeProviderInterface```
 
 ## Usage

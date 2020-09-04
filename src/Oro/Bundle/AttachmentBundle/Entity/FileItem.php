@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFileItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
 /**
@@ -22,6 +23,13 @@ class FileItem extends ExtendFileItem implements EmptyItem
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 

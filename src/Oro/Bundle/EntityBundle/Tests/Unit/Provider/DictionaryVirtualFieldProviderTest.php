@@ -317,6 +317,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function initialize(ClassMetadata $metadata)
     {

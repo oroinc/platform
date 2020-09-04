@@ -9,6 +9,9 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
 {
     private const CLASS_NAME = 'Foo\\Entity';

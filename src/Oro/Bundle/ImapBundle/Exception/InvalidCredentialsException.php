@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Exception;
 
-use Zend\Mail\Storage\Exception\RuntimeException;
+use Laminas\Mail\Storage\Exception\RuntimeException;
 
 /**
  * Exception that triggers in case if the sync of origin was failed because of wrong credentials.

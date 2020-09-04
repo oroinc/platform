@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\StringOptionValueBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithInvalidDelimiter()

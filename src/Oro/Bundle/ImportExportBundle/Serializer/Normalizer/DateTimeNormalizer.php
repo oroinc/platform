@@ -6,6 +6,9 @@ use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeConverterInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
+/**
+ * Converts a formatted datetime string into a \DateTime object and vice versa.
+ */
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
@@ -82,6 +85,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @return \DateTime|null
      * @throws RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {

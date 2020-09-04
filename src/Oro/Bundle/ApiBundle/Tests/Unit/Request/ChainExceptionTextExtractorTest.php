@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainExceptionTextExtractor */

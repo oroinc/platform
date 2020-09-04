@@ -31,6 +31,7 @@ class FixRestoredFieldsQuery extends ParametrizedMigrationQuery
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {

@@ -64,6 +64,7 @@ class ConfigNormalizer
      * @param EntityDefinitionConfig $config
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doNormalizeConfig(EntityDefinitionConfig $config)
     {

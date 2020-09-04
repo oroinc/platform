@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerI
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**

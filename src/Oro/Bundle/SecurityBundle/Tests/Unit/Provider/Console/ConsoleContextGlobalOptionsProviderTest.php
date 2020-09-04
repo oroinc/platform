@@ -19,6 +19,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
@@ -164,7 +167,112 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $this->provider->resolveGlobalOptions($input);
     }
 
-    public function testResolveGlobalOptionsWhenUserIsIntAndNoOrganization()
+    public function testResolveGlobalOptionsWhenUserIsIntAndNoOrganizationAndUserHaveAccessToOneOrg()
+    {
+        $userId = 777;
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
+        $input = $this->createMock(InputInterface::class);
+        $input->expects($this->exactly(2))
+            ->method('getParameterOption')
+            ->withConsecutive(
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+            )
+            ->willReturn($userId, null);
+
+        $organization = new Organization();
+        $organization->setEnabled(true);
+        /** @var Role $role */
+        $role = $this->createMock(Role::class);
+        $user = new User();
+        $user->addRole($role);
+        $user->addOrganization($organization);
+        $repository = $this->getUserRepository();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($userId)
+            ->willReturn($user);
+
+        $expectedToken = new ConsoleToken([$role]);
+        $expectedToken->setUser($user);
+        $expectedToken->setOrganization($organization);
+
+        $this->provider->resolveGlobalOptions($input);
+        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+    }
+
+    public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveAccessToMultipleOrgs()
+    {
+        $userId = 777;
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
+        $input = $this->createMock(InputInterface::class);
+        $input->expects($this->exactly(2))
+            ->method('getParameterOption')
+            ->withConsecutive(
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+            )
+            ->willReturn($userId, null);
+
+        $organization1 = new Organization();
+        $organization1->setEnabled(true);
+        $organization2 = new Organization();
+        $organization2->setEnabled(true);
+        /** @var Role $role */
+        $role = $this->createMock(Role::class);
+        $user = new User();
+        $user->addRole($role);
+        $user->addOrganization($organization1);
+        $user->addOrganization($organization2);
+        $repository = $this->getUserRepository();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($userId)
+            ->willReturn($user);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The --current-organization parameter is not specified.');
+
+        $this->provider->resolveGlobalOptions($input);
+    }
+
+    public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveAccessToMultipleOrgsAndEnableOnlyOne()
+    {
+        $userId = 777;
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
+        $input = $this->createMock(InputInterface::class);
+        $input->expects($this->exactly(2))
+            ->method('getParameterOption')
+            ->withConsecutive(
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
+                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+            )
+            ->willReturn($userId, null);
+
+        $organization1 = new Organization();
+        $organization2 = new Organization();
+        $organization2->setEnabled(true);
+        /** @var Role $role */
+        $role = $this->createMock(Role::class);
+        $user = new User();
+        $user->addRole($role);
+        $user->addOrganization($organization1);
+        $user->addOrganization($organization2);
+        $repository = $this->getUserRepository();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($userId)
+            ->willReturn($user);
+
+        $expectedToken = new ConsoleToken([$role]);
+        $expectedToken->setUser($user);
+        $expectedToken->setOrganization($organization2);
+
+        $this->provider->resolveGlobalOptions($input);
+        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+    }
+
+    public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveNoOrgs()
     {
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
@@ -187,11 +295,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->with($userId)
             ->willReturn($user);
 
-        $expectedToken = new ConsoleToken([$role]);
-        $expectedToken->setUser($user);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The --current-organization parameter is not specified.');
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenUserIsStringAndNoOrganization()
@@ -207,10 +314,13 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             )
             ->willReturn($username, null);
 
+        $organization = new Organization();
+        $organization->setEnabled(true);
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
         $user->addRole($role);
+        $user->addOrganization($organization);
         $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
@@ -218,6 +328,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
 
         $expectedToken = new ConsoleToken([$role]);
         $expectedToken->setUser($user);
+        $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
         $this->assertEquals($expectedToken, $this->tokenStorage->getToken());

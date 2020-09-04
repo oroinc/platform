@@ -9,6 +9,9 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */

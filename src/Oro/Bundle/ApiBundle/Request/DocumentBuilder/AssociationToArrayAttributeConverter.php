@@ -34,6 +34,7 @@ class AssociationToArrayAttributeConverter
      * @param AssociationMetadata|null $association
      *
      * @return mixed The result can be an array, a scalar or NULL
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function convertObjectToArray($object, AssociationMetadata $association = null)
     {

@@ -112,6 +112,10 @@
     .checkbox-view {
         margin-#{$end}: $content-padding-small;
     }
+
+    .oro-checkbox-view {
+        display: $fallback-item-use-fallback-oro-checkbox-view-display;
+    }
 }
 
 .fallback-item-value-input {

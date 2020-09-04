@@ -6,8 +6,7 @@ define(function(require) {
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
     const persistentStorage = require('oroui/js/persistent-storage');
-
-    require('jquery-ui');
+    require('jquery-ui/widget');
 
     $.widget('oroui.collapseWidget', {
         options: {

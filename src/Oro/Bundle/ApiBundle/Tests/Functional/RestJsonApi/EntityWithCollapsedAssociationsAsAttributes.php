@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
 {

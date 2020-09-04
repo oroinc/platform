@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch;
 
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileNameProvider */

@@ -1,11 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/layout',
-    'jquery-ui'
-], function($, _, __, layout) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const layout = require('oroui/js/layout');
+    require('jquery-ui/widget');
 
     /**
      * Condition builder widget

@@ -15,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

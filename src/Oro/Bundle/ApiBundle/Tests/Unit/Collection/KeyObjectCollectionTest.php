@@ -4,6 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */

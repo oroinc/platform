@@ -36,6 +36,7 @@ class BusinessUnitRepository extends EntityRepository
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getBusinessUnitsTree(User $user = null, $organizationId = null)
     {

@@ -12,6 +12,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */

@@ -13,13 +13,16 @@ define(function(require) {
     const mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     const mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     const PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    const FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
-    const FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    const DatagridSettingsPlugin = require('orodatagrid/js/app/plugins/grid/datagrid-settings-plugin');
-    const ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
     const MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
     const DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
-    const StickedScrollbarPlugin = require('orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin');
+
+    const pluginModules = {
+        FloatingHeaderPlugin: 'orodatagrid/js/app/plugins/grid/floating-header-plugin',
+        FullscreenPlugin: 'orodatagrid/js/app/plugins/grid/fullscreen-plugin',
+        DatagridSettingsPlugin: 'orodatagrid/js/app/plugins/grid/datagrid-settings-plugin',
+        ToolbarMassActionPlugin: 'orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin',
+        StickedScrollbarPlugin: 'orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin'
+    };
 
     const helpers = {
         cellType: function(type) {
@@ -246,6 +249,31 @@ define(function(require) {
                     }
                 });
             });
+
+            // load pluginsModules
+            if (!this.themeOptions.headerHide) {
+                if (this.metadata.enableFloatingHeaderPlugin) {
+                    modules.FloatingHeaderPlugin = pluginModules.FloatingHeaderPlugin;
+                } else if (this.metadata.enableFullScreenLayout) {
+                    modules.FullscreenPlugin = pluginModules.FullscreenPlugin;
+                }
+            }
+
+            if (metadata.options.toolbarOptions.addDatagridSettingsManager) {
+                modules.DatagridSettingsPlugin = pluginModules.DatagridSettingsPlugin;
+            }
+
+            if (this.themeOptions.showMassActionOnToolbar) {
+                modules.ToolbarMassActionPlugin = pluginModules.ToolbarMassActionPlugin;
+            }
+
+            if (!this.themeOptions.disableStickedScrollbar) {
+                if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
+                    modules.StickedScrollbarPlugin = pluginModules.StickedScrollbarPlugin;
+                } else if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
+                    modules.StickedScrollbarPlugin = pluginModules.StickedScrollbarPlugin;
+                }
+            }
         },
 
         /**
@@ -414,34 +442,23 @@ define(function(require) {
             // mass actions
             const massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
-            if (!this.themeOptions.headerHide) {
-                if (this.metadata.enableFloatingHeaderPlugin) {
-                    plugins.push(FloatingHeaderPlugin);
-                } else if (this.metadata.enableFullScreenLayout) {
-                    plugins.push(FullscreenPlugin);
-                }
-            }
+            Object.values(_.pick(modules, [
+                'FloatingHeaderPlugin',
+                'FullscreenPlugin',
+                'DatagridSettingsPlugin',
+                'ToolbarMassActionPlugin'
+            ])).forEach(plugin => plugins.push(plugin));
 
-            if (metadata.options.toolbarOptions.addDatagridSettingsManager) {
-                plugins.push(DatagridSettingsPlugin);
-            }
-
-            if (this.themeOptions.showMassActionOnToolbar) {
-                plugins.push(ToolbarMassActionPlugin);
-            }
-
-            if (!this.themeOptions.disableStickedScrollbar) {
+            if (modules.StickedScrollbarPlugin) {
                 if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
                     plugins.push({
-                        constructor: StickedScrollbarPlugin,
+                        constructor: modules.StickedScrollbarPlugin,
                         options: {
                             viewport: this.metadata.responsiveGrids.viewport || {}
                         }
                     });
                 } else {
-                    if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
-                        plugins.push(StickedScrollbarPlugin);
-                    }
+                    plugins.push(modules.StickedScrollbarPlugin);
                 }
             }
 
@@ -467,8 +484,8 @@ define(function(require) {
 
             return {
                 name: this.gridName,
-                columns: columns,
-                rowActions: rowActions,
+                columns,
+                rowActions,
                 massActions: new Backbone.Collection(massActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
@@ -480,7 +497,7 @@ define(function(require) {
                 rowClickAction: metadata.options.rowClickAction || false,
                 metadata: this.metadata,
                 metadataModel: this.metadataModel,
-                plugins: plugins,
+                plugins,
                 themeOptionsConfigurator: DataGridThemeOptionsManager.createConfigurator(this.themeOptions)
             };
         },

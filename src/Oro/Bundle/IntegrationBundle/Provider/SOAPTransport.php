@@ -214,6 +214,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 
     /**
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isAttemptNecessary()
     {

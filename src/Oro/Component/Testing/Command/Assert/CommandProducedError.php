@@ -44,7 +44,12 @@ class CommandProducedError extends Constraint
     protected function failureDescription($commandTester): string
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
-        return "Command produced an error:\n" . $commandTester->getDisplay();
+        return \sprintf(
+            "command produced an error:\n- %s\nReturn code: %s\nCommand output:\n%s\n",
+            \implode("\n- ", $this->errors),
+            $commandTester->getStatusCode(),
+            $commandTester->getDisplay()
+        );
     }
 
     public function toString(): string

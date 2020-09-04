@@ -7,7 +7,7 @@ define(function(require) {
     const moment = require('moment');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
     const BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
+    require('jquery-ui/widgets/datepicker');
 
     const DatePickerView = BaseView.extend({
         defaults: {

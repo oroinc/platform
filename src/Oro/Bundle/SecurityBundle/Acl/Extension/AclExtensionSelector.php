@@ -73,6 +73,7 @@ class AclExtensionSelector implements ResetInterface
      *
      * @throws InvalidDomainObjectException if ACL extension was not found for the given domain object
      *                                      and $throwException is requested (default behaviour)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function select($val, $throwException = true)
     {

@@ -380,6 +380,7 @@ class EntitySerializer
      * @param array        $context
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function serializeItem($entity, $entityClass, EntityConfig $config, array $context)
     {
@@ -739,6 +740,7 @@ class EntitySerializer
      * @param array        $context
      *
      * @return array [entityId => [field => value, ...], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadRelatedItems($relatedItemsIds, $entityClass, EntityConfig $config, array $context)
     {

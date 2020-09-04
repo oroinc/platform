@@ -32,6 +32,7 @@ class UsernamePasswordOrganizationTokenTest extends \PHPUnit\Framework\TestCase
         $providerKey = 'user_provider';
         /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
+        $user->addRole($role);
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 

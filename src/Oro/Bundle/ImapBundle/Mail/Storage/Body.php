@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
-use Zend\Mail\Headers;
-use Zend\Mail\Storage\Part;
 
+/**
+ * Imap protocol message contents.
+ */
 class Body
 {
     const FORMAT_TEXT = false;

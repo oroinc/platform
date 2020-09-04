@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
     protected $entityManager;

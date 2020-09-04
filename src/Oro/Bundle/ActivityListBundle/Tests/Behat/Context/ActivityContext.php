@@ -10,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
 {
     use PageObjectDictionary;

@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * This compiler pass for testing that arguments and calls parameters
@@ -73,6 +74,9 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
                 return;
             }
             if ($definition->getClass() === MemoryCacheChain::class) {
+                return;
+            }
+            if ($parameter->getClass() === MimeTypes::class) {
                 return;
             }
 

@@ -25,6 +25,7 @@ use Symfony\Component\Translation\Translator;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 {

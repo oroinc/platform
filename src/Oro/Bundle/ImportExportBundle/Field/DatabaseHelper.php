@@ -6,6 +6,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -282,6 +285,19 @@ class DatabaseHelper
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $identifierField = $this->getIdentifierFieldName($entityName);
         $entityManager->getClassMetadata($entityName)->setIdentifierValues($entity, [$identifierField => null]);
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @throws NotManageableEntityException
+     * @throws ORMInvalidArgumentException
+     * @throws ORMException
+     */
+    public function refreshEntity(object $entity): void
+    {
+        $entityManager = $this->doctrineHelper->getEntityManager($entity);
+        $entityManager->refresh($entity);
     }
 
     /**

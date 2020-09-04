@@ -37,6 +37,7 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Context extends NormalizeResultContext implements ContextInterface
 {

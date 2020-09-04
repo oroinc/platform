@@ -200,6 +200,7 @@ class LoadFromConfigBag implements ProcessorInterface
      * @param array         $config
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function saveConfig(ConfigContext $context, array $config)
     {

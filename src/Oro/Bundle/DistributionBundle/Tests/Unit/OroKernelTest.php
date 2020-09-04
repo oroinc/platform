@@ -181,14 +181,12 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
 
     public function testBootDeploymentWithoutDeploymentFile()
     {
-        $appDir = 'application/app3-without-deployment-config';
-        $configPath = $this->kernel->getProjectDir() . '/' . $appDir . '/config/deployment/config_local.yml';
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('Deployment config "%s" for type "local" not found', $configPath));
-
-        $this->kernel->setAppDir($appDir);
+        $this->kernel->setAppDir('application/app3-without-deployment-config');
         $this->kernel->boot();
+
+        /* @var $container ContainerInterface */
+        $container = $this->kernel->getContainer();
+        $this->assertFalse($container->hasParameter('deployment_type'));
     }
 
     public function testBootDeploymentWithLocalConfig()

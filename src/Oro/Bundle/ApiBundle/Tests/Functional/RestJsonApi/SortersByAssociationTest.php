@@ -6,6 +6,9 @@ use Extend\Entity\TestApiE1 as Entity;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SortersByAssociationTest extends RestJsonApiTestCase
 {
     /**

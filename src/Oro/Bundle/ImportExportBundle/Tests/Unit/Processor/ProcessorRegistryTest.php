@@ -9,6 +9,9 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorRegistry */

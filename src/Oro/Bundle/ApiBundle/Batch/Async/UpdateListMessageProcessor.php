@@ -152,6 +152,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {

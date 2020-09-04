@@ -10,6 +10,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */

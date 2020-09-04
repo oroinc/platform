@@ -163,6 +163,7 @@ class ScopeCriteria implements \IteratorAggregate
      * @param bool         $withPriority
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function reapplyJoins(
         QueryBuilder $qb,

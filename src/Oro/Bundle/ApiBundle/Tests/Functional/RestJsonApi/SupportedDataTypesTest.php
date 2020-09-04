@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 /**
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SupportedDataTypesTest extends RestJsonApiTestCase
 {

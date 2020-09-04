@@ -84,6 +84,7 @@ class ConfigurationBuilder implements BuilderInterface
      * @param array $sliceData
      * @param array $options
      * @param array $existingNames
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function appendChildData(ItemInterface $menu, array $sliceData, array $options, array &$existingNames)
     {

@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataH
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */

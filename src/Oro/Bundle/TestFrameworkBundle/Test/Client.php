@@ -29,6 +29,7 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function request(
         string $method,

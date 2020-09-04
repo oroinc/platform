@@ -42,6 +42,16 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
+    public function testExecuteWithoutEntity()
+    {
+        $context = new ActionData(['data' => null]);
+        $this->registry->expects($this->never())
+            ->method($this->anything());
+
+        $this->action->initialize([]);
+        $this->action->execute($context);
+    }
+
     /**
      * @dataProvider executeDataProvider
      * @param array $data

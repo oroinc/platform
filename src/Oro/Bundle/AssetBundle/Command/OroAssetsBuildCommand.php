@@ -201,6 +201,12 @@ DESCRIPTION
                 InputOption::VALUE_NONE,
                 'Skip building source map.'
             )
+            ->addOption(
+                'analyze',
+                null,
+                InputOption::VALUE_NONE,
+                'Run BundleAnalyzerPlugin'
+            )
             ->addUsage('admin.oro --watch')
             ->addUsage('blank -w')
             ->addUsage('blank --hot')
@@ -320,6 +326,9 @@ DESCRIPTION
         }
         if ($input->getOption('skip-sourcemap')) {
             $command[] = '--env.skipSourcemap';
+        }
+        if ($input->getOption('analyze')) {
+            $command[] = '--env.analyze';
         }
 
         return $command;

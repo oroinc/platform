@@ -1,5 +1,6 @@
 datagrids:
     dashboards-grid:
+        extended_entity_name: 'Oro\Bundle\DashboardBundle\Entity\Dashboard'
         acl_resource: oro_dashboard_view
         source:
             type: orm

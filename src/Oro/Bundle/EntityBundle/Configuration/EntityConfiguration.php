@@ -302,6 +302,7 @@ class EntityConfiguration implements ConfigurationInterface
     /**
      * @param array $v
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function validateEntityNameFormats(array $v)
     {

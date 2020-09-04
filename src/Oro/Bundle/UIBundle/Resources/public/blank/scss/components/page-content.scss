@@ -31,6 +31,10 @@
 
 @include breakpoint('print') {
     .page-content {
-        width: 100%;
+        width: $page-content-print-width;
+
+        &--has-sidebar {
+            padding: $page-content-print-inner-offset;
+        }
     }
 }

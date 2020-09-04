@@ -6,6 +6,9 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\ORMException;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -353,6 +353,7 @@ class CountQueryBuilderOptimizer
      * @param string      $groupByAliases the aliases that was used in GROUP BY statement
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getNonSymmetricJoinAliases($fromStatements, $joins, $groupByAliases)
     {

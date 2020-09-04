@@ -35,6 +35,7 @@ class CompoundObjectListener implements EventSubscriberInterface
 
     /**
      * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event): void
     {

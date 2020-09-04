@@ -7,6 +7,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
 {

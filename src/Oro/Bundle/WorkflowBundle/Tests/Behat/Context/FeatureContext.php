@@ -89,7 +89,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      *
      * @return WorkflowDefinition|null
      */
-    private function getWorkflowDefinitionByTitle(string $title): WorkflowDefinition
+    private function getWorkflowDefinitionByTitle(string $title): ?WorkflowDefinition
     {
         /* @var $translationHelper WorkflowTranslationHelper */
         $translationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
@@ -122,12 +122,13 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     {
         /** @var UserRoleViewForm $userRoleForm */
         $userRoleForm = $this->elementFactory->createElement('User Role View Workflow Permissions');
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $workflowName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($role, $value) = explode(':', $cell);
+                [$role, $value] = explode(':', $cell);
                 self::assertNotEmpty($permissionsArray[$workflowName][$role]);
                 $expected = $permissionsArray[$workflowName][$role];
                 self::assertEquals(
@@ -248,7 +249,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     /**
      * @param array $workflowNames
      *
-     * @return array
      * @throws WorkflowException
      */
     private function deactivateWorkflows(array $workflowNames): void

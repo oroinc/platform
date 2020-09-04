@@ -129,6 +129,7 @@ class SerializationHelper
      * @param array        $fields [field name => [property, ...], ...]
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function handleFieldsReferencedToChildFields(
         array $serializedData,

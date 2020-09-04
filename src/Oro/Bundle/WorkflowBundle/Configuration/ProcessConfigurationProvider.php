@@ -4,6 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Locates and parses process configuration files.
+ */
 class ProcessConfigurationProvider extends AbstractConfigurationProvider
 {
     const NODE_ROOT = 'processes';
@@ -46,6 +49,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
      * @param array|null $usedDefinitions
      * @return array
      * @throws InvalidConfigurationException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getProcessConfiguration(
         array $usedDirectories = null,

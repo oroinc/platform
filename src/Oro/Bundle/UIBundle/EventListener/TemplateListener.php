@@ -89,6 +89,7 @@ class TemplateListener implements ServiceSubscriberInterface
      * Allow to use the controller view directory name in CamelCase
      *
      * @param TemplateReferenceInterface $templateReference
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function resolveControllerDir(TemplateReferenceInterface $templateReference): void
     {

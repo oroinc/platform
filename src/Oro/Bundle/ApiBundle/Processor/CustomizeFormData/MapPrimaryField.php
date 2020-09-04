@@ -127,6 +127,7 @@ class MapPrimaryField implements ProcessorInterface
 
     /**
      * @param CustomizeFormDataContext $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processPostSubmit(CustomizeFormDataContext $context)
     {

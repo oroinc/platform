@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */

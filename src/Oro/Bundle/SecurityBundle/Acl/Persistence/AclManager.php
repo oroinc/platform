@@ -173,6 +173,7 @@ class AclManager extends AbstractAclManager
     /**
      * Flushes all changes to ACLs that have been queued up to now to the database.
      * This synchronizes the in-memory state of managed ACLs with the database.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function flush()
     {
@@ -886,6 +887,7 @@ class AclManager extends AbstractAclManager
      * @return \SplObjectStorage mapping the passed object identities to ACLs
      * @throws AclNotFoundException
      * @throws NotAllAclsFoundException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doFindAcls(array $oids, array $sids)
     {

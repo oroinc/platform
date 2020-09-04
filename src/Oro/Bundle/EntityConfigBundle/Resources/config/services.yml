@@ -510,7 +510,7 @@ services:
         class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
         arguments:
             - 'oro_entity_config.attribute_import'
-            - '@gos_web_socket.websocket.client_manipulator'
+            - '@gos_web_socket.client.manipulator'
         tags:
             - { name: gos_web_socket.topic }
 

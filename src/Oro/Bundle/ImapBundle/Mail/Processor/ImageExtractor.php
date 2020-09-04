@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Processor;
 
-use Zend\Mail\Storage\Part\PartInterface;
+use Laminas\Mail\Storage\Part\PartInterface;
 
+/**
+ * Extractor of replacement parts based on content id header from a base64 encoded image.
+ */
 class ImageExtractor implements ContentIdExtractorInterface
 {
     /**

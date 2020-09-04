@@ -15,6 +15,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /* @var AbstractGuesser */

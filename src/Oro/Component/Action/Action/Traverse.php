@@ -6,6 +6,9 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Execute specified actions on each element of an array.
+ */
 class Traverse extends AbstractAction
 {
     const OPTION_KEY_ARRAY   = 'array';
@@ -60,6 +63,7 @@ class Traverse extends AbstractAction
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function initialize(array $options)
     {

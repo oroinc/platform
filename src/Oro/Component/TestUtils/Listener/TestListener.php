@@ -14,18 +14,20 @@ class TestListener implements BaseListener
     use TestListenerDefaultImplementation;
 
     /**
-     * @param Test $test
-     * @param float $time
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function endTest(Test $test, float $time): void
     {
         $reflection = new \ReflectionObject($test);
 
         foreach ($reflection->getProperties() as $property) {
-            if ($property->isStatic() || strpos($property->getDeclaringClass()->getName(), 'PHPUnit_') === 0) {
+            /** @noinspection NullPointerExceptionInspection */
+            if ($property->isStatic()
+                || 0 === \strpos($property->getDeclaringClass()->getName(), 'PHPUnit_')
+                || ($property->hasType() && !$property->getType()->allowsNull())
+            ) {
                 continue;
             }
-
             $property->setAccessible(true);
             $property->setValue($test, null);
         }

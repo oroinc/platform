@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasStorage */

@@ -12,6 +12,8 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {

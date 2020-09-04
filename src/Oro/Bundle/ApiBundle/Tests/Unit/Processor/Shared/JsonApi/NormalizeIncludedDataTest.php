@@ -24,6 +24,9 @@ use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */

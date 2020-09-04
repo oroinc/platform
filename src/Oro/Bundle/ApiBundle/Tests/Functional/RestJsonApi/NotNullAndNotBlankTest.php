@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NotNullAndNotBlankTest extends DefaultAndNullTestCase
 {

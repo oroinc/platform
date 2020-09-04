@@ -12,6 +12,9 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';

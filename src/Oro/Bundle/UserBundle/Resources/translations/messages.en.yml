@@ -1,4 +1,3 @@
-Add another email: Add another email
 Additional: Additional
 "Opportunity Information": "Opportunity Information"
 "New contact": "New contact"
@@ -103,7 +102,9 @@ oro:
             label:                          Phone
             description:                    The user's primary phone number.
         email_origins.label:                Email Origins
-        emails.label:                       Emails
+        emails:
+            label:                          Emails
+            add:                            Add another email
         auth_status:
             label:                          Status
             description:                    Defines the actuality of the user's current password, whether the user can use it to log into the system, is in the process of the password change, or (for EE) their password needs to be reset because the user has too many failed login attempts.

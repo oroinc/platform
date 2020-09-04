@@ -4,13 +4,19 @@ namespace Oro\Bundle\UIBundle\Tools;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\TranslationBundle\Translation\TranslatorAwareInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslatorAwareTrait;
+use Oro\Bundle\UIBundle\Tools\HTMLPurifier\ErrorCollector;
+use Oro\Bundle\UIBundle\Tools\HTMLPurifier\HTMLPurifier;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * This class helps format HTML
  */
-class HtmlTagHelper
+class HtmlTagHelper implements TranslatorAwareInterface
 {
+    use TranslatorAwareTrait;
+
     const SUB_DIR = 'ezyang';
     const MODE = 0775;
 
@@ -19,7 +25,7 @@ class HtmlTagHelper
     const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
 
     /**
-     * @var \HtmlPurifier[]
+     * @var HTMLPurifier[]
      */
     private $htmlPurifiers = [];
 
@@ -44,7 +50,7 @@ class HtmlTagHelper
     private $cacheDir;
 
     /**
-     * @var \HTMLPurifier_ErrorCollector
+     * @var ErrorCollector
      */
     private $lastErrorCollector;
 
@@ -59,7 +65,7 @@ class HtmlTagHelper
     }
 
     /**
-     * @return \HTMLPurifier_ErrorCollector
+     * @return ErrorCollector
      */
     public function getLastErrorCollector()
     {
@@ -165,7 +171,9 @@ class HtmlTagHelper
                 }
             }
 
-            $this->htmlPurifiers[$scope] = new \HTMLPurifier($config);
+            $purifier = new HTMLPurifier($config);
+            $purifier->setTranslator($this->translator);
+            $this->htmlPurifiers[$scope] = $purifier;
         }
 
         $result = $this->htmlPurifiers[$scope]->purify($value);

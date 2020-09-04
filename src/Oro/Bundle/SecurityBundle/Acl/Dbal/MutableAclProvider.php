@@ -1297,6 +1297,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * @param \SplObjectStorage $aces
      * @param EntryInterface    $ace
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function updateAce(\SplObjectStorage $aces, $ace)
     {

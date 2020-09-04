@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import 'jquery-ui/tabbable';
 
 const TAB_KEY_CODE = 9;
 

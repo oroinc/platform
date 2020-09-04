@@ -40,8 +40,9 @@ dynamic-imports:
         - oroemail/js/app/views/unread-emails-counter-view
         - oroemail/js/datagrid/auto-response-rules-extension
         - oroemail/js/datagrid/listen-to-read-email-extension
-        - oroemail/js/validator/email-address
         - oroemail/sidebar_widgets/recent_emails/js/widget
     orofilter:
         - oro/filter/email-string-filter
         - oro/filter/multiselect-originfolder-filter
+    oroform-validate:
+        - oroemail/js/validator/email-address

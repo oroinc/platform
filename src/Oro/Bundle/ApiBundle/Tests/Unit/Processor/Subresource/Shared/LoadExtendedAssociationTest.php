@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */

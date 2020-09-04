@@ -110,6 +110,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getExceptionText(\Exception $exception)
     {

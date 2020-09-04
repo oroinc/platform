@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
+use Laminas\Mail\Storage\Exception\InvalidArgumentException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
-use Zend\Mail\Storage\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class ImapTest extends \PHPUnit\Framework\TestCase
+class ImapTest extends TestCase
 {
     public function testCacheForGetNumberByUniqueId()
     {
@@ -14,7 +15,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
             2 => 2,
             3 => 3,
             4 => 4,
-            5 => 5
+            5 => 5,
         ];
 
         $protocolImap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Protocol\Imap')

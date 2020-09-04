@@ -72,6 +72,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
@@ -96,7 +97,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             [$start, $end, $type] = $this->getPeriodValues($value, $saveOpenRange);
             $start = $this->getCompiledDate($start);
             $end   = $this->getCompiledDate($end);
-            
+
             //Swap start and end dates if end date is behind start date
             if ($end && $start > $end) {
                 $e     = $end;
@@ -137,6 +138,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getViewValue($value)
     {
@@ -271,7 +273,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             'prev_end'   => $prevEnd
         ];
     }
-    
+
     protected function getCompiledDate($value)
     {
         return $value instanceof \DateTime

@@ -18,6 +18,8 @@ use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AuditChangedEntitiesProcessorTest extends WebTestCase
 {

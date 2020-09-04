@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 {

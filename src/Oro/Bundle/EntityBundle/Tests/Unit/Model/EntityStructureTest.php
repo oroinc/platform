@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityStructureTest extends \PHPUnit\Framework\TestCase
 {
     public function testId()

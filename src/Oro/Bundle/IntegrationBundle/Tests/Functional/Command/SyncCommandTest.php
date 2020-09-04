@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -31,6 +34,38 @@ class SyncCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron:integration:sync', ['--help']);
 
         static::assertStringContainsString('Usage: oro:cron:integration:sync [options]', $result);
+    }
+
+    public function testIsActive()
+    {
+        $this->assertTrue(self::getContainer()->get(SyncCommand::class)->isActive());
+    }
+
+    public function testIsActiveAllDisabled()
+    {
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManager(Channel::class);
+        $em->createQueryBuilder()
+            ->update(Channel::class, 'c')
+            ->set('c.enabled', ':enabled')
+            ->getQuery()
+            ->execute(['enabled' => false]);
+
+        $this->assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
+    }
+
+    public function testIsActiveNoConnectors()
+    {
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManager(Channel::class);
+        $em->createQueryBuilder()
+            ->update(Channel::class, 'c')
+            ->set('c.connectors', ':emptyConnectors')
+            ->setParameter('emptyConnectors', [], Types::ARRAY)
+            ->getQuery()
+            ->execute();
+
+        $this->assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
     }
 
     public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()

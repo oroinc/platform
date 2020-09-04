@@ -15,6 +15,9 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FieldAclHelperTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */

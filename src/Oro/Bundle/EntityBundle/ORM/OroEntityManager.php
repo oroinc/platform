@@ -12,6 +12,7 @@ use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Utility\IdentifierFlattener;
+use Oro\Bundle\EntityBundle\ORM\Event\PreClearEventArgs;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 
 /**
@@ -137,5 +138,17 @@ class OroEntityManager extends EntityManager
         $property = new \ReflectionProperty($class, 'metadataFactory');
         $property->setAccessible(true);
         $property->setValue($object, $metadataFactory);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Throws additional event "preClear".
+     */
+    public function clear($entityName = null): void
+    {
+        $this->getEventManager()->dispatchEvent(Events::preClear, new PreClearEventArgs($this, $entityName));
+
+        parent::clear($entityName);
     }
 }

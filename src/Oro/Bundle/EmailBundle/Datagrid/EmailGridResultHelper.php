@@ -54,6 +54,7 @@ class EmailGridResultHelper
 
     /**
      * @param ResultRecord[] $records
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addEmailDirections(array $records)
     {

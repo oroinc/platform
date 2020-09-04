@@ -672,3 +672,7 @@ datagrids:
                 pageSize:
                     default_per_page: 10
             routerEnabled: false
+        properties:
+            # Use emailId as default identifier for "click" row action which is used to select context
+            id:
+                data_name: emailId

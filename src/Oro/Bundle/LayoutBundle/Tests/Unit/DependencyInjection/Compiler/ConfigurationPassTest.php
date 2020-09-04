@@ -106,7 +106,8 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->addTag('layout.context_configurator');
 
         $container->register('dataProvider1', 'Test\DataProvider1')
-            ->addTag('layout.data_provider', ['alias' => 'test_data_provider_name1']);
+            ->addTag('layout.data_provider', ['alias' => 'test_data_provider_name1'])
+            ->addTag('layout.data_provider', ['alias' => 'test_data_provider_name1_alias']);
         $container->register('dataProvider2', 'Test\DataProvider2')
             ->addTag('layout.data_provider', ['alias' => 'test_data_provider_name2']);
 
@@ -145,6 +146,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'test_data_provider_name1' => 'dataProvider1',
+                'test_data_provider_name1_alias' => 'dataProvider1',
                 'test_data_provider_name2' => 'dataProvider2'
             ],
             $extensionDef->getArgument(5)
@@ -156,7 +158,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
             $debugCommandDef->getArgument(2)
         );
         self::assertEquals(
-            ['test_data_provider_name1', 'test_data_provider_name2'],
+            ['test_data_provider_name1', 'test_data_provider_name1_alias', 'test_data_provider_name2'],
             $debugCommandDef->getArgument(3)
         );
     }
