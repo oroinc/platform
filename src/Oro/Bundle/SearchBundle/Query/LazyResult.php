@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\Criteria;
 
 /**
  * Allows to pass callbacks instead of the actual values to calculate them separately on demand
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LazyResult extends Result
 {

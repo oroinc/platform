@@ -1,5 +1,10 @@
-define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, mediator) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const Backbone = require('backbone');
+    const mediator = require('oroui/js/mediator');
+    require('jquery-ui/widget');
 
     $.widget('oroui.sideMenu', {
         options: {

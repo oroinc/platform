@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testConvertObjectsToArrayDoNotTreatEmptyAsNull()

@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependenci
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
 {
     /** @var ValidateIncludedDataDependencies */
@@ -174,6 +177,15 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                             'data' => ['type' => 'users', 'id' => 'user_1']
                         ]
                     ]
+                ],
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_2',
+                    'relationships' => [
+                        'user' => [
+                            'data' => ['type' => 'users', 'id' => 'user_1']
+                        ]
+                    ]
                 ]
             ]
         ];
@@ -276,6 +288,68 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type'          => 'grouptypes',
                     'id'            => 'included_group_type_1',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'grouptypes',
+                    'id'            => 'included_group_type_2',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessThirdLevelIndirectInverseRelationshipOn()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'organizations',
+                'id'   => 'org_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'users',
+                    'id'            => 'included_user_1',
+                    'relationships' => [
+                        'user' => [
+                            'data' => ['type' => 'organizations', 'id' => 'org_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user' => [
+                            'data' => ['type' => 'users', 'id' => 'included_user_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'grouptypes',
+                    'id'            => 'included_group_type_1',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'grouptypes',
+                    'id'            => 'included_group_type_2',
                     'relationships' => [
                         'group' => [
                             'data' => ['type' => 'groups', 'id' => 'included_group_1']

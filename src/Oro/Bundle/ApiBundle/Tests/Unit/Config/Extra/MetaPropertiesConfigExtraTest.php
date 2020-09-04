@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MetaPropertiesConfigExtra */

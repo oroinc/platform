@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()

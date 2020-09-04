@@ -10,7 +10,6 @@
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder">
             <div class="float-holder ">
-                {{ form_errors(form) }}
                 {% if form.children|length  %}
                     {% for child in form %}
                         {{ form_widget(child) }}
@@ -19,11 +18,12 @@
                 {% else %}
                     {{ form_widget(form) }}
                 {% endif %}
+                {{ form_errors(form) }}
                 {{ form_rest(form) }}
             </div>
-            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
-                <span class="fa-close"></span>
-            </button>
+            {% if widget.parent.vars.allow_delete is not defined or widget.parent.vars.allow_delete -%}
+                <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}"><span class="fa-close"></span></button>
+            {%- endif %}
         </div>
     </div>
 {% endmacro %}
@@ -1247,7 +1247,7 @@
                     <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    {{ data.formErrors|raw }}
+                    {{ data.formErrors|raw|nl2br }}
                 </div>
             </div>
         {% endif %}
@@ -1265,37 +1265,6 @@
                     {% endif %}
                 </div>
             {% endif %}
-        </div>
-    </div>
-{% endmacro %}
-
-{#
-    Create collection field block
-    Parameters:
-        field - form collection field
-        label - label of block
-        buttonCaption - Caption of add entity button
-        tooltipText (optional) - text to render a tooltip for the collection field
-#}
-{% macro collectionField(field, label, buttonCaption, tooltipText = null) %}
-    {% import _self as UIMacro %}
-
-    <div class="control-group">
-        <div class="control-label wrap">
-            {% if tooltipText is not null %}
-                {{ UIMacro.tooltip(tooltipText) }}
-            {% endif %}
-            <label>{{ label }}</label>
-        </div>
-        <div class="controls">
-            <div class="row-oro">
-                <div class="oro-item-collection collection-fields-list" data-prototype="{{ UIMacro.collection_prototype(field)|escape }}">
-                    {% for emailField in field.children %}
-                        {{ UIMacro.collection_prototype(emailField) }}
-                    {% endfor %}
-                </div>
-                <a class="btn add-list-item" href="#" role="button">{{ buttonCaption }}</a>
-            </div>
         </div>
     </div>
 {% endmacro %}

@@ -143,6 +143,7 @@ services:
             - '@oro_form.provider.html_tag_provider'
             - '%kernel.cache_dir%/oro_data'
         calls:
+            - ['setTranslator', ['@translator']]
             # Additional div attributes
             - ['setAttribute', ['div', 'role', 'Text']]
             - ['setAttribute', ['div', 'aria-label', 'Text']]
@@ -245,6 +246,8 @@ services:
             - ['setAttribute', ['video', 'controls', 'Bool']]
             - ['setAttribute', ['video', 'loop', 'Bool']]
             - ['setAttribute', ['video', 'poster', 'URI']]
+            # iframe
+            - ['setAttribute', ['iframe', 'allow', 'Text']]
             # Set Custom Elements
             - ['setElement', ['button', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]
@@ -359,3 +362,18 @@ services:
         class: Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider
         arguments:
             - '@router'
+
+    oro_ui.session.flash_bag:
+        class: Oro\Bundle\UIBundle\Model\FlashBag
+        decorates: session.flash_bag
+        lazy: true
+        arguments:
+            - '@session'
+
+    oro_ui.consumption_extension.request_context:
+        class: Oro\Bundle\UIBundle\Consumption\Extension\ConsumptionExtension
+        arguments:
+            - '@router.request_context'
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_message_queue.consumption.extension }

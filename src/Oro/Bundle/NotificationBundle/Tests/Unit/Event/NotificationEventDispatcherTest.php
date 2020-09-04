@@ -12,6 +12,9 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NotificationEventDispatcherTest extends TestCase
 {
     private const NO_VALUE = 'NO_VALUE';

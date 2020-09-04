@@ -28,9 +28,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
+    private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
+
+    private const DEFAULT_IDENTITY_FIELDS = ['id'];
+
     /**
      * @var ExtendOptionsManager
      */
@@ -352,6 +357,43 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
 
         return $enumTable;
+    }
+
+    /**
+     * @param Table $table
+     * @param array $identityFields
+     */
+    public function setEnumFieldIdentities(Table $table, array $identityFields = self::DEFAULT_IDENTITY_FIELDS): void
+    {
+        if (empty($identityFields)) {
+            throw new \InvalidArgumentException('At least one identify field is required.');
+        }
+
+        if ($invalidIdentifyFields = array_diff($identityFields, self::ALLOWED_IDENTITY_FIELDS)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'The identification fields can only be: %s. Current invalid fields: %s.',
+                    implode(', ', self::ALLOWED_IDENTITY_FIELDS),
+                    implode(', ', $invalidIdentifyFields)
+                )
+            );
+        }
+
+        foreach (array_keys($table->getColumns()) as $column) {
+            $this->extendOptionsManager->mergeColumnOptions(
+                $table->getName(),
+                $column,
+                ['importexport' => ['identity' => false]]
+            );
+        }
+
+        foreach ($identityFields as $identityField) {
+            $this->extendOptionsManager->mergeColumnOptions(
+                $table->getName(),
+                $identityField,
+                ['importexport' => ['identity' => true]]
+            );
+        }
     }
 
     /**

@@ -1,7 +1,6 @@
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
     'oroui/js/mediator', 'oroui/js/layout',
-    'oroui/js/delete-confirmation', 'oroui/js/scrollspy', 'oroui/js/tools/scroll-helper',
-    'bootstrap', 'jquery-ui'
+    'oroui/js/delete-confirmation', 'oroui/js/scrollspy', 'oroui/js/tools/scroll-helper'
 ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy, scrollHelper) {
     'use strict';
 

@@ -14,6 +14,9 @@ use Oro\Bundle\GaufretteBundle\FileManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ErrorManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */

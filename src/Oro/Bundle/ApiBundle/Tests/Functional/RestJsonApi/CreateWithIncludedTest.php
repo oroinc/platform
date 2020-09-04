@@ -2,51 +2,44 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @dbIsolationPerTest
+ */
 class CreateWithIncludedTest extends RestJsonApiTestCase
 {
     protected function setUp()
     {
         parent::setUp();
         $this->loadFixtures([
-            LoadUser::class,
-            LoadOrganization::class,
-            LoadBusinessUnit::class
+            '@OroApiBundle/Tests/Functional/DataFixtures/create_with_included.yml'
         ]);
     }
 
     /**
      * @return Organization
      */
-    protected function getOrganization()
+    private function getOrganization(): Organization
     {
-        return $this->getEntityManager()
-            ->getRepository(Organization::class)
-            ->getFirst();
+        return $this->getReference('organization');
     }
 
     /**
      * @return BusinessUnit
      */
-    protected function getBusinessUnit()
+    private function getBusinessUnit(): BusinessUnit
     {
-        return $this->getEntityManager()
-            ->getRepository(BusinessUnit::class)
-            ->getFirst();
+        return $this->getReference('business_unit');
     }
 
-    /**
-     * @return array [$productId, $productTypeId]
-     */
     public function testCreateIncludedEntity()
     {
         $data = [
@@ -96,23 +89,27 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         self::assertEquals('Test Product 1', $product->getName());
         self::assertNotNull($product->getProductType());
         self::assertEquals($productTypeId, $product->getProductType()->getName());
-
-        return [$productId, $productTypeId];
     }
 
-    /**
-     * @depends testCreateIncludedEntity
-     *
-     * @param array $ids [$productId, $productTypeId]
-     */
-    public function testUpdateIncludedEntity($ids)
+    public function testUpdateIncludedEntity()
     {
-        list($productId, $productTypeId) = $ids;
+        $productType = new TestProductType();
+        $productType->setName('TEST_PRODUCT_TYPE_1');
+        $productType->setLabel('Test Product Type 1');
+        $product = new TestProduct();
+        $product->setName('Test Product 1');
+        $product->setProductType($productType);
+        $this->getEntityManager()->persist($productType);
+        $this->getEntityManager()->persist($product);
+        $this->getEntityManager()->flush();
+
+        $productId = $product->getId();
+        $productTypeId = $productType->getName();
 
         $data = [
             'data'     => [
                 'type'          => 'testproducts',
-                'id'            => $productId,
+                'id'            => (string)$productId,
                 'attributes'    => [
                     'name' => 'Test Product 1 (updated)'
                 ],
@@ -155,7 +152,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         $productType = $this->getEntityManager()->find(TestProductType::class, $productTypeId);
         self::assertNotNull($productType);
         self::assertEquals('Test Product Type 1 (updated)', $productType->getLabel());
-        $product = $this->getEntityManager()->find(TestProduct::class, (int)$productId);
+        $product = $this->getEntityManager()->find(TestProduct::class, $productId);
         self::assertEquals('Test Product 1 (updated)', $product->getName());
         self::assertNotNull($product->getProductType());
         self::assertEquals($productTypeId, $product->getProductType()->getName());
@@ -236,7 +233,7 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
                         'organization' => [
                             'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
                         ],
-                        'users' => [
+                        'users'        => [
                             'data' => [['type' => $entityType, 'id' => 'nested_user']]
                         ]
                     ]
@@ -251,10 +248,10 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
                         'email'     => 'test_user_21@example.com',
                     ],
                     'relationships' => [
-                        'organization'  => [
+                        'organization' => [
                             'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
                         ],
-                        'owner'         => [
+                        'owner'        => [
                             'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
                         ]
                     ]
@@ -380,6 +377,79 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
                 'source' => ['pointer' => '/included/0']
             ],
             $response
+        );
+    }
+
+    public function testUpdateIncludedEntityWithInversedDependency()
+    {
+        $orderId = $this->getReference('order1')->getId();
+        $orderLineItem1Id = $this->getReference('order1_line_item1')->getId();
+        $orderLineItem2Id = $this->getReference('order1_line_item2')->getId();
+        $orderLineItem3Id = $this->getReference('order1_line_item3')->getId();
+
+        // guard
+        self::assertSame(
+            3,
+            $this->getEntityManager()->find(TestOrder::class, $orderId)->getLineItems()->count()
+        );
+
+        $orderEntityType = $this->getEntityType(TestOrder::class);
+        $orderLineItemEntityType = $this->getEntityType(TestOrderLineItem::class);
+
+        $data = [
+            'data'     => [
+                'type' => $orderEntityType,
+                'id'   => (string)$orderId
+            ],
+            'included' => [
+                [
+                    'type'          => $orderLineItemEntityType,
+                    'id'            => (string)$orderLineItem1Id,
+                    'meta'          => ['update' => true],
+                    'attributes'    => [
+                        'quantity' => 110
+                    ],
+                    'relationships' => [
+                        'order' => [
+                            'data' => ['type' => $orderEntityType, 'id' => (string)$orderId]
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => $orderLineItemEntityType,
+                    'id'            => (string)$orderLineItem3Id,
+                    'meta'          => ['update' => true],
+                    'attributes'    => [
+                        'quantity' => 120
+                    ],
+                    'relationships' => [
+                        'order' => [
+                            'data' => ['type' => $orderEntityType, 'id' => (string)$orderId]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $orderEntityType, 'id' => (string)$orderId], $data);
+        $result = self::jsonToArray($response->getContent());
+        self::assertCount(3, $result['data']['relationships']['items']['data']);
+
+        self::assertSame(
+            3,
+            $this->getEntityManager()->find(TestOrder::class, $orderId)->getLineItems()->count()
+        );
+        self::assertSame(
+            110.0,
+            $this->getEntityManager()->find(TestOrderLineItem::class, $orderLineItem1Id)->getQuantity()
+        );
+        self::assertSame(
+            10.0,
+            $this->getEntityManager()->find(TestOrderLineItem::class, $orderLineItem2Id)->getQuantity()
+        );
+        self::assertSame(
+            120.0,
+            $this->getEntityManager()->find(TestOrderLineItem::class, $orderLineItem3Id)->getQuantity()
         );
     }
 }

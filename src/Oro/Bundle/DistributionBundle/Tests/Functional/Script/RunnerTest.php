@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @group dist
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RunnerTest extends WebTestCase
 {

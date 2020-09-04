@@ -9,6 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class HateoasTest extends RestJsonApiTestCase
 {

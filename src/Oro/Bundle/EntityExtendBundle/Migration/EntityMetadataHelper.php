@@ -137,6 +137,7 @@ class EntityMetadataHelper
 
     /**
      * Loads table name <-> entity class name maps
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadNameMaps()
     {

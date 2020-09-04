@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
+/**
+ * IMAP search query builder.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchQueryBuilder extends AbstractSearchQueryBuilder
 {
     /**

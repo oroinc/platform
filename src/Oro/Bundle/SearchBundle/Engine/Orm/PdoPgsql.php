@@ -63,6 +63,7 @@ class PdoPgsql extends BaseDriver
      * @param boolean                    $setOrderBy
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {

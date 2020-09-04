@@ -47,7 +47,7 @@ services:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.unix_mysql_simple_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlSyncIsolator'
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
     arguments:
       - '@symfony2_extension.kernel'
     tags:
@@ -55,6 +55,34 @@ services:
 
   oro_behat_extension.isolation.unix_pgsql_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 110 }
+
+  oro_behat_extension.isolation.docker_pgsql_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerPgsqlIsolator
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 110 }
+
+  oro_behat_extension.isolation.docker_compose_pgsql_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposePgsqlIsolator
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 110 }
+
+  oro_behat_extension.isolation.docker_mysql_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerMysqlIsolator
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 110 }
+
+  oro_behat_extension.isolation.docker_compose_mysql_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposeMysqlIsolator
     arguments:
       - '@symfony2_extension.kernel'
     tags:

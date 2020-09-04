@@ -21,7 +21,7 @@ use Guzzle\Parser\UriTemplate\UriTemplateInterface;
 /**
  * HTTP client
  *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD)
  */
 class Client extends AbstractHasDispatcher implements ClientInterface
 {

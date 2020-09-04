@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -55,7 +56,16 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
         $message = $this->createMessage([
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
-            'entities_inserted' => [],
+            'entities_inserted' => [
+                '000000004ad74b060000000013bc8879' => [
+                    'entity_class' => Country::class,
+                    'entity_id' => '0',
+                    'change_set' => [
+                        'iso2Code' => [null, '0'],
+                        'name' => [null, '0']
+                    ]
+                ]
+            ],
             'entities_updated' => [],
             'entities_deleted' => [],
             'collections_updated' => [],

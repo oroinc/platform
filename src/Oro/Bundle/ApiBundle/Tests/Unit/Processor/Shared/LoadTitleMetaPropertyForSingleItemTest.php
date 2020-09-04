@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */

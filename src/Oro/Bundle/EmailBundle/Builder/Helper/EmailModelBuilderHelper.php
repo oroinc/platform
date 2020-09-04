@@ -94,6 +94,7 @@ class EmailModelBuilderHelper
      * @param string|null $ownerClass
      * @param mixed|null  $ownerId
      * @param bool        $excludeCurrentUser
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preciseFullEmailAddress(
         &$emailAddress,

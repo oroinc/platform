@@ -5,6 +5,7 @@ namespace Oro\Component\TestUtils\ORM\Mocks;
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\StatementMock that is excluded from doctrine
  * package since v2.4.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Statement
 {

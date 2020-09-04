@@ -4,20 +4,8 @@ define(function(require, exports, module) {
     const _ = require('underscore');
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
-    const cssVars = require('css-vars-ponyfill');
-    let config = require('module-config').default(module.id);
-    config = _.defaults({}, config, {
-        onlyLegacy: false,
-        preserveStatic: false,
-        updateDOM: false,
-        updateURLs: false
-    });
 
     const cssVariablesManager = {
-        /**
-         * @property {Object}
-         */
-        cssVariables: {},
 
         /**
          * @property {Promise}
@@ -31,24 +19,7 @@ define(function(require, exports, module) {
         initialize: function() {
             this.createHandlers();
             this.getComputedVariables(document.head, this.deferred);
-
-            cssVars(_.extend(config, {
-                onComplete: _.bind(function(cssText, styleNodes, cssVariables) {
-                    this.cssVariables = _.extend(this.cssVariables, cssVariables);
-
-                    mediator.trigger('css:variables:fetched', this.cssVariables);
-                }, this)
-            }));
-
             return this.deferred.promise;
-        },
-
-        /**
-         * Ger array of CSS variables
-         * @returns {cssVariablesManager.cssVariables|{}}
-         */
-        getVariables: function() {
-            return this.cssVariables;
         },
 
         /**

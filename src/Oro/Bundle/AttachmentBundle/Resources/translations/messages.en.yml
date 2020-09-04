@@ -124,6 +124,18 @@ oro:
                 file_size.label: Size
                 created_at.label: Created At
 
+        import:
+            entity_is_skipped: 'File importing has failed, entity is skipped'
+            failed_to_upload_or_clone: 'Failed to either upload or clone file from the existing one: file not found by specified UUID and nothing is specified for uploading. Please make sure %fieldname%.URI and %fieldname%.UUID columns are present in the import file and have the correct values.'
+            failed_to_upload: 'Failed to upload a file from %path%: %error%'
+            failed_to_clone: 'Failed to clone a file from %origin_uuid%: %error%'
+            failed_to_clone_forbidden: 'you do not have permission to view the file with uuid %origin_uuid%'
+            failed_to_clone_origin_file_empty: 'file is empty or not found'
+            file_constraint_violation: 'File validation failed for field %fieldname%: %error%'
+            multi_file_constraint_violation: 'File validation failed for element %index% of field %fieldname%: %error%'
+            multi_file_field_constraint_violation: 'Validation failed for field %fieldname%: %error%'
+            multi_image_field_constraint_violation: 'Validation failed for field %fieldname%: %error%'
+
     entity_extend:
         form:
             data_type:

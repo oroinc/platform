@@ -33,9 +33,9 @@ class SegmentControllerTest extends WebTestCase
         $responseData = json_decode($response->getContent(), true);
 
         self::assertCount(3, $responseData['results']);
-        self::assertEquals('Main BU segment', $responseData['results'][0]['text']);
-        self::assertEquals('Second BU segment', $responseData['results'][1]['text']);
-        self::assertEquals('Child BU segment', $responseData['results'][2]['text']);
+        self::assertEquals('Child BU segment', $responseData['results'][0]['text']);
+        self::assertEquals('Main BU segment', $responseData['results'][1]['text']);
+        self::assertEquals('Second BU segment', $responseData['results'][2]['text']);
     }
 
     public function testGetItemsForDivisionAccessLevel()
@@ -59,8 +59,8 @@ class SegmentControllerTest extends WebTestCase
         $responseData = json_decode($response->getContent(), true);
 
         self::assertCount(2, $responseData['results']);
-        self::assertEquals('Main BU segment', $responseData['results'][0]['text']);
-        self::assertEquals('Child BU segment', $responseData['results'][1]['text']);
+        self::assertEquals('Child BU segment', $responseData['results'][0]['text']);
+        self::assertEquals('Main BU segment', $responseData['results'][1]['text']);
     }
 
     public function testGetItemsForUserAccessLevel()

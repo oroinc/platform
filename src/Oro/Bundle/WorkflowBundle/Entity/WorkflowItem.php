@@ -51,6 +51,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 {

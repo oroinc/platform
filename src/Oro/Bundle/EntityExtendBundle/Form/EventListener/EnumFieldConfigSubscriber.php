@@ -114,6 +114,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
      * @param FormEvent $event
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function postSubmit(FormEvent $event)
     {

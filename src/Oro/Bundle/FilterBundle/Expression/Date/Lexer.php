@@ -39,6 +39,7 @@ class Lexer
      *
      * @return Token[]
      * @throws SyntaxException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function tokenize(string $string): array
     {

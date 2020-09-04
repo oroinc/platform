@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()

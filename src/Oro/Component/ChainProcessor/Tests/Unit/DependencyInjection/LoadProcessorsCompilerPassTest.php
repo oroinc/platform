@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessWithoutProcessorBagConfigBuilder()

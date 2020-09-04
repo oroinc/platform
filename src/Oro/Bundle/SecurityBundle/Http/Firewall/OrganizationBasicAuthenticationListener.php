@@ -83,6 +83,7 @@ class OrganizationBasicAuthenticationListener
      * Handles basic authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function handle(GetResponseEvent $event)
     {

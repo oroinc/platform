@@ -9,6 +9,11 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * A generic configuration DTO.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigObject implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';

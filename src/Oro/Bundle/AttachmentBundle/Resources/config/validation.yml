@@ -17,4 +17,7 @@ Oro\Bundle\AttachmentBundle\Entity\File:
         fileSize:
             - Type: integer
             - Range:
-                  max: 2147483647 # max allowed value for integer column
+                max: 2147483647 # max allowed value for integer column
+        uuid:
+            - Uuid:
+                groups: ['Default', 'import_field_type']

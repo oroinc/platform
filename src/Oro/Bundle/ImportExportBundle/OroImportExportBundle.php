@@ -4,11 +4,11 @@ namespace Oro\Bundle\ImportExportBundle;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
-use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\IdentityValidationLoaderPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ReaderCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TypeValidationLoaderPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
 use Oro\Bundle\ImportExportBundle\MimeType\CsvMimeTypeGuesser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,7 +27,7 @@ class OroImportExportBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new IdentityValidationLoaderPass());
+        $container->addCompilerPass(new TypeValidationLoaderPass());
         $container->addCompilerPass(new AddNormalizerCompilerPass());
         $container->addCompilerPass(new ProcessorRegistryCompilerPass());
         $container->addCompilerPass(new TemplateEntityRepositoryCompilerPass());

@@ -199,13 +199,12 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Field config attribute "field_name" can not be empty.
      * @dataProvider formChoicesWithFieldsWithoutFieldNameAttributeDataProvider
      *
      * @param array $fields
+     * @param array $expectedChoices
      */
-    public function testFormChoicesWithFieldsWithoutFieldNameAttribute(array $fields)
+    public function testFormChoicesWithFieldsWithoutFieldNameAttribute(array $fields, array $expectedChoices)
     {
         $this->managerMock->expects($this->atLeastOnce())
             ->method('getActiveAttributesByClass')
@@ -219,7 +218,10 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $this->managerMock->method('isSystem')
             ->willReturn(false);
 
-        $this->factory->createBuilder(AttributeMultiSelectType::class, []);
+        $builder = $this->factory->createBuilder(AttributeMultiSelectType::class, []);
+        $form = $builder->getForm();
+        $actualChoices = $form->getConfig()->getOption('choices');
+        $this->assertEquals($expectedChoices, $actualChoices);
     }
 
     /**
@@ -227,18 +229,55 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
      */
     public function formChoicesWithFieldsWithoutFieldNameAttributeDataProvider(): array
     {
+        /** @var FieldConfigModel $field1 */
         $field1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
+        $field1->setFieldName('field1');
         $field1->fromArray('attribute', ['field_name' => 'color_custom_1']);
         $field2 = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
+        $field2->setFieldName('field2');
         $field2->fromArray('attribute', ['field_name' => '']);
         $field3 = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
+        $field3->setFieldName('field3');
         $field3->fromArray('attribute', ['field_name' => null]);
         $field4 = $this->getEntity(FieldConfigModel::class, ['id' => 4]);
+        $field4->setFieldName('field4');
 
         return [
-            [[$field1, $field2]],
-            [[$field3, $field1]],
-            [[$field4, $field1]],
+            [
+                [$field1, $field2],
+                [
+                    'Label(color_custom_1)' => 1,
+                    'Label(field2)' => 2
+                ]
+            ],
+            [
+                [$field3, $field1],
+                [
+                    'Label(color_custom_1)' => 1,
+                    'Label(field3)' => 3
+                ]
+            ],
+            [
+                [$field4, $field1],
+                [
+                    'Label(color_custom_1)' => 1,
+                    'Label(field4)' => 4
+                ]
+            ],
+            [
+                [$field2, $field3],
+                [
+                    'Label(field2)' => 2,
+                    'Label(field3)' => 3
+                ]
+            ],
+            [
+                [$field3, $field4],
+                [
+                    'Label(field3)' => 3,
+                    'Label(field4)' => 4
+                ]
+            ]
         ];
     }
 }

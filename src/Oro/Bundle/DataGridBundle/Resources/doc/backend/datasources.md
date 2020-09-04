@@ -16,7 +16,7 @@ OroPlatform gives you a wide variety of ways to prepare and supply data to a dat
 
  - [ORM](datasources/orm.md)
  - [Array](datasources/array.md)
- - [Search](../../../../SearchBundle/Resources/doc/configuration.md#datagrid-configuration)
+ - [Search](https://doc.oroinc.com/backend/entities-data-management/search/configuration/#datagrid-configuration)
 
 
 ## Custom Types

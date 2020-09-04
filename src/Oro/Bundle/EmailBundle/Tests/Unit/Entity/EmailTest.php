@@ -14,6 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailTest extends \PHPUnit\Framework\TestCase
 {

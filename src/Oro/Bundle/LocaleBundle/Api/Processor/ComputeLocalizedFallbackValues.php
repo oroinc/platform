@@ -36,6 +36,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context)
     {

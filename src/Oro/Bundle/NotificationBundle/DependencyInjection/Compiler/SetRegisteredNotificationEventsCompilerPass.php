@@ -17,6 +17,7 @@ class SetRegisteredNotificationEventsCompilerPass implements CompilerPassInterfa
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContainerBuilder $container)
     {

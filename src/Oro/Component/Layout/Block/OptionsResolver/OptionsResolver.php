@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
  * using with expressions, like `setAllowedTypes` etc.
  * @see Symfony\Component\OptionsResolver\OptionsResolver
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OptionsResolver implements Options
 {

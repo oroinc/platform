@@ -66,6 +66,7 @@ class PropertyConfigContainer
      * @param string|null              $fieldType
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getDefaultValues($type = self::TYPE_ENTITY, $fieldType = null)
     {
@@ -201,6 +202,7 @@ class PropertyConfigContainer
      * @param string|null              $fieldType
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function hasForm($type = self::TYPE_ENTITY, $fieldType = null)
     {
@@ -252,6 +254,7 @@ class PropertyConfigContainer
      * @param string|null              $fieldType
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFormItems($type = self::TYPE_ENTITY, $fieldType = null)
     {

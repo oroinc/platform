@@ -11,6 +11,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * see methods documentation for more details
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ArrayUtil
 {
@@ -125,6 +126,7 @@ class ArrayUtil
      * @return array|null
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive)
     {

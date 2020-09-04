@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents a field configuration inside "actions" section.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActionFieldConfig implements FieldConfigInterface
 {

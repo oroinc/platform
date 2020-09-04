@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_NONCE = 'someNonce';
+    private const TEST_NONCE = 'тестовый апи'; // RU chars used to enforce nonce to contain / symbol in base64
     private const TEST_API_KEY = 'someApiKey';
     private const PROVIDER_KEY = 'someProviderKey';
 
@@ -239,11 +239,10 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     */
     public function testGetSecretException(): void
     {
+        $this->expectException(AuthenticationException::class);
+
         $noApiKeyUser = $this->createMock(\Oro\Bundle\UserBundle\Entity\User::class);
         $noApiKeyUser
             ->expects(self::once())
@@ -255,7 +254,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->method('loadUserByUsername')
             ->willReturn($noApiKeyUser);
 
-        $nonce = base64_encode(uniqid(self::TEST_NONCE));
+        $nonce = $this->getNonce();
         $time = date('Y-m-d H:i:s');
 
         $digest = $this->encoder->encodePassword(sprintf('%s%s%s', base64_decode($nonce), $time, ''), '');
@@ -278,7 +277,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $token = new Token(new User(), 'asd', self::PROVIDER_KEY);
         $token->setAttribute('firewallName', 'test');
-        $token->setAttribute('nonce', base64_encode(uniqid(self::TEST_NONCE)));
+        $token->setAttribute('nonce', $this->getNonce());
         $token->setAttribute('created', date('Y-m-d H:i:s'));
         $this->assertTrue($this->provider->supports($token));
     }
@@ -296,7 +295,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->method('loadUserByUsername')
             ->willReturn($user);
 
-        $nonce = base64_encode(uniqid(self::TEST_NONCE));
+        $nonce = $this->getNonce();
         $time = date('Y-m-d H:i:s');
 
         $digest = $this->encoder->encodePassword(
@@ -316,5 +315,13 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token->setAttribute('firewallName', 'test');
 
         return $token;
+    }
+
+    /**
+     * @return string
+     */
+    private function getNonce(): string
+    {
+        return base64_encode(uniqid(self::TEST_NONCE, true));
     }
 }

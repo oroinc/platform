@@ -126,6 +126,11 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
                 ['mode' => 'full']
             ],
             [
+                new TestEnumValue('0', '0', 100, true),
+                ['id' => '0', 'name' => '0', 'priority' => 100, 'is_default' => true],
+                ['mode' => 'full']
+            ],
+            [
                 new TestEnumValue($id, 'name', 100, true),
                 ['name' => 'name'],
                 ['mode' => 'short']
@@ -135,7 +140,13 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
                 ['id' => $id],
                 ['mode' => 'short'],
                 'id'
-            ]
+            ],
+            [
+                new TestEnumValue('0', '0', 100, true),
+                ['id' => '0'],
+                ['mode' => 'short'],
+                'id'
+            ],
         ];
     }
 

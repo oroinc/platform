@@ -51,6 +51,13 @@ services:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
 
+    oro_sync.topic.dispatcher:
+        class: Oro\Bundle\SyncBundle\Server\App\Dispatcher\TopicDispatcher
+        lazy: true
+        decorates: gos_web_socket.topic.dispatcher
+        arguments:
+            - '@oro_sync.topic.dispatcher.inner'
+
     oro_sync.topic.maintenance:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
         arguments:

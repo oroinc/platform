@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * Represents the configuration of a field that can be used to filter data.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FilterFieldConfig implements FieldConfigInterface
 {

@@ -8,6 +8,9 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
+/**
+ * Normalizes objects that implement AbstractLocalizedFallbackValue.
+ */
 class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 {
     /** @var ManagerRegistry */
@@ -58,7 +61,10 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         return $result;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!is_array($data)) {

@@ -20,6 +20,7 @@ define(function(require) {
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {
+                    maxWidth: 650,
                     width: 650,
                     autoResize: true,
                     modal: true,

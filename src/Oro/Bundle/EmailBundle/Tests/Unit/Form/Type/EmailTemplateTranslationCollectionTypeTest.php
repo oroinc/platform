@@ -54,6 +54,7 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
             ->willReturn(['br', 'a']);
 
         $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
+        $htmlTagHelper->setTranslator($this->translator);
 
         /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);

@@ -4,6 +4,9 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DashboardTest extends \PHPUnit\Framework\TestCase
 {
     /**

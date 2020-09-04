@@ -18,6 +18,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class QueryExpressionVisitorTest extends OrmRelatedTestCase
 {

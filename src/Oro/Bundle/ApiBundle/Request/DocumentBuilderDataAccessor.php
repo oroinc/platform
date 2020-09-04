@@ -187,6 +187,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
      * @param mixed    $value
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doTryGetValue(array $path, &$value): bool
     {

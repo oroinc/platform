@@ -1,0 +1,8 @@
+services:
+    oro_entity_config.provider.export_query_tuple_length.test:
+        parent: oro_entity_config.provider.export_query_tuple_length
+        public: true
+
+    oro_importexport.reader.entity.test:
+        parent: oro_importexport.reader.entity
+        public: true

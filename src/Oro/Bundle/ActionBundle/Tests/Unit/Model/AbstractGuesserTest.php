@@ -14,6 +14,9 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /* @var AbstractGuesser */

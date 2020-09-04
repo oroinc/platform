@@ -18,6 +18,7 @@ class HtmlTagProviderTest extends WebTestCase
      */
     protected $allowedElements = [
         '@[id|style|class]',
+        'iframe[allowfullscreen|frameborder|height|marginheight|marginwidth|name|scrolling|src|width|allow]',
         'table[cellspacing|cellpadding|border|align|width]',
         'thead[align|valign]',
         'tbody[align|valign]',
@@ -91,9 +92,9 @@ class HtmlTagProviderTest extends WebTestCase
     ];
 
     /** @var string */
-    protected $allowedTags = '<table></table><thead></thead><tbody></tbody><tr></tr><td></td><th></th><a></a>' .
-    '<dl></dl><dt></dt><div></div><ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p><u></u>' .
-    '<font></font><i></i><br><span></span><img><h1></h1><h2></h2><h3></h3><h4></h4><h5></h5><h6></h6>' .
+    protected $allowedTags = '<iframe></iframe><table></table><thead></thead><tbody></tbody><tr></tr><td></td>' .
+    '<th></th><a></a><dl></dl><dt></dt><div></div><ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p>' .
+    '<u></u><font></font><i></i><br><span></span><img><h1></h1><h2></h2><h3></h3><h4></h4><h5></h5><h6></h6>' .
     '<hgroup></hgroup><abbr></abbr><address></address><article></article><audio></audio><bdo></bdo>' .
     '<blockquote></blockquote><caption></caption><cite></cite><code></code><col></col><colgroup></colgroup>' .
     '<dd></dd><del></del><details></details><dfn></dfn><figure></figure><figcaption></figcaption>' .

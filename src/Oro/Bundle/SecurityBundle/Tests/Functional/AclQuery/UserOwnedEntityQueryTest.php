@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPe
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UserOwnedEntityQueryTest extends AclTestCase
 {

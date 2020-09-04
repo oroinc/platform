@@ -64,6 +64,7 @@ abstract class RemoveInfoRecords implements ProcessorInterface
      * @param string         $propertyPath
      *
      * @return array [property path => info record, ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processEntity(array &$data, EntityMetadata $metadata, string $propertyPath): array
     {

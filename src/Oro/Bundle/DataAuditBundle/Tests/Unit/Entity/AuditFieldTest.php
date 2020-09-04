@@ -7,6 +7,9 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AuditFieldTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()

@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\NullLogger;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ContextTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
@@ -31,7 +34,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowGetMessageConsumerPreviouslySet()
     {
         $messageConsumer = $this->createMessageConsumer();
-        
+
         $context = new Context($this->createSession());
         $context->setMessageConsumer($messageConsumer);
 

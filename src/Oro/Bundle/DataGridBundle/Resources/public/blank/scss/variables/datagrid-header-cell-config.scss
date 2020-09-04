@@ -7,14 +7,6 @@ $datagrid-header-cell-action-column-width: 50px !default;
 $datagrid-header-cell-action-column-text-align: right !default;
 $datagrid-header-cell-action-column-offset-inner: $datagrid-header-cell-mass-action-offset-inner !default;
 
-$datagrid-header-cell-sortable-icon-offset: 0 0 0 5px !default;
-$datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;
-$datagrid-header-cell-sortable-icon-size: 4px !default;
-
-$datagrid-header-cell-sortable-icon-position: absolute !default;
-$datagrid-header-cell-sortable-icon-top: 50% !default;
-$datagrid-header-cell-sortable-icon-right: -15px !default;
-
 $datagrid-header-cell-link-font-size: $base-font-size !default;
 $datagrid-header-cell-link-font-weight: 600 !default;
 $datagrid-header-cell-link-line-height: 1 !default;
@@ -22,3 +14,8 @@ $datagrid-header-cell-link-color: get-color('additional', 'dark') !default;
 $datagrid-header-cell-link-position: relative !default;
 $datagrid-header-cell-link-hover-color: get-color('additional', 'dark') !default;
 $datagrid-header-cell-link-hover-text-decoration: none !default;
+
+$datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-sortable-icon-size: 4px !default;
+
+$datagrid-header-cell-sortable-icon-left: $offset-y-s !default;

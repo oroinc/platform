@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CompleteSortersTest extends ConfigProcessorTestCase
 {

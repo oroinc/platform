@@ -123,6 +123,9 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function configureTestAclExtension()
     {
         $this->extension->expects(self::any())

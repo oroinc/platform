@@ -56,6 +56,7 @@ class BeforeMapObjectSearchListener
      *  entity or field will bw added to the main search map.
      *
      * @param SearchMappingCollectEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
     {

@@ -199,7 +199,7 @@ class ACLContext extends OroFeatureContext implements
             $entityName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($permission, $value) = explode(':', $cell);
+                [$permission, $value] = explode(':', $cell);
                 $userRoleForm->setPermission($entityName, $permission, $value);
             }
         }
@@ -237,16 +237,18 @@ class ACLContext extends OroFeatureContext implements
      *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
      *
      * @Then /^the role has following active permissions:$/
+     * @param TableNode $table
      */
     public function iSeeFollowingPermissions(TableNode $table)
     {
         $userRoleForm = $this->getRoleViewFormElement();
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($role, $value) = explode(':', $cell);
+                [$role, $value] = explode(':', $cell);
                 self::assertNotEmpty($permissionsArray[$entityName][$role]);
                 $expected = $permissionsArray[$entityName][$role];
                 self::assertEquals(
@@ -269,7 +271,8 @@ class ACLContext extends OroFeatureContext implements
     public function iDontSeeFollowingPermissions(TableNode $table)
     {
         $userRoleForm = $this->getRoleViewFormElement();
-        $permissionsArray = $userRoleForm->getPermissions();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
 
@@ -426,6 +429,7 @@ class ACLContext extends OroFeatureContext implements
      *       | Account name  | View:Business Unit | Create:Global | Edit:None |
      *
      * @Then /^(?:|I )select following field permissions:$/
+     * @param TableNode $table
      */
     public function iSelectFollowingFieldPermissions(TableNode $table)
     {
@@ -435,7 +439,7 @@ class ACLContext extends OroFeatureContext implements
             $fieldName = array_shift($row);
 
             foreach ($row as $cell) {
-                list($permission, $value) = explode(':', $cell);
+                [$permission, $value] = explode(':', $cell);
                 $userRoleForm->setPermission($fieldName, $permission, $value, true);
             }
         }

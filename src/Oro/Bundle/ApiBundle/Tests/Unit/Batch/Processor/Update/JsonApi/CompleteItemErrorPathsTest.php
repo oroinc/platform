@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update\BatchUpdateProcessorTestCase;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */

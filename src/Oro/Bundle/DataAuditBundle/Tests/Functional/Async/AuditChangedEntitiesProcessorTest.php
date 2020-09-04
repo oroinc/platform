@@ -18,6 +18,8 @@ use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AuditChangedEntitiesProcessorTest extends WebTestCase
 {

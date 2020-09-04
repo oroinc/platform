@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Provider\AbstractEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides human-readable enum field name.
+ */
 class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implements EntityClassNameProviderInterface
 {
     /** @var array [enumCode => [class name, field name], ...] */
@@ -58,6 +61,7 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
 
     /**
      * @return string[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getEnumCodesMap()
     {

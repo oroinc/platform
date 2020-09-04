@@ -12,6 +12,7 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class JobManagerTest extends WebTestCase
 {

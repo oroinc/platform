@@ -178,7 +178,7 @@ class AttributeController extends Controller
      * @param string $alias
      * @return EntityConfigModel
      */
-    private function getEntityByAlias($alias)
+    protected function getEntityByAlias($alias)
     {
         /** @var EntityAliasResolver $aliasResolver */
         $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
@@ -197,7 +197,7 @@ class AttributeController extends Controller
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $this->ensureEntityConfigSupported($entityConfigModel);
-        list($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
+        [$layoutActions] = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
 
         $response = [
             'entity' => $entityConfigModel,

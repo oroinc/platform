@@ -93,6 +93,7 @@ class JsValidationExtension extends AbstractTypeExtension
      *
      * @param FormView $view
      * @param FormInterface $form
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addDataValidationAttribute(FormView $view, FormInterface $form)
     {

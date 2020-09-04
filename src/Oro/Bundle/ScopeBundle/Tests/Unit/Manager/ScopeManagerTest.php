@@ -23,6 +23,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 {

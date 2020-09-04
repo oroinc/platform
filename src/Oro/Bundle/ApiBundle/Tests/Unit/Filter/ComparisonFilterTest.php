@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetAndGetField()

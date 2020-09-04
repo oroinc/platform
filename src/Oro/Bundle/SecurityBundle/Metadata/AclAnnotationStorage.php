@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 
 /**
  * The storage for ACL annotations and bindings.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AclAnnotationStorage implements \Serializable
 {

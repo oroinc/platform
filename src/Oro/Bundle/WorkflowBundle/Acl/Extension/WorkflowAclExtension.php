@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -177,5 +179,31 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     public function removeServiceBits($mask)
     {
         return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getValidMasks($object)
+    {
+        if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            $maxAccessLevel = $this->metadataProvider->getMaxAccessLevel(
+                AccessLevel::SYSTEM_LEVEL,
+                ObjectIdentityFactory::ROOT_IDENTITY_TYPE
+            );
+
+            return $maxAccessLevel === AccessLevel::SYSTEM_LEVEL
+                ? $this->getMaskForGroup('SYSTEM')
+                    | $this->getMaskForGroup('GLOBAL')
+                    | $this->getMaskForGroup('DEEP')
+                    | $this->getMaskForGroup('LOCAL')
+                    | $this->getMaskForGroup('BASIC')
+                : $this->getMaskForGroup('GLOBAL')
+                    | $this->getMaskForGroup('DEEP')
+                    | $this->getMaskForGroup('LOCAL')
+                    | $this->getMaskForGroup('BASIC');
+        }
+
+        return parent::getValidMasks($object);
     }
 }

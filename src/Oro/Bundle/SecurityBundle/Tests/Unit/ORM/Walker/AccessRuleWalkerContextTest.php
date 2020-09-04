@@ -7,6 +7,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext;
 use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AccessRuleWalkerContextTest extends TestCase
 {
     public function testPermissionWithDefaultValue()

@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit\Extension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasType()

@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {

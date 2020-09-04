@@ -7,6 +7,7 @@ namespace Oro\Bundle\ImapBundle\Connector\Search;
  *
  * Notes: In all search keys that use strings, a message matches the key if
  * the string is a substring of the field. The matching is case-insensitive.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SearchQuery
 {

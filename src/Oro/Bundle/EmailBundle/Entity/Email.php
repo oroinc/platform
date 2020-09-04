@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
- * Email
+ * Represents an email.
  *
  * @ORM\Table(
  *      name="oro_email",
@@ -47,6 +47,7 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  * )
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Email extends ExtendEmail
 {
@@ -733,8 +734,6 @@ class Email extends ExtendEmail
     }
 
     /**
-     * todo: remove this method
-     *
      * @param EmailFolder $emailFolder
      *
      * @return EmailUser|null

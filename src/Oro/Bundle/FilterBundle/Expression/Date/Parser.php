@@ -5,6 +5,9 @@ namespace Oro\Bundle\FilterBundle\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * Date expression parser.
+ */
 class Parser
 {
     /** @var LocaleSettings */
@@ -64,6 +67,7 @@ class Parser
      *
      * @return Token[]
      * @throws \LogicException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertExprToRPN($tokens)
     {

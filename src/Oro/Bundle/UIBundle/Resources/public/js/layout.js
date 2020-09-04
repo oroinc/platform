@@ -9,8 +9,7 @@ define(function(require) {
     const scrollHelper = require('oroui/js/tools/scroll-helper');
     const Popover = require('bootstrap-popover');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
-
-    require('jquery-ui');
+    require('jquery-ui/tabbable');
 
     const document = window.document;
     const console = window.console;

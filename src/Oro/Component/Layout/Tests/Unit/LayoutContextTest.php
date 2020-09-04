@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\LayoutContext;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContext */

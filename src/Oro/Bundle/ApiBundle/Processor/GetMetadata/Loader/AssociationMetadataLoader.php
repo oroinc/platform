@@ -28,6 +28,7 @@ class AssociationMetadataLoader
      * @param EntityMetadata         $entityMetadata
      * @param EntityDefinitionConfig $config
      * @param MetadataContext        $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function completeAssociationMetadata(
         EntityMetadata $entityMetadata,

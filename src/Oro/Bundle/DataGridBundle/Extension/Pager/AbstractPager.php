@@ -3,9 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
 /**
- * Class AbstractPager
- * @package Oro\Bundle\DataGridBundle\Extension\Pager
+ * Generic base class, agnostic of the datagrid's source, for creating datagrid pagers.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractPager implements \Iterator, \Countable, \Serializable, PagerInterface
 {

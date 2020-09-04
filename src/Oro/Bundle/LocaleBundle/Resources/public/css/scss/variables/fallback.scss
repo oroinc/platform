@@ -38,9 +38,9 @@ $fallback-item-label-offset: 10px 0 !default;
 $fallback-item-fallback-line-offset: 10px 0 !default;
 
 $fallback-item-fallback-min-width: 50% !default;
-$fallback-item-fallback-max-width: 80% !default;
+$fallback-item-fallback-max-width: 70% !default;
 
-$fallback-item-use-fallback-width: 20% !default;
+$fallback-item-use-fallback-width: 30% !default;
 $fallback-item-use-fallback-max-width: 50% !default;
 
 $fallback-item-mce-tinymce-width: 100% !important !default;
@@ -54,3 +54,5 @@ $fallback-item-value--first-validation-width: 100% !default;
 $fallback-item-value--first-validation-order: 1 !default;
 
 $fallback-item-value--first-input-group-offset-end: 4px !default;
+
+$fallback-item-use-fallback-oro-checkbox-view-display: inline-block !default;

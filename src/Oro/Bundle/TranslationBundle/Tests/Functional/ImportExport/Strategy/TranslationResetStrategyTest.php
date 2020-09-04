@@ -47,7 +47,7 @@ class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
     {
         $container = $this->getContainer();
 
-        return new TranslationResetStrategy(
+        $strategy = new TranslationResetStrategy(
             $container->get('event_dispatcher'),
             $container->get('oro_importexport.strategy.import.helper'),
             $container->get('oro_entity.helper.field_helper'),
@@ -58,5 +58,9 @@ class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
             $container->get('oro_entity.doctrine_helper'),
             $container->get('oro_importexport.field.related_entity_state_helper')
         );
+
+        $strategy->setOwnershipSetter($container->get('oro_organization.entity_ownership_associations_setter'));
+
+        return $strategy;
     }
 }

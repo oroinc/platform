@@ -12,6 +12,9 @@ use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */

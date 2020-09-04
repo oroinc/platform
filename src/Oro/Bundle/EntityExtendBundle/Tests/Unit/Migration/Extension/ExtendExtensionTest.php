@@ -548,6 +548,105 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @dataProvider createEnumWithIdentityDataProvider
+     *
+     * @param array $identityFields
+     * @param array $expected
+     */
+    public function testSetEnumFieldIdentifiers($identityFields = [], $expected = []): void
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+        $table1 = $schema->createTable('table1');
+
+        $enumTable = $extension->addEnumField($schema, $table1, 'association_name', 'enum_code');
+        $extension->setEnumFieldIdentities($enumTable, $identityFields);
+
+        foreach ($expected as $column => $columnParameters) {
+            $columnOptions = $this->extendOptionsManager->getColumnOptions($enumTable->getName(), $column);
+            $this->assertEquals($columnOptions['importexport']['identity'], $columnParameters['identity']);
+        }
+    }
+
+    /**
+     * @return array[]
+     */
+    public function createEnumWithIdentityDataProvider(): array
+    {
+        return [
+            '`id` is identity field' => [
+                'identityFields' => ['id'],
+                'expected' => [
+                    'id' => ['identity' => true],
+                    'name' => ['identity' => false],
+                    'priority' => ['identity' => false],
+                    'is_default' => ['identity' => false]
+                ]
+            ],
+            '`name` is identity field' => [
+                'identityFields' => ['name'],
+                'expected' => [
+                    'id' => ['identity' => false],
+                    'name' => ['identity' => true],
+                    'priority' => ['identity' => false],
+                    'is_default' => ['identity' => false]
+                ]
+            ],
+            '`id` and `name` are identity field' => [
+                'identityFields' => ['id', 'name'],
+                'expected' => [
+                    'id' => ['identity' => true],
+                    'name' => ['identity' => true],
+                    'priority' => ['identity' => false],
+                    'is_default' => ['identity' => false]
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param string $exception
+     * @param string $exceptionMessage
+     * @param array $identityFields
+     *
+     * @dataProvider createEnumWithInvalidIdentityFieldDataProvider
+     */
+    public function testCreateEnumWithInvalidIdentityField(
+        string $exception,
+        string $exceptionMessage,
+        array $identityFields = []
+    ): void {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
+        $enumTable = $extension->createEnum($schema, 'test_status');
+        $extension->setEnumFieldIdentities($enumTable, $identityFields);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function createEnumWithInvalidIdentityFieldDataProvider(): array
+    {
+        return [
+            'with not allowed identify fields' => [
+                'exception' => \InvalidArgumentException::class,
+                'exceptionMessage' =>
+                    'The identification fields can only be: id, name. '.
+                    'Current invalid fields: priority, is_default.',
+                'identityFields' => ['id', 'name', 'priority', 'is_default', ]
+            ],
+            'with empty identify fields' => [
+                'exception' => \InvalidArgumentException::class,
+                'exceptionMessage' => 'At least one identify field is required',
+                'identityFields' => []
+            ]
+        ];
+    }
+
     public function testAddEnumFieldForExistingEnum()
     {
         $schema = $this->getExtendSchema();

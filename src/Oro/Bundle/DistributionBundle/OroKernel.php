@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
+use LogicException;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
@@ -492,7 +493,15 @@ abstract class OroKernel extends Kernel
     {
         $container = parent::buildContainer();
 
-        if (null !== ($deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir()))) {
+        try {
+            $deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir());
+        } catch (LogicException $e) {
+            $deploymentConfig = null;
+            // do nothing, the warning message would be shown later by
+            // {@ see \Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener}
+        }
+
+        if (null !== $deploymentConfig) {
             $this->getContainerLoader($container)->load($deploymentConfig);
         }
 

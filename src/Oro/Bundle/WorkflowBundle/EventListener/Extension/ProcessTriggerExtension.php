@@ -20,6 +20,9 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Extension for process triggers.
+ */
 class ProcessTriggerExtension extends AbstractEventTriggerExtension
 {
     /** @var ProcessHandler */
@@ -107,6 +110,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
 
     /**
      * @param ObjectManager $manager
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ObjectManager $manager)
     {

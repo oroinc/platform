@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Role\Role;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  *
  * @ORM\MappedSuperclass
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractUser implements
     UserInterface,

@@ -175,6 +175,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $uniqueJobSlug = $body['userId'];
         if (isset($body['options']['unique_job_slug'])) {
             $uniqueJobSlug = $body['options']['unique_job_slug'];
+        } else {
+            $uniqueJobSlug .= ':' . random_int(1, PHP_INT_MAX);
         }
         $jobName = sprintf(
             'oro:%s:%s:%s:%s',

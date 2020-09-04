@@ -11,7 +11,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * This manager is main entry point for system configuration.
+ * Configuration manager.
+ * Contains chain of scope managers, get/set config values with a respect to fallback.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -644,6 +645,13 @@ class ConfigManager
      */
     protected function resolveIdentifier($scopeIdentifier)
     {
-        return $this->getScopeManager()->resolveIdentifier($scopeIdentifier);
+        foreach ($this->getScopeManagersToGetValue(false) as $scopeManager) {
+            $identifier = $scopeManager->resolveIdentifier($scopeIdentifier);
+            if ($identifier !== null) {
+                return $identifier;
+            }
+        }
+
+        return null;
     }
 }
