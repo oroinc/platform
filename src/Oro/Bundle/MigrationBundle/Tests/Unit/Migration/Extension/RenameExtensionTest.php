@@ -180,7 +180,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
             'mssql' => [
                 new SQLServer2005Platform(),
                 [
-                    "sp_RENAME 'old_table', 'new_table'",
+                    "sp_rename 'old_table', 'new_table'",
                     "DECLARE @sql NVARCHAR(MAX) = N''; "
                     . "SELECT @sql += N'EXEC sp_rename N''' + dc.name + ''', N'''"
                     . " + REPLACE(dc.name, '50BD45A0', 'EBFCC9B') + ''', ''OBJECT'';' "
@@ -217,7 +217,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
             [new MySqlPlatform(), 'ALTER TABLE test_table CHANGE old_column new_column VARCHAR(100) NOT NULL'],
             [new PostgreSqlPlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
             [new OraclePlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
-            [new SQLServer2005Platform(), "sp_RENAME 'test_table.old_column', 'new_column', 'COLUMN'",],
+            [new SQLServer2005Platform(), "sp_rename 'test_table.old_column', 'new_column', 'COLUMN'",],
         ];
     }
 
