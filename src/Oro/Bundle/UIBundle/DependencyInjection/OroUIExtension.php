@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\UIBundle\DependencyInjection;
 
@@ -12,7 +13,7 @@ class OroUIExtension extends Extension
     public const ALIAS = 'oro_ui';
 
     /**
-     * {@inheritDoc}
+     * @throws \Exception If something went wrong
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -27,12 +28,13 @@ class OroUIExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('controllers.yml');
 
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAlias()
     {
         return static::ALIAS;
