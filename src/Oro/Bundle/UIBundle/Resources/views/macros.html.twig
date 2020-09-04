@@ -712,6 +712,9 @@
     {%- if (parameters.dataId is defined) -%}
         data-id="{{ parameters.dataId }}"
     {%- endif -%}
+    {%- if (parameters.dataIntention is defined) -%}
+        data-intention="{{ parameters.dataIntention }}"
+    {%- endif -%}
     {%- if (parameters.successMessage is defined) -%}
         data-success-message="{{ parameters.successMessage }}"
     {%- endif -%}

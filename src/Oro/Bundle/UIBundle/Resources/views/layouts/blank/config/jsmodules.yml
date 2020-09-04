@@ -18,6 +18,7 @@ aliases:
     cryptojs/sha256$: npmassets/crypto-js/sha256
     datepair$: npmassets/datepair.js/dist/datepair
     extend-popper$: oroui/js/extend/popper
+    Fuse$: npmassets/fuse.js/dist/fuse
     jquery$: npmassets/jquery/dist/jquery
     jquery-ui: npmassets/jquery-ui/ui
     jquery.cookie$: npmassets/jquery.cookie/jquery.cookie
@@ -66,6 +67,7 @@ configs:
     oroui/js/error: {}
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}
     oroui/js/extend/scriptjs: {}
+    oroui/js/fuzzy-search: {}
     oroui/js/modal: {}
     oroui/js/tools/highlighter/highlighter-favicon: {}
     oroui/js/tools/highlighter/highlighter-title: {}
