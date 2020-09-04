@@ -7,6 +7,7 @@ use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\SelectorManipulator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use WebDriver\Exception\NoSuchElement;
 use WebDriver\Key;
@@ -51,6 +52,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function chooseFilterColumn($column)
     {
+        $selectorManipulator = new SelectorManipulator();
         $lastConditionItem = $this->createElement('Last condition item');
         $lastConditionItem->click();
         $this->getPage()
@@ -61,12 +63,9 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         $columnParts = array_map('trim', explode('>', $column));
 
         foreach ($columnParts as $column) {
-            $searchResult = $this->spin(function (FilterContext $context) use ($column) {
-                $searchResult = $this->getPage()
-                    ->find(
-                        'xpath',
-                        "//div[@id='select2-drop']//div[contains(., '{$column}')]"
-                    );
+            $searchResult = $this->spin(function (FilterContext $context) use ($column, $selectorManipulator) {
+                $selector = $selectorManipulator->getContainsXPathSelector("//div[@id='select2-drop']//div", $column);
+                $searchResult = $this->getPage()->find($selector['type'], $selector['locator']);
                 if ($searchResult && $searchResult->isVisible()) {
                     return $searchResult;
                 }

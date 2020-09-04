@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase

@@ -48,6 +48,7 @@ class AttributeConfigurationValidator extends ConstraintValidator
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function validate($value, Constraint $constraint)
     {

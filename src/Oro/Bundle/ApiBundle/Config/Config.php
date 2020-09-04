@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents the configuration of API resource.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Config implements \IteratorAggregate
 {

@@ -9,6 +9,9 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CriteriaTest extends TestCase
 {
     public function testGetDefaultPermission()

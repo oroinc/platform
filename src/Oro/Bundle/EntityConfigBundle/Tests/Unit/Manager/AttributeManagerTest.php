@@ -22,6 +22,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 {

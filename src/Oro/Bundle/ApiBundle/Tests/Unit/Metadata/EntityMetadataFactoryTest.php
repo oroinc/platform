@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
 {
     /** @var EntityMetadataFactory */

@@ -39,6 +39,7 @@ class EntityIdAccessor
      * @param RequestType    $requestType
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getEntityId($entity, EntityMetadata $metadata, RequestType $requestType): string
     {

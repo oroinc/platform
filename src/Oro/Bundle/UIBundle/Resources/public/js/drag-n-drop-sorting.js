@@ -4,7 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
+    require('jquery-ui/widgets/sortable');
 
     const DraggableSortingView = BaseView.extend({
         /**

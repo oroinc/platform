@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */

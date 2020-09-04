@@ -19,6 +19,9 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */

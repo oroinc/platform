@@ -52,6 +52,7 @@ dynamic-imports:
         - oroform/js/multiple-entity/collection
         - oroform/js/multiple-entity/component
         - oroform/js/multiple-entity/model
+    oroform-validate:
         - oroform/js/validator/callback
         - oroform/js/validator/count
         - oroform/js/validator/date

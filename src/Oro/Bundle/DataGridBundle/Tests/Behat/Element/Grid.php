@@ -9,6 +9,7 @@ use WebDriver\Exception\NoSuchElement;
 
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Grid extends Table implements GridInterface
 {

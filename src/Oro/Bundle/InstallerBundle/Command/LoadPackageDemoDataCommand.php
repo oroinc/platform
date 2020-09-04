@@ -33,6 +33,7 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getFixtures(InputInterface $input, OutputInterface $output)
     {

@@ -155,6 +155,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
      * @param string                  $overridePath
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function resolveOverrideRoute(Route $route, RouteCollectionAccessor $routes, $overridePath)
     {

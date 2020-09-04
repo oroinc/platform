@@ -63,6 +63,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
      * @param ClassMetadata          $metadata
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function isAssociationValueChanged($value, EntityManagerInterface $em, ClassMetadata $metadata): bool
     {

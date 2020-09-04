@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Templating;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Normalizes and translates (if needed) labels in the given value.
+ */
 class TextHelper
 {
     const DEFAULT_TRANS_DOMAIN = 'messages';
@@ -48,6 +51,7 @@ class TextHelper
      * @param string|null $domain
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processArray(&$value, $domain)
     {

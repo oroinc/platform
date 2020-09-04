@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Basic feature context which may be used as parent class for other contexts.
@@ -114,5 +115,40 @@ class OroFeatureContext extends RawMinkContext
         ]);
 
         return $client->get($imageUrl);
+    }
+
+    /**
+     * @param string $sourcePath
+     * @param string $destinationPath
+     */
+    protected function copyFiles(string $sourcePath, string $destinationPath): void
+    {
+        $fs = new Filesystem();
+        try {
+            $isDir = substr($destinationPath, -1) === '/';
+            $destinationPath = rtrim($destinationPath, '/');
+            if ($isDir && !$fs->exists($destinationPath)) {
+                $fs->mkdir($destinationPath);
+            }
+
+            if (is_dir($sourcePath)) {
+                $fs->mirror($sourcePath, $destinationPath);
+            } else {
+                if ($isDir) {
+                    $filename = basename($sourcePath);
+                    $destinationPath = sprintf('%s/%s', $destinationPath, $filename);
+                }
+                $fs->copy($sourcePath, $destinationPath);
+            }
+        } catch (\Throwable $e) {
+            $this->fail(
+                sprintf(
+                    'Failed to copy fixture files from %s to %s: %s',
+                    $sourcePath,
+                    $destinationPath,
+                    $e->getMessage()
+                )
+            );
+        }
     }
 }

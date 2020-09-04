@@ -1,6 +1,19 @@
 Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that should be addressed before attempting to upgrade or during the upgrade of a vanilla Oro application.
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
+## 4.1.7
+### Changed
+
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
+
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
+
+### Removed
+
+#### UIBundle
+* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
 ## 4.1.1 (2020-02-25)
 [Show detailed list of changes](incompatibilities-4-1-1.md)
@@ -10,6 +23,12 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * Email template `user_reset_password_as_admin` has been removed. Use `force_reset_password` instead.
 
+#### UIBundle
+* The `collectionField` TWIG macros was removed. Use the `form_row_collection` TWIG function instead.
+  Before: `UI.collectionField(form.emails, 'oro.user.emails.label'|trans)`.
+  After: `form_row_collection(form.emails)`.
+  To change "add" button label use the `add_label` form option.
+  
 ## 4.1.0 (2020-01-31)
 [Show detailed list of changes](incompatibilities-4-1.md)
 
@@ -579,7 +598,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
  * API processor `oro_user.api.create.save_entity` was renamed to `oro_user.api.create.save_user`.
 
 #### WorkflowBundle
-* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction` 
+* In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::activateAction`
  (`/api/rest/{version}/process/activate/{processDefinition}` path)
  action the request method was changed to POST. 
 * In `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\ProcessController::deactivateAction` 
@@ -1022,7 +1041,8 @@ datagrids:
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.
-* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md) 
+* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](https://doc.oroinc.com/backend/bundles/platform/SearchBundle/date-time-formatter/)
+
 #### WorkflowBundle
 * The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
@@ -1066,7 +1086,7 @@ datagrids:
 * `JobResult`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobResult.php "Oro\Bundle\ImportExportBundle\Job\JobResult")</sup> have new `needRedelivery` flag.
 `JobExecutor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobExecutor.php "Oro\Bundle\ImportExportBundle\Job\JobExecutor")</sup> in case of any of catched exception during Job processing is a type of
 `Doctrine\DBAL\Exception\UniqueConstraintViolationException` JobResult will have a `needRedelivery` flag set to true.
-* `ImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Async/Import/ImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor")</sup> is able to catch new 
+* `ImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Async/Import/ImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor")</sup> is able to catch new
 `Oro\Component\MessageQueue\Exception\JobRedeliveryException` and it this case is able to requeue a message to process
 #### MessageQueue component
 * Added interface `Oro\Component\MessageQueue\Job\ExtensionInterface` that can be used to do some additional work before and after job processing.

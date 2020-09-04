@@ -29,6 +29,7 @@ class OroEntityConfigExtension extends Extension
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $this->configureTestEnvironment($container);
+            $loader->load('services_test.yml');
         }
     }
 

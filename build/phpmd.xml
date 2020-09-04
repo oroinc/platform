@@ -8,33 +8,5 @@
         Custom rule set that is used to check the code of the Oro Projects...
     </description>
     <rule ref="rulesets/codesize.xml">
-        <exclude name="CyclomaticComplexity"/>
-        <exclude name="TooManyMethods"/>
-        <exclude name="TooManyPublicMethods"/>
-        <exclude name="TooManyFields"/>
-    </rule>
-    <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
-        <priority>1</priority>
-        <properties>
-            <property name="reportLevel" value="15"/>
-        </properties>
-    </rule>
-    <rule ref="rulesets/codesize.xml/TooManyMethods">
-        <priority>1</priority>
-        <properties>
-            <property name="maxmethods" value="50"/>
-        </properties>
-    </rule>
-    <rule ref="rulesets/codesize.xml/TooManyPublicMethods">
-        <priority>1</priority>
-        <properties>
-            <property name="maxmethods" value="50"/>
-        </properties>
-    </rule>
-    <rule ref="rulesets/codesize.xml/TooManyFields">
-        <priority>1</priority>
-        <properties>
-            <property name="maxfields" value="25"/>
-        </properties>
     </rule>
 </ruleset>

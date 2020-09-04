@@ -33,6 +33,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Splits data of API batch update request to chunks
  * and send a separate MQ message to process each chunk.
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -164,6 +165,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {

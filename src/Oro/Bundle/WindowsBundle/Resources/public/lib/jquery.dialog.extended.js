@@ -19,7 +19,7 @@ define(function (require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
-    require('jquery-ui');
+    require('jquery-ui/widgets/dialog');
 
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',

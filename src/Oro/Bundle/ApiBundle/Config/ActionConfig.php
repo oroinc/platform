@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Represents the configuration of API resource action.
  *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -29,6 +30,7 @@ class ActionConfig implements ConfigBagInterface
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function toArray()
     {

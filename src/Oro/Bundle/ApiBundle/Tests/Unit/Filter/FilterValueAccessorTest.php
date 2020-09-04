@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterValueAccessor */

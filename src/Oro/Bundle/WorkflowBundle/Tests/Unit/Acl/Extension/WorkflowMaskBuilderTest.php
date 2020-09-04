@@ -4,6 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testViewWorkflowGroup()

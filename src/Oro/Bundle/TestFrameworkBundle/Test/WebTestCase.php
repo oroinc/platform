@@ -36,6 +36,8 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
@@ -1079,6 +1081,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $source
      * @param array $target
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected static function getRecursiveArrayIntersect(array $target, array $source)
     {

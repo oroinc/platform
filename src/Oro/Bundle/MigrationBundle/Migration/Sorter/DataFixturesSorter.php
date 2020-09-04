@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
  * Basically code of this class comes from origin \Doctrine\Common\DataFixtures\Loader.
  * Issue solved is notices during fixtures sorting
  *
- * @TODO could be removed when https://github.com/doctrine/data-fixtures/issues/148 will be resolved
+ * It can be removed in the future after https://github.com/doctrine/data-fixtures/issues/148 is resolved.
  */
 class DataFixturesSorter
 {
@@ -86,6 +86,7 @@ class DataFixturesSorter
      * @throws CircularReferenceException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function orderFixturesByDependencies($usedPrioritySorting)
     {

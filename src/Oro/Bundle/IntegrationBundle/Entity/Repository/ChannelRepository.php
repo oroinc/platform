@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
@@ -106,11 +107,14 @@ class ChannelRepository extends EntityRepository
         $qb = $this->createQueryBuilder('c')
             ->where('c.transport is NOT NULL')
             ->andWhere('c.enabled = :isEnabled')
-            ->setParameter('isEnabled', true);
+            ->setParameter('isEnabled', true, Types::BOOLEAN);
 
         if (null !== $type) {
             $qb->andWhere('c.type = :type')
-                ->setParameter('type', $type);
+                ->setParameter('type', $type, Types::STRING);
+        } else {
+            $qb->andWhere($qb->expr()->neq('c.connectors', ':emptyConnectors'))
+                ->setParameter('emptyConnectors', [], Types::ARRAY);
         }
 
         $integrations = $qb->getQuery()->getResult();

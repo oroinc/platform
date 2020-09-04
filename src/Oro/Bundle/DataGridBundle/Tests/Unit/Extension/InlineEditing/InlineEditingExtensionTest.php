@@ -199,6 +199,9 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function getProcessConfigsCallBack()
     {
         return function ($columnName, $entity, $column) {

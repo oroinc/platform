@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request */

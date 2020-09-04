@@ -28,6 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Contains methods handling email recipients
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailRecipientsHelper
 {

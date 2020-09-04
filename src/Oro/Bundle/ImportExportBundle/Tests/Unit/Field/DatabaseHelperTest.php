@@ -67,7 +67,6 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->entityManager));
 
         $this->doctrineHelper->expects($this->any())
@@ -258,6 +257,17 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($fieldName));
 
         $this->helper->resetIdentifier($entity);
+    }
+
+    public function testRefreshEntity(): void
+    {
+        $entity = new \stdClass();
+
+        $this->entityManager->expects($this->once())
+            ->method('refresh')
+            ->with($entity);
+
+        $this->helper->refreshEntity($entity);
     }
 
     public function testGetOwnerFieldName(): void

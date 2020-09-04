@@ -8,6 +8,9 @@ use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Twig\Environment;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const TEMPLATE = 'template.twig.html';

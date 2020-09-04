@@ -24,6 +24,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * By default all tests are disabled and they are enabled only during
  * modification of ConfigManager and related classes.
  * To enable tests use ENABLE_TESTS constant.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 {

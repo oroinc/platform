@@ -17,6 +17,9 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryCountCalculatorTest extends OrmTestCase
 {
     private const TEST_COUNT = 42;

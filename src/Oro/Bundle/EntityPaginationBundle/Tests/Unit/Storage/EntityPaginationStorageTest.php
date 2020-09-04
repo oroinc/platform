@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'stdClass';

@@ -7,7 +7,6 @@ use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
@@ -20,6 +19,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * Locates, sorts and loads migrations.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MigrationsLoader
@@ -252,6 +253,7 @@ class MigrationsLoader
      *                                'bundles'    => string[] names of bundles
      *
      * @throws \RuntimeException if a migration script contains more than one class
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function createMigrationObjects(&$result, $files)
     {
@@ -311,6 +313,7 @@ class MigrationsLoader
      * @param array $migrations
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function groupAndSortMigrations($files, $migrations)
     {
@@ -369,6 +372,7 @@ class MigrationsLoader
      *
      * @return array
      * @throws \RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadMigrationObjects($files)
     {

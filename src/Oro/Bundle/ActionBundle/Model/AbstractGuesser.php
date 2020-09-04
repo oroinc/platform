@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Guesses type mapping for a field.
+ */
 abstract class AbstractGuesser
 {
     /**
@@ -105,6 +108,7 @@ abstract class AbstractGuesser
      * @param string|PropertyPathInterface $propertyPath
      *
      * @return array|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function guessMetadataAndField($rootClass, $propertyPath)
     {

@@ -14,6 +14,9 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityTypeTest extends OrmRelatedTestCase
 {
     /** @var FormFactoryInterface */

@@ -1,0 +1,7 @@
+{%- if config.importAdditionalNotices -%}
+    <div class="alert alert-info import-notice" role="alert">
+        {%- for importAdditionalNotice in config.importAdditionalNotices -%}
+            <div>{{ importAdditionalNotice|nl2br }}</div>
+        {%- endfor -%}
+    </div>
+{%- endif -%}

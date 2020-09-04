@@ -19,6 +19,8 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {

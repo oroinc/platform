@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormActionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateEmpty()

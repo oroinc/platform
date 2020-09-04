@@ -53,6 +53,10 @@ define(function(require) {
          */
         triggerGroupChange: function(model, initialize) {
             mediator.trigger('entity-config:attribute-group:changed', model, initialize);
+        },
+
+        getGroupById: function(id) {
+            return this.groups.find(model => model.get('id') === id);
         }
     });
 

@@ -18,6 +18,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */

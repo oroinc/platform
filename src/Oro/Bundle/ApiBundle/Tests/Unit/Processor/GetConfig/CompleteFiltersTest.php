@@ -9,6 +9,8 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CompleteFiltersTest extends ConfigProcessorTestCase
 {

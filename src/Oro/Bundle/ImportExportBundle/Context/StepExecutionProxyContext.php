@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Provides the ability to save and manage parameters
  * Performs the role of an adapter and provides access to the original object
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
 {

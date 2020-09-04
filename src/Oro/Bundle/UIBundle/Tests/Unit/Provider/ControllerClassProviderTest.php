@@ -20,6 +20,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;

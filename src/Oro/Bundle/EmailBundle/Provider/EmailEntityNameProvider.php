@@ -27,6 +27,7 @@ class EmailEntityNameProvider implements EntityNameProviderInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getName($format, $locale, $entity)
     {

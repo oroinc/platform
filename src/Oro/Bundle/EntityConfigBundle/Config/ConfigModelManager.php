@@ -15,6 +15,7 @@ use Oro\Component\DependencyInjection\ServiceLink;
  * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ConfigModelManager
 {

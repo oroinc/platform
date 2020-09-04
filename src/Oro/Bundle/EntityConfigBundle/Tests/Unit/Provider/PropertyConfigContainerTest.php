@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
 {

@@ -38,7 +38,6 @@ services:
             - { name: oro_entity.database_checker }
 
     oro_entity_config.config_model_manager:
-        public: false
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
         arguments:
             - '@oro_entity_config.link.entity_manager'

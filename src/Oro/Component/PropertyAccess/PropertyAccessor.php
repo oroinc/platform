@@ -348,6 +348,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws Exception\NoSuchPropertyException If a value within the path is neither object nor array.
      *                                           If a non-existing index is accessed.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function &readPropertiesUntil(
         &$object,
@@ -624,6 +625,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
      * @param boolean            $shouldRemoveItems Flag that tells if we want to remove existing items
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function writeCollection(
         $object,
@@ -831,6 +833,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string $property
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getReadAccessInfo($class, $property)
     {
@@ -906,6 +909,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param mixed  $value
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getWriteAccessInfo($class, $property, $value)
     {

@@ -12,7 +12,8 @@ use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Reminder
+ * Reminder is a message that can be attached to an entity and is periodically sent to users
+ * (e.g. via emails or WebSocket notifications).
  *
  * @ORM\Table(name="oro_reminder", indexes={
  *     @ORM\Index(name="reminder_state_idx", columns={"state"})
@@ -38,6 +39,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Reminder extends ExtendReminder
 {
@@ -178,7 +180,7 @@ class Reminder extends ExtendReminder
      * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
     protected $failureException;
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -435,7 +437,7 @@ class Reminder extends ExtendReminder
 
         return $this;
     }
-    
+
     /**
      * Sets reminder data
      *
@@ -451,7 +453,7 @@ class Reminder extends ExtendReminder
         if ($data instanceof SenderAwareReminderDataInterface) {
             $this->setSender($data->getSender());
         }
-        
+
         return $this;
     }
 

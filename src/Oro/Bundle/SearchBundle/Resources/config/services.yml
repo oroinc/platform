@@ -359,3 +359,11 @@ services:
         class: Oro\Bundle\SearchBundle\EventListener\LimitResultsListener
         tags:
             - { name: kernel.event_listener, event: oro_search.before_search, method: onBeforeSearch, priority: -255 }
+
+    oro_search.event_listener.search_mapping_listener:
+        class: Oro\Bundle\SearchBundle\EventListener\SearchMappingListener
+        public: false
+        arguments:
+            - '@oro_search.provider.search_mapping'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: invalidateCache }

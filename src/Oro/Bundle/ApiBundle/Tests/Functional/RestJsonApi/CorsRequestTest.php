@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CorsRequestTest extends RestJsonApiTestCase
 {
     public function methodsProvider()

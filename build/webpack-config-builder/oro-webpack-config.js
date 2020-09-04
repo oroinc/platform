@@ -21,6 +21,7 @@ const prepareModulesMap = require('./plugin/map/prepare-modules-map');
 const resolve = require('enhanced-resolve');
 const webpackMerge = require('webpack-merge');
 const babelConfig = require('./../babel.config.js');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 class ConfigBuilder {
     constructor() {
@@ -156,11 +157,6 @@ class ConfigBuilder {
                                 priority: 10,
                                 reuseExistingChunk: true
                             },
-                            vendors: {
-                                test: /[\/\\]node_modules[\/\\]/,
-                                name: 'vendors',
-                                priority: -10
-                            },
                             tinymce: {
                                 test: /tinymce/,
                                 name: 'tinymce.min',
@@ -255,6 +251,10 @@ class ConfigBuilder {
                 ]
             };
 
+            if (env.analyze) {
+                webpackConfig.plugins.push(new BundleAnalyzerPlugin());
+            }
+
             if (!env.skipJS && !env.skipBabel) {
                 let happyPackOptions = {
                     id: 'babel',
@@ -342,10 +342,10 @@ class ConfigBuilder {
                     ],
                     alias: {
                         ...themeConfig.aliases,
-                        'node_modules/spectrum-colorpicker/spectrum$': 'npmassets/spectrum-colorpicker/spectrum.css',
-                        'node_modules/font-awesome/scss/font-awesome$': 'npmassets/font-awesome/scss/font-awesome.scss',
-                        'node_modules/codemirror/lib/codemirror$': 'npmassets/codemirror/lib/codemirror.css',
-                        'node_modules/codemirror/theme/hopscotch$': 'npmassets/codemirror/theme/hopscotch.css',
+                        '../../../node_modules/spectrum-colorpicker/spectrum$': 'npmassets/spectrum-colorpicker/spectrum.css',
+                        '../../../node_modules/font-awesome/scss/font-awesome$': 'npmassets/font-awesome/scss/font-awesome.scss',
+                        '../../../node_modules/codemirror/lib/codemirror$': 'npmassets/codemirror/lib/codemirror.css',
+                        '../../../node_modules/codemirror/theme/hopscotch$': 'npmassets/codemirror/theme/hopscotch.css',
                     },
                     symlinks: false
                 };
@@ -433,7 +433,6 @@ class ConfigBuilder {
     _getJsEntryPoints(theme) {
         return {
             'app': [
-                'whatwg-fetch',
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]

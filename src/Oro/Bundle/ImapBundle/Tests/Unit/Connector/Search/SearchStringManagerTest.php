@@ -6,6 +6,9 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManager;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchStringManager */

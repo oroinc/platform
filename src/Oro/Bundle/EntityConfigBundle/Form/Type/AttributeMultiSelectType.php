@@ -93,11 +93,11 @@ class AttributeMultiSelectType extends AbstractType
         $field = $this->configFields[$id];
         $fieldAttributes = $field->toArray('attribute');
 
-        if (empty($fieldAttributes['field_name'])) {
-            throw new \InvalidArgumentException('Field config attribute "field_name" can not be empty.');
+        if (!empty($fieldAttributes['field_name'])) {
+            return $fieldAttributes['field_name'];
         }
 
-        return $fieldAttributes['field_name'];
+        return  $field->getFieldName();
     }
 
     /**

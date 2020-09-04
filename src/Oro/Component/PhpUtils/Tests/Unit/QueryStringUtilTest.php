@@ -4,6 +4,9 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\QueryStringUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**

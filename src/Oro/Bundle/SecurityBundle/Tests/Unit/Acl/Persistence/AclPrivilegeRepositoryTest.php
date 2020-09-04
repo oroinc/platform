@@ -152,6 +152,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testGetPrivileges()
     {

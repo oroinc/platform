@@ -6,6 +6,9 @@ use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**

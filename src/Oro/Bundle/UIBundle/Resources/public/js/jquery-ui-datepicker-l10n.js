@@ -6,7 +6,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const localeSettings = require('orolocale/js/locale-settings');
     const locale = localeSettings.getLocale();
-    require('jquery-ui');
+    require('jquery-ui/widgets/datepicker');
 
     $.datepicker.regional[locale] = {
         closeText: __('oro.ui.datepicker.close'), // Display text for close link
@@ -39,14 +39,14 @@ define(function(require) {
     $.datepicker.setDefaults($.datepicker.regional[locale]);
 
     (function() {
-        const _gotoToday = $.datepicker._gotoToday;
-        const _updateDatepicker = $.datepicker._updateDatepicker;
+        const _gotoToday = $.datepicker.constructor.prototype._gotoToday;
+        const _updateDatepicker = $.datepicker.constructor.prototype._updateDatepicker;
 
         /**
          * Select today Date takes in account system timezone
          * @inheritDoc
          */
-        $.datepicker._gotoToday = function(id) {
+        $.datepicker.constructor.prototype._gotoToday = function(id) {
             const inst = this._getInst($(id)[0]);
             const now = moment.tz(localeSettings.getTimeZone());
 
@@ -66,7 +66,7 @@ define(function(require) {
          * Today Date highlight takes in account system timezone
          * @inheritDoc
          */
-        $.datepicker._updateDatepicker = function(inst) {
+        $.datepicker.constructor.prototype._updateDatepicker = function(inst) {
             const today = moment.tz(localeSettings.getTimeZone());
 
             _updateDatepicker.call(this, inst);

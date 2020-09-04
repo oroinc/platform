@@ -12,6 +12,11 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Context object for Behat statistics collection.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StatisticContext implements Context
 {
     /**

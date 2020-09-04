@@ -4,6 +4,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\View;
 
 use Oro\Bundle\UIBundle\View\ScrollData;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ScrollDataTest extends \PHPUnit\Framework\TestCase
 {
     /**

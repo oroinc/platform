@@ -41,6 +41,7 @@ class OroSelenium2Driver extends Selenium2Driver
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function setValue($xpath, $value)
     {

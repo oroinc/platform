@@ -13,6 +13,7 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides an information about all registered API resources.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ResourcesProvider implements ResetInterface
 {
@@ -253,6 +254,8 @@ class ResourcesProvider implements ResetInterface
      *
      * @return ApiResource[]
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadResources(string $version, RequestType $requestType, string $cacheKey): array
     {

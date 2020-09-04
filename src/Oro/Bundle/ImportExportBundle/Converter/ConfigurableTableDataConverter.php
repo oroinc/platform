@@ -80,11 +80,21 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     public function getFieldHeaderWithRelation($entityClassName, $initialFieldName, $isSearchingIdentityField = false)
     {
+        $expectedFields = [$initialFieldName];
         $fields = $this->fieldHelper->getFields($entityClassName, true);
+
+        $dotPosition = strpos($initialFieldName, '.');
+        if ($dotPosition && $this->attributeConfigHelper) {
+            $fieldName = substr($initialFieldName, 0, $dotPosition);
+
+            if ($this->attributeConfigHelper->isFieldAttribute($entityClassName, $fieldName)) {
+                $expectedFields[] = $fieldName;
+            }
+        }
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            $notFoundFieldName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
+            $notFoundFieldName = !$isSearchingIdentityField && !in_array($fieldName, $expectedFields, true);
             $foundIdentifyField = $this->fieldHelper->getConfigValue($entityClassName, $fieldName, 'identity');
             $notFoundFieldIdentify = $isSearchingIdentityField && !$foundIdentifyField;
 
@@ -93,11 +103,17 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             }
 
             if ($this->fieldHelper->isRelation($field) &&
-                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)) {
+                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)
+            ) {
+                $relatedClassName = $field['related_entity_name'];
+                $relatedFieldName = $dotPosition
+                    ? substr($initialFieldName, $dotPosition + 1, strlen($initialFieldName))
+                    : null;
+
                 return
                     $this->getFieldHeader($entityClassName, $field) .
                     $this->relationDelimiter .
-                    $this->getFieldHeaderWithRelation($field['related_entity_name'], null, true);
+                    $this->getFieldHeaderWithRelation($relatedClassName, $relatedFieldName, $relatedFieldName === null);
             }
 
             return $this->getFieldHeader($entityClassName, $field);

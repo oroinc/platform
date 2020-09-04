@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NestedAssociationTransformerTest extends OrmRelatedTestCase
 {
     /**

@@ -217,6 +217,7 @@ class EmailType extends AbstractType
 
     /**
      * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function initChoicesByEntityName(FormEvent $event)
     {

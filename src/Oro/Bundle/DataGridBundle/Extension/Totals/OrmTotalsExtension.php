@@ -222,6 +222,7 @@ class OrmTotalsExtension extends AbstractExtension
      *
      * @param QueryBuilder $query
      * @return array with root entities config
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getRootIds(QueryBuilder $query)
     {

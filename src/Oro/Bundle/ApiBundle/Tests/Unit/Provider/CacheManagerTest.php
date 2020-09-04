@@ -14,6 +14,9 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CacheManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheFactory */

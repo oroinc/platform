@@ -129,6 +129,7 @@ class Renderer implements FormRendererInterface
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * {@inheritdoc}
      */

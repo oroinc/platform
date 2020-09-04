@@ -234,6 +234,7 @@ class CompleteEntityDefinitionHelper
     /**
      * @param EntityDefinitionConfig $definition
      * @param ClassMetadata          $metadata
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeIdentifierFields(
         EntityDefinitionConfig $definition,
@@ -277,6 +278,7 @@ class CompleteEntityDefinitionHelper
      * @param array                  $existingFields [property path => field name, ...]
      * @param bool                   $skipNotConfiguredCustomFields
      * @param RequestType            $requestType
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeFields(
         EntityDefinitionConfig $definition,
@@ -322,6 +324,7 @@ class CompleteEntityDefinitionHelper
      * @param bool                            $skipNotConfiguredCustomFields
      * @param string                          $version
      * @param RequestType                     $requestType
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeAssociations(
         EntityOverrideProviderInterface $entityOverrideProvider,
@@ -584,6 +587,7 @@ class CompleteEntityDefinitionHelper
      * @param string                          $propertyPath
      * @param string                          $version
      * @param RequestType                     $requestType
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeDependentAssociation(
         EntityOverrideProviderInterface $entityOverrideProvider,

@@ -57,6 +57,7 @@ class EnumSynchronizer
 
     /**
      * Synchronizes enum related data for new enums
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sync()
     {

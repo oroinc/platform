@@ -484,6 +484,7 @@ class ImapEmailManager
      * @param Headers $headers
      *
      * @return integer
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getImportance(Headers $headers)
     {

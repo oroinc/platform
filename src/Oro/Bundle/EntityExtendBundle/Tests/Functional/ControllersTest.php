@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group dist
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ControllersTest extends AbstractConfigControllerTest
 {

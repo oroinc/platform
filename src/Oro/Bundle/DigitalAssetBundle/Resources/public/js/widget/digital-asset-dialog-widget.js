@@ -142,6 +142,23 @@ define(function(require) {
             this.$el.find('.fallback-status, .fa-language').bind('click', () => {
                 this.resetDialogPosition();
             });
+        },
+
+        _onContentLoadFail: function(jqxhr) {
+            if (jqxhr.status === 413) {
+                delete this.loading;
+                this._hideLoading();
+                this._showFlashMessage('error', _.__('oro.ui.request_too_large_error'));
+                return;
+            }
+
+            DigitalAssetDialogWidget.__super__._onContentLoadFail.call(this, jqxhr);
+        },
+
+        _showFlashMessage: function(type, message) {
+            const id = this.$el.closest('.ui-widget-content').attr('id');
+            const options = {container: '#' + id + ' .flash-messages'};
+            mediator.execute('showFlashMessage', type, message, options);
         }
     });
 

@@ -82,6 +82,7 @@ class SelectIdentifierWalker extends TreeWalkerAdapter
      * Queries that include Order By on a joined to-many field are not supported on PostgreSQL
      *
      * @param AST\SelectStatement $AST
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validate(AST\SelectStatement $AST)
     {

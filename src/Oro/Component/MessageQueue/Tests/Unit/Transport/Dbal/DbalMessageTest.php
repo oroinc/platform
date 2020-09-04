@@ -5,6 +5,9 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DbalMessageTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;

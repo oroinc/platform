@@ -7,6 +7,9 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /**

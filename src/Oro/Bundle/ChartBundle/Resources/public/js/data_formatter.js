@@ -1,7 +1,9 @@
-define([
-    'moment', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
-], function(moment, numberFormatter, dateTimeFormatter) {
+define(function(require) {
     'use strict';
+
+    const moment = require('moment');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     /**
      * @export orochart/js/data_formatter

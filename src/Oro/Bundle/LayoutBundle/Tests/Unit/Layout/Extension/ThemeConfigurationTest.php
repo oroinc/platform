@@ -5,6 +5,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**

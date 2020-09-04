@@ -56,12 +56,15 @@
 
     {% set dataBlock %}
         {{ form_row(form.label) }}
+        {% if form.owner is defined %}
+            {{ form_row(form.owner) }}
+        {% endif %}
         {% if form.startDashboard is defined %}
             {{ form_row(form.startDashboard) }}
         {% endif %}
-    {% if form.owner is defined %}
-        {{ form_row(form.owner) }}
-    {% endif %}
+        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+            {{ form_row(child) }}
+        {% endfor %}
     {% endset %}
 
     {% set dataBlocks = [{

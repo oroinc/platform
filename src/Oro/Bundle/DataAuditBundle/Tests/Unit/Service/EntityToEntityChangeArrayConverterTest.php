@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
@@ -38,22 +39,22 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $metadataFactory
             ->expects($this->any())
             ->method('hasMetadataFor')
-            ->will($this->returnValue(false));
-        $metadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
+            ->willReturn(false);
+        $metadata = $this->createMock(ClassMetadata::class);
 
         $em = $this->getEntityManager();
         $em
             ->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
         $em
             ->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $expected = [
             'entity_class' => EntityAdditionalFields::class,
-            'entity_id' => 1,
+            'entity_id' => '0',
         ];
 
         if ($expectedChangeSet) {
@@ -76,13 +77,13 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $metadataFactory
             ->expects($this->any())
             ->method('hasMetadataFor')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $em = $this->getEntityManager();
         $em
             ->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
 
         $converted = $this->converter->convertNamedEntityToArray($em, new EntityAdditionalFields($fields), []);
 
@@ -96,18 +97,18 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $metadataFactory
             ->expects($this->any())
             ->method('hasMetadataFor')
-            ->will($this->returnValue(true));
-        $metadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
+            ->willReturn(true);
+        $metadata = $this->createMock(ClassMetadata::class);
 
         $em = $this->getEntityManager();
         $em
             ->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
         $em
             ->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $field = new \stdClass();
         $field->prop = 'value';
@@ -130,7 +131,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
                     null,
                     [
                         'entity_class' => ArrayCollection::class,
-                        'entity_id' => 1,
+                        'entity_id' => '0',
                     ],
                 ],
             ],
@@ -205,7 +206,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return EntityManagerInterface|\PHPUnit_Framework_\MockObject\MockObject
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEntityManager()
     {
@@ -220,7 +221,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($uow);
         $uow->expects($this->any())
             ->method('getSingleIdentifierValue')
-            ->willReturn(1);
+            ->willReturn('0');
 
         return $em;
     }

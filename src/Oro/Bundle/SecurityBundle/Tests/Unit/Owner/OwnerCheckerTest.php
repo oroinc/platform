@@ -19,6 +19,9 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_CLASS = 'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity';

@@ -86,7 +86,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             $qb = $this->getRepository($class)
                 ->createQueryBuilder('e');
             $qb
-                ->andWhere($qb->expr()->exists($activityListDql))
+                ->andWhere($qb->expr()->in('e.id', $activityListDql))
                 ->setParameter('related_activity_class', $class);
 
             foreach ($activityListQb->getParameters() as $param) {
@@ -146,7 +146,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         );
 
         $activityListQb
-            ->andWhere('activity.relatedActivityId = e.id')
+            ->select('activity.relatedActivityId')
             ->andWhere('activity.relatedActivityClass = :related_activity_class');
 
         return $activityListQb;

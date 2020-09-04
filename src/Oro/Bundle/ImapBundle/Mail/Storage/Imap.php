@@ -181,6 +181,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      * @throws \Zend\Mail\Storage\Exception\RuntimeException
      * @throws \Zend\Mail\Storage\Exception\InvalidArgumentException
      * @throws \Zend\Mail\Protocol\Exception\RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFolders($rootFolder = null)
     {

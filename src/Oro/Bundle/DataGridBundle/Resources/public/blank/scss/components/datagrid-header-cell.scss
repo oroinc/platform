@@ -13,34 +13,41 @@
 
     &.sortable {
         .sortable-icon {
+            position: relative;
+
             display: none;
-            margin: $datagrid-header-cell-sortable-icon-offset;
-            
-            border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
-            border-right: $datagrid-header-cell-sortable-icon-size solid transparent;
-            border-left: $datagrid-header-cell-sortable-icon-size solid transparent;
-            vertical-align: middle;
+            height: $datagrid-header-cell-link-font-size;
 
-            position: $datagrid-header-cell-sortable-icon-position;
-            top: $datagrid-header-cell-sortable-icon-top;
-            right: $datagrid-header-cell-sortable-icon-right;
+            &:before {
+                position: absolute;
+                top: $datagrid-header-cell-link-font-size / 2;
+                left: $datagrid-header-cell-sortable-icon-left;
 
-            transform: translateY(-50%);
+                content: '';
 
-            transition: all .2s;
+                border-right: $datagrid-header-cell-sortable-icon-size solid transparent;
+                border-left: $datagrid-header-cell-sortable-icon-size solid transparent;
+            }
         }
     }
 
-    &.descending,
     &.ascending {
         .sortable-icon {
             display: inline-block;
+
+            &:before {
+                border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
+            }
         }
     }
-    
+
     &.descending {
         .sortable-icon {
-            transform: translateY(-50%) rotate(180deg);
+            display: inline-block;
+
+            &:before {
+                border-bottom: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
+            }
         }
     }
 
@@ -67,13 +74,14 @@
             }
         }
     }
+
     &__link {
         font-size: $datagrid-header-cell-link-font-size;
         line-height: $datagrid-header-cell-link-line-height;
         font-weight: $datagrid-header-cell-link-font-weight;
         color: $datagrid-header-cell-link-color;
         position: $datagrid-header-cell-link-position;
-        
+
         &:hover,
         &:focus,
         &:active {

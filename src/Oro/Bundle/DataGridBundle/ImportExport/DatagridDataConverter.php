@@ -119,6 +119,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * @param array $options
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {

@@ -8,6 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
  * ORO Migration that creates base Email database structure
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OroEmailBundle implements Migration
 {

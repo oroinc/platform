@@ -15,6 +15,9 @@ use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */

@@ -12,6 +12,9 @@ use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnershipQueryHelperTest extends OrmTestCase
 {
     /** @var EntityManager */

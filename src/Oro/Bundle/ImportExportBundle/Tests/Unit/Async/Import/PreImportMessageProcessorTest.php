@@ -454,9 +454,11 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(1, 'oro:import:processor_test:test_import:1')
             ->will(
                 $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                    self::assertEquals(1, $jobId);
+                    self::assertRegExp('/^oro:import:processor_test:test_import:1:\d*/', $name);
+
                     return $callback($jobRunner, $childJob);
                 })
             );
@@ -464,9 +466,13 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
-            ->with('oro:import:processor_test:test_import:1:chunk.1')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+                    self::assertRegExp(
+                        '/^oro:import:processor_test:test_import:1:\d*:chunk.1/',
+                        $jobId
+                    );
+
                     return $callback($jobRunner, $childJob1);
                 })
             );
@@ -474,9 +480,13 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
-            ->with('oro:import:processor_test:test_import:1:chunk.2')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+                    self::assertRegExp(
+                        '/^oro:import:processor_test:test_import:1:\d*:chunk.2/',
+                        $jobId
+                    );
+
                     return $callback($jobRunner, $childJob2);
                 })
             );

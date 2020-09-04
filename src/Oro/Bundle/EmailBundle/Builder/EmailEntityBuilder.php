@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
  * The builder that simplifies creation of the email related entities.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailEntityBuilder
 {

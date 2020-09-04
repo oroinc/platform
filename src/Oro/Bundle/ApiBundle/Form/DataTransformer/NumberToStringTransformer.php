@@ -59,6 +59,7 @@ class NumberToStringTransformer implements DataTransformerInterface
      * @return string
      *
      * @throws TransformationFailedException if the given string cannot be converted to a number
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function transformStringToNumber($value)
     {

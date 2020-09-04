@@ -8,6 +8,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GroupTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ROLE = 'ROLE_FOO';

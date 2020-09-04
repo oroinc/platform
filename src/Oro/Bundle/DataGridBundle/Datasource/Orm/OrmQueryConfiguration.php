@@ -6,7 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
+ * Provides a set of methods to configure (modify) an ORM query.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OrmQueryConfiguration
 {

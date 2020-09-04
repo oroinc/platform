@@ -32,6 +32,8 @@ use Psr\Log\LoggerInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class PackageManagerTest extends \PHPUnit\Framework\TestCase
 {

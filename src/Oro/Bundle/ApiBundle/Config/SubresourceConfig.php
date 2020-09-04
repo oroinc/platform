@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents the configuration of API sub-resource.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SubresourceConfig implements ConfigBagInterface
 {

@@ -9,6 +9,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DateHelperTest extends OrmTestCase
 {

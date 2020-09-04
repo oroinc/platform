@@ -173,6 +173,7 @@ class IncludeMapManager
      * @return IncludedData|null The included items or NULL if it is not possible to get them now
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getIncludedItems(
         FileManager $fileManager,
@@ -402,6 +403,7 @@ class IncludeMapManager
      * @param array                    $loadedItems            [file index => items, ...]
      *
      * @return array [file index => [item index, ...], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadIncludedItems(
         FileManager $fileManager,

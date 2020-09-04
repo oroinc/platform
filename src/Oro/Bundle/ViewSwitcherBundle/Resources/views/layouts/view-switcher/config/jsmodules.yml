@@ -6,6 +6,7 @@ aliases:
     chaplin$: oroui/lib/chaplin
     cryptojs/sha256$: npmassets/crypto-js/sha256
     jquery$: npmassets/jquery/dist/jquery
+    jquery-ui: npmassets/jquery-ui/ui
     module-config$: oroui/js/app/services/module-config
     oroui/js/app$: oroviewswitcher/js/app/views/demo/demo
     routing$: fosjsrouting/js/router

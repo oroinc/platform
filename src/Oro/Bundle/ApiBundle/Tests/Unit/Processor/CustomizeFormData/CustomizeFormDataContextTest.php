@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeFormDataContext */

@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeParentResourceHelp
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */

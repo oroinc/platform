@@ -28,6 +28,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {

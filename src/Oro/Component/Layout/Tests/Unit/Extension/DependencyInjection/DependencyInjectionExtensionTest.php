@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\DependencyInjection;
 use Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */

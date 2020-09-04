@@ -13,6 +13,7 @@ use Oro\Component\Testing\ResponseExtension;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AuditControllerTest extends WebTestCase
 {

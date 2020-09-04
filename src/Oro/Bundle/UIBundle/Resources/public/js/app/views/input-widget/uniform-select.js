@@ -6,6 +6,8 @@ define(function(require) {
     require('jquery.uniform');
 
     const UniformSelectInputWidget = AbstractInputWidget.extend({
+        wrapperClass: null,
+
         widgetFunctionName: 'uniform',
 
         refreshOptions: 'update',
@@ -42,9 +44,16 @@ define(function(require) {
             }
 
             UniformSelectInputWidget.__super__.initializeWidget.call(this, options);
+
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
                 this.getContainer().addClass('error');
+            }
+
+            const {wrapperClass} = this;
+
+            if (wrapperClass) {
+                this.getContainer().addClass(wrapperClass);
             }
         },
 

@@ -21,6 +21,8 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActivityManagerTest extends OrmTestCase
 {

@@ -27,6 +27,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DynamicAttributesExtensionTest extends TypeTestCase
 {
     const DATA_CLASS = TestActivityTarget::class;

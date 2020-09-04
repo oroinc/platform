@@ -539,10 +539,11 @@ class OroMainContext extends MinkContext implements
     /**
      * Example: Then I should see only "At least one of the fields First name, Last name must be defined." error message
      *
-     * @Then /^(?:|I should )see only "(?P<title>[^"]+)" error message$/
+     * @Then /^(?:|I should )see only "(?P<title>([^"]|\\")+)" error message$/
      */
     public function iShouldSeeStrictErrorMessage($title)
     {
+        $title = $this->fixStepArgument($title);
         $errorElement = $this->spin(function (MinkContext $context) {
             return $context->getSession()->getPage()->find('css', '.alert-error');
         });
@@ -2579,5 +2580,46 @@ JS;
         $this->assertNotNull($element);
         $this->assertTrue($element->isValid());
         $this->assertNotContains($value, $element->getAttribute($attribute));
+    }
+
+    /**
+     * Checks, that page contains text matching specified regexp
+     * Example: Then I should see text matching regexp "Batman, the vigilante"
+     *
+     * @Then /^(?:|I )should see text matching regexp (?P<pattern>(?:[^"]|\\")*)$/
+     */
+    public function assertPageMatchesRegexp(string $pattern): void
+    {
+        $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
+    }
+
+    /**
+     * Checks, that all resources of a given type are versioned
+     * Example: I should be sure that all "json" are versioned
+     *
+     * @Then /^(?:|I )should be sure that all "(?P<format>(?:[^"]|\\")+)" assets are versioned$/
+     */
+    public function assertVersionedContent(string $format)
+    {
+        $content = $this->getSession()->getPage()->getContent();
+        $matches = [];
+        $versionedMatches = [];
+        preg_match_all('/(\w+\.' . $format . ')/i', $content, $matches);
+        preg_match_all('/(\w+\.' . $format . ')\?\w*version=\w+/i', $content, $versionedMatches);
+
+        $this->assertArrayHasKey(0, $matches);
+        $this->assertArrayHasKey(1, $matches);
+        $this->assertArrayHasKey(0, $versionedMatches);
+        $this->assertArrayHasKey(1, $versionedMatches);
+
+        $this->assertCount(
+            count($matches[0]),
+            $versionedMatches[0],
+            sprintf(
+                'Not all %s assets are versioned: %s',
+                $format,
+                implode(', ', array_diff($matches[1], $versionedMatches[1]))
+            )
+        );
     }
 }

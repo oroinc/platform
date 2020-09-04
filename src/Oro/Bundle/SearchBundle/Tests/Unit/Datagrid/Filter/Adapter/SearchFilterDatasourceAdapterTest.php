@@ -11,6 +11,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */

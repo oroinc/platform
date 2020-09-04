@@ -9,6 +9,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */

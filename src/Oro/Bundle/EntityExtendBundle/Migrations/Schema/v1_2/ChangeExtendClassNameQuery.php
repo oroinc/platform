@@ -33,6 +33,7 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
      * @param bool            $dryRun
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
