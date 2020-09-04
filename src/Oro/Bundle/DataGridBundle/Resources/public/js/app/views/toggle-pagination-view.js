@@ -1,5 +1,6 @@
 import BaseView from 'oroui/js/app/views/base/view';
 import template from 'tpl-loader!orodatagrid/templates/datagrid/toggle-pagination.html';
+import _ from 'underscore';
 import __ from 'orotranslation/js/translator';
 
 /**
@@ -14,6 +15,8 @@ const TogglePaginationView = BaseView.extend({
 
     maxPageSize: void 0,
 
+    translationPrefix: 'oro.datagrid.btn',
+
     template,
 
     events: {
@@ -25,6 +28,8 @@ const TogglePaginationView = BaseView.extend({
     },
 
     initialize: function(options) {
+        _.extend(this, _.pick(options, ['translationPrefix']));
+
         this.grid = options.datagrid;
 
         const {items} = this.grid.gridOptions.toolbarOptions.pageSize;
@@ -51,7 +56,7 @@ const TogglePaginationView = BaseView.extend({
         const {pageSize: initialPageSize} = this.grid.collection.initialState;
         const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
         const isMaxPageSize = currentPageSize === this.maxPageSize;
-        const translationPrefix = `oro.frontend.shoppinglist.btn.${isMaxPageSize ? 'show_less' : 'show_all'}`;
+        const translationPrefix = `${this.translationPrefix}.${isMaxPageSize ? 'show_less' : 'show_all'}`;
 
         return {
             enabled: this.enabled,
