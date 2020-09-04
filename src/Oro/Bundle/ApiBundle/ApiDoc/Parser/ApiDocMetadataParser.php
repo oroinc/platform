@@ -82,6 +82,7 @@ class ApiDocMetadataParser implements ParserInterface
      * @param bool                   $isOutput
      *
      * @return array [field name => [key => value, ...], ...]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getApiDocFieldsDefinition(
         EntityMetadata $metadata,

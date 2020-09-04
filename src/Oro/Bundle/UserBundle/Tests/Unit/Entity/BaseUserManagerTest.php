@@ -12,6 +12,9 @@ use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */

@@ -553,6 +553,7 @@ class Parser
      * @param ExpressionBuilder $expr
      * @param string $fieldName
      * @return Comparison
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getComparisonForOtherOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
     {

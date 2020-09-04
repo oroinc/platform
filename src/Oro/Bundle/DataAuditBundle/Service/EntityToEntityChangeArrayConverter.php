@@ -121,20 +121,26 @@ class EntityToEntityChangeArrayConverter
     {
         if ($value instanceof \DateTime) {
             return $value->format(\DateTime::ISO8601);
-        } elseif (is_object($value)) {
+        }
+
+        if (is_object($value)) {
             if ($em->getMetadataFactory()->hasMetadataFor(ClassUtils::getClass($value))) {
                 return $this->convertNamedEntityToArray($em, $value, []);
             }
 
             return null;
-        } elseif (is_array($value)) {
+        }
+
+        if (is_array($value)) {
             $sanitized = [];
             foreach ($value as $key => $item) {
                 $sanitized[$key] = $this->convertFieldValue($em, $item);
             }
 
             return $sanitized;
-        } elseif (!is_scalar($value)) {
+        }
+
+        if (!is_scalar($value)) {
             return null;
         }
 
@@ -151,7 +157,7 @@ class EntityToEntityChangeArrayConverter
     {
         try {
             $id = $em->getUnitOfWork()->getSingleIdentifierValue($entity);
-            if ($id) {
+            if ($id !== null) {
                 return $id;
             }
 
@@ -162,11 +168,11 @@ class EntityToEntityChangeArrayConverter
                 $oldVal = reset($changeSet[$identifierField]);
                 $newVal = end($changeSet[$identifierField]);
 
-                if ($newVal) {
+                if ($newVal !== null) {
                     return $newVal;
                 }
 
-                if ($oldVal) {
+                if ($oldVal !== null) {
                     return $oldVal;
                 }
             }

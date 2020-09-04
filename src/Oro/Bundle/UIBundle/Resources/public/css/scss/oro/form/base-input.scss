@@ -46,6 +46,11 @@
         box-shadow: $input-error-box-shadow;
     }
 
+    &.full-width {
+        width: 100%;
+        min-width: 100%;
+    }
+
     // Disable platform styles of input search
     &::-webkit-search-decoration,
     &::-webkit-search-cancel-button,

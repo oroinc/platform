@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
+use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Zend\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 
 /**
  * Provides metadata about multi-enum attribute type.

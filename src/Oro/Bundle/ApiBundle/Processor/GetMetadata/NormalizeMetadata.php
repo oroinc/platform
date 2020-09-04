@@ -91,6 +91,7 @@ class NormalizeMetadata implements ProcessorInterface
      * @param EntityDefinitionConfig $config
      * @param bool                   $processLinkedProperties
      * @param MetadataContext        $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeMetadata(
         EntityMetadata $entityMetadata,

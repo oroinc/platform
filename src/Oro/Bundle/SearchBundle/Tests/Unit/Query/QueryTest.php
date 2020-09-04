@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryTest extends \PHPUnit\Framework\TestCase
 {
     private $config = [

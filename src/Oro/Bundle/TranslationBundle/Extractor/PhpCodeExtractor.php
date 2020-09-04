@@ -42,6 +42,7 @@ class PhpCodeExtractor implements ExtractorInterface
      *
      * @param array $tokens
      * @param MessageCatalogue $catalog
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {

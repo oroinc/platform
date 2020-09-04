@@ -19,10 +19,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportContext extends OroFeatureContext implements
@@ -66,6 +68,9 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected static $exportFiles = [];
 
+    /** @var null|string */
+    private $absoluteUrl;
+
     /**
      * @param EntityAliasResolver $aliasResolver
      * @param ProcessorRegistry $processorRegistry
@@ -74,6 +79,14 @@ class ImportExportContext extends OroFeatureContext implements
     {
         $this->aliasResolver = $aliasResolver;
         $this->processorRegistry = $processorRegistry;
+    }
+
+    /**
+     * @param string|null $absoluteUrl
+     */
+    public function setAbsoluteUrl(?string $absoluteUrl): void
+    {
+        $this->absoluteUrl = $absoluteUrl;
     }
 
     /**
@@ -346,14 +359,17 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @Given /^exported file contains at least the following columns:$/
+     * @Then /^(?:|I )download export file$/
      *
      * @param TableNode $expectedEntities
      */
-    public function exportedFileContainsAtLeastFollowingColumns(TableNode $expectedEntities)
+    public function exportedFileContainsAtLeastFollowingColumns(?TableNode $expectedEntities = null)
     {
         $filePath = $this->getExportFile();
 
-        $this->assertFileContainsAtLeastFollowingColumns($filePath, $expectedEntities);
+        if ($expectedEntities) {
+            $this->assertFileContainsAtLeastFollowingColumns($filePath, $expectedEntities);
+        }
     }
 
     /**
@@ -381,13 +397,26 @@ class ImportExportContext extends OroFeatureContext implements
             // Ensure that at least expected data is present.
             foreach ($expectedEntityData as $property => $value) {
                 try {
-                    static::assertEquals(
-                        $value,
-                        $entityDataFromCsv[$property],
-                        sprintf('Failed asserting that two columns "%s" are equal on row %d', $property, $line)
-                    );
-                } catch (ExpectationFailedException $exception) {
-                    $errors[] = $exception->getMessage() . $exception->getComparisonFailure()->getDiff();
+                    if (preg_match('/\<contains\("(?P<needle>(?:[^"]|\\")+)"\)\>/i', $value, $matches)) {
+                        static::assertMatchesRegularExpression(
+                            sprintf('~%s~', $matches['needle']),
+                            (string)$entityDataFromCsv[$property]
+                        );
+                    } elseif ($value === '<notEmpty()>') {
+                        static::assertNotEmpty($entityDataFromCsv[$property]);
+                    } else {
+                        static::assertEquals(
+                            $value,
+                            $entityDataFromCsv[$property],
+                            sprintf('Failed asserting that two columns "%s" are equal on row %d', $property, $line)
+                        );
+                    }
+                } catch (Exception $exception) {
+                    $message = $exception->getMessage();
+                    if ($exception instanceof ExpectationFailedException && $exception->getComparisonFailure()) {
+                        $message .= $exception->getComparisonFailure()->getDiff();
+                    }
+                    $errors[] = $message;
                 }
             }
         }
@@ -535,32 +564,77 @@ class ImportExportContext extends OroFeatureContext implements
                     }
                 }
 
-                $regex = '/\<valueFromExportFile\("(?P<column>(?:[^"]|\\")+)",\s?'
-                    . '"(?P<searchedColumn>(?:[^"]|\\")+)",\s?'
-                    . '"(?P<searchedColumnValue>(?:[^"]|\\")+)"\)\>/i';
-                if (preg_match($regex, $value, $matches)) {
-                    $foundValue = $this->getValueFromExportFile(
-                        $matches['searchedColumn'],
-                        $matches['searchedColumnValue'],
-                        $matches['column']
-                    );
-
-                    self::assertNotNull(
-                        $foundValue,
-                        sprintf(
-                            'Searched value \"%s\" in column \"%s\" not found in export file',
-                            $matches['searchedColumnValue'],
-                            $matches['searchedColumn']
-                        )
-                    );
-
-                    $value = $foundValue;
-                }
-
-                $values[] = $value;
+                $values[] = $this->processFunctions($value);
             }
             fputcsv($fp, $values);
         }
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    private function processFunctions(string $value): string
+    {
+        switch (true) {
+            case preg_match(
+                '/\<valueFromExportFile\("(?P<column>(?:[^"]|\\")+)",\s?'
+                . '"(?P<searchedColumn>(?:[^"]|\\")+)",\s?'
+                . '"(?P<searchedColumnValue>(?:[^"]|\\")+)"\)\>/i',
+                $value,
+                $matches
+            ):
+                $value = $this->getValueFromExportFile(
+                    $matches['searchedColumn'],
+                    $matches['searchedColumnValue'],
+                    $matches['column']
+                );
+
+                self::assertNotNull(
+                    $value,
+                    sprintf(
+                        'Searched value \"%s\" in column \"%s\" not found in export file',
+                        $matches['searchedColumnValue'],
+                        $matches['searchedColumn']
+                    )
+                );
+                break;
+
+            case preg_match('/\<absoluteUrl\("(?P<path>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
+                $value = $this->getAbsoluteUrl($matches['path']);
+                break;
+
+            case preg_match('/\<absolutePath\("(?P<path>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
+                $value = $this->getAbsolutePath($matches['path']);
+                break;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getAbsoluteUrl(string $path): string
+    {
+        if (!$this->absoluteUrl) {
+            $this->absoluteUrl = $this->getContainer()->get('oro_config.manager')->get('oro_ui.application_url');
+        }
+
+        return sprintf('%s/%s', $this->absoluteUrl, ltrim($path, '/'));
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getAbsolutePath(string $path): string
+    {
+        return sprintf('%s/%s', $this->getContainer()->getParameter('kernel.project_dir'), ltrim($path, '/'));
     }
 
     /**
@@ -577,12 +651,12 @@ class ImportExportContext extends OroFeatureContext implements
         $this->importFile = $this->getTempFilePath('import_data_');
         $fp = fopen($this->importFile, 'w');
 
-        fputcsv($fp, array_keys($table->getRow(0)));
+        fputcsv($fp, $table->getRow(0));
 
         foreach ($table as $row) {
             $values = [];
             foreach ($row as $rowHeader => $rowValue) {
-                $values[] = $rowValue;
+                $values[] = $this->processFunctions($rowValue);
             }
 
             fputcsv($fp, $values);
@@ -892,7 +966,7 @@ class ImportExportContext extends OroFeatureContext implements
             return $response->getStatusCode() === 200;
         });
 
-        self::assertFileExists($filePath, 'Failed to perform export');
+        self::assertFileExists($filePath, 'Failed to find a link and download an export file from email');
 
         static::rememberExport($filePath);
 

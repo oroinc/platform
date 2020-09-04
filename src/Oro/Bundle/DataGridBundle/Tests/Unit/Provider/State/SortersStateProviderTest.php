@@ -9,6 +9,9 @@ use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SortersStateProviderTest extends AbstractStateProviderTest
 {
     use EntityTrait;

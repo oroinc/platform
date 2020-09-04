@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RouteOverridePathTest extends RestJsonApiTestCase
 {

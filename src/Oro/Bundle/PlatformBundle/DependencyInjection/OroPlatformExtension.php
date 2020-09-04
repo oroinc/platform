@@ -18,6 +18,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepend(ContainerBuilder $container)
     {

@@ -103,6 +103,7 @@ class DebugCommand extends Command
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

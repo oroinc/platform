@@ -100,6 +100,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param string                 $version
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeEntityAssociations(
         ClassMetadata $metadata,

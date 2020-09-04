@@ -133,6 +133,7 @@ class FilterFieldsByExtra implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param array                  $fieldFilters
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterEntityFields(
         EntityDefinitionConfig $definition,
@@ -195,6 +196,7 @@ class FilterFieldsByExtra implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param array                  $fieldFilters
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterObjectFields(
         EntityDefinitionConfig $definition,

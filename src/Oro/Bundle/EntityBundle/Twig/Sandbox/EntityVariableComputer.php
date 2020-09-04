@@ -80,6 +80,7 @@ class EntityVariableComputer
      * @param string[]     $path
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function tryComputeNestedEntityVariable(
         string $variable,

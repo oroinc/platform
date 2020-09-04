@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Closure;
+use Laminas\Mail\Exception\ExceptionInterface as LaminasMailException;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Exception as BaseException;
+use Laminas\Mail\Storage\Exception\InvalidArgumentException;
+use Laminas\Mail\Storage\Exception\RuntimeException;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Exception\InvalidMessageHeadersException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
-use Zend\Mail\Exception\ExceptionInterface as ZendMailException;
-use Zend\Mail\Storage\Exception as BaseException;
 
 /**
  * Imap protocol implementation.
@@ -18,21 +22,21 @@ use Zend\Mail\Storage\Exception as BaseException;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Imap extends \Zend\Mail\Storage\Imap
+class Imap extends \Laminas\Mail\Storage\Imap
 {
-    const BODY_HEADER      = 'BODY[HEADER]';
+    const BODY_HEADER = 'BODY[HEADER]';
     const BODY_PEEK_HEADER = 'BODY.PEEK[HEADER]';
-    const BODY_PEEK_TEXT   = 'BODY.PEEK[TEXT]';
-    const RFC822_HEADER    = 'RFC822.HEADER';
-    const FLAGS            = 'FLAGS';
-    const UID              = 'UID';
-    const INTERNALDATE     = 'INTERNALDATE';
+    const BODY_PEEK_TEXT = 'BODY.PEEK[TEXT]';
+    const RFC822_HEADER = 'RFC822.HEADER';
+    const FLAGS = 'FLAGS';
+    const UID = 'UID';
+    const INTERNALDATE = 'INTERNALDATE';
 
     /**
      * Indicates protocol capabilities
      */
-    const CAPABILITY_IMAP4_REV_1      = 'IMAP4rev1';
-    const CAPABILITY_IMAP4            = 'IMAP4';
+    const CAPABILITY_IMAP4_REV_1 = 'IMAP4rev1';
+    const CAPABILITY_IMAP4 = 'IMAP4';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
@@ -77,11 +81,12 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     private $uniqueIds = [];
 
-    /** @var \Closure */
+    /** @var Closure */
     private $onConvertError;
 
     /**
      * {@inheritdoc}
+     * @param array|Imap|ProtocolImap $params mail reader specific parameters
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -104,7 +109,7 @@ class Imap extends \Zend\Mail\Storage\Imap
             try {
                 $this->selectFolder('INBOX');
             } catch (BaseException\ExceptionInterface $e) {
-                throw new BaseException\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+                throw new RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
             }
             $this->postInit();
 
@@ -112,7 +117,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         if (!isset($params->user)) {
-            throw new BaseException\InvalidArgumentException('need at least user in params');
+            throw new InvalidArgumentException('need at least user in params');
         }
 
         $host     = isset($params->host)     ? $params->host     : 'localhost';
@@ -141,12 +146,12 @@ class Imap extends \Zend\Mail\Storage\Imap
     protected function postInit()
     {
         $this->messageClass = 'Oro\Bundle\ImapBundle\Mail\Storage\Message';
-        $this->getMessageItems = array(
+        $this->getMessageItems = [
             self::FLAGS,
             self::BODY_PEEK_HEADER,
             self::UID,
-            self::INTERNALDATE
-        );
+            self::INTERNALDATE,
+        ];
     }
 
     /**
@@ -176,20 +181,21 @@ class Imap extends \Zend\Mail\Storage\Imap
     /**
      * get root folder or given folder
      *
-     * @param  string $rootFolder get folder structure for given folder, else root
+     * @param string $rootFolder get folder structure for given folder, else root
      * @return Folder root or wanted folder
-     * @throws \Zend\Mail\Storage\Exception\RuntimeException
-     * @throws \Zend\Mail\Storage\Exception\InvalidArgumentException
-     * @throws \Zend\Mail\Protocol\Exception\RuntimeException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws \Laminas\Mail\Protocol\Exception\RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFolders($rootFolder = null)
     {
         $folders = $this->protocol->listMailbox((string)$rootFolder);
         if (!$folders) {
-            throw new BaseException\InvalidArgumentException('folder not found');
+            throw new InvalidArgumentException('folder not found');
         }
 
-        $decodedFolders = array();
+        $decodedFolders = [];
         foreach ($folders as $globalName => $data) {
             $decodedGlobalName = mb_convert_encoding($globalName, 'UTF-8', 'UTF7-IMAP');
             $decodedFolders[$decodedGlobalName] = $data;
@@ -198,8 +204,8 @@ class Imap extends \Zend\Mail\Storage\Imap
 
         ksort($folders, SORT_STRING);
         $root = new Folder('/', '/', false);
-        $stack = array(null);
-        $folderStack = array(null);
+        $stack = [null];
+        $folderStack = [null];
         $parentFolder = $root;
         $parent = '';
 
@@ -231,7 +237,7 @@ class Imap extends \Zend\Mail\Storage\Imap
                 }
             } while ($stack);
             if (!$stack) {
-                throw new BaseException\RuntimeException('error while constructing folder tree');
+                throw new RuntimeException('error while constructing folder tree');
             }
         }
 
@@ -282,7 +288,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         foreach ($items as $id => $data) {
             try {
                 $messages[$id] = $this->createMessageObject($id, $data);
-            } catch (ZendMailException $e) {
+            } catch (LaminasMailException $e) {
                 if (null !== $this->onConvertError) {
                     call_user_func($this->onConvertError, $e, $data[self::UID]);
                 } else {
@@ -299,17 +305,17 @@ class Imap extends \Zend\Mail\Storage\Imap
      *
      * @param array $criteria The search criteria
      * @return string[] Message ids
-     * @throws \Zend\Mail\Storage\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function search(array $criteria)
     {
         if (empty($criteria)) {
-            throw new BaseException\RuntimeException('The search criteria must not be empty.');
+            throw new RuntimeException('The search criteria must not be empty.');
         }
 
         $response = $this->protocol->search($criteria);
         if (!is_array($response)) {
-            throw new BaseException\RuntimeException('Cannot search messages.');
+            throw new RuntimeException('Cannot search messages.');
         }
 
         return $response;
@@ -328,12 +334,12 @@ class Imap extends \Zend\Mail\Storage\Imap
             throw new UnsupportException('The server do not support UID SEARCH.');
         }
         if (empty($criteria)) {
-            throw new BaseException\RuntimeException('The search criteria must not be empty.');
+            throw new RuntimeException('The search criteria must not be empty.');
         }
 
         $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
         if (!is_array($response)) {
-            throw new BaseException\RuntimeException('Cannot search messages.');
+            throw new RuntimeException('Cannot search messages.');
         }
 
         foreach ($response as $ids) {
@@ -425,7 +431,7 @@ class Imap extends \Zend\Mail\Storage\Imap
             }
         }
 
-        throw new BaseException\InvalidArgumentException('unique id not found');
+        throw new InvalidArgumentException('unique id not found');
     }
 
     /**
@@ -489,7 +495,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {
-            throw new BaseException\RuntimeException('not implemented');
+            throw new RuntimeException('not implemented');
         }
 
         return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
@@ -500,10 +506,10 @@ class Imap extends \Zend\Mail\Storage\Imap
      * If this callback set then the iterator will work in fail safe mode
      * and invalid messages will just skipped.
      *
-     * @param \Closure|null $callback The callback function.
+     * @param Closure|null $callback The callback function.
      *                                function (\Exception)
      */
-    public function setConvertErrorCallback(\Closure $callback = null)
+    public function setConvertErrorCallback(Closure $callback = null)
     {
         $this->onConvertError = $callback;
     }
@@ -521,8 +527,8 @@ class Imap extends \Zend\Mail\Storage\Imap
     /**
      * Sets additional message headers
      *
-     * @param \Zend\Mail\Headers $headers
-     * @param array $data
+     * @param Headers $headers
+     * @param array   $data
      */
     protected function setExtHeaders(&$headers, array $data)
     {

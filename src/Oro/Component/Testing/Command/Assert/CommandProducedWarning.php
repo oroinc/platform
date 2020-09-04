@@ -44,7 +44,11 @@ class CommandProducedWarning extends Constraint
     protected function failureDescription($commandTester): string
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
-        return "Command produced a warning:\n" . $commandTester->getDisplay();
+        return \sprintf(
+            "command produced a warning:\n- %s\nCommand output:\n%s\n",
+            \implode("\n- ", $this->errors),
+            $commandTester->getDisplay()
+        );
     }
 
     public function toString(): string

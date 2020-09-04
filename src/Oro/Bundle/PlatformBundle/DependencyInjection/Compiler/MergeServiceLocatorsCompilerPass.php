@@ -34,6 +34,7 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContainerBuilder $container)
     {

@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\MergeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeActionConfigHelper */

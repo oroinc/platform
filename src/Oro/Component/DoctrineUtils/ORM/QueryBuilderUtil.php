@@ -12,6 +12,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 /**
  * A set of reusable static methods to help building of queries.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class QueryBuilderUtil
 {

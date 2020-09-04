@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This is used to edit workflow attributes in workflow configurator.
+ */
 class WorkflowAttributesType extends AbstractType
 {
     const NAME = 'oro_workflow_attributes';
@@ -157,6 +160,7 @@ class WorkflowAttributesType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array $options
      * @throws InvalidConfigurationException When attribute is not found in given Workflow
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addAttributes(FormBuilderInterface $builder, array $options)
     {

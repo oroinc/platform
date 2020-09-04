@@ -123,6 +123,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function guessType($class, $property)
     {

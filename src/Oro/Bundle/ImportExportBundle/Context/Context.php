@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Context;
 
 /**
  * Provides the ability to save and manage parameters
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Context implements ContextInterface, BatchContextInterface
 {

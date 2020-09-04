@@ -27,6 +27,8 @@ styles:
         - 'bundles/oroui/blank/scss/variables/loader-mask-config.scss'
         - 'bundles/oroui/blank/scss/variables/loading-bar-config.scss'
         - 'bundles/oroui/blank/scss/variables/line-clamp-config.scss'
+        - 'bundles/oroui/blank/scss/variables/highlight-text-config.scss'
+        - 'bundles/oroui/blank/scss/components/highlight-text.scss'
         - 'bundles/oroui/blank/scss/reset.scss'
         - 'bundles/oroui/blank/scss/components/loading-bar-lines.scss'
         - 'bundles/oroui/blank/scss/styles.scss'

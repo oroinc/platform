@@ -77,6 +77,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
      * @param \Exception $exception
      * @param \Exception $expectedException
      * @dataProvider executeProvider
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testExecute(
         $id,

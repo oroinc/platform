@@ -35,6 +35,7 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
 
     /**
      * @param CustomizeFormDataContext $context
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function processPreSubmit(CustomizeFormDataContext $context): void
     {

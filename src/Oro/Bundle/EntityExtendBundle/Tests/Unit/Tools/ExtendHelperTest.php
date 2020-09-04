@@ -4,6 +4,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

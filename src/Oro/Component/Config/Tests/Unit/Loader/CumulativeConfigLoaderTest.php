@@ -13,6 +13,9 @@ use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /**

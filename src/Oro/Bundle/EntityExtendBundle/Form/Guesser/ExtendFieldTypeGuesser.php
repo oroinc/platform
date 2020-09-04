@@ -127,6 +127,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
      * @param FieldConfigId   $fieldConfigId
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getOptions(ConfigInterface $extendConfig, FieldConfigId $fieldConfigId)
     {

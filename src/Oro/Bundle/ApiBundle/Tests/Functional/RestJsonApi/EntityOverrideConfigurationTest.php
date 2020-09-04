@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * Tests configuration and metadata for API resource for a class inherited from ORM entity.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityOverrideConfigurationTest extends RestJsonApiTestCase
 {

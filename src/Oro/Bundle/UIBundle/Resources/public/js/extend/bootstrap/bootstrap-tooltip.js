@@ -3,8 +3,6 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-
-    require('jquery-ui');
     require('bootstrap-tooltip');
 
     const Tooltip = $.fn.tooltip.Constructor;

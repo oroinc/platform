@@ -111,6 +111,7 @@ class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param array $entities
      * @param bool $dryRun
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processChange(LoggerInterface $logger, array $entities, $dryRun = false)
     {

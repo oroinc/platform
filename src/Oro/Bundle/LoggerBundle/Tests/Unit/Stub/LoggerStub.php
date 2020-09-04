@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Stub;
 
+use Closure;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
@@ -20,7 +21,7 @@ class LoggerStub extends ArrayLogger implements LazyLoadingInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyInitializer()
+    public function getProxyInitializer() : ?Closure
     {
     }
 

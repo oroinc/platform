@@ -6,10 +6,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\AbstractColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * Guesses filtering options based on a column type.
+ */
 class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function guessFilter($class, $property, $type)
     {

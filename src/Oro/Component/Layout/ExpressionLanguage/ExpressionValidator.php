@@ -178,6 +178,9 @@ class ExpressionValidator
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function validatePrimaryExpression(): void
     {
         $token = $this->stream->current;

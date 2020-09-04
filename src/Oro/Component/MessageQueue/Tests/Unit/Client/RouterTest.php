@@ -12,6 +12,9 @@ use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\Testing\ClassExtensionTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RouterTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;

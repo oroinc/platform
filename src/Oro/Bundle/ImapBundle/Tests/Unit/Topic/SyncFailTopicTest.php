@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Topic;
 
-use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
+use Gos\Bundle\PubSubRouterBundle\Router\Route;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\ImapBundle\Topic\SyncFailTopic;
+use Oro\Bundle\SyncBundle\Client\ClientManipulator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Ratchet\ConnectionInterface;
@@ -38,10 +39,12 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $this->conn = $this->createMock(ConnectionInterface::class);
         $this->topic = $this->createMock(Topic::class);
         $this->parameterBag = $this->createMock(ParameterBag::class);
-        $this->request = $this->createMock(WampRequest::class);
-        $this->request->expects($this->any())
-            ->method('getAttributes')
-            ->willReturn($this->parameterBag);
+        $this->request = new WampRequest(
+            'sample_route',
+            $this->createMock(Route::class),
+            $this->parameterBag,
+            'sample_match'
+        );
 
         $this->clientManipulator = $this->createMock(ClientManipulator::class);
         $this->syncFailTopic = new SyncFailTopic('oro_imap.sync_fail', $this->clientManipulator);
@@ -81,7 +84,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $user = $this->getEntity(User::class, ['id' => 111]);
 
         $this->clientManipulator->expects($this->once())
-            ->method('getClient')
+            ->method('getUser')
             ->with($this->conn)
             ->willReturn($user);
 
@@ -104,7 +107,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $user = $this->getEntity(User::class, ['id' => 111]);
 
         $this->clientManipulator->expects($this->once())
-            ->method('getClient')
+            ->method('getUser')
             ->with($this->conn)
             ->willReturn($user);
 

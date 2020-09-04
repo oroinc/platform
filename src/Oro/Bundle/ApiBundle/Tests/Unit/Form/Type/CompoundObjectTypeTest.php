@@ -27,6 +27,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CompoundObjectTypeTest extends TypeTestCase
 {
     protected function setUp(): void

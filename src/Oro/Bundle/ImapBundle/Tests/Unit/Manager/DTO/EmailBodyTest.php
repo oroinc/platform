@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
+use Laminas\Mail\Header\ContentType;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Zend\Mail\Header\ContentType;
+use PHPUnit\Framework\TestCase;
 
-class EmailBodyTest extends \PHPUnit\Framework\TestCase
+class EmailBodyTest extends TestCase
 {
     use EntityTestCaseTrait;
 

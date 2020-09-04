@@ -4,6 +4,11 @@ namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 
+/**
+ * Block type option DTO.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class Options implements \ArrayAccess, \Iterator
 {
     /** @var array */

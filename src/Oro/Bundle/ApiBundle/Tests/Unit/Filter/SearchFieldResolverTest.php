@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\SearchFieldResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchFieldResolver */

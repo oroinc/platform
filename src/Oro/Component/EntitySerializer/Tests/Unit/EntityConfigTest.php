@@ -5,6 +5,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()

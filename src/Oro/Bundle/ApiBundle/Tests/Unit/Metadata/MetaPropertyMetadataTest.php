@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()

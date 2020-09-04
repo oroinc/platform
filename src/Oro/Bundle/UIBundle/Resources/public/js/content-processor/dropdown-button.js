@@ -1,11 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'jquery-ui',
-    'orotranslation/js/translator',
-    'oroui/js/app/views/sticky-element/sticky-element-mixin'
-], function($, _, $ui, __, stickyElementMixin) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
+    require('jquery-ui/widget');
 
     /**
      * Converts buttons sequence from container to group with main buttons

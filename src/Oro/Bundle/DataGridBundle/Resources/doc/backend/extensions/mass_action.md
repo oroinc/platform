@@ -74,5 +74,5 @@ operations:
  - `allowedRequestTypes` intended to use for mass action request server side validation. If it's not specified, request compared to `GET` method.
  - `requestType` intended to use for mass action to override default HTTP request type `GET` to one from allowed types. If it's not specified will be `GET` type.
 
-How to configure operations described in [Operations](../../../../../ActionBundle/Resources/doc/operations.md) article.
+How to configure operations described in [Operations](https://doc.oroinc.com/backend/bundles/platform/ActionBundle/operations/) article.
 

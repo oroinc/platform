@@ -99,16 +99,17 @@ class SegmentManager
      */
     public function getSegmentByEntityName($entityName, $term, $page = 1, $skippedSegment = null)
     {
-        $queryBuilder = $this->em->getRepository('OroSegmentBundle:Segment')
+        $queryBuilder = $this->em->getRepository(Segment::class)
             ->createQueryBuilder('segment')
             ->where('segment.entity = :entity')
             ->setParameter('entity', $entityName);
 
         if (!empty($term)) {
             $queryBuilder
-                ->andWhere('segment.name LIKE :segmentName')
-                ->setParameter('segmentName', sprintf('%%%s%%', $term));
+                ->andWhere('LOWER(segment.name) LIKE :segmentName')
+                ->setParameter('segmentName', sprintf('%%%s%%', strtolower($term)));
         }
+
         if (!empty($skippedSegment)) {
             $queryBuilder
                 ->andWhere('segment.id <> :skippedSegment')
@@ -118,7 +119,7 @@ class SegmentManager
         $queryBuilder
             ->setFirstResult($this->getOffset($page))
             ->setMaxResults(self::PER_PAGE + 1)
-            ->orderBy('segment.id');
+            ->orderBy('segment.name', 'ASC');
         $segments = $this->aclHelper->apply($queryBuilder)->getResult();
 
         $result = [

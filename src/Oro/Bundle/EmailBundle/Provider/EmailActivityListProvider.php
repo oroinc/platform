@@ -449,6 +449,7 @@ class EmailActivityListProvider implements
      * @param ActivityList $activityList
      * @param array $filter
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function collectActivityOwners(ActivityList $activityList, array $filter)
     {
@@ -522,11 +523,11 @@ class EmailActivityListProvider implements
     {
         $route = null;
         $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
-        
+
         if (null !== $entityMetadata) {
             $route = $entityMetadata->getRoute('view');
         }
-        
+
         if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {

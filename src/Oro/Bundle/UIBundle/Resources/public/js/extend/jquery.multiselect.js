@@ -1,11 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/dropdown-mask',
-    'jquery-ui',
-    'jquery.multiselect'
-], function($, _, mask) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mask = require('oroui/js/dropdown-mask');
+    require('jquery-ui/widget');
+    require('jquery.multiselect');
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
         options: _.extend({}, $.ech.multiselect.prototype.options, {

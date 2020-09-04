@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UnidirectionalAssociationsTest extends RestJsonApiTestCase
 {

@@ -16,6 +16,9 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */

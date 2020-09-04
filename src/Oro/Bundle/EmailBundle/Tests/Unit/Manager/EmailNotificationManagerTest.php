@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EmailNotificationManagerTest
@@ -49,12 +50,14 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($this->repository);
 
-
         $htmlTagProvider = $this->getMockBuilder('Oro\Bundle\FormBundle\Provider\HtmlTagProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->htmlTagHelper = new HtmlTagHelper($htmlTagProvider, '');
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
+        $translator = $this->createMock(TranslatorInterface::class);
+        $this->htmlTagHelper->setTranslator($translator);
 
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()->getMock();

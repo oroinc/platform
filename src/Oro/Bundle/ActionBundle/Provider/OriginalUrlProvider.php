@@ -47,11 +47,15 @@ class OriginalUrlProvider
      *
      * @param ButtonSearchContext|null $buttonSearchContext
      *
-     * @return string
+     * @return string|null
      */
-    public function getOriginalUrl(ButtonSearchContext $buttonSearchContext = null)
+    public function getOriginalUrl(ButtonSearchContext $buttonSearchContext = null): ?string
     {
         $originalUrl = $this->getMasterRequestUri();
+        if (null === $originalUrl) {
+            return null;
+        }
+
         if (null === $buttonSearchContext) {
             return $originalUrl;
         }
@@ -70,10 +74,23 @@ class OriginalUrlProvider
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    private function getMasterRequestUri()
+    private function getMasterRequestUri(): ?string
     {
-        return $this->requestStack->getMasterRequest()->getRequestUri();
+        $request = $this->requestStack->getMasterRequest();
+
+        /**
+         * Based on the "requestStack" contract "MasterRequest" could be "null". it could happens in case
+         * if this service is called during the console command work.
+         *
+         * Example of such case is the building of the MarketingList datasource, where datagrid used as a source of
+         * the data.
+         */
+        if (!$request) {
+            return null;
+        }
+
+        return $request->getRequestUri();
     }
 }

@@ -7,6 +7,9 @@ use Oro\Component\Layout\DataProviderDecorator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */

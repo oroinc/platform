@@ -9,6 +9,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclExtensionSelector */

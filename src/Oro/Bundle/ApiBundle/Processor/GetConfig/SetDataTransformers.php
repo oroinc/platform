@@ -58,6 +58,7 @@ class SetDataTransformers implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param RequestType            $requestType
      * @param ClassMetadata|null     $metadata
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function setDataTransformers(
         EntityDefinitionConfig $definition,

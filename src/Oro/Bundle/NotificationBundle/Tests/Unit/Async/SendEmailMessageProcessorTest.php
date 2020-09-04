@@ -19,6 +19,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;

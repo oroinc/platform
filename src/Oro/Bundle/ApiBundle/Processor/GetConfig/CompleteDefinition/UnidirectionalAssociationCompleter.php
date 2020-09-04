@@ -81,6 +81,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
      * @param EntityOverrideProviderInterface $entityOverrideProvider
      *
      * @return string the name of the target association
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeUnidirectionalAssociation(
         ClassMetadata $metadata,

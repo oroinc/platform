@@ -52,7 +52,7 @@ class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInte
     /**
      * {@inheritdoc}
      */
-    public function registerPeriodicTimer(Topic $topic)
+    public function registerPeriodicTimer(Topic $topic): void
     {
         $this->periodicTimer->addPeriodicTimer(
             $this,

@@ -89,6 +89,7 @@ class QueueConsumer
      * @param ExtensionInterface|null $runtimeExtension
      *
      * @throws \Exception
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function consume(ExtensionInterface $runtimeExtension = null)
     {

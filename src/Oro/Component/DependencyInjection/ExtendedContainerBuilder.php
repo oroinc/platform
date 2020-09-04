@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
+/**
+ * Allows to set foreign extension config and to change priority of compiler passes.
+ */
 class ExtendedContainerBuilder extends ContainerBuilder
 {
     /**
@@ -35,6 +38,7 @@ class ExtendedContainerBuilder extends ContainerBuilder
      * @param string $passClassName       The class name of a compiler pass to be moved
      * @param string $targetPassClassName The class name of a target compiler pass
      * @param string $type                The type of compiler pass
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function moveCompilerPassBefore(
         $passClassName,

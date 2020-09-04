@@ -50,6 +50,7 @@ class FieldAccessor
      * @param EntityConfig $config
      *
      * @return string[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFields(string $entityClass, EntityConfig $config): array
     {

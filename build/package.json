@@ -11,12 +11,12 @@
     "test-codestyle": "./node_modules/.bin/eslint ../../ -c .eslintrc.yml --ignore-path .eslintignore --quiet"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-transform-runtime": "^7.7.6",
-    "@babel/preset-env": "^7.7.7",
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
     "autoprefixer": "9.6.1",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^3.4.0",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.6.0",
     "deepmerge": "3.3.0",
     "eslint": "6.5.1",
     "eslint-config-google": "0.14.0",
@@ -35,7 +35,7 @@
     "jasmine-core": "3.5.0",
     "jasmine-jquery": "2.1.1",
     "js-yaml": "3.13.1",
-    "karma": "4.4.1",
+    "karma": "^5.1.0",
     "karma-chrome-launcher": "3.1.0",
     "karma-firefox-launcher": "1.2.0",
     "karma-jasmine": "2.0.1",
@@ -43,7 +43,7 @@
     "karma-webpack": "4.0.2",
     "mini-css-extract-plugin": "0.7.0",
     "minimist": "^1.2.3",
-    "node-sass": "4.12.0",
+    "node-sass": "^4.14.1",
     "optimize-css-assets-webpack-plugin": "5.0.3",
     "path": "0.12.7",
     "postcss-loader": "3.0.0",
@@ -52,16 +52,16 @@
     "style-loader": "^0.23.1",
     "terser": "4.1.2",
     "text-loader": "0.0.1",
-    "underscore": "^1.9.1",
+    "underscore": "^1.10.2",
     "url-loader": "2.0.1",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1",
+    "webpack-bundle-analyzer": "^3.8.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
     "webpack-merge": "4.2.1"
   },
   "dependencies": {
-    "@babel/runtime": "^7.7.7",
-    "core-js": "^3.6.1",
-    "whatwg-fetch": "^3.0.0"
+    "@babel/runtime": "^7.10.4",
+    "core-js": "^3.6.5"
   }
 }

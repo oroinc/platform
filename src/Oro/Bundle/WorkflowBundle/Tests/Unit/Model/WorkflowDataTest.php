@@ -7,6 +7,9 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowDataTest extends \PHPUnit\Framework\TestCase
 {
     /**

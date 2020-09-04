@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 /**
  * Tests that "master request" flag is TRUE for master requests and FALSE for sub requests.
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class MasterRequestTest extends RestJsonApiTestCase
 {

@@ -8,7 +8,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializer;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -58,13 +57,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     {
         $organization = new Organization();
         $organization->setId(1);
-        $user = $this->getMockBuilder(AbstractUser::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getId'])
-            ->getMockForAbstractClass();
-        $user->expects(self::once())
-            ->method('getId')
-            ->willReturn(123);
+        $user = new User();
+        $user->setId(123);
         $token = new OrganizationToken($organization);
         $token->setUser($user);
 
@@ -78,21 +72,12 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     {
         $organization = new Organization();
         $organization->setId(1);
-        $user = $this->getMockBuilder(AbstractUser::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getId'])
-            ->getMockForAbstractClass();
-        $user->expects(self::once())
-            ->method('getId')
-            ->willReturn(123);
-        $role1 = $this->createMock(Role::class);
-        $role1->expects(self::once())
-            ->method('getRole')
-            ->willReturn('ROLE_1');
-        $role2 = $this->createMock(Role::class);
-        $role2->expects(self::once())
-            ->method('getRole')
-            ->willReturn('ROLE_2');
+        $user = new User();
+        $user->setId(123);
+        $role1 = new Role('ROLE_1');
+        $role2 = new Role('ROLE_2');
+        $user->addRole($role1);
+        $user->addRole($role2);
         $token = new OrganizationToken($organization, [$role1, $role2]);
         $token->setUser($user);
 
@@ -145,9 +130,10 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(ImpersonationToken::class, $token);
         self::assertSame($organization, $token->getOrganization());
         self::assertSame($user, $token->getUser());
-        self::assertCount(2, $token->getRoles());
-        self::assertSame($role1, $token->getRoles()[0]);
-        self::assertSame($role2, $token->getRoles()[1]);
+        self::assertCount(3, $token->getRoles());
+        self::assertEquals($role1, $token->getRoles()[0]);
+        self::assertEquals($role2, $token->getRoles()[1]);
+        self::assertEquals($role3, $token->getRoles()[2]);
     }
 
     /**

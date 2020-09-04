@@ -67,6 +67,7 @@ class OroSyncExtension extends Extension
         $loader->load('security.yml');
         $loader->load('client.yml');
         $loader->load('data_update.yml');
+        $loader->load('controllers.yml');
 
         $this->cloneParameters(
             $container,

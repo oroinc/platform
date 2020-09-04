@@ -30,6 +30,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ConfigManager
 {
@@ -573,6 +575,7 @@ class ConfigManager
      * @param array $models
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function prepareFlush(&$models)
     {
@@ -770,6 +773,7 @@ class ConfigManager
      * @param string|null $mode
      *
      * @return EntityConfigModel
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function createConfigEntityModel($className = null, $mode = null)
     {

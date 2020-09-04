@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit\Extension;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testTypes()

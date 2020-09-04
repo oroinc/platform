@@ -124,6 +124,7 @@ class Criteria extends BaseCriteria
      *
      * @return Join
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function addJoin(
         string $propertyPath,

@@ -3,7 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const template = require('tpl-loader!orofilter/templates/filter/date-picker.html');
-    require('jquery-ui');
+    require('jquery-ui/widget');
 
     $.widget('orofilter.itemizedPicker', {
         options: {

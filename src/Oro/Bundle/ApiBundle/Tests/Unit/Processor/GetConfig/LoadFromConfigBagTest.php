@@ -29,6 +29,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {

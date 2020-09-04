@@ -153,6 +153,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
     /**
      * @param EntityDefinitionFieldConfig $field
      * @param string[]                    $targets
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
     {

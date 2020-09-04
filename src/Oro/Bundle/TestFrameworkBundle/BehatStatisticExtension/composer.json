@@ -2,7 +2,7 @@
     "name": "oroinc/behat-statistic-extension",
     "description": "Added database statistic formatter and suite divider",
     "require": {
-        "php": "~7.3.13 || ~7.4.2",
+        "php": "~7.4.2",
         "behat/behat": "3.4.*",
         "behat/gherkin": "4.6.0",
         "doctrine/dbal": "2.5.5",

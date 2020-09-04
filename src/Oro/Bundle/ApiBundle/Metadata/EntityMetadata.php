@@ -13,6 +13,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
 {
@@ -73,6 +74,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      * @return array [key => value, ...]
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function toArray()
     {

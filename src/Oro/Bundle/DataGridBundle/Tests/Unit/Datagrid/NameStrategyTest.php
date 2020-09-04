@@ -6,6 +6,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\NameStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NameStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */

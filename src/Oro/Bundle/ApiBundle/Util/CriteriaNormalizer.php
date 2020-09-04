@@ -149,6 +149,7 @@ class CriteriaNormalizer
      *      ],
      *      ...
      *  ]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getJoinPathMap(Criteria $criteria, string $rootEntityClass): array
     {

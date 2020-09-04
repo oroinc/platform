@@ -89,6 +89,7 @@ class TokenSerializer implements TokenSerializerInterface
      * @param string $value organizationId=int;userId=int;userClass=string;roles=string,...
      *
      * @return array|null [organizationId, userId, userClass, roles]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function unpack($value)
     {

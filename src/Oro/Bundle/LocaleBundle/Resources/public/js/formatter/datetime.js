@@ -1,6 +1,9 @@
-define(['../locale-settings', 'moment', 'orotranslation/js/translator'
-], function(localeSettings, moment, __) {
+define(function(require) {
     'use strict';
+
+    const localeSettings = require('../locale-settings');
+    const moment = require('moment');
+    const __ = require('orotranslation/js/translator');
 
     const datetimeVendor = 'moment';
 

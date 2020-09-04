@@ -3,6 +3,7 @@ aliases:
     oro/dialog-widget$: orowindows/js/widget/dialog-widget
 configs:
     oro/dialog-widget: {}
+    orowindows/lib/jquery.dialog.extended: {}
 dynamic-imports:
     commons:
         - oro/dialog-widget

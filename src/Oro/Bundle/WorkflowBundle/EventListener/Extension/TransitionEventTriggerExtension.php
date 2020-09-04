@@ -16,6 +16,9 @@ use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Extension for transition event triggers.
+ */
 class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
 {
     /** @var MessageProducerInterface */

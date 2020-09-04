@@ -9,6 +9,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ */
 abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OwnerTree */

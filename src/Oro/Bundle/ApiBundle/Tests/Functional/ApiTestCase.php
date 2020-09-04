@@ -337,6 +337,7 @@ abstract class ApiTestCase extends WebTestCase
      * @param string $key
      * @param string $placeholder
      * @param array  $path
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function walkResponseContent(
         array &$expectedContent,

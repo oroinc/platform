@@ -7,6 +7,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 /**
  * The logger that is used for the profiling of ORM operations.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OrmLogger
 {

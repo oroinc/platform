@@ -19,7 +19,38 @@ define(function (require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
-    require('jquery-ui');
+    var config = require('module-config').default(module.id);
+    require('jquery-ui/widgets/dialog');
+
+    config = $.extend(true, {}, {
+        minimizeTo: false,
+        maximizedHeightDecreaseBy: false,
+        allowClose: true,
+        allowMaximize: false,
+        allowMinimize: false,
+        dblclick: false,
+        titlebar: false,
+        icons: {
+            close: 'ui-icon-closethick',
+            maximize: 'ui-icon-extlink',
+            minimize: 'ui-icon-minus',
+            restore: 'ui-icon-newwin'
+        },
+        snapshot: null,
+        state: 'normal',
+        // Events
+        beforeCollapse: null,
+        beforeMaximize: null,
+        beforeMinimize: null,
+        beforeRestore: null,
+        collapse: null,
+        maximize: null,
+        minimize: null,
+        restore: null,
+        closeText: __('Close'),
+        btnCloseClass: 'close-dialog',
+        btnCloseAriaText: __('oro.orowindows.dialog.close.aria_label')
+    }, config);
 
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',
@@ -28,33 +59,7 @@ define(function (require) {
 
         _resizeTries: 0,
 
-        options: $.extend($.ui.dialog.options, {
-            minimizeTo: false,
-            maximizedHeightDecreaseBy: false,
-            allowClose: true,
-            allowMaximize: false,
-            allowMinimize: false,
-            dblclick: false,
-            titlebar: false,
-            icons: {
-                close: 'ui-icon-closethick',
-                maximize: 'ui-icon-extlink',
-                minimize: 'ui-icon-minus',
-                restore: 'ui-icon-newwin'
-            },
-            snapshot: null,
-            state: 'normal',
-            // Events
-            beforeCollapse: null,
-            beforeMaximize: null,
-            beforeMinimize: null,
-            beforeRestore: null,
-            collapse: null,
-            maximize: null,
-            minimize: null,
-            restore: null,
-            closeText: __('Close')
-        }),
+        options: $.extend($.ui.dialog.options, config),
 
         _allowInteraction: function(e) {
             return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .mce-window, ' +
@@ -421,14 +426,19 @@ define(function (require) {
             // move 'close' button to button-pane
             this._buttons = {};
             this.uiDialogTitlebarClose
+            .addClass(this.options.btnCloseClass)
             // override some unwanted jquery-ui styles
-            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto', 'margin': 0 })
-            .attr('title', this.options.closeText)
+            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto' })
+            .attr({
+                'title': this.options.closeText,
+                'aria-label': this.options.btnCloseAriaText
+            })
             // change icon
             .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
             // move to button-pane
             .appendTo(buttonPane)
             .end();
+            this.uiDialogTitlebarClose.find('.ui-button-icon, .ui-button-icon-space').attr('aria-hidden', true)
             // append other buttons to button-pane
             var types =  ['maximize', 'restore', 'minimize'];
             for (var key in types) {

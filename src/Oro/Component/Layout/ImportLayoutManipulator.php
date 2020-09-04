@@ -6,6 +6,11 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
+/**
+ * Layout imports manipulator. See the layout architecture overview.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportLayoutManipulator implements LayoutManipulatorInterface
 {
     const ROOT_PLACEHOLDER = '__root';

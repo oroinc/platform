@@ -38,6 +38,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Reminder extends ExtendReminder
 {

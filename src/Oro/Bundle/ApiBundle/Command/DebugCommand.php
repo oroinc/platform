@@ -400,6 +400,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param string $action
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function formatProcessorAttributes(array $attributes, $action)
     {
@@ -469,6 +470,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param mixed $value
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function convertProcessorAttributeValueToString($value)
     {

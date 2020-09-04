@@ -6,13 +6,29 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
+
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
+
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
 
 ### Removed
 
 #### CacheBundle
 * The service "oro.file_cache.abstract" was removed because it is not used anywhere.
+
+#### ImportExportBundle
+* The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic. 
+
+#### UIBundle
+* The `collectionField` TWIG macros was removed. Use the `form_row_collection` TWIG function instead.
+  Before: `UI.collectionField(form.emails, 'oro.user.emails.label'|trans)`.
+  After: `form_row_collection(form.emails)`.
+  To change "add" button label use the `add_label` form option.
+* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
 ## 4.2.0-alpha.2 (2020-05-29)
 [Show detailed list of changes](incompatibilities-4-2-alpha-2.md)
@@ -1060,7 +1076,7 @@ datagrids:
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.
-* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md)
+* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](https://doc.oroinc.com/backend/bundles/platform/SearchBundle/date-time-formatter/)
 #### WorkflowBundle
 * The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated

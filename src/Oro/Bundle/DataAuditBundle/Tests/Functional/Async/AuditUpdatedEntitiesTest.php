@@ -15,6 +15,7 @@ use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AuditUpdatedEntitiesTest extends WebTestCase
 {

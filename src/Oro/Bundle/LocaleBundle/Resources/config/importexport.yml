@@ -18,7 +18,7 @@ services:
         public: false
         parent: oro_importexport.strategy.configurable_add_or_replace
         calls:
-            - [setLocalizedFallbackValueClass, ['Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue']]
+            - [setLocalizedFallbackValueClass, ['Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue']]
 
     oro_locale.importexport.normalizer.localized_fallback_value_collection_normalizer:
         class: 'Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizedFallbackValueCollectionNormalizer'

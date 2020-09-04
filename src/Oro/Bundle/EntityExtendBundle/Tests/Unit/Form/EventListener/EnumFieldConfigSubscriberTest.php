@@ -14,6 +14,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */

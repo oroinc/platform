@@ -11,6 +11,7 @@ use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -61,6 +62,38 @@ class FileManager extends GaufretteFileManager
      */
     public function createFileEntity($path)
     {
+        $file = new File();
+
+        $this->setFileFromPath($file, $path);
+
+        return $file;
+    }
+
+    /**
+     * @param string $path The local path or remote URL of a file
+     *
+     * @return string
+     */
+    private function getFilenameFromPath(string $path): string
+    {
+        $fileName = pathinfo(\trim($path), PATHINFO_BASENAME);
+        $parametersPosition = strpos($fileName, '?');
+        if ($parametersPosition) {
+            $fileName = substr($fileName, 0, $parametersPosition);
+        }
+
+        return $fileName;
+    }
+
+    /**
+     * @param string $path The local path or remote URL of a file
+     *
+     * @throws FileNotFoundException         When the given file doesn't exist
+     * @throws ProtocolNotSupportedException When the given file path is not supported
+     * @throws IOException                   When the given file cannot be copied to a temporary folder
+     */
+    private function assertValidProtocolInPath(string $path): void
+    {
         $path = \trim($path);
         $protocolDelimiter = strpos($path, '://');
         if (false !== $protocolDelimiter
@@ -68,22 +101,24 @@ class FileManager extends GaufretteFileManager
         ) {
             throw new ProtocolNotSupportedException($path);
         }
+    }
 
-        $fileName = pathinfo($path, PATHINFO_BASENAME);
-        $parametersPosition = strpos($fileName, '?');
-        if ($parametersPosition) {
-            $fileName = substr($fileName, 0, $parametersPosition);
-        }
+    /**
+     * @param File $file The file entity for which is needed to set file property.
+     * @param string $path The local path or remote URL of a file
+     */
+    public function setFileFromPath(File $file, string $path): void
+    {
+        $this->assertValidProtocolInPath($path);
+
+        $fileName = $this->getFilenameFromPath($path);
 
         $tmpFile = $this->getTemporaryFileName($fileName);
         $filesystem = new SymfonyFileSystem();
         $filesystem->copy($path, $tmpFile, true);
 
-        $entity = new File();
-        $entity->setFile(new TemporaryFile($tmpFile));
-        $entity->setOriginalFilename($fileName);
-
-        return $entity;
+        $file->setFile(new TemporaryFile($tmpFile));
+        $file->setOriginalFilename($fileName);
     }
 
     /**
@@ -98,14 +133,28 @@ class FileManager extends GaufretteFileManager
         $fileCopy = clone $file;
         $fileCopy->setFilename(null);
 
-        $content = $this->getContent($file, false);
-        if (null !== $content) {
-            $fileCopy->setFile(
-                $this->writeToTemporaryFile($content, $fileCopy->getOriginalFilename())
-            );
+        $symfonyFile = $this->getFileFromFileEntity($file, false);
+        if ($symfonyFile) {
+            $fileCopy->setFile($symfonyFile);
         }
 
         return $fileCopy;
+    }
+
+    /**
+     * @param File $file
+     * @param bool $throwException Whether to throw exception in case the file does not exist in the storage
+     *
+     * @return SymfonyFile|null
+     */
+    public function getFileFromFileEntity(File $file, bool $throwException = true): ?SymfonyFile
+    {
+        $content = $this->getContent($file, $throwException);
+        if (null !== $content) {
+            return $this->writeToTemporaryFile($content, $file->getOriginalFilename());
+        }
+
+        return null;
     }
 
     /**

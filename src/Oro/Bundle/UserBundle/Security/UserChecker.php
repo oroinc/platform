@@ -8,11 +8,9 @@ use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
 use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Checks User state during authentication.
@@ -22,25 +20,13 @@ class UserChecker extends BaseUserChecker
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /** @var FlashBagInterface */
-    protected $flashBag;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param TokenStorageInterface $tokenStorage
-     * @param FlashBagInterface     $flashBag
-     * @param TranslatorInterface   $translator
      */
     public function __construct(
-        TokenStorageInterface $tokenStorage,
-        FlashBagInterface $flashBag,
-        TranslatorInterface $translator
+        TokenStorageInterface $tokenStorage
     ) {
         $this->tokenStorage = $tokenStorage;
-        $this->flashBag = $flashBag;
-        $this->translator = $translator;
     }
 
     /**
@@ -82,11 +68,6 @@ class UserChecker extends BaseUserChecker
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()
         ) {
-            $this->flashBag->add(
-                'error',
-                $this->translator->trans('oro.user.security.password_changed.message')
-            );
-
             $exception = new PasswordChangedException('Invalid password.');
             $exception->setUser($user);
 

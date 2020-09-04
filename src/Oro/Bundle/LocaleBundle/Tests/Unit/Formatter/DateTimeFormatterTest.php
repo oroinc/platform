@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**

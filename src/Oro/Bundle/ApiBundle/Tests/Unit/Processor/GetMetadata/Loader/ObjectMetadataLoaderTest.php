@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ObjectMetadataLoaderTest extends LoaderTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
