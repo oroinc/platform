@@ -1,5 +1,6 @@
 import BaseView from 'oroui/js/app/views/base/view';
 import template from 'tpl-loader!orodatagrid/templates/datagrid/toggle-group.html';
+import _ from 'underscore';
 import __ from 'orotranslation/js/translator';
 
 /**
@@ -12,7 +13,9 @@ const TogglePaginationView = BaseView.extend({
 
     grid: null,
 
-    defaultGroupState: true, // grouped by default
+    defaultGroupState: false, // ungrouped by default
+
+    translationPrefix: 'oro.datagrid.btn',
 
     template,
 
@@ -25,6 +28,8 @@ const TogglePaginationView = BaseView.extend({
     },
 
     initialize(options) {
+        _.extend(this, _.pick(options, ['translationPrefix']));
+
         this.grid = options.datagrid;
         this.listenTo(this.grid.collection, 'updateState sync', this.render);
         this.listenTo(this.grid, 'disable', this.disable);
@@ -50,21 +55,14 @@ const TogglePaginationView = BaseView.extend({
 
     getTemplateData() {
         const isGrouped = this.getCurrentState();
-        const translationPrefix = `oro.frontend.shoppinglist.btn.${isGrouped ? 'ungroup_similar' : 'group_similar'}`;
+        const translationPrefix = `${this.translationPrefix}.${isGrouped ? 'ungroup_similar' : 'group_similar'}`;
+
         return {
             enabled: this.enabled,
-            visible: this.hasSimilar(),
+            visible: this.grid.metadata.canBeGrouped || false,
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)
         };
-    },
-
-    hasSimilar() {
-        const groups = [];
-        return this.grid.collection.models.some(model => {
-            const groupId = model.get('_groupId');
-            return groupId && (groups.indexOf(groupId) !== -1 || !groups.push(groupId));
-        });
     },
 
     disable() {
