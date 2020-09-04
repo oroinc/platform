@@ -1,13 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class WidgetSortByListenerTest extends OrmTestCase
 {
@@ -16,12 +20,9 @@ class WidgetSortByListenerTest extends OrmTestCase
      */
     public function testOnResultBeforeQueryShouldNotUpdateQuery(WidgetOptionBag $widgetOptionBag = null)
     {
-        $widgetConfigs = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetConfigs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $widgetConfigs->expects($this->any())
-            ->method('getWidgetOptions')
-            ->will($this->returnValue($widgetOptionBag));
+        /** @var MockObject|WidgetConfigs $widgetConfigs */
+        $widgetConfigs = $this->getMockBuilder(WidgetConfigs::class)->disableOriginalConstructor()->getMock();
+        $widgetConfigs->method('getWidgetOptions')->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl(
@@ -31,7 +32,7 @@ class WidgetSortByListenerTest extends OrmTestCase
             )
         );
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $qb = $em->createQueryBuilder();
         $originalDQL = $qb->getQuery()->getDQL();
@@ -39,13 +40,12 @@ class WidgetSortByListenerTest extends OrmTestCase
         $widgetSortByListener = new WidgetSortByListener($widgetConfigs);
         $widgetSortByListener->onResultBeforeQuery(new OrmResultBeforeQuery($datagrid, $qb));
 
-        $this->assertEquals($originalDQL, $qb->getQuery()->getDQL());
+        static::assertEquals($originalDQL, $qb->getQuery()->getDQL());
     }
 
     public function onResultBeforeQueryShouldNotUpdateQueryProvider()
     {
         return [
-            [null],
             [new WidgetOptionBag()],
             [new WidgetOptionBag([
                 'sortBy' => [
@@ -69,12 +69,9 @@ class WidgetSortByListenerTest extends OrmTestCase
      */
     public function testOnResultBeforeQueryShouldUpdateQuery(WidgetOptionBag $widgetOptionBag, $expectedDQL)
     {
-        $widgetConfigs = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetConfigs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $widgetConfigs->expects($this->any())
-            ->method('getWidgetOptions')
-            ->will($this->returnValue($widgetOptionBag));
+        /** @var MockObject|WidgetConfigs $widgetConfigs */
+        $widgetConfigs = $this->getMockBuilder(WidgetConfigs::class)->disableOriginalConstructor()->getMock();
+        $widgetConfigs->method('getWidgetOptions')->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl(
@@ -88,12 +85,12 @@ class WidgetSortByListenerTest extends OrmTestCase
             ->from('Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass', 'tc')
             ->orderBy('tc.id', 'DESC');
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $widgetSortByListener = new WidgetSortByListener($widgetConfigs);
         $widgetSortByListener->onResultBeforeQuery(new OrmResultBeforeQuery($datagrid, $qb));
 
-        $this->assertEquals($expectedDQL, $qb->getQuery()->getDQL());
+        static::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
     }
 
     public function onResultBeforeQueryShouldUpdateQueryProvider()

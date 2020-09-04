@@ -5,8 +5,6 @@ namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Oro\Bundle\ContactUsBundle\Form\Type\ContactRequestType as ContactUsContactRequestType;
-use Oro\Bundle\MagentoContactUsBundle\Form\Type\ContactRequestType as MagentoContactRequestType;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -36,8 +34,14 @@ class UpdateEmbeddedFormsTypes extends AbstractFixture implements
      */
     public function load(ObjectManager $manager)
     {
-        $this->updateFormType('oro_contact_us.embedded_form', ContactUsContactRequestType::class);
-        $this->updateFormType('oro_magento_contact_us.embedded_form', MagentoContactRequestType::class);
+        $this->updateFormType(
+            'oro_contact_us.embedded_form',
+            'Oro\Bundle\ContactUsBundle\Form\Type\ContactRequestType'
+        );
+        $this->updateFormType(
+            'oro_magento_contact_us.embedded_form',
+            'Oro\Bundle\MagentoContactUsBundle\Form\Type\ContactRequestType'
+        );
     }
 
     /**

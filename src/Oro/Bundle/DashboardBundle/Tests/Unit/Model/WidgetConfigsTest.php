@@ -5,12 +5,15 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
+use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,28 +21,27 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var WidgetRepository|MockObject */
     private $widgetRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigValueProvider|MockObject */
     private $valueProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     protected $configProvider;
 
-    /** @var WidgetConfigs */
-    private $widgetConfigs;
+    private WidgetConfigs $widgetConfigs;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|MockObject */
     protected $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|MockObject */
     protected $eventDispatcher;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestStack|MockObject */
     protected $requestStack;
 
     protected function setUp(): void
@@ -52,17 +54,10 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $widgetConfigVisibilityFilter = $this->createMock(WidgetConfigVisibilityFilter::class);
 
-        $this->valueProvider->expects($this->any())
-            ->method('getConvertedValue')
-            ->willReturnCallback(
-                function ($widgetConfig, $type, $value) {
-                    return $value;
-                }
-            );
+        $this->valueProvider->method('getConvertedValue')
+            ->willReturnCallback(fn ($widgetConfig, $type, $value) => $value);
 
-        $widgetConfigVisibilityFilter->expects($this->any())
-            ->method('filterConfigs')
-            ->will($this->returnArgument(0));
+        $widgetConfigVisibilityFilter->method('filterConfigs')->willReturnArgument(0);
 
         $this->requestStack = new RequestStack();
         $this->widgetConfigs = new WidgetConfigs(
@@ -77,86 +72,120 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->widgetRepository = $this->createMock(EntityRepository::class);
-        $this->em->expects($this->any())
-            ->method('getRepository')
-            ->with('OroDashboardBundle:Widget')
-            ->will($this->returnValue($this->widgetRepository));
+        $this->em->method('getRepository')->with('OroDashboardBundle:Widget')->willReturn($this->widgetRepository);
     }
 
-    public function testGetWidgetOptionsShouldReturnEmptyArrayIfRequestIsNull()
+    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfRequestIsNull()
     {
-        $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
-    public function testGetWidgetOptionsShouldReturnEmptyArrayIfThereIsNoWidgetIdInRequestQuery()
+    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfThereIsNoWidgetIdInRequestQuery()
     {
-        $request = new Request();
-        $this->requestStack->push($request);
+        $this->requestStack->push(new Request());
 
-        $this->assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+    }
+
+    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfWidgetDoesNotExist()
+    {
+        $this->requestStack->push(new Request(['_widgetId' => 1]));
+
+        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
     public function testGetWidgetOptionsShouldReturnOptionsOfWidget()
     {
-        $request = new Request([
-            '_widgetId' => 1,
-        ]);
+        $request = new Request(['_widgetId' => 1,]);
         $this->requestStack->push($request);
 
         $widget = new Widget();
         $widget->setName('test');
-        $this->widgetRepository
-            ->expects($this->once())
+        $this->widgetRepository->expects(static::once())
             ->method('find')
             ->with(1)
-            ->will($this->returnValue($widget));
+            ->willReturn($widget);
 
         $options = ['k' => 'v', 'k2' => 'v2'];
         $widget->setOptions($options);
 
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
-            ->willReturn(
-                [
-                    'configuration' => [
-                        'k'  => ['type' => 'test'],
-                        'k2' => ['type' => 'test'],
-                    ]
+            ->willReturn([
+                'configuration' => [
+                    'k'  => ['type' => 'test'],
+                    'k2' => ['type' => 'test'],
                 ]
-            );
+            ]);
 
-        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+    }
+
+    public function testGetWidgetsShouldReturnOptionsFromLocalCacheOnSubsequentCalls()
+    {
+        $request = new Request(['_widgetId' => 1,]);
+        $this->requestStack->push($request);
+
+        $widget = (new Widget())->setName('test');
+        $options = ['k' => 'v', 'k2' => 'v2'];
+        $widget->setOptions($options);
+        $this->widgetRepository->expects(static::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn($widget);
+
+        $this->configProvider->expects(static::once())
+            ->method('getWidgetConfig')
+            ->willReturn([
+                'configuration' => [
+                    'k'  => ['type' => 'test'],
+                    'k2' => ['type' => 'test'],
+                ]
+            ]);
+
+
+        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
     }
 
     public function testGetWidgetOptionsShouldReturnOptionsOfWidgetSpecifiedAsArgument()
     {
-        $request = new Request([
-            '_widgetId' => 1,
-        ]);
-        $this->requestStack->push($request);
+        $this->requestStack->push(new Request(['_widgetId' => 1,]));
 
         $widget = new Widget();
         $widget->setName('test');
-        $this->widgetRepository
-            ->expects($this->once())
+        $this->widgetRepository->expects(static::once())
             ->method('find')
             ->with(2)
-            ->will($this->returnValue($widget));
+            ->willReturn($widget);
 
         $options = ['k' => 'v', 'k2' => 'v2'];
         $widget->setOptions($options);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(static::once())
             ->method('getWidgetConfig')
-            ->willReturn(
-                [
-                    'configuration' => [
-                        'k'  => ['type' => 'test'],
-                        'k2' => ['type' => 'test'],
-                    ]
+            ->willReturn([
+                'configuration' => [
+                    'k'  => ['type' => 'test'],
+                    'k2' => ['type' => 'test'],
                 ]
-            );
+            ]);
 
-        $this->assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
+        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
+    }
+
+    public function testGetWidgetConfigShouldReturnNullIfConfigProviderReturnsNull()
+    {
+        $this->configProvider->method('getWidgetConfig')->willReturn(null);
+        static::assertNull($this->widgetConfigs->getWidgetConfig('non-existent-widget'));
+    }
+
+    public function testGetWidgetConfigShouldPassThroughConfigProviderException()
+    {
+        $this->configProvider->method('getWidgetConfig')
+            ->willThrowException(new InvalidConfigurationException('non-existent-widget'));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Can't find configuration for: non-existent-widget");
+        $this->widgetConfigs->getWidgetConfig('non-existent-widget');
     }
 }

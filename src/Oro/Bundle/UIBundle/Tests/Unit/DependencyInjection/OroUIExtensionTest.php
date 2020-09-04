@@ -1,15 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadDefaultConfiguration()
     {
-        $container = new ContainerBuilder();
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.environment' => 'prod'
+        ]));
 
         $extension = new OroUIExtension();
         $extension->load([], $container);
