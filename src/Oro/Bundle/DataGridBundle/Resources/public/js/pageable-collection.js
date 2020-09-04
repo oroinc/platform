@@ -249,8 +249,10 @@ define([
          *
          * @protected
          */
-        onRemove: function() {
-            if (this.state.totalRecords > 0) {
+        onRemove: function(modelToRemove, collection, options = {}) {
+            const {recountTotalRecords = true} = options;
+
+            if (recountTotalRecords && this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
         },
