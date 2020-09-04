@@ -1340,7 +1340,7 @@ define(function(require) {
 
             if (collection) {
                 const fetchKeys = ['mode', 'parse', 'reset', 'wait', 'uniqueOnly',
-                    'add', 'remove', 'merge', 'toggleLoading'];
+                    'add', 'remove', 'merge', 'toggleLoading', 'recountTotalRecords'];
                 let fetchOptions = {
                     reset: true
                 };
