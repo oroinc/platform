@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea84437313d00ed2d2a58ecb252f0eab",
+    "content-hash": "27269af00324d153081aac68ca3c9814",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -2001,16 +2001,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "2.1.19",
+            "version": "2.1.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "840d5603eb84cc81a6a0382adac3293e57c1c64c"
+                "reference": "f46887bc48db66c7f38f668eb7d6ae54583617ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/840d5603eb84cc81a6a0382adac3293e57c1c64c",
-                "reference": "840d5603eb84cc81a6a0382adac3293e57c1c64c",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/f46887bc48db66c7f38f668eb7d6ae54583617ff",
+                "reference": "f46887bc48db66c7f38f668eb7d6ae54583617ff",
                 "shasum": ""
             },
             "require": {
@@ -2055,7 +2055,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2020-08-08T21:28:19+00:00"
+            "time": "2020-09-06T13:44:32+00:00"
         },
         {
             "name": "evenement/evenement",
@@ -8947,16 +8947,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.6.7",
+            "version": "4.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "9f9cf10d009892009a296dff48970b079ec78c7a"
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/9f9cf10d009892009a296dff48970b079ec78c7a",
-                "reference": "9f9cf10d009892009a296dff48970b079ec78c7a",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a68b67d1120ab89c6760afeb787291703c9a7d5",
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5",
                 "shasum": ""
             },
             "type": "component",
@@ -8977,7 +8977,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-2.1"
+                "LGPL-2.1-only"
             ],
             "description": "Web based JavaScript HTML WYSIWYG editor control.",
             "homepage": "http://www.tinymce.com",
@@ -8989,7 +8989,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2017-09-18T11:31:55+00:00"
+            "time": "2020-07-13T05:29:19+00:00"
         },
         {
             "name": "true/punycode",
