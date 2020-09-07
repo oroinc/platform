@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class Status
+ * Integration Status ORM entity.
  *
  * @package Oro\Bundle\IntegrationBundle\Entity
  * @ORM\Entity
@@ -19,8 +19,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Status
 {
-    const STATUS_COMPLETED = 1;
-    const STATUS_FAILED    = 2;
+    public const STATUS_COMPLETED = '1';
+    public const STATUS_FAILED    = '2';
 
     /**
      * @var integer
