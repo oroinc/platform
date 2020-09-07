@@ -66,7 +66,7 @@
         "ocramius/proxy-manager": "2.2.*",
         "knplabs/knp-gaufrette-bundle": "0.5.2",
         "oro/doctrine-extensions": "1.2.*",
-        "tinymce/tinymce": "4.6.*",
+        "tinymce/tinymce": "4.9.11",
         "ezyang/htmlpurifier": "4.12.*",
         "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "0.6.*",
