@@ -109,7 +109,9 @@ class UpdateHandlerFacade
         $entity = $update->getFormData();
         if ($request->get('_wid')) {
             $result = $this->getResult($update, $request);
-            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            if ($this->doctrineHelper->isManageableEntity($entity)) {
+                $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
 
             return $result;
         } else {
