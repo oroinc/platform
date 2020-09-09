@@ -1,5 +1,8 @@
 /* @theme: default; */
 
+$select-font-family: $base-font;
+$select-color: get-color('additional', 'dark');
+
 $select-firefox-height: null;
 $select-firefox-line-height: null;
 $select-firefox-inner-offset-top: null;

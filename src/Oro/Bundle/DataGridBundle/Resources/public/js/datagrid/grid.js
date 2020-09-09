@@ -1340,7 +1340,7 @@ define(function(require) {
 
             if (collection) {
                 const fetchKeys = ['mode', 'parse', 'reset', 'wait', 'uniqueOnly',
-                    'add', 'remove', 'merge', 'toggleLoading', 'recountTotalRecords'];
+                    'add', 'remove', 'merge', 'toggleLoading', 'recountTotalRecords', 'alreadySynced'];
                 let fetchOptions = {
                     reset: true
                 };
@@ -1351,7 +1351,10 @@ define(function(require) {
                 }
 
                 fetchOptions = _.extend(fetchOptions, params, _.pick(options, fetchKeys));
-                this.collection.fetch(fetchOptions);
+
+                if (!fetchOptions.alreadySynced) {
+                    this.collection.fetch(fetchOptions);
+                }
             }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
