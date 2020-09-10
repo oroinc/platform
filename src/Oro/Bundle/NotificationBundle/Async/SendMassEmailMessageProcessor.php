@@ -94,7 +94,7 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
         ], $data);
 
         if (empty($data['body'])
-            || !isset($data['fromEmail'], $data['toEmail'])
+            || !isset($data['sender'], $data['toEmail'])
             || (isset($data['template']) && !is_array($data['body']))
         ) {
             $this->logger->critical('Got invalid message');
