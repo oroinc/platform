@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+@mixin pattern-checkerboard($pattern-size: 20px, $pattern-color: #e8e8e8, $pattern-background: #fff) {
+    background: $pattern-background;
+    background-image:
+        linear-gradient(45deg, $pattern-color 25%, transparent 25%),
+        linear-gradient(-45deg, $pattern-color 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, $pattern-color 75%),
+        linear-gradient(-45deg, transparent 75%, $pattern-color 75%);
+    background-size: $pattern-size $pattern-size;
+    background-position:
+        0 0,
+        0 #{$pattern-size/2},
+        #{$pattern-size/2} -#{$pattern-size/2},
+        -#{$pattern-size/2} 0px;
+}
