@@ -50,14 +50,4 @@ class ExtendScope
      * The system is fully responsible how the custom entities and fields are used on UI.
      */
     public const OWNER_CUSTOM = 'Custom';
-
-    /**
-     * Changes are made with UI.
-     */
-    public const ORIGIN_CUSTOM = 'Custom';
-
-    /**
-     * Changes are made on System level.
-     */
-    public const ORIGIN_SYSTEM = 'System';
 }
