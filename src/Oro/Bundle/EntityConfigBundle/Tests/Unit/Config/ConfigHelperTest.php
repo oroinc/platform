@@ -24,7 +24,6 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
     const DEFAULT_EXTEND_OPTIONS = [
         'is_extend' => true,
-        'origin' => ExtendScope::ORIGIN_CUSTOM,
         'owner' => ExtendScope::OWNER_CUSTOM,
         'state' => ExtendScope::STATE_NEW
     ];
@@ -225,7 +224,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $fieldType = 'string';
         $additionalFieldOptions = [];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -249,7 +248,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -272,7 +271,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $fieldType = 'enum||some_enum_code';
         $additionalFieldOptions = [];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -295,7 +294,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $fieldType = 'multiEnum||some_enum_code';
         $additionalFieldOptions = [];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -327,7 +326,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $fieldType = 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField||targetSideField';
         $additionalFieldOptions = [];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -337,7 +336,6 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             [
                 'extend' => [
                     'is_extend' => true,
-                    'origin'        => ExtendScope::ORIGIN_CUSTOM,
                     'owner'         => ExtendScope::OWNER_CUSTOM,
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField',
@@ -363,7 +361,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $fieldType = 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField||';
         $additionalFieldOptions = [];
 
-        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+        [$resultFieldType, $resultFieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions
@@ -373,7 +371,6 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             [
                 'extend' => [
                     'is_extend' => true,
-                    'origin'        => ExtendScope::ORIGIN_CUSTOM,
                     'owner'         => ExtendScope::OWNER_CUSTOM,
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField',

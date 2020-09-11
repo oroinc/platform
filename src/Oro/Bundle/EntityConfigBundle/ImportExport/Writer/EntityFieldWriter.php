@@ -188,7 +188,6 @@ class EntityFieldWriter implements ItemWriterInterface
         $data = [
             'owner' => ExtendScope::OWNER_CUSTOM,
             'state' =>  $config->is('state', ExtendScope::STATE_NEW) ? ExtendScope::STATE_NEW : $state,
-            'origin' => ExtendScope::ORIGIN_CUSTOM,
             'is_extend' => true,
             'is_deleted' => false,
             'is_serialized' => $config->get('is_serialized', false, false)

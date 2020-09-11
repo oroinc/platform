@@ -20,6 +20,11 @@ The current file describes significant changes in the code that may affect the u
 #### CacheBundle
 * The service "oro.file_cache.abstract" was removed because it is not used anywhere.
 
+#### EntityExtendBundle
+* The `origin` option was removed from entity and field configuration.
+* The `ORIGIN_CUSTOM` and `ORIGIN_SYSTEM` constants were removed from `Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope`.
+* The `skip-origin` argument was removed from the `oro:entity-extend:update-config` CLI command.
+
 #### ImportExportBundle
 * The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic. 
 

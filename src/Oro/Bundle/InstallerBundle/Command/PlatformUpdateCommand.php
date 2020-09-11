@@ -5,6 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Command;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
+use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
@@ -20,6 +21,18 @@ class PlatformUpdateCommand extends AbstractCommand
 {
     /** @var string */
     protected static $defaultName = 'oro:platform:update';
+
+    /** @var PlatformUpdateCheckerInterface */
+    private $platformUpdateChecker;
+
+    /**
+     * @param PlatformUpdateCheckerInterface $platformUpdateChecker
+     */
+    public function __construct(PlatformUpdateCheckerInterface $platformUpdateChecker)
+    {
+        parent::__construct();
+        $this->platformUpdateChecker = $platformUpdateChecker;
+    }
 
     /**
      * {@inheritdoc}
@@ -71,8 +84,11 @@ class PlatformUpdateCommand extends AbstractCommand
         }
 
         $force = $input->getOption('force');
-
         if ($force) {
+            if (!$this->checkReadyToUpdate($output)) {
+                return 1;
+            }
+
             $eventDispatcher = $this->getEventDispatcher();
             $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
@@ -81,11 +97,7 @@ class PlatformUpdateCommand extends AbstractCommand
                 $this->loadDataStep($commandExecutor, $output);
                 $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
 
-                $skipAssets = $input->getOption('skip-assets');
-
-                $this->finalStep($commandExecutor, $output, $input, $skipAssets);
-
-                return 0;
+                $this->finalStep($commandExecutor, $output, $input, $input->getOption('skip-assets'));
             } catch (\Exception $exception) {
                 return $commandExecutor->getLastCommandExitCode();
             }
@@ -98,8 +110,12 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
 
-            return 0;
+            if (!$this->checkReadyToUpdate($output)) {
+                return 1;
+            }
         }
+
+        return 0;
     }
 
     /**
@@ -185,6 +201,28 @@ class PlatformUpdateCommand extends AbstractCommand
         );
 
         return $commandExecutor->getLastCommandExitCode();
+    }
+
+    /**
+     * @param OutputInterface $output
+     *
+     * @return bool
+     */
+    private function checkReadyToUpdate(OutputInterface $output): bool
+    {
+        $messages = $this->platformUpdateChecker->checkReadyToUpdate();
+        if (!$messages) {
+            return true;
+        }
+
+        $output->writeln('');
+        $output->writeln('<error>The application update is not possible:</error>');
+        foreach ($messages as $message) {
+            $output->writeln(sprintf('<error>  - %s</error>', $message));
+        }
+        $output->writeln('');
+
+        return false;
     }
 
     /**
