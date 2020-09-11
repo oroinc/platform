@@ -32,9 +32,7 @@ class AttributeFamilyRepositoryTest extends WebTestCase
 
     public function testGetFamiliesByAttributeIdEmpty()
     {
-        $families = $this->repository->getFamiliesByAttributeId(
-            LoadAttributeData::getAttributeIdByName(LoadAttributeData::NOT_USED_ATTRIBUTE)
-        );
+        $families = $this->repository->getFamiliesByAttributeId(9999999);
 
         $this->assertCount(0, $families);
     }

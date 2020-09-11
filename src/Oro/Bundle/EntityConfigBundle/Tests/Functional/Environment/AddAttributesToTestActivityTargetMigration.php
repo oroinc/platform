@@ -33,9 +33,11 @@ class AddAttributesToTestActivityTargetMigration implements Migration
         $this->addAttribute($table, self::REGULAR_ATTRIBUTE_1, ExtendScope::OWNER_CUSTOM);
         $this->addAttribute($table, self::REGULAR_ATTRIBUTE_2, ExtendScope::OWNER_CUSTOM);
 
-        // these attributes will be marked as to be deleted in UpdateAttributesForTestActivityTargetMigration
-        $this->addAttribute($table, self::DELETED_SYSTEM_ATTRIBUTE, ExtendScope::OWNER_SYSTEM);
-        $this->addAttribute($table, self::DELETED_REGULAR_ATTRIBUTE, ExtendScope::OWNER_CUSTOM);
+        /**
+         * @deprecated
+         */
+        //$this->addAttribute($table, self::DELETED_SYSTEM_ATTRIBUTE, ExtendScope::OWNER_SYSTEM);
+        //$this->addAttribute($table, self::DELETED_REGULAR_ATTRIBUTE, ExtendScope::OWNER_CUSTOM);
     }
 
     /**
