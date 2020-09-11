@@ -164,7 +164,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$fieldId]);
 
         $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, self::FIELD_NAME, 'string'));
-        $extendConfig->set('owner', ExtendScope::ORIGIN_SYSTEM);
+        $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
 
@@ -207,7 +207,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$fieldId]);
 
         $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, self::FIELD_NAME, 'string'));
-        $extendConfig->set('owner', ExtendScope::ORIGIN_SYSTEM);
+        $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
         $extendConfig->set('target_entity', self::ENTITY_CLASS);

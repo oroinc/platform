@@ -302,7 +302,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $fieldOptions = [
             'extend' => [
                 'is_extend' => true,
-                'origin' => ExtendScope::ORIGIN_CUSTOM,
                 'owner' => ExtendScope::OWNER_CUSTOM,
                 'state' => ExtendScope::STATE_NEW,
                 'bidirectional' => true,
@@ -401,7 +400,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $entityConfigModel = $this->createEntityConfigModel();
 
-        list($newFieldModel, $extendEntityConfig) = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
+        [$newFieldModel, $extendEntityConfig] = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
             $entityConfigModel
         );
 
@@ -462,7 +461,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $entityConfigModel = $this->createEntityConfigModel();
 
         /** @var Config $extendEntityConfig */
-        list($newFieldModel, $extendEntityConfig) = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
+        [$newFieldModel, $extendEntityConfig] = $this->expectsCreateConfigFieldModelAndUpdateItWithFieldOptions(
             $entityConfigModel
         );
 

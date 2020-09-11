@@ -91,11 +91,6 @@ entity_config:
                         auditable:          false
                         default_value:      true
 
-                origin:
-                    options:
-                        auditable:          false
-                        default_value:      'System'
-
                 relation:
                     options:
                         auditable:          false
@@ -316,11 +311,6 @@ entity_config:
                         query:
                             operator:       '!='
                             value:          true
-
-                origin:
-                    options:
-                        auditable:          false
-                        default_value:      'System'
 
                 #
                 # Relations form type fields

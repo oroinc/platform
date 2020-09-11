@@ -65,13 +65,11 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
                 $group->setDefaultLabel($groupName);
 
                 foreach ($attributes as $attributeName) {
-                    $attribute = $configManager->getConfigFieldModel(
-                        LoadAttributeData::ENTITY_CONFIG_MODEL,
-                        $attributeName
-                    );
                     $relation = new AttributeGroupRelation();
                     $relation->setAttributeGroup($group);
-                    $relation->setEntityConfigFieldId($attribute->getId());
+                    $relation->setEntityConfigFieldId(
+                        LoadAttributeData::getAttribute($configManager, $attributeName)->getId()
+                    );
                     $manager->persist($relation);
                     $group->addAttributeRelation($relation);
                 }
