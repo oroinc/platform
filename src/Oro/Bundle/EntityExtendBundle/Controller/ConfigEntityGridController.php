@@ -104,7 +104,6 @@ class ConfigEntityGridController extends AbstractController
             $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
             $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
-            $extendConfig->set('origin', ExtendScope::ORIGIN_CUSTOM);
             $extendConfig->set('is_extend', true);
 
             $config = $configManager->getProvider('security')->getConfig($className);

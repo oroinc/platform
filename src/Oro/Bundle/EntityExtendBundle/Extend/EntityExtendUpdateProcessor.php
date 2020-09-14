@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
- * Provides a way to update the database and all related caches to reflect changes made in extended entities.
+ * Provides a way to update the database schema and all related caches to reflect changes made in extended entities.
  */
 class EntityExtendUpdateProcessor
 {
@@ -26,7 +26,7 @@ class EntityExtendUpdateProcessor
     /** @var EventDispatcherInterface */
     private $dispatcher;
 
-    /** @var Profiler */
+    /** @var Profiler|null */
     private $profiler;
 
     /**
@@ -34,7 +34,7 @@ class EntityExtendUpdateProcessor
      * @param CommandExecutor          $commandExecutor
      * @param LoggerInterface          $logger
      * @param EventDispatcherInterface $dispatcher
-     * @param Profiler                 $profiler
+     * @param Profiler|null            $profiler
      */
     public function __construct(
         MaintenanceMode $maintenance,
@@ -51,7 +51,7 @@ class EntityExtendUpdateProcessor
     }
 
     /**
-     * Updates the database and all related caches to reflect changes made in extended entities.
+     * Updates the database schema and all related caches to reflect changes made in extended entities.
      *
      * @return bool
      */
@@ -76,7 +76,8 @@ class EntityExtendUpdateProcessor
             $this->dispatchUpdateSchemaEvent();
         } catch (\RuntimeException $e) {
             $this->logger->error(
-                'Failed to update the database and all related caches to reflect changes made in extended entities.',
+                'Failed to update the database schema'
+                . ' and all related caches to reflect changes made in extended entities.',
                 ['exception' => $e]
             );
 
