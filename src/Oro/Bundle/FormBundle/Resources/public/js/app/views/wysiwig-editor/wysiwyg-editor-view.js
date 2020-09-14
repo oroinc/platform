@@ -189,7 +189,7 @@ define(function(require) {
                                 }).join('; ');
                                 tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
                                 self.$el.after($('<div />', {'class': 'mce-fullscreen-overlay'}));
-                                const DOM = editor.target.DOM;
+                                const DOM = editor.dom;
                                 const iframe = editor.iframeElement;
                                 const iframeTop = iframe.getBoundingClientRect().top;
                                 DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
