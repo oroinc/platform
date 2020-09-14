@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * Manager for working with entity attributes
@@ -146,6 +147,16 @@ class AttributeManager
         }
 
         return $this->activeAttributesByClass[$className];
+    }
+
+    /**
+     * @param string $className
+     * @param OrganizationInterface $organization
+     * @return FieldConfigModel[]
+     */
+    public function getActiveAttributesByClassForOrganization(string $className, OrganizationInterface $organization)
+    {
+        return $this->getActiveAttributesByClass($className);
     }
 
     /**
