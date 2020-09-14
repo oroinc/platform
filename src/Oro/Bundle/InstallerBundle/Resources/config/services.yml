@@ -18,3 +18,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: beforeExecute }
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+
+    oro_installer.platform_update_checker:
+        class: Oro\Bundle\InstallerBundle\ChainPlatformUpdateChecker
+        arguments:
+            - !tagged_iterator oro.installer.platform_update_checker

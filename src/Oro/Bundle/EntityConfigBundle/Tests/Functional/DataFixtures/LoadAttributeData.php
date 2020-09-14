@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\AddAttributesToTestActivityTargetMigration;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\UpdateAttributesForTestActivityTargetMigration;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
@@ -26,9 +28,7 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
     const NOT_USED_ATTRIBUTE        = UpdateAttributesForTestActivityTargetMigration::NOT_USED_ATTRIBUTE;
     const DELETED_REGULAR_ATTRIBUTE = AddAttributesToTestActivityTargetMigration::DELETED_REGULAR_ATTRIBUTE;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private static $attributesData = [];
 
     /**
@@ -43,17 +43,13 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
         $attributes = [
             self::SYSTEM_ATTRIBUTE_1,
             self::SYSTEM_ATTRIBUTE_2,
-            self::DELETED_SYSTEM_ATTRIBUTE,
             self::REGULAR_ATTRIBUTE_1,
-            self::REGULAR_ATTRIBUTE_2,
-            self::DELETED_REGULAR_ATTRIBUTE,
-            self::NOT_USED_ATTRIBUTE,
+            self::REGULAR_ATTRIBUTE_2
         ];
 
         $configManager = $this->container->get('oro_entity_config.config_manager');
         foreach ($attributes as $attributeName) {
-            $attribute = $configManager->getConfigFieldModel(self::ENTITY_CONFIG_MODEL, $attributeName);
-            self::$attributesData[$attributeName] = $attribute->getId();
+            self::$attributesData[$attributeName] = self::getAttribute($configManager, $attributeName)->getId();
         }
     }
 
@@ -64,6 +60,24 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
      */
     public static function getAttributeIdByName($attributeName)
     {
-        return isset(self::$attributesData[$attributeName]) ? self::$attributesData[$attributeName] : null;
+        return self::$attributesData[$attributeName] ?? null;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     * @param string        $attributeName
+     *
+     * @return FieldConfigModel
+     */
+    public static function getAttribute(ConfigManager $configManager, string $attributeName): FieldConfigModel
+    {
+        $attribute = $configManager->getConfigFieldModel(self::ENTITY_CONFIG_MODEL, $attributeName);
+        if (null === $attribute) {
+            throw new \RuntimeException(
+                sprintf('The attribute "%s::%s" not found.', self::ENTITY_CONFIG_MODEL, $attributeName)
+            );
+        }
+
+        return $attribute;
     }
 }

@@ -42,6 +42,10 @@
     }
 }
 
+.lg-image {
+    @include pattern-checkerboard($pattern-size: 12px);
+}
+
 .mobile-version .lg-print {
     display: none !important;
 }
