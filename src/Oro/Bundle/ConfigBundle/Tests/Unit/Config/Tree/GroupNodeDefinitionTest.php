@@ -77,13 +77,14 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('title', $result);
         $this->assertArrayHasKey('priority', $result);
         $this->assertArrayHasKey('description', $result);
+        $this->assertArrayHasKey('description_style', $result);
         $this->assertArrayHasKey('page_reload', $result);
         $this->assertArrayHasKey('configurator', $result);
         $this->assertArrayHasKey('handler', $result);
+        $this->assertArrayHasKey('tooltip', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('icon', $result);
-        $this->assertArrayHasKey('tooltip', $result);
-        $this->assertCount(7, $result);
+        $this->assertCount(8, $result);
     }
 
     /**
@@ -98,13 +99,14 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('title', $result);
         $this->assertArrayHasKey('priority', $result);
         $this->assertArrayHasKey('description', $result);
+        $this->assertArrayHasKey('description_style', $result);
         $this->assertArrayHasKey('icon', $result);
+        $this->assertArrayHasKey('tooltip', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('page_reload', $result);
         $this->assertArrayNotHasKey('configurator', $result);
         $this->assertArrayNotHasKey('handler', $result);
-        $this->assertArrayHasKey('tooltip', $result);
-        $this->assertCount(5, $result);
+        $this->assertCount(6, $result);
     }
 
     /**
@@ -118,6 +120,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
                 'title'        => 'some title',
                 'priority'     => 123,
                 'description'  => 'some desc',
+                'description_style'  => 'class_style',
                 'icon'         => 'real icon',
                 'page_reload'  => true,
                 'configurator' => ['Test\Class::method'],
